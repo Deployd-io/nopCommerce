@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Menus;
+using Nop.Core.Events;
 using Nop.Core.Http;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
@@ -29,6 +30,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     protected readonly IAclService _aclService;
     protected readonly ICategoryService _categoryService;
     protected readonly ICustomerService _customerService;
+    protected readonly IEventPublisher _eventPublisher;
     protected readonly ILocalizationService _localizationService;
     protected readonly ILogger _logger;
     protected readonly IManufacturerService _manufacturerService;
@@ -51,6 +53,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     public MenuModelFactory(IAclService aclService,
         ICategoryService categoryService,
         ICustomerService customerService,
+        IEventPublisher eventPublisher,
         ILocalizationService localizationService,
         ILogger logger,
         IManufacturerService manufacturerService,
@@ -69,6 +72,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         _aclService = aclService;
         _categoryService = categoryService;
         _customerService = customerService;
+        _eventPublisher = eventPublisher;
         _localizationService = localizationService;
         _logger = logger;
         _manufacturerService = manufacturerService;
@@ -494,7 +498,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         var store = await _storeContext.GetCurrentStoreAsync();
         var menuCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.MenuByTypeModelKey, menuType, customerRoleIds, store, language);
 
-        return await _staticCacheManager.GetAsync(menuCacheKey, async () =>
+        var menuModels = await _staticCacheManager.GetAsync(menuCacheKey, async () =>
         {
             var menus = await _menuService.GetAllMenusAsync(menuType, store.Id);
 
@@ -507,6 +511,10 @@ public partial class MenuModelFactory : IMenuModelFactory
                 Items = await PrepareMenuItemModelsAsync(menu)
             }).ToListAsync();
         });
+
+        await _eventPublisher.PublishAsync(new MenuModelsCreatedEvent(menuModels));
+
+        return menuModels;
     }
 
     #endregion
