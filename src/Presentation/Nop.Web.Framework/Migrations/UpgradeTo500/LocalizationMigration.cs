@@ -825,6 +825,16 @@ public class LocalizationMigration : MigrationBase
             //#8093
             ["Admin.Address.Fields.PhoneNumber.NotValid"] = "Phone number is not valid.",
             ["Admin.Customers.Customers.Fields.Phone.NotValid"] = "Phone number is not valid.",
+
+            //#8247
+            ["Admin.Customers.Customers.Fields.PriceLists"] = "Price lists",
+            ["Admin.Customers.Customers.Fields.PriceLists.Hint"] = "Choose price lists of this user.",
+            ["Admin.Customers.Customers.Fields.PriceLists.NoPriceList"] = "No price lists available. Create at least one price list before mapping.",
+
+            //#8248
+            ["Admin.Catalog.Products.Fields.PriceLists"] = "Price lists",
+            ["Admin.Catalog.Products.Fields.PriceLists.Hint"] = "Choose price lists of this product.",
+            ["Admin.Catalog.Products.Fields.PriceLists.NoPriceList"] = "No price lists available. Create at least one price list before mapping.",
         });
 
         #endregion
