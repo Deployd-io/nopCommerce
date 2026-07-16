@@ -1565,6 +1565,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.ReturnRequestsEnabled = returnRequestSettings.ReturnRequestsEnabled;
         model.UseEuWithdrawalLocales = returnRequestSettings.UseEuWithdrawalLocales;
         model.WithdrawalLinkDaysValid = returnRequestSettings.WithdrawalLinkDaysValid;
+        model.DownloadableProductsReturnRequestsAllowed = returnRequestSettings.DownloadableProductsReturnRequestsAllowed;
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
