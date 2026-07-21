@@ -24,9 +24,15 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
     /// <param name="resultType">The result type for not confirmed access situation</param>
     public CheckPermissionAttribute(string permissionSystemName, CheckPermissionResultType resultType = CheckPermissionResultType.Default) : base(typeof(CheckPermissionFilter))
     {
+		logger.LogDebug(">>> Entering CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType})", permissionSystemName, resultType);
         Arguments = new object[] { resultType, new List<string> { permissionSystemName } };
         PermissionSystemName.Add(permissionSystemName);
+		logger.LogDebug("CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType}): Arguments → {Arguments}", permissionSystemName, resultType, Arguments);
         ResultType = resultType;
+		logger.LogDebug("CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType}): ResultType → {ResultType1}", permissionSystemName, resultType, ResultType);
+		logger.LogDebug(">>> Entering CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType})", permissionSystemNames, resultType);
+		logger.LogDebug("CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType}): Arguments → {Arguments}", permissionSystemNames, resultType, Arguments);
+		logger.LogDebug("<<< Exiting CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType})", permissionSystemNames, resultType);
     }
 
     /// <summary>
@@ -39,6 +45,8 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
         Arguments = new object[] { resultType, permissionSystemNames.ToList() };
         PermissionSystemName.AddRange(permissionSystemNames);
         ResultType = resultType;
+		logger.LogDebug("CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType}): ResultType → {ResultType1}", permissionSystemNames, resultType, ResultType);
+		logger.LogDebug("<<< Exiting CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType})", permissionSystemName, resultType);
     }
 
     #endregion
@@ -105,6 +113,7 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task AuthorizeAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering AuthorizeAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -120,6 +129,7 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
 
             var resultType = _resultType;
 
+			logger.LogDebug("AuthorizeAsync(context={Context}): resultType → {ResultType}", context, resultType);
             var request = _httpContextAccessor.HttpContext?.Request;
 
             if (request == null)
@@ -145,11 +155,13 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
 
                 var pageSystemNameKey = $"{controller}.{action}";
 
+				logger.LogDebug("AuthorizeAsync(context={Context}): pageSystemNameKey → {PageSystemNameKey}", context, pageSystemNameKey);
                 return new RedirectToActionResult("AccessDenied", "Security",
                     new { pageUrl = _webHelper.GetRawUrl(request), pageSystemNameKey });
             }
 
             context.Result = resultType switch
+			logger.LogDebug("AuthorizeAsync(context={Context}): context.Result → {Arg1}", context, context.Result);
             {
                 CheckPermissionResultType.Json => new JsonResult(new
                 {
@@ -157,12 +169,14 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
                 }),
                 CheckPermissionResultType.Html => html(),
                 CheckPermissionResultType.Text => new ContentResult
+					logger.LogDebug("AuthorizeAsync(context={Context}): error → {Error}", context, error);
                 {
                     Content = await _localizationService.GetResourceAsync("Admin.AccessDenied.Description"),
                     ContentType = "text/plain",
                 },
                 _ => context.Result
             };
+			logger.LogDebug("<<< Exiting AuthorizeAsync(context={Context})", context);
         }
 
         #endregion
@@ -176,7 +190,9 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await AuthorizeAsync(context);
+			logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

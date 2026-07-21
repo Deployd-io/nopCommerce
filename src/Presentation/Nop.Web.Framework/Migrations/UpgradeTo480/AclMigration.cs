@@ -37,9 +37,11 @@ public class AclMigration : Migration
     /// <returns>Permission record-customer role mapping</returns>
     protected virtual IList<PermissionRecordCustomerRoleMapping> GetMappingByPermissionRecordId(int permissionId)
     {
+		logger.LogDebug(">>> Entering GetMappingByPermissionRecordId(permissionId={PermissionId})", permissionId);
         var records = _permissionRecordCustomerRoleMappingRepository.Table
             .Where(x => x.PermissionRecordId == permissionId);
 
+		logger.LogDebug("<<< Exiting GetMappingByPermissionRecordId(permissionId={PermissionId})", permissionId);
         return records.ToList();
     }
 
@@ -48,6 +50,8 @@ public class AclMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var dbPermissions = _permissionRepository.Table
             .OrderBy(pr => pr.Id)
             .ToList();
@@ -67,6 +71,7 @@ public class AclMigration : Migration
         {
             var record = getPermissionRecord(oldPermissionSystemName);
 
+			logger.LogDebug("Up(): record → {Record}", record);
             if (record == null) 
                 return;
 
@@ -78,6 +83,7 @@ public class AclMigration : Migration
             {
                 var newPermissionRecord = getPermissionRecord(systemName);
 
+				logger.LogDebug("Up(): newPermissionRecord → {NewPermissionRecord}", newPermissionRecord);
                 if (newPermissionRecord == null)
                     continue;
 
@@ -90,14 +96,17 @@ public class AclMigration : Migration
                                 CustomerRoleId = role,
                                 PermissionRecordId = newPermissionRecord.Id
                             });
+							logger.LogInformation("Up(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
                     }
                     catch
                     {
+						logger.LogError("Exception in Up(): {Arg0}", ex.Message);
                         //ignore
                     }
             }
 
             _permissionRepository.Delete(record);
+			logger.LogInformation("Up(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }
         
         insertMappings("AccessAdminPanel", StandardPermission.Security.ACCESS_ADMIN_PANEL);
@@ -165,6 +174,7 @@ public class AclMigration : Migration
         {
             var viewDiscountsPermission = _permissionRepository.Table.FirstOrDefault(x => x.SystemName == StandardPermission.Promotions.DISCOUNTS_VIEW);
             if (viewDiscountsPermission is not null && !_permissionRecordCustomerRoleMappingRepository.Table.Any(x => x.CustomerRoleId == vendorRole.Id && x.PermissionRecordId == viewDiscountsPermission.Id))
+			logger.LogDebug("Up(): viewDiscountsPermission → {ViewDiscountsPermission}", viewDiscountsPermission);
             {
                 _permissionRecordCustomerRoleMappingRepository.Insert(
                         new PermissionRecordCustomerRoleMapping
@@ -176,6 +186,7 @@ public class AclMigration : Migration
 
             var crudDiscountsPermission = _permissionRepository.Table.FirstOrDefault(x => x.SystemName == StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE);
             if (crudDiscountsPermission is not null && !_permissionRecordCustomerRoleMappingRepository.Table.Any(x => x.CustomerRoleId == vendorRole.Id && x.PermissionRecordId == crudDiscountsPermission.Id))
+			logger.LogDebug("Up(): crudDiscountsPermission → {CrudDiscountsPermission}", crudDiscountsPermission);
             {
                 _permissionRecordCustomerRoleMappingRepository.Insert(
                         new PermissionRecordCustomerRoleMapping
@@ -186,10 +197,13 @@ public class AclMigration : Migration
             }
 
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

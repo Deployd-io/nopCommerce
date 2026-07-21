@@ -22,7 +22,10 @@ public class FacebookPixelViewComponent : NopViewComponent
 
     public FacebookPixelViewComponent(FacebookPixelService facebookPixelService)
     {
+		logger.LogDebug(">>> Entering FacebookPixelViewComponent(facebookPixelService={FacebookPixelService})", facebookPixelService);
         _facebookPixelService = facebookPixelService;
+		logger.LogDebug("<<< Exiting FacebookPixelViewComponent(facebookPixelService={FacebookPixelService})", facebookPixelService);
+		logger.LogDebug("FacebookPixelViewComponent(facebookPixelService={FacebookPixelService}): _facebookPixelService → {_facebookPixelService}", facebookPixelService, _facebookPixelService);
     }
 
     #endregion
@@ -40,10 +43,12 @@ public class FacebookPixelViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var script = widgetZone != PublicWidgetZones.HeadHtmlTag
             ? await _facebookPixelService.PrepareCustomEventsScriptAsync(widgetZone)
             : await _facebookPixelService.PrepareScriptAsync();
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return new HtmlContentViewComponentResult(new HtmlString(script ?? string.Empty));
     }
 

@@ -17,9 +17,11 @@ public partial class PollAnswerBuilder : NopEntityBuilder<PollAnswer>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(PollAnswer.Name)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(PollAnswer.PollId)).AsInt32().ForeignKey<Poll>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

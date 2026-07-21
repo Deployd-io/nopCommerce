@@ -16,9 +16,11 @@ public partial class NewsItemCacheEventConsumer : CacheEventConsumer<NewsItem>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(NewsItem entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         if (entityEventType == EntityEventType.Delete)
             await RemoveByPrefixAsync(NopNewsDefaults.NewsCommentsNumberPrefix, entity);
 
         await base.ClearCacheAsync(entity, entityEventType);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

@@ -16,6 +16,8 @@ public partial class VendorAttributeCacheEventConsumer : CacheEventConsumer<Vend
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(VendorAttribute entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopAttributeDefaults.AttributeValuesByAttributeCacheKey, nameof(VendorAttribute), entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

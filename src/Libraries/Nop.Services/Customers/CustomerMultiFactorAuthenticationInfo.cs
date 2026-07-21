@@ -7,7 +7,10 @@ public partial class CustomerMultiFactorAuthenticationInfo
 {
     public CustomerMultiFactorAuthenticationInfo()
     {
+		logger.LogDebug(">>> Entering CustomerMultiFactorAuthenticationInfo()");
         CustomValues = new Dictionary<string, object>();
+		logger.LogDebug("<<< Exiting CustomerMultiFactorAuthenticationInfo()");
+		logger.LogDebug("CustomerMultiFactorAuthenticationInfo(): CustomValues → {CustomValues}", CustomValues);
     }
     public string UserName { get; set; }
 

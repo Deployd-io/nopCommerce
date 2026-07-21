@@ -21,6 +21,7 @@ public static class MappingExtensions
     /// <returns>Mapped destination object</returns>
     private static TDestination Map<TDestination>(this object source)
     {
+		logger.LogDebug(">>> Entering Map(source={Source})", source);
         //use AutoMapper for mapping objects
         return AutoMapperConfiguration.Mapper.Map<TDestination>(source);
     }
@@ -35,6 +36,7 @@ public static class MappingExtensions
     /// <returns>Mapped destination object, same instance as the passed destination object</returns>
     private static TDestination MapTo<TSource, TDestination>(this TSource source, TDestination destination)
     {
+		logger.LogDebug(">>> Entering MapTo(source={Source},destination={Destination})", source, destination);
         //use AutoMapper for mapping objects
         return AutoMapperConfiguration.Mapper.Map(source, destination);
     }
@@ -53,6 +55,7 @@ public static class MappingExtensions
     /// <returns>Mapped model</returns>
     public static TModel ToModel<TModel>(this BaseEntity entity) where TModel : BaseNopEntityModel
     {
+		logger.LogDebug(">>> Entering ToModel(entity={Entity})", entity);
         ArgumentNullException.ThrowIfNull(entity);
 
         return entity.Map<TModel>();
@@ -119,6 +122,7 @@ public static class MappingExtensions
     /// <returns>Mapped model</returns>
     public static TModel ToSettingsModel<TModel>(this ISettings settings) where TModel : BaseNopModel, ISettingsModel
     {
+		logger.LogDebug(">>> Entering ToSettingsModel(settings={Settings})", settings);
         ArgumentNullException.ThrowIfNull(settings);
 
         return settings.Map<TModel>();
@@ -154,6 +158,7 @@ public static class MappingExtensions
     /// <returns>Mapped model</returns>
     public static TModel ToConfigModel<TModel>(this IConfig config) where TModel : BaseNopModel, IConfigModel
     {
+		logger.LogDebug(">>> Entering ToConfigModel(config={Config})", config);
         ArgumentNullException.ThrowIfNull(config);
 
         return config.Map<TModel>();
@@ -189,6 +194,7 @@ public static class MappingExtensions
     /// <returns>Mapped model</returns>
     public static TModel ToPluginModel<TModel>(this IPlugin plugin) where TModel : BaseNopModel, IPluginModel
     {
+		logger.LogDebug(">>> Entering ToPluginModel(plugin={Plugin})", plugin);
         ArgumentNullException.ThrowIfNull(plugin);
 
         return plugin.Map<TModel>();
@@ -203,6 +209,7 @@ public static class MappingExtensions
     /// <returns>Mapped model</returns>
     public static TModel ToPluginModel<TModel>(this PluginDescriptor pluginDescriptor, TModel model = null)
         where TModel : BaseNopModel, IPluginModel
+		logger.LogDebug("ToPluginModel(pluginDescriptor={PluginDescriptor},model={Model}): model → {Model1}", pluginDescriptor, model, model);
     {
         ArgumentNullException.ThrowIfNull(pluginDescriptor);
 

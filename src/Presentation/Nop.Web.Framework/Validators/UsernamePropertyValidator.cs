@@ -19,7 +19,10 @@ public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator
     /// </summary>
     public UsernamePropertyValidator(CustomerSettings customerSettings)
     {
+		logger.LogDebug(">>> Entering UsernamePropertyValidator(customerSettings={CustomerSettings})", customerSettings);
         _customerSettings = customerSettings;
+		logger.LogDebug("<<< Exiting UsernamePropertyValidator(customerSettings={CustomerSettings})", customerSettings);
+		logger.LogDebug("UsernamePropertyValidator(customerSettings={CustomerSettings}): _customerSettings → {_customerSettings}", customerSettings, _customerSettings);
     }
 
     /// <summary>
@@ -29,6 +32,8 @@ public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator
     /// <returns>Result</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		logger.LogDebug(">>> Entering IsValid(context={Context},value={Value})", context, value);
+		logger.LogDebug("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return IsValid(value as string, _customerSettings);
     }
 
@@ -44,6 +49,7 @@ public partial class UsernamePropertyValidator<T, TProperty> : PropertyValidator
             return true;
 
         if (string.IsNullOrEmpty(username))
+		logger.LogDebug("<<< Exiting IsValid(username={Username},customerSettings={CustomerSettings})", username, customerSettings);
             return false;
 
         return customerSettings.UsernameValidationUseRegex

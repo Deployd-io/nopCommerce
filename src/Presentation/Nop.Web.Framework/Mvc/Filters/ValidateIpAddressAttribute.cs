@@ -19,6 +19,8 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
     /// </summary>
     public ValidateIpAddressAttribute() : base(typeof(ValidateIpAddressFilter))
     {
+	logger.LogDebug(">>> Entering ValidateIpAddressAttribute()");
+	logger.LogDebug("<<< Exiting ValidateIpAddressAttribute()");
     }
 
     #endregion
@@ -56,6 +58,7 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
         /// <param name="context">A context for action filters</param>
         private void ValidateIpAddress(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering ValidateIpAddress(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.HttpContext.Request == null)
@@ -89,6 +92,7 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
             //whether current IP is allowed
             var currentIp = _webHelper.GetCurrentIpAddress();
 
+			logger.LogDebug("ValidateIpAddress(context={Context}): currentIp → {CurrentIp}", context, currentIp);
             if (ipAddresses.Any(ip => ip.Equals(currentIp, StringComparison.InvariantCultureIgnoreCase)))
                 return;
 
@@ -108,9 +112,11 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             ValidateIpAddress(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

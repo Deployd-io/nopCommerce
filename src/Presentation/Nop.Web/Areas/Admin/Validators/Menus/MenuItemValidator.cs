@@ -12,6 +12,7 @@ public partial class MenuItemValidator : BaseNopValidator<MenuItemModel>
 
     public MenuItemValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering MenuItemValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.RouteName)
             .NotEmpty()
             .When(x => x.MenuItemTypeId == (int)MenuItemType.StandardPage)
@@ -44,6 +45,7 @@ public partial class MenuItemValidator : BaseNopValidator<MenuItemModel>
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Menus.MenuItem.Fields.Url.Required"));
 
         SetDatabaseValidationRules<MenuItem>();
+		logger.LogDebug("<<< Exiting MenuItemValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

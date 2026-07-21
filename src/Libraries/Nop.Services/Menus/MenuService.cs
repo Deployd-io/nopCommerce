@@ -102,6 +102,10 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task DeleteMenuAsync(Menu menu)
     {
+		logger.LogDebug(">>> Entering DeleteMenuAsync(menu={Menu})", menu);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteMenuAsync(menu)={Menu}: external service call took {Arg1} ms", menu, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting DeleteMenuAsync(menu={Menu})", menu);
         return _menuRepository.DeleteAsync(menu);
     }
 
@@ -172,6 +176,8 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task InsertMenuAsync(Menu menu)
     {
+		logger.LogDebug(">>> Entering InsertMenuAsync(menu={Menu})", menu);
+		logger.LogDebug("<<< Exiting InsertMenuAsync(menu={Menu})", menu);
         return _menuRepository.InsertAsync(menu);
     }
 
@@ -182,6 +188,8 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task UpdateMenuAsync(Menu menu)
     {
+		logger.LogDebug(">>> Entering UpdateMenuAsync(menu={Menu})", menu);
+		logger.LogDebug("<<< Exiting UpdateMenuAsync(menu={Menu})", menu);
         return _menuRepository.UpdateAsync(menu);
     }
 
@@ -196,22 +204,30 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteMenuItemAsync(MenuItem menuItem)
     {
+		logger.LogDebug(">>> Entering DeleteMenuItemAsync(menuItem={MenuItem})", menuItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (menuItem is null)
             return;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         await deleteChildrenRecursive(menuItem.Id);
         await _menuItemRepository.DeleteAsync(menuItem);
+		logger.LogInformation("DeleteMenuItemAsync(menuItem)={MenuItem}: external service call took {Arg1} ms", menuItem, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("DeleteMenuItemAsync(menuItem)={MenuItem}: delete query executed in {Arg1} ms", menuItem, __logStart.ElapsedMilliseconds);
 
         async Task deleteChildrenRecursive(int parentId)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var children = await GetAllMenuItemsAsync(parentMenuItemId: parentId, showHidden: true);
 
             foreach (var child in children)
             {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 await deleteChildrenRecursive(child.Id);
                 await _menuItemRepository.DeleteAsync(child);
             }
         }
+		logger.LogDebug("<<< Exiting DeleteMenuItemAsync(menuItem={MenuItem})", menuItem);
     }
 
     /// <summary>
@@ -224,6 +240,8 @@ public partial class MenuService : IMenuService
     /// </returns>
     public virtual Task<MenuItem> GetMenuItemByIdAsync(int menuItemId)
     {
+		logger.LogDebug(">>> Entering GetMenuItemByIdAsync(menuItemId={MenuItemId})", menuItemId);
+		logger.LogDebug("<<< Exiting GetMenuItemByIdAsync(menuItemId={MenuItemId})", menuItemId);
         return _menuItemRepository.GetByIdAsync(menuItemId, cache => default);
     }
 
@@ -234,6 +252,8 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task InsertMenuItemAsync(MenuItem menuItem)
     {
+		logger.LogDebug(">>> Entering InsertMenuItemAsync(menuItem={MenuItem})", menuItem);
+		logger.LogDebug("<<< Exiting InsertMenuItemAsync(menuItem={MenuItem})", menuItem);
         return _menuItemRepository.InsertAsync(menuItem);
     }
 
@@ -244,15 +264,19 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateMenuItemAsync(MenuItem menuItem)
     {
+		logger.LogDebug(">>> Entering UpdateMenuItemAsync(menuItem={MenuItem})", menuItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(menuItem);
 
         //validate hierarchy
         var parentMenuItem = await GetMenuItemByIdAsync(menuItem.ParentId);
         while (parentMenuItem != null)
+		logger.LogDebug("UpdateMenuItemAsync(menuItem={MenuItem}): parentMenuItem → {ParentMenuItem}", menuItem, parentMenuItem);
         {
             if (menuItem.Id == parentMenuItem.Id)
             {
                 menuItem.ParentId = 0;
+				logger.LogDebug("UpdateMenuItemAsync(menuItem={MenuItem}): menuItem.ParentId → {Arg1}", menuItem, menuItem.ParentId);
                 break;
             }
 
@@ -260,6 +284,8 @@ public partial class MenuService : IMenuService
         }
 
         await _menuItemRepository.UpdateAsync(menuItem);
+		logger.LogDebug("<<< Exiting UpdateMenuItemAsync(menuItem={MenuItem})", menuItem);
+		logger.LogInformation("UpdateMenuItemAsync(menuItem)={MenuItem}: update query executed in {Arg1} ms", menuItem, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>

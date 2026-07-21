@@ -11,6 +11,7 @@ public partial class VendorValidator : BaseNopValidator<VendorModel>
 {
     public VendorValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering VendorValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Vendors.Fields.Name.Required"));
 
         RuleFor(x => x.Email).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Vendors.Fields.Email.Required"));
@@ -39,5 +40,6 @@ public partial class VendorValidator : BaseNopValidator<VendorModel>
             .When(x => x.PriceRangeFiltering && x.ManuallyPriceRange);
 
         SetDatabaseValidationRules<Vendor>();
+		logger.LogDebug("<<< Exiting VendorValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -44,9 +44,14 @@ public static class GuidGenerator
 
     static GuidGenerator()
     {
+		logger.LogDebug(">>> Entering GuidGenerator()");
         _random = new Random();
         _nodeBytes = GenerateNodeBytes();
+		logger.LogDebug("GuidGenerator(): _random → {_random}", _random);
+		logger.LogDebug("GuidGenerator(): _nodeBytes → {_nodeBytes}", _nodeBytes);
         _clockSequenceBytes = GenerateClockSequenceBytes();
+		logger.LogDebug("<<< Exiting GuidGenerator()");
+		logger.LogDebug("GuidGenerator(): _clockSequenceBytes → {_clockSequenceBytes}", _clockSequenceBytes);
     }
 
     #endregion
@@ -59,9 +64,11 @@ public static class GuidGenerator
     /// <returns></returns>
     private static byte[] GenerateNodeBytes()
     {
+		logger.LogDebug(">>> Entering GenerateNodeBytes()");
         var node = new byte[6];
 
         _random.NextBytes(node);
+		logger.LogDebug("<<< Exiting GenerateNodeBytes()");
         return node;
     }
 
@@ -70,8 +77,10 @@ public static class GuidGenerator
     /// </summary>
     private static byte[] GenerateClockSequenceBytes()
     {
+		logger.LogDebug(">>> Entering GenerateClockSequenceBytes()");
         var bytes = new byte[2];
         _random.NextBytes(bytes);
+		logger.LogDebug("<<< Exiting GenerateClockSequenceBytes()");
         return bytes;
     }
 
@@ -87,6 +96,7 @@ public static class GuidGenerator
             return [0x0, 0x0];
 
         if (bytes.Length == 1)
+		logger.LogDebug("<<< Exiting GenerateClockSequenceBytes(dt={Dt})", dt);
             return [0x0, bytes[0]];
 
         return [bytes[0], bytes[1]];
@@ -124,6 +134,7 @@ public static class GuidGenerator
         guid[VERSION_BYTE] &= (byte)VERSION_BYTE_MASK;
         guid[VERSION_BYTE] |= (byte)((byte)GuidVersion.TimeBased << VERSION_BYTE_SHIFT);
 
+		logger.LogDebug("<<< Exiting GenerateTimeBasedGuid(dateTime={DateTime})", dateTime);
         return new Guid(guid);
     }
     #endregion

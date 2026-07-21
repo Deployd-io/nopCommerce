@@ -41,8 +41,11 @@ public partial class ExternalAuthenticationModelFactory : IExternalAuthenticatio
     /// </returns>
     public virtual async Task<List<ExternalAuthenticationMethodModel>> PrepareExternalMethodsModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareExternalMethodsModelAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrepareExternalMethodsModelAsync(): store → {Store}", store);
+		logger.LogDebug("<<< Exiting PrepareExternalMethodsModelAsync()");
         return (await _authenticationPluginManager
                 .LoadActivePluginsAsync(await _workContext.GetCurrentCustomerAsync(), store.Id))
             .Select(authenticationMethod => new ExternalAuthenticationMethodModel

@@ -10,12 +10,18 @@ public partial class SearchBoxViewComponent : NopViewComponent
 
     public SearchBoxViewComponent(ICatalogModelFactory catalogModelFactory)
     {
+		logger.LogDebug(">>> Entering SearchBoxViewComponent(catalogModelFactory={CatalogModelFactory})", catalogModelFactory);
         _catalogModelFactory = catalogModelFactory;
+		logger.LogDebug("<<< Exiting SearchBoxViewComponent(catalogModelFactory={CatalogModelFactory})", catalogModelFactory);
+		logger.LogDebug("SearchBoxViewComponent(catalogModelFactory={CatalogModelFactory}): _catalogModelFactory → {_catalogModelFactory}", catalogModelFactory, _catalogModelFactory);
     }
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         var model = await _catalogModelFactory.PrepareSearchBoxModelAsync();
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 }

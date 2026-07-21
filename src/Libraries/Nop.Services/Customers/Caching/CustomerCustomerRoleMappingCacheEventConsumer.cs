@@ -15,6 +15,8 @@ public partial class CustomerCustomerRoleMappingCacheEventConsumer : CacheEventC
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(CustomerCustomerRoleMapping entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCustomerServicesDefaults.CustomerRolesCacheKey, entity.CustomerId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

@@ -79,10 +79,13 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicModel> PrepareTopicModelBySystemNameAsync(string systemName)
     {
+		logger.LogDebug(">>> Entering PrepareTopicModelBySystemNameAsync(systemName={SystemName})", systemName);
         //load by store
         var store = await _storeContext.GetCurrentStoreAsync();
         var topic = await _topicService.GetTopicBySystemNameAsync(systemName, store.Id);
+		logger.LogDebug("PrepareTopicModelBySystemNameAsync(systemName={SystemName}): store → {Store}", systemName, store);
         if (topic == null)
+			logger.LogDebug("PrepareTopicModelBySystemNameAsync(systemName={SystemName}): topic → {Topic}", systemName, topic);
             return null;
 
         return await PrepareTopicModelAsync(topic);
@@ -98,9 +101,11 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<string> PrepareTemplateViewPathAsync(int topicTemplateId)
     {
+		logger.LogDebug(">>> Entering PrepareTemplateViewPathAsync(topicTemplateId={TopicTemplateId})", topicTemplateId);
         var template = (await _topicTemplateService.GetTopicTemplateByIdAsync(topicTemplateId) ??
                         (await _topicTemplateService.GetAllTopicTemplatesAsync()).FirstOrDefault()) ?? throw new Exception("No default template could be loaded");
 
+		logger.LogDebug("<<< Exiting PrepareTemplateViewPathAsync(topicTemplateId={TopicTemplateId})", topicTemplateId);
         return template.ViewPath;
     }
 

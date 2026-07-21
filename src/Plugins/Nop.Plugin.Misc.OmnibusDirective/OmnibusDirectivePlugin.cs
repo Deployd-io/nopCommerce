@@ -35,6 +35,8 @@ public class OmnibusDirectivePlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/OmnibusDirective/Configure";
     }
 
@@ -44,7 +46,9 @@ public class OmnibusDirectivePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -53,7 +57,9 @@ public class OmnibusDirectivePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

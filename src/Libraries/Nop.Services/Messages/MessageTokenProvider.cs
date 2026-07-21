@@ -601,6 +601,8 @@ public partial class MessageTokenProvider : IMessageTokenProvider
                 var licenseLink = $"<a class=\"link\" href=\"{licenseUrl}\">{await _localizationService.GetResourceAsync("Messages.Order.Product(s).License", languageId)}</a>";
                 sb.AppendLine("<br />");
                 sb.AppendLine(licenseLink);
+				logger.LogDebug(">>> Entering RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues})", storeId, routeName, routeValues);
+				logger.LogDebug("<<< Exiting RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues})", storeId, routeName, routeValues);
             }
             //attributes
             if (!string.IsNullOrEmpty(orderItem.AttributeDescription))
@@ -977,6 +979,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// </returns>
     protected virtual async Task<string> RouteUrlAsync(int storeId = 0, string routeName = null, object routeValues = null)
     {
+		logger.LogDebug(">>> Entering RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues})", storeId, routeName, routeValues);
         try
         {
             //try to get a store by the passed identifier
@@ -990,6 +993,8 @@ public partial class MessageTokenProvider : IMessageTokenProvider
             //generate the relative URL
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
             var url = urlHelper.RouteUrl(routeName, routeValues);
+			logger.LogDebug("RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues}): urlHelper → {UrlHelper}", storeId, routeName, routeValues, urlHelper);
+			logger.LogDebug("RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues}): url → {Url}", storeId, routeName, routeValues, url);
 
             //compose the result
             return new Uri(new Uri(store.Url), url).AbsoluteUri;
@@ -998,6 +1003,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
         {
             var warning = $"When sending a notification, an error occurred while creating a link for '{routeName}', ensure that URL of the store #{storeId} is correct.";
             await _logger.WarningAsync(warning, exception);
+			logger.LogDebug("RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues}): warning → {Warning}", storeId, routeName, routeValues, warning);
 
             return string.Empty;
         }
@@ -1193,14 +1199,18 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddOrderNoteTokensAsync(IList<Token> tokens, OrderNote orderNote)
     {
+		logger.LogDebug(">>> Entering AddOrderNoteTokensAsync(tokens={Tokens},orderNote={OrderNote})", tokens, orderNote);
         var order = await _orderService.GetOrderByIdAsync(orderNote.OrderId);
 
+		logger.LogDebug("AddOrderNoteTokensAsync(tokens={Tokens},orderNote={OrderNote}): order → {Order}", tokens, orderNote, order);
         tokens.Add(new Token("Order.NewNoteText", _orderService.FormatOrderNoteText(orderNote), true));
         var orderNoteAttachmentUrl = await RouteUrlAsync(order.StoreId, NopRouteNames.Standard.GET_ORDER_NOTE_FILE, new { ordernoteid = orderNote.Id });
         tokens.Add(new Token("Order.OrderNoteAttachmentUrl", orderNoteAttachmentUrl, true));
+		logger.LogDebug("AddOrderNoteTokensAsync(tokens={Tokens},orderNote={OrderNote}): orderNoteAttachmentUrl → {OrderNoteAttachmentUrl}", tokens, orderNote, orderNoteAttachmentUrl);
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(orderNote, tokens);
+		logger.LogDebug("<<< Exiting AddOrderNoteTokensAsync(tokens={Tokens},orderNote={OrderNote})", tokens, orderNote);
     }
 
     /// <summary>
@@ -1211,6 +1221,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddRecurringPaymentTokensAsync(IList<Token> tokens, RecurringPayment recurringPayment)
     {
+		logger.LogDebug(">>> Entering AddRecurringPaymentTokensAsync(tokens={Tokens},recurringPayment={RecurringPayment})", tokens, recurringPayment);
         tokens.Add(new Token("RecurringPayment.ID", recurringPayment.Id));
         tokens.Add(new Token("RecurringPayment.CancelAfterFailedPayment",
             recurringPayment.LastPaymentFailed && _paymentSettings.CancelRecurringPaymentsAfterFailedPayment));
@@ -1219,6 +1230,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(recurringPayment, tokens);
+		logger.LogDebug("<<< Exiting AddRecurringPaymentTokensAsync(tokens={Tokens},recurringPayment={RecurringPayment})", tokens, recurringPayment);
     }
 
     /// <summary>
@@ -1282,12 +1294,15 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddCustomerTokensAsync(IList<Token> tokens, int customerId)
     {
+		logger.LogDebug(">>> Entering AddCustomerTokensAsync(tokens={Tokens},customerId={CustomerId})", tokens, customerId);
         if (customerId <= 0)
             throw new ArgumentOutOfRangeException(nameof(customerId));
 
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
 
+		logger.LogDebug("AddCustomerTokensAsync(tokens={Tokens},customerId={CustomerId}): customer → {Customer}", tokens, customerId, customer);
         await AddCustomerTokensAsync(tokens, customer);
+		logger.LogDebug("<<< Exiting AddCustomerTokensAsync(tokens={Tokens},customerId={CustomerId})", tokens, customerId);
     }
 
     /// <summary>
@@ -1331,14 +1346,17 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddVendorTokensAsync(IList<Token> tokens, Vendor vendor)
     {
+		logger.LogDebug(">>> Entering AddVendorTokensAsync(tokens={Tokens},vendor={Vendor})", tokens, vendor);
         tokens.Add(new Token("Vendor.Name", vendor.Name));
         tokens.Add(new Token("Vendor.Email", vendor.Email));
 
         var vendorAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(vendor, NopVendorDefaults.VendorAttributes);
         tokens.Add(new Token("Vendor.VendorAttributes", await _vendorAttributeFormatter.FormatAttributesAsync(vendorAttributesXml), true));
+		logger.LogDebug("AddVendorTokensAsync(tokens={Tokens},vendor={Vendor}): vendorAttributesXml → {VendorAttributesXml}", tokens, vendor, vendorAttributesXml);
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(vendor, tokens);
+		logger.LogDebug("<<< Exiting AddVendorTokensAsync(tokens={Tokens},vendor={Vendor})", tokens, vendor);
     }
 
     /// <summary>
@@ -1349,16 +1367,20 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddNewsLetterSubscriptionTokensAsync(IList<Token> tokens, NewsLetterSubscription subscription)
     {
+		logger.LogDebug(">>> Entering AddNewsLetterSubscriptionTokensAsync(tokens={Tokens},subscription={Subscription})", tokens, subscription);
         tokens.Add(new Token("NewsLetterSubscription.Email", subscription.Email));
 
         var activationUrl = await RouteUrlAsync(routeName: NopRouteNames.Standard.NEWSLETTER_ACTIVATION, routeValues: new { token = subscription.NewsLetterSubscriptionGuid, active = "true" });
         tokens.Add(new Token("NewsLetterSubscription.ActivationUrl", activationUrl, true));
+		logger.LogDebug("AddNewsLetterSubscriptionTokensAsync(tokens={Tokens},subscription={Subscription}): activationUrl → {ActivationUrl}", tokens, subscription, activationUrl);
 
         var deactivationUrl = await RouteUrlAsync(routeName: NopRouteNames.Standard.NEWSLETTER_ACTIVATION, routeValues: new { token = subscription.NewsLetterSubscriptionGuid, active = "false" });
         tokens.Add(new Token("NewsLetterSubscription.DeactivationUrl", deactivationUrl, true));
+		logger.LogDebug("AddNewsLetterSubscriptionTokensAsync(tokens={Tokens},subscription={Subscription}): deactivationUrl → {DeactivationUrl}", tokens, subscription, deactivationUrl);
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(subscription, tokens);
+		logger.LogDebug("<<< Exiting AddNewsLetterSubscriptionTokensAsync(tokens={Tokens},subscription={Subscription})", tokens, subscription);
     }
 
     /// <summary>
@@ -1369,6 +1391,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddProductReviewTokensAsync(IList<Token> tokens, ProductReview productReview)
     {
+		logger.LogDebug(">>> Entering AddProductReviewTokensAsync(tokens={Tokens},productReview={ProductReview})", tokens, productReview);
         tokens.Add(new Token("ProductReview.ProductName", (await _productService.GetProductByIdAsync(productReview.ProductId))?.Name));
         tokens.Add(new Token("ProductReview.Title", productReview.Title));
         tokens.Add(new Token("ProductReview.IsApproved", productReview.IsApproved));
@@ -1377,6 +1400,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(productReview, tokens);
+		logger.LogDebug("<<< Exiting AddProductReviewTokensAsync(tokens={Tokens},productReview={ProductReview})", tokens, productReview);
     }
 
     /// <summary>
@@ -1387,12 +1411,15 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddBlogCommentTokensAsync(IList<Token> tokens, BlogComment blogComment)
     {
+		logger.LogDebug(">>> Entering AddBlogCommentTokensAsync(tokens={Tokens},blogComment={BlogComment})", tokens, blogComment);
         var blogPost = await _blogService.GetBlogPostByIdAsync(blogComment.BlogPostId);
 
+		logger.LogDebug("AddBlogCommentTokensAsync(tokens={Tokens},blogComment={BlogComment}): blogPost → {BlogPost}", tokens, blogComment, blogPost);
         tokens.Add(new Token("BlogComment.BlogPostTitle", blogPost.Title));
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(blogComment, tokens);
+		logger.LogDebug("<<< Exiting AddBlogCommentTokensAsync(tokens={Tokens},blogComment={BlogComment})", tokens, blogComment);
     }
 
     /// <summary>
@@ -1403,12 +1430,15 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddNewsCommentTokensAsync(IList<Token> tokens, NewsComment newsComment)
     {
+		logger.LogDebug(">>> Entering AddNewsCommentTokensAsync(tokens={Tokens},newsComment={NewsComment})", tokens, newsComment);
         var newsItem = await _newsService.GetNewsByIdAsync(newsComment.NewsItemId);
 
+		logger.LogDebug("AddNewsCommentTokensAsync(tokens={Tokens},newsComment={NewsComment}): newsItem → {NewsItem}", tokens, newsComment, newsItem);
         tokens.Add(new Token("NewsComment.NewsTitle", newsItem.Title));
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(newsComment, tokens);
+		logger.LogDebug("<<< Exiting AddNewsCommentTokensAsync(tokens={Tokens},newsComment={NewsComment})", tokens, newsComment);
     }
 
     /// <summary>
@@ -1504,18 +1534,22 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddForumPostTokensAsync(IList<Token> tokens, ForumPost forumPost)
     {
+		logger.LogDebug(">>> Entering AddForumPostTokensAsync(tokens={Tokens},forumPost={ForumPost})", tokens, forumPost);
         //attributes
         //we cannot inject IForumService into constructor because it'll cause circular references.
         //that's why we resolve it here this way
         var forumService = EngineContext.Current.Resolve<IForumService>();
 
+		logger.LogDebug("AddForumPostTokensAsync(tokens={Tokens},forumPost={ForumPost}): forumService → {ForumService}", tokens, forumPost, forumService);
         var customer = await _customerService.GetCustomerByIdAsync(forumPost.CustomerId);
 
+		logger.LogDebug("AddForumPostTokensAsync(tokens={Tokens},forumPost={ForumPost}): customer → {Customer}", tokens, forumPost, customer);
         tokens.Add(new Token("Forums.PostAuthor", await _customerService.FormatUsernameAsync(customer)));
         tokens.Add(new Token("Forums.PostBody", forumService.FormatPostText(forumPost), true));
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(forumPost, tokens);
+		logger.LogDebug("<<< Exiting AddForumPostTokensAsync(tokens={Tokens},forumPost={ForumPost})", tokens, forumPost);
     }
 
     /// <summary>
@@ -1526,17 +1560,21 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddForumTokensAsync(IList<Token> tokens, Forum forum)
     {
+		logger.LogDebug(">>> Entering AddForumTokensAsync(tokens={Tokens},forum={Forum})", tokens, forum);
         //attributes
         //we cannot inject IForumService into constructor because it'll cause circular references.
         //that's why we resolve it here this way
         var forumService = EngineContext.Current.Resolve<IForumService>();
 
+		logger.LogDebug("AddForumTokensAsync(tokens={Tokens},forum={Forum}): forumService → {ForumService}", tokens, forum, forumService);
         var forumUrl = await RouteUrlAsync(routeName: NopRouteNames.Standard.FORUM_SLUG, routeValues: new { id = forum.Id, slug = await forumService.GetForumSeNameAsync(forum) });
         tokens.Add(new Token("Forums.ForumURL", forumUrl, true));
+		logger.LogDebug("AddForumTokensAsync(tokens={Tokens},forum={Forum}): forumUrl → {ForumUrl}", tokens, forum, forumUrl);
         tokens.Add(new Token("Forums.ForumName", forum.Name));
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(forum, tokens);
+		logger.LogDebug("<<< Exiting AddForumTokensAsync(tokens={Tokens},forum={Forum})", tokens, forum);
     }
 
     /// <summary>
@@ -1547,16 +1585,19 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddPrivateMessageTokensAsync(IList<Token> tokens, PrivateMessage privateMessage)
     {
+		logger.LogDebug(">>> Entering AddPrivateMessageTokensAsync(tokens={Tokens},privateMessage={PrivateMessage})", tokens, privateMessage);
         //attributes
         //we cannot inject IForumService into constructor because it'll cause circular references.
         //that's why we resolve it here this way
         var forumService = EngineContext.Current.Resolve<IForumService>();
 
+		logger.LogDebug("AddPrivateMessageTokensAsync(tokens={Tokens},privateMessage={PrivateMessage}): forumService → {ForumService}", tokens, privateMessage, forumService);
         tokens.Add(new Token("PrivateMessage.Subject", privateMessage.Subject));
         tokens.Add(new Token("PrivateMessage.Text", forumService.FormatPrivateMessageText(privateMessage), true));
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(privateMessage, tokens);
+		logger.LogDebug("<<< Exiting AddPrivateMessageTokensAsync(tokens={Tokens},privateMessage={PrivateMessage})", tokens, privateMessage);
     }
 
     /// <summary>
@@ -1567,14 +1608,18 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddBackInStockTokensAsync(IList<Token> tokens, BackInStockSubscription subscription)
     {
+		logger.LogDebug(">>> Entering AddBackInStockTokensAsync(tokens={Tokens},subscription={Subscription})", tokens, subscription);
         var product = await _productService.GetProductByIdAsync(subscription.ProductId);
 
+		logger.LogDebug("AddBackInStockTokensAsync(tokens={Tokens},subscription={Subscription}): product → {Product}", tokens, subscription, product);
         tokens.Add(new Token("BackInStockSubscription.ProductName", product.Name));
         var productUrl = await RouteUrlAsync(subscription.StoreId, "ProductDetails", new { SeName = await _urlRecordService.GetSeNameAsync(product) });
         tokens.Add(new Token("BackInStockSubscription.ProductUrl", productUrl, true));
+		logger.LogDebug("AddBackInStockTokensAsync(tokens={Tokens},subscription={Subscription}): productUrl → {ProductUrl}", tokens, subscription, productUrl);
 
         //event notification
         await _eventPublisher.EntityTokensAddedAsync(subscription, tokens);
+		logger.LogDebug("<<< Exiting AddBackInStockTokensAsync(tokens={Tokens},subscription={Subscription})", tokens, subscription);
     }
 
     /// <summary>
@@ -1586,12 +1631,16 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// </returns>
     public virtual async Task<IEnumerable<string>> GetListOfCampaignAllowedTokensAsync()
     {
+		logger.LogDebug(">>> Entering GetListOfCampaignAllowedTokensAsync()");
         var additionalTokens = new CampaignAdditionalTokensAddedEvent();
         await _eventPublisher.PublishAsync(additionalTokens);
+		logger.LogDebug("GetListOfCampaignAllowedTokensAsync(): additionalTokens → {AdditionalTokens}", additionalTokens);
 
         var allowedTokens = (await GetListOfAllowedTokensAsync(new[] { TokenGroupNames.StoreTokens, TokenGroupNames.SubscriptionTokens })).ToList();
         allowedTokens.AddRange(additionalTokens.AdditionalTokens);
+		logger.LogDebug("GetListOfCampaignAllowedTokensAsync(): allowedTokens → {AllowedTokens}", allowedTokens);
 
+		logger.LogDebug("<<< Exiting GetListOfCampaignAllowedTokensAsync()");
         return allowedTokens.Distinct();
     }
 
@@ -1605,6 +1654,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// </returns>
     public virtual async Task<IEnumerable<string>> GetListOfAllowedTokensAsync(IList<string> tokenGroups = null)
     {
+		logger.LogDebug(">>> Entering GetListOfAllowedTokensAsync(tokenGroups={TokenGroups})", tokenGroups);
         var additionalTokens = new AdditionalTokensAddedEvent
         {
             TokenGroups = tokenGroups ?? new List<string>()
@@ -1626,7 +1676,36 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>Collection of token group names</returns>
     public virtual IEnumerable<string> GetTokenGroups(MessageTemplate messageTemplate)
     {
+		logger.LogDebug(">>> Entering GetTokenGroups(messageTemplate={MessageTemplate})", messageTemplate);
         //groups depend on which tokens are added at the appropriate methods in IWorkflowMessageService
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.DELETE_CUSTOMER_REQUEST_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.DELETE_CUSTOMER_REQUEST_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.ORDER_CANCELLED_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.ORDER_CANCELLED_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.SHIPMENT_DELIVERED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.SHIPMENT_DELIVERED_CUSTOMER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.ORDER_REFUNDED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.ORDER_REFUNDED_CUSTOMER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_ORDER_NOTE_ADDED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_ORDER_NOTE_ADDED_CUSTOMER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.RECURRING_PAYMENT_FAILED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.RECURRING_PAYMENT_FAILED_CUSTOMER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEWSLETTER_SUBSCRIPTION_DEACTIVATION_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEWSLETTER_SUBSCRIPTION_DEACTIVATION_MESSAGE);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.EMAIL_A_FRIEND_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.EMAIL_A_FRIEND_MESSAGE);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.WISHLIST_TO_FRIEND_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.WISHLIST_TO_FRIEND_MESSAGE);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.RETURN_REQUEST_STATUS_CHANGED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.RETURN_REQUEST_STATUS_CHANGED_CUSTOMER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_FORUM_TOPIC_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_FORUM_TOPIC_MESSAGE);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_FORUM_POST_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_FORUM_POST_MESSAGE);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.PRIVATE_MESSAGE_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.PRIVATE_MESSAGE_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_VENDOR_ACCOUNT_APPLY_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_VENDOR_ACCOUNT_APPLY_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.VENDOR_INFORMATION_CHANGE_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.VENDOR_INFORMATION_CHANGE_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.GIFT_CARD_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.GIFT_CARD_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.PRODUCT_REVIEW_REPLY_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.PRODUCT_REVIEW_REPLY_CUSTOMER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_VENDOR_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_VENDOR_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_VENDOR_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_VENDOR_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_VAT_SUBMITTED_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_VAT_SUBMITTED_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.BLOG_COMMENT_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.BLOG_COMMENT_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEWS_COMMENT_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEWS_COMMENT_STORE_OWNER_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.BACK_IN_STOCK_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.BACK_IN_STOCK_NOTIFICATION);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.CONTACT_US_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.CONTACT_US_MESSAGE);
+		logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.CONTACT_VENDOR_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.CONTACT_VENDOR_MESSAGE);
+		logger.LogDebug("<<< Exiting GetTokenGroups(messageTemplate={MessageTemplate})", messageTemplate);
         return messageTemplate.Name switch
         {
             MessageTemplateSystemNames.CUSTOMER_REGISTERED_STORE_OWNER_NOTIFICATION or

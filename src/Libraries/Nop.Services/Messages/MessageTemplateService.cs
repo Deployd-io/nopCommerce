@@ -51,9 +51,19 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		logger.LogDebug(">>> Entering DeleteMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _messageTemplateRepository.DeleteAsync(messageTemplate);
+		logger.LogDebug("<<< Exiting DeleteMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteMessageTemplateAsync(messageTemplate)={MessageTemplate}: external service call took {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteMessageTemplateAsync(messageTemplate)={MessageTemplate}: delete query executed in {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteMessageTemplateAsync(messageTemplate)={MessageTemplate}: external service call took {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteMessageTemplateAsync(messageTemplate)={MessageTemplate}: delete query executed in {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a message template
     /// </summary>
@@ -61,9 +71,15 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		logger.LogDebug(">>> Entering InsertMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _messageTemplateRepository.InsertAsync(messageTemplate);
+		logger.LogDebug("<<< Exiting InsertMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertMessageTemplateAsync(messageTemplate)={MessageTemplate}: save query executed in {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertMessageTemplateAsync(messageTemplate)={MessageTemplate}: save query executed in {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a message template
     /// </summary>
@@ -71,9 +87,15 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		logger.LogDebug(">>> Entering UpdateMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _messageTemplateRepository.UpdateAsync(messageTemplate);
+		logger.LogDebug("<<< Exiting UpdateMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateMessageTemplateAsync(messageTemplate)={MessageTemplate}: update query executed in {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateMessageTemplateAsync(messageTemplate)={MessageTemplate}: update query executed in {Arg1} ms", messageTemplate, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a message template
     /// </summary>
@@ -84,6 +106,8 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<MessageTemplate> GetMessageTemplateByIdAsync(int messageTemplateId)
     {
+		logger.LogDebug(">>> Entering GetMessageTemplateByIdAsync(messageTemplateId={MessageTemplateId})", messageTemplateId);
+		logger.LogDebug("<<< Exiting GetMessageTemplateByIdAsync(messageTemplateId={MessageTemplateId})", messageTemplateId);
         return await _messageTemplateRepository.GetByIdAsync(messageTemplateId, cache => default);
     }
 
@@ -98,11 +122,15 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<IList<MessageTemplate>> GetMessageTemplatesByNameAsync(string messageTemplateName, int? storeId = null)
     {
+		logger.LogDebug(">>> Entering GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(messageTemplateName))
             throw new ArgumentException(nameof(messageTemplateName));
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopMessageDefaults.MessageTemplatesByNameCacheKey, messageTemplateName, storeId);
 
+		logger.LogWarning("GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId}): key → {Key}", messageTemplateName, storeId, key);
         return await _staticCacheManager.GetAsync(key, async () =>
         {
             //get message templates with the passed name
@@ -116,7 +144,10 @@ public partial class MessageTemplateService : IMessageTemplateService
 
             return await templatesQuery.OrderBy(messageTemplate => messageTemplate.Id)
             .ToListAsync();
+			logger.LogInformation("GetMessageTemplatesByNameAsync(messageTemplateName,storeId)={MessageTemplateName},{StoreId}: database query executed in {Arg2} ms", messageTemplateName, storeId, __logStart.ElapsedMilliseconds);
         });
+		logger.LogInformation("GetMessageTemplatesByNameAsync(messageTemplateName,storeId)={MessageTemplateName},{StoreId}: external service call took {Arg2} ms", messageTemplateName, storeId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
     }
 
     /// <summary>
@@ -132,11 +163,16 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<IList<MessageTemplate>> GetAllMessageTemplatesAsync(int storeId, string keywords = null, bool? isActive = null, int emailAccountId = 0)
     {
+		logger.LogDebug(">>> Entering GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId})", storeId, keywords, isActive, emailAccountId);
         var messageTemplates = await _messageTemplateRepository.GetAllAsync(async query =>
         {
+			logger.LogDebug("GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId}): query → {Query}", storeId, keywords, isActive, emailAccountId, query);
+			logger.LogDebug("GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId}): messageTemplates → {MessageTemplates}", storeId, keywords, isActive, emailAccountId, messageTemplates);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             //apply store mapping constraints
             query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
+			logger.LogInformation("GetAllMessageTemplatesAsync(storeId,keywords,isActive,emailAccountId)={StoreId},{Keywords},{IsActive},{EmailAccountId}: find query executed in {Arg4} ms", storeId, keywords, isActive, emailAccountId, __logStart.ElapsedMilliseconds);
             if (isActive.HasValue)
                 query = query.Where(mt => mt.IsActive == isActive);
 
@@ -151,6 +187,7 @@ public partial class MessageTemplateService : IMessageTemplateService
                 || (x.Body?.Contains(keywords, StringComparison.InvariantCultureIgnoreCase) ?? false)
                 || (x.Name?.Contains(keywords, StringComparison.InvariantCultureIgnoreCase) ?? false)).ToList();
 
+		logger.LogDebug("<<< Exiting GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId})", storeId, keywords, isActive, emailAccountId);
         return messageTemplates;
     }
 
@@ -164,6 +201,7 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<MessageTemplate> CopyMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		logger.LogDebug(">>> Entering CopyMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         ArgumentNullException.ThrowIfNull(messageTemplate);
 
         var mtCopy = new MessageTemplate
@@ -184,23 +222,28 @@ public partial class MessageTemplateService : IMessageTemplateService
 
         var languages = await _languageService.GetAllLanguagesAsync(true);
 
+		logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): languages → {Languages}", messageTemplate, languages);
         //localization
         foreach (var lang in languages)
         {
             var bccEmailAddresses = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.BccEmailAddresses, lang.Id, false, false);
             if (!string.IsNullOrEmpty(bccEmailAddresses))
+				logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): bccEmailAddresses → {BccEmailAddresses}", messageTemplate, bccEmailAddresses);
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.BccEmailAddresses, bccEmailAddresses, lang.Id);
 
             var subject = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.Subject, lang.Id, false, false);
             if (!string.IsNullOrEmpty(subject))
+				logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): subject → {Subject}", messageTemplate, subject);
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.Subject, subject, lang.Id);
 
             var body = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.Body, lang.Id, false, false);
             if (!string.IsNullOrEmpty(body))
+				logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): body → {Body}", messageTemplate, body);
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.Body, body, lang.Id);
 
             var emailAccountId = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.EmailAccountId, lang.Id, false, false);
             if (emailAccountId > 0)
+				logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): emailAccountId → {EmailAccountId}", messageTemplate, emailAccountId);
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.EmailAccountId, emailAccountId, lang.Id);
         }
 
@@ -208,7 +251,9 @@ public partial class MessageTemplateService : IMessageTemplateService
         var selectedStoreIds = await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate);
         foreach (var id in selectedStoreIds)
             await _storeMappingService.InsertStoreMappingAsync(mtCopy, id);
+			logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): selectedStoreIds → {SelectedStoreIds}", messageTemplate, selectedStoreIds);
 
+		logger.LogDebug("<<< Exiting CopyMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         return mtCopy;
     }
 

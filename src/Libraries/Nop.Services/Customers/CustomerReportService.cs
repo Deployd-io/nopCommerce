@@ -115,10 +115,13 @@ public partial class CustomerReportService : ICustomerReportService
     /// </returns>
     public virtual async Task<int> GetRegisteredCustomersReportAsync(int days)
     {
+		logger.LogDebug(">>> Entering GetRegisteredCustomersReportAsync(days={Days})", days);
         var date = (await _dateTimeHelper.ConvertToUserTimeAsync(DateTime.Now)).AddDays(-days);
 
+		logger.LogDebug("GetRegisteredCustomersReportAsync(days={Days}): date → {Date}", days, date);
         var registeredCustomerRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
         if (registeredCustomerRole == null)
+			logger.LogDebug("GetRegisteredCustomersReportAsync(days={Days}): registeredCustomerRole → {RegisteredCustomerRole}", days, registeredCustomerRole);
             return 0;
 
         return (await _customerService.GetAllCustomersAsync(

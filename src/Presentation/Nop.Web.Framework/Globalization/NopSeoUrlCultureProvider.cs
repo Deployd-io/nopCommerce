@@ -21,14 +21,17 @@ public partial class NopSeoUrlCultureProvider : RequestCultureProvider
     /// </returns>
     public override async Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
     {
+		logger.LogDebug(">>> Entering DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
         var localizationSettings = EngineContext.Current.Resolve<LocalizationSettings>();
 
+		logger.LogDebug("DetermineProviderCultureResult(httpContext={HttpContext}): localizationSettings → {LocalizationSettings}", httpContext, localizationSettings);
         if (!localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
             return await NullProviderCultureResult;
 
         //localized URLs are enabled, so try to get language from the requested page URL
         var (isLocalized, language) = await httpContext.Request.Path.Value.IsLocalizedUrlAsync(httpContext.Request.PathBase, false);
         if (!isLocalized || language is null)
+		logger.LogDebug("<<< Exiting DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
             return await NullProviderCultureResult;
 
         return new ProviderCultureResult(language.LanguageCulture);

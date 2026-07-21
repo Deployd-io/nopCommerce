@@ -13,10 +13,12 @@ public class SchemaMigration : AutoReversingMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<RequestQuote>();
         Create.TableFor<RequestQuoteItem>();
 
         Create.TableFor<Quote>();
         Create.TableFor<QuoteItem>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 }

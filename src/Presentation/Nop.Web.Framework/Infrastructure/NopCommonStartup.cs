@@ -19,6 +19,7 @@ public partial class NopCommonStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //add options feature
         services.AddOptions();
 
@@ -43,6 +44,7 @@ public partial class NopCommonStartup : INopStartup
             //add constraint key for language
             options.ConstraintMap[NopRoutingDefaults.LanguageParameterTransformer] = typeof(LanguageParameterTransformer);
         });
+		logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -51,6 +53,7 @@ public partial class NopCommonStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+		logger.LogDebug(">>> Entering Configure(application={Application})", application);
         //check whether requested page is keep alive page
         application.UseKeepAlive();
 
@@ -65,6 +68,7 @@ public partial class NopCommonStartup : INopStartup
 
         //configure PDF
         application.UseNopPdf();
+		logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

@@ -87,11 +87,13 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
     /// </returns>
     public virtual Task<RecurringPaymentSearchModel> PrepareRecurringPaymentSearchModelAsync(RecurringPaymentSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareRecurringPaymentSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareRecurringPaymentSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -105,6 +107,7 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
     /// </returns>
     public virtual async Task<RecurringPaymentListModel> PrepareRecurringPaymentListModelAsync(RecurringPaymentSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareRecurringPaymentListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get recurringPayments
@@ -119,8 +122,11 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
                 //fill in model values from the entity
                 var recurringPaymentModel = recurringPayment.ToModel<RecurringPaymentModel>();
 
+				logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): recurringPaymentModel → {RecurringPaymentModel}", searchModel, recurringPaymentModel);
                 var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
                 var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+				logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): order → {Order}", searchModel, order);
+				logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): customer → {Customer}", searchModel, customer);
 
                 //convert dates to the user time
                 if ((await _orderProcessingService.GetNextPaymentDateAsync(recurringPayment)) is DateTime nextPaymentDate)
@@ -135,6 +141,8 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
 
                 //fill in additional values (not existing in the entity)
                 recurringPaymentModel.CustomerId = customer.Id;
+				logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): recurringPaymentModel.CustomerId → {Arg1}", searchModel, recurringPaymentModel.CustomerId);
+				logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): recurringPaymentModel.InitialOrderId → {Arg1}", searchModel, recurringPaymentModel.InitialOrderId);
                 recurringPaymentModel.InitialOrderId = order.Id;
 
                 recurringPaymentModel.CyclePeriodStr = await _localizationService.GetLocalizedEnumAsync(recurringPayment.CyclePeriod);
@@ -146,6 +154,7 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareRecurringPaymentListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

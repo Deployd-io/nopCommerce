@@ -47,13 +47,16 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual async Task<IList<StateProvinceModel>> GetStatesByCountryIdAsync(int countryId, bool addSelectStateItem)
     {
+		logger.LogDebug(">>> Entering GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         var country = await _countryService.GetCountryByIdAsync(countryId);
         var states =
             (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country?.Id ?? 0,
                 (await _workContext.GetWorkingLanguageAsync()).Id)).ToList();
+			logger.LogDebug("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): country → {Country}", countryId, addSelectStateItem, country);
         
         var result = new List<StateProvinceModel>();
         
+		logger.LogDebug("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): result → {Result}", countryId, addSelectStateItem, result);
         foreach (var state in states)
             result.Add(new StateProvinceModel
             {
@@ -99,6 +102,7 @@ public partial class CountryModelFactory : ICountryModelFactory
             }
         }
 
+		logger.LogDebug("<<< Exiting GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         return result;
     }
 

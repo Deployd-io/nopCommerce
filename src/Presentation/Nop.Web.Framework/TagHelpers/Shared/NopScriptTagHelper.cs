@@ -64,24 +64,31 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
     protected static async Task<string> BuildInlineScriptTagAsync(TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering BuildInlineScriptTagAsync(output={Output})", output);
         //get JavaScript
         var scriptTag = new TagBuilder(SCRIPT_TAG_NAME);
 
+		logger.LogDebug("BuildInlineScriptTagAsync(output={Output}): scriptTag → {ScriptTag}", output, scriptTag);
         var childContent = await output.GetChildContentAsync();
         var script = childContent.GetContent();
+		logger.LogDebug("BuildInlineScriptTagAsync(output={Output}): childContent → {ChildContent}", output, childContent);
+		logger.LogDebug("BuildInlineScriptTagAsync(output={Output}): script → {Script}", output, script);
 
         if (!string.IsNullOrEmpty(script))
             scriptTag.InnerHtml.SetHtmlContent(new HtmlString(script));
 
         scriptTag.MergeAttributes(await output.GetAttributeDictionaryAsync(), replaceExisting: false);
 
+		logger.LogDebug("<<< Exiting BuildInlineScriptTagAsync(output={Output})", output);
         return await scriptTag.RenderHtmlContentAsync() + Environment.NewLine;
     }
 
     protected void ProcessSrcAttribute(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessSrcAttribute(context={Context},output={Output})", context, output);
         if (!string.IsNullOrEmpty(DebugSrc) && _webHostEnvironment.IsDevelopment())
             Src = DebugSrc;
+			logger.LogDebug("ProcessSrcAttribute(context={Context},output={Output}): Src → {Src}", context, output, Src);
 
         // Pass through attribute that is also a well-known HTML attribute.
         if (Src != null)
@@ -95,15 +102,18 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
         // not function properly.
         if (output.Attributes[SRC_ATTRIBUTE_NAME]?.Value is string srcAttribute)
             Src = srcAttribute;
+			logger.LogDebug("<<< Exiting ProcessSrcAttribute(context={Context},output={Output})", context, output);
     }
 
     protected void ProcessAsset(TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsset(output={Output})", output);
         if (string.IsNullOrEmpty(Src))
             return;
 
         var urlHelper = UrlHelperFactory.GetUrlHelper(ViewContext);
         if (!urlHelper.IsLocalUrl(Src))
+		logger.LogDebug("ProcessAsset(output={Output}): urlHelper → {UrlHelper}", output, urlHelper);
         {
             output.Attributes.SetAttribute(SRC_ATTRIBUTE_NAME, Src);
             return;
@@ -111,6 +121,8 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
         var asset = _bundleHelper.GetOrCreateJavaScriptAsset(Src, [Src]);
         output.Attributes.SetAttribute(SRC_ATTRIBUTE_NAME, _bundleHelper.CacheBusting(asset));
+		logger.LogDebug("ProcessAsset(output={Output}): asset → {Asset}", output, asset);
+		logger.LogDebug("<<< Exiting ProcessAsset(output={Output})", output);
     }
 
     #endregion
@@ -119,6 +131,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -127,6 +140,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
             return;
 
         output.TagMode = TagMode.StartTagAndEndTag;
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
 
         //process only text/javascript scripts
         if (context.AllAttributes.TryGetAttribute("type", out var attribute)
@@ -137,10 +151,12 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
         var woConfig = _appSettings.Get<WebOptimizerConfig>();
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): woConfig → {WoConfig}", context, output, woConfig);
         if (Location == ResourceLocation.Auto)
         {
             // move script to the footer bundle when bundling is enabled
             Location = woConfig.EnableJavaScriptBundling ? ResourceLocation.Footer : ResourceLocation.None;
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): Location → {Location}", context, output, Location);
         }
 
         if (Location == ResourceLocation.None)
@@ -160,6 +176,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
             _nopHtmlHelper.AddScriptParts(Location, Src, DebugSrc, ExcludeFromBundle);
 
         output.SuppressOutput();
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

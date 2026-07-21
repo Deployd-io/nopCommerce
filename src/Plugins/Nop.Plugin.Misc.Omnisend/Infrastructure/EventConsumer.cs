@@ -66,6 +66,7 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(CustomerLoggedinEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!_omnisendService.IsConfigured)
             return;
 
@@ -74,8 +75,10 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
 
         var script = _settings.IdentifyContactScript.Replace(OmnisendDefaults.Email, eventMessage.Customer.Email);
 
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): script → {Script}", eventMessage, script);
         await _genericAttributeService.SaveAttributeAsync(eventMessage.Customer,
             OmnisendDefaults.IdentifyContactAttribute, script);
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

@@ -19,7 +19,10 @@ public class NopIndexConvention : IIndexConvention
 
     public NopIndexConvention(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering NopIndexConvention(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		logger.LogDebug("<<< Exiting NopIndexConvention(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("NopIndexConvention(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     #endregion
@@ -33,6 +36,8 @@ public class NopIndexConvention : IIndexConvention
     /// <returns>Name of an index</returns>
     protected virtual string GetIndexName(IndexDefinition index)
     {
+		logger.LogDebug(">>> Entering GetIndexName(index={Index})", index);
+		logger.LogDebug("<<< Exiting GetIndexName(index={Index})", index);
         return _dataProvider.GetIndexName(index.TableName, string.Join('_', index.Columns.Select(c => c.Name)));
     }
 
@@ -47,9 +52,11 @@ public class NopIndexConvention : IIndexConvention
     /// <returns>The same or a new expression. The underlying type must stay the same.</returns>
     public IIndexExpression Apply(IIndexExpression expression)
     {
+		logger.LogDebug(">>> Entering Apply(expression={Expression})", expression);
         if (string.IsNullOrEmpty(expression.Index.Name))
             expression.Index.Name = GetIndexName(expression.Index);
 
+		logger.LogDebug("<<< Exiting Apply(expression={Expression})", expression);
         return expression;
     }
 

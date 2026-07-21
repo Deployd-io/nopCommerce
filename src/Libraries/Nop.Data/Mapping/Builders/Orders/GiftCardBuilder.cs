@@ -18,7 +18,9 @@ public partial class GiftCardBuilder : NopEntityBuilder<GiftCard>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table.WithColumn(nameof(GiftCard.PurchasedWithOrderItemId)).AsInt32().Nullable().ForeignKey<OrderItem>(onDelete: Rule.None);
+		logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -70,6 +70,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		logger.LogDebug(">>> Entering ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
+		logger.LogDebug("<<< Exiting ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.FromResult(new ProcessPaymentResult());
     }
 
@@ -80,6 +82,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// <returns>A task that represents the asynchronous operation</returns>
     public Task PostProcessPaymentAsync(PostProcessPaymentRequest postProcessPaymentRequest)
     {
+		logger.LogDebug(">>> Entering PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
+		logger.LogDebug("<<< Exiting PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         return Task.CompletedTask;
     }
 
@@ -93,9 +97,11 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public async Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
     {
+		logger.LogDebug(">>> Entering CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
         //capture previously authorized payment
         var (capture, error) = await _serviceManager.CaptureAuthorizationAsync(_settings, capturePaymentRequest.Order.AuthorizationTransactionId);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
             return new() { Errors = new[] { error } };
 
         //request succeeded
@@ -117,9 +123,11 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public async Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
     {
+		logger.LogDebug(">>> Entering VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
         //void previously authorized payment
         var (_, error) = await _serviceManager.VoidAsync(_settings, voidPaymentRequest.Order.AuthorizationTransactionId);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
             return new() { Errors = new[] { error } };
 
         //request succeeded
@@ -136,6 +144,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public async Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
     {
+		logger.LogDebug(">>> Entering RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
         //refund previously captured payment
         var amount = refundPaymentRequest.AmountToRefund != refundPaymentRequest.Order.OrderTotal
             ? (decimal?)refundPaymentRequest.AmountToRefund
@@ -143,6 +152,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
 
         var (_, error) = await _serviceManager.RefundAsync(_settings, refundPaymentRequest.Order, amount);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
             return new() { Errors = new[] { error } };
 
         //request succeeded
@@ -159,12 +169,14 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public async Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		logger.LogDebug(">>> Entering ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         //we process an initial order separately
         if (processPaymentRequest.InitialOrder is null)
             return new();
 
         var (_, error) = await _serviceManager.ProcessNextRecurringPaymentAsync(_settings, processPaymentRequest);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
             return new() { Errors = new[] { error }, RecurringPaymentFailed = true };
 
         //request succeeded
@@ -181,8 +193,10 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public async Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
     {
+		logger.LogDebug(">>> Entering CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         var (_, error) = await _serviceManager.CancelRecurringPaymentAsync(_settings, cancelPaymentRequest.Order);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
             return new() { Errors = new[] { error } };
 
         return new();
@@ -198,7 +212,10 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering HidePaymentMethodAsync(cart={Cart})", cart);
         var notConnected = !PayPalCommerceServiceManager.IsConnected(_settings);
+		logger.LogDebug("HidePaymentMethodAsync(cart={Cart}): notConnected → {NotConnected}", cart, notConnected);
+		logger.LogDebug("<<< Exiting HidePaymentMethodAsync(cart={Cart})", cart);
         return Task.FromResult(notConnected);
     }
 
@@ -212,6 +229,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
+		logger.LogDebug("<<< Exiting GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
         return Task.FromResult(decimal.Zero);
     }
 
@@ -225,6 +244,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<bool> CanRePostProcessPaymentAsync(Order order)
     {
+		logger.LogDebug(">>> Entering CanRePostProcessPaymentAsync(order={Order})", order);
+		logger.LogDebug("<<< Exiting CanRePostProcessPaymentAsync(order={Order})", order);
         return Task.FromResult(false);
     }
 
@@ -238,6 +259,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering ValidatePaymentFormAsync(form={Form})", form);
+		logger.LogDebug("<<< Exiting ValidatePaymentFormAsync(form={Form})", form);
         return Task.FromResult<IList<string>>(new List<string>());
     }
 
@@ -251,6 +274,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering GetPaymentInfoAsync(form={Form})", form);
+		logger.LogDebug("<<< Exiting GetPaymentInfoAsync(form={Form})", form);
         return Task.FromResult(new ProcessPaymentRequest());
     }
 
@@ -259,6 +284,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(PayPalCommerceDefaults.Route.Configuration);
     }
 
@@ -267,6 +294,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </summary>
     public Type GetPublicViewComponent()
     {
+		logger.LogDebug(">>> Entering GetPublicViewComponent()");
+		logger.LogDebug("<<< Exiting GetPublicViewComponent()");
         return typeof(PaymentInfoViewComponent);
     }
 
@@ -279,6 +308,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             PublicWidgetZones.ProductDetailsAddInfo,
@@ -299,6 +330,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         ArgumentNullException.ThrowIfNull(widgetZone);
 
         if (widgetZone.Equals(PublicWidgetZones.ProductDetailsAddInfo) || widgetZone.Equals(PublicWidgetZones.OrderSummaryContentBefore))
@@ -314,6 +346,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
             return typeof(ShipmentCarrierViewComponent);
 
         if (widgetZone.Equals(AdminWidgetZones.PaymentMethodListTop))
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
             return typeof(PaymentMethodViewComponent);
 
         return null;
@@ -325,6 +358,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         await _settingService.SaveSettingAsync(new PayPalCommerceSettings
         {
             SetCredentialsManually = false,
@@ -491,6 +525,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -499,13 +534,17 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //clear webhooks when uninstall
         var stores = await _storeService.GetAllStoresAsync();
         var storeIds = new List<int> { 0 }.Union(stores.Select(store => store.Id));
+		logger.LogDebug("UninstallAsync(): stores → {Stores}", stores);
+		logger.LogDebug("UninstallAsync(): storeIds → {StoreIds}", storeIds);
         foreach (var storeId in storeIds)
         {
             var settings = await _settingService.LoadSettingAsync<PayPalCommerceSettings>(storeId);
             if (PayPalCommerceServiceManager.IsConnected(settings))
+				logger.LogDebug("UninstallAsync(): settings → {Settings}", settings);
                 await _serviceManager.DeleteWebhookAsync(settings);
         }
 
@@ -527,6 +566,7 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Payments.PayPalCommerce");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     /// <summary>
@@ -535,6 +575,8 @@ public class PayPalCommercePaymentMethod : BasePlugin, IPaymentMethod, IWidgetPl
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetPaymentMethodDescriptionAsync()
     {
+		logger.LogDebug(">>> Entering GetPaymentMethodDescriptionAsync()");
+		logger.LogDebug("<<< Exiting GetPaymentMethodDescriptionAsync()");
         return await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.PaymentMethodDescription");
     }
 

@@ -15,8 +15,12 @@ public partial class EntityTokensAddedEvent<T> where T : BaseEntity
     /// <param name="tokens">Tokens</param>
     public EntityTokensAddedEvent(T entity, IList<Token> tokens)
     {
+		logger.LogDebug(">>> Entering EntityTokensAddedEvent(entity={Entity},tokens={Tokens})", entity, tokens);
         Entity = entity;
         Tokens = tokens;
+		logger.LogDebug("<<< Exiting EntityTokensAddedEvent(entity={Entity},tokens={Tokens})", entity, tokens);
+		logger.LogDebug("EntityTokensAddedEvent(entity={Entity},tokens={Tokens}): Tokens → {Tokens1}", entity, tokens, Tokens);
+		logger.LogDebug("EntityTokensAddedEvent(entity={Entity},tokens={Tokens}): Entity → {Entity1}", entity, tokens, Entity);
     }
 
     /// <summary>

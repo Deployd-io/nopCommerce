@@ -11,6 +11,7 @@ public partial class BlogPostValidator : BaseNopValidator<BlogPostModel>
 {
     public BlogPostValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering BlogPostValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Title)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Blog.BlogPosts.Fields.Title.Required"));
@@ -29,5 +30,6 @@ public partial class BlogPostValidator : BaseNopValidator<BlogPostModel>
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.SEO.SeName.MaxLengthValidation"), NopSeoDefaults.SearchEngineNameLength);
 
         SetDatabaseValidationRules<BlogPost>();
+		logger.LogDebug("<<< Exiting BlogPostValidator(localizationService={LocalizationService})", localizationService);
     }
 }

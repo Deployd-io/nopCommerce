@@ -11,6 +11,7 @@ public partial class NewsItemValidator : BaseNopValidator<NewsItemModel>
 {
     public NewsItemValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering NewsItemValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Title).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.News.NewsItems.Fields.Title.Required"));
 
         RuleFor(x => x.Short).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.News.NewsItems.Fields.Short.Required"));
@@ -21,5 +22,6 @@ public partial class NewsItemValidator : BaseNopValidator<NewsItemModel>
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.SEO.SeName.MaxLengthValidation"), NopSeoDefaults.SearchEngineNameLength);
 
         SetDatabaseValidationRules<NewsItem>();
+		logger.LogDebug("<<< Exiting NewsItemValidator(localizationService={LocalizationService})", localizationService);
     }
 }

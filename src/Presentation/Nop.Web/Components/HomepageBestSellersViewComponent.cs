@@ -44,10 +44,13 @@ public partial class HomepageBestSellersViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(int? productThumbPictureSize)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!_catalogSettings.ShowBestsellersOnHomepage || _catalogSettings.NumberOfBestsellersOnHomepage == 0)
             return Content("");
 
         //load and cache report
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var report = await _staticCacheManager.GetAsync(
             _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.HomepageBestsellersIdsKey,
@@ -55,7 +58,10 @@ public partial class HomepageBestSellersViewComponent : NopViewComponent
             async () => await (await _orderReportService.BestSellersReportAsync(
                 storeId: store.Id,
                 pageSize: _catalogSettings.NumberOfBestsellersOnHomepage)).ToListAsync());
+			logger.LogDebug("InvokeAsync(productThumbPictureSize={ProductThumbPictureSize}): store → {Store}", productThumbPictureSize, store);
+			logger.LogInformation("InvokeAsync(productThumbPictureSize)={ProductThumbPictureSize}: external service call took {Arg1} ms", productThumbPictureSize, __logStart.ElapsedMilliseconds);
 
+		logger.LogInformation("async(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         //load products
         var products = await (await _productService.GetProductsByIdsAsync(report.Select(x => x.ProductId).ToArray()))
             //ACL and store mapping
@@ -68,6 +74,8 @@ public partial class HomepageBestSellersViewComponent : NopViewComponent
 
         //prepare model
         var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize)).ToList();
+		logger.LogDebug("<<< Exiting InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
         return View(model);
     }
+	logger.LogDebug("<<< Exiting async()");
 }

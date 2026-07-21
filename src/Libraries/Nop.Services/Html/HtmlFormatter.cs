@@ -18,7 +18,10 @@ public partial class HtmlFormatter : IHtmlFormatter
 
     public HtmlFormatter(IBBCodeHelper bbCodeHelper)
     {
+		logger.LogDebug(">>> Entering HtmlFormatter(bbCodeHelper={BbCodeHelper})", bbCodeHelper);
         _bbCodeHelper = bbCodeHelper;
+		logger.LogDebug("<<< Exiting HtmlFormatter(bbCodeHelper={BbCodeHelper})", bbCodeHelper);
+		logger.LogDebug("HtmlFormatter(bbCodeHelper={BbCodeHelper}): _bbCodeHelper → {_bbCodeHelper}", bbCodeHelper, _bbCodeHelper);
     }
 
     #endregion
@@ -32,21 +35,27 @@ public partial class HtmlFormatter : IHtmlFormatter
     /// <returns>Sanitized text with all invalid tags removed</returns>
     protected static string EnsureOnlyAllowedHtml(string text)
     {
+		logger.LogDebug(">>> Entering EnsureOnlyAllowedHtml(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         const string allowedTags = "br,hr,b,i,u,a,div,ol,ul,li,blockquote,img,span,p,em,strong,font,pre,h1,h2,h3,h4,h5,h6,address,cite";
 
+		logger.LogDebug("EnsureOnlyAllowedHtml(text={Text}): allowedTags → {AllowedTags}", text, allowedTags);
         var m = Regex.Matches(text, "<.*?>", RegexOptions.IgnoreCase);
             
+			logger.LogDebug("EnsureOnlyAllowedHtml(text={Text}): m → {M}", text, m);
         for (var i = m.Count - 1; i >= 0; i--)
         {
             var tag = text[(m[i].Index + 1)..(m[i].Index + m[i].Length)].Trim().ToLower();
 
+			logger.LogDebug("EnsureOnlyAllowedHtml(text={Text}): tag → {Tag}", text, tag);
             if (!IsValidTag(tag, allowedTags))
                 text = text.Remove(m[i].Index, m[i].Length);
         }
+		logger.LogDebug("EnsureOnlyAllowedHtml(text={Text}): text → {Text1}", text, text);
 
+		logger.LogDebug("<<< Exiting EnsureOnlyAllowedHtml(text={Text})", text);
         return text;
     }
 
@@ -72,6 +81,7 @@ public partial class HtmlFormatter : IHtmlFormatter
         if (pos > 0)
             tag = tag[0..pos];
         if (tag[0] == '/')
+			logger.LogDebug("IsValidTag(tag={Tag},tags={Tags}): tag → {Tag1}", tag, tags, tag);
             tag = tag[1..^0];
 
         foreach (var aTag in allowedTags)
@@ -80,6 +90,7 @@ public partial class HtmlFormatter : IHtmlFormatter
                 return true;
         }
 
+		logger.LogDebug("<<< Exiting IsValidTag(tag={Tag},tags={Tags})", tag, tags);
         return false;
     }
 
@@ -149,13 +160,16 @@ public partial class HtmlFormatter : IHtmlFormatter
     /// <returns>Formatted text</returns>
     public virtual string StripTags(string text)
     {
+		logger.LogDebug(">>> Entering StripTags(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = Regex.Replace(text, @"(>)(\r|\n)*(<)", "><");
         text = Regex.Replace(text, "(<[^>]*>)([^<]*)", "$2");
+		logger.LogDebug("StripTags(text={Text}): text → {Text1}", text, text);
         text = Regex.Replace(text, "(&#x?[0-9]{2,4};|&quot;|&amp;|&nbsp;|&lt;|&gt;|&euro;|&copy;|&reg;|&permil;|&Dagger;|&dagger;|&lsaquo;|&rsaquo;|&bdquo;|&rdquo;|&ldquo;|&sbquo;|&rsquo;|&lsquo;|&mdash;|&ndash;|&rlm;|&lrm;|&zwj;|&zwnj;|&thinsp;|&emsp;|&ensp;|&tilde;|&circ;|&Yuml;|&scaron;|&Scaron;)", "@");
 
+		logger.LogDebug("<<< Exiting StripTags(text={Text})", text);
         return text;
     }
 
@@ -166,10 +180,13 @@ public partial class HtmlFormatter : IHtmlFormatter
     /// <returns>Text</returns>
     public virtual string ReplaceAnchorTags(string text)
     {
+		logger.LogDebug(">>> Entering ReplaceAnchorTags(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = Regex.Replace(text, @"<a\b[^>]+>([^<]*(?:(?!</a)<[^<]*)*)</a>", "$1", RegexOptions.IgnoreCase);
+		logger.LogDebug("ReplaceAnchorTags(text={Text}): text → {Text1}", text, text);
+		logger.LogDebug("<<< Exiting ReplaceAnchorTags(text={Text})", text);
         return text;
     }
 
@@ -180,15 +197,18 @@ public partial class HtmlFormatter : IHtmlFormatter
     /// <returns>Formatted text</returns>
     public virtual string ConvertPlainTextToHtml(string text)
     {
+		logger.LogDebug(">>> Entering ConvertPlainTextToHtml(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = text.Replace("\r\n", "<br />");
         text = text.Replace("\r", "<br />");
+		logger.LogDebug("ConvertPlainTextToHtml(text={Text}): text → {Text1}", text, text);
         text = text.Replace("\n", "<br />");
         text = text.Replace("\t", "&nbsp;&nbsp;");
         text = text.Replace("  ", "&nbsp;&nbsp;");
 
+		logger.LogDebug("<<< Exiting ConvertPlainTextToHtml(text={Text})", text);
         return text;
     }
 

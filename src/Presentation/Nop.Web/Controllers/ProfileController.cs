@@ -28,6 +28,7 @@ public partial class ProfileController : BasePublicController
 
     public virtual async Task<IActionResult> Index(int? id, int? pageNumber)
     {
+		logger.LogDebug(">>> Entering Index(id={Id},pageNumber={PageNumber})", id, pageNumber);
         if (!_customerSettings.AllowViewingProfiles)
         {
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
@@ -35,12 +36,14 @@ public partial class ProfileController : BasePublicController
 
         var customerId = 0;
         if (id.HasValue)
+		logger.LogDebug("Index(id={Id},pageNumber={PageNumber}): customerId → {CustomerId}", id, pageNumber, customerId);
         {
             customerId = id.Value;
         }
 
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
         if (customer == null || await _customerService.IsGuestAsync(customer))
+		logger.LogDebug("Index(id={Id},pageNumber={PageNumber}): customer → {Customer}", id, pageNumber, customer);
         {
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
         }
@@ -50,6 +53,8 @@ public partial class ProfileController : BasePublicController
             DisplayEditLink(Url.Action("Edit", "Customer", new { id = customer.Id, area = AreaNames.ADMIN }));
 
         var model = await _profileModelFactory.PrepareProfileIndexModelAsync(customer, pageNumber);
+		logger.LogDebug("Index(id={Id},pageNumber={PageNumber}): model → {Model}", id, pageNumber, model);
+		logger.LogDebug("<<< Exiting Index(id={Id},pageNumber={PageNumber})", id, pageNumber);
         return View(model);
     }
 }

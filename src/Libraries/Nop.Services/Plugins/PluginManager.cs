@@ -43,6 +43,8 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     protected virtual async Task<string> GetKeyAsync(Customer customer, int storeId, string systemName = null)
     {
+		logger.LogDebug(">>> Entering GetKeyAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
+		logger.LogDebug("<<< Exiting GetKeyAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         return $"{storeId}-{(customer != null ? string.Join(',', await _customerService.GetCustomerRoleIdsAsync(customer)) : null)}-{systemName}";
     }
 
@@ -58,10 +60,12 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     protected virtual async Task<TPlugin> LoadPrimaryPluginAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         //try to get a plugin by system name or return the first loaded one (it's necessary to have a primary active plugin)
         var plugin = await LoadPluginBySystemNameAsync(systemName, customer, storeId)
                      ?? (await LoadAllPluginsAsync(customer, storeId)).FirstOrDefault();
 
+		logger.LogDebug("<<< Exiting LoadPrimaryPluginAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return plugin;
     }
 
@@ -80,11 +84,14 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     public virtual async Task<IList<TPlugin>> LoadAllPluginsAsync(Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadAllPluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         //get plugins and put them into the dictionary to avoid further loading
         var key = await GetKeyAsync(customer, storeId);
         if (!_plugins.ContainsKey(key))
+			logger.LogWarning("LoadAllPluginsAsync(customer={Customer},storeId={StoreId}): key → {Key}", customer, storeId, key);
             _plugins.Add(key, await _pluginService.GetPluginsAsync<TPlugin>(customer: customer, storeId: storeId));
 
+		logger.LogDebug("<<< Exiting LoadAllPluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return _plugins[key];
     }
 
@@ -100,12 +107,14 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     public virtual async Task<TPlugin> LoadPluginBySystemNameAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadPluginBySystemNameAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         if (string.IsNullOrEmpty(systemName))
             return null;
 
         //try to get already loaded plugin
         var key = await GetKeyAsync(customer, storeId, systemName);
         if (_plugins.TryGetValue(key, out var value))
+			logger.LogWarning("LoadPluginBySystemNameAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): key → {Key}", systemName, customer, storeId, key);
             return value.FirstOrDefault();
 
         //or get it from list of all loaded plugins or load it for the first time
@@ -132,7 +141,9 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     public virtual async Task<IList<TPlugin>> LoadActivePluginsAsync(List<string> systemNames, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadActivePluginsAsync(systemNames={SystemNames},customer={Customer},storeId={StoreId})", systemNames, customer, storeId);
         if (systemNames == null)
+		logger.LogDebug("<<< Exiting LoadActivePluginsAsync(systemNames={SystemNames},customer={Customer},storeId={StoreId})", systemNames, customer, storeId);
             return new List<TPlugin>();
 
         //get loaded plugins according to passed system names
@@ -150,6 +161,7 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     public virtual bool IsPluginActive(TPlugin plugin, List<string> systemNames)
     {
         if (plugin == null)
+		logger.LogDebug("<<< Exiting IsPluginActive(plugin={Plugin},systemNames={SystemNames})", plugin, systemNames);
             return false;
 
         return systemNames

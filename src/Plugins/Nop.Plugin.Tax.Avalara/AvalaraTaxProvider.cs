@@ -71,12 +71,14 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </returns>
     public async Task<TaxRateResult> GetTaxRateAsync(TaxRateRequest taxRateRequest)
     {
+		logger.LogDebug(">>> Entering GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
         if (taxRateRequest?.Address is null)
             return new TaxRateResult { Errors = new List<string> { "Address not set" } };
 
         //get tax rate
         var (taxRate, error) = await _avalaraTaxManager.GetTaxRateAsync(taxRateRequest);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
             return new TaxRateResult { Errors = new List<string> { error } };
 
         return new TaxRateResult { TaxRate = taxRate };
@@ -92,19 +94,23 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </returns>
     public async Task<TaxTotalResult> GetTaxTotalAsync(TaxTotalRequest taxTotalRequest)
     {
+		logger.LogDebug(">>> Entering GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         //cache tax total within the request
         var key = $"nop.TaxTotal-{taxTotalRequest.UsePaymentMethodAdditionalFee}";
 
+		logger.LogWarning("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): key → {Key}", taxTotalRequest, key);
         if (_httpContextAccessor.HttpContext.Items.TryGetValue(key, out var result) && result is TaxTotalResult taxTotalResult)
             return taxTotalResult;
 
         //create a transaction
         taxTotalResult = new();
+		logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotalResult → {TaxTotalResult}", taxTotalRequest, taxTotalResult);
         var (transaction, error) = await _avalaraTaxManager.CreateTaxTotalTransactionAsync(taxTotalRequest);
         if (string.IsNullOrEmpty(error))
         {
             //and get tax details
             taxTotalResult.TaxTotal = transaction.totalTax.Value;
+			logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotalResult.TaxTotal → {Arg1}", taxTotalRequest, taxTotalResult.TaxTotal);
             var taxRates = transaction.summary?
                 .Where(summary => summary.rate.HasValue && summary.tax.HasValue)
                 .Select(summary => new { Rate = summary.rate.Value * 100, Value = summary.tax.Value })
@@ -125,6 +131,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
 
         _httpContextAccessor.HttpContext.Items.TryAdd(key, taxTotalResult);
 
+		logger.LogDebug("<<< Exiting GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         return taxTotalResult;
     }
 
@@ -133,6 +140,8 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(AvalaraTaxDefaults.ConfigurationRouteName);
     }
 
@@ -145,6 +154,8 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             AdminWidgetZones.CustomerDetailsBlock,
@@ -163,6 +174,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         if (widgetZone.Equals(AdminWidgetZones.CustomerDetailsBlock) || widgetZone.Equals(AdminWidgetZones.CustomerRoleDetailsTop))
             return typeof(EntityUseCodeViewComponent);
 
@@ -173,6 +185,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
             return typeof(AddressValidationViewComponent);
 
         if (widgetZone.Equals(PublicWidgetZones.OrderSummaryContentBefore))
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
             return typeof(AppliedCertificateViewComponent);
 
         return null;
@@ -184,6 +197,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new AvalaraTaxSettings
         {
@@ -217,6 +231,11 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
                 Seconds = AvalaraTaxDefaults.DownloadTaxRatesTask.Days * 24 * 60 * 60,
                 Name = AvalaraTaxDefaults.DownloadTaxRatesTask.Name,
                 Type = AvalaraTaxDefaults.DownloadTaxRatesTask.Type
+				logger.LogInformation("InstallAsync(): Enabled → {Enabled}", Enabled);
+				logger.LogDebug("InstallAsync(): LastEnabledUtc → {LastEnabledUtc}", LastEnabledUtc);
+				logger.LogDebug("InstallAsync(): Seconds → {Seconds}", Seconds);
+				logger.LogDebug("InstallAsync(): Name → {Name}", Name);
+				logger.LogDebug("InstallAsync(): Type → {Type}", Type);
             });
         }
 
@@ -375,6 +394,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -383,6 +403,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //generic attributes
         await _avalaraTaxManager.DeleteAttributesAsync();
 
@@ -398,6 +419,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         //schedule task
         var task = await _scheduleTaskService.GetTaskByTypeAsync(AvalaraTaxDefaults.DownloadTaxRatesTask.Type);
         if (task is not null)
+			logger.LogDebug("UninstallAsync(): task → {Task}", task);
             await _scheduleTaskService.DeleteTaskAsync(task);
 
         //locales
@@ -405,6 +427,7 @@ public class AvalaraTaxProvider : BasePlugin, ITaxProvider, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Tax.Avalara");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

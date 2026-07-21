@@ -66,10 +66,14 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual Task<PrivateMessageIndexModel> PreparePrivateMessageIndexModelAsync(int? page, string tab)
     {
+		logger.LogDebug(">>> Entering PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab})", page, tab);
         var inboxPage = 0;
         var sentItemsPage = 0;
+		logger.LogDebug("PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab}): inboxPage → {InboxPage}", page, tab, inboxPage);
+		logger.LogDebug("PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab}): sentItemsPage → {SentItemsPage}", page, tab, sentItemsPage);
         var sentItemsTabSelected = false;
 
+		logger.LogDebug("PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab}): sentItemsTabSelected → {SentItemsTabSelected}", page, tab, sentItemsTabSelected);
         switch (tab)
         {
             case "inbox":
@@ -99,6 +103,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             SentItemsTabSelected = sentItemsTabSelected
         };
 
+		logger.LogDebug("<<< Exiting PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab})", page, tab);
         return Task.FromResult(model);
     }
 
@@ -113,6 +118,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<PrivateMessageListModel> PrepareInboxModelAsync(int page, string tab)
     {
+		logger.LogDebug(">>> Entering PrepareInboxModelAsync(page={Page},tab={Tab})", page, tab);
         if (page > 0)
         {
             page -= 1;
@@ -122,9 +128,12 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
 
         var messages = new List<PrivateMessageModel>();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareInboxModelAsync(page={Page},tab={Tab}): messages → {Messages}", page, tab, messages);
+		logger.LogDebug("PrepareInboxModelAsync(page={Page},tab={Tab}): store → {Store}", page, tab, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var list = await _forumService.GetAllPrivateMessagesAsync(store.Id,
             0, customer.Id, null, null, false, string.Empty, page, pageSize);
+			logger.LogDebug("PrepareInboxModelAsync(page={Page},tab={Tab}): customer → {Customer}", page, tab, customer);
 
         foreach (var pm in list)
             messages.Add(await PreparePrivateMessageModelAsync(pm));
@@ -146,6 +155,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             PagerModel = pagerModel
         };
 
+		logger.LogDebug("<<< Exiting PrepareInboxModelAsync(page={Page},tab={Tab})", page, tab);
         return model;
     }
 
@@ -160,6 +170,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<PrivateMessageListModel> PrepareSentModelAsync(int page, string tab)
     {
+		logger.LogDebug(">>> Entering PrepareSentModelAsync(page={Page},tab={Tab})", page, tab);
         if (page > 0)
         {
             page -= 1;
@@ -169,9 +180,12 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
 
         var messages = new List<PrivateMessageModel>();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareSentModelAsync(page={Page},tab={Tab}): messages → {Messages}", page, tab, messages);
+		logger.LogDebug("PrepareSentModelAsync(page={Page},tab={Tab}): store → {Store}", page, tab, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var list = await _forumService.GetAllPrivateMessagesAsync(store.Id,
             customer.Id, 0, null, false, null, string.Empty, page, pageSize);
+			logger.LogDebug("PrepareSentModelAsync(page={Page},tab={Tab}): customer → {Customer}", page, tab, customer);
         foreach (var pm in list)
             messages.Add(await PreparePrivateMessageModelAsync(pm));
 
@@ -192,6 +206,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             PagerModel = pagerModel
         };
 
+		logger.LogDebug("<<< Exiting PrepareSentModelAsync(page={Page},tab={Tab})", page, tab);
         return model;
     }
 
@@ -206,6 +221,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<SendPrivateMessageModel> PrepareSendPrivateMessageModelAsync(Customer customerTo, PrivateMessage replyToPM)
     {
+		logger.LogDebug(">>> Entering PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM})", customerTo, replyToPM);
         ArgumentNullException.ThrowIfNull(customerTo);
 
         var model = new SendPrivateMessageModel
@@ -220,12 +236,16 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (replyToPM.ToCustomerId == customer.Id ||
+			logger.LogDebug("PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM}): customer → {Customer}", customerTo, replyToPM, customer);
             replyToPM.FromCustomerId == customer.Id)
         {
             model.ReplyToMessageId = replyToPM.Id;
+			logger.LogDebug("PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM}): model.ReplyToMessageId → {Arg2}", customerTo, replyToPM, model.ReplyToMessageId);
+			logger.LogDebug("PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM}): model.Subject → {Arg2}", customerTo, replyToPM, model.Subject);
             model.Subject = $"Re: {replyToPM.Subject}";
         }
 
+		logger.LogDebug("<<< Exiting PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM})", customerTo, replyToPM);
         return model;
     }
 
@@ -239,10 +259,13 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<PrivateMessageModel> PreparePrivateMessageModelAsync(PrivateMessage pm)
     {
+		logger.LogDebug(">>> Entering PreparePrivateMessageModelAsync(pm={Pm})", pm);
         ArgumentNullException.ThrowIfNull(pm);
 
         var fromCustomer = await _customerService.GetCustomerByIdAsync(pm.FromCustomerId);
         var toCustomer = await _customerService.GetCustomerByIdAsync(pm.ToCustomerId);
+		logger.LogDebug("PreparePrivateMessageModelAsync(pm={Pm}): fromCustomer → {FromCustomer}", pm, fromCustomer);
+		logger.LogDebug("PreparePrivateMessageModelAsync(pm={Pm}): toCustomer → {ToCustomer}", pm, toCustomer);
 
         var model = new PrivateMessageModel
         {
@@ -259,6 +282,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             IsRead = pm.IsRead,
         };
 
+		logger.LogDebug("<<< Exiting PreparePrivateMessageModelAsync(pm={Pm})", pm);
         return model;
     }
 

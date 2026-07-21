@@ -49,7 +49,11 @@ public class MenuMigration : Migration
 
     private bool IsSettingEnabled(string key, out Setting setting)
     {
+		logger.LogDebug(">>> Entering IsSettingEnabled(key={Key})", key);
         setting = _settingService.GetSetting(key);
+		logger.LogDebug("IsSettingEnabled(key={Key}): setting → {Setting}", key, setting);
+		logger.LogInformation("IsSettingEnabled(key={Key}): setting → {Setting}", key, setting);
+		logger.LogDebug("<<< Exiting IsSettingEnabled(key={Key})", key);
         return setting is not null && CommonHelper.To<bool>(setting.Value);
     }
 
@@ -62,6 +66,8 @@ public class MenuMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!_menuRepository.Table.Any(m => m.MenuTypeId == (int)MenuType.Main))
         {
             _menuRepository.Insert(new M.Menu
@@ -71,6 +77,7 @@ public class MenuMigration : Migration
                 DisplayAllCategories = true,
                 Published = true
             });
+			logger.LogInformation("Up(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }
 
         if (_menuRepository.Table.Any(m => m.MenuTypeId == (int)MenuType.Footer))
@@ -78,6 +85,8 @@ public class MenuMigration : Migration
 
         var topics = _topicRepository.Table.ToList();
         var catalogSettings = _settingService.LoadSetting<CatalogSettings>();
+		logger.LogDebug("Up(): topics → {Topics}", topics);
+		logger.LogDebug("Up(): catalogSettings → {CatalogSettings}", catalogSettings);
 
         #region Information
 
@@ -110,6 +119,8 @@ public class MenuMigration : Migration
                 MenuItemType = MenuItemType.TopicPage,
                 EntityId = topics.FirstOrDefault(t => t.SystemName == "ShippingInfo")?.Id,
                 Published = true
+				logger.LogDebug("Up(): MenuId → {MenuId}", MenuId);
+				logger.LogDebug("Up(): MenuItemType → {MenuItemType}", MenuItemType);
             },
             new()
             {
@@ -340,6 +351,7 @@ public class MenuMigration : Migration
             _settingService.DeleteSetting(displayapplyvendoraccountfooteritem);
 
         #endregion
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -347,7 +359,9 @@ public class MenuMigration : Migration
     /// </summary>
     public override void Down()
     {
+	logger.LogDebug(">>> Entering Down()");
 
+	logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

@@ -15,8 +15,12 @@ public partial class GetShoppingCartItemUnitPriceEvent : IStopProcessingEvent
     /// <param name="includeDiscounts">A value indicating whether include discounts or not for price computation</param>
     public GetShoppingCartItemUnitPriceEvent(ShoppingCartItem shoppingCartItem, bool includeDiscounts)
     {
+		logger.LogDebug(">>> Entering GetShoppingCartItemUnitPriceEvent(shoppingCartItem={ShoppingCartItem},includeDiscounts={IncludeDiscounts})", shoppingCartItem, includeDiscounts);
         ShoppingCartItem = shoppingCartItem;
         IncludeDiscounts = includeDiscounts;
+		logger.LogDebug("<<< Exiting GetShoppingCartItemUnitPriceEvent(shoppingCartItem={ShoppingCartItem},includeDiscounts={IncludeDiscounts})", shoppingCartItem, includeDiscounts);
+		logger.LogDebug("GetShoppingCartItemUnitPriceEvent(shoppingCartItem={ShoppingCartItem},includeDiscounts={IncludeDiscounts}): IncludeDiscounts → {IncludeDiscounts1}", shoppingCartItem, includeDiscounts, IncludeDiscounts);
+		logger.LogDebug("GetShoppingCartItemUnitPriceEvent(shoppingCartItem={ShoppingCartItem},includeDiscounts={IncludeDiscounts}): ShoppingCartItem → {ShoppingCartItem1}", shoppingCartItem, includeDiscounts, ShoppingCartItem);
     }
 
     /// <summary>

@@ -194,14 +194,17 @@ public partial class PluginService : IPluginService
     /// <param name="migrationProcessType">Migration process type</param>
     protected virtual void InsertPluginData(Type pluginType, MigrationProcessType migrationProcessType = MigrationProcessType.NoMatter)
     {
+		logger.LogDebug(">>> Entering InsertPluginData(pluginType={PluginType},migrationProcessType={MigrationProcessType})", pluginType, migrationProcessType);
         var assembly = Assembly.GetAssembly(pluginType);
         _migrationManager.Value.ApplyUpMigrations(assembly, migrationProcessType);
+		logger.LogDebug("InsertPluginData(pluginType={PluginType},migrationProcessType={MigrationProcessType}): assembly → {Assembly}", pluginType, migrationProcessType, assembly);
 
         //mark update migrations as applied
         if (migrationProcessType == MigrationProcessType.Installation)
         {
             _migrationManager.Value.ApplyUpMigrations(assembly, MigrationProcessType.Update, true);
         }
+		logger.LogDebug("<<< Exiting InsertPluginData(pluginType={PluginType},migrationProcessType={MigrationProcessType})", pluginType, migrationProcessType);
     }
 
     #endregion
@@ -297,6 +300,7 @@ public partial class PluginService : IPluginService
     /// <returns>Plugin</returns>
     public virtual IPlugin FindPluginByTypeInAssembly(Type typeInAssembly)
     {
+		logger.LogDebug(">>> Entering FindPluginByTypeInAssembly(typeInAssembly={TypeInAssembly})", typeInAssembly);
         ArgumentNullException.ThrowIfNull(typeInAssembly);
 
         //try to do magic
@@ -304,6 +308,7 @@ public partial class PluginService : IPluginService
             descriptor.pluginDescriptor?.ReferencedAssembly?.FullName?.Equals(typeInAssembly.Assembly.FullName,
                 StringComparison.InvariantCultureIgnoreCase) ?? false);
 
+		logger.LogDebug("<<< Exiting FindPluginByTypeInAssembly(typeInAssembly={TypeInAssembly})", typeInAssembly);
         return pluginDescriptor.pluginDescriptor?.Instance<IPlugin>();
     }
 
@@ -345,17 +350,20 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PreparePluginToInstallAsync(string systemName, Customer customer = null, bool checkDependencies = true)
     {
+		logger.LogDebug(">>> Entering PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies})", systemName, customer, checkDependencies);
         //add plugin name to the appropriate list (if not yet contained) and save changes
         if (_pluginsInfo.PluginNamesToInstall.Any(item => item.SystemName == systemName))
             return;
 
         var pluginsAfterRestart = _pluginsInfo.InstalledPlugins.Select(pd => pd.SystemName).Where(installedSystemName => !_pluginsInfo.PluginNamesToUninstall.Contains(installedSystemName)).ToList();
         pluginsAfterRestart.AddRange(_pluginsInfo.PluginNamesToInstall.Select(item => item.SystemName));
+		logger.LogDebug("PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies}): pluginsAfterRestart → {PluginsAfterRestart}", systemName, customer, checkDependencies, pluginsAfterRestart);
 
         if (checkDependencies)
         {
             var descriptor = await GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.NotInstalledOnly);
 
+			logger.LogDebug("PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies}): descriptor → {Descriptor}", systemName, customer, checkDependencies, descriptor);
             if (descriptor.DependsOn?.Any() ?? false)
             {
                 var dependsOn = descriptor.DependsOn
@@ -365,11 +373,14 @@ public partial class PluginService : IPluginService
                 {
                     var dependsOnSystemNames = dependsOn.Aggregate((all, current) => $"{all}, {current}");
 
+					logger.LogDebug("PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies}): dependsOnSystemNames → {DependsOnSystemNames}", systemName, customer, checkDependencies, dependsOnSystemNames);
                     //do not inject services via constructor because it'll cause circular references
                     var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+					logger.LogDebug("PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies}): localizationService → {LocalizationService}", systemName, customer, checkDependencies, localizationService);
                     var errorMessage = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.InstallDependsOn"), string.IsNullOrEmpty(descriptor.FriendlyName) ? descriptor.SystemName : descriptor.FriendlyName, dependsOnSystemNames);
 
+					logger.LogDebug("PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies}): errorMessage → {ErrorMessage}", systemName, customer, checkDependencies, errorMessage);
                     throw new NopException(errorMessage);
                 }
             }
@@ -377,6 +388,7 @@ public partial class PluginService : IPluginService
 
         _pluginsInfo.PluginNamesToInstall.Add((systemName, customer?.CustomerGuid));
         await _pluginsInfo.SaveAsync();
+		logger.LogDebug("<<< Exiting PreparePluginToInstallAsync(systemName={SystemName},customer={Customer},checkDependencies={CheckDependencies})", systemName, customer, checkDependencies);
     }
 
     /// <summary>
@@ -386,17 +398,21 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PreparePluginToUninstallAsync(string systemName)
     {
+		logger.LogDebug(">>> Entering PreparePluginToUninstallAsync(systemName={SystemName})", systemName);
         //add plugin name to the appropriate list (if not yet contained) and save changes
         if (_pluginsInfo.PluginNamesToUninstall.Contains(systemName))
             return;
 
         var dependentPlugins = await GetPluginDescriptorsAsync<IPlugin>(dependsOnSystemName: systemName);
         var descriptor = await GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName);
+		logger.LogDebug("PreparePluginToUninstallAsync(systemName={SystemName}): dependentPlugins → {DependentPlugins}", systemName, dependentPlugins);
+		logger.LogDebug("PreparePluginToUninstallAsync(systemName={SystemName}): descriptor → {Descriptor}", systemName, descriptor);
 
         if (dependentPlugins.Any())
         {
             var dependsOn = new List<string>();
 
+			logger.LogDebug("PreparePluginToUninstallAsync(systemName={SystemName}): dependsOn → {DependsOn}", systemName, dependsOn);
             foreach (var dependentPlugin in dependentPlugins)
             {
                 if (!_pluginsInfo.InstalledPlugins.Select(pd => pd.SystemName).Contains(dependentPlugin.SystemName))
@@ -413,9 +429,11 @@ public partial class PluginService : IPluginService
             {
                 var dependsOnSystemNames = dependsOn.Aggregate((all, current) => $"{all}, {current}");
 
+				logger.LogDebug("PreparePluginToUninstallAsync(systemName={SystemName}): dependsOnSystemNames → {DependsOnSystemNames}", systemName, dependsOnSystemNames);
                 //do not inject services via constructor because it'll cause circular references
                 var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+				logger.LogDebug("PreparePluginToUninstallAsync(systemName={SystemName}): localizationService → {LocalizationService}", systemName, localizationService);
                 var errorMessage = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.UninstallDependsOn"),
                     string.IsNullOrEmpty(descriptor.FriendlyName) ? descriptor.SystemName : descriptor.FriendlyName,
                     dependsOnSystemNames);
@@ -426,11 +444,13 @@ public partial class PluginService : IPluginService
 
         var plugin = descriptor?.Instance<IPlugin>();
 
+		logger.LogDebug("PreparePluginToUninstallAsync(systemName={SystemName}): plugin → {Plugin}", systemName, plugin);
         if (plugin != null)
             await plugin.PreparePluginToUninstallAsync();
 
         _pluginsInfo.PluginNamesToUninstall.Add(systemName);
         await _pluginsInfo.SaveAsync();
+		logger.LogDebug("<<< Exiting PreparePluginToUninstallAsync(systemName={SystemName})", systemName);
     }
 
     /// <summary>
@@ -440,12 +460,14 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PreparePluginToDeleteAsync(string systemName)
     {
+		logger.LogDebug(">>> Entering PreparePluginToDeleteAsync(systemName={SystemName})", systemName);
         //add plugin name to the appropriate list (if not yet contained) and save changes
         if (_pluginsInfo.PluginNamesToDelete.Contains(systemName))
             return;
 
         _pluginsInfo.PluginNamesToDelete.Add(systemName);
         await _pluginsInfo.SaveAsync();
+		logger.LogDebug("<<< Exiting PreparePluginToDeleteAsync(systemName={SystemName})", systemName);
     }
 
     /// <summary>
@@ -453,6 +475,7 @@ public partial class PluginService : IPluginService
     /// </summary>
     public virtual void ResetChanges()
     {
+		logger.LogDebug(">>> Entering ResetChanges()");
         //clear lists and save changes
         _pluginsInfo.PluginNamesToDelete.Clear();
         _pluginsInfo.PluginNamesToInstall.Clear();
@@ -463,10 +486,12 @@ public partial class PluginService : IPluginService
         var pluginDescriptors = _pluginsInfo.PluginDescriptors.ToList();
         foreach (var pluginDescriptor in pluginDescriptors)
             pluginDescriptor.pluginDescriptor.ShowInPluginsList = true;
+			logger.LogDebug("ResetChanges(): pluginDescriptors → {PluginDescriptors}", pluginDescriptors);
 
         //clear the uploaded directory
         foreach (var directory in _fileProvider.GetDirectories(_fileProvider.MapPath(NopPluginDefaults.UploadedPath)))
             _fileProvider.DeleteDirectory(directory);
+			logger.LogDebug("<<< Exiting ResetChanges()");
     }
 
     /// <summary>
@@ -474,7 +499,9 @@ public partial class PluginService : IPluginService
     /// </summary>
     public virtual void ClearInstalledPluginsList()
     {
+		logger.LogDebug(">>> Entering ClearInstalledPluginsList()");
         _pluginsInfo.InstalledPlugins.Clear();
+		logger.LogDebug("<<< Exiting ClearInstalledPluginsList()");
     }
 
     /// <summary>
@@ -483,9 +510,11 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InstallPluginsAsync()
     {
+		logger.LogDebug(">>> Entering InstallPluginsAsync()");
         //get all uninstalled plugins
         var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => !descriptor.pluginDescriptor.Installed).ToList();
 
+		logger.LogDebug("InstallPluginsAsync(): pluginDescriptors → {PluginDescriptors}", pluginDescriptors);
         //filter plugins need to install
         pluginDescriptors = pluginDescriptors.Where(descriptor => _pluginsInfo.PluginNamesToInstall
             .Any(item => item.SystemName.Equals(descriptor.pluginDescriptor.SystemName))).ToList();
@@ -495,6 +524,8 @@ public partial class PluginService : IPluginService
         //do not inject services via constructor because it'll cause circular references
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
         var customerActivityService = EngineContext.Current.Resolve<ICustomerActivityService>();
+		logger.LogDebug("InstallPluginsAsync(): localizationService → {LocalizationService}", localizationService);
+		logger.LogDebug("InstallPluginsAsync(): customerActivityService → {CustomerActivityService}", customerActivityService);
 
         var installPluginSampleDataSetting =
             await _settingService.GetSettingAsync(NopInstallationDefaults.InstallPluginSampleDataSettingName);
@@ -502,6 +533,7 @@ public partial class PluginService : IPluginService
         bool.TryParse(installPluginSampleDataSetting?.Value, out var installPluginSampleData);
         var removeInstallPluginSampleDataSetting = true;
 
+		logger.LogDebug("InstallPluginsAsync(): removeInstallPluginSampleDataSetting → {RemoveInstallPluginSampleDataSetting}", removeInstallPluginSampleDataSetting);
         //install plugins
         foreach (var descriptor in pluginDescriptors.OrderBy(pluginDescriptor => pluginDescriptor.pluginDescriptor.DisplayOrder))
         {
@@ -511,6 +543,7 @@ public partial class PluginService : IPluginService
 
                 var pluginInstance = descriptor.pluginDescriptor.Instance<IPlugin>();
                 //try to install an instance
+				logger.LogDebug("InstallPluginsAsync(): pluginInstance → {PluginInstance}", pluginInstance);
                 await pluginInstance.InstallAsync();
 
                 if (installPluginSampleData)
@@ -527,6 +560,7 @@ public partial class PluginService : IPluginService
                 var customer = await _customerService.GetCustomerByGuidAsync(pluginToInstall.CustomerGuid ?? Guid.Empty);
                 await customerActivityService.InsertActivityAsync(customer, "InstallNewPlugin",
                     string.Format(await localizationService.GetResourceAsync("ActivityLog.InstallNewPlugin"), descriptor.pluginDescriptor.SystemName, descriptor.pluginDescriptor.Version));
+					logger.LogDebug("InstallPluginsAsync(): customer → {Customer}", customer);
 
                 //mark the plugin as installed
                 descriptor.pluginDescriptor.Installed = true;
@@ -537,6 +571,7 @@ public partial class PluginService : IPluginService
                 //log error
                 var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotInstalled"), descriptor.pluginDescriptor.SystemName);
                 await _logger.ErrorAsync(message, exception);
+				logger.LogDebug("InstallPluginsAsync(): message → {Message}", message);
 
                 removeInstallPluginSampleDataSetting = false;
             }
@@ -547,6 +582,7 @@ public partial class PluginService : IPluginService
 
         if (removeInstallPluginSampleDataSetting && installPluginSampleDataSetting != null)
             await _settingService.DeleteSettingAsync(installPluginSampleDataSetting);
+			logger.LogDebug("<<< Exiting InstallPluginsAsync()");
     }
 
     /// <summary>
@@ -555,9 +591,11 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UninstallPluginsAsync()
     {
+		logger.LogDebug(">>> Entering UninstallPluginsAsync()");
         //get all installed plugins
         var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => descriptor.pluginDescriptor.Installed).ToList();
 
+		logger.LogDebug("UninstallPluginsAsync(): pluginDescriptors → {PluginDescriptors}", pluginDescriptors);
         //filter plugins need to uninstall
         pluginDescriptors = pluginDescriptors
             .Where(descriptor => _pluginsInfo.PluginNamesToUninstall.Contains(descriptor.pluginDescriptor.SystemName)).ToList();
@@ -567,6 +605,8 @@ public partial class PluginService : IPluginService
         //do not inject services via constructor because it'll cause circular references
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
         var customerActivityService = EngineContext.Current.Resolve<ICustomerActivityService>();
+		logger.LogDebug("UninstallPluginsAsync(): localizationService → {LocalizationService}", localizationService);
+		logger.LogDebug("UninstallPluginsAsync(): customerActivityService → {CustomerActivityService}", customerActivityService);
 
         //uninstall plugins
         foreach (var descriptor in pluginDescriptors.OrderByDescending(pluginDescriptor => pluginDescriptor.pluginDescriptor.DisplayOrder))
@@ -575,11 +615,13 @@ public partial class PluginService : IPluginService
             {
                 var plugin = descriptor.pluginDescriptor.Instance<IPlugin>();
                 //try to uninstall an instance
+				logger.LogDebug("UninstallPluginsAsync(): plugin → {Plugin}", plugin);
                 await plugin.UninstallAsync();
 
                 //clear plugin data on the database
                 var assembly = Assembly.GetAssembly(descriptor.pluginDescriptor.PluginType);
                 _migrationManager.Value.ApplyDownMigrations(assembly);
+				logger.LogDebug("UninstallPluginsAsync(): assembly → {Assembly}", assembly);
 
                 //remove plugin system name from appropriate lists
                 _pluginsInfo.InstalledPlugins.Remove(descriptor.pluginDescriptor);
@@ -598,11 +640,13 @@ public partial class PluginService : IPluginService
                 //log error
                 var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotUninstalled"), descriptor.pluginDescriptor.SystemName);
                 await _logger.ErrorAsync(message, exception);
+				logger.LogDebug("UninstallPluginsAsync(): message → {Message}", message);
             }
         }
 
         //save changes
         await _pluginsInfo.SaveAsync();
+		logger.LogDebug("<<< Exiting UninstallPluginsAsync()");
     }
 
     /// <summary>
@@ -611,9 +655,11 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePluginsAsync()
     {
+		logger.LogDebug(">>> Entering DeletePluginsAsync()");
         //get all uninstalled plugins (delete plugin only previously uninstalled)
         var pluginDescriptors = _pluginsInfo.PluginDescriptors.Where(descriptor => !descriptor.pluginDescriptor.Installed).ToList();
 
+		logger.LogDebug("DeletePluginsAsync(): pluginDescriptors → {PluginDescriptors}", pluginDescriptors);
         //filter plugins need to delete
         pluginDescriptors = pluginDescriptors
             .Where(descriptor => _pluginsInfo.PluginNamesToDelete.Contains(descriptor.pluginDescriptor.SystemName)).ToList();
@@ -623,6 +669,8 @@ public partial class PluginService : IPluginService
         //do not inject services via constructor because it'll cause circular references
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
         var customerActivityService = EngineContext.Current.Resolve<ICustomerActivityService>();
+		logger.LogDebug("DeletePluginsAsync(): localizationService → {LocalizationService}", localizationService);
+		logger.LogDebug("DeletePluginsAsync(): customerActivityService → {CustomerActivityService}", customerActivityService);
 
         //delete plugins
         foreach (var descriptor in pluginDescriptors)
@@ -632,6 +680,7 @@ public partial class PluginService : IPluginService
                 //try to delete a plugin directory from disk storage
                 var pluginDirectory = _fileProvider.GetDirectoryName(descriptor.pluginDescriptor.OriginalAssemblyFile);
                 if (_fileProvider.DirectoryExists(pluginDirectory))
+					logger.LogDebug("DeletePluginsAsync(): pluginDirectory → {PluginDirectory}", pluginDirectory);
                     _fileProvider.DeleteDirectory(pluginDirectory);
 
                 //remove plugin system name from the appropriate list
@@ -646,11 +695,13 @@ public partial class PluginService : IPluginService
                 //log error
                 var message = string.Format(await localizationService.GetResourceAsync("Admin.Plugins.Errors.NotDeleted"), descriptor.pluginDescriptor.SystemName);
                 await _logger.ErrorAsync(message, exception);
+				logger.LogDebug("DeletePluginsAsync(): message → {Message}", message);
             }
         }
 
         //save changes
         await _pluginsInfo.SaveAsync();
+		logger.LogDebug("<<< Exiting DeletePluginsAsync()");
     }
 
     /// <summary>
@@ -659,7 +710,9 @@ public partial class PluginService : IPluginService
     /// <returns>Result of check</returns>
     public virtual bool IsRestartRequired()
     {
+		logger.LogDebug(">>> Entering IsRestartRequired()");
         //return true if any of lists contains items or some plugins were uploaded
+		logger.LogDebug("<<< Exiting IsRestartRequired()");
         return _pluginsInfo.PluginNamesToInstall.Any()
                || _pluginsInfo.PluginNamesToUninstall.Any()
                || _pluginsInfo.PluginNamesToDelete.Any()
@@ -672,9 +725,12 @@ public partial class PluginService : IPluginService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePluginsAsync()
     {
+		logger.LogDebug(">>> Entering UpdatePluginsAsync()");
         //do not inject services via constructor because it'll cause circular references
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
         var customerActivityService = EngineContext.Current.Resolve<ICustomerActivityService>();
+		logger.LogDebug("UpdatePluginsAsync(): localizationService → {LocalizationService}", localizationService);
+		logger.LogDebug("UpdatePluginsAsync(): customerActivityService → {CustomerActivityService}", customerActivityService);
 
         foreach (var installedPlugin in _pluginsInfo.InstalledPlugins)
         {
@@ -699,9 +755,11 @@ public partial class PluginService : IPluginService
 
             //update installed plugin info
             installedPlugin.Version = newVersion.pluginDescriptor.Version;
+			logger.LogDebug("UpdatePluginsAsync(): installedPlugin.Version → {Arg0}", installedPlugin.Version);
         }
 
         await _pluginsInfo.SaveAsync();
+		logger.LogDebug("<<< Exiting UpdatePluginsAsync()");
     }
 
     /// <summary>
@@ -719,6 +777,8 @@ public partial class PluginService : IPluginService
     /// <returns>List of plugin loaded assembly info</returns>
     public virtual IList<PluginLoadedAssemblyInfo> GetAssemblyCollisions()
     {
+		logger.LogDebug(">>> Entering GetAssemblyCollisions()");
+		logger.LogDebug("<<< Exiting GetAssemblyCollisions()");
         return _pluginsInfo.AssemblyLoadedCollision;
     }
 

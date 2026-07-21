@@ -16,6 +16,7 @@ public partial class CustomerRoleCacheEventConsumer : CacheEventConsumer<Custome
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(CustomerRole entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         switch (entityEventType)
         {
             case EntityEventType.Update:
@@ -30,5 +31,6 @@ public partial class CustomerRoleCacheEventConsumer : CacheEventConsumer<Custome
             await RemoveByPrefixAsync(NopCustomerServicesDefaults.CustomerCustomerRolesPrefix);
 
         await base.ClearCacheAsync(entity, entityEventType);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

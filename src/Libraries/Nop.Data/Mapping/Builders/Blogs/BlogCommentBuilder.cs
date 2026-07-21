@@ -19,10 +19,12 @@ public partial class BlogCommentBuilder : NopEntityBuilder<BlogComment>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(BlogComment.StoreId)).AsInt32().ForeignKey<Store>()
             .WithColumn(nameof(BlogComment.CustomerId)).AsInt32().ForeignKey<Customer>()
             .WithColumn(nameof(BlogComment.BlogPostId)).AsInt32().ForeignKey<BlogPost>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

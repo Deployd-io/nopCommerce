@@ -8,6 +8,7 @@ public class ShippingByWeightByTotalRecordBuilder : NopEntityBuilder<ShippingByW
 {
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ShippingByWeightByTotalRecord.WeightFrom))
             .AsDecimal(18, 4)
@@ -28,5 +29,6 @@ public class ShippingByWeightByTotalRecordBuilder : NopEntityBuilder<ShippingByW
             .WithColumn(nameof(ShippingByWeightByTotalRecord.Zip))
             .AsString(400)
             .Nullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 }

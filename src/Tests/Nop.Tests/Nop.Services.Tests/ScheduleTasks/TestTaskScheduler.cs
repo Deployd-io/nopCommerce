@@ -10,6 +10,8 @@ public class TestTaskScheduler : TaskScheduler
 {
     public TestTaskScheduler(AppSettings appSettings, IHttpClientFactory httpClientFactory, IScheduleTaskService scheduleTaskService, IServiceScopeFactory serviceScopeFactory, IStoreContext storeContext) : base(appSettings, httpClientFactory, serviceScopeFactory)
     {
+	logger.LogDebug(">>> Entering TestTaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},scheduleTaskService={ScheduleTaskService},serviceScopeFactory={ServiceScopeFactory},storeContext={StoreContext})", appSettings, httpClientFactory, scheduleTaskService, serviceScopeFactory, storeContext);
+	logger.LogDebug("<<< Exiting TestTaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},scheduleTaskService={ScheduleTaskService},serviceScopeFactory={ServiceScopeFactory},storeContext={StoreContext})", appSettings, httpClientFactory, scheduleTaskService, serviceScopeFactory, storeContext);
     }
 
     public bool IsInit => _taskThreads.Any();

@@ -36,11 +36,13 @@ public class ConversionsApiMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         var facebookPixelConfigurationTableName = NameCompatibilityManager.GetTableName(typeof(FacebookPixelConfiguration));
 
+		logger.LogDebug("Up(): facebookPixelConfigurationTableName → {FacebookPixelConfigurationTableName}", facebookPixelConfigurationTableName);
         //add ConversionsApiEnabled column if not exists
         if (!Schema.Table(facebookPixelConfigurationTableName).Column(nameof(FacebookPixelConfiguration.ConversionsApiEnabled)).Exists())
         {
@@ -83,6 +85,7 @@ public class ConversionsApiMigration : MigrationBase
             "Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled",
             "Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled.Hint"
         });
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -90,7 +93,9 @@ public class ConversionsApiMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

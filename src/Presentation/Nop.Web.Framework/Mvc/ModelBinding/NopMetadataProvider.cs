@@ -14,9 +14,13 @@ public partial class NopMetadataProvider : IDisplayMetadataProvider
     /// <param name="context">Display metadata provider context</param>
     public virtual void CreateDisplayMetadata(DisplayMetadataProviderContext context)
     {
+		logger.LogDebug(">>> Entering CreateDisplayMetadata(context={Context})", context);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get all custom attributes
         var additionalValues = context.Attributes.OfType<IModelAttribute>().ToList();
 
+		logger.LogDebug("CreateDisplayMetadata(context={Context}): additionalValues → {AdditionalValues}", context, additionalValues);
+		logger.LogInformation("CreateDisplayMetadata(context)={Context}: database query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
         //and try add them as additional values of metadata
         foreach (var additionalValue in additionalValues)
         {
@@ -25,5 +29,6 @@ public partial class NopMetadataProvider : IDisplayMetadataProvider
 
             context.DisplayMetadata.AdditionalValues.Add(additionalValue.Name, additionalValue);
         }
+		logger.LogDebug("<<< Exiting CreateDisplayMetadata(context={Context})", context);
     }
 }

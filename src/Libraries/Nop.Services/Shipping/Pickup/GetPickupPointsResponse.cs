@@ -9,7 +9,10 @@ public partial class GetPickupPointsResponse : BaseNopResult
 {
     public GetPickupPointsResponse()
     {
+		logger.LogDebug(">>> Entering GetPickupPointsResponse()");
         PickupPoints = new List<PickupPoint>();
+		logger.LogDebug("<<< Exiting GetPickupPointsResponse()");
+		logger.LogDebug("GetPickupPointsResponse(): PickupPoints → {PickupPoints}", PickupPoints);
     }
 
     /// <summary>

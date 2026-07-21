@@ -12,7 +12,10 @@ public partial class EntityInsertedEvent<T> where T : BaseEntity
     /// <param name="entity">Entity</param>
     public EntityInsertedEvent(T entity)
     {
+		logger.LogDebug(">>> Entering EntityInsertedEvent(entity={Entity})", entity);
         Entity = entity;
+		logger.LogDebug("<<< Exiting EntityInsertedEvent(entity={Entity})", entity);
+		logger.LogDebug("EntityInsertedEvent(entity={Entity}): Entity → {Entity1}", entity, Entity);
     }
 
     /// <summary>

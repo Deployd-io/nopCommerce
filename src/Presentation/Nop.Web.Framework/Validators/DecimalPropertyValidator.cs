@@ -18,7 +18,10 @@ public partial class DecimalPropertyValidator<T, TProperty> : PropertyValidator<
     /// <param name="maxValue">Maximum value</param>
     public DecimalPropertyValidator(decimal maxValue)
     {
+		logger.LogDebug(">>> Entering DecimalPropertyValidator(maxValue={MaxValue})", maxValue);
         _maxValue = maxValue;
+		logger.LogDebug("<<< Exiting DecimalPropertyValidator(maxValue={MaxValue})", maxValue);
+		logger.LogDebug("DecimalPropertyValidator(maxValue={MaxValue}): _maxValue → {_maxValue}", maxValue, _maxValue);
     }
 
     /// <summary>
@@ -28,7 +31,9 @@ public partial class DecimalPropertyValidator<T, TProperty> : PropertyValidator<
     /// <returns>Result</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		logger.LogDebug(">>> Entering IsValid(context={Context},value={Value})", context, value);
         if (decimal.TryParse(value.ToString(), out var propertyValue))
+		logger.LogDebug("<<< Exiting IsValid(context={Context},value={Value})", context, value);
             return Math.Round(propertyValue, 3) < _maxValue;
 
         return false;

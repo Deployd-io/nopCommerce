@@ -17,11 +17,13 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(name: RfqDefaults.ConfigurationRouteName,
             pattern: "Admin/RFQ/Configure",
             defaults: new { controller = "RfqAdmin", action = "Configure", area = AreaNames.ADMIN });
         var lang = GetLanguageRoutePattern();
 
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         endpointRouteBuilder.MapControllerRoute(name: RfqDefaults.CreateCustomerRequestRouteName,
             pattern: $"{lang}/rfq/requestforquote/{{requestId?}}",
             defaults: new { controller = "RfqCustomer", action = "CustomerRequest" });
@@ -41,6 +43,7 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: RfqDefaults.CustomerQuoteRouteName,
             pattern: $"{lang}/rfq/quote/{{quoteId}}",
             defaults: new { controller = "RfqCustomer", action = "CustomerQuote" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

@@ -28,7 +28,9 @@ public class PayPalCommerceWebhookController : Controller
     [HttpPost]
     public async Task<IActionResult> WebhookHandler()
     {
+		logger.LogDebug(">>> Entering WebhookHandler()");
         await _serviceManager.HandleWebhookAsync(_settings, Request);
+		logger.LogDebug("<<< Exiting WebhookHandler()");
         return Ok();
     }
 

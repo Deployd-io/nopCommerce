@@ -44,6 +44,7 @@ public class ItemClassificationMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -85,11 +86,14 @@ public class ItemClassificationMigration : MigrationBase
         //settings
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.UseItemClassification))
             _avalaraTaxSettings.UseItemClassification = false;
+			logger.LogDebug("Up(): _avalaraTaxSettings.UseItemClassification → {Arg0}", _avalaraTaxSettings.UseItemClassification);
 
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.SelectedCountryIds))
             _avalaraTaxSettings.SelectedCountryIds = null;
+			logger.LogDebug("Up(): _avalaraTaxSettings.SelectedCountryIds → {Arg0}", _avalaraTaxSettings.SelectedCountryIds);
 
         _settingService.SaveSetting(_avalaraTaxSettings);
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -97,7 +101,9 @@ public class ItemClassificationMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

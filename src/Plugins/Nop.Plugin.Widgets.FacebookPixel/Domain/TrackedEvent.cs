@@ -9,7 +9,10 @@ public class TrackedEvent
 
     public TrackedEvent()
     {
+		logger.LogDebug(">>> Entering TrackedEvent()");
         EventObjects = new List<string>();
+		logger.LogDebug("<<< Exiting TrackedEvent()");
+		logger.LogDebug("TrackedEvent(): EventObjects → {EventObjects}", EventObjects);
     }
 
     #endregion

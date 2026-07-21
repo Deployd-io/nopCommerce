@@ -33,9 +33,11 @@ public partial class ClearLogTask : IScheduleTask
     /// </summary>
     public virtual async System.Threading.Tasks.Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         var utcNow = DateTime.UtcNow;
 
         await _logger.ClearLogAsync(_commonSettings.ClearLogOlderThanDays == 0 ? null : utcNow.AddDays(-_commonSettings.ClearLogOlderThanDays));
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

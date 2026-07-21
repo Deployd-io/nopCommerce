@@ -43,6 +43,7 @@ public class LogoViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
@@ -53,6 +54,7 @@ public class LogoViewComponent : NopViewComponent
             ? _settings.LogoInFooter
             : null;
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return new HtmlContentViewComponentResult(new HtmlString(script ?? string.Empty));
     }
 

@@ -22,13 +22,16 @@ public partial class ScheduleTaskController : Controller
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> RunTask(string taskType)
     {
+		logger.LogDebug(">>> Entering RunTask(taskType={TaskType})", taskType);
         var scheduleTask = await _scheduleTaskService.GetTaskByTypeAsync(taskType);
         if (scheduleTask == null)
+			logger.LogDebug("RunTask(taskType={TaskType}): scheduleTask → {ScheduleTask}", taskType, scheduleTask);
             //schedule task cannot be loaded
             return NoContent();
 
         await _taskRunner.ExecuteAsync(scheduleTask);
 
+		logger.LogDebug("<<< Exiting RunTask(taskType={TaskType})", taskType);
         return NoContent();
     }
 }

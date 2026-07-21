@@ -13,7 +13,10 @@ public partial class RenderLink : IRender
     /// <param name="url">URL</param>
     public RenderLink(DataUrl url)
     {
+		logger.LogDebug(">>> Entering RenderLink(url={Url})", url);
         Url = url;
+		logger.LogDebug("<<< Exiting RenderLink(url={Url})", url);
+		logger.LogInformation("RenderLink(url={Url}): Url → {Url1}", url, Url);
     }
 
     #endregion

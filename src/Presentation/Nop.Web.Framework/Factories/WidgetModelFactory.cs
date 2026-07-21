@@ -60,10 +60,16 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     /// </returns>
     public virtual async Task<List<RenderWidgetModel>> PrepareRenderWidgetModelAsync(string widgetZone, object additionalData = null, bool useCache = true)
     {
+		logger.LogDebug(">>> Entering PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache})", widgetZone, additionalData, useCache);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var theme = await _themeContext.GetWorkingThemeNameAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): theme → {Theme}", widgetZone, additionalData, useCache, theme);
+		logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): customer → {Customer}", widgetZone, additionalData, useCache, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): customerRoleIds → {CustomerRoleIds}", widgetZone, additionalData, useCache, customerRoleIds);
+		logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): store → {Store}", widgetZone, additionalData, useCache, store);
 
         if (!useCache)
             return (await _widgetPluginManager.LoadActivePluginsAsync(customer, store.Id, widgetZone))
@@ -89,6 +95,8 @@ public partial class WidgetModelFactory : IWidgetModelFactory
             WidgetViewComponentArguments = new RouteValueDictionary { ["widgetZone"] = widgetZone, ["additionalData"] = additionalData }
         }).ToList();
 
+		logger.LogInformation("PrepareRenderWidgetModelAsync(widgetZone,additionalData,useCache)={WidgetZone},{AdditionalData},{UseCache}: external service call took {Arg3} ms", widgetZone, additionalData, useCache, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache})", widgetZone, additionalData, useCache);
         return models;
     }
 

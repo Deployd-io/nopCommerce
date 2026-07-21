@@ -21,9 +21,14 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
     /// <param name="persistForTheNextRequest">Whether a message should be persisted for the next request</param>
     public SaveSelectedTabAttribute(bool ignore = false, bool persistForTheNextRequest = true) : base(typeof(SaveSelectedTabFilter))
     {
+		logger.LogDebug(">>> Entering SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest})", ignore, persistForTheNextRequest);
         PersistForTheNextRequest = persistForTheNextRequest;
         IgnoreFilter = ignore;
+		logger.LogDebug("SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest}): IgnoreFilter → {IgnoreFilter}", ignore, persistForTheNextRequest, IgnoreFilter);
+		logger.LogDebug("SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest}): PersistForTheNextRequest → {PersistForTheNextRequest1}", ignore, persistForTheNextRequest, PersistForTheNextRequest);
         Arguments = [ignore, persistForTheNextRequest];
+		logger.LogDebug("<<< Exiting SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest})", ignore, persistForTheNextRequest);
+		logger.LogDebug("SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest}): Arguments → {Arguments}", ignore, persistForTheNextRequest, Arguments);
     }
 
     #endregion
@@ -78,6 +83,7 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SaveSelectedTabAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering SaveSelectedTabAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in POST requests
@@ -106,6 +112,7 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
 
             if (context.Controller is BaseController controller)
                 await controller.SaveSelectedTabNameAsync(persistForTheNextRequest: persistForTheNextRequest);
+				logger.LogDebug("<<< Exiting SaveSelectedTabAsync(context={Context})", context);
         }
 
         #endregion
@@ -120,8 +127,10 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await next();
             await SaveSelectedTabAsync(context);
+			logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

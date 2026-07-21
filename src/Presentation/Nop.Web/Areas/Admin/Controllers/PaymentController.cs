@@ -62,6 +62,10 @@ public partial class PaymentController : BaseAdminController
 
     public virtual IActionResult PaymentMethods()
     {
+		logger.LogDebug(">>> Entering PaymentMethods()");
+		logger.LogDebug(">>> Entering Methods()");
+		logger.LogDebug("<<< Exiting Methods()");
+		logger.LogDebug("<<< Exiting Methods(searchModel={SearchModel})", searchModel);
         return RedirectToAction("Methods");
     }
 
@@ -124,9 +128,12 @@ public partial class PaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public virtual async Task<IActionResult> MethodRestrictions()
     {
+		logger.LogDebug(">>> Entering MethodRestrictions()");
         //prepare model
         var model = await _paymentModelFactory.PreparePaymentMethodsModelAsync(new PaymentMethodsModel());
 
+		logger.LogDebug("MethodRestrictions(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting MethodRestrictions()");
         return View(model);
     }
 

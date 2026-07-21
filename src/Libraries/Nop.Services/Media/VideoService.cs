@@ -39,6 +39,8 @@ public partial class VideoService : IVideoService
     /// </returns>
     public virtual async Task<Video> GetVideoByIdAsync(int videoId)
     {
+		logger.LogDebug(">>> Entering GetVideoByIdAsync(videoId={VideoId})", videoId);
+		logger.LogDebug("<<< Exiting GetVideoByIdAsync(videoId={VideoId})", videoId);
         return await _videoRepository.GetByIdAsync(videoId, cache => default);
     }
 
@@ -52,8 +54,10 @@ public partial class VideoService : IVideoService
     /// </returns>
     public virtual async Task<IList<Video>> GetVideosByProductIdAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetVideosByProductIdAsync(productId={ProductId})", productId);
         if (productId == 0)
             return new List<Video>();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var query = from v in _videoRepository.Table
             join pv in _productVideoRepository.Table on v.Id equals pv.VideoId
@@ -63,6 +67,8 @@ public partial class VideoService : IVideoService
 
         var videos = await query.ToListAsync();
 
+		logger.LogDebug("GetVideosByProductIdAsync(productId={ProductId}): videos → {Videos}", productId, videos);
+		logger.LogDebug("<<< Exiting GetVideosByProductIdAsync(productId={ProductId})", productId);
         return videos;
     }
 
@@ -76,7 +82,9 @@ public partial class VideoService : IVideoService
     /// </returns>
     public virtual async Task<Video> InsertVideoAsync(Video video)
     {
+		logger.LogDebug(">>> Entering InsertVideoAsync(video={Video})", video);
         await _videoRepository.InsertAsync(video);
+		logger.LogDebug("<<< Exiting InsertVideoAsync(video={Video})", video);
         return video;
     }
 
@@ -90,8 +98,11 @@ public partial class VideoService : IVideoService
     /// </returns>
     public virtual async Task<Video> UpdateVideoAsync(Video video)
     {
+		logger.LogDebug(">>> Entering UpdateVideoAsync(video={Video})", video);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _videoRepository.UpdateAsync(video);
 
+		logger.LogDebug("<<< Exiting UpdateVideoAsync(video={Video})", video);
         return video;
     }
 
@@ -102,9 +113,16 @@ public partial class VideoService : IVideoService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteVideoAsync(Video video)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering DeleteVideoAsync(video={Video})", video);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(video);
 
         await _videoRepository.DeleteAsync(video);
+		logger.LogDebug("<<< Exiting DeleteVideoAsync(video={Video})", video);
+		logger.LogInformation("DeleteVideoAsync(video)={Video}: external service call took {Arg1} ms", video, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteVideoAsync(video)={Video}: delete query executed in {Arg1} ms", video, __logStart.ElapsedMilliseconds);
     }
 
     #endregion

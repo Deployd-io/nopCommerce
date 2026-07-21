@@ -13,6 +13,8 @@ public class GoogleAuthenticatorSchemaMigration : AutoReversingMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<GoogleAuthenticatorRecord>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 }

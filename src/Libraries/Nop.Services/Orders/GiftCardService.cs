@@ -47,9 +47,19 @@ public partial class GiftCardService : IGiftCardService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteGiftCardAsync(GiftCard giftCard)
     {
+		logger.LogDebug(">>> Entering DeleteGiftCardAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _giftCardRepository.DeleteAsync(giftCard);
+		logger.LogDebug("<<< Exiting DeleteGiftCardAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteGiftCardAsync(giftCard)={GiftCard}: external service call took {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteGiftCardAsync(giftCard)={GiftCard}: delete query executed in {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteGiftCardAsync(giftCard)={GiftCard}: external service call took {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteGiftCardAsync(giftCard)={GiftCard}: delete query executed in {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a gift card
     /// </summary>
@@ -60,6 +70,8 @@ public partial class GiftCardService : IGiftCardService
     /// </returns>
     public virtual async Task<GiftCard> GetGiftCardByIdAsync(int giftCardId)
     {
+		logger.LogDebug(">>> Entering GetGiftCardByIdAsync(giftCardId={GiftCardId})", giftCardId);
+		logger.LogDebug("<<< Exiting GetGiftCardByIdAsync(giftCardId={GiftCardId})", giftCardId);
         return await _giftCardRepository.GetByIdAsync(giftCardId, cache => default);
     }
 
@@ -126,9 +138,15 @@ public partial class GiftCardService : IGiftCardService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertGiftCardAsync(GiftCard giftCard)
     {
+		logger.LogDebug(">>> Entering InsertGiftCardAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _giftCardRepository.InsertAsync(giftCard);
+		logger.LogDebug("<<< Exiting InsertGiftCardAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertGiftCardAsync(giftCard)={GiftCard}: save query executed in {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertGiftCardAsync(giftCard)={GiftCard}: save query executed in {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the gift card
     /// </summary>
@@ -136,9 +154,15 @@ public partial class GiftCardService : IGiftCardService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateGiftCardAsync(GiftCard giftCard)
     {
+		logger.LogDebug(">>> Entering UpdateGiftCardAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _giftCardRepository.UpdateAsync(giftCard);
+		logger.LogDebug("<<< Exiting UpdateGiftCardAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateGiftCardAsync(giftCard)={GiftCard}: update query executed in {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateGiftCardAsync(giftCard)={GiftCard}: update query executed in {Arg1} ms", giftCard, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets gift cards by 'PurchasedWithOrderItemId'
     /// </summary>
@@ -149,15 +173,20 @@ public partial class GiftCardService : IGiftCardService
     /// </returns>
     public virtual async Task<IList<GiftCard>> GetGiftCardsByPurchasedWithOrderItemIdAsync(int purchasedWithOrderItemId)
     {
+		logger.LogDebug(">>> Entering GetGiftCardsByPurchasedWithOrderItemIdAsync(purchasedWithOrderItemId={PurchasedWithOrderItemId})", purchasedWithOrderItemId);
         if (purchasedWithOrderItemId == 0)
             return new List<GiftCard>();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var query = _giftCardRepository.Table;
         query = query.Where(gc => gc.PurchasedWithOrderItemId.HasValue && gc.PurchasedWithOrderItemId.Value == purchasedWithOrderItemId);
+		logger.LogDebug("GetGiftCardsByPurchasedWithOrderItemIdAsync(purchasedWithOrderItemId={PurchasedWithOrderItemId}): query → {Query}", purchasedWithOrderItemId, query);
         query = query.OrderBy(gc => gc.Id);
 
         var giftCards = await query.ToListAsync();
 
+		logger.LogDebug("GetGiftCardsByPurchasedWithOrderItemIdAsync(purchasedWithOrderItemId={PurchasedWithOrderItemId}): giftCards → {GiftCards}", purchasedWithOrderItemId, giftCards);
+		logger.LogDebug("<<< Exiting GetGiftCardsByPurchasedWithOrderItemIdAsync(purchasedWithOrderItemId={PurchasedWithOrderItemId})", purchasedWithOrderItemId);
         return giftCards;
     }
 
@@ -171,19 +200,24 @@ public partial class GiftCardService : IGiftCardService
     /// </returns>
     public virtual async Task<IList<GiftCard>> GetActiveGiftCardsAppliedByCustomerAsync(Customer customer)
     {
+		logger.LogDebug(">>> Entering GetActiveGiftCardsAppliedByCustomerAsync(customer={Customer})", customer);
         var result = new List<GiftCard>();
         if (customer == null)
+			logger.LogDebug("GetActiveGiftCardsAppliedByCustomerAsync(customer={Customer}): result → {Result}", customer, result);
             return result;
 
         var couponCodes = await _customerService.ParseAppliedGiftCardCouponCodesAsync(customer);
         foreach (var couponCode in couponCodes)
         {
+		logger.LogDebug("GetActiveGiftCardsAppliedByCustomerAsync(customer={Customer}): couponCodes → {CouponCodes}", customer, couponCodes);
             var giftCards = await GetAllGiftCardsAsync(isGiftCardActivated: true, giftCardCouponCode: couponCode);
             foreach (var gc in giftCards)
                 if (await IsGiftCardValidAsync(gc))
+				logger.LogDebug("GetActiveGiftCardsAppliedByCustomerAsync(customer={Customer}): giftCards → {GiftCards}", customer, giftCards);
                     result.Add(gc);
         }
 
+		logger.LogDebug("<<< Exiting GetActiveGiftCardsAppliedByCustomerAsync(customer={Customer})", customer);
         return result;
     }
 
@@ -193,10 +227,13 @@ public partial class GiftCardService : IGiftCardService
     /// <returns>Result</returns>
     public virtual string GenerateGiftCardCode()
     {
+		logger.LogDebug(">>> Entering GenerateGiftCardCode()");
         var length = 13;
         var result = Guid.NewGuid().ToString();
         if (result.Length > length)
+			logger.LogDebug("GenerateGiftCardCode(): result → {Result}", result);
             result = result[0..length];
+		logger.LogDebug("<<< Exiting GenerateGiftCardCode()");
         return result;
     }
 
@@ -207,18 +244,30 @@ public partial class GiftCardService : IGiftCardService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteGiftCardUsageHistoryAsync(Order order)
     {
+		logger.LogDebug(">>> Entering DeleteGiftCardUsageHistoryAsync(order={Order})", order);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var giftCardUsageHistory = await GetGiftCardUsageHistoryAsync(order);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _giftCardUsageHistoryRepository.DeleteAsync(giftCardUsageHistory);
 
+		logger.LogDebug("DeleteGiftCardUsageHistoryAsync(order={Order}): giftCardUsageHistory → {GiftCardUsageHistory}", order, giftCardUsageHistory);
+		logger.LogInformation("DeleteGiftCardUsageHistoryAsync(order)={Order}: delete query executed in {Arg1} ms", order, __logStart.ElapsedMilliseconds);
         var query = _giftCardRepository.Table;
 
+		logger.LogDebug("DeleteGiftCardUsageHistoryAsync(order={Order}): query → {Query}", order, query);
         var giftCardIds = giftCardUsageHistory.Select(gcuh => gcuh.GiftCardId).ToArray();
         var giftCards = await query.Where(bp => giftCardIds.Contains(bp.Id)).ToListAsync();
 
+		logger.LogDebug("DeleteGiftCardUsageHistoryAsync(order={Order}): giftCardIds → {GiftCardIds}", order, giftCardIds);
+		logger.LogDebug("DeleteGiftCardUsageHistoryAsync(order={Order}): giftCards → {GiftCards}", order, giftCards);
+		logger.LogInformation("DeleteGiftCardUsageHistoryAsync(order)={Order}: database query executed in {Arg1} ms", order, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("DeleteGiftCardUsageHistoryAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
         //event notification
         foreach (var giftCard in giftCards)
             await _eventPublisher.EntityUpdatedAsync(giftCard);
+			logger.LogDebug("<<< Exiting DeleteGiftCardUsageHistoryAsync(order={Order})", order);
+			logger.LogInformation("DeleteGiftCardUsageHistoryAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -230,16 +279,19 @@ public partial class GiftCardService : IGiftCardService
     /// </returns>
     public virtual async Task<decimal> GetGiftCardRemainingAmountAsync(GiftCard giftCard)
     {
+		logger.LogDebug(">>> Entering GetGiftCardRemainingAmountAsync(giftCard={GiftCard})", giftCard);
         ArgumentNullException.ThrowIfNull(giftCard);
 
         var result = giftCard.Amount;
 
+		logger.LogDebug("GetGiftCardRemainingAmountAsync(giftCard={GiftCard}): result → {Result}", giftCard, result);
         foreach (var gcuh in await GetGiftCardUsageHistoryAsync(giftCard))
             result -= gcuh.UsedValue;
 
         if (result < decimal.Zero)
             result = decimal.Zero;
 
+		logger.LogDebug("<<< Exiting GetGiftCardRemainingAmountAsync(giftCard={GiftCard})", giftCard);
         return result;
     }
 
@@ -253,8 +305,11 @@ public partial class GiftCardService : IGiftCardService
     /// </returns>
     public virtual async Task<IList<GiftCardUsageHistory>> GetGiftCardUsageHistoryAsync(GiftCard giftCard)
     {
+		logger.LogDebug(">>> Entering GetGiftCardUsageHistoryAsync(giftCard={GiftCard})", giftCard);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(giftCard);
 
+		logger.LogDebug("<<< Exiting GetGiftCardUsageHistoryAsync(giftCard={GiftCard})", giftCard);
         return await _giftCardUsageHistoryRepository.Table
             .Where(gcuh => gcuh.GiftCardId == giftCard.Id)
             .ToListAsync();
@@ -272,6 +327,7 @@ public partial class GiftCardService : IGiftCardService
     {
         ArgumentNullException.ThrowIfNull(order);
 
+		logger.LogDebug("<<< Exiting GetGiftCardUsageHistoryAsync(order={Order})", order);
         return await _giftCardUsageHistoryRepository.Table
             .Where(gcuh => gcuh.UsedWithOrderId == order.Id)
             .ToListAsync();
@@ -284,6 +340,8 @@ public partial class GiftCardService : IGiftCardService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertGiftCardUsageHistoryAsync(GiftCardUsageHistory giftCardUsageHistory)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _giftCardUsageHistoryRepository.InsertAsync(giftCardUsageHistory);
     }
 
@@ -297,6 +355,7 @@ public partial class GiftCardService : IGiftCardService
     /// </returns>
     public virtual async Task<bool> IsGiftCardValidAsync(GiftCard giftCard)
     {
+		logger.LogDebug(">>> Entering IsGiftCardValidAsync(giftCard={GiftCard})", giftCard);
         ArgumentNullException.ThrowIfNull(giftCard);
 
         if (!giftCard.IsGiftCardActivated)
@@ -304,6 +363,7 @@ public partial class GiftCardService : IGiftCardService
 
         var remainingAmount = await GetGiftCardRemainingAmountAsync(giftCard);
         if (remainingAmount > decimal.Zero)
+			logger.LogDebug("IsGiftCardValidAsync(giftCard={GiftCard}): remainingAmount → {RemainingAmount}", giftCard, remainingAmount);
             return true;
 
         return false;

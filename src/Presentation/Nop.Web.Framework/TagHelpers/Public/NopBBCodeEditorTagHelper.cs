@@ -27,7 +27,10 @@ public partial class NopBBCodeEditorTagHelper : TagHelper
 
     public NopBBCodeEditorTagHelper(IWebHelper webHelper)
     {
+		logger.LogDebug(">>> Entering NopBBCodeEditorTagHelper(webHelper={WebHelper})", webHelper);
         _webHelper = webHelper;
+		logger.LogDebug("<<< Exiting NopBBCodeEditorTagHelper(webHelper={WebHelper})", webHelper);
+		logger.LogDebug("NopBBCodeEditorTagHelper(webHelper={WebHelper}): _webHelper → {_webHelper}", webHelper, _webHelper);
     }
 
     #endregion
@@ -42,28 +45,36 @@ public partial class NopBBCodeEditorTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
 
         output.TagName = "div";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.Add("class", "bb-code-editor-wrapper");
 
         var storeLocation = _webHelper.GetStoreLocation();
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): storeLocation → {StoreLocation}", context, output, storeLocation);
         var bbEditorWebRoot = $"{storeLocation}js/";
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): bbEditorWebRoot → {BbEditorWebRoot}", context, output, bbEditorWebRoot);
         var script1 = new TagBuilder("script");
         script1.Attributes.Add("src", $"{storeLocation}js/bbeditor/ed.js");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): script1 → {Script1}", context, output, script1);
 
         var script2 = new TagBuilder("script");
         script2.Attributes.Add("language", "javascript");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): script2 → {Script2}", context, output, script2);
         script2.InnerHtml.AppendHtml($"edToolbar('{For.Name}','{bbEditorWebRoot}');");
 
         output.Content.AppendHtml(script1);
         output.Content.AppendHtml(script2);
 
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

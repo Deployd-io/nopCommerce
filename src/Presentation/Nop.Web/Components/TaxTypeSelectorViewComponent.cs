@@ -19,10 +19,13 @@ public partial class TaxTypeSelectorViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (!_taxSettings.AllowCustomersToSelectTaxDisplayType)
             return Content("");
 
         var model = await _commonModelFactory.PrepareTaxTypeSelectorModelAsync();
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 }

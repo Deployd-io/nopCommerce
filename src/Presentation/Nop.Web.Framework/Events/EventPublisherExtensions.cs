@@ -16,7 +16,9 @@ public static class EventPublisherExtensions
     /// <param name="model">Model</param>
     public static void ModelPrepared(this IEventPublisher eventPublisher, object model)
     {
+		logger.LogDebug(">>> Entering ModelPrepared(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
         ModelPreparedAsync(eventPublisher, model).Wait();
+		logger.LogDebug("<<< Exiting ModelPrepared(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
     }
 
     /// <summary>
@@ -27,6 +29,7 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task ModelPreparedAsync(this IEventPublisher eventPublisher, object model)
     {
+		logger.LogDebug(">>> Entering ModelPreparedAsync(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
         switch (model)
         {
             case BaseNopModel nopModel:
@@ -40,6 +43,7 @@ public static class EventPublisherExtensions
                 await eventPublisher.PublishAsync(new ModelPreparedEvent<IEnumerable<BaseNopModel>>(modelCollection));
                 break;
         }
+		logger.LogDebug("<<< Exiting ModelPreparedAsync(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
     }
 
     /// <summary>
@@ -52,6 +56,8 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task ModelReceivedAsync<T>(this IEventPublisher eventPublisher, T model, ModelStateDictionary modelState)
     {
+		logger.LogDebug(">>> Entering ModelReceivedAsync(eventPublisher={EventPublisher},model={Model},modelState={ModelState})", eventPublisher, model, modelState);
         await eventPublisher.PublishAsync(new ModelReceivedEvent<T>(model, modelState));
+		logger.LogDebug("<<< Exiting ModelReceivedAsync(eventPublisher={EventPublisher},model={Model},modelState={ModelState})", eventPublisher, model, modelState);
     }
 }

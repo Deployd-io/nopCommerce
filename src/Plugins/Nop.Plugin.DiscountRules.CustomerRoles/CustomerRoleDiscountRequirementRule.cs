@@ -52,22 +52,26 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// </returns>
     public async Task<DiscountRequirementValidationResult> CheckRequirementAsync(DiscountRequirementValidationRequest request)
     {
+		logger.LogDebug(">>> Entering CheckRequirementAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         //invalid by default
         var result = new DiscountRequirementValidationResult();
 
+		logger.LogDebug("CheckRequirementAsync(request={Request}): result → {Result}", request, result);
         if (request.Customer == null)
             return result;
 
         //try to get saved restricted customer role identifier
         var restrictedRoleId = await _settingService.GetSettingByKeyAsync<int>(string.Format(DiscountRequirementDefaults.SettingsKey, request.DiscountRequirementId));
         if (restrictedRoleId == 0)
+			logger.LogDebug("CheckRequirementAsync(request={Request}): restrictedRoleId → {RestrictedRoleId}", request, restrictedRoleId);
             return result;
 
         //result is valid if the customer belongs to the restricted role
         result.IsValid = (await _customerService.GetCustomerRolesAsync(request.Customer)).Any(role => role.Id == restrictedRoleId);
 
+		logger.LogDebug("<<< Exiting CheckRequirementAsync(request={Request})", request);
         return result;
     }
 
@@ -79,6 +83,8 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>URL</returns>
     public string GetConfigurationUrl(int discountId, int? discountRequirementId)
     {
+		logger.LogDebug(">>> Entering GetConfigurationUrl(discountId={DiscountId},discountRequirementId={DiscountRequirementId})", discountId, discountRequirementId);
+		logger.LogDebug("<<< Exiting GetConfigurationUrl(discountId={DiscountId},discountRequirementId={DiscountRequirementId})", discountId, discountRequirementId);
         return _nopUrlHelper.RouteUrl(DiscountRequirementDefaults.ConfigurationRouteName,
             new { discountId = discountId, discountRequirementId = discountRequirementId }, _webHelper.GetCurrentRequestProtocol());
     }
@@ -89,6 +95,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //locales
         await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
         {
@@ -100,6 +107,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -108,6 +116,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //discount requirements
         var discountRequirements = (await _discountService.GetAllDiscountRequirementsAsync())
             .Where(discountRequirement => discountRequirement.DiscountRequirementRuleSystemName == DiscountRequirementDefaults.SystemName);
@@ -120,6 +129,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.DiscountRules.CustomerRoles");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

@@ -47,6 +47,7 @@ public class ScheduleTaskMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -62,12 +63,14 @@ public class ScheduleTaskMigration : MigrationBase
         //settings
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.UseTaxRateTables))
             _avalaraTaxSettings.UseTaxRateTables = true;
+			logger.LogDebug("Up(): _avalaraTaxSettings.UseTaxRateTables → {Arg0}", _avalaraTaxSettings.UseTaxRateTables);
         _settingService.SaveSetting(_avalaraTaxSettings);
 
         //in version 4.50 we added the LastEnabledUtc field to the ScheduleTask entity,
         //we need to make sure that these changes are applied before inserting new task into the database
         var scheduleTaskTableName = NameCompatibilityManager.GetTableName(typeof(ScheduleTask));
 
+		logger.LogDebug("Up(): scheduleTaskTableName → {ScheduleTaskTableName}", scheduleTaskTableName);
         //add column if not exists
         if (!Schema.Table(scheduleTaskTableName).Column(nameof(ScheduleTask.LastEnabledUtc)).Exists())
             Alter.Table(scheduleTaskTableName)
@@ -82,7 +85,14 @@ public class ScheduleTaskMigration : MigrationBase
             StopOnError = false,
             Name = AvalaraTaxDefaults.DownloadTaxRatesTask.Name,
             Type = AvalaraTaxDefaults.DownloadTaxRatesTask.Type
+			logger.LogInformation("Up(): Enabled → {Enabled}", Enabled);
+			logger.LogDebug("Up(): LastEnabledUtc → {LastEnabledUtc}", LastEnabledUtc);
+			logger.LogDebug("Up(): Seconds → {Seconds}", Seconds);
+			logger.LogDebug("Up(): StopOnError → {StopOnError}", StopOnError);
+			logger.LogDebug("Up(): Name → {Name}", Name);
+			logger.LogDebug("Up(): Type → {Type}", Type);
         });
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -90,7 +100,9 @@ public class ScheduleTaskMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

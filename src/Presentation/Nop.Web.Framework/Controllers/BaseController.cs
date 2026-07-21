@@ -44,6 +44,7 @@ public abstract partial class BaseController : Controller
     /// </returns>
     protected virtual async Task<string> RenderViewComponentToStringAsync(Type componentType, object arguments = null)
     {
+		logger.LogDebug(">>> Entering RenderViewComponentToStringAsync(componentType={ComponentType},arguments={Arguments})", componentType, arguments);
         var helper = new DefaultViewComponentHelper(
             EngineContext.Current.Resolve<IViewComponentDescriptorCollectionProvider>(),
             HtmlEncoder.Default,
@@ -53,10 +54,14 @@ public abstract partial class BaseController : Controller
 
         using var writer = new StringWriter();
         var context = new ViewContext(ControllerContext, NullView.Instance, ViewData, TempData, writer, new HtmlHelperOptions());
+		logger.LogDebug("RenderViewComponentToStringAsync(componentType={ComponentType},arguments={Arguments}): writer → {Writer}", componentType, arguments, writer);
+		logger.LogDebug("RenderViewComponentToStringAsync(componentType={ComponentType},arguments={Arguments}): context → {Context}", componentType, arguments, context);
         helper.Contextualize(context);
         var result = await helper.InvokeAsync(componentType, arguments);
         result.WriteTo(writer, HtmlEncoder.Default);
+		logger.LogDebug("RenderViewComponentToStringAsync(componentType={ComponentType},arguments={Arguments}): result → {Result}", componentType, arguments, result);
         await writer.FlushAsync();
+		logger.LogDebug("<<< Exiting RenderViewComponentToStringAsync(componentType={ComponentType},arguments={Arguments})", componentType, arguments);
         return writer.ToString();
     }
 
@@ -72,11 +77,14 @@ public abstract partial class BaseController : Controller
     protected virtual async Task<string> RenderPartialViewToStringAsync(string viewName, object model)
     {
         //get Razor view engine
+		logger.LogDebug(">>> Entering RenderPartialViewToStringAsync(viewName={ViewName},model={Model})", viewName, model);
         var razorViewEngine = EngineContext.Current.Resolve<IRazorViewEngine>();
 
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): razorViewEngine → {RazorViewEngine}", viewName, model, razorViewEngine);
         //create action context
         var actionContext = new ActionContext(HttpContext, RouteData, ControllerContext.ActionDescriptor, ModelState);
 
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): actionContext → {ActionContext}", viewName, model, actionContext);
         //set view name as action name in case if not passed
         if (string.IsNullOrEmpty(viewName))
             viewName = ControllerContext.ActionDescriptor.ActionName;
@@ -86,13 +94,16 @@ public abstract partial class BaseController : Controller
         //as we do in the /Nop.Web.Framework/Mvc/Filters/PublishModelEventsAttribute.cs for controllers
         var eventPublisher = EngineContext.Current.Resolve<IEventPublisher>();
         await eventPublisher.ModelPreparedAsync(model);
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): eventPublisher → {EventPublisher}", viewName, model, eventPublisher);
         
         //set model
         ViewData.Model = model;
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): ViewData.Model → {Arg2}", viewName, model, ViewData.Model);
 
         //try to get a view by the name
         var viewResult = razorViewEngine.FindView(actionContext, viewName, false);
 
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): viewResult → {ViewResult}", viewName, model, viewResult);
         if (viewResult.View == null)
         {
             //or try to get a view by the path
@@ -103,8 +114,11 @@ public abstract partial class BaseController : Controller
 
         await using var stringWriter = new StringWriter();
         var viewContext = new ViewContext(actionContext, viewResult.View, ViewData, TempData, stringWriter, new HtmlHelperOptions());
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): stringWriter → {StringWriter}", viewName, model, stringWriter);
+		logger.LogDebug("RenderPartialViewToStringAsync(viewName={ViewName},model={Model}): viewContext → {ViewContext}", viewName, model, viewContext);
         await viewResult.View.RenderAsync(viewContext);
 
+		logger.LogDebug("<<< Exiting RenderPartialViewToStringAsync(viewName={ViewName},model={Model})", viewName, model);
         return stringWriter.GetStringBuilder().ToString();
     }
 
@@ -119,6 +133,8 @@ public abstract partial class BaseController : Controller
     /// <returns>Error's JSON data</returns>
     protected JsonResult ErrorJson(string error)
     {
+		logger.LogDebug(">>> Entering ErrorJson(error={Error})", error);
+		logger.LogDebug("<<< Exiting ErrorJson(error={Error})", error);
         return Json(new
         {
             error
@@ -132,6 +148,8 @@ public abstract partial class BaseController : Controller
     /// <returns>Error's JSON data</returns>
     protected JsonResult ErrorJson(object errors)
     {
+		logger.LogDebug("ErrorJson(errors={Errors}): error → {Error}", errors, error);
+		logger.LogDebug("<<< Exiting ErrorJson(errors={Errors})", errors);
         return Json(new
         {
             error = errors
@@ -143,9 +161,12 @@ public abstract partial class BaseController : Controller
     /// <param name="editPageUrl">Edit page URL</param>
     protected virtual void DisplayEditLink(string editPageUrl)
     {
+		logger.LogDebug(">>> Entering DisplayEditLink(editPageUrl={EditPageUrl})", editPageUrl);
         var nopHtmlHelper = EngineContext.Current.Resolve<INopHtmlHelper>();
 
+		logger.LogDebug("DisplayEditLink(editPageUrl={EditPageUrl}): nopHtmlHelper → {NopHtmlHelper}", editPageUrl, nopHtmlHelper);
         nopHtmlHelper.AddEditPageUrl(editPageUrl);
+		logger.LogDebug("<<< Exiting DisplayEditLink(editPageUrl={EditPageUrl})", editPageUrl);
     }
 
     #endregion
@@ -196,9 +217,12 @@ public abstract partial class BaseController : Controller
     /// <returns>Access denied view</returns>
     protected virtual IActionResult AccessDeniedView()
     {
+		logger.LogDebug(">>> Entering AccessDeniedView()");
         var webHelper = EngineContext.Current.Resolve<IWebHelper>();
 
+		logger.LogDebug("AccessDeniedView(): webHelper → {WebHelper}", webHelper);
         //return Challenge();
+		logger.LogDebug("<<< Exiting AccessDeniedView()");
         return RedirectToAction("AccessDenied", "Security", new { pageUrl = webHelper.GetRawUrl(Request) });
     }
 
@@ -211,8 +235,11 @@ public abstract partial class BaseController : Controller
     /// </returns>
     protected virtual async Task<JsonResult> AccessDeniedJsonAsync()
     {
+		logger.LogDebug(">>> Entering AccessDeniedJsonAsync()");
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		logger.LogDebug("AccessDeniedJsonAsync(): localizationService → {LocalizationService}", localizationService);
+		logger.LogDebug("<<< Exiting AccessDeniedJsonAsync()");
         return ErrorJson(await localizationService.GetResourceAsync("Admin.AccessDenied.Description"));
     }
 
@@ -227,12 +254,14 @@ public abstract partial class BaseController : Controller
     /// <param name="persistForTheNextRequest">A value indicating whether a message should be persisted for the next request. Pass null to ignore</param>
     public virtual void SaveSelectedCardName(string cardName, bool persistForTheNextRequest = true)
     {
+		logger.LogDebug(">>> Entering SaveSelectedCardName(cardName={CardName},persistForTheNextRequest={PersistForTheNextRequest})", cardName, persistForTheNextRequest);
         //keep this method synchronized with
         //"GetSelectedCardName" method of \Nop.Web.Framework\Extensions\HtmlExtensions.cs
         ArgumentException.ThrowIfNullOrEmpty(cardName);
 
         const string dataKey = "nop.selected-card-name";
         if (persistForTheNextRequest)
+		logger.LogDebug("SaveSelectedCardName(cardName={CardName},persistForTheNextRequest={PersistForTheNextRequest}): dataKey → {DataKey}", cardName, persistForTheNextRequest, dataKey);
         {
             TempData[dataKey] = cardName;
         }
@@ -240,6 +269,7 @@ public abstract partial class BaseController : Controller
         {
             ViewData[dataKey] = cardName;
         }
+		logger.LogDebug("<<< Exiting SaveSelectedCardName(cardName={CardName},persistForTheNextRequest={PersistForTheNextRequest})", cardName, persistForTheNextRequest);
     }
 
     /// <summary>
@@ -249,6 +279,7 @@ public abstract partial class BaseController : Controller
     /// <param name="persistForTheNextRequest">A value indicating whether a message should be persisted for the next request. Pass null to ignore</param>
     public virtual async Task SaveSelectedTabNameAsync(string tabName = "", bool persistForTheNextRequest = true)
     {
+		logger.LogDebug(">>> Entering SaveSelectedTabNameAsync(tabName={TabName},persistForTheNextRequest={PersistForTheNextRequest})", tabName, persistForTheNextRequest);
         //default root tab
         SaveSelectedTabName(tabName, await Request.GetFormValueAsync("selected-tab-name"), null, persistForTheNextRequest);
         //child tabs (usually used for localization)
@@ -258,9 +289,11 @@ public abstract partial class BaseController : Controller
 
         var form = await Request.ReadFormAsync();
 
+		logger.LogDebug("SaveSelectedTabNameAsync(tabName={TabName},persistForTheNextRequest={PersistForTheNextRequest}): form → {Form}", tabName, persistForTheNextRequest, form);
         foreach (var item in form)
             if (item.Key.StartsWith("selected-tab-name-", StringComparison.InvariantCultureIgnoreCase))
                 SaveSelectedTabName(null, item.Value, item.Key["selected-tab-name-".Length..], persistForTheNextRequest);
+				logger.LogDebug("<<< Exiting SaveSelectedTabNameAsync(tabName={TabName},persistForTheNextRequest={PersistForTheNextRequest})", tabName, persistForTheNextRequest);
     }
 
     /// <summary>
@@ -272,6 +305,7 @@ public abstract partial class BaseController : Controller
     /// <param name="dataKeyPrefix">A prefix for child tab to process</param>
     protected virtual void SaveSelectedTabName(string tabName, StringValues selectedTabName, string dataKeyPrefix, bool persistForTheNextRequest)
     {
+		logger.LogDebug(">>> Entering SaveSelectedTabName(tabName={TabName},selectedTabName={SelectedTabName},dataKeyPrefix={DataKeyPrefix},persistForTheNextRequest={PersistForTheNextRequest})", tabName, selectedTabName, dataKeyPrefix, persistForTheNextRequest);
         //keep this method synchronized with
         //"GetSelectedTabName" method of \Nop.Web.Framework\Extensions\HtmlExtensions.cs
         if (string.IsNullOrEmpty(tabName))
@@ -282,6 +316,7 @@ public abstract partial class BaseController : Controller
 
         var dataKey = "nop.selected-tab-name";
         if (!string.IsNullOrEmpty(dataKeyPrefix))
+			logger.LogDebug("SaveSelectedTabName(tabName={TabName},selectedTabName={SelectedTabName},dataKeyPrefix={DataKeyPrefix},persistForTheNextRequest={PersistForTheNextRequest}): dataKey → {DataKey}", tabName, selectedTabName, dataKeyPrefix, persistForTheNextRequest, dataKey);
             dataKey += $"-{dataKeyPrefix}";
 
         if (persistForTheNextRequest)

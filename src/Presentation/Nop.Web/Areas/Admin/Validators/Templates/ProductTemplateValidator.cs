@@ -10,9 +10,11 @@ public partial class ProductTemplateValidator : BaseNopValidator<ProductTemplate
 {
     public ProductTemplateValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductTemplateValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Product.Name.Required"));
         RuleFor(x => x.ViewPath).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Product.ViewPath.Required"));
 
         SetDatabaseValidationRules<ProductTemplate>();
+		logger.LogDebug("<<< Exiting ProductTemplateValidator(localizationService={LocalizationService})", localizationService);
     }
 }

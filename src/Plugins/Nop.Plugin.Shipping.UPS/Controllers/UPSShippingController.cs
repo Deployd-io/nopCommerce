@@ -58,6 +58,7 @@ public class UPSShippingController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //prepare common model
         var model = new UPSShippingModel
         {
@@ -104,12 +105,15 @@ public class UPSShippingController : BasePluginController
         //check measures
         var weightSystemName = _upsSettings.WeightType switch { "LBS" => "lb", "KGS" => "kg", _ => null };
         if (await _measureService.GetMeasureWeightBySystemKeywordAsync(weightSystemName) == null)
+			logger.LogDebug("Configure(): weightSystemName → {WeightSystemName}", weightSystemName);
             _notificationService.ErrorNotification($"Could not load '{weightSystemName}' <a href=\"{Url.Action("List", "Measure")}\" target=\"_blank\">measure weight</a>", false);
 
         var dimensionSystemName = _upsSettings.DimensionsType switch { "IN" => "inches", "CM" => "centimeters", _ => null };
         if (await _measureService.GetMeasureDimensionBySystemKeywordAsync(dimensionSystemName) == null)
+			logger.LogDebug("Configure(): dimensionSystemName → {DimensionSystemName}", dimensionSystemName);
             _notificationService.ErrorNotification($"Could not load '{dimensionSystemName}' <a href=\"{Url.Action("List", "Measure")}\" target=\"_blank\">measure dimension</a>", false);
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Shipping.UPS/Views/Configure.cshtml", model);
     }
 

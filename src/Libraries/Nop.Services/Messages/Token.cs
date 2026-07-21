@@ -14,6 +14,9 @@ public sealed partial class Token
     /// <param name="value">Value</param>
     public Token(string key, object value) : this(key, value, false)
     {
+	logger.LogDebug(">>> Entering Token(key={Key},value={Value})", key, value);
+	logger.LogDebug(">>> Entering Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded})", key, value, neverHtmlEncoded);
+	logger.LogDebug("<<< Exiting Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded})", key, value, neverHtmlEncoded);
     }
 
     /// <summary>
@@ -26,7 +29,11 @@ public sealed partial class Token
     {
         Key = key;
         Value = value;
+		logger.LogWarning("Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded}): Key → {Key1}", key, value, neverHtmlEncoded, Key);
+		logger.LogDebug("Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded}): Value → {Value1}", key, value, neverHtmlEncoded, Value);
         NeverHtmlEncoded = neverHtmlEncoded;
+		logger.LogDebug("<<< Exiting Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded})", key, value, neverHtmlEncoded);
+		logger.LogDebug("Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded}): NeverHtmlEncoded → {NeverHtmlEncoded1}", key, value, neverHtmlEncoded, NeverHtmlEncoded);
     }
 
     #endregion
@@ -58,6 +65,8 @@ public sealed partial class Token
     /// <returns>String value</returns>
     public override string ToString()
     {
+		logger.LogDebug(">>> Entering ToString()");
+		logger.LogDebug("<<< Exiting ToString()");
         return $"{Key}: {Value}";
     }
 

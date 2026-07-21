@@ -7,8 +7,12 @@ public class ItemClassificationModel
 
     public ItemClassificationModel()
     {
+		logger.LogDebug(">>> Entering ItemClassificationModel()");
         ClassificationParameters = new List<ClassificationParameters>();
         Parameters = new List<ClassificationParameters>();
+		logger.LogDebug("<<< Exiting ItemClassificationModel()");
+		logger.LogDebug("ItemClassificationModel(): ClassificationParameters → {ClassificationParameters}", ClassificationParameters);
+		logger.LogDebug("ItemClassificationModel(): Parameters → {Parameters}", Parameters);
     }
 
     /// <summary>

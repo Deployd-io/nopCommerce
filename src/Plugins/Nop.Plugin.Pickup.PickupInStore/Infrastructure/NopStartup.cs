@@ -19,8 +19,10 @@ public class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         services.AddScoped<IStorePickupPointService, StorePickupPointService>();
         services.AddScoped<IStorePickupPointModelFactory, StorePickupPointModelFactory>();
+		logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -29,6 +31,8 @@ public class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public void Configure(IApplicationBuilder application)
     {
+	logger.LogDebug(">>> Entering Configure(application={Application})", application);
+	logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

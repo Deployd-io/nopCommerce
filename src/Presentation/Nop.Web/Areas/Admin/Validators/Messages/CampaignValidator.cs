@@ -10,6 +10,7 @@ public partial class CampaignValidator : BaseNopValidator<CampaignModel>
 {
     public CampaignValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CampaignValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Promotions.Campaigns.Fields.Name.Required"));
 
         RuleFor(x => x.Subject).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Promotions.Campaigns.Fields.Subject.Required"));
@@ -17,5 +18,6 @@ public partial class CampaignValidator : BaseNopValidator<CampaignModel>
         RuleFor(x => x.Body).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Promotions.Campaigns.Fields.Body.Required"));
 
         SetDatabaseValidationRules<Campaign>();
+		logger.LogDebug("<<< Exiting CampaignValidator(localizationService={LocalizationService})", localizationService);
     }
 }

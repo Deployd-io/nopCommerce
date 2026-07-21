@@ -62,6 +62,8 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(RfqDefaults.ConfigurationRouteName);
     }
 
@@ -74,6 +76,8 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             PublicWidgetZones.OrderSummaryContentAfter,
@@ -88,10 +92,12 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         if (widgetZone == PublicWidgetZones.OrderSummaryContentAfter)
             return typeof(AddRfqComponent);
 
         if (widgetZone == PublicWidgetZones.AccountNavigationAfter)
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
             return typeof(CustomerRfqMenuComponent);
 
         return null;
@@ -103,6 +109,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new RfqSettings
         {
@@ -121,8 +128,11 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 
         var messageTemplates = new List<MessageTemplate>();
         var allMessageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(0);
+		logger.LogDebug("InstallAsync(): messageTemplates → {MessageTemplates}", messageTemplates);
+		logger.LogDebug("InstallAsync(): allMessageTemplates → {AllMessageTemplates}", allMessageTemplates);
         var existsMessageTemplateNames = allMessageTemplates.Select(t => t.Name).ToList();
 
+		logger.LogDebug("InstallAsync(): existsMessageTemplateNames → {ExistsMessageTemplateNames}", existsMessageTemplateNames);
         if (!existsMessageTemplateNames.Contains(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE))
         {
             messageTemplates.Add(new MessageTemplate
@@ -262,6 +272,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -270,6 +281,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<RfqSettings>();
 
@@ -294,6 +306,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 
         var deletedMessageTemplates = new List<MessageTemplate>();
         deletedMessageTemplates.AddRange((await _messageTemplateService.GetMessageTemplatesByNameAsync(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE)).ToList());
+		logger.LogDebug("UninstallAsync(): deletedMessageTemplates → {DeletedMessageTemplates}", deletedMessageTemplates);
         deletedMessageTemplates.AddRange((await _messageTemplateService.GetMessageTemplatesByNameAsync(RfqDefaults.ADMIN_SENT_NEW_QUOTE)).ToList());
 
         deletedMessageTemplates = deletedMessageTemplates.Where(mt => mt != null).ToList();
@@ -308,6 +321,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourceAsync($"Admin.ContentManagement.MessageTemplates.Description.{RfqDefaults.ADMIN_SENT_NEW_QUOTE}");
         await _localizationService.DeleteLocaleResourcesAsync("Security.Permission.Misc.RFQ.AccessRFQ.Admin.AccessRFQ");
         await _localizationService.DeleteLocaleResourcesAsync("Security.Permission.Misc.RFQ.AccessRFQ.PublicStore.AccessRFQ");
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

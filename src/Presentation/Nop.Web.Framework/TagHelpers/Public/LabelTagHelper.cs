@@ -20,6 +20,8 @@ public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelT
 
     public LabelTagHelper(IHtmlGenerator generator) : base(generator)
     {
+	logger.LogDebug(">>> Entering LabelTagHelper(generator={Generator})", generator);
+	logger.LogDebug("<<< Exiting LabelTagHelper(generator={Generator})", generator);
     }
 
     #endregion
@@ -34,6 +36,7 @@ public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelT
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -41,6 +44,7 @@ public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelT
         output.Content.Append(Postfix);
 
         await base.ProcessAsync(context, output);
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

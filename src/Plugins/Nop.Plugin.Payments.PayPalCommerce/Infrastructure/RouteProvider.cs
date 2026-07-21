@@ -17,8 +17,10 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         var lang = GetLanguageRoutePattern();
 
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         endpointRouteBuilder.MapControllerRoute(name: PayPalCommerceDefaults.Route.Configuration,
             pattern: "Admin/PayPalCommerce/Configure",
             defaults: new { controller = "PayPalCommerce", action = "Configure", area = AreaNames.ADMIN });
@@ -47,6 +49,7 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
             pattern: $"{lang}/customer/paypal-payment-methods",
             defaults: new { controller = "PayPalCommercePublic", action = "PaymentTokens" });
 
+	logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

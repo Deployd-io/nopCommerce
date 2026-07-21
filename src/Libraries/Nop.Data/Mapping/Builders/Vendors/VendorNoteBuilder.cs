@@ -17,9 +17,11 @@ public partial class VendorNoteBuilder : NopEntityBuilder<VendorNote>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(VendorNote.Note)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(VendorNote.VendorId)).AsInt32().ForeignKey<Vendor>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

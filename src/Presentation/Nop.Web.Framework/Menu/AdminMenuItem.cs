@@ -19,7 +19,10 @@ public partial class AdminMenuItem
     /// </summary>
     public AdminMenuItem()
     {
+		logger.LogDebug(">>> Entering AdminMenuItem()");
         ChildNodes = new List<AdminMenuItem>();
+		logger.LogDebug("<<< Exiting AdminMenuItem()");
+		logger.LogDebug("AdminMenuItem(): ChildNodes → {ChildNodes}", ChildNodes);
     }
 
     #endregion
@@ -35,9 +38,11 @@ public partial class AdminMenuItem
     /// <returns>True if a new menu item has been inserted</returns>
     protected virtual bool Insert(string itemSystemName, AdminMenuItem newMenuItem, bool before)
     {
+		logger.LogDebug(">>> Entering Insert(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem},before={Before})", itemSystemName, newMenuItem, before);
         var position = 0;
         var inserted = false;
 
+		logger.LogDebug("Insert(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem},before={Before}): inserted → {Inserted}", itemSystemName, newMenuItem, before, inserted);
         foreach (var adminMenuItem in ChildNodes.ToList())
             if (!adminMenuItem.SystemName.Equals(itemSystemName))
                 position += 1;
@@ -59,6 +64,7 @@ public partial class AdminMenuItem
                 break;
         }
 
+		logger.LogDebug("<<< Exiting Insert(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem},before={Before})", itemSystemName, newMenuItem, before);
         return inserted;
     }
 
@@ -73,6 +79,8 @@ public partial class AdminMenuItem
     /// <returns>Result</returns>
     public bool ContainsSystemName(string systemName)
     {
+		logger.LogDebug(">>> Entering ContainsSystemName(systemName={SystemName})", systemName);
+		logger.LogDebug("<<< Exiting ContainsSystemName(systemName={SystemName})", systemName);
         return GetItemBySystemName(systemName) is not null;
     }
 
@@ -83,7 +91,9 @@ public partial class AdminMenuItem
     /// <returns>Menu item if found, otherwise null</returns>
     public AdminMenuItem GetItemBySystemName(string systemName)
     {
+		logger.LogDebug(">>> Entering GetItemBySystemName(systemName={SystemName})", systemName);
         if (string.IsNullOrEmpty(systemName))
+		logger.LogDebug("<<< Exiting GetItemBySystemName(systemName={SystemName})", systemName);
             return null;
 
         return SystemName.Equals(systemName) ? this : ChildNodes.Select(node => node.GetItemBySystemName(systemName)).FirstOrDefault(node => node is not null);
@@ -97,6 +107,8 @@ public partial class AdminMenuItem
     /// <returns>True if a new menu item has been inserted</returns>
     public virtual bool InsertBefore(string itemSystemName, AdminMenuItem newMenuItem)
     {
+		logger.LogDebug(">>> Entering InsertBefore(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
+		logger.LogDebug("<<< Exiting InsertBefore(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
         return Insert(itemSystemName, newMenuItem, true);
     }
 
@@ -108,6 +120,8 @@ public partial class AdminMenuItem
     /// <returns>True if a new menu item has been inserted</returns>
     public virtual bool InsertAfter(string itemSystemName, AdminMenuItem newMenuItem)
     {
+		logger.LogDebug(">>> Entering InsertAfter(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
+		logger.LogDebug("<<< Exiting InsertAfter(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
         return Insert(itemSystemName, newMenuItem, false);
     }
 

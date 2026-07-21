@@ -16,6 +16,8 @@ public static class HttpRequestExtensions
     /// <returns>True if the request is POST request, false in all other cases</returns>
     public static bool IsPostRequest(this HttpRequest request)
     {
+		logger.LogDebug(">>> Entering IsPostRequest(request={Request})", request);
+		logger.LogDebug("<<< Exiting IsPostRequest(request={Request})", request);
         return request.Method.Equals(WebRequestMethods.Http.Post, StringComparison.InvariantCultureIgnoreCase);
     }
 
@@ -26,6 +28,8 @@ public static class HttpRequestExtensions
     /// <returns>True if the request is GET request, false in all other cases</returns>
     public static bool IsGetRequest(this HttpRequest request)
     {
+		logger.LogDebug(">>> Entering IsGetRequest(request={Request})", request);
+		logger.LogDebug("<<< Exiting IsGetRequest(request={Request})", request);
         return request.Method.Equals(WebRequestMethods.Http.Get, StringComparison.InvariantCultureIgnoreCase);
     }
 
@@ -40,11 +44,14 @@ public static class HttpRequestExtensions
     /// </returns>
     public static async Task<StringValues> GetFormValueAsync(this HttpRequest request, string formKey)
     {
+		logger.LogDebug(">>> Entering GetFormValueAsync(request={Request},formKey={FormKey})", request, formKey);
         if (!request.HasFormContentType)
             return new StringValues();
 
         var form = await request.ReadFormAsync();
 
+		logger.LogDebug("GetFormValueAsync(request={Request},formKey={FormKey}): form → {Form}", request, formKey, form);
+		logger.LogDebug("<<< Exiting GetFormValueAsync(request={Request},formKey={FormKey})", request, formKey);
         return form[formKey];
     }
 
@@ -59,6 +66,8 @@ public static class HttpRequestExtensions
     /// </returns>
     public static async Task<bool> IsFormKeyExistsAsync(this HttpRequest request, string formKey)
     {
+		logger.LogDebug(">>> Entering IsFormKeyExistsAsync(request={Request},formKey={FormKey})", request, formKey);
+		logger.LogDebug("<<< Exiting IsFormKeyExistsAsync(request={Request},formKey={FormKey})", request, formKey);
         return await IsFormAnyAsync(request, key => key.Equals(formKey));
     }
 
@@ -112,11 +121,14 @@ public static class HttpRequestExtensions
     /// </returns>
     public static async Task<IFormFile> GetFirstOrDefaultFileAsync(this HttpRequest request)
     {
+		logger.LogDebug(">>> Entering GetFirstOrDefaultFileAsync(request={Request})", request);
         if (!request.HasFormContentType)
             return default;
 
         var form = await request.ReadFormAsync();
 
+		logger.LogDebug("GetFirstOrDefaultFileAsync(request={Request}): form → {Form}", request, form);
+		logger.LogDebug("<<< Exiting GetFirstOrDefaultFileAsync(request={Request})", request);
         return form.Files.FirstOrDefault();
     }
 }

@@ -53,7 +53,9 @@ public static class LocalizedUrlExtensions
     /// <returns>Result</returns>
     public static string RemoveApplicationPathFromRawUrl(this string rawUrl, PathString pathBase)
     {
+		logger.LogDebug(">>> Entering RemoveApplicationPathFromRawUrl(rawUrl={RawUrl},pathBase={PathBase})", rawUrl, pathBase);
         new PathString(rawUrl).StartsWithSegments(pathBase, out var result);
+		logger.LogDebug("<<< Exiting RemoveApplicationPathFromRawUrl(rawUrl={RawUrl},pathBase={PathBase})", rawUrl, pathBase);
         return WebUtility.UrlDecode(result);
     }
 
@@ -66,6 +68,7 @@ public static class LocalizedUrlExtensions
     /// <returns>URL without language SEO code</returns>
     public static string RemoveLanguageSeoCodeFromUrl(this string url, PathString pathBase, bool isRawPath)
     {
+		logger.LogDebug(">>> Entering RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath})", url, pathBase, isRawPath);
         if (string.IsNullOrEmpty(url))
             return url;
 
@@ -73,14 +76,17 @@ public static class LocalizedUrlExtensions
         if (isRawPath)
             url = url.RemoveApplicationPathFromRawUrl(pathBase);
 
+		logger.LogDebug("RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath}): url → {Url1}", url, pathBase, isRawPath, url);
         //get result URL
         url = url.TrimStart('/');
         var result = url.Contains('/') ? url[(url.IndexOf('/'))..] : string.Empty;
+		logger.LogDebug("RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath}): result → {Result}", url, pathBase, isRawPath, result);
 
         //and add back application path to raw URL
         if (isRawPath)
             result = pathBase + result;
 
+		logger.LogDebug("<<< Exiting RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath})", url, pathBase, isRawPath);
         return result;
     }
 

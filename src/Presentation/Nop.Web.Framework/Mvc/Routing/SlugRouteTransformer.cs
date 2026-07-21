@@ -287,9 +287,11 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// </returns>
     public override async ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary routeValues)
     {
+		logger.LogDebug(">>> Entering TransformAsync(httpContext={HttpContext},routeValues={RouteValues})", httpContext, routeValues);
         //get values to transform for action selection
         var values = new RouteValueDictionary(routeValues);
 
+		logger.LogDebug("TransformAsync(httpContext={HttpContext},routeValues={RouteValues}): values → {Values}", httpContext, routeValues, values);
         if (!values.TryGetValue(NopRoutingDefaults.RouteValue.SeName, out var slug) || slug is null)
             return values;
 
@@ -300,6 +302,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         //allow third-party handlers to select an action by the found URL record
         var routingEvent = new GenericRoutingEvent(httpContext, values, urlRecord);
         await _eventPublisher.PublishAsync(routingEvent);
+		logger.LogDebug("TransformAsync(httpContext={HttpContext},routeValues={RouteValues}): routingEvent → {RoutingEvent}", httpContext, routeValues, routingEvent);
         if (routingEvent.StopProcessing)
             return values;
 
@@ -313,6 +316,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         //finally, select an action by the URL record only
         await SingleSlugRoutingAsync(httpContext, values, urlRecord, catalogPath);
 
+		logger.LogDebug("<<< Exiting TransformAsync(httpContext={HttpContext},routeValues={RouteValues})", httpContext, routeValues);
         return values;
     }
 

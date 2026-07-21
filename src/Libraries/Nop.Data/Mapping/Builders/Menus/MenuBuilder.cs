@@ -16,9 +16,11 @@ public partial class MenuBuilder : NopEntityBuilder<Menu>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Menu.Name)).AsString(400).NotNullable()
             .WithColumn(nameof(Menu.CssClass)).AsString(400).Nullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -45,6 +45,7 @@ public partial class NopAssetHelper : INopAssetHelper
     /// <param name="sourceFiles">A list of relative file names of the sources to optimize</param>
     public IAsset GetOrCreateJavaScriptAsset(string bundleKey, params string[] sourceFiles)
     {
+		logger.LogDebug(">>> Entering GetOrCreateJavaScriptAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
         ArgumentException.ThrowIfNullOrEmpty(bundleKey);
 
         if (sourceFiles.Length == 0)
@@ -68,6 +69,7 @@ public partial class NopAssetHelper : INopAssetHelper
                 asset.TryAddSourceFile(source);
         }
 
+		logger.LogDebug("<<< Exiting GetOrCreateJavaScriptAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
         return asset;
     }
 
@@ -78,6 +80,7 @@ public partial class NopAssetHelper : INopAssetHelper
     /// <param name="sourceFiles">A list of relative file names of the sources to optimize</param>
     public IAsset GetOrCreateCssAsset(string bundleKey, params string[] sourceFiles)
     {
+		logger.LogDebug(">>> Entering GetOrCreateCssAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
         ArgumentException.ThrowIfNullOrEmpty(bundleKey);
 
         if (sourceFiles.Length == 0)
@@ -102,6 +105,7 @@ public partial class NopAssetHelper : INopAssetHelper
                 asset.TryAddSourceFile(source);
         }
 
+		logger.LogDebug("<<< Exiting GetOrCreateCssAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
         return asset;
     }
 
@@ -111,6 +115,7 @@ public partial class NopAssetHelper : INopAssetHelper
     /// <param name="asset">Bundle</param>
     public string CacheBusting(IAsset asset)
     {
+		logger.LogDebug(">>> Entering CacheBusting(asset={Asset})", asset);
         ArgumentNullException.ThrowIfNull(asset);
 
         try
@@ -120,7 +125,9 @@ public partial class NopAssetHelper : INopAssetHelper
         }
         catch
         {
+			logger.LogError("Exception in CacheBusting(asset={Asset}): {Arg1}", asset, ex.Message);
             //in some cases WO can't handle assets (e.g. IIS sub-application with PathBase)
+			logger.LogDebug("<<< Exiting CacheBusting(asset={Asset})", asset);
             return asset.Route;
         }
     }

@@ -162,6 +162,7 @@ public partial class PluginModelFactory : IPluginModelFactory
     /// </returns>
     public virtual async Task<PluginSearchModel> PreparePluginSearchModelAsync(PluginSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePluginSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available load plugin modes
@@ -175,6 +176,7 @@ public partial class PluginModelFactory : IPluginModelFactory
 
         searchModel.NeedToRestart = _pluginService.IsRestartRequired();
 
+		logger.LogDebug("<<< Exiting PreparePluginSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -188,13 +190,18 @@ public partial class PluginModelFactory : IPluginModelFactory
     /// </returns>
     public virtual async Task<PluginListModel> PreparePluginListModelAsync(PluginSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePluginListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter plugins
         var group = string.IsNullOrEmpty(searchModel.SearchGroup) || searchModel.SearchGroup.Equals("0") ? null : searchModel.SearchGroup;
         var loadMode = (LoadPluginsMode)searchModel.SearchLoadModeId;
+		logger.LogDebug("PreparePluginListModelAsync(searchModel={SearchModel}): group → {Group}", searchModel, group);
+		logger.LogDebug("PreparePluginListModelAsync(searchModel={SearchModel}): loadMode → {LoadMode}", searchModel, loadMode);
         var friendlyName = string.IsNullOrEmpty(searchModel.SearchFriendlyName) ? null : searchModel.SearchFriendlyName;
         var author = string.IsNullOrEmpty(searchModel.SearchAuthor) ? null : searchModel.SearchAuthor;
+		logger.LogDebug("PreparePluginListModelAsync(searchModel={SearchModel}): friendlyName → {FriendlyName}", searchModel, friendlyName);
+		logger.LogDebug("PreparePluginListModelAsync(searchModel={SearchModel}): author → {Author}", searchModel, author);
 
         //filter visible plugins
         var plugins = (await _pluginService.GetPluginDescriptorsAsync<IPlugin>(group: group, loadMode: loadMode, friendlyName: friendlyName, author: author))
@@ -210,6 +217,7 @@ public partial class PluginModelFactory : IPluginModelFactory
                 //fill in model values from the entity
                 var pluginModel = pluginDescriptor.ToPluginModel<PluginModel>();
 
+				logger.LogDebug("PreparePluginListModelAsync(searchModel={SearchModel}): pluginModel → {PluginModel}", searchModel, pluginModel);
                 //fill in additional values (not existing in the entity)
                 pluginModel.LogoUrl = await _pluginService.GetPluginLogoUrlAsync(pluginDescriptor);
 
@@ -220,6 +228,7 @@ public partial class PluginModelFactory : IPluginModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PreparePluginListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -276,11 +285,13 @@ public partial class PluginModelFactory : IPluginModelFactory
     /// </returns>
     public virtual async Task<OfficialFeedPluginSearchModel> PrepareOfficialFeedPluginSearchModelAsync(OfficialFeedPluginSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available versions
         var pluginVersions = await _officialFeedManager.GetVersionsAsync();
         searchModel.AvailableVersions.Add(new SelectListItem { Text = await _localizationService.GetResourceAsync("Admin.Common.All"), Value = "0" });
+		logger.LogDebug("PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel}): pluginVersions → {PluginVersions}", searchModel, pluginVersions);
         foreach (var version in pluginVersions)
             searchModel.AvailableVersions.Add(new SelectListItem { Text = version.Name, Value = version.Id.ToString() });
 
@@ -288,18 +299,23 @@ public partial class PluginModelFactory : IPluginModelFactory
         //current version name and named on official site do not match. that's why we use "Contains"
         var currentVersionItem = searchModel.AvailableVersions.FirstOrDefault(x => x.Text.Contains(NopVersion.CURRENT_VERSION));
         if (currentVersionItem != null)
+		logger.LogDebug("PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel}): currentVersionItem → {CurrentVersionItem}", searchModel, currentVersionItem);
         {
             searchModel.SearchVersionId = int.Parse(currentVersionItem.Value);
             currentVersionItem.Selected = true;
+			logger.LogDebug("PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel}): currentVersionItem.Selected → {Arg1}", searchModel, currentVersionItem.Selected);
         }
 
         //prepare available plugin categories
         var pluginCategories = await _officialFeedManager.GetCategoriesAsync();
         searchModel.AvailableCategories.Add(new SelectListItem { Text = await _localizationService.GetResourceAsync("Admin.Common.All"), Value = "0" });
+		logger.LogDebug("PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel}): pluginCategories → {PluginCategories}", searchModel, pluginCategories);
         foreach (var pluginCategory in pluginCategories)
         {
             var pluginCategoryNames = new List<string>();
             var tmpCategory = pluginCategory;
+			logger.LogDebug("PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel}): pluginCategoryNames → {PluginCategoryNames}", searchModel, pluginCategoryNames);
+			logger.LogDebug("PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel}): tmpCategory → {TmpCategory}", searchModel, tmpCategory);
             while (tmpCategory != null)
             {
                 pluginCategoryNames.Add(tmpCategory.Name);
@@ -335,6 +351,7 @@ public partial class PluginModelFactory : IPluginModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize(15, "15");
 
+		logger.LogDebug("<<< Exiting PrepareOfficialFeedPluginSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -348,6 +365,7 @@ public partial class PluginModelFactory : IPluginModelFactory
     /// </returns>
     public virtual async Task<OfficialFeedPluginListModel> PrepareOfficialFeedPluginListModelAsync(OfficialFeedPluginSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOfficialFeedPluginListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get plugins
@@ -372,6 +390,7 @@ public partial class PluginModelFactory : IPluginModelFactory
             }) ?? new List<OfficialFeedPluginModel>();
         });
 
+		logger.LogDebug("<<< Exiting PrepareOfficialFeedPluginListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -384,11 +403,17 @@ public partial class PluginModelFactory : IPluginModelFactory
     /// </returns>
     public virtual async Task<IList<AdminNavigationPluginModel>> PrepareAdminNavigationPluginModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareAdminNavigationPluginModelsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _workContext.GetCurrentCustomerAsync();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopPluginDefaults.AdminNavigationPluginsCacheKey, customer);
+		logger.LogDebug("PrepareAdminNavigationPluginModelsAsync(): customer → {Customer}", customer);
         return await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
+			logger.LogDebug("PrepareAdminNavigationPluginModelsAsync(): cacheKey → {CacheKey}", cacheKey);
             //get installed plugins
+			logger.LogInformation("PrepareAdminNavigationPluginModelsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+			logger.LogDebug("<<< Exiting PrepareAdminNavigationPluginModelsAsync()");
             return (await _pluginService.GetPluginDescriptorsAsync<IPlugin>(LoadPluginsMode.InstalledOnly, customer))
                 .Where(plugin => plugin.ShowInPluginsList)
                 .Select(plugin => new AdminNavigationPluginModel

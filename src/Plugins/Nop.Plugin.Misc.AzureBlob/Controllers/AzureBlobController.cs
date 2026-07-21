@@ -44,6 +44,7 @@ public class AzureBlobController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             AppendContainerName = _azureBlobSettings.AppendContainerName,
@@ -53,6 +54,7 @@ public class AzureBlobController : BasePluginController
             EndPoint = _azureBlobSettings.EndPoint,
         };
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.AzureBlob/Views/Configure.cshtml", model);
     }
 

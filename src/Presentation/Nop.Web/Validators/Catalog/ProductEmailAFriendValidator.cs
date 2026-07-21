@@ -9,6 +9,7 @@ public partial class ProductEmailAFriendValidator : BaseNopValidator<ProductEmai
 {
     public ProductEmailAFriendValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductEmailAFriendValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.FriendEmail).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Products.EmailAFriend.FriendEmail.Required"));
         RuleFor(x => x.FriendEmail)
             .IsEmailAddress()
@@ -18,5 +19,6 @@ public partial class ProductEmailAFriendValidator : BaseNopValidator<ProductEmai
         RuleFor(x => x.YourEmailAddress)
             .IsEmailAddress()
             .WithMessageAwait(localizationService.GetResourceAsync("Common.WrongEmail"));
+			logger.LogDebug("<<< Exiting ProductEmailAFriendValidator(localizationService={LocalizationService})", localizationService);
     }
 }

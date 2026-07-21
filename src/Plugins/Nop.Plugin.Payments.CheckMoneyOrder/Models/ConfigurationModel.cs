@@ -7,7 +7,10 @@ public record ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationMo
 {
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         Locales = new List<ConfigurationLocalizedModel>();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): Locales → {Locales}", Locales);
     }
 
     public int ActiveStoreScopeConfiguration { get; set; }

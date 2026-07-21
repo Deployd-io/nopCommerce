@@ -17,11 +17,13 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public virtual void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         //get language pattern
         //it's not needed to use language pattern in AJAX requests and for actions returning the result directly (e.g. file to download),
         //use it only for URLs of pages that the user can go to
         var lang = GetLanguageRoutePattern();
 
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         //areas
         endpointRouteBuilder.MapControllerRoute(name: "areaRoute",
             pattern: $"{{area:exists}}/{{controller=Home}}/{{action=Index}}/{{id?}}");
@@ -785,6 +787,7 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
         //fallback is intended to handle cases when no other endpoint has matched
         //we use it to invoke [CheckLanguageSeoCode] and give a chance to find a localized route
         endpointRouteBuilder.MapFallbackToController("FallbackRedirect", "Common");
+		logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     #endregion

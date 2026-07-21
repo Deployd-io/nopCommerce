@@ -16,6 +16,7 @@ public class RouteProvider : IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(name: ZettleDefaults.ConfigurationRouteName,
             pattern: "Admin/Zettle/Configure",
             defaults: new { controller = "ZettleAdmin", action = "Configure", area = AreaNames.ADMIN });
@@ -23,6 +24,7 @@ public class RouteProvider : IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: ZettleDefaults.WebhookRouteName,
             pattern: "zettle/webhook",
             defaults: new { controller = "ZettleWebhook", action = "Webhook" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

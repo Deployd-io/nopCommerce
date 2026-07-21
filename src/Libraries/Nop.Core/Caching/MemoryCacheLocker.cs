@@ -17,7 +17,10 @@ public partial class MemoryCacheLocker : ILocker
 
     public MemoryCacheLocker(IMemoryCache memoryCache)
     {
+		logger.LogDebug(">>> Entering MemoryCacheLocker(memoryCache={MemoryCache})", memoryCache);
         _memoryCache = memoryCache;
+		logger.LogDebug("<<< Exiting MemoryCacheLocker(memoryCache={MemoryCache})", memoryCache);
+		logger.LogDebug("MemoryCacheLocker(memoryCache={MemoryCache}): _memoryCache → {_memoryCache}", memoryCache, _memoryCache);
     }
 
     #endregion
@@ -72,6 +75,8 @@ public partial class MemoryCacheLocker : ILocker
     /// <returns>A task that resolves true if lock was acquired and action was performed; otherwise false</returns>
     public virtual async Task<bool> PerformActionWithLockAsync(string resource, TimeSpan expirationTime, Func<Task> action)
     {
+		logger.LogDebug(">>> Entering PerformActionWithLockAsync(resource={Resource},expirationTime={ExpirationTime},action={Action})", resource, expirationTime, action);
+		logger.LogDebug("<<< Exiting PerformActionWithLockAsync(resource={Resource},expirationTime={ExpirationTime},action={Action})", resource, expirationTime, action);
         return await RunAsync(resource, expirationTime, _ => action());
     }
 
@@ -102,9 +107,11 @@ public partial class MemoryCacheLocker : ILocker
     /// necessarily imply that the task has been canceled, only that cancellation has been requested.</returns>
     public virtual Task CancelTaskAsync(string key, TimeSpan expirationTime)
     {
+		logger.LogDebug(">>> Entering CancelTaskAsync(key={Key},expirationTime={ExpirationTime})", key, expirationTime);
         if (_memoryCache.TryGetValue(key, out Lazy<CancellationTokenSource> tokenSource))
             tokenSource.Value.Cancel();
 
+		logger.LogDebug("<<< Exiting CancelTaskAsync(key={Key},expirationTime={ExpirationTime})", key, expirationTime);
         return Task.CompletedTask;
     }
 
@@ -115,6 +122,8 @@ public partial class MemoryCacheLocker : ILocker
     /// <returns>A task that resolves to true if the background task is running; otherwise false</returns>
     public virtual Task<bool> IsTaskRunningAsync(string key)
     {
+		logger.LogDebug(">>> Entering IsTaskRunningAsync(key={Key})", key);
+		logger.LogDebug("<<< Exiting IsTaskRunningAsync(key={Key})", key);
         return Task.FromResult(_memoryCache.TryGetValue(key, out _));
     }
 

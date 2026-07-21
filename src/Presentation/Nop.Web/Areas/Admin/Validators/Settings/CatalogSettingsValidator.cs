@@ -9,6 +9,7 @@ public partial class CatalogSettingsValidator : BaseNopValidator<CatalogSettings
 {
     public CatalogSettingsValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CatalogSettingsValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.SearchPagePriceFrom)
             .GreaterThanOrEqualTo(0)
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.Catalog.SearchPagePriceFrom.GreaterThanOrEqualZero"))
@@ -28,5 +29,6 @@ public partial class CatalogSettingsValidator : BaseNopValidator<CatalogSettings
             .GreaterThan(x => x.ProductsByTagPriceFrom > decimal.Zero ? x.ProductsByTagPriceFrom : decimal.Zero)
             .WithMessage(x => string.Format(localizationService.GetResourceAsync("Admin.Configuration.Settings.Catalog.ProductsByTagPriceTo.GreaterThanZeroOrPriceFrom").Result, x.ProductsByTagPriceFrom > decimal.Zero ? x.ProductsByTagPriceFrom : decimal.Zero))
             .When(x => x.ProductsByTagPriceRangeFiltering && x.ProductsByTagManuallyPriceRange);
+			logger.LogDebug("<<< Exiting CatalogSettingsValidator(localizationService={LocalizationService})", localizationService);
     }
 }

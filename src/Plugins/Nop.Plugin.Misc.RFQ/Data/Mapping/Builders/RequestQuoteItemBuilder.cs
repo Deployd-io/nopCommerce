@@ -17,8 +17,10 @@ public class RequestQuoteItemBuilder : NopEntityBuilder<RequestQuoteItem>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table.WithColumn(nameof(RequestQuoteItem.RequestQuoteId)).AsInt32().ForeignKey<RequestQuote>();
         table.WithColumn(nameof(RequestQuoteItem.ProductId)).AsInt32().ForeignKey<Product>(onDelete: Rule.None);
+		logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

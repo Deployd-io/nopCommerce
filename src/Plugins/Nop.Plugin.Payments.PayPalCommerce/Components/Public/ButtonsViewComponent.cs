@@ -55,18 +55,21 @@ public class ButtonsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
 
         PaymentInfoModel model = null;
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
         if (widgetZone.Equals(PublicWidgetZones.ProductDetailsAddInfo))
         {
             if (_settings.DisplayButtonsOnProductDetails)
             {
                 var productId = additionalData is ProductDetailsModel.AddToCartModel product ? (int?)product.ProductId : null;
                 if (productId is null || (await _productService.GetProductByIdAsync(productId ?? 0))?.ParentGroupedProductId == 0)
+					logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): productId → {ProductId}", widgetZone, additionalData, productId);
                     model = await _modelFactory.PreparePaymentInfoModelAsync(ButtonPlacement.Product, productId);
             }
         }
@@ -76,6 +79,7 @@ public class ButtonsViewComponent : NopViewComponent
             {
                 var routeName = HttpContext.GetEndpoint()?.Metadata.GetMetadata<RouteNameMetadata>()?.RouteName;
                 if (routeName == NopRouteNames.General.CART)
+					logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): routeName → {RouteName}", widgetZone, additionalData, routeName);
                     model = await _modelFactory.PreparePaymentInfoModelAsync(ButtonPlacement.Cart);
             }
         }
@@ -89,6 +93,7 @@ public class ButtonsViewComponent : NopViewComponent
             return Content(string.Empty);
 
         if (model.Cart.IsRecurring == true)
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return View("~/Plugins/Payments.PayPalCommerce/Views/Public/_Buttons.Recurring.cshtml", model);
 
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/_Buttons.cshtml", model);

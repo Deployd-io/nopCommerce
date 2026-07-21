@@ -33,6 +33,7 @@ public partial class SearchCompleteController : BaseAdminController
 
     public virtual async Task<IActionResult> SearchAutoComplete(string term)
     {
+		logger.LogDebug(">>> Entering SearchAutoComplete(term={Term})", term);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL))
             return Content(string.Empty);
 
@@ -43,6 +44,8 @@ public partial class SearchCompleteController : BaseAdminController
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         var vendorId = 0;
+		logger.LogDebug("SearchAutoComplete(term={Term}): currentVendor → {CurrentVendor}", term, currentVendor);
+		logger.LogDebug("SearchAutoComplete(term={Term}): vendorId → {VendorId}", term, vendorId);
         if (currentVendor != null)
         {
             vendorId = currentVendor.Id;
@@ -61,8 +64,11 @@ public partial class SearchCompleteController : BaseAdminController
             {
                 label = p.Name,
                 productid = p.Id
+				logger.LogDebug("SearchAutoComplete(term={Term}): label → {Label}", term, label);
+				logger.LogDebug("SearchAutoComplete(term={Term}): productid → {Productid}", term, productid);
             }).ToList();
 
+		logger.LogDebug("<<< Exiting SearchAutoComplete(term={Term})", term);
         return Json(result);
     }
 

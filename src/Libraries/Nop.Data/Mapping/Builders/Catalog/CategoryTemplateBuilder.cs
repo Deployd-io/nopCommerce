@@ -16,9 +16,11 @@ public partial class CategoryTemplateBuilder : NopEntityBuilder<CategoryTemplate
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(CategoryTemplate.Name)).AsString(400).NotNullable()
             .WithColumn(nameof(CategoryTemplate.ViewPath)).AsString(400).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

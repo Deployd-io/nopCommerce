@@ -20,21 +20,28 @@ public class LocalizationServiceTests : ServiceTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _localizationService = GetService<ILocalizationService>();
         _lsrRepository = GetService<IRepository<LocaleStringResource>>();
+		logger.LogDebug("SetUp(): _localizationService → {_localizationService}", _localizationService);
+		logger.LogDebug("SetUp(): _lsrRepository → {_lsrRepository}", _lsrRepository);
 
         _resources = new Dictionary<string, string>
         {
+			logger.LogDebug("SetUp(): _resources → {_resources}", _resources);
             [$"{PREFIX}.Val1"] = "Value1",
             [$"{PREFIX}.Val2"] = "Value2",
             [$"{PREFIX}.Val3"] = "Value3"
         };
+		logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [TearDown]
     public async Task TearDown()
     {
+		logger.LogDebug(">>> Entering TearDown()");
         await _localizationService.DeleteLocaleResourcesAsync(PREFIX);
+		logger.LogDebug("<<< Exiting TearDown()");
     }
 
     protected IQueryable<LocaleStringResource> Filter(Dictionary<string, string> resources, IQueryable<LocaleStringResource> query)
@@ -48,9 +55,13 @@ public class LocalizationServiceTests : ServiceTest
     [Test]
     public async Task CanAddOrUpdateLocaleResource()
     {
+		logger.LogDebug(">>> Entering CanAddOrUpdateLocaleResource()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var localeStringResources = await _lsrRepository.GetAllAsync(query => Filter(_resources, query));
 
         localeStringResources.Any().Should().BeFalse();
+		logger.LogDebug("CanAddOrUpdateLocaleResource(): localeStringResources → {LocaleStringResources}", localeStringResources);
+		logger.LogInformation("CanAddOrUpdateLocaleResource(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources);
 
@@ -58,11 +69,13 @@ public class LocalizationServiceTests : ServiceTest
 
         localeStringResources.Any().Should().BeTrue();
         localeStringResources.Count.Should().Be(3);
+		logger.LogDebug("<<< Exiting CanAddOrUpdateLocaleResource()");
     }
 
     [Test]
     public async Task AddOrUpdateLocaleResourceShouldIgnoreKeyCase()
     {
+		logger.LogDebug(">>> Entering AddOrUpdateLocaleResourceShouldIgnoreKeyCase()");
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources);
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources.ToDictionary(p => p.Key.ToUpperInvariant(), p => p.Value));
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources.ToDictionary(p => p.Key.ToLowerInvariant(), p => p.Value));
@@ -73,11 +86,13 @@ public class LocalizationServiceTests : ServiceTest
             .Where(p => p.ResourceName.StartsWith(PREFIX, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
         rez.Count.Should().Be(3);
+		logger.LogDebug("<<< Exiting AddOrUpdateLocaleResourceShouldIgnoreKeyCase()");
     }
 
     [Test]
     public async Task AddOrUpdateLocaleResourceShouldNotIgnoreValueCase()
     {
+		logger.LogDebug(">>> Entering AddOrUpdateLocaleResourceShouldNotIgnoreValueCase()");
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources);
 
         var rez = _lsrRepository.Table
@@ -96,13 +111,16 @@ public class LocalizationServiceTests : ServiceTest
         rez.Count.Should().Be(3);
         rez.Count(p => p.ResourceValue == p.ResourceValue.ToUpperInvariant()).Should().Be(3);
         rez.Count(p => _resources.ContainsValue(p.ResourceValue)).Should().Be(0);
+		logger.LogDebug("<<< Exiting AddOrUpdateLocaleResourceShouldNotIgnoreValueCase()");
     }
 
     [Test]
     public async Task AddOrUpdateLocaleResourceShouldSkipAlreadyExistsResources()
     {
+		logger.LogDebug(">>> Entering AddOrUpdateLocaleResourceShouldSkipAlreadyExistsResources()");
         LocaleResourceConsumer.UpdateCount = 0;
 
+		logger.LogDebug("AddOrUpdateLocaleResourceShouldSkipAlreadyExistsResources(): LocaleResourceConsumer.UpdateCount → {Arg0}", LocaleResourceConsumer.UpdateCount);
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources);
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources.ToDictionary(p => p.Key.ToUpperInvariant(), p => p.Value));
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources.ToDictionary(p => p.Key.ToLowerInvariant(), p => p.Value));
@@ -113,13 +131,16 @@ public class LocalizationServiceTests : ServiceTest
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources.ToDictionary(p => p.Key.ToUpperInvariant(), p => p.Value.ToUpperInvariant()));
 
         LocaleResourceConsumer.UpdateCount.Should().Be(3);
+		logger.LogDebug("<<< Exiting AddOrUpdateLocaleResourceShouldSkipAlreadyExistsResources()");
     }
 
     [Test]
     public async Task AddOrUpdateLocaleResourceShouldApdateAllResorcesIfLangIdIsNull()
     {
+		logger.LogDebug(">>> Entering AddOrUpdateLocaleResourceShouldApdateAllResorcesIfLangIdIsNull()");
         var languageService = GetService<ILanguageService>();
         var language = new Language
+		logger.LogDebug("AddOrUpdateLocaleResourceShouldApdateAllResorcesIfLangIdIsNull(): languageService → {LanguageService}", languageService);
         {
             Name = "test lang",
             LanguageCulture = "en"
@@ -128,14 +149,17 @@ public class LocalizationServiceTests : ServiceTest
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources, 1);
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources, language.Id);
         LocaleResourceConsumer.UpdateCount = 0;
+		logger.LogDebug("AddOrUpdateLocaleResourceShouldApdateAllResorcesIfLangIdIsNull(): LocaleResourceConsumer.UpdateCount → {Arg0}", LocaleResourceConsumer.UpdateCount);
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources.ToDictionary(p => p.Key, p => p.Value.ToUpperInvariant()), null);
         await languageService.DeleteLanguageAsync(language);
         LocaleResourceConsumer.UpdateCount.Should().Be(6);
+		logger.LogDebug("<<< Exiting AddOrUpdateLocaleResourceShouldApdateAllResorcesIfLangIdIsNull()");
     }
 
     [Test]
     public async Task CanDeleteLocaleResources()
     {
+		logger.LogDebug(">>> Entering CanDeleteLocaleResources()");
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources);
 
         var rez = _lsrRepository.Table
@@ -149,11 +173,13 @@ public class LocalizationServiceTests : ServiceTest
             .Where(p => p.ResourceName.StartsWith(PREFIX, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
         rez.Count.Should().Be(0);
+		logger.LogDebug("<<< Exiting CanDeleteLocaleResources()");
     }
 
     [Test]
     public async Task DeleteLocaleResourcesShuoldIgnoreCase()
     {
+		logger.LogDebug(">>> Entering DeleteLocaleResourcesShuoldIgnoreCase()");
         await _localizationService.AddOrUpdateLocaleResourceAsync(_resources);
 
         var rez = _lsrRepository.Table
@@ -167,6 +193,7 @@ public class LocalizationServiceTests : ServiceTest
             .Where(p => p.ResourceName.StartsWith(PREFIX, StringComparison.InvariantCultureIgnoreCase)).ToList();
 
         rez.Count.Should().Be(0);
+		logger.LogDebug("<<< Exiting DeleteLocaleResourcesShuoldIgnoreCase()");
     }
 
     public class LocaleResourceConsumer : IConsumer<EntityUpdatedEvent<LocaleStringResource>>
@@ -175,8 +202,10 @@ public class LocalizationServiceTests : ServiceTest
 
         public Task HandleEventAsync(EntityUpdatedEvent<LocaleStringResource> eventMessage)
         {
+			logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
             UpdateCount += 1;
 
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
             return Task.CompletedTask;
         }
     }

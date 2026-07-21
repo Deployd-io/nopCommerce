@@ -17,6 +17,8 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
     /// </summary>
     public SignOutFromExternalAuthenticationAttribute() : base(typeof(SignOutFromExternalAuthenticationFilter))
     {
+	logger.LogDebug(">>> Entering SignOutFromExternalAuthenticationAttribute()");
+	logger.LogDebug("<<< Exiting SignOutFromExternalAuthenticationAttribute()");
     }
 
     #endregion
@@ -37,12 +39,15 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SignOutFromExternalAuthenticationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering SignOutFromExternalAuthenticationAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //sign out from the external authentication scheme
             var authenticateResult = await context.HttpContext.AuthenticateAsync(NopAuthenticationDefaults.ExternalAuthenticationScheme);
             if (authenticateResult.Succeeded)
+				logger.LogDebug("SignOutFromExternalAuthenticationAsync(context={Context}): authenticateResult → {AuthenticateResult}", context, authenticateResult);
                 await context.HttpContext.SignOutAsync(NopAuthenticationDefaults.ExternalAuthenticationScheme);
+				logger.LogDebug("<<< Exiting SignOutFromExternalAuthenticationAsync(context={Context})", context);
         }
 
         #endregion
@@ -56,7 +61,9 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await SignOutFromExternalAuthenticationAsync(context);
+			logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

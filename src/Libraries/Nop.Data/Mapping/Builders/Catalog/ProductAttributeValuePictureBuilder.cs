@@ -17,9 +17,11 @@ public partial class ProductAttributeValuePictureBuilder : NopEntityBuilder<Prod
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ProductAttributeValuePicture.ProductAttributeValueId)).AsInt32().ForeignKey<ProductAttributeValue>()
             .WithColumn(nameof(ProductAttributeValuePicture.PictureId)).AsInt32();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

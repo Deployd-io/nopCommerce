@@ -37,14 +37,18 @@ public partial class DeleteInactiveCustomersTask : IScheduleTask
     /// </summary>
     public virtual async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         if (!_gdprSettings.GdprEnabled)
             return;
 
         var lastActivityToUtc = DateTime.UtcNow.AddMonths(-_gdprSettings.DeleteInactiveCustomersAfterMonths);
         var inactiveCustomers = await _customerService.GetAllCustomersAsync(lastActivityToUtc: lastActivityToUtc);
+		logger.LogDebug("ExecuteAsync(): lastActivityToUtc → {LastActivityToUtc}", lastActivityToUtc);
+		logger.LogDebug("ExecuteAsync(): inactiveCustomers → {InactiveCustomers}", inactiveCustomers);
 
         foreach (var customer in inactiveCustomers.Where(c => !c.IsSystemAccount))
             await _gdprService.PermanentDeleteCustomerAsync(customer);
+			logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

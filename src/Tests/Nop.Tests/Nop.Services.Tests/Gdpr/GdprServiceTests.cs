@@ -12,7 +12,10 @@ public class GdprServiceTests : ServiceTest<GdprConsent>
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _gdprService = GetService<IGdprService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _gdprService → {_gdprService}", _gdprService);
     }
 
     protected override CrudData<GdprConsent> CrudData

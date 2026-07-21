@@ -86,9 +86,12 @@ public class BrevoMessageService : WorkflowMessageService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task SendSmsNotificationAsync(MessageTemplate messageTemplate, IEnumerable<Token> tokens)
     {
+		logger.LogDebug(">>> Entering SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens})", messageTemplate, tokens);
         //get plugin settings
         var storeId = (int?)tokens.FirstOrDefault(token => token.Key == "Store.Id")?.Value;
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId ?? 0);
+		logger.LogDebug("SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens}): storeId → {StoreId}", messageTemplate, tokens, storeId);
+		logger.LogDebug("SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens}): brevoSettings → {BrevoSettings}", messageTemplate, tokens, brevoSettings);
 
         //ensure SMS notifications enabled
         if (!brevoSettings.UseSmsNotifications)
@@ -103,11 +106,14 @@ public class BrevoMessageService : WorkflowMessageService
         //get text with replaced tokens
         var text = await _genericAttributeService.GetAttributeAsync<string>(messageTemplate, BrevoDefaults.SmsTextAttribute);
         if (!string.IsNullOrEmpty(text))
+			logger.LogDebug("SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens}): text → {Text}", messageTemplate, tokens, text);
             text = _tokenizer.Replace(text, tokens, false);
 
         //get phone number send to
         var phoneNumberTo = string.Empty;
         var phoneType = await _genericAttributeService.GetAttributeAsync<int>(messageTemplate, BrevoDefaults.PhoneTypeAttribute);
+		logger.LogDebug("SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens}): phoneNumberTo → {PhoneNumberTo}", messageTemplate, tokens, phoneNumberTo);
+		logger.LogDebug("SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens}): phoneType → {PhoneType}", messageTemplate, tokens, phoneType);
         switch (phoneType)
         {
             case 0:
@@ -126,6 +132,7 @@ public class BrevoMessageService : WorkflowMessageService
 
         //try to send SMS
         await _brevoEmailManager.SendSMSAsync(phoneNumberTo, brevoSettings.SmsSenderName, text);
+		logger.LogDebug("<<< Exiting SendSmsNotificationAsync(messageTemplate={MessageTemplate},tokens={Tokens})", messageTemplate, tokens);
     }
 
     /// <summary>

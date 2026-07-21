@@ -19,15 +19,21 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
     /// </summary>
     /// <param name="submitButtonNames">Submit button names</param>
     public FormValueRequiredAttribute(params string[] submitButtonNames) :
+		logger.LogDebug(">>> Entering FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
+		logger.LogDebug("<<< Exiting FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
         this(FormValueRequirement.Equal, submitButtonNames)
     {
+	logger.LogDebug(">>> Entering FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
     }
+	logger.LogDebug("<<< Exiting FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
     /// <summary>
     /// Ctor
     /// </summary>
     /// <param name="requirement">Requirement</param>
     /// <param name="submitButtonNames">Submit button names</param>
     public FormValueRequiredAttribute(FormValueRequirement requirement, params string[] submitButtonNames) :
+		logger.LogDebug(">>> Entering FormValueRequiredAttribute(requirement={Requirement},submitButtonNames={SubmitButtonNames})", requirement, submitButtonNames);
+		logger.LogDebug("<<< Exiting FormValueRequiredAttribute(requirement={Requirement},submitButtonNames={SubmitButtonNames})", requirement, submitButtonNames);
         this(requirement, true, submitButtonNames)
     {
     }
@@ -41,8 +47,11 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
     {
         //at least one submit button should be found
         _submitButtonNames = submitButtonNames;
+		logger.LogDebug("FormValueRequiredAttribute(requirement={Requirement},validateNameOnly={ValidateNameOnly},submitButtonNames={SubmitButtonNames}): _submitButtonNames → {_submitButtonNames}", requirement, validateNameOnly, submitButtonNames, _submitButtonNames);
         _validateNameOnly = validateNameOnly;
+		logger.LogDebug("FormValueRequiredAttribute(requirement={Requirement},validateNameOnly={ValidateNameOnly},submitButtonNames={SubmitButtonNames}): _validateNameOnly → {_validateNameOnly}", requirement, validateNameOnly, submitButtonNames, _validateNameOnly);
         _requirement = requirement;
+		logger.LogDebug("FormValueRequiredAttribute(requirement={Requirement},validateNameOnly={ValidateNameOnly},submitButtonNames={SubmitButtonNames}): _requirement → {_requirement}", requirement, validateNameOnly, submitButtonNames, _requirement);
     }
 
 
@@ -54,11 +63,13 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
     /// <returns>Result</returns>
     public override bool IsValidForRequest(RouteContext routeContext, ActionDescriptor action)
     {
+		logger.LogDebug(">>> Entering IsValidForRequest(routeContext={RouteContext},action={Action})", routeContext, action);
         if (!routeContext.HttpContext.Request.IsPostRequest())
             return false;
 
         var form = routeContext.HttpContext.Request.ReadFormAsync().Result;
 
+		logger.LogDebug("IsValidForRequest(routeContext={RouteContext},action={Action}): form → {Form}", routeContext, action, form);
         foreach (var buttonName in _submitButtonNames)
         {
             try
@@ -108,9 +119,11 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
             }
             catch
             {
+				logger.LogError("Exception in IsValidForRequest(routeContext={RouteContext},action={Action}): {Arg2}", routeContext, action, ex.Message);
                 //try-catch to ensure that no exception is throw
             }
         }
+		logger.LogDebug("<<< Exiting IsValidForRequest(routeContext={RouteContext},action={Action})", routeContext, action);
         return false;
     }
 }

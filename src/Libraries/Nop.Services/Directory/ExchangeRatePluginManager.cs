@@ -40,6 +40,8 @@ public partial class ExchangeRatePluginManager : PluginManager<IExchangeRateProv
     /// </returns>
     public virtual async Task<IExchangeRateProvider> LoadPrimaryPluginAsync(Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		logger.LogDebug("<<< Exiting LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadPrimaryPluginAsync(_currencySettings.ActiveExchangeRateProviderSystemName, customer, storeId);
     }
 
@@ -50,6 +52,8 @@ public partial class ExchangeRatePluginManager : PluginManager<IExchangeRateProv
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IExchangeRateProvider exchangeRateProvider)
     {
+		logger.LogDebug(">>> Entering IsPluginActive(exchangeRateProvider={ExchangeRateProvider})", exchangeRateProvider);
+		logger.LogDebug("<<< Exiting IsPluginActive(exchangeRateProvider={ExchangeRateProvider})", exchangeRateProvider);
         return IsPluginActive(exchangeRateProvider, [_currencySettings.ActiveExchangeRateProviderSystemName]);
     }
 
