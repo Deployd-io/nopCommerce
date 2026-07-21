@@ -19,7 +19,10 @@ public class WebApiFrontendPlugin : BasePlugin, IMiscPlugin
 
     public WebApiFrontendPlugin(IWebHelper webHelper)
     {
+		logger.LogDebug(">>> Entering WebApiFrontendPlugin(webHelper={WebHelper})", webHelper);
         _webHelper = webHelper;
+		logger.LogDebug("<<< Exiting WebApiFrontendPlugin(webHelper={WebHelper})", webHelper);
+		logger.LogDebug("WebApiFrontendPlugin(webHelper={WebHelper}): _webHelper → {_webHelper}", webHelper, _webHelper);
     }
 
     #endregion
@@ -31,6 +34,8 @@ public class WebApiFrontendPlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/WebApiFrontend/Configure";
     }
 
@@ -40,7 +45,9 @@ public class WebApiFrontendPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
     
     /// <summary>
@@ -49,7 +56,9 @@ public class WebApiFrontendPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

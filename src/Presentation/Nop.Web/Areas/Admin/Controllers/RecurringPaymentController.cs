@@ -47,15 +47,20 @@ public partial class RecurringPaymentController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Orders.RECURRING_PAYMENTS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentSearchModelAsync(new RecurringPaymentSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -66,20 +71,25 @@ public partial class RecurringPaymentController : BaseAdminController
         //prepare model
         var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Orders.RECURRING_PAYMENTS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a recurring payment with the specified id
         var payment = await _orderService.GetRecurringPaymentByIdAsync(id);
         if (payment == null || payment.Deleted)
+			logger.LogWarning("Edit(id={Id}): payment → {Payment}", id, payment);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentModelAsync(null, payment);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -110,6 +120,7 @@ public partial class RecurringPaymentController : BaseAdminController
         model = await _recurringPaymentModelFactory.PrepareRecurringPaymentModelAsync(model, payment, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -117,15 +128,18 @@ public partial class RecurringPaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.RECURRING_PAYMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a recurring payment with the specified id
         var payment = await _orderService.GetRecurringPaymentByIdAsync(id);
         if (payment == null)
+			logger.LogWarning("Delete(id={Id}): payment → {Payment}", id, payment);
             return RedirectToAction("List");
 
         await _orderService.DeleteRecurringPaymentAsync(payment);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.RecurringPayments.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -133,6 +147,7 @@ public partial class RecurringPaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.RECURRING_PAYMENTS_VIEW)]
     public virtual async Task<IActionResult> HistoryList(RecurringPaymentHistorySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering HistoryList(searchModel={SearchModel})", searchModel);
         //try to get a recurring payment with the specified id
         var payment = await _orderService.GetRecurringPaymentByIdAsync(searchModel.RecurringPaymentId)
                       ?? throw new ArgumentException("No recurring payment found with the specified id");
@@ -140,6 +155,8 @@ public partial class RecurringPaymentController : BaseAdminController
         //prepare model
         var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentHistoryListModelAsync(searchModel, payment);
 
+		logger.LogDebug("HistoryList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting HistoryList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -148,15 +165,18 @@ public partial class RecurringPaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.RECURRING_PAYMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProcessNextPayment(int id)
     {
+		logger.LogDebug(">>> Entering ProcessNextPayment(id={Id})", id);
         //try to get a recurring payment with the specified id
         var payment = await _orderService.GetRecurringPaymentByIdAsync(id);
         if (payment == null)
+			logger.LogWarning("ProcessNextPayment(id={Id}): payment → {Payment}", id, payment);
             return RedirectToAction("List");
 
         try
         {
             var errors = (await _orderProcessingService.ProcessNextRecurringPaymentAsync(payment)).ToList();
             if (errors.Any())
+			logger.LogDebug("ProcessNextPayment(id={Id}): errors → {Errors}", id, errors);
             {
                 foreach (var error in errors)
                 {
@@ -169,6 +189,7 @@ public partial class RecurringPaymentController : BaseAdminController
             //prepare model
             var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentModelAsync(null, payment);
 
+			logger.LogDebug("ProcessNextPayment(id={Id}): model → {Model}", id, model);
             //selected card
             SaveSelectedCardName("recurringpayment-history");
 
@@ -176,6 +197,7 @@ public partial class RecurringPaymentController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ProcessNextPayment(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
 
             //prepare model
@@ -184,6 +206,7 @@ public partial class RecurringPaymentController : BaseAdminController
             //selected card
             SaveSelectedCardName("recurringpayment-history", persistForTheNextRequest: false);
 
+			logger.LogDebug("<<< Exiting ProcessNextPayment(id={Id})", id);
             return View(model);
         }
     }
@@ -193,15 +216,18 @@ public partial class RecurringPaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.RECURRING_PAYMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CancelRecurringPayment(int id)
     {
+		logger.LogDebug(">>> Entering CancelRecurringPayment(id={Id})", id);
         //try to get a recurring payment with the specified id
         var payment = await _orderService.GetRecurringPaymentByIdAsync(id);
         if (payment == null)
+			logger.LogWarning("CancelRecurringPayment(id={Id}): payment → {Payment}", id, payment);
             return RedirectToAction("List");
 
         try
         {
             var errors = await _orderProcessingService.CancelRecurringPaymentAsync(payment);
             if (errors.Any())
+			logger.LogDebug("CancelRecurringPayment(id={Id}): errors → {Errors}", id, errors);
             {
                 foreach (var error in errors)
                     _notificationService.ErrorNotification(error);
@@ -212,6 +238,7 @@ public partial class RecurringPaymentController : BaseAdminController
             //prepare model
             var model = await _recurringPaymentModelFactory.PrepareRecurringPaymentModelAsync(null, payment);
 
+			logger.LogDebug("CancelRecurringPayment(id={Id}): model → {Model}", id, model);
             //selected card
             SaveSelectedCardName("recurringpayment-history");
 
@@ -219,6 +246,7 @@ public partial class RecurringPaymentController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in CancelRecurringPayment(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
 
             //prepare model
@@ -227,6 +255,7 @@ public partial class RecurringPaymentController : BaseAdminController
             //selected card
             SaveSelectedCardName("recurringpayment-history", persistForTheNextRequest: false);
 
+			logger.LogDebug("<<< Exiting CancelRecurringPayment(id={Id})", id);
             return View(model);
         }
     }

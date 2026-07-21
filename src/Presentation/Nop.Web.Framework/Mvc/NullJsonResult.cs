@@ -12,5 +12,7 @@ public partial class NullJsonResult : JsonResult
     /// </summary>
     public NullJsonResult() : base(null)
     {
+	logger.LogDebug(">>> Entering NullJsonResult()");
+	logger.LogDebug("<<< Exiting NullJsonResult()");
     }
 }

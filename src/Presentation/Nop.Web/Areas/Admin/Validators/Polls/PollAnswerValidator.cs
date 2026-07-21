@@ -10,6 +10,7 @@ public partial class PollAnswerValidator : BaseNopValidator<PollAnswerModel>
 {
     public PollAnswerValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering PollAnswerValidator(localizationService={LocalizationService})", localizationService);
         //if validation without this set rule is applied, in this case nothing will be validated
         //it's used to prevent auto-validation of child models
         RuleSet(NopValidationDefaults.ValidationRuleSet, () =>
@@ -20,5 +21,6 @@ public partial class PollAnswerValidator : BaseNopValidator<PollAnswerModel>
 
             SetDatabaseValidationRules<PollAnswer>();
         });
+		logger.LogDebug("<<< Exiting PollAnswerValidator(localizationService={LocalizationService})", localizationService);
     }
 }

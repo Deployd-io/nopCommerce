@@ -17,9 +17,14 @@ public partial class DataUrl
     /// <param name="routeValues">Route values</param>
     public DataUrl(string actionName, string controllerName, RouteValueDictionary routeValues)
     {
+		logger.LogDebug(">>> Entering DataUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues})", actionName, controllerName, routeValues);
         ActionName = actionName;
         ControllerName = controllerName;
+		logger.LogDebug("DataUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues}): ControllerName → {ControllerName1}", actionName, controllerName, routeValues, ControllerName);
+		logger.LogDebug("DataUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues}): ActionName → {ActionName1}", actionName, controllerName, routeValues, ActionName);
         RouteValues = routeValues;
+		logger.LogDebug("<<< Exiting DataUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues})", actionName, controllerName, routeValues);
+		logger.LogDebug("DataUrl(actionName={ActionName},controllerName={ControllerName},routeValues={RouteValues}): RouteValues → {RouteValues1}", actionName, controllerName, routeValues, RouteValues);
     }
 
     /// <summary>
@@ -28,7 +33,10 @@ public partial class DataUrl
     /// <param name="url">URL</param>
     public DataUrl(string url)
     {
+		logger.LogDebug(">>> Entering DataUrl(url={Url})", url);
         Url = url;
+		logger.LogDebug("<<< Exiting DataUrl(url={Url})", url);
+		logger.LogInformation("DataUrl(url={Url}): Url → {Url1}", url, Url);
     }
 
     /// <summary>
@@ -38,8 +46,12 @@ public partial class DataUrl
     /// <param name="dataId">Name of the column whose value is to be used as identifier in URL</param>
     public DataUrl(string url, string dataId)
     {
+		logger.LogDebug(">>> Entering DataUrl(url={Url},dataId={DataId})", url, dataId);
         Url = url;
         DataId = dataId;
+		logger.LogDebug("<<< Exiting DataUrl(url={Url},dataId={DataId})", url, dataId);
+		logger.LogDebug("DataUrl(url={Url},dataId={DataId}): DataId → {DataId1}", url, dataId, DataId);
+		logger.LogInformation("DataUrl(url={Url},dataId={DataId}): Url → {Url1}", url, dataId, Url);
     }
 
     /// <summary>
@@ -49,8 +61,12 @@ public partial class DataUrl
     /// <param name="trimEnd">Parameter indicating that you need to delete all occurrences of the character "/" at the end of the line</param>
     public DataUrl(string url, bool trimEnd)
     {
+		logger.LogDebug(">>> Entering DataUrl(url={Url},trimEnd={TrimEnd})", url, trimEnd);
         Url = url;
         TrimEnd = trimEnd;
+		logger.LogDebug("<<< Exiting DataUrl(url={Url},trimEnd={TrimEnd})", url, trimEnd);
+		logger.LogDebug("DataUrl(url={Url},trimEnd={TrimEnd}): TrimEnd → {TrimEnd1}", url, trimEnd, TrimEnd);
+		logger.LogInformation("DataUrl(url={Url},trimEnd={TrimEnd}): Url → {Url1}", url, trimEnd, Url);
     }
 
     #endregion

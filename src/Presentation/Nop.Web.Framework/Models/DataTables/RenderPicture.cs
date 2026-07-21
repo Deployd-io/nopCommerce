@@ -9,8 +9,12 @@ public partial class RenderPicture : IRender
 
     public RenderPicture(string srcPrefix = "", int width = 0)
     {
+		logger.LogDebug(">>> Entering RenderPicture(srcPrefix={SrcPrefix},width={Width})", srcPrefix, width);
         SrcPrefix = srcPrefix;
         Width = width;
+		logger.LogDebug("<<< Exiting RenderPicture(srcPrefix={SrcPrefix},width={Width})", srcPrefix, width);
+		logger.LogDebug("RenderPicture(srcPrefix={SrcPrefix},width={Width}): Width → {Width1}", srcPrefix, width, Width);
+		logger.LogDebug("RenderPicture(srcPrefix={SrcPrefix},width={Width}): SrcPrefix → {SrcPrefix1}", srcPrefix, width, SrcPrefix);
     }
 
     #endregion

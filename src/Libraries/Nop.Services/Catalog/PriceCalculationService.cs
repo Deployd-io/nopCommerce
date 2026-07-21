@@ -70,17 +70,21 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAppliedToProductAsync(Product product, Customer customer)
     {
+		logger.LogDebug(">>> Entering GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
+			logger.LogDebug("GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer}): allowedDiscounts → {AllowedDiscounts}", product, customer, allowedDiscounts);
             return allowedDiscounts;
 
         var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
 
+		logger.LogDebug("GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer}): couponCodesToValidate → {CouponCodesToValidate}", product, customer, couponCodesToValidate);
         foreach (var discount in await _discountService.GetAppliedDiscountsAsync(product))
             if (discount.DiscountType == DiscountType.AssignedToSkus &&
                 (await _discountService.ValidateDiscountAsync(discount, customer, couponCodesToValidate)).IsValid)
                 allowedDiscounts.Add(discount);
 
+		logger.LogDebug("<<< Exiting GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -95,8 +99,10 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAppliedToCategoriesAsync(Product product, Customer customer)
     {
+		logger.LogDebug(">>> Entering GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
+			logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): allowedDiscounts → {AllowedDiscounts}", product, customer, allowedDiscounts);
             return allowedDiscounts;
 
         //load cached discount models (performance optimization)
@@ -105,9 +111,11 @@ public partial class PriceCalculationService : IPriceCalculationService
             //load identifier of categories with this discount applied to
             var discountCategoryIds = await _categoryService.GetAppliedCategoryIdsAsync(discount, customer);
 
+			logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): discountCategoryIds → {DiscountCategoryIds}", product, customer, discountCategoryIds);
             //compare with categories of this product
             var productCategoryIds = new List<int>();
             if (discountCategoryIds.Any())
+			logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): productCategoryIds → {ProductCategoryIds}", product, customer, productCategoryIds);
             {
                 productCategoryIds = (await _categoryService
                         .GetProductCategoriesByProductIdAsync(product.Id))
@@ -117,6 +125,7 @@ public partial class PriceCalculationService : IPriceCalculationService
 
             var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
 
+			logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): couponCodesToValidate → {CouponCodesToValidate}", product, customer, couponCodesToValidate);
             foreach (var categoryId in productCategoryIds)
             {
                 if (!discountCategoryIds.Contains(categoryId))
@@ -128,6 +137,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
         }
 
+		logger.LogDebug("<<< Exiting GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -142,8 +152,10 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAppliedToManufacturersAsync(Product product, Customer customer)
     {
+		logger.LogDebug(">>> Entering GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
+			logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): allowedDiscounts → {AllowedDiscounts}", product, customer, allowedDiscounts);
             return allowedDiscounts;
 
         foreach (var discount in await _discountService.GetAllDiscountsAsync(DiscountType.AssignedToManufacturers))
@@ -151,9 +163,11 @@ public partial class PriceCalculationService : IPriceCalculationService
             //load identifier of manufacturers with this discount applied to
             var discountManufacturerIds = await _manufacturerService.GetAppliedManufacturerIdsAsync(discount, customer);
 
+			logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): discountManufacturerIds → {DiscountManufacturerIds}", product, customer, discountManufacturerIds);
             //compare with manufacturers of this product
             var productManufacturerIds = new List<int>();
             if (discountManufacturerIds.Any())
+			logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): productManufacturerIds → {ProductManufacturerIds}", product, customer, productManufacturerIds);
             {
                 productManufacturerIds =
                     (await _manufacturerService
@@ -164,6 +178,7 @@ public partial class PriceCalculationService : IPriceCalculationService
 
             var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
 
+			logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): couponCodesToValidate → {CouponCodesToValidate}", product, customer, couponCodesToValidate);
             foreach (var manufacturerId in productManufacturerIds)
             {
                 if (!discountManufacturerIds.Contains(manufacturerId))
@@ -175,6 +190,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
         }
 
+		logger.LogDebug("<<< Exiting GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -189,8 +205,10 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAsync(Product product, Customer customer)
     {
+		logger.LogDebug(">>> Entering GetAllowedDiscountsAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
+			logger.LogDebug("GetAllowedDiscountsAsync(product={Product},customer={Customer}): allowedDiscounts → {AllowedDiscounts}", product, customer, allowedDiscounts);
             return allowedDiscounts;
 
         //discounts applied to products
@@ -208,6 +226,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             if (!_discountService.ContainsDiscount(allowedDiscounts, discount))
                 allowedDiscounts.Add(discount);
 
+		logger.LogDebug("<<< Exiting GetAllowedDiscountsAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -413,12 +432,14 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     public virtual async Task<decimal> GetProductCostAsync(Product product, string attributesXml)
     {
+		logger.LogDebug(">>> Entering GetProductCostAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         ArgumentNullException.ThrowIfNull(product);
 
         var cost = product.ProductCost;
         var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(attributesXml);
         foreach (var attributeValue in attributeValues)
         {
+		logger.LogDebug("GetProductCostAsync(product={Product},attributesXml={AttributesXml}): attributeValues → {AttributeValues}", product, attributesXml, attributeValues);
             switch (attributeValue.AttributeValueType)
             {
                 case AttributeValueType.Simple:
@@ -429,6 +450,7 @@ public partial class PriceCalculationService : IPriceCalculationService
                     //bundled product
                     var associatedProduct = await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId);
                     if (associatedProduct != null)
+						logger.LogDebug("GetProductCostAsync(product={Product},attributesXml={AttributesXml}): associatedProduct → {AssociatedProduct}", product, attributesXml, associatedProduct);
                         cost += associatedProduct.ProductCost * attributeValue.Quantity;
                     break;
                 default:
@@ -436,6 +458,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
         }
 
+		logger.LogDebug("<<< Exiting GetProductCostAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         return cost;
     }
 
@@ -504,11 +527,13 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     public virtual async Task<decimal> RoundPriceAsync(decimal value, Currency currency = null)
     {
+		logger.LogDebug(">>> Entering RoundPriceAsync(value={Value},currency={Currency})", value, currency);
         //we use this method because some currencies (e.g. Hungarian Forint or Swiss Franc) use non-standard rules for rounding
         //you can implement any rounding logic here
 
         currency ??= await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
 
+		logger.LogDebug("<<< Exiting RoundPriceAsync(value={Value},currency={Currency})", value, currency);
         return Round(value, currency.RoundingType);
     }
 
@@ -520,9 +545,12 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// <returns>Rounded value</returns>
     public virtual decimal Round(decimal value, RoundingType roundingType)
     {
+		logger.LogDebug(">>> Entering Round(value={Value},roundingType={RoundingType})", value, roundingType);
         //default round (Rounding001)
         var rez = Math.Round(value, 2);
         var fractionPart = (rez - Math.Truncate(rez)) * 10;
+		logger.LogDebug("Round(value={Value},roundingType={RoundingType}): rez → {Rez}", value, roundingType, rez);
+		logger.LogDebug("Round(value={Value},roundingType={RoundingType}): fractionPart → {FractionPart}", value, roundingType, fractionPart);
 
         //cash rounding not needed
         if (fractionPart == 0)
@@ -582,6 +610,7 @@ public partial class PriceCalculationService : IPriceCalculationService
                 break;
         }
 
+		logger.LogDebug("<<< Exiting Round(value={Value},roundingType={RoundingType})", value, roundingType);
         return rez;
     }
 

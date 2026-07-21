@@ -10,8 +10,10 @@ public partial class VendorAttributeValidator : BaseNopValidator<VendorAttribute
 {
     public VendorAttributeValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering VendorAttributeValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Vendors.VendorAttributes.Fields.Name.Required"));
 
         SetDatabaseValidationRules<VendorAttribute>();
+		logger.LogDebug("<<< Exiting VendorAttributeValidator(localizationService={LocalizationService})", localizationService);
     }
 }

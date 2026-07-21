@@ -10,8 +10,10 @@ public partial class SpecificationAttributeOptionValidator : BaseNopValidator<Sp
 {
     public SpecificationAttributeOptionValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeOptionValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttribute.Options.Fields.Name.Required"));
 
         SetDatabaseValidationRules<SpecificationAttributeOption>();
+		logger.LogDebug("<<< Exiting SpecificationAttributeOptionValidator(localizationService={LocalizationService})", localizationService);
     }
 }

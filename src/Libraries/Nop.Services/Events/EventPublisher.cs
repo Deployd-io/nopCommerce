@@ -19,9 +19,11 @@ public partial class EventPublisher : IEventPublisher
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PublishAsync<TEvent>(TEvent @event)
     {
+		logger.LogDebug(">>> Entering PublishAsync()");
         //get all event consumers
         var consumers = EngineContext.Current.ResolveAll<IConsumer<TEvent>>().ToList();
 
+		logger.LogDebug("PublishAsync(): consumers → {Consumers}", consumers);
         foreach (var consumer in consumers)
             try
             {
@@ -38,15 +40,18 @@ public partial class EventPublisher : IEventPublisher
                 {
                     var logger = EngineContext.Current.Resolve<ILogger>();
                     if (logger == null)
+						logger.LogDebug("PublishAsync(): logger → {Logger}", logger);
                         return;
 
                     await logger.ErrorAsync(exception.Message, exception);
                 }
                 catch
                 {
+					logger.LogError("Exception in PublishAsync(): {Arg0}", ex.Message);
                     // ignored
                 }
             }
+			logger.LogDebug("<<< Exiting PublishAsync()");
     }
 
     /// <summary>
@@ -56,9 +61,11 @@ public partial class EventPublisher : IEventPublisher
     /// <param name="event">Event object</param>
     public virtual void Publish<TEvent>(TEvent @event)
     {
+		logger.LogDebug(">>> Entering Publish()");
         //get all event consumers
         var consumers = EngineContext.Current.ResolveAll<IConsumer<TEvent>>().ToList();
 
+		logger.LogDebug("Publish(): consumers → {Consumers}", consumers);
         foreach (var consumer in consumers)
             try
             {
@@ -75,15 +82,18 @@ public partial class EventPublisher : IEventPublisher
                 {
                     var logger = EngineContext.Current.Resolve<ILogger>();
                     if (logger == null)
+						logger.LogDebug("Publish(): logger → {Logger}", logger);
                         return;
 
                     logger.Error(exception.Message, exception);
                 }
                 catch
                 {
+					logger.LogError("Exception in Publish(): {Arg0}", ex.Message);
                     // ignored
                 }
             }
+			logger.LogDebug("<<< Exiting Publish()");
     }
 
     #endregion

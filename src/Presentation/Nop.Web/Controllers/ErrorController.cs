@@ -8,7 +8,9 @@ public partial class ErrorController : Controller
 {
     public virtual IActionResult Error()
     {
+		logger.LogDebug(">>> Entering Error()");
         Response.StatusCode = StatusCodes.Status500InternalServerError;
+		logger.LogDebug("<<< Exiting Error()");
         return File("ErrorPage.htm", "text/html");
     }
 }

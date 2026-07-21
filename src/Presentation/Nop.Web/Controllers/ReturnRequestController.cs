@@ -77,17 +77,23 @@ public partial class ReturnRequestController : BasePublicController
 
     public virtual async Task<IActionResult> CustomerReturnRequests()
     {
+		logger.LogDebug(">>> Entering CustomerReturnRequests()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
         var model = await _returnRequestModelFactory.PrepareCustomerReturnRequestsModelAsync();
+		logger.LogDebug("CustomerReturnRequests(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CustomerReturnRequests()");
         return View(model);
     }
 
     public virtual async Task<IActionResult> ReturnRequest(int orderId)
     {
+		logger.LogDebug(">>> Entering ReturnRequest(orderId={OrderId})", orderId);
         var order = await _orderService.GetOrderByIdAsync(orderId);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("ReturnRequest(orderId={OrderId}): order → {Order}", orderId, order);
+		logger.LogDebug("ReturnRequest(orderId={OrderId}): customer → {Customer}", orderId, customer);
         if (order == null || order.Deleted || customer.Id != order.CustomerId)
             return Challenge();
 
@@ -96,6 +102,8 @@ public partial class ReturnRequestController : BasePublicController
 
         var model = new SubmitReturnRequestModel();
         model = await _returnRequestModelFactory.PrepareSubmitReturnRequestModelAsync(model, order);
+		logger.LogDebug("ReturnRequest(orderId={OrderId}): model → {Model}", orderId, model);
+		logger.LogDebug("<<< Exiting ReturnRequest(orderId={OrderId})", orderId);
         return View(model);
     }
 
@@ -172,10 +180,12 @@ public partial class ReturnRequestController : BasePublicController
 
         model = await _returnRequestModelFactory.PrepareSubmitReturnRequestModelAsync(model, order);
         if (count > 0)
+			logger.LogDebug("ReturnRequestSubmit(orderId={OrderId},model={Model},form={Form}): model → {Model1}", orderId, model, form, model);
             model.Result = await _localizationService.GetResourceAsync("ReturnRequests.Submitted");
         else
             model.Result = await _localizationService.GetResourceAsync("ReturnRequests.NoItemsSubmitted");
 
+		logger.LogDebug("<<< Exiting ReturnRequestSubmit(orderId={OrderId},model={Model},form={Form})", orderId, model, form);
         return View(model);
     }
 
@@ -183,6 +193,7 @@ public partial class ReturnRequestController : BasePublicController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> UploadFileReturnRequest()
     {
+		logger.LogDebug(">>> Entering UploadFileReturnRequest()");
         if (!_orderSettings.ReturnRequestsEnabled || !_orderSettings.ReturnRequestsAllowFiles)
         {
             return Json(new
@@ -190,10 +201,13 @@ public partial class ReturnRequestController : BasePublicController
                 success = false,
                 downloadGuid = Guid.Empty,
             });
+				logger.LogDebug("UploadFileReturnRequest(): success → {Success}", success);
+				logger.LogDebug("UploadFileReturnRequest(): downloadGuid → {DownloadGuid}", downloadGuid);
         }
 
         var httpPostedFile = await Request.GetFirstOrDefaultFileAsync();
         if (httpPostedFile == null)
+		logger.LogDebug("UploadFileReturnRequest(): httpPostedFile → {HttpPostedFile}", httpPostedFile);
         {
             return Json(new
             {
@@ -201,12 +215,15 @@ public partial class ReturnRequestController : BasePublicController
                 message = "No file uploaded",
                 downloadGuid = Guid.Empty,
             });
+				logger.LogDebug("UploadFileReturnRequest(): message → {Message}", message);
         }
 
         var fileBinary = await _downloadService.GetDownloadBitsAsync(httpPostedFile);
 
+		logger.LogDebug("UploadFileReturnRequest(): fileBinary → {FileBinary}", fileBinary);
         var fileName = httpPostedFile.FileName;
 
+		logger.LogDebug("UploadFileReturnRequest(): fileName → {FileName}", fileName);
         //remove path (passed in IE)
         fileName = _fileProvider.GetFileName(fileName);
 
@@ -214,6 +231,7 @@ public partial class ReturnRequestController : BasePublicController
 
         var fileExtension = _fileProvider.GetFileExtension(fileName);
         if (!string.IsNullOrEmpty(fileExtension))
+			logger.LogDebug("UploadFileReturnRequest(): fileExtension → {FileExtension}", fileExtension);
             fileExtension = fileExtension.ToLowerInvariant();
 
         var validationFileMaximumSize = _orderSettings.ReturnRequestsFileMaximumSize;
@@ -248,6 +266,7 @@ public partial class ReturnRequestController : BasePublicController
 
         //when returning JSON the mime-type must be set to text/plain
         //otherwise some browsers will pop-up a "Save As" dialog.
+		logger.LogDebug("<<< Exiting UploadFileReturnRequest()");
         return Json(new
         {
             success = true,

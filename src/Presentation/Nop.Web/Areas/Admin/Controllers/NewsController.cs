@@ -60,15 +60,20 @@ public partial class NewsController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("NewsItems");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.NEWS_VIEW)]
     public virtual async Task<IActionResult> NewsItems(int? filterByNewsItemId)
     {
+		logger.LogDebug(">>> Entering NewsItems(filterByNewsItemId={FilterByNewsItemId})", filterByNewsItemId);
         //prepare model
         var model = await _newsModelFactory.PrepareNewsContentModelAsync(new NewsContentModel(), filterByNewsItemId);
 
+		logger.LogDebug("NewsItems(filterByNewsItemId={FilterByNewsItemId}): model → {Model}", filterByNewsItemId, model);
+		logger.LogDebug("<<< Exiting NewsItems(filterByNewsItemId={FilterByNewsItemId})", filterByNewsItemId);
         return View(model);
     }
 
@@ -76,18 +81,24 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_VIEW)]
     public virtual async Task<IActionResult> List(NewsItemSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _newsModelFactory.PrepareNewsItemListModelAsync(searchModel);
 
+		logger.LogDebug("List(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.NEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> NewsItemCreate()
     {
+		logger.LogDebug(">>> Entering NewsItemCreate()");
         //prepare model
         var model = await _newsModelFactory.PrepareNewsItemModelAsync(new NewsItemModel(), null);
 
+		logger.LogDebug("NewsItemCreate(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting NewsItemCreate()");
         return View(model);
     }
 
@@ -124,20 +135,25 @@ public partial class NewsController : BaseAdminController
         model = await _newsModelFactory.PrepareNewsItemModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting NewsItemCreate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.NEWS_VIEW)]
     public virtual async Task<IActionResult> NewsItemEdit(int id)
     {
+		logger.LogDebug(">>> Entering NewsItemEdit(id={Id})", id);
         //try to get a news item with the specified id
         var newsItem = await _newsService.GetNewsByIdAsync(id);
         if (newsItem == null)
+			logger.LogDebug("NewsItemEdit(id={Id}): newsItem → {NewsItem}", id, newsItem);
             return RedirectToAction("NewsItems");
 
         //prepare model
         var model = await _newsModelFactory.PrepareNewsItemModelAsync(null, newsItem);
 
+		logger.LogDebug("NewsItemEdit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting NewsItemEdit(id={Id})", id);
         return View(model);
     }
 
@@ -178,6 +194,7 @@ public partial class NewsController : BaseAdminController
         model = await _newsModelFactory.PrepareNewsItemModelAsync(model, newsItem, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting NewsItemEdit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -185,9 +202,11 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a news item with the specified id
         var newsItem = await _newsService.GetNewsByIdAsync(id);
         if (newsItem == null)
+			logger.LogDebug("Delete(id={Id}): newsItem → {NewsItem}", id, newsItem);
             return RedirectToAction("NewsItems");
 
         await _newsService.DeleteNewsAsync(newsItem);
@@ -198,6 +217,7 @@ public partial class NewsController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.News.NewsItems.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("NewsItems");
     }
 
@@ -208,14 +228,19 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_COMMENTS_VIEW)]
     public virtual async Task<IActionResult> NewsComments(int? filterByNewsItemId)
     {
+		logger.LogDebug(">>> Entering NewsComments(filterByNewsItemId={FilterByNewsItemId})", filterByNewsItemId);
         //try to get a news item with the specified id
         var newsItem = await _newsService.GetNewsByIdAsync(filterByNewsItemId ?? 0);
         if (newsItem == null && filterByNewsItemId.HasValue)
+			logger.LogDebug("NewsComments(filterByNewsItemId={FilterByNewsItemId}): newsItem → {NewsItem}", filterByNewsItemId, newsItem);
             return RedirectToAction("NewsComments");
 
         //prepare model
         var model = await _newsModelFactory.PrepareNewsCommentSearchModelAsync(new NewsCommentSearchModel(), newsItem);
 
+		logger.LogDebug("NewsComments(filterByNewsItemId={FilterByNewsItemId}): model → {Model}", filterByNewsItemId, model);
+		logger.LogDebug(">>> Entering Comments(searchModel={SearchModel})", searchModel);
+		logger.LogDebug("<<< Exiting Comments(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -259,6 +284,7 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CommentDelete(int id)
     {
+		logger.LogDebug(">>> Entering CommentDelete(id={Id})", id);
         //try to get a news comment with the specified id
         var comment = await _newsService.GetNewsCommentByIdAsync(id)
             ?? throw new ArgumentException("No comment found with the specified id", nameof(id));
@@ -269,6 +295,7 @@ public partial class NewsController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteNewsComment",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteNewsComment"), comment.Id), comment);
 
+		logger.LogDebug("<<< Exiting CommentDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -276,17 +303,21 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelectedComments(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelectedComments(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var comments = await _newsService.GetNewsCommentsByIdsAsync(selectedIds.ToArray());
 
+		logger.LogDebug("DeleteSelectedComments(selectedIds={SelectedIds}): comments → {Comments}", selectedIds, comments);
         await _newsService.DeleteNewsCommentsAsync(comments);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteNewsComment");
         await _customerActivityService.InsertActivitiesAsync("DeleteNewsComment", comments, newsComment => string.Format(activityLogFormat, newsComment.Id));
+		logger.LogDebug("DeleteSelectedComments(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DeleteSelectedComments(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -294,15 +325,18 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ApproveSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         //filter not approved comments
         var newsComments = (await _newsService.GetNewsCommentsByIdsAsync(selectedIds.ToArray())).Where(comment => !comment.IsApproved).ToList();
 
+		logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): newsComments → {NewsComments}", selectedIds, newsComments);
         foreach (var newsComment in newsComments)
         {
             newsComment.IsApproved = true;
+			logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): newsComment.IsApproved → {Arg1}", selectedIds, newsComment.IsApproved);
 
             await _newsService.UpdateNewsCommentAsync(newsComment);
 
@@ -313,7 +347,9 @@ public partial class NewsController : BaseAdminController
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.EditNewsComment");
         await _customerActivityService.InsertActivitiesAsync("EditNewsComment", newsComments, newsComment => string.Format(activityLogFormat, newsComment.Id));
+		logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -321,15 +357,18 @@ public partial class NewsController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.NEWS_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DisapproveSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         //filter approved comments
         var newsComments = (await _newsService.GetNewsCommentsByIdsAsync(selectedIds.ToArray())).Where(comment => comment.IsApproved).ToList();
 
+		logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): newsComments → {NewsComments}", selectedIds, newsComments);
         foreach (var newsComment in newsComments)
         {
             newsComment.IsApproved = false;
+			logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): newsComment.IsApproved → {Arg1}", selectedIds, newsComment.IsApproved);
 
             await _newsService.UpdateNewsCommentAsync(newsComment);
         }
@@ -337,7 +376,9 @@ public partial class NewsController : BaseAdminController
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.EditNewsComment");
         await _customerActivityService.InsertActivitiesAsync("EditNewsComment", newsComments, newsComment => string.Format(activityLogFormat, newsComment.Id));
+		logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 

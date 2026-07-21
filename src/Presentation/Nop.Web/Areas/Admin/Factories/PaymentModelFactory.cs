@@ -49,12 +49,14 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodsModel> PreparePaymentMethodsModelAsync(PaymentMethodsModel methodsModel)
     {
+		logger.LogDebug(">>> Entering PreparePaymentMethodsModelAsync(methodsModel={MethodsModel})", methodsModel);
         ArgumentNullException.ThrowIfNull(methodsModel);
 
         //prepare nested search models
         await PreparePaymentMethodSearchModelAsync(methodsModel.PaymentsMethod);
         await PreparePaymentMethodRestrictionModelAsync(methodsModel.PaymentMethodRestriction);
 
+		logger.LogDebug("<<< Exiting PreparePaymentMethodsModelAsync(methodsModel={MethodsModel})", methodsModel);
         return methodsModel;
     }
 
@@ -68,11 +70,13 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodListModel> PreparePaymentMethodListModelAsync(PaymentMethodSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePaymentMethodListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get payment methods
         var paymentMethods = (await _paymentPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PreparePaymentMethodListModelAsync(searchModel={SearchModel}): paymentMethods → {PaymentMethods}", searchModel, paymentMethods);
         //prepare grid model
         var model = await new PaymentMethodListModel().PrepareToGridAsync(searchModel, paymentMethods, () =>
         {
@@ -81,6 +85,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
                 //fill in model values from the entity
                 var paymentMethodModel = method.ToPluginModel<PaymentMethodModel>();
 
+				logger.LogDebug("PreparePaymentMethodListModelAsync(searchModel={SearchModel}): paymentMethodModel → {PaymentMethodModel}", searchModel, paymentMethodModel);
                 //fill in additional values (not existing in the entity)
                 paymentMethodModel.IsActive = _paymentPluginManager.IsPluginActive(method);
                 paymentMethodModel.ConfigurationUrl = method.GetConfigurationPageUrl();
@@ -92,6 +97,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PreparePaymentMethodListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -105,11 +111,13 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual Task<PaymentMethodSearchModel> PreparePaymentMethodSearchModelAsync(PaymentMethodSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePaymentMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PreparePaymentMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -123,6 +131,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodRestrictionModel> PreparePaymentMethodRestrictionModelAsync(PaymentMethodRestrictionModel model)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(model);
 
         var countries = await _countryService.GetAllCountriesAsync(showHidden: true);

@@ -79,11 +79,14 @@ public partial class CookieAuthenticationService : IAuthenticationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SignOutAsync()
     {
+		logger.LogDebug(">>> Entering SignOutAsync()");
         //reset cached customer
         _cachedCustomer = null;
+		logger.LogDebug("SignOutAsync(): _cachedCustomer → {_cachedCustomer}", _cachedCustomer);
 
         //and sign out from the current authentication scheme
         await _httpContextAccessor.HttpContext.SignOutAsync(NopAuthenticationDefaults.AuthenticationScheme);
+		logger.LogDebug("<<< Exiting SignOutAsync()");
     }
 
     /// <summary>
@@ -95,6 +98,7 @@ public partial class CookieAuthenticationService : IAuthenticationService
     /// </returns>
     public virtual async Task<Customer> GetAuthenticatedCustomerAsync()
     {
+		logger.LogDebug(">>> Entering GetAuthenticatedCustomerAsync()");
         //whether there is a cached customer
         if (_cachedCustomer != null)
             return _cachedCustomer;
@@ -102,10 +106,12 @@ public partial class CookieAuthenticationService : IAuthenticationService
         //try to get authenticated user identity
         var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync(NopAuthenticationDefaults.AuthenticationScheme);
         if (!authenticateResult.Succeeded)
+			logger.LogDebug("GetAuthenticatedCustomerAsync(): authenticateResult → {AuthenticateResult}", authenticateResult);
             return null;
 
         Customer customer = null;
         if (_customerSettings.UsernamesEnabled)
+		logger.LogDebug("GetAuthenticatedCustomerAsync(): customer → {Customer}", customer);
         {
             //try to get customer by username
             var usernameClaim = authenticateResult.Principal.FindFirst(claim => claim.Type == ClaimTypes.Name
@@ -138,6 +144,7 @@ public partial class CookieAuthenticationService : IAuthenticationService
         //cache authenticated customer
         _cachedCustomer = customer;
 
+		logger.LogDebug("<<< Exiting GetAuthenticatedCustomerAsync()");
         return _cachedCustomer;
     }
 

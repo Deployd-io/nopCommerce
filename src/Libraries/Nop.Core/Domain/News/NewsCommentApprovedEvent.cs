@@ -11,7 +11,10 @@ public partial class NewsCommentApprovedEvent
     /// <param name="newsComment">News comment</param>
     public NewsCommentApprovedEvent(NewsComment newsComment)
     {
+		logger.LogDebug(">>> Entering NewsCommentApprovedEvent(newsComment={NewsComment})", newsComment);
         NewsComment = newsComment;
+		logger.LogDebug("<<< Exiting NewsCommentApprovedEvent(newsComment={NewsComment})", newsComment);
+		logger.LogDebug("NewsCommentApprovedEvent(newsComment={NewsComment}): NewsComment → {NewsComment1}", newsComment, NewsComment);
     }
 
     /// <summary>

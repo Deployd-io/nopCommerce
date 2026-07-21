@@ -54,9 +54,19 @@ public partial class TopicService : ITopicService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTopicAsync(Topic topic)
     {
+		logger.LogDebug(">>> Entering DeleteTopicAsync(topic={Topic})", topic);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _topicRepository.DeleteAsync(topic);
+		logger.LogDebug("<<< Exiting DeleteTopicAsync(topic={Topic})", topic);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTopicAsync(topic)={Topic}: external service call took {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTopicAsync(topic)={Topic}: delete query executed in {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteTopicAsync(topic)={Topic}: external service call took {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteTopicAsync(topic)={Topic}: delete query executed in {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a topic
     /// </summary>
@@ -67,6 +77,8 @@ public partial class TopicService : ITopicService
     /// </returns>
     public virtual async Task<Topic> GetTopicByIdAsync(int topicId)
     {
+		logger.LogDebug(">>> Entering GetTopicByIdAsync(topicId={TopicId})", topicId);
+		logger.LogDebug("<<< Exiting GetTopicByIdAsync(topicId={TopicId})", topicId);
         return await _topicRepository.GetByIdAsync(topicId, cache => default);
     }
 
@@ -81,14 +93,20 @@ public partial class TopicService : ITopicService
     /// </returns>
     public virtual async Task<Topic> GetTopicBySystemNameAsync(string systemName, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId})", systemName, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(systemName))
             return null;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId}): customer → {Customer}", systemName, storeId, customer);
+		logger.LogDebug("GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId}): customerRoleIds → {CustomerRoleIds}", systemName, storeId, customerRoleIds);
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopTopicDefaults.TopicBySystemNameCacheKey, systemName, storeId, customerRoleIds);
 
+		logger.LogDebug("GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId}): cacheKey → {CacheKey}", systemName, storeId, cacheKey);
         return await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var query = _topicRepository.Table
@@ -107,7 +125,10 @@ public partial class TopicService : ITopicService
             return await query.Where(t => t.SystemName == systemName)
                 .OrderBy(t => t.Id)
                 .FirstOrDefaultAsync();
+				logger.LogInformation("GetTopicBySystemNameAsync(systemName,storeId)={SystemName},{StoreId}: database query executed in {Arg2} ms", systemName, storeId, __logStart.ElapsedMilliseconds);
         });
+		logger.LogInformation("GetTopicBySystemNameAsync(systemName,storeId)={SystemName},{StoreId}: external service call took {Arg2} ms", systemName, storeId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId})", systemName, storeId);
     }
 
     /// <summary>
@@ -122,16 +143,22 @@ public partial class TopicService : ITopicService
     /// </returns>
     public virtual async Task<IList<Topic>> GetAllTopicsAsync(int storeId, bool ignoreAcl = false, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden})", storeId, ignoreAcl, showHidden);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden}): customer → {Customer}", storeId, ignoreAcl, showHidden, customer);
+		logger.LogDebug("GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden}): customerRoleIds → {CustomerRoleIds}", storeId, ignoreAcl, showHidden, customerRoleIds);
 
         return await _topicRepository.GetAllAsync(async query =>
         {
+		logger.LogDebug("GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden}): query → {Query}", storeId, ignoreAcl, showHidden, query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
             if (!showHidden || storeId > 0)
             {
                 //apply store mapping constraints
                 query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+				logger.LogInformation("GetAllTopicsAsync(storeId,ignoreAcl,showHidden)={StoreId},{IgnoreAcl},{ShowHidden}: find query executed in {Arg3} ms", storeId, ignoreAcl, showHidden, __logStart.ElapsedMilliseconds);
             }
 
             if (!showHidden)
@@ -154,6 +181,7 @@ public partial class TopicService : ITopicService
                 ? cache.PrepareKeyForDefaultCache(NopTopicDefaults.TopicsAllCacheKey, storeId, showHidden)
                 : cache.PrepareKeyForDefaultCache(NopTopicDefaults.TopicsAllWithACLCacheKey, storeId, showHidden, customerRoleIds);
         });
+		logger.LogDebug("<<< Exiting GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden})", storeId, ignoreAcl, showHidden);
     }
 
     /// <summary>
@@ -192,9 +220,15 @@ public partial class TopicService : ITopicService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTopicAsync(Topic topic)
     {
+		logger.LogDebug(">>> Entering InsertTopicAsync(topic={Topic})", topic);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _topicRepository.InsertAsync(topic);
+		logger.LogDebug("<<< Exiting InsertTopicAsync(topic={Topic})", topic);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertTopicAsync(topic)={Topic}: save query executed in {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertTopicAsync(topic)={Topic}: save query executed in {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Get a value indicating whether a topic is available (availability dates)
     /// </summary>
@@ -203,6 +237,7 @@ public partial class TopicService : ITopicService
     /// <returns>Result</returns>
     public virtual bool TopicIsAvailable(Topic topic, DateTime? dateTime = null)
     {
+		logger.LogDebug(">>> Entering TopicIsAvailable(topic={Topic},dateTime={DateTime})", topic, dateTime);
         ArgumentNullException.ThrowIfNull(topic);
 
         dateTime ??= DateTime.UtcNow;
@@ -211,6 +246,7 @@ public partial class TopicService : ITopicService
             return false;
 
         if (topic.AvailableEndDateTimeUtc.HasValue && topic.AvailableEndDateTimeUtc.Value < dateTime)
+		logger.LogDebug("<<< Exiting TopicIsAvailable(topic={Topic},dateTime={DateTime})", topic, dateTime);
             return false;
 
         return true;
@@ -223,8 +259,14 @@ public partial class TopicService : ITopicService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTopicAsync(Topic topic)
     {
+		logger.LogDebug(">>> Entering UpdateTopicAsync(topic={Topic})", topic);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _topicRepository.UpdateAsync(topic);
+		logger.LogDebug("<<< Exiting UpdateTopicAsync(topic={Topic})", topic);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateTopicAsync(topic)={Topic}: update query executed in {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateTopicAsync(topic)={Topic}: update query executed in {Arg1} ms", topic, __logStart.ElapsedMilliseconds);
     #endregion
 }

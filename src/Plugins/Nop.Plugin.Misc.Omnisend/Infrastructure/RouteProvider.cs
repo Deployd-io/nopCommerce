@@ -16,6 +16,7 @@ public class RouteProvider : IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(name: OmnisendDefaults.ConfigurationRouteName,
             pattern: "Admin/Omnisend/Configure",
             defaults: new { controller = "OmnisendAdmin", action = "Configure", area = AreaNames.ADMIN });
@@ -23,6 +24,7 @@ public class RouteProvider : IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: OmnisendDefaults.AbandonedCheckoutRouteName,
             pattern: "Omnisend/AbandonedCheckout/{cartId}",
             defaults: new { controller = "Omnisend", action = "AbandonedCheckout" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

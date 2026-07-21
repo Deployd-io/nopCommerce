@@ -39,9 +39,12 @@ public partial class ShoppingCartController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.CURRENT_CARTS_MANAGE)]
     public virtual async Task<IActionResult> CurrentCarts()
     {
+		logger.LogDebug(">>> Entering CurrentCarts()");
         //prepare model
         var model = await _shoppingCartModelFactory.PrepareShoppingCartSearchModelAsync(new ShoppingCartSearchModel());
 
+		logger.LogDebug("CurrentCarts(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CurrentCarts()");
         return View(model);
     }
 
@@ -52,6 +55,7 @@ public partial class ShoppingCartController : BaseAdminController
         //prepare model
         var model = await _shoppingCartModelFactory.PrepareShoppingCartListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting CurrentCarts(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -59,6 +63,7 @@ public partial class ShoppingCartController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.CURRENT_CARTS_MANAGE)]
     public virtual async Task<IActionResult> GetCartDetails(ShoppingCartItemSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering GetCartDetails(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
                        ?? throw new ArgumentException("No customer found with the specified id");
@@ -66,6 +71,8 @@ public partial class ShoppingCartController : BaseAdminController
         //prepare model
         var model = await _shoppingCartModelFactory.PrepareShoppingCartItemListModelAsync(searchModel, customer);
 
+		logger.LogDebug("GetCartDetails(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting GetCartDetails(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -73,8 +80,10 @@ public partial class ShoppingCartController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.CURRENT_CARTS_MANAGE)]
     public virtual async Task<IActionResult> DeleteItem(int id)
     {
+		logger.LogDebug(">>> Entering DeleteItem(id={Id})", id);
         await _shoppingCartService.DeleteShoppingCartItemAsync(id);
 
+		logger.LogDebug("<<< Exiting DeleteItem(id={Id})", id);
         return new NullJsonResult();
     }
 

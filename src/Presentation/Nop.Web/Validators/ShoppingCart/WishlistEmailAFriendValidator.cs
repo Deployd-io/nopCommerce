@@ -9,6 +9,7 @@ public partial class WishlistEmailAFriendValidator : BaseNopValidator<WishlistEm
 {
     public WishlistEmailAFriendValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering WishlistEmailAFriendValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.FriendEmail).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Wishlist.EmailAFriend.FriendEmail.Required"));
         RuleFor(x => x.FriendEmail)
             .IsEmailAddress()
@@ -18,5 +19,6 @@ public partial class WishlistEmailAFriendValidator : BaseNopValidator<WishlistEm
         RuleFor(x => x.YourEmailAddress)
             .IsEmailAddress()
             .WithMessageAwait(localizationService.GetResourceAsync("Common.WrongEmail"));
+			logger.LogDebug("<<< Exiting WishlistEmailAFriendValidator(localizationService={LocalizationService})", localizationService);
     }
 }

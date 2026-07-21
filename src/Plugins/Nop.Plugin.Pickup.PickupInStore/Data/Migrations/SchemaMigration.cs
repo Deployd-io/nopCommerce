@@ -10,6 +10,8 @@ public class SchemaMigration : AutoReversingMigration
 {
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<StorePickupPoint>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 }

@@ -82,9 +82,13 @@ public partial class ProductAttributeFormatter : IProductAttributeFormatter
     /// </returns>
     public virtual async Task<string> FormatAttributesAsync(Product product, string attributesXml)
     {
+		logger.LogDebug(">>> Entering FormatAttributesAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("FormatAttributesAsync(product={Product},attributesXml={AttributesXml}): customer → {Customer}", product, attributesXml, customer);
+		logger.LogDebug("FormatAttributesAsync(product={Product},attributesXml={AttributesXml}): currentStore → {CurrentStore}", product, attributesXml, currentStore);
 
+		logger.LogDebug("<<< Exiting FormatAttributesAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         return await FormatAttributesAsync(product, attributesXml, customer, currentStore);
     }
 

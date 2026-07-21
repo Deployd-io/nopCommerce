@@ -77,7 +77,10 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var shippingProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): shippingProvider → {ShippingProvider}", systemName, customer, storeId, shippingProvider);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(shippingProvider);
     }
 

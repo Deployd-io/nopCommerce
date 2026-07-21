@@ -18,6 +18,8 @@ public partial class EmailPropertyValidator<T> : PropertyValidator<T, string>, I
     /// <param name="errorCode">The currently configured error code for the validator.</param>
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
+		logger.LogDebug(">>> Entering GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+		logger.LogDebug("<<< Exiting GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
         return Localized(errorCode, Name);
     }
 
@@ -34,6 +36,8 @@ public partial class EmailPropertyValidator<T> : PropertyValidator<T, string>, I
     /// <returns>True if valid, otherwise false.</returns>
     public override bool IsValid(ValidationContext<T> context, string value)
     {
+		logger.LogDebug(">>> Entering IsValid(context={Context},value={Value})", context, value);
+		logger.LogDebug("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return value == null || CommonHelper.GetEmailRegex().IsMatch(value);
     }
 

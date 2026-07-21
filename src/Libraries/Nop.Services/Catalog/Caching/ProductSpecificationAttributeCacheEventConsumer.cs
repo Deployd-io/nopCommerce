@@ -15,8 +15,10 @@ public partial class ProductSpecificationAttributeCacheEventConsumer : CacheEven
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductSpecificationAttribute entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductSpecificationAttributeByProductPrefix, entity.ProductId);
         await RemoveByPrefixAsync(NopCatalogDefaults.FilterableSpecificationAttributeOptionsPrefix);
         await RemoveAsync(NopCatalogDefaults.SpecificationAttributeGroupByProductCacheKey, entity.ProductId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

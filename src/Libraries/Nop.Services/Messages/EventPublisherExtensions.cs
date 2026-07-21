@@ -17,7 +17,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task PublishNewsLetterSubscribeAsync(this IEventPublisher eventPublisher, NewsLetterSubscription subscription)
     {
+		logger.LogDebug(">>> Entering PublishNewsLetterSubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
         await eventPublisher.PublishAsync(new EmailSubscribedEvent(subscription));
+		logger.LogDebug("<<< Exiting PublishNewsLetterSubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
     }
 
     /// <summary>
@@ -28,7 +30,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task PublishNewsLetterUnsubscribeAsync(this IEventPublisher eventPublisher, NewsLetterSubscription subscription)
     {
+		logger.LogDebug(">>> Entering PublishNewsLetterUnsubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
         await eventPublisher.PublishAsync(new EmailUnsubscribedEvent(subscription));
+		logger.LogDebug("<<< Exiting PublishNewsLetterUnsubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
     }
 
     /// <summary>
@@ -41,7 +45,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task EntityTokensAddedAsync<T>(this IEventPublisher eventPublisher, T entity, IList<Token> tokens) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityTokensAddedAsync(eventPublisher={EventPublisher},entity={Entity},tokens={Tokens})", eventPublisher, entity, tokens);
         await eventPublisher.PublishAsync(new EntityTokensAddedEvent<T>(entity, tokens));
+		logger.LogDebug("<<< Exiting EntityTokensAddedAsync(eventPublisher={EventPublisher},entity={Entity},tokens={Tokens})", eventPublisher, entity, tokens);
     }
 
     /// <summary>
@@ -53,6 +59,8 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task MessageTokensAddedAsync(this IEventPublisher eventPublisher, MessageTemplate message, IList<Token> tokens)
     {
+		logger.LogDebug(">>> Entering MessageTokensAddedAsync(eventPublisher={EventPublisher},message={Message},tokens={Tokens})", eventPublisher, message, tokens);
         await eventPublisher.PublishAsync(new MessageTokensAddedEvent(message, tokens));
+		logger.LogDebug("<<< Exiting MessageTokensAddedAsync(eventPublisher={EventPublisher},message={Message},tokens={Tokens})", eventPublisher, message, tokens);
     }
 }

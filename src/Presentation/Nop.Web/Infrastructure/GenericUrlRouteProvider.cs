@@ -16,8 +16,10 @@ public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public virtual void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         var lang = GetLanguageRoutePattern();
 
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         //default routes
         //these routes are not generic, they are just default to map requests that don't match other patterns, 
         //but we define them here since this route provider is with the lowest priority, to allow to add additional routes before them
@@ -36,9 +38,11 @@ public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
         //generic routes (actually routing is processed later in SlugRouteTransformer)
         var genericCatalogPattern = $"{lang}/{{{NopRoutingDefaults.RouteValue.CatalogSeName}}}/{{{NopRoutingDefaults.RouteValue.SeName}}}";
         endpointRouteBuilder.MapDynamicControllerRoute<SlugRouteTransformer>(genericCatalogPattern);
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): genericCatalogPattern → {GenericCatalogPattern}", endpointRouteBuilder, genericCatalogPattern);
 
         var genericPattern = $"{lang}/{{{NopRoutingDefaults.RouteValue.SeName}}}";
         endpointRouteBuilder.MapDynamicControllerRoute<SlugRouteTransformer>(genericPattern);
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): genericPattern → {GenericPattern}", endpointRouteBuilder, genericPattern);
 
         //routes for not found slugs
         if (!string.IsNullOrEmpty(lang))
@@ -97,6 +101,7 @@ public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.ProductTag,
             pattern: genericPattern,
             defaults: new { controller = "Catalog", action = "ProductsByTag" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     #endregion

@@ -23,14 +23,18 @@ public abstract class ServiceTest : BaseNopTest
 {
     protected ServiceTest()
     {
+		logger.LogDebug(">>> Entering ServiceTest()");
         //init plugins
         InitPlugins();
+		logger.LogDebug("<<< Exiting ServiceTest()");
     }
 
     private static void InitPlugins()
     {
+		logger.LogDebug(">>> Entering InitPlugins()");
         var webHostEnvironment = new Mock<IWebHostEnvironment>();
         webHostEnvironment.Setup(x => x.ContentRootPath).Returns(System.Reflection.Assembly.GetExecutingAssembly().Location);
+		logger.LogDebug("InitPlugins(): webHostEnvironment → {WebHostEnvironment}", webHostEnvironment);
         webHostEnvironment.Setup(x => x.WebRootPath).Returns(System.IO.Directory.GetCurrentDirectory());
         CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment.Object);
 
@@ -93,13 +97,18 @@ public abstract class ServiceTest : BaseNopTest
 
         var taxSettings = GetService<TaxSettings>();
         var settingsService = GetService<ISettingService>();
+		logger.LogDebug("InitPlugins(): taxSettings → {TaxSettings}", taxSettings);
+		logger.LogDebug("InitPlugins(): settingsService → {SettingsService}", settingsService);
+		logger.LogDebug("InitPlugins(): taxSettings.ActiveTaxProviderSystemName → {Arg0}", taxSettings.ActiveTaxProviderSystemName);
 
         taxSettings.ActiveTaxProviderSystemName = "FixedTaxRateTest";
         settingsService.SaveSetting(taxSettings, settings => settings.ActiveTaxProviderSystemName);
 
         var shippingSettings = GetService<ShippingSettings>();
         shippingSettings.ActivePickupPointProviderSystemNames.Add("PickupPoint.TestProvider");
+		logger.LogDebug("InitPlugins(): shippingSettings → {ShippingSettings}", shippingSettings);
         settingsService.SaveSetting(shippingSettings, settings => settings.ActivePickupPointProviderSystemNames);
+		logger.LogDebug("<<< Exiting InitPlugins()");
     }
 }
 
@@ -110,8 +119,10 @@ public abstract class ServiceTest<TEntity> : ServiceTest where TEntity : BaseEnt
     [Test]
     public async Task TestCrudAsync()
     {
+		logger.LogDebug(">>> Entering TestCrudAsync()");
         var data = CrudData;
 
+		logger.LogDebug("TestCrudAsync(): data → {Data}", data);
         data.BaseEntity.Id = 0;
 
         await data.Insert(data.BaseEntity);
@@ -122,6 +133,7 @@ public abstract class ServiceTest<TEntity> : ServiceTest where TEntity : BaseEnt
 
         var item = await data.GetById(data.BaseEntity.Id);
         item.Should().NotBeNull();
+		logger.LogDebug("TestCrudAsync(): item → {Item}", item);
         data.IsEqual(data.UpdatedEntity, item).Should().BeTrue();
 
         await data.Delete(data.BaseEntity);
@@ -131,5 +143,6 @@ public abstract class ServiceTest<TEntity> : ServiceTest where TEntity : BaseEnt
             softDeletedEntity.Deleted.Should().BeTrue();
         else
             item.Should().BeNull();
+			logger.LogDebug("<<< Exiting TestCrudAsync()");
     }
 }

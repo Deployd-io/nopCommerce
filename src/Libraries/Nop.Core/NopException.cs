@@ -10,6 +10,8 @@ public partial class NopException : Exception
     /// </summary>
     public NopException()
     {
+	logger.LogDebug(">>> Entering NopException()");
+	logger.LogDebug("<<< Exiting NopException()");
     }
 
     /// <summary>
@@ -19,7 +21,9 @@ public partial class NopException : Exception
     public NopException(string message)
         : base(message)
     {
+	logger.LogDebug(">>> Entering NopException(message={Message})", message);
     }
+	logger.LogDebug("<<< Exiting NopException(message={Message})", message);
 
     /// <summary>
     /// Initializes a new instance of the Exception class with a specified error message.

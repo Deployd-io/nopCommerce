@@ -128,6 +128,7 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<TResult> HandleFunctionAsync<TResult>(Func<Task<TResult>> function, bool logErrors = true)
     {
+		logger.LogDebug(">>> Entering HandleFunctionAsync(function={Function},logErrors={LogErrors})", function, logErrors);
         try
         {
             //check whether the plugin is active
@@ -139,16 +140,19 @@ public class FacebookPixelService
         }
         catch (Exception exception)
         {
+			logger.LogError("Exception in HandleFunctionAsync(function={Function},logErrors={LogErrors}): {Arg2}", function, logErrors, ex.Message);
             if (!logErrors)
                 return default;
 
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (customer.IsSearchEngineAccount() || customer.IsBackgroundTaskAccount())
+				logger.LogDebug("HandleFunctionAsync(function={Function},logErrors={LogErrors}): customer → {Customer}", function, logErrors, customer);
                 return default;
 
             //log errors
             var error = $"{FacebookPixelDefaults.SystemName} error: {Environment.NewLine}{exception.Message}";
             await _logger.ErrorAsync(error, exception, customer);
+			logger.LogDebug("HandleFunctionAsync(function={Function},logErrors={LogErrors}): error → {Error}", function, logErrors, error);
 
             return default;
         }
@@ -163,8 +167,12 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<bool> PluginActiveAsync()
     {
+		logger.LogDebug(">>> Entering PluginActiveAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PluginActiveAsync(): customer → {Customer}", customer);
+		logger.LogDebug("PluginActiveAsync(): store → {Store}", store);
+		logger.LogDebug("<<< Exiting PluginActiveAsync()");
         return await _widgetPluginManager.IsPluginActiveAsync(FacebookPixelDefaults.SystemName, customer, store.Id);
     }
 
@@ -193,9 +201,12 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<string> GetUserObjectAsync()
     {
+		logger.LogDebug(">>> Entering GetUserObjectAsync()");
         //prepare user object
         var customer = await _workContext.GetCurrentCustomerAsync();
         var email = customer.Email;
+		logger.LogDebug("GetUserObjectAsync(): customer → {Customer}", customer);
+		logger.LogDebug("GetUserObjectAsync(): email → {Email}", email);
         var firstName = customer.FirstName;
         var lastName = customer.LastName;
         var phone = customer.Phone;
@@ -205,9 +216,12 @@ public class FacebookPixelService
         var countryId = customer.CountryId;
         var countryName = (await _countryService.GetCountryByIdAsync(countryId))?.TwoLetterIsoCode;
         var stateId = customer.StateProvinceId;
+		logger.LogDebug("GetUserObjectAsync(): countryName → {CountryName}", countryName);
         var stateName = (await _stateProvinceService.GetStateProvinceByIdAsync(stateId))?.Abbreviation;
         var zipcode = customer.ZipPostalCode;
+		logger.LogDebug("GetUserObjectAsync(): stateName → {StateName}", stateName);
 
+		logger.LogDebug("<<< Exiting GetUserObjectAsync()");
         return FormatEventObject(
         [
             ("em", JavaScriptEncoder.Default.Encode(email?.ToLowerInvariant() ?? string.Empty)),
@@ -246,6 +260,7 @@ public class FacebookPixelService
                     : null);
             return $"fbq('init', '{configuration.PixelId}'{additionalParameter});";
         });
+		logger.LogDebug("<<< Exiting FormatScriptAsync(configurations={Configurations},Func<FacebookPixelConfiguration={Arg1},getScript={GetScript})", configurations, Func<FacebookPixelConfiguration, getScript);
     }
 
     /// <summary>
@@ -319,6 +334,7 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<string> PrepareTrackedEventsScriptAsync(IList<FacebookPixelConfiguration> configurations)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get previously stored events and remove them from the session data
         var events = (await _httpContextAccessor.HttpContext.Session
                          .GetAsync<IList<TrackedEvent>>(FacebookPixelDefaults.TrackedEventsSessionValue))
@@ -373,6 +389,9 @@ public class FacebookPixelService
                 });
             });
         });
+		logger.LogDebug(">>> Entering GetCustomEventsAsync(configurationId={ConfigurationId},widgetZone={WidgetZone})", configurationId, widgetZone);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug("<<< Exiting GetCustomEventsAsync(configurationId={ConfigurationId},widgetZone={WidgetZone})", configurationId, widgetZone);
     }
 
     /// <summary>
@@ -420,6 +439,7 @@ public class FacebookPixelService
     /// <returns>Script code</returns>
     protected string FormatEventObject(List<(string Name, object Value)> properties, int? tabsNumber = null)
     {
+		logger.LogDebug(">>> Entering FormatEventObject(properties={Properties},tabsNumber={TabsNumber})", properties, tabsNumber);
         //local function to format list of objects
         string formatObjectList(List<List<(string Name, object Value)>> objectList)
         {
@@ -429,6 +449,7 @@ public class FacebookPixelService
                 {
                     var value = FormatEventObject(propertiesList, (tabsNumber ?? TABS_NUMBER) + 1);
                     preparedObjects += $"{Environment.NewLine}{new string('\t', (tabsNumber ?? TABS_NUMBER) + 1)}{value},";
+					logger.LogDebug("FormatEventObject(properties={Properties},tabsNumber={TabsNumber}): value → {Value}", properties, tabsNumber, value);
                 }
 
                 return preparedObjects;
@@ -457,6 +478,7 @@ public class FacebookPixelService
             return preparedObject;
         }).TrimEnd(',');
 
+		logger.LogDebug("<<< Exiting FormatEventObject(properties={Properties},tabsNumber={TabsNumber})", properties, tabsNumber);
         return $"{{{formattedObject}{Environment.NewLine}{new string('\t', tabsNumber ?? TABS_NUMBER)}}}";
     }
 
@@ -489,11 +511,13 @@ public class FacebookPixelService
     /// <returns>Script code</returns>
     protected string FormatCustomData(ConversionsEventCustomData customData)
     {
+		logger.LogDebug(">>> Entering FormatCustomData(customData={CustomData})", customData);
         List<(string Name, object Value)> getProperties(JObject jObject)
         {
             var result = jObject.ToObject<Dictionary<string, object>>();
             foreach (var pair in result)
             {
+			logger.LogDebug("FormatCustomData(customData={CustomData}): result → {Result}", customData, result);
                 if (pair.Value is JObject nestedObject)
                     result[pair.Key] = getProperties(nestedObject);
                 if (pair.Value is JArray nestedArray && nestedArray.OfType<JObject>().Any())
@@ -507,12 +531,15 @@ public class FacebookPixelService
         {
             var customDataObject = JObject.FromObject(customData, new JsonSerializer { NullValueHandling = NullValueHandling.Ignore });
 
+			logger.LogDebug("FormatCustomData(customData={CustomData}): customDataObject → {CustomDataObject}", customData, customDataObject);
             return FormatEventObject(getProperties(customDataObject));
 
         }
         catch
         {
+			logger.LogError("Exception in FormatCustomData(customData={CustomData}): {Arg1}", customData, ex.Message);
             //if something went wrong, just serialize the data without format
+			logger.LogDebug("<<< Exiting FormatCustomData(customData={CustomData})", customData);
             return JsonConvert.SerializeObject(customData, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
         }
     }
@@ -527,9 +554,14 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<IList<FacebookPixelConfiguration>> GetConfigurationsAsync(int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetConfigurationsAsync(storeId={StoreId})", storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(FacebookPixelDefaults.ConfigurationsCacheKey, storeId);
 
         var query = _facebookPixelConfigurationRepository.Table;
+		logger.LogWarning("GetConfigurationsAsync(storeId={StoreId}): key → {Key}", storeId, key);
+		logger.LogDebug("GetConfigurationsAsync(storeId={StoreId}): query → {Query}", storeId, query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         //filter by the store
         if (storeId > 0)
@@ -537,6 +569,7 @@ public class FacebookPixelService
 
         query = query.OrderBy(configuration => configuration.Id);
 
+		logger.LogInformation("GetConfigurationsAsync(storeId)={StoreId}: external service call took {Arg1} ms", storeId, __logStart.ElapsedMilliseconds);
         return await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
     }
 
@@ -552,6 +585,7 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<bool> HandleEventAsync(Func<Task<ConversionsEvent>> prepareModel, string eventName, int? storeId = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         storeId ??= (await _storeContext.GetCurrentStoreAsync()).Id;
         var configurations = (await GetConfigurationsAsync(storeId ?? 0)).Where(configuration => eventName switch
         {
@@ -589,6 +623,7 @@ public class FacebookPixelService
 
                 return true;
             }, logErrors);
+			logger.LogDebug("<<< Exiting HandleFunctionAsync(function={Function},logErrors={LogErrors})", function, logErrors);
         }
 
         return true;
@@ -604,13 +639,19 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEventUserData> PrepareUserDataAsync(Customer customer = null)
     {
+		logger.LogDebug(">>> Entering PrepareUserDataAsync(customer={Customer})", customer);
         //prepare user object
         customer ??= await _workContext.GetCurrentCustomerAsync();
         var twoLetterCountryIsoCode = (await _countryService.GetCountryByIdAsync(customer.CountryId))?.TwoLetterIsoCode;
         var stateName = (await _stateProvinceService.GetStateProvinceByIdAsync(customer.StateProvinceId))?.Abbreviation;
+		logger.LogDebug("PrepareUserDataAsync(customer={Customer}): twoLetterCountryIsoCode → {TwoLetterCountryIsoCode}", customer, twoLetterCountryIsoCode);
+		logger.LogDebug("PrepareUserDataAsync(customer={Customer}): stateName → {StateName}", customer, stateName);
         var ipAddress = _webHelper.GetCurrentIpAddress();
         var userAgent = _httpContextAccessor.HttpContext?.Request?.Headers[HeaderNames.UserAgent].ToString();
+		logger.LogDebug("PrepareUserDataAsync(customer={Customer}): ipAddress → {IpAddress}", customer, ipAddress);
+		logger.LogDebug("PrepareUserDataAsync(customer={Customer}): userAgent → {UserAgent}", customer, userAgent);
 
+		logger.LogDebug("<<< Exiting PrepareUserDataAsync(customer={Customer})", customer);
         return new ConversionsEventUserData
         {
             EmailAddress = [HashHelper.CreateHash(Encoding.UTF8.GetBytes(customer.Email?.ToLowerInvariant() ?? string.Empty), "SHA256")],
@@ -640,13 +681,16 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PrepareAddToCartEventModelAsync(ShoppingCartItem item)
     {
+		logger.LogDebug(">>> Entering PrepareAddToCartEventModelAsync(item={Item})", item);
         ArgumentNullException.ThrowIfNull(item);
 
         //check whether the shopping was initiated by the customer
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): customer → {Customer}", item, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): store → {Store}", item, store);
         if (item.CustomerId != customer.Id)
             throw new NopException("Shopping was not initiated by customer");
 
@@ -656,13 +700,20 @@ public class FacebookPixelService
 
         var product = await _productService.GetProductByIdAsync(item.ProductId);
         var categoryMapping = (await _categoryService.GetProductCategoriesByProductIdAsync(product?.Id ?? 0)).FirstOrDefault();
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): product → {Product}", item, product);
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): categoryMapping → {CategoryMapping}", item, categoryMapping);
         var categoryName = (await _categoryService.GetCategoryByIdAsync(categoryMapping?.CategoryId ?? 0))?.Name;
         var sku = product != null ? await _productService.FormatSkuAsync(product, item.AttributesXml) : string.Empty;
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): categoryName → {CategoryName}", item, categoryName);
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): sku → {Sku}", item, sku);
         var quantity = product != null ? (int?)item.Quantity : null;
         var (productPrice, _, _, _) = await _priceCalculationService.GetFinalPriceAsync(product, customer, store, includeDiscounts: false);
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): quantity → {Quantity}", item, quantity);
         var (price, _) = await _taxService.GetProductPriceAsync(product, productPrice);
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
         var priceValue = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(price, currentCurrency);
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): currentCurrency → {CurrentCurrency}", item, currentCurrency);
+		logger.LogDebug("PrepareAddToCartEventModelAsync(item={Item}): priceValue → {PriceValue}", item, priceValue);
         var currency = currentCurrency?.CurrencyCode;
 
         var eventObject = new ConversionsEventCustomData
@@ -684,6 +735,7 @@ public class FacebookPixelService
             Value = priceValue
         };
 
+		logger.LogDebug("<<< Exiting PrepareAddToCartEventModelAsync(item={Item})", item);
         return new ConversionsEvent
             {
                 Data =
@@ -712,23 +764,31 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PreparePurchaseModelAsync(Order order)
     {
+		logger.LogDebug(">>> Entering PreparePurchaseModelAsync(order={Order})", order);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         //check whether the purchase was initiated by the customer
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (order.CustomerId != customer.Id)
+			logger.LogDebug("PreparePurchaseModelAsync(order={Order}): customer → {Customer}", order, customer);
             throw new NopException("Purchase was not initiated by customer");
 
         //prepare event object
         var currency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
         var contentsProperties = await (await _orderService.GetOrderItemsAsync(order.Id)).SelectAwait(async item =>
         {
+		logger.LogDebug("PreparePurchaseModelAsync(order={Order}): currency → {Currency}", order, currency);
             var product = await _productService.GetProductByIdAsync(item.ProductId);
             var sku = product != null ? await _productService.FormatSkuAsync(product, item.AttributesXml) : string.Empty;
+			logger.LogDebug("PreparePurchaseModelAsync(order={Order}): product → {Product}", order, product);
+			logger.LogDebug("PreparePurchaseModelAsync(order={Order}): sku → {Sku}", order, sku);
             var quantity = product != null ? (int?)item.Quantity : null;
             return new { id = sku, quantity = quantity };
         }).Cast<object>().ToListAsync();
         var eventObject = new ConversionsEventCustomData
+		logger.LogDebug("PreparePurchaseModelAsync(order={Order}): quantity → {Quantity}", order, quantity);
+		logger.LogInformation("PreparePurchaseModelAsync(order)={Order}: database query executed in {Arg1} ms", order, __logStart.ElapsedMilliseconds);
         {
             ContentType = "product",
             Contents = contentsProperties,
@@ -736,6 +796,7 @@ public class FacebookPixelService
             Value = order.OrderTotal
         };
 
+		logger.LogDebug("<<< Exiting PreparePurchaseModelAsync(order={Order})", order);
         return new ConversionsEvent
             {
                 Data =
@@ -764,16 +825,21 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PrepareViewContentModelAsync(ProductDetailsModel productDetails)
     {
+		logger.LogDebug(">>> Entering PrepareViewContentModelAsync(productDetails={ProductDetails})", productDetails);
         ArgumentNullException.ThrowIfNull(productDetails);
 
         //prepare event object
         var product = await _productService.GetProductByIdAsync(productDetails.Id);
         var categoryMapping = (await _categoryService.GetProductCategoriesByProductIdAsync(product?.Id ?? 0)).FirstOrDefault();
+		logger.LogDebug("PrepareViewContentModelAsync(productDetails={ProductDetails}): product → {Product}", productDetails, product);
+		logger.LogDebug("PrepareViewContentModelAsync(productDetails={ProductDetails}): categoryMapping → {CategoryMapping}", productDetails, categoryMapping);
         var categoryName = (await _categoryService.GetCategoryByIdAsync(categoryMapping?.CategoryId ?? 0))?.Name;
         var sku = productDetails.Sku;
+		logger.LogDebug("PrepareViewContentModelAsync(productDetails={ProductDetails}): categoryName → {CategoryName}", productDetails, categoryName);
         var priceValue = productDetails.ProductPrice.PriceValue;
         var currency = (await _workContext.GetWorkingCurrencyAsync())?.CurrencyCode;
 
+		logger.LogDebug("PrepareViewContentModelAsync(productDetails={ProductDetails}): currency → {Currency}", productDetails, currency);
         var eventObject = new ConversionsEventCustomData
         {
             ContentCategory = categoryName,
@@ -784,6 +850,7 @@ public class FacebookPixelService
             Value = priceValue
         };
 
+		logger.LogDebug("<<< Exiting PrepareViewContentModelAsync(productDetails={ProductDetails})", productDetails);
         return new ConversionsEvent
             {
                 Data =
@@ -810,23 +877,34 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PrepareInitiateCheckoutModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareInitiateCheckoutModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare event object
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareInitiateCheckoutModelAsync(): customer → {Customer}", customer);
+		logger.LogDebug("PrepareInitiateCheckoutModelAsync(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
         var (price, _, _, _, _, _) = await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart, false, false);
+		logger.LogDebug("PrepareInitiateCheckoutModelAsync(): cart → {Cart}", cart);
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
         var priceValue = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(price ?? 0, currentCurrency);
+		logger.LogDebug("PrepareInitiateCheckoutModelAsync(): currentCurrency → {CurrentCurrency}", currentCurrency);
+		logger.LogDebug("PrepareInitiateCheckoutModelAsync(): priceValue → {PriceValue}", priceValue);
         var currency = currentCurrency?.CurrencyCode;
 
         var contentsProperties = await cart.SelectAwait(async item =>
         {
             var product = await _productService.GetProductByIdAsync(item.ProductId);
             var sku = product != null ? await _productService.FormatSkuAsync(product, item.AttributesXml) : string.Empty;
+			logger.LogDebug("PrepareInitiateCheckoutModelAsync(): product → {Product}", product);
+			logger.LogDebug("PrepareInitiateCheckoutModelAsync(): sku → {Sku}", sku);
             var quantity = product != null ? (int?)item.Quantity : null;
             return new { id = sku, quantity = quantity };
         }).Cast<object>().ToListAsync();
 
+		logger.LogDebug("PrepareInitiateCheckoutModelAsync(): quantity → {Quantity}", quantity);
+		logger.LogInformation("PrepareInitiateCheckoutModelAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         var eventObject = new ConversionsEventCustomData
         {
             ContentType = "product",
@@ -835,6 +913,7 @@ public class FacebookPixelService
             Value = priceValue
         };
 
+		logger.LogDebug("<<< Exiting PrepareInitiateCheckoutModelAsync()");
         return new ConversionsEvent
             {
                 Data =
@@ -861,6 +940,8 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PreparePageViewModelAsync()
     {
+		logger.LogDebug(">>> Entering PreparePageViewModelAsync()");
+		logger.LogDebug("<<< Exiting PreparePageViewModelAsync()");
         return new ConversionsEvent
             {
                 Data =
@@ -888,12 +969,14 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PrepareSearchModelAsync(string searchTerm)
     {
+		logger.LogDebug(">>> Entering PrepareSearchModelAsync(searchTerm={SearchTerm})", searchTerm);
         //prepare event object
         var eventObject = new ConversionsEventCustomData
         {
             SearchString = JavaScriptEncoder.Default.Encode(searchTerm)
         };
 
+		logger.LogDebug("<<< Exiting PrepareSearchModelAsync(searchTerm={SearchTerm})", searchTerm);
         return new ConversionsEvent
             {
                 Data =
@@ -920,6 +1003,8 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PrepareContactModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareContactModelAsync()");
+		logger.LogDebug("<<< Exiting PrepareContactModelAsync()");
         return new ConversionsEvent
             {
                 Data =
@@ -946,12 +1031,14 @@ public class FacebookPixelService
     /// </returns>
     protected async Task<ConversionsEvent> PrepareCompleteRegistrationModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCompleteRegistrationModelAsync()");
         //prepare event object
         var eventObject = new ConversionsEventCustomData
         {
             Status = true.ToString()
         };
 
+		logger.LogDebug("<<< Exiting PrepareCompleteRegistrationModelAsync()");
         return new ConversionsEvent
             {
                 Data =
@@ -982,6 +1069,7 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task PrepareEventScriptAsync(ConversionsEvent conversionsEvent)
     {
+		logger.LogDebug(">>> Entering PrepareEventScriptAsync(conversionsEvent={ConversionsEvent})", conversionsEvent);
         await HandleFunctionAsync(async () =>
         {
             //get current stored events 
@@ -992,6 +1080,7 @@ public class FacebookPixelService
             var store = await _storeContext.GetCurrentStoreAsync();
             foreach (var conversionsEventData in conversionsEvent.Data)
             {
+			logger.LogDebug("PrepareEventScriptAsync(conversionsEvent={ConversionsEvent}): store → {Store}", conversionsEvent, store);
                 conversionsEventData.StoreId ??= store.Id;
                 var activeEvent = events.FirstOrDefault(trackedEvent =>
                     trackedEvent.EventName == conversionsEventData.EventName &&
@@ -1017,6 +1106,7 @@ public class FacebookPixelService
 
             return true;
         });
+		logger.LogDebug("<<< Exiting PrepareEventScriptAsync(conversionsEvent={ConversionsEvent})", conversionsEvent);
     }
 
     /// <summary>
@@ -1028,6 +1118,8 @@ public class FacebookPixelService
     /// </returns>
     public async Task<string> PrepareScriptAsync()
     {
+		logger.LogDebug(">>> Entering PrepareScriptAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await HandleFunctionAsync(async () =>
         {
             //get the enabled configurations
@@ -1045,6 +1137,7 @@ public class FacebookPixelService
                     NopCustomerDefaults.EuCookieLawAcceptedAttribute, store.Id);
                 return cookieConsentAccepted;
             }).ToListAsync();
+			logger.LogInformation("PrepareScriptAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             if (!configurations.Any())
                 return string.Empty;
 
@@ -1060,12 +1153,19 @@ public class FacebookPixelService
             }};
             if (!f._fbq) f._fbq = n;
             n.push = n;
+			logger.LogDebug("PrepareScriptAsync(): n.push → {Arg0}", n.push);
+			logger.LogDebug("PrepareScriptAsync(): n.loaded → {Arg0}", n.loaded);
+			logger.LogDebug("PrepareScriptAsync(): n.version → {Arg0}", n.version);
+			logger.LogDebug("PrepareScriptAsync(): n.agent → {Arg0}", n.agent);
+			logger.LogDebug("PrepareScriptAsync(): n.queue → {Arg0}", n.queue);
             n.loaded = !0;
             n.version = '2.0';
             n.agent = '{FacebookPixelDefaults.AgentId}';
             n.queue = [];
             t = b.createElement(e);
             t.async = !0;
+			logger.LogDebug("PrepareScriptAsync(): t.async → {Arg0}", t.async);
+			logger.LogDebug("PrepareScriptAsync(): t.src → {Arg0}", t.src);
             t.src = v;
             s = b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t, s)
@@ -1074,6 +1174,7 @@ public class FacebookPixelService
     </script>
     <!-- End Facebook Pixel Code -->";
         });
+		logger.LogDebug("<<< Exiting PrepareScriptAsync()");
     }
 
     /// <summary>
@@ -1086,14 +1187,18 @@ public class FacebookPixelService
     /// </returns>
     public async Task<string> PrepareCustomEventsScriptAsync(string widgetZone)
     {
+		logger.LogDebug(">>> Entering PrepareCustomEventsScriptAsync(widgetZone={WidgetZone})", widgetZone);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await HandleFunctionAsync(async () =>
         {
             var customEvents = await (await GetConfigurationsAsync()).SelectManyAwait(async configuration => await GetCustomEventsAsync(configuration.Id, widgetZone)).ToListAsync();
+			logger.LogInformation("PrepareCustomEventsScriptAsync(widgetZone)={WidgetZone}: database query executed in {Arg1} ms", widgetZone, __logStart.ElapsedMilliseconds);
             foreach (var customEvent in customEvents)
                 await PrepareTrackedEventScriptAsync(customEvent.EventName, string.Empty, isCustomEvent: true);
 
             return string.Empty;
         });
+		logger.LogDebug("<<< Exiting PrepareCustomEventsScriptAsync(widgetZone={WidgetZone})", widgetZone);
     }
 
     #endregion
@@ -1107,6 +1212,7 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendAddToCartEventAsync(ShoppingCartItem shoppingCartItem)
     {
+		logger.LogDebug(">>> Entering SendAddToCartEventAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
         await HandleFunctionAsync(async () =>
         {
             var eventName = shoppingCartItem.ShoppingCartTypeId == (int)ShoppingCartType.ShoppingCart
@@ -1115,6 +1221,7 @@ public class FacebookPixelService
 
             return await HandleEventAsync(() => PrepareAddToCartEventModelAsync(shoppingCartItem), eventName, shoppingCartItem.StoreId);
         });
+		logger.LogDebug("<<< Exiting SendAddToCartEventAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
     }
 
     /// <summary>
@@ -1124,8 +1231,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendPurchaseEventAsync(Order order)
     {
+		logger.LogDebug(">>> Entering SendPurchaseEventAsync(order={Order})", order);
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PreparePurchaseModelAsync(order), FacebookPixelDefaults.PURCHASE, order.StoreId));
+			logger.LogDebug("<<< Exiting SendPurchaseEventAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -1135,8 +1244,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendViewContentEventAsync(ProductDetailsModel productDetailsModel)
     {
+		logger.LogDebug(">>> Entering SendViewContentEventAsync(productDetailsModel={ProductDetailsModel})", productDetailsModel);
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PrepareViewContentModelAsync(productDetailsModel), FacebookPixelDefaults.VIEW_CONTENT));
+			logger.LogDebug("<<< Exiting SendViewContentEventAsync(productDetailsModel={ProductDetailsModel})", productDetailsModel);
     }
 
     /// <summary>
@@ -1145,8 +1256,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendInitiateCheckoutEventAsync()
     {
+		logger.LogDebug(">>> Entering SendInitiateCheckoutEventAsync()");
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PrepareInitiateCheckoutModelAsync(), FacebookPixelDefaults.INITIATE_CHECKOUT));
+			logger.LogDebug("<<< Exiting SendInitiateCheckoutEventAsync()");
     }
 
     /// <summary>
@@ -1155,8 +1268,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendPageViewEventAsync()
     {
+		logger.LogDebug(">>> Entering SendPageViewEventAsync()");
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PreparePageViewModelAsync(), FacebookPixelDefaults.PAGE_VIEW));
+			logger.LogDebug("<<< Exiting SendPageViewEventAsync()");
     }
 
     /// <summary>
@@ -1166,8 +1281,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendSearchEventAsync(string searchTerm)
     {
+		logger.LogDebug(">>> Entering SendSearchEventAsync(searchTerm={SearchTerm})", searchTerm);
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PrepareSearchModelAsync(searchTerm), FacebookPixelDefaults.SEARCH));
+			logger.LogDebug("<<< Exiting SendSearchEventAsync(searchTerm={SearchTerm})", searchTerm);
     }
 
     /// <summary>
@@ -1176,8 +1293,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendContactEventAsync()
     {
+		logger.LogDebug(">>> Entering SendContactEventAsync()");
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PrepareContactModelAsync(), FacebookPixelDefaults.CONTACT));
+			logger.LogDebug("<<< Exiting SendContactEventAsync()");
     }
 
     /// <summary>
@@ -1186,8 +1305,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SendCompleteRegistrationEventAsync()
     {
+		logger.LogDebug(">>> Entering SendCompleteRegistrationEventAsync()");
         await HandleFunctionAsync(() =>
             HandleEventAsync(() => PrepareCompleteRegistrationModelAsync(), FacebookPixelDefaults.COMPLETE_REGISTRATION));
+			logger.LogDebug("<<< Exiting SendCompleteRegistrationEventAsync()");
     }
 
     #endregion
@@ -1206,14 +1327,17 @@ public class FacebookPixelService
     /// </returns>
     public async Task<IPagedList<FacebookPixelConfiguration>> GetPagedConfigurationsAsync(int storeId = 0, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		logger.LogDebug(">>> Entering GetPagedConfigurationsAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize})", storeId, pageIndex, pageSize);
         var query = _facebookPixelConfigurationRepository.Table;
 
+		logger.LogDebug("GetPagedConfigurationsAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", storeId, pageIndex, pageSize, query);
         //filter by the store
         if (storeId > 0)
             query = query.Where(configuration => configuration.StoreId == storeId);
 
         query = query.OrderBy(configuration => configuration.Id);
 
+		logger.LogDebug("<<< Exiting GetPagedConfigurationsAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize})", storeId, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -1227,9 +1351,14 @@ public class FacebookPixelService
     /// </returns>
     public async Task<FacebookPixelConfiguration> GetConfigurationByIdAsync(int configurationId)
     {
+		logger.LogDebug(">>> Entering GetConfigurationByIdAsync(configurationId={ConfigurationId})", configurationId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (configurationId == 0)
             return null;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
+		logger.LogInformation("GetConfigurationByIdAsync(configurationId)={ConfigurationId}: external service call took {Arg1} ms", configurationId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetConfigurationByIdAsync(configurationId={ConfigurationId})", configurationId);
         return await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(FacebookPixelDefaults.ConfigurationCacheKey, configurationId), async () =>
             await _facebookPixelConfigurationRepository.GetByIdAsync(configurationId));
     }
@@ -1241,6 +1370,7 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task InsertConfigurationAsync(FacebookPixelConfiguration configuration)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(configuration);
 
         await _facebookPixelConfigurationRepository.InsertAsync(configuration, false);
@@ -1254,6 +1384,7 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateConfigurationAsync(FacebookPixelConfiguration configuration)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(configuration);
 
         await _facebookPixelConfigurationRepository.UpdateAsync(configuration, false);
@@ -1267,8 +1398,10 @@ public class FacebookPixelService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteConfigurationAsync(FacebookPixelConfiguration configuration)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(configuration);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _facebookPixelConfigurationRepository.DeleteAsync(configuration, false);
         await _staticCacheManager.RemoveByPrefixAsync(FacebookPixelDefaults.PrefixCacheKey);
     }
@@ -1284,11 +1417,14 @@ public class FacebookPixelService
     /// </returns>
     public async Task<IList<CustomEvent>> GetCustomEventsAsync(int configurationId, string widgetZone = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cachedCustomEvents = await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(FacebookPixelDefaults.CustomEventsCacheKey, configurationId), async () =>
         {
+			logger.LogDebug("GetCustomEventsAsync(configurationId={ConfigurationId},widgetZone={WidgetZone}): cachedCustomEvents → {CachedCustomEvents}", configurationId, widgetZone, cachedCustomEvents);
             //load configuration custom events
             var configuration = await GetConfigurationByIdAsync(configurationId);
             var customEventsValue = configuration?.CustomEvents ?? string.Empty;
+			logger.LogDebug("GetCustomEventsAsync(configurationId={ConfigurationId},widgetZone={WidgetZone}): configuration → {Configuration}", configurationId, widgetZone, configuration);
             var customEvents = JsonConvert.DeserializeObject<List<CustomEvent>>(customEventsValue) ?? new List<CustomEvent>();
             return customEvents;
         });
@@ -1342,6 +1478,7 @@ public class FacebookPixelService
         await UpdateConfigurationAsync(configuration);
         await _staticCacheManager.RemoveByPrefixAsync(FacebookPixelDefaults.PrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(WidgetModelDefaults.WidgetPrefixCacheKey);
+		logger.LogDebug("<<< Exiting SaveCustomEventsAsync(configurationId={ConfigurationId},eventName={EventName},widgetZones={WidgetZones})", configurationId, eventName, widgetZones);
     }
 
     /// <summary>
@@ -1353,15 +1490,21 @@ public class FacebookPixelService
     /// </returns>
     public async Task<IList<string>> GetCustomEventsWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetCustomEventsWidgetZonesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(FacebookPixelDefaults.WidgetZonesCacheKey), async () =>
         {
             //load custom events and their widget zones
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var configurations = await GetConfigurationsAsync();
             var customEvents = await configurations.SelectManyAwait(async configuration => await GetCustomEventsAsync(configuration.Id)).ToListAsync();
+			logger.LogInformation("GetCustomEventsWidgetZonesAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             var widgetZones = await customEvents.SelectMany(customEvent => customEvent.WidgetZones).Distinct().ToListAsync();
 
             return widgetZones;
         });
+		logger.LogInformation("GetCustomEventsWidgetZonesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetCustomEventsWidgetZonesAsync()");
     }
 
     #endregion

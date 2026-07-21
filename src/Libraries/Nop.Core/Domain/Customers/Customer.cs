@@ -10,7 +10,10 @@ public partial class Customer : BaseEntity, ISoftDeletedEntity
 {
     public Customer()
     {
+		logger.LogDebug(">>> Entering Customer()");
         CustomerGuid = Guid.NewGuid();
+		logger.LogDebug("<<< Exiting Customer()");
+		logger.LogDebug("Customer(): CustomerGuid → {CustomerGuid}", CustomerGuid);
     }
 
     /// <summary>

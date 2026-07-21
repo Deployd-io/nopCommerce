@@ -44,6 +44,7 @@ public partial class HtmlFormat : SourceFormat
     /// <summary/>
     public HtmlFormat()
     {
+		logger.LogDebug(">>> Entering HtmlFormat()");
         const string regJavaScript = @"(?<=&lt;script(?:\s.*?)?&gt;).+?(?=&lt;/script&gt;)";
         const string regComment = @"&lt;!--.*?--&gt;";
         const string regAspTag = @"&lt;%@.*?%&gt;|&lt;%|%&gt;";
@@ -61,10 +62,15 @@ public partial class HtmlFormat : SourceFormat
                      + regAttributes + ")|(" + regEntity + ")";
 
         CodeRegex = new Regex(regAll, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+		logger.LogDebug("HtmlFormat(): CodeRegex → {CodeRegex}", CodeRegex);
         _attributeRegex = new Regex(regAttributeMatch, RegexOptions.Singleline);
 
+		logger.LogDebug("HtmlFormat(): _attributeRegex → {_attributeRegex}", _attributeRegex);
         _csf = new CSharpFormat();
         _jsf = new JavaScriptFormat();
+		logger.LogDebug("<<< Exiting HtmlFormat()");
+		logger.LogDebug("HtmlFormat(): _csf → {_csf}", _csf);
+		logger.LogDebug("HtmlFormat(): _jsf → {_jsf}", _jsf);
     }
 
     /// <summary>
@@ -76,6 +82,7 @@ public partial class HtmlFormat : SourceFormat
     /// <returns>A string containing the HTML code fragment.</returns>
     protected string AttributeMatchEval(Match match)
     {
+		logger.LogDebug(">>> Entering AttributeMatchEval(match={Match})", match);
         if (match.Groups[1].Success) //attribute value
             return "<span class=\"kwrd\">" + match + "</span>";
 

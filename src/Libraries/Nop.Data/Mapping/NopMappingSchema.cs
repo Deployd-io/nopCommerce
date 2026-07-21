@@ -28,6 +28,7 @@ public static class NopMappingSchema
     /// <returns>Mapped entity descriptor</returns>
     public static NopEntityDescriptor GetEntityDescriptor(Type entityType)
     {
+		logger.LogDebug(">>> Entering GetEntityDescriptor(entityType={EntityType})", entityType);
         if (!typeof(BaseEntity).IsAssignableFrom(entityType))
             return null;
 
@@ -54,6 +55,7 @@ public static class NopMappingSchema
                 }).ToList()
             };
         });
+		logger.LogDebug("<<< Exiting GetEntityDescriptor(entityType={EntityType})", entityType);
     }
 
     /// <summary>
@@ -61,6 +63,7 @@ public static class NopMappingSchema
     /// </summary>
     public static MappingSchema GetMappingSchema(string configurationName, IDataProvider mappings)
     {
+	logger.LogDebug(">>> Entering GetMappingSchema(configurationName={ConfigurationName},mappings={Mappings})", configurationName, mappings);
 
         if (Singleton<MappingSchema>.Instance is null)
         {
@@ -68,6 +71,7 @@ public static class NopMappingSchema
             Singleton<MappingSchema>.Instance.AddMetadataReader(new FluentMigratorMetadataReader());
         }
 
+		logger.LogDebug("<<< Exiting GetMappingSchema(configurationName={ConfigurationName},mappings={Mappings})", configurationName, mappings);
         return Singleton<MappingSchema>.Instance;
     }
 }

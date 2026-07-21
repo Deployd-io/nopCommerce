@@ -14,9 +14,11 @@ public class ConfigurationModelValidator : BaseNopValidator<ConfigurationModel>
 
     public ConfigurationModelValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ConfigurationModelValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(model => model.ApiKey)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Misc.Omnisend.Fields.ApiKey.Required"));
+			logger.LogDebug("<<< Exiting ConfigurationModelValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

@@ -88,15 +88,20 @@ public partial class ReturnRequestController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Orders.RETURN_REQUESTS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestSearchModelAsync(new ReturnRequestSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -107,20 +112,25 @@ public partial class ReturnRequestController : BaseAdminController
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Orders.RETURN_REQUESTS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a return request with the specified id
         var returnRequest = await _returnRequestService.GetReturnRequestByIdAsync(id);
         if (returnRequest == null)
+			logger.LogDebug("Edit(id={Id}): returnRequest → {ReturnRequest}", id, returnRequest);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestModelAsync(null, returnRequest);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -177,6 +187,7 @@ public partial class ReturnRequestController : BaseAdminController
         model = await _returnRequestModelFactory.PrepareReturnRequestModelAsync(model, returnRequest, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -210,9 +221,11 @@ public partial class ReturnRequestController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.RETURN_REQUESTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a return request with the specified id
         var returnRequest = await _returnRequestService.GetReturnRequestByIdAsync(id);
         if (returnRequest == null)
+			logger.LogDebug("Delete(id={Id}): returnRequest → {ReturnRequest}", id, returnRequest);
             return RedirectToAction("List");
 
         await _returnRequestService.DeleteReturnRequestAsync(returnRequest);
@@ -223,6 +236,7 @@ public partial class ReturnRequestController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ReturnRequests.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -231,10 +245,12 @@ public partial class ReturnRequestController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult ReturnRequestReasonList()
     {
+		logger.LogDebug(">>> Entering ReturnRequestReasonList()");
         //select an appropriate card
         SaveSelectedCardName("ordersettings-return-request");
 
         //we just redirect a user to the order settings page
+		logger.LogDebug("<<< Exiting ReturnRequestReasonList()");
         return RedirectToAction("Order", "Setting");
     }
 
@@ -245,15 +261,19 @@ public partial class ReturnRequestController : BaseAdminController
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestReasonListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting ReturnRequestReasonList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ReturnRequestReasonCreate()
     {
+		logger.LogDebug(">>> Entering ReturnRequestReasonCreate()");
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestReasonModelAsync(new ReturnRequestReasonModel(), null);
 
+		logger.LogDebug("ReturnRequestReasonCreate(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting ReturnRequestReasonCreate()");
         return View(model);
     }
 
@@ -280,20 +300,25 @@ public partial class ReturnRequestController : BaseAdminController
         model = await _returnRequestModelFactory.PrepareReturnRequestReasonModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting ReturnRequestReasonCreate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ReturnRequestReasonEdit(int id)
     {
+		logger.LogDebug(">>> Entering ReturnRequestReasonEdit(id={Id})", id);
         //try to get a return request reason with the specified id
         var returnRequestReason = await _returnRequestService.GetReturnRequestReasonByIdAsync(id);
         if (returnRequestReason == null)
+			logger.LogDebug("ReturnRequestReasonEdit(id={Id}): returnRequestReason → {ReturnRequestReason}", id, returnRequestReason);
             return RedirectToAction("ReturnRequestReasonList");
 
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestReasonModelAsync(null, returnRequestReason);
 
+		logger.LogDebug("ReturnRequestReasonEdit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting ReturnRequestReasonEdit(id={Id})", id);
         return View(model);
     }
 
@@ -326,6 +351,7 @@ public partial class ReturnRequestController : BaseAdminController
         model = await _returnRequestModelFactory.PrepareReturnRequestReasonModelAsync(model, returnRequestReason, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting ReturnRequestReasonEdit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -333,6 +359,7 @@ public partial class ReturnRequestController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ReturnRequestReasonDelete(int id)
     {
+		logger.LogDebug(">>> Entering ReturnRequestReasonDelete(id={Id})", id);
         //try to get a return request reason with the specified id
         var returnRequestReason = await _returnRequestService.GetReturnRequestReasonByIdAsync(id)
                                   ?? throw new ArgumentException("No return request reason found with the specified id", nameof(id));
@@ -341,6 +368,7 @@ public partial class ReturnRequestController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.Order.ReturnRequestReasons.Deleted"));
 
+		logger.LogDebug("<<< Exiting ReturnRequestReasonDelete(id={Id})", id);
         return RedirectToAction("ReturnRequestReasonList");
     }
 
@@ -351,10 +379,12 @@ public partial class ReturnRequestController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult ReturnRequestActionList()
     {
+		logger.LogDebug(">>> Entering ReturnRequestActionList()");
         //select an appropriate card
         SaveSelectedCardName("ordersettings-return-request");
 
         //we just redirect a user to the order settings page
+		logger.LogDebug("<<< Exiting ReturnRequestActionList()");
         return RedirectToAction("Order", "Setting");
     }
 
@@ -365,15 +395,19 @@ public partial class ReturnRequestController : BaseAdminController
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestActionListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting ReturnRequestActionList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ReturnRequestActionCreate()
     {
+		logger.LogDebug(">>> Entering ReturnRequestActionCreate()");
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestActionModelAsync(new ReturnRequestActionModel(), null);
 
+		logger.LogDebug("ReturnRequestActionCreate(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting ReturnRequestActionCreate()");
         return View(model);
     }
 
@@ -400,20 +434,25 @@ public partial class ReturnRequestController : BaseAdminController
         model = await _returnRequestModelFactory.PrepareReturnRequestActionModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting ReturnRequestActionCreate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ReturnRequestActionEdit(int id)
     {
+		logger.LogDebug(">>> Entering ReturnRequestActionEdit(id={Id})", id);
         //try to get a return request action with the specified id
         var returnRequestAction = await _returnRequestService.GetReturnRequestActionByIdAsync(id);
         if (returnRequestAction == null)
+			logger.LogDebug("ReturnRequestActionEdit(id={Id}): returnRequestAction → {ReturnRequestAction}", id, returnRequestAction);
             return RedirectToAction("ReturnRequestActionList");
 
         //prepare model
         var model = await _returnRequestModelFactory.PrepareReturnRequestActionModelAsync(null, returnRequestAction);
 
+		logger.LogDebug("ReturnRequestActionEdit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting ReturnRequestActionEdit(id={Id})", id);
         return View(model);
     }
 
@@ -446,6 +485,7 @@ public partial class ReturnRequestController : BaseAdminController
         model = await _returnRequestModelFactory.PrepareReturnRequestActionModelAsync(model, returnRequestAction, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting ReturnRequestActionEdit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -453,6 +493,7 @@ public partial class ReturnRequestController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ReturnRequestActionDelete(int id)
     {
+		logger.LogDebug(">>> Entering ReturnRequestActionDelete(id={Id})", id);
         //try to get a return request action with the specified id
         var returnRequestAction = await _returnRequestService.GetReturnRequestActionByIdAsync(id)
                                   ?? throw new ArgumentException("No return request action found with the specified id", nameof(id));
@@ -461,6 +502,7 @@ public partial class ReturnRequestController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.Order.ReturnRequestActions.Deleted"));
 
+		logger.LogDebug("<<< Exiting ReturnRequestActionDelete(id={Id})", id);
         return RedirectToAction("ReturnRequestActionList");
     }
 

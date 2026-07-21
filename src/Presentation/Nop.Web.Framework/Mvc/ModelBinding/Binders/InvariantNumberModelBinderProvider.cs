@@ -32,6 +32,7 @@ public partial class InvariantNumberModelBinderProvider : IModelBinderProvider
     /// <returns>Instance of model binder for floating-point types</returns>
     public IModelBinder GetBinder(ModelBinderProviderContext context)
     {
+		logger.LogDebug(">>> Entering GetBinder(context={Context})", context);
         ArgumentNullException.ThrowIfNull(context);
 
         var modelType = context.Metadata.UnderlyingOrModelType;
@@ -43,6 +44,7 @@ public partial class InvariantNumberModelBinderProvider : IModelBinderProvider
             return new InvariantNumberModelBinder(NumberStyles.Float, new FloatingPointTypeModelBinderProvider().GetBinder(context));
 
         if (_integerTypes.Contains(modelType))
+		logger.LogDebug("<<< Exiting GetBinder(context={Context})", context);
             return new InvariantNumberModelBinder(NumberStyles.Integer, new SimpleTypeModelBinderProvider().GetBinder(context));
 
         return null;

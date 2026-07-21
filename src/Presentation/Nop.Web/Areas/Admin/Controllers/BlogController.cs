@@ -62,15 +62,20 @@ public partial class BlogController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("BlogPosts");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.BLOG_VIEW)]
     public virtual async Task<IActionResult> BlogPosts(int? filterByBlogPostId)
     {
+		logger.LogDebug(">>> Entering BlogPosts(filterByBlogPostId={FilterByBlogPostId})", filterByBlogPostId);
         //prepare model
         var model = await _blogModelFactory.PrepareBlogContentModelAsync(new BlogContentModel(), filterByBlogPostId);
 
+		logger.LogDebug("BlogPosts(filterByBlogPostId={FilterByBlogPostId}): model → {Model}", filterByBlogPostId, model);
+		logger.LogDebug("<<< Exiting BlogPosts(filterByBlogPostId={FilterByBlogPostId})", filterByBlogPostId);
         return View(model);
     }
 
@@ -78,18 +83,24 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_VIEW)]
     public virtual async Task<IActionResult> List(BlogPostSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _blogModelFactory.PrepareBlogPostListModelAsync(searchModel);
 
+		logger.LogDebug("List(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.BLOG_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> BlogPostCreate()
     {
+		logger.LogDebug(">>> Entering BlogPostCreate()");
         //prepare model
         var model = await _blogModelFactory.PrepareBlogPostModelAsync(new BlogPostModel(), null);
 
+		logger.LogDebug("BlogPostCreate(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting BlogPostCreate()");
         return View(model);
     }
 
@@ -126,20 +137,25 @@ public partial class BlogController : BaseAdminController
         model = await _blogModelFactory.PrepareBlogPostModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting BlogPostCreate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.BLOG_VIEW)]
     public virtual async Task<IActionResult> BlogPostEdit(int id)
     {
+		logger.LogDebug(">>> Entering BlogPostEdit(id={Id})", id);
         //try to get a blog post with the specified id
         var blogPost = await _blogService.GetBlogPostByIdAsync(id);
         if (blogPost == null)
+			logger.LogDebug("BlogPostEdit(id={Id}): blogPost → {BlogPost}", id, blogPost);
             return RedirectToAction("BlogPosts");
 
         //prepare model
         var model = await _blogModelFactory.PrepareBlogPostModelAsync(null, blogPost);
 
+		logger.LogDebug("BlogPostEdit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting BlogPostEdit(id={Id})", id);
         return View(model);
     }
 
@@ -180,6 +196,7 @@ public partial class BlogController : BaseAdminController
         model = await _blogModelFactory.PrepareBlogPostModelAsync(model, blogPost, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting BlogPostEdit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -187,9 +204,11 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a blog post with the specified id
         var blogPost = await _blogService.GetBlogPostByIdAsync(id);
         if (blogPost == null)
+			logger.LogDebug("Delete(id={Id}): blogPost → {BlogPost}", id, blogPost);
             return RedirectToAction("BlogPosts");
 
         await _blogService.DeleteBlogPostAsync(blogPost);
@@ -200,6 +219,7 @@ public partial class BlogController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Blog.BlogPosts.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("BlogPosts");
     }
 
@@ -210,14 +230,19 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_COMMENTS_VIEW)]
     public virtual async Task<IActionResult> BlogComments(int? filterByBlogPostId)
     {
+		logger.LogDebug(">>> Entering BlogComments(filterByBlogPostId={FilterByBlogPostId})", filterByBlogPostId);
         //try to get a blog post with the specified id
         var blogPost = await _blogService.GetBlogPostByIdAsync(filterByBlogPostId ?? 0);
         if (blogPost == null && filterByBlogPostId.HasValue)
+			logger.LogDebug("BlogComments(filterByBlogPostId={FilterByBlogPostId}): blogPost → {BlogPost}", filterByBlogPostId, blogPost);
             return RedirectToAction("BlogComments");
 
         //prepare model
         var model = await _blogModelFactory.PrepareBlogCommentSearchModelAsync(new BlogCommentSearchModel(), blogPost);
 
+		logger.LogDebug("BlogComments(filterByBlogPostId={FilterByBlogPostId}): model → {Model}", filterByBlogPostId, model);
+		logger.LogDebug(">>> Entering Comments(searchModel={SearchModel})", searchModel);
+		logger.LogDebug("<<< Exiting Comments(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -260,6 +285,7 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CommentDelete(int id)
     {
+		logger.LogDebug(">>> Entering CommentDelete(id={Id})", id);
         //try to get a blog comment with the specified id
         var comment = await _blogService.GetBlogCommentByIdAsync(id)
             ?? throw new ArgumentException("No comment found with the specified id", nameof(id));
@@ -270,6 +296,7 @@ public partial class BlogController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteBlogPostComment",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteBlogPostComment"), comment.Id), comment);
 
+		logger.LogDebug("<<< Exiting CommentDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -277,17 +304,21 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelectedComments(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelectedComments(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var comments = await _blogService.GetBlogCommentsByIdsAsync(selectedIds.ToArray());
 
+		logger.LogDebug("DeleteSelectedComments(selectedIds={SelectedIds}): comments → {Comments}", selectedIds, comments);
         await _blogService.DeleteBlogCommentsAsync(comments);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteBlogPostComment");
         await _customerActivityService.InsertActivitiesAsync("DeleteBlogPostComment", comments, blogComment => string.Format(activityLogFormat, blogComment.Id));
+		logger.LogDebug("DeleteSelectedComments(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DeleteSelectedComments(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -295,15 +326,18 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ApproveSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         //filter not approved comments
         var blogComments = (await _blogService.GetBlogCommentsByIdsAsync(selectedIds.ToArray())).Where(comment => !comment.IsApproved).ToList();
 
+		logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): blogComments → {BlogComments}", selectedIds, blogComments);
         foreach (var blogComment in blogComments)
         {
             blogComment.IsApproved = true;
+			logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): blogComment.IsApproved → {Arg1}", selectedIds, blogComment.IsApproved);
 
             await _blogService.UpdateBlogCommentAsync(blogComment);
 
@@ -314,7 +348,9 @@ public partial class BlogController : BaseAdminController
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.EditBlogComment");
         await _customerActivityService.InsertActivitiesAsync("EditBlogComment", blogComments, blogComment => string.Format(activityLogFormat, blogComment.Id));
+		logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -322,15 +358,18 @@ public partial class BlogController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.BLOG_COMMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DisapproveSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         //filter approved comments
         var blogComments = (await _blogService.GetBlogCommentsByIdsAsync(selectedIds.ToArray())).Where(comment => comment.IsApproved).ToList();
 
+		logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): blogComments → {BlogComments}", selectedIds, blogComments);
         foreach (var blogComment in blogComments)
         {
             blogComment.IsApproved = false;
+			logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): blogComment.IsApproved → {Arg1}", selectedIds, blogComment.IsApproved);
 
             await _blogService.UpdateBlogCommentAsync(blogComment);
         }
@@ -338,7 +377,9 @@ public partial class BlogController : BaseAdminController
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.EditBlogComment");
         await _customerActivityService.InsertActivitiesAsync("EditBlogComment", blogComments, blogComment => string.Format(activityLogFormat, blogComment.Id));
+		logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 

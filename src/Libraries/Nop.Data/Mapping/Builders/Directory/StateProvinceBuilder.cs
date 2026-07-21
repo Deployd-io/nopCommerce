@@ -17,10 +17,12 @@ public partial class StateProvinceBuilder : NopEntityBuilder<StateProvince>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(StateProvince.Name)).AsString(100).NotNullable()
             .WithColumn(nameof(StateProvince.Abbreviation)).AsString(100).Nullable()
             .WithColumn(nameof(StateProvince.CountryId)).AsInt32().ForeignKey<Country>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -13,7 +13,10 @@ public partial class LocalizedString : HtmlString
     /// <param name="localized">Localized value</param>
     public LocalizedString(string localized) : base(localized)
     {
+		logger.LogDebug(">>> Entering LocalizedString(localized={Localized})", localized);
         Text = localized;
+		logger.LogDebug("<<< Exiting LocalizedString(localized={Localized})", localized);
+		logger.LogDebug("LocalizedString(localized={Localized}): Text → {Text}", localized, Text);
     }
 
     /// <summary>

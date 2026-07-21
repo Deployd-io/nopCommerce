@@ -30,20 +30,26 @@ public partial class DataSettingsManager
     /// <returns>Data settings</returns>
     protected static DataConfig LoadDataSettingsFromOldTxtFile(string data)
     {
+		logger.LogDebug(">>> Entering LoadDataSettingsFromOldTxtFile(data={Data})", data);
         if (string.IsNullOrEmpty(data))
             return null;
 
         var dataSettings = new DataConfig();
         using var reader = new StringReader(data);
+		logger.LogDebug("LoadDataSettingsFromOldTxtFile(data={Data}): dataSettings → {DataSettings}", data, dataSettings);
+		logger.LogDebug("LoadDataSettingsFromOldTxtFile(data={Data}): reader → {Reader}", data, reader);
         string settingsLine;
         while ((settingsLine = reader.ReadLine()) != null)
         {
             var separatorIndex = settingsLine.IndexOf(':');
             if (separatorIndex == -1)
+				logger.LogDebug("LoadDataSettingsFromOldTxtFile(data={Data}): separatorIndex → {SeparatorIndex}", data, separatorIndex);
                 continue;
 
             var key = settingsLine[0..separatorIndex].Trim();
             var value = settingsLine[(separatorIndex + 1)..].Trim();
+			logger.LogWarning("LoadDataSettingsFromOldTxtFile(data={Data}): key → {Key}", data, key);
+			logger.LogDebug("LoadDataSettingsFromOldTxtFile(data={Data}): value → {Value}", data, value);
 
             switch (key)
             {
@@ -52,6 +58,7 @@ public partial class DataSettingsManager
                     continue;
                 case "DataConnectionString":
                     dataSettings.ConnectionString = value;
+					logger.LogDebug("LoadDataSettingsFromOldTxtFile(data={Data}): dataSettings.ConnectionString → {Arg1}", data, dataSettings.ConnectionString);
                     continue;
                 case "SQLCommandTimeout":
                     //If parsing isn't successful, we set a negative timeout, that means the current provider will use a default value
@@ -62,6 +69,7 @@ public partial class DataSettingsManager
             }
         }
 
+		logger.LogDebug("<<< Exiting LoadDataSettingsFromOldTxtFile(data={Data})", data);
         return dataSettings;
     }
 
@@ -72,6 +80,7 @@ public partial class DataSettingsManager
     /// <returns>Data settings</returns>
     protected static DataConfig LoadDataSettingsFromOldJsonFile(string data)
     {
+		logger.LogDebug(">>> Entering LoadDataSettingsFromOldJsonFile(data={Data})", data);
         if (string.IsNullOrEmpty(data))
             return null;
 
@@ -84,6 +93,7 @@ public partial class DataSettingsManager
             SQLCommandTimeout = int.TryParse(jsonDataSettings.SQLCommandTimeout, out var result) ? result : null
         };
 
+		logger.LogDebug("<<< Exiting LoadDataSettingsFromOldJsonFile(data={Data})", data);
         return dataSettings;
     }
 
@@ -99,6 +109,7 @@ public partial class DataSettingsManager
     /// <returns>Data settings</returns>
     public static DataConfig LoadSettings(INopFileProvider fileProvider = null, bool reload = false)
     {
+		logger.LogDebug(">>> Entering LoadSettings(fileProvider={FileProvider},reload={Reload})", fileProvider, reload);
         if (!reload && Singleton<DataConfig>.Instance is not null)
             return Singleton<DataConfig>.Instance;
 
@@ -106,6 +117,8 @@ public partial class DataSettingsManager
         fileProvider ??= CommonHelper.DefaultFileProvider;
         var filePath_json = fileProvider.MapPath(NopDataSettingsDefaults.FilePath);
         var filePath_txt = fileProvider.MapPath(NopDataSettingsDefaults.ObsoleteFilePath);
+		logger.LogDebug("LoadSettings(fileProvider={FileProvider},reload={Reload}): filePath_json → {FilePath_json}", fileProvider, reload, filePath_json);
+		logger.LogDebug("LoadSettings(fileProvider={FileProvider},reload={Reload}): filePath_txt → {FilePath_txt}", fileProvider, reload, filePath_txt);
         if (fileProvider.FileExists(filePath_json) || fileProvider.FileExists(filePath_txt))
         {
             var dataSettings = fileProvider.FileExists(filePath_json)
@@ -124,6 +137,7 @@ public partial class DataSettingsManager
             Singleton<DataConfig>.Instance = Singleton<AppSettings>.Instance.Get<DataConfig>();
         }
 
+		logger.LogDebug("<<< Exiting LoadSettings(fileProvider={FileProvider},reload={Reload})", fileProvider, reload);
         return Singleton<DataConfig>.Instance;
     }
 
@@ -143,8 +157,10 @@ public partial class DataSettingsManager
     /// </summary>
     public static bool IsDatabaseInstalled()
     {
+		logger.LogDebug(">>> Entering IsDatabaseInstalled()");
         _databaseIsInstalled ??= !string.IsNullOrEmpty(LoadSettings()?.ConnectionString);
 
+		logger.LogDebug("<<< Exiting IsDatabaseInstalled()");
         return _databaseIsInstalled.Value;
     }
 
@@ -156,6 +172,8 @@ public partial class DataSettingsManager
     /// </value>
     public static int GetSqlCommandTimeout()
     {
+		logger.LogDebug(">>> Entering GetSqlCommandTimeout()");
+		logger.LogDebug("<<< Exiting GetSqlCommandTimeout()");
         return LoadSettings()?.SQLCommandTimeout ?? -1;
     }
 
@@ -164,9 +182,12 @@ public partial class DataSettingsManager
     /// </summary>
     public static bool UseNoLock()
     {
+		logger.LogDebug(">>> Entering UseNoLock()");
         var settings = LoadSettings();
 
+		logger.LogDebug("UseNoLock(): settings → {Settings}", settings);
         if (settings is null)
+		logger.LogDebug("<<< Exiting UseNoLock()");
             return false;
 
         return settings.DataProvider == DataProviderType.SqlServer && settings.WithNoLock;

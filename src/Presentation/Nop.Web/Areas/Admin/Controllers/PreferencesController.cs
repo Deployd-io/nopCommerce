@@ -29,11 +29,13 @@ public partial class PreferencesController : BaseAdminController
     [HttpPost]
     public virtual async Task<IActionResult> SavePreference(string name, bool value)
     {
+		logger.LogDebug(">>> Entering SavePreference(name={Name},value={Value})", name, value);
         //permission validation is not required here
         ArgumentException.ThrowIfNullOrEmpty(name);
 
         await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(), name, value);
 
+		logger.LogDebug("<<< Exiting SavePreference(name={Name},value={Value})", name, value);
         return Json(new
         {
             Result = true

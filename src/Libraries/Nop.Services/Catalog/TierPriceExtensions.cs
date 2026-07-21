@@ -16,10 +16,12 @@ public static class TierPriceExtensions
     /// <returns>Filtered tier prices</returns>
     public static IEnumerable<TierPrice> FilterByStore(this IEnumerable<TierPrice> source, Store store)
     {
+		logger.LogDebug(">>> Entering FilterByStore(source={Source},store={Store})", source, store);
         ArgumentNullException.ThrowIfNull(source);
 
         var storeId = store?.Id ?? 0;
 
+		logger.LogDebug("<<< Exiting FilterByStore(source={Source},store={Store})", source, store);
         return source.Where(tierPrice => tierPrice.StoreId == 0 || tierPrice.StoreId == storeId);
     }
 
@@ -31,11 +33,13 @@ public static class TierPriceExtensions
     /// <returns>Filtered tier prices</returns>
     public static IEnumerable<TierPrice> FilterByCustomerRole(this IEnumerable<TierPrice> source, int[] customerRoleIds)
     {
+		logger.LogDebug(">>> Entering FilterByCustomerRole(source={Source},customerRoleIds={CustomerRoleIds})", source, customerRoleIds);
         ArgumentNullException.ThrowIfNull(source);
 
         ArgumentNullException.ThrowIfNull(customerRoleIds);
 
         if (!customerRoleIds.Any())
+		logger.LogDebug("<<< Exiting FilterByCustomerRole(source={Source},customerRoleIds={CustomerRoleIds})", source, customerRoleIds);
             return source;
 
         return source.Where(tierPrice =>
@@ -49,13 +53,16 @@ public static class TierPriceExtensions
     /// <returns>Filtered tier prices</returns>
     public static IEnumerable<TierPrice> RemoveDuplicatedQuantities(this IEnumerable<TierPrice> source)
     {
+		logger.LogDebug(">>> Entering RemoveDuplicatedQuantities(source={Source})", source);
         ArgumentNullException.ThrowIfNull(source);
 
         var tierPrices = source.ToList();
 
+		logger.LogDebug("RemoveDuplicatedQuantities(source={Source}): tierPrices → {TierPrices}", source, tierPrices);
         //get group of tier prices with the same quantity
         var tierPricesWithDuplicates = tierPrices.GroupBy(tierPrice => tierPrice.Quantity).Where(group => group.Count() > 1);
 
+		logger.LogDebug("RemoveDuplicatedQuantities(source={Source}): tierPricesWithDuplicates → {TierPricesWithDuplicates}", source, tierPricesWithDuplicates);
         //get tier prices with higher prices 
         var duplicatedPrices = tierPricesWithDuplicates.SelectMany(group =>
         {
@@ -68,6 +75,7 @@ public static class TierPriceExtensions
         });
 
         //return tier prices without duplicates
+		logger.LogDebug("<<< Exiting RemoveDuplicatedQuantities(source={Source})", source);
         return tierPrices.Where(tierPrice => duplicatedPrices.All(duplicatedPrice => duplicatedPrice.Id != tierPrice.Id));
     }
 
@@ -79,11 +87,13 @@ public static class TierPriceExtensions
     /// <returns>Filtered tier prices</returns>
     public static IEnumerable<TierPrice> FilterByDate(this IEnumerable<TierPrice> source, DateTime? date = null)
     {
+		logger.LogDebug(">>> Entering FilterByDate(source={Source},date={Date})", source, date);
         ArgumentNullException.ThrowIfNull(source);
 
         if (!date.HasValue)
             date = DateTime.UtcNow;
 
+		logger.LogDebug("<<< Exiting FilterByDate(source={Source},date={Date})", source, date);
         return source.Where(tierPrice =>
             (!tierPrice.StartDateTimeUtc.HasValue || tierPrice.StartDateTimeUtc.Value < date) &&
             (!tierPrice.EndDateTimeUtc.HasValue || tierPrice.EndDateTimeUtc.Value > date));

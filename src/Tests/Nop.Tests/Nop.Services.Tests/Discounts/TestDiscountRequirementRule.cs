@@ -9,7 +9,10 @@ public partial class TestDiscountRequirementRule : BasePlugin, IDiscountRequirem
 
     public TestDiscountRequirementRule(IDiscountService discountService)
     {
+		logger.LogDebug(">>> Entering TestDiscountRequirementRule(discountService={DiscountService})", discountService);
         _discountService = discountService;
+		logger.LogDebug("<<< Exiting TestDiscountRequirementRule(discountService={DiscountService})", discountService);
+		logger.LogDebug("TestDiscountRequirementRule(discountService={DiscountService}): _discountService → {_discountService}", discountService, _discountService);
     }
 
     /// <summary>
@@ -19,10 +22,14 @@ public partial class TestDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>Result</returns>
     public async Task<DiscountRequirementValidationResult> CheckRequirementAsync(DiscountRequirementValidationRequest request)
     {
+		logger.LogDebug(">>> Entering CheckRequirementAsync(request={Request})", request);
         var dr = await _discountService.GetDiscountRequirementByIdAsync(request.DiscountRequirementId);
         var valid = !dr.IsGroup;
+		logger.LogDebug("CheckRequirementAsync(request={Request}): dr → {Dr}", request, dr);
         valid = valid && !dr.InteractionTypeId.HasValue;
+			logger.LogDebug("CheckRequirementAsync(request={Request}): valid → {Valid}", request, valid);
             
+		logger.LogDebug("<<< Exiting CheckRequirementAsync(request={Request})", request);
         return new DiscountRequirementValidationResult
         {
             IsValid = valid
@@ -37,6 +44,7 @@ public partial class TestDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>URL</returns>
     public string GetConfigurationUrl(int discountId, int? discountRequirementId)
     {
+		logger.LogDebug(">>> Entering GetConfigurationUrl(discountId={DiscountId},discountRequirementId={DiscountRequirementId})", discountId, discountRequirementId);
         throw new NotImplementedException();
     }
 }

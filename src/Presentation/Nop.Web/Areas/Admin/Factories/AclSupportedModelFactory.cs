@@ -38,16 +38,19 @@ public partial class AclSupportedModelFactory : IAclSupportedModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareModelCustomerRolesAsync<TModel>(TModel model) where TModel : IAclSupportedModel
     {
+		logger.LogDebug(">>> Entering PrepareModelCustomerRolesAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available customer roles
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
         model.AvailableCustomerRoles = availableRoles.Select(role => new SelectListItem
         {
+		logger.LogDebug("PrepareModelCustomerRolesAsync(model={Model}): availableRoles → {AvailableRoles}", model, availableRoles);
             Text = role.Name,
             Value = role.Id.ToString(),
             Selected = model.SelectedCustomerRoleIds.Contains(role.Id)
         }).ToList();
+		logger.LogDebug("<<< Exiting PrepareModelCustomerRolesAsync(model={Model})", model);
     }
 
     /// <summary>

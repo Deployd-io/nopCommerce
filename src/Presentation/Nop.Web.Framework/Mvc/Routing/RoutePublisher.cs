@@ -25,7 +25,10 @@ public partial class RoutePublisher : IRoutePublisher
     /// <param name="typeFinder">Type finder</param>
     public RoutePublisher(ITypeFinder typeFinder)
     {
+		logger.LogDebug(">>> Entering RoutePublisher(typeFinder={TypeFinder})", typeFinder);
         _typeFinder = typeFinder;
+		logger.LogDebug("<<< Exiting RoutePublisher(typeFinder={TypeFinder})", typeFinder);
+		logger.LogDebug("RoutePublisher(typeFinder={TypeFinder}): _typeFinder → {_typeFinder}", typeFinder, _typeFinder);
     }
 
     #endregion
@@ -38,9 +41,11 @@ public partial class RoutePublisher : IRoutePublisher
     /// <param name="endpointRouteBuilder">Route builder</param>
     public virtual void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         //find route providers provided by other assemblies
         var routeProviders = _typeFinder.FindClassesOfType<IRouteProvider>();
 
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): routeProviders → {RouteProviders}", endpointRouteBuilder, routeProviders);
         //create and sort instances of route providers
         var instances = routeProviders
             .Select(routeProvider => (IRouteProvider)Activator.CreateInstance(routeProvider))
@@ -49,6 +54,7 @@ public partial class RoutePublisher : IRoutePublisher
         //register all provided routes
         foreach (var routeProvider in instances)
             routeProvider.RegisterRoutes(endpointRouteBuilder);
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     #endregion

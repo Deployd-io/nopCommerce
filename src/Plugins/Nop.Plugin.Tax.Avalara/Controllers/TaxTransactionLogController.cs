@@ -54,6 +54,7 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> LogList(TaxTransactionLogSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering LogList(searchModel={SearchModel})", searchModel);
         //prepare filter parameters
         var createdFromValue = searchModel.CreatedFrom.HasValue
             ? (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync())
@@ -79,6 +80,7 @@ public class TaxTransactionLogController : BaseAdminController
             });
         });
 
+		logger.LogDebug("<<< Exiting LogList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -86,20 +88,24 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         await _taxTransactionLogService.DeleteTaxTransactionLogAsync(selectedIds.ToArray());
 
+		logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> View(int id)
     {
+		logger.LogDebug(">>> Entering View(id={Id})", id);
         //try to get log item with the passed identifier
         var logItem = await _taxTransactionLogService.GetTaxTransactionLogByIdAsync(id);
         if (logItem == null)
+			logger.LogDebug("View(id={Id}): logItem → {LogItem}", id, logItem);
             return RedirectToAction("Configure", "Avalara");
 
         var model = new TaxTransactionLogModel
@@ -114,6 +120,7 @@ public class TaxTransactionLogController : BaseAdminController
             CreatedDate = await _dateTimeHelper.ConvertToUserTimeAsync(logItem.CreatedDateUtc, DateTimeKind.Utc)
         };
 
+		logger.LogDebug("<<< Exiting View(id={Id})", id);
         return View("~/Plugins/Tax.Avalara/Views/Log/View.cshtml", model);
     }
 
@@ -121,22 +128,27 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get log item with the passed identifier
         var logItem = await _taxTransactionLogService.GetTaxTransactionLogByIdAsync(id);
         if (logItem != null)
+		logger.LogDebug("Delete(id={Id}): logItem → {LogItem}", id, logItem);
         {
             await _taxTransactionLogService.DeleteTaxTransactionLogAsync(logItem);
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Log.Deleted"));
         }
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("Configure", "Avalara");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ClearAll()
     {
+		logger.LogDebug(">>> Entering ClearAll()");
         await _taxTransactionLogService.ClearLogAsync();
 
+		logger.LogDebug("<<< Exiting ClearAll()");
         return Json(new { Result = true });
     }
 

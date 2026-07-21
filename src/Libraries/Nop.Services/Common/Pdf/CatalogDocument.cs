@@ -70,8 +70,10 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
     protected virtual PdfPCell ConfigureCatalogItemTemplate(InlineFieldData data)
     {
+		logger.LogDebug(">>> Entering ConfigureCatalogItemTemplate(data={Data})", data);
         var font16Bold = PdfDocumentHelper.GetFont(Font, Font.Size * 1.6f, DocumentFontStyle.Bold);
 
+		logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): font16Bold → {Font16Bold}", data, font16Bold);
         var table = new PdfGrid(numColumns: 1)
         {
             WidthPercentage = 100,
@@ -82,6 +84,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
         var name = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Name);
         table.AddCell(new PdfPCell(new Phrase(name, font16Bold))
         {
+		logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): name → {Name}", data, name);
             RunDirection = DocumentRunDirection,
             HorizontalAlignment = Element.ALIGN_LEFT,
             VerticalAlignment = Element.ALIGN_TOP,
@@ -91,6 +94,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
         var description = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Description);
 
+		logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): description → {Description}", data, description);
         var cell = new PdfPCell(new Paragraph(description, Font))
         {
             RunDirection = DocumentRunDirection,
@@ -119,6 +123,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
             Border = 0,
         });
 
+		logger.LogDebug("<<< Exiting ConfigureCatalogItemTemplate(data={Data})", data);
         return new PdfPCell(tableContainer)
         {
             RunDirection = DocumentRunDirection,
@@ -138,6 +143,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
     /// <param name="pdfStreamOutput">Stream for PDF output</param>
     public override void Generate(Stream pdfStreamOutput)
     {
+		logger.LogDebug(">>> Entering Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
         Document
             .MainTablePreferences(table =>
             {
@@ -162,6 +168,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
             })
             .Generate(builder => builder.AsPdfStream(pdfStreamOutput, closeStream: false));
+			logger.LogDebug("<<< Exiting Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
     }
 
     #endregion

@@ -16,6 +16,8 @@ public partial class CheckoutAttributeValueCacheEventConsumer : CacheEventConsum
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(CheckoutAttributeValue entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopAttributeDefaults.AttributeValuesByAttributeCacheKey, nameof(CheckoutAttribute), entity.AttributeId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

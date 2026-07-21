@@ -20,11 +20,14 @@ public partial class ShippingOptionTypeConverter : TypeConverter
     /// <returns>Result</returns>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
+		logger.LogDebug(">>> Entering CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         if (sourceType == typeof(string))
         {
             return true;
         }
 
+		logger.LogDebug(">>> Entering ConvertFrom(context={Context},culture={Culture},value={Value})", context, culture, value);
+		logger.LogDebug("<<< Exiting ConvertFrom(context={Context},culture={Culture},value={Value})", context, culture, value);
         return base.CanConvertFrom(context, sourceType);
     }
 
@@ -71,6 +74,7 @@ public partial class ShippingOptionTypeConverter : TypeConverter
     /// <returns>Result</returns>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
+		logger.LogDebug(">>> Entering ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         if (destinationType != typeof(string))
             return base.ConvertTo(context, culture, value, destinationType);
 
@@ -79,9 +83,14 @@ public partial class ShippingOptionTypeConverter : TypeConverter
 
         var sb = new StringBuilder();
         using var tw = new StringWriter(sb);
+		logger.LogDebug("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): sb → {Sb}", context, culture, value, destinationType, sb);
+		logger.LogDebug("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): tw → {Tw}", context, culture, value, destinationType, tw);
         var xmlS = new XmlSerializer(typeof(ShippingOption));
         xmlS.Serialize(tw, value);
         var serialized = sb.ToString();
+		logger.LogDebug("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): xmlS → {XmlS}", context, culture, value, destinationType, xmlS);
+		logger.LogDebug("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): serialized → {Serialized}", context, culture, value, destinationType, serialized);
+		logger.LogDebug("<<< Exiting ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         return serialized;
     }
 }

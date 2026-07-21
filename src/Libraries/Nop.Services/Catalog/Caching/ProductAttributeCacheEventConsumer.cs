@@ -17,6 +17,7 @@ public partial class ProductAttributeCacheEventConsumer : CacheEventConsumer<Pro
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductAttribute entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         if (entityEventType == EntityEventType.Insert)
             await RemoveAsync(NopCatalogDefaults.ProductAttributeValuesByAttributeCacheKey, entity);
 
@@ -26,5 +27,6 @@ public partial class ProductAttributeCacheEventConsumer : CacheEventConsumer<Pro
             await RemoveByPrefixAsync(NopEntityCacheDefaults<ProductAttributeMapping>.ByIdPrefix);
         }
         await base.ClearCacheAsync(entity, entityEventType);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

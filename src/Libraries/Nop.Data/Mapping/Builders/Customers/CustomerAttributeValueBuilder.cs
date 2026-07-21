@@ -17,9 +17,11 @@ public partial class CustomerAttributeValueBuilder : NopEntityBuilder<CustomerAt
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(CustomerAttributeValue.Name)).AsString(400).NotNullable()
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(CustomerAttributeValue), nameof(CustomerAttributeValue.AttributeId))).AsInt32().ForeignKey<CustomerAttribute>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -11,7 +11,10 @@ public partial class OrderPlacedEvent
     /// <param name="order">Order</param>
     public OrderPlacedEvent(Order order)
     {
+		logger.LogDebug(">>> Entering OrderPlacedEvent(order={Order})", order);
         Order = order;
+		logger.LogDebug("<<< Exiting OrderPlacedEvent(order={Order})", order);
+		logger.LogDebug("OrderPlacedEvent(order={Order}): Order → {Order1}", order, Order);
     }
 
     /// <summary>

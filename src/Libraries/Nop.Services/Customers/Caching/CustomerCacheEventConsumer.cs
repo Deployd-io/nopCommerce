@@ -19,7 +19,9 @@ public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, 
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(CustomerPasswordChangedEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await RemoveAsync(NopCustomerServicesDefaults.CustomerPasswordLifetimeCacheKey, eventMessage.Password.CustomerId);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -30,6 +32,7 @@ public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, 
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Customer entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         if (entityEventType == EntityEventType.Delete)
         {
             await RemoveAsync(NopCustomerServicesDefaults.CustomerAddressesCacheKey, entity);
@@ -37,6 +40,9 @@ public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, 
         }
 
         await base.ClearCacheAsync(entity, entityEventType);
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 
     /// <summary>

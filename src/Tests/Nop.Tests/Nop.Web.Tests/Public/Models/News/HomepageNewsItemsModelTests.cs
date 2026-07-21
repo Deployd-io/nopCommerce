@@ -10,6 +10,7 @@ public class HomepageNewsItemsModelTests
     [Test]
     public void CanClone()
     {
+		logger.LogDebug(">>> Entering CanClone()");
         //create
         var model1 = new HomepageNewsItemsModel
         {
@@ -73,5 +74,6 @@ public class HomepageNewsItemsModelTests
         newsItemModel2.AddNewComment.CommentTitle.Should().Be("CommentTitle 1");
         newsItemModel2.AddNewComment.CommentText.Should().Be("CommentText 1");
         newsItemModel2.AddNewComment.DisplayCaptcha.Should().BeTrue();
+		logger.LogDebug("<<< Exiting CanClone()");
     }
 }

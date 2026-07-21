@@ -60,6 +60,7 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(AppStartedEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -79,6 +80,7 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
         //update nopCommerce core and db
         var assembly = Assembly.GetAssembly(typeof(ApplicationBuilderExtensions));
         _migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): assembly → {Assembly}", eventMessage, assembly);
         assembly = Assembly.GetAssembly(typeof(IMigrationManager));
         _migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
 
@@ -87,6 +89,7 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
         await _taskScheduler.StartSchedulerAsync();
 
         await _settingService.TryGetLicenseAsync();
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

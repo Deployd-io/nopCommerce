@@ -19,7 +19,10 @@ public partial class AdminWidgetViewComponent : NopViewComponent
 
     public AdminWidgetViewComponent(IWidgetModelFactory widgetModelFactory)
     {
+		logger.LogDebug(">>> Entering AdminWidgetViewComponent(widgetModelFactory={WidgetModelFactory})", widgetModelFactory);
         _widgetModelFactory = widgetModelFactory;
+		logger.LogDebug("<<< Exiting AdminWidgetViewComponent(widgetModelFactory={WidgetModelFactory})", widgetModelFactory);
+		logger.LogDebug("AdminWidgetViewComponent(widgetModelFactory={WidgetModelFactory}): _widgetModelFactory → {_widgetModelFactory}", widgetModelFactory, _widgetModelFactory);
     }
 
     #endregion
@@ -37,11 +40,14 @@ public partial class AdminWidgetViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData = null)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //prepare model
         var models = await _widgetModelFactory.PrepareRenderWidgetModelAsync(widgetZone, additionalData, false);
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): models → {Models}", widgetZone, additionalData, models);
         //no data?
         if (!models.Any())
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return Content(string.Empty);
 
         return View(models);

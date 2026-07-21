@@ -9,7 +9,10 @@ public partial class WidgetSettings : ISettings
 {
     public WidgetSettings()
     {
+		logger.LogDebug(">>> Entering WidgetSettings()");
         ActiveWidgetSystemNames = new List<string>();
+		logger.LogDebug("<<< Exiting WidgetSettings()");
+		logger.LogDebug("WidgetSettings(): ActiveWidgetSystemNames → {ActiveWidgetSystemNames}", ActiveWidgetSystemNames);
     }
 
     /// <summary>

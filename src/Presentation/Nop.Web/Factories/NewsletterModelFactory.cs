@@ -42,6 +42,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
     /// </returns>
     public virtual Task<NewsLetterBoxModel> PrepareNewsLetterBoxModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareNewsLetterBoxModelAsync()");
         var model = new NewsLetterBoxModel
         {
             AllowToUnsubscribe = _customerSettings.NewsletterBlockAllowToUnsubscribe,
@@ -50,6 +51,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
             ReCaptchaPublicKey = _captchaSettings.ReCaptchaPublicKey
         };
 
+		logger.LogDebug("<<< Exiting PrepareNewsLetterBoxModelAsync()");
         return Task.FromResult(model);
     }
 
@@ -63,6 +65,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
     /// </returns>
     public virtual async Task<SubscriptionActivationModel> PrepareSubscriptionActivationModelAsync(bool active)
     {
+		logger.LogDebug(">>> Entering PrepareSubscriptionActivationModelAsync(active={Active})", active);
         var model = new SubscriptionActivationModel
         {
             Result = active
@@ -70,6 +73,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
                 : await _localizationService.GetResourceAsync("Newsletter.ResultDeactivated")
         };
 
+		logger.LogDebug("<<< Exiting PrepareSubscriptionActivationModelAsync(active={Active})", active);
         return model;
     }
 

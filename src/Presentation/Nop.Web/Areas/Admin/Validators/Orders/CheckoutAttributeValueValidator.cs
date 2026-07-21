@@ -10,8 +10,10 @@ public partial class CheckoutAttributeValueValidator : BaseNopValidator<Checkout
 {
     public CheckoutAttributeValueValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CheckoutAttributeValueValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Attributes.CheckoutAttributes.Values.Fields.Name.Required"));
 
         SetDatabaseValidationRules<CheckoutAttributeValue>();
+		logger.LogDebug("<<< Exiting CheckoutAttributeValueValidator(localizationService={LocalizationService})", localizationService);
     }
 }

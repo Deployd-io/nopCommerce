@@ -77,7 +77,10 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var paymentMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): paymentMethod → {PaymentMethod}", systemName, customer, storeId, paymentMethod);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(paymentMethod);
     }
 

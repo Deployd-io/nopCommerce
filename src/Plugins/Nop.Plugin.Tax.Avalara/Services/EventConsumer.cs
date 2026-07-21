@@ -103,6 +103,7 @@ public class EventConsumer :
 
         //create customer
         await _avalaraTaxManager.CreateOrUpdateCustomerAsync(eventMessage.Customer);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -121,6 +122,7 @@ public class EventConsumer :
 
         //delete customer
         await _avalaraTaxManager.DeleteCustomerAsync(eventMessage.CustomerId);
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -138,6 +140,7 @@ public class EventConsumer :
         //ensure that Avalara tax provider is active for the passed customer, since it's the event from the public area
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, customer))
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): customer → {Customer}", eventMessage, customer);
             return;
 
         if (!_avalaraTaxSettings.EnableCertificates)
@@ -150,11 +153,14 @@ public class EventConsumer :
             {
                 var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
                 if (!customerRoleIds.Intersect(_avalaraTaxSettings.CustomerRoleIds).Any())
+					logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): customerRoleIds → {CustomerRoleIds}", eventMessage, customerRoleIds);
                     return;
             }
 
             var infoItem = navigationModel.CustomerNavigationItems.FirstOrDefault(item => item.Tab == (int)CustomerNavigationEnum.Info);
             var position = navigationModel.CustomerNavigationItems.IndexOf(infoItem) + 1;
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): infoItem → {InfoItem}", eventMessage, infoItem);
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): position → {Position}", eventMessage, position);
             navigationModel.CustomerNavigationItems.Insert(position, new CustomerNavigationItemModel
             {
                 RouteName = AvalaraTaxDefaults.ExemptionCertificatesRouteName,

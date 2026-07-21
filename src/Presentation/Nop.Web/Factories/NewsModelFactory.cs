@@ -138,13 +138,20 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<HomepageNewsItemsModel> PrepareHomepageNewsItemsModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareHomepageNewsItemsModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var language = await _workContext.GetWorkingLanguageAsync();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.HomepageNewsModelKey, language, store);
+		logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): store → {Store}", store);
+		logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): language → {Language}", language);
+		logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): cacheKey → {CacheKey}", cacheKey);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cachedModel = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var newsItems = await _newsService.GetAllNewsAsync(language.Id, store.Id, 0, _newsSettings.MainPageNewsCount);
 
+			logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): newsItems → {NewsItems}", newsItems);
             return new HomepageNewsItemsModel
             {
                 WorkingLanguageId = language.Id,
@@ -155,6 +162,7 @@ public partial class NewsModelFactory : INewsModelFactory
                     return newsModel;
                 }).ToListAsync()
             };
+			logger.LogInformation("PrepareHomepageNewsItemsModelAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         });
 
         //"Comments" property of "NewsItemModel" object depends on the current customer.
@@ -164,6 +172,8 @@ public partial class NewsModelFactory : INewsModelFactory
         foreach (var newsItemModel in model.NewsItems)
             newsItemModel.Comments.Clear();
 
+		logger.LogInformation("PrepareHomepageNewsItemsModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareHomepageNewsItemsModelAsync()");
         return model;
     }
 
@@ -177,15 +187,22 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsItemListModel> PrepareNewsItemListModelAsync(NewsPagingFilteringModel command)
     {
+		logger.LogDebug(">>> Entering PrepareNewsItemListModelAsync(command={Command})", command);
         if (command.PageSize <= 0)
             command.PageSize = _newsSettings.NewsArchivePageSize;
+			logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): command.PageSize → {Arg1}", command, command.PageSize);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (command.PageNumber <= 0)
             command.PageNumber = 1;
+			logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): command.PageNumber → {Arg1}", command, command.PageNumber);
 
         var language = await _workContext.GetWorkingLanguageAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): language → {Language}", command, language);
+		logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): store → {Store}", command, store);
         var newsItems = await _newsService.GetAllNewsAsync(language.Id, store.Id, command.PageNumber - 1, command.PageSize);
 
+		logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): newsItems → {NewsItems}", command, newsItems);
         var model = new NewsItemListModel
         {
             WorkingLanguageId = language.Id,
@@ -196,8 +213,10 @@ public partial class NewsModelFactory : INewsModelFactory
                 return newsModel;
             }).ToListAsync()
         };
+		logger.LogInformation("PrepareNewsItemListModelAsync(command)={Command}: database query executed in {Arg1} ms", command, __logStart.ElapsedMilliseconds);
         model.PagingFilteringContext.LoadPagedList(newsItems);
 
+		logger.LogDebug("<<< Exiting PrepareNewsItemListModelAsync(command={Command})", command);
         return model;
     }
 
@@ -211,10 +230,12 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsCommentModel> PrepareNewsCommentModelAsync(NewsComment newsComment)
     {
+		logger.LogDebug(">>> Entering PrepareNewsCommentModelAsync(newsComment={NewsComment})", newsComment);
         ArgumentNullException.ThrowIfNull(newsComment);
 
         var customer = await _customerService.GetCustomerByIdAsync(newsComment.CustomerId);
 
+		logger.LogDebug("PrepareNewsCommentModelAsync(newsComment={NewsComment}): customer → {Customer}", newsComment, customer);
         var model = new NewsCommentModel
         {
             Id = newsComment.Id,
@@ -233,6 +254,7 @@ public partial class NewsModelFactory : INewsModelFactory
                 _mediaSettings.AvatarPictureSize, _customerSettings.DefaultAvatarEnabled, defaultPictureType: PictureType.Avatar);
         }
 
+		logger.LogDebug("<<< Exiting PrepareNewsCommentModelAsync(newsComment={NewsComment})", newsComment);
         return model;
     }
 

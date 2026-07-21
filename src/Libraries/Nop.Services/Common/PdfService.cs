@@ -653,6 +653,7 @@ public partial class PdfService : IPdfService
     /// <returns>A font object</returns>
     protected virtual Font ResolvePdfFont(Language language, PdfSettings settings)
     {
+		logger.LogDebug(">>> Entering ResolvePdfFont(language={Language},settings={Settings})", language, settings);
         ArgumentNullException.ThrowIfNull(settings);
 
         var fontName = language?.Rtl == true
@@ -661,6 +662,7 @@ public partial class PdfService : IPdfService
 
         var fontSize = settings.BaseFontSize >= 0 ? settings.BaseFontSize : 10;
 
+		logger.LogDebug("<<< Exiting ResolvePdfFont(language={Language},settings={Settings})", language, settings);
         return PdfDocumentHelper.GetFont(fontName, fontSize);
     }
 
@@ -770,24 +772,32 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintOrdersToPdfAsync(Stream stream, IList<Order> orders, Language language = null, Vendor vendor = null)
     {
+		logger.LogDebug(">>> Entering PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor})", stream, orders, language, vendor);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(orders);
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): currentStore → {CurrentStore}", stream, orders, language, vendor, currentStore);
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
 
+		logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): archive → {Archive}", stream, orders, language, vendor, archive);
         foreach (var order in orders)
         {
             var entryName = string.Format(await _localizationService.GetResourceAsync("Pdf.Order"), order.CustomOrderNumber);
 
+			logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): entryName → {EntryName}", stream, orders, language, vendor, entryName);
             await using var fileStreamInZip = archive.CreateEntry($"{entryName}.pdf").Open();
             await using var pdfStream = new MemoryStream();
+			logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): fileStreamInZip → {FileStreamInZip}", stream, orders, language, vendor, fileStreamInZip);
+			logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): pdfStream → {PdfStream}", stream, orders, language, vendor, pdfStream);
+			logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): pdfStream.Position → {Arg4}", stream, orders, language, vendor, pdfStream.Position);
             await PrintOrderToPdfAsync(pdfStream, order, language, currentStore, vendor);
             pdfStream.Position = 0;
             await pdfStream.CopyToAsync(fileStreamInZip);
         }
+		logger.LogDebug("<<< Exiting PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor})", stream, orders, language, vendor);
     }
 
     /// <summary>
@@ -799,23 +809,30 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintPackagingSlipsToPdfAsync(Stream stream, IList<Shipment> shipments, Language language = null)
     {
+		logger.LogDebug(">>> Entering PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language})", stream, shipments, language);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(shipments);
 
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
 
+		logger.LogDebug("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): archive → {Archive}", stream, shipments, language, archive);
         foreach (var shipment in shipments)
         {
             var entryName = string.Format(await _localizationService.GetResourceAsync("Pdf.Shipment"), shipment.Id);
 
+			logger.LogDebug("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): entryName → {EntryName}", stream, shipments, language, entryName);
             await using var fileStreamInZip = archive.CreateEntry($"{entryName}.pdf").Open();
             await using var pdfStream = new MemoryStream();
+			logger.LogDebug("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): fileStreamInZip → {FileStreamInZip}", stream, shipments, language, fileStreamInZip);
+			logger.LogDebug("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): pdfStream → {PdfStream}", stream, shipments, language, pdfStream);
             await PrintPackagingSlipToPdfAsync(pdfStream, shipment, language);
 
             pdfStream.Position = 0;
+			logger.LogDebug("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): pdfStream.Position → {Arg3}", stream, shipments, language, pdfStream.Position);
             await pdfStream.CopyToAsync(fileStreamInZip);
         }
+		logger.LogDebug("<<< Exiting PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language})", stream, shipments, language);
     }
 
     /// <summary>
@@ -827,14 +844,19 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintPackagingSlipToPdfAsync(Stream stream, Shipment shipment, Language language = null)
     {
+		logger.LogDebug(">>> Entering PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language})", stream, shipment, language);
         ArgumentNullException.ThrowIfNull(stream);
 
+		logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): language → {Language1}", stream, shipment, language, language);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId);
 
+		logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): order → {Order}", stream, shipment, language, order);
         var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(order.StoreId);
 
+		logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): pdfSettingsByStore → {PdfSettingsByStore}", stream, shipment, language, pdfSettingsByStore);
         //language info
         language ??= await _languageService.GetLanguageByIdAsync(order.CustomerLanguageId);
 
@@ -843,6 +865,7 @@ public partial class PdfService : IPdfService
 
         var shipmentItems = await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id);
 
+		logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): shipmentItems → {ShipmentItems}", stream, shipment, language, shipmentItems);
         if (shipmentItems?.Any() != true)
             return;
 
@@ -850,12 +873,14 @@ public partial class PdfService : IPdfService
             .SelectAwait(async si => await _orderService.GetOrderItemByIdAsync(si.OrderItemId))
             .Where(pi => pi != null)
             .ToListAsync();
+			logger.LogInformation("PrintPackagingSlipToPdfAsync(stream,shipment,language)={Stream},{Shipment},{Language}: database query executed in {Arg3} ms", stream, shipment, language, __logStart.ElapsedMilliseconds);
 
         if (orderItems?.Any() != true)
             return;
 
         await using var pdfStream = new MemoryStream();
         var document = new ShipmentDocument
+		logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): pdfStream → {PdfStream}", stream, shipment, language, pdfStream);
         {
             PageSize = pdfSettingsByStore.LetterPageSizeEnabled ? PdfPageSize.Letter : PdfPageSize.A4,
             Language = language,
@@ -871,7 +896,9 @@ public partial class PdfService : IPdfService
         document.Generate(pdfStream);
 
         pdfStream.Position = 0;
+		logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): pdfStream.Position → {Arg3}", stream, shipment, language, pdfStream.Position);
         await pdfStream.CopyToAsync(stream);
+		logger.LogDebug("<<< Exiting PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language})", stream, shipment, language);
     }
 
     /// <summary>
@@ -882,26 +909,35 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintProductsToPdfAsync(Stream stream, IList<Product> products)
     {
+		logger.LogDebug(">>> Entering PrintProductsToPdfAsync(stream={Stream},products={Products})", stream, products);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(products);
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
         var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(currentStore.Id);
+		logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): currentStore → {CurrentStore}", stream, products, currentStore);
+		logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): pdfSettingsByStore → {PdfSettingsByStore}", stream, products, pdfSettingsByStore);
         var lang = await _workContext.GetWorkingLanguageAsync();
 
+		logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): lang → {Lang}", stream, products, lang);
         var productItems = new List<CatalogItem>();
 
+		logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): productItems → {ProductItems}", stream, products, productItems);
         foreach (var product in products)
         {
             var priceStr = $"{product.Price:0.00} {(await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId)).CurrencyCode}";
             if (product.IsRental)
+				logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): priceStr → {PriceStr}", stream, products, priceStr);
                 priceStr = await _priceFormatter.FormatRentalProductPeriodAsync(product, priceStr);
 
             var rawDescription = await _localizationService.GetLocalizedAsync(product, x => x.FullDescription, lang.Id);
 
+			logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): rawDescription → {RawDescription}", stream, products, rawDescription);
             var productNumber = products.IndexOf(product) + 1;
             var productName = await _localizationService.GetLocalizedAsync(product, x => x.Name, lang.Id);
+			logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): productNumber → {ProductNumber}", stream, products, productNumber);
+			logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): productName → {ProductName}", stream, products, productName);
 
             var item = new CatalogItem()
             {
@@ -919,6 +955,7 @@ public partial class PdfService : IPdfService
 
             var pictures = await _pictureService.GetPicturesByProductIdAsync(product.Id);
 
+			logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): pictures → {Pictures}", stream, products, pictures);
             //WebP images are not supported
             pictures = pictures.Where(picture => picture.MimeType != MimeTypes.ImageWebp).ToList();
 
@@ -926,16 +963,19 @@ public partial class PdfService : IPdfService
             {
                 var picturePaths = new HashSet<string>();
 
+				logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): picturePaths → {PicturePaths}", stream, products, picturePaths);
                 foreach (var pic in pictures)
                 {
                     var (pictureUrl, _) = await _pictureService.GetPictureUrlAsync(pic, pdfSettingsByStore.ImageTargetSize, false);
                     var picPath = await _thumbService.GetThumbLocalPathAsync(pictureUrl);
 
+					logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): picPath → {PicPath}", stream, products, picPath);
                     if (!string.IsNullOrEmpty(picPath))
                         picturePaths.Add(picPath);
                 }
 
                 item.PicturePaths = picturePaths;
+				logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): item.PicturePaths → {Arg2}", stream, products, item.PicturePaths);
             }
 
             productItems.Add(item);
@@ -967,9 +1007,12 @@ public partial class PdfService : IPdfService
 
         await using var pdfStream = new MemoryStream();
         catalogDocument.Generate(pdfStream);
+		logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): pdfStream → {PdfStream}", stream, products, pdfStream);
 
         pdfStream.Position = 0;
+		logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): pdfStream.Position → {Arg2}", stream, products, pdfStream.Position);
         await pdfStream.CopyToAsync(stream);
+		logger.LogDebug("<<< Exiting PrintProductsToPdfAsync(stream={Stream},products={Products})", stream, products);
     }
 
     /// <summary>

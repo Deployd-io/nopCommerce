@@ -18,10 +18,12 @@ public partial class LogBuilder : NopEntityBuilder<Log>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Log.ShortMessage)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(Log.IpAddress)).AsString(100).Nullable()
             .WithColumn(nameof(Log.CustomerId)).AsInt32().Nullable().ForeignKey<Customer>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

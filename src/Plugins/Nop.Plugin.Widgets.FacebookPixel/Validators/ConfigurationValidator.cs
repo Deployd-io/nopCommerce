@@ -14,6 +14,7 @@ public class ConfigurationValidator : BaseNopValidator<FacebookPixelModel>
 
     public ConfigurationValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ConfigurationValidator(localizationService={LocalizationService})", localizationService);
         //set validation rules
         RuleFor(model => model.PixelId)
             .NotEmpty()
@@ -30,6 +31,7 @@ public class ConfigurationValidator : BaseNopValidator<FacebookPixelModel>
             .NotEqual(true)
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Widgets.FacebookPixel.Configuration.Fields.PassUserProperties.Forbidden"))
             .When(model => model.UseAdvancedMatching);
+			logger.LogDebug("<<< Exiting ConfigurationValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

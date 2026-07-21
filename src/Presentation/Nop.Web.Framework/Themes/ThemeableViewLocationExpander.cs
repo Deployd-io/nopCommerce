@@ -19,6 +19,7 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
     /// <param name="context">Context</param>
     public virtual void PopulateValues(ViewLocationExpanderContext context)
     {
+		logger.LogDebug(">>> Entering PopulateValues(context={Context})", context);
         //no need to add the themeable view locations at all as the administration should not be themeable anyway
         if (context.AreaName?.Equals(AreaNames.ADMIN) ?? false)
             return;
@@ -27,10 +28,12 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
         if (!httpContext.Items.TryGetValue(HTTP_CONTEXT_THEME_CACHE_KEY, out var cachedThemeName))
         {
             cachedThemeName = EngineContext.Current.Resolve<IThemeContext>().GetWorkingThemeNameAsync().Result;
+			logger.LogDebug("PopulateValues(context={Context}): cachedThemeName → {CachedThemeName}", context, cachedThemeName);
             httpContext.Items[HTTP_CONTEXT_THEME_CACHE_KEY] = cachedThemeName;
         }
 
         context.Values[THEME_KEY] = (string)cachedThemeName;
+		logger.LogDebug("<<< Exiting PopulateValues(context={Context})", context);
     }
 
     /// <summary>
@@ -41,6 +44,7 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
     /// <returns>View locations</returns>
     public virtual IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
     {
+		logger.LogDebug(">>> Entering ExpandViewLocations(context={Context},viewLocations={ViewLocations})", context, viewLocations);
         if (context.Values.TryGetValue(THEME_KEY, out string theme))
         {
             viewLocations = new[] {
@@ -50,6 +54,7 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
                 .Concat(viewLocations);
         }
 
+		logger.LogDebug("<<< Exiting ExpandViewLocations(context={Context},viewLocations={ViewLocations})", context, viewLocations);
         return viewLocations;
     }
 }

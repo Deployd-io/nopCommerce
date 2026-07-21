@@ -10,9 +10,11 @@ public partial class MeasureWeightValidator : BaseNopValidator<MeasureWeightMode
 {
     public MeasureWeightValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering MeasureWeightValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Shipping.Measures.Weights.Fields.Name.Required"));
         RuleFor(x => x.SystemKeyword).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Shipping.Measures.Weights.Fields.SystemKeyword.Required"));
 
         SetDatabaseValidationRules<MeasureWeight>();
+		logger.LogDebug("<<< Exiting MeasureWeightValidator(localizationService={LocalizationService})", localizationService);
     }
 }

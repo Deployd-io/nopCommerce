@@ -74,16 +74,20 @@ public partial class ReviewTypeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult List()
     {
+		logger.LogDebug(">>> Entering List()");
         //select an appropriate card
         SaveSelectedCardName("catalogsettings-review-types");
 
         //we just redirect a user to the catalog settings page
+		logger.LogDebug("<<< Exiting List()");
         return RedirectToAction("Catalog", "Setting");
     }
 
@@ -94,15 +98,19 @@ public partial class ReviewTypeController : BaseAdminController
         //prepare model
         var model = await _reviewTypeModelFactory.PrepareReviewTypeListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _reviewTypeModelFactory.PrepareReviewTypeModelAsync(new ReviewTypeModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -131,20 +139,25 @@ public partial class ReviewTypeController : BaseAdminController
         model = await _reviewTypeModelFactory.PrepareReviewTypeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an product review type with the specified id
         var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(id);
         if (reviewType == null)
+			logger.LogDebug("Edit(id={Id}): reviewType → {ReviewType}", id, reviewType);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _reviewTypeModelFactory.PrepareReviewTypeModelAsync(null, reviewType);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -179,6 +192,7 @@ public partial class ReviewTypeController : BaseAdminController
         model = await _reviewTypeModelFactory.PrepareReviewTypeModelAsync(model, reviewType, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -186,9 +200,11 @@ public partial class ReviewTypeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an review type with the specified id
         var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(id);
         if (reviewType == null)
+			logger.LogDebug("Delete(id={Id}): reviewType → {ReviewType}", id, reviewType);
             return RedirectToAction("List");
 
         try
@@ -206,7 +222,9 @@ public partial class ReviewTypeController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = reviewType.Id });
         }
     }

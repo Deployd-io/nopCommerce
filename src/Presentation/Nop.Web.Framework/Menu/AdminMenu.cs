@@ -71,10 +71,12 @@ public partial class AdminMenu : IAdminMenu
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task FillBaseRootAsync()
     {
+		logger.LogDebug(">>> Entering FillBaseRootAsync()");
         if (_baseRootMenuItem != null)
             return;
 
         _baseRootMenuItem = new AdminMenuItem
+		logger.LogDebug("FillBaseRootAsync(): _baseRootMenuItem → {_baseRootMenuItem}", _baseRootMenuItem);
         {
             SystemName = "Home",
             Title = await _localizationService.GetResourceAsync("Admin.Home"),
@@ -1041,6 +1043,7 @@ public partial class AdminMenu : IAdminMenu
                 }
             }
         };
+		logger.LogDebug("<<< Exiting FillBaseRootAsync()");
     }
 
     /// <summary>
@@ -1053,6 +1056,7 @@ public partial class AdminMenu : IAdminMenu
     /// </returns>
     protected virtual async Task<AdminMenuItem> LoadMenuAsync(bool showHidden)
     {
+		logger.LogDebug(">>> Entering LoadMenuAsync(showHidden={ShowHidden})", showHidden);
         await FillBaseRootAsync();
 
         AdminMenuItem cloneMenuItem(AdminMenuItem item)
@@ -1072,8 +1076,10 @@ public partial class AdminMenu : IAdminMenu
 
         var root = cloneMenuItem(_baseRootMenuItem);
 
+		logger.LogWarning("LoadMenuAsync(showHidden={ShowHidden}): root → {Root}", showHidden, root);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("LoadMenuAsync(showHidden={ShowHidden}): customer → {Customer}", showHidden, customer);
         await _eventPublisher.PublishAsync(new AdminMenuCreatedEvent(this, root));
 
         if (await _permissionService.AuthorizeAsync(StandardPermission.Configuration.MANAGE_PLUGINS, customer))
@@ -1082,6 +1088,7 @@ public partial class AdminMenu : IAdminMenu
 
             var adminMenuPlugins = await _adminMenuPluginManager.LoadAllPluginsAsync(customer);
 
+			logger.LogDebug("LoadMenuAsync(showHidden={ShowHidden}): adminMenuPlugins → {AdminMenuPlugins}", showHidden, adminMenuPlugins);
             foreach (var adminMenuPlugin in adminMenuPlugins)
                 await adminMenuPlugin.ManageSiteMapAsync(root);
         }
@@ -1090,16 +1097,19 @@ public partial class AdminMenu : IAdminMenu
 
         async Task checkPermissions(AdminMenuItem menuItem, AdminMenuItem rootItem = null)
         {
+			logger.LogDebug(">>> Entering checkPermissions(menuItem={MenuItem},rootItem={RootItem})", menuItem, rootItem);
             if (menuItem.Visible)
             {
                 var permissions = (menuItem.PermissionNames.Any() ? menuItem.PermissionNames : (rootItem?.PermissionNames ?? new List<string>())).Distinct().Where(p => !string.IsNullOrEmpty(p)).ToList();
 
+				logger.LogDebug("checkPermissions(menuItem={MenuItem},rootItem={RootItem}): permissions → {Permissions}", menuItem, rootItem, permissions);
                 if (permissions.Any())
                     menuItem.Visible = menuItem.ChildNodes.Any() ? await permissions.AnyAwaitAsync(authorizePermission) : await permissions.AllAwaitAsync(authorizePermission);
             }
 
             foreach (var childNode in menuItem.ChildNodes)
                 await checkPermissions(childNode, menuItem);
+				logger.LogDebug("<<< Exiting checkPermissions(menuItem={MenuItem},rootItem={RootItem})", menuItem, rootItem);
         }
 
         await checkPermissions(root);
@@ -1124,6 +1134,7 @@ public partial class AdminMenu : IAdminMenu
 
         checkVisible(root);
 
+		logger.LogDebug("<<< Exiting LoadMenuAsync(showHidden={ShowHidden})", showHidden);
         return root;
     }
 
@@ -1141,13 +1152,16 @@ public partial class AdminMenu : IAdminMenu
     /// </returns>
     public virtual async Task<AdminMenuItem> GetRootNodeAsync(bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetRootNodeAsync(showHidden={ShowHidden})", showHidden);
         if (_rootItem != null)
             return _rootItem;
 
         _rootItem = await LoadMenuAsync(showHidden);
+		logger.LogDebug("GetRootNodeAsync(showHidden={ShowHidden}): _rootItem → {_rootItem}", showHidden, _rootItem);
 
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext ?? throw new ArgumentNullException(nameof(_actionContextAccessor.ActionContext)));
 
+		logger.LogDebug("GetRootNodeAsync(showHidden={ShowHidden}): urlHelper → {UrlHelper}", showHidden, urlHelper);
         void transformUrl(AdminMenuItem node)
         {
             if (node.Url?.StartsWith("~/", StringComparison.Ordinal) ?? false)
@@ -1159,6 +1173,7 @@ public partial class AdminMenu : IAdminMenu
 
         transformUrl(_rootItem);
 
+		logger.LogDebug("<<< Exiting GetRootNodeAsync(showHidden={ShowHidden})", showHidden);
         return _rootItem;
     }
 
@@ -1170,11 +1185,13 @@ public partial class AdminMenu : IAdminMenu
     /// <returns>Menu item URL</returns>
     public virtual string GetMenuItemUrl(string controllerName, string actionName)
     {
+		logger.LogDebug(">>> Entering GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName})", controllerName, actionName);
         if (string.IsNullOrEmpty(controllerName) || string.IsNullOrEmpty(actionName))
             return null;
 
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext ?? throw new ArgumentNullException(nameof(_actionContextAccessor.ActionContext)));
 
+		logger.LogDebug("GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName}): urlHelper → {UrlHelper}", controllerName, actionName, urlHelper);
         return urlHelper.Action(actionName, controllerName, new RouteValueDictionary { { "area", AreaNames.ADMIN } }, null, null);
     }
 

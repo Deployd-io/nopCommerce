@@ -55,11 +55,13 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual Task<CustomerRoleSearchModel> PrepareCustomerRoleSearchModelAsync(CustomerRoleSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerRoleSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCustomerRoleSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -73,11 +75,13 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleListModel> PrepareCustomerRoleListModelAsync(CustomerRoleSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerRoleListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customer roles
         var customerRoles = (await _customerService.GetAllCustomerRolesAsync(true)).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareCustomerRoleListModelAsync(searchModel={SearchModel}): customerRoles → {CustomerRoles}", searchModel, customerRoles);
         //prepare grid model
         var model = await new CustomerRoleListModel().PrepareToGridAsync(searchModel, customerRoles, () =>
         {
@@ -86,6 +90,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
                 //fill in model values from the entity
                 var customerRoleModel = role.ToModel<CustomerRoleModel>();
 
+				logger.LogDebug("PrepareCustomerRoleListModelAsync(searchModel={SearchModel}): customerRoleModel → {CustomerRoleModel}", searchModel, customerRoleModel);
                 //fill in additional values (not existing in the entity)
                 customerRoleModel.PurchasedWithProductName = (await _productService.GetProductByIdAsync(role.PurchasedWithProductId))?.Name;
 
@@ -93,6 +98,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCustomerRoleListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -135,6 +141,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleProductSearchModel> PrepareCustomerRoleProductSearchModelAsync(CustomerRoleProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerRoleProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
@@ -158,6 +165,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCustomerRoleProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -171,11 +179,14 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleProductListModel> PrepareCustomerRoleProductListModelAsync(CustomerRoleProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+			logger.LogDebug("PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+			logger.LogDebug("PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             searchModel.SearchVendorId = currentVendor.Id;
 
         //get products
@@ -195,12 +206,14 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

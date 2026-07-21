@@ -15,9 +15,14 @@ public partial class AdminTabStripCreated
     /// <param name="tabStripName">Tabstrip name</param>
     public AdminTabStripCreated(IHtmlHelper helper, string tabStripName)
     {
+		logger.LogDebug(">>> Entering AdminTabStripCreated(helper={Helper},tabStripName={TabStripName})", helper, tabStripName);
         Helper = helper;
         TabStripName = tabStripName;
+		logger.LogDebug("AdminTabStripCreated(helper={Helper},tabStripName={TabStripName}): TabStripName → {TabStripName1}", helper, tabStripName, TabStripName);
+		logger.LogDebug("AdminTabStripCreated(helper={Helper},tabStripName={TabStripName}): Helper → {Helper1}", helper, tabStripName, Helper);
         BlocksToRender = new List<IHtmlContent>();
+		logger.LogDebug("<<< Exiting AdminTabStripCreated(helper={Helper},tabStripName={TabStripName})", helper, tabStripName);
+		logger.LogDebug("AdminTabStripCreated(helper={Helper},tabStripName={TabStripName}): BlocksToRender → {BlocksToRender}", helper, tabStripName, BlocksToRender);
     }
 
     /// <summary>

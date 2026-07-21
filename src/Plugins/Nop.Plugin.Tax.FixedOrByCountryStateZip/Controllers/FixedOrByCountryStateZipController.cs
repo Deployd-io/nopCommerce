@@ -68,8 +68,10 @@ public class FixedOrByCountryStateZipController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var taxCategories = await _taxCategoryService.GetAllTaxCategoriesAsync();
 
+		logger.LogDebug("Configure(): taxCategories → {TaxCategories}", taxCategories);
         if (!taxCategories.Any())
         {
             var errorModel = new ConfigurationModel
@@ -90,6 +92,7 @@ public class FixedOrByCountryStateZipController : BasePluginController
         var stores = await _storeService.GetAllStoresAsync();
         foreach (var s in stores)
             model.AvailableStores.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
+			logger.LogDebug("Configure(): stores → {Stores}", stores);
         //tax categories
         foreach (var tc in taxCategories)
             model.AvailableTaxCategories.Add(new SelectListItem { Text = tc.Name, Value = tc.Id.ToString() });
@@ -97,16 +100,20 @@ public class FixedOrByCountryStateZipController : BasePluginController
         var countries = await _countryService.GetAllCountriesAsync(showHidden: true);
         foreach (var c in countries)
             model.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+			logger.LogDebug("Configure(): countries → {Countries}", countries);
         //states
         model.AvailableStates.Add(new SelectListItem { Text = "*", Value = "0" });
         var defaultCountry = countries.FirstOrDefault();
         if (defaultCountry != null)
+		logger.LogDebug("Configure(): defaultCountry → {DefaultCountry}", defaultCountry);
         {
             var states = await _stateProvinceService.GetStateProvincesByCountryIdAsync(defaultCountry.Id);
             foreach (var s in states)
                 model.AvailableStates.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString() });
+				logger.LogDebug("Configure(): states → {States}", states);
         }
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Tax.FixedOrByCountryStateZip/Views/Configure.cshtml", model);
     }
 
@@ -114,10 +121,13 @@ public class FixedOrByCountryStateZipController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> SaveMode(bool value)
     {
+		logger.LogDebug(">>> Entering SaveMode(value={Value})", value);
         //save settings
         _countryStateZipSettings.CountryStateZipEnabled = value;
+		logger.LogDebug("SaveMode(value={Value}): _countryStateZipSettings.CountryStateZipEnabled → {Arg1}", value, _countryStateZipSettings.CountryStateZipEnabled);
         await _settingService.SaveSettingAsync(_countryStateZipSettings);
 
+		logger.LogDebug("<<< Exiting SaveMode(value={Value})", value);
         return Json(new { Result = true });
     }
 
@@ -127,8 +137,10 @@ public class FixedOrByCountryStateZipController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> FixedRatesList(ConfigurationModel searchModel)
     {
+		logger.LogDebug(">>> Entering FixedRatesList(searchModel={SearchModel})", searchModel);
         var categories = (await _taxCategoryService.GetAllTaxCategoriesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("FixedRatesList(searchModel={SearchModel}): categories → {Categories}", searchModel, categories);
         var gridModel = await new FixedTaxRateListModel().PrepareToGridAsync(searchModel, categories, () =>
         {
             return categories.SelectAwait(async taxCategory => new FixedTaxRateModel
@@ -141,6 +153,7 @@ public class FixedOrByCountryStateZipController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting FixedRatesList(searchModel={SearchModel})", searchModel);
         return Json(gridModel);
     }
 
@@ -161,8 +174,10 @@ public class FixedOrByCountryStateZipController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> RatesByCountryStateZipList(ConfigurationModel searchModel)
     {
+		logger.LogDebug(">>> Entering RatesByCountryStateZipList(searchModel={SearchModel})", searchModel);
         var records = await _taxRateService.GetAllTaxRatesAsync(searchModel.Page - 1, searchModel.PageSize);
 
+		logger.LogDebug("RatesByCountryStateZipList(searchModel={SearchModel}): records → {Records}", searchModel, records);
         var gridModel = await new CountryStateZipListModel().PrepareToGridAsync(searchModel, records, () =>
         {
             return records.SelectAwait(async record => new CountryStateZipModel
@@ -182,6 +197,7 @@ public class FixedOrByCountryStateZipController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting RatesByCountryStateZipList(searchModel={SearchModel})", searchModel);
         return Json(gridModel);
     }
 
@@ -218,10 +234,13 @@ public class FixedOrByCountryStateZipController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteRateByCountryStateZip(int id)
     {
+		logger.LogDebug(">>> Entering DeleteRateByCountryStateZip(id={Id})", id);
         var taxRate = await _taxRateService.GetTaxRateByIdAsync(id);
         if (taxRate != null)
+			logger.LogDebug("DeleteRateByCountryStateZip(id={Id}): taxRate → {TaxRate}", id, taxRate);
             await _taxRateService.DeleteTaxRateAsync(taxRate);
 
+		logger.LogDebug("<<< Exiting DeleteRateByCountryStateZip(id={Id})", id);
         return new NullJsonResult();
     }
 

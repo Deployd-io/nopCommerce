@@ -14,9 +14,14 @@ public partial class PluginLoadedAssemblyInfo
     /// <param name="assemblyInMemory">Assembly version</param>
     public PluginLoadedAssemblyInfo(string shortName, Version assemblyInMemory)
     {
+		logger.LogDebug(">>> Entering PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory})", shortName, assemblyInMemory);
         ShortName = shortName;
         References = new List<(string PluginName, Version AssemblyVersion)>();
+		logger.LogDebug("PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory}): References → {References}", shortName, assemblyInMemory, References);
+		logger.LogDebug("PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory}): ShortName → {ShortName1}", shortName, assemblyInMemory, ShortName);
         AssemblyInMemory = assemblyInMemory;
+		logger.LogDebug("<<< Exiting PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory})", shortName, assemblyInMemory);
+		logger.LogDebug("PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory}): AssemblyInMemory → {AssemblyInMemory1}", shortName, assemblyInMemory, AssemblyInMemory);
     }
 
     #endregion

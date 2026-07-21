@@ -47,6 +47,7 @@ public partial class SmtpBuilder : ISmtpBuilder
 
     protected virtual async Task<SaslMechanism> GetGmailCredentialsAsync(EmailAccount emailAccount)
     {
+		logger.LogDebug(">>> Entering GetGmailCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         if (string.IsNullOrEmpty(emailAccount.ClientId))
@@ -57,6 +58,8 @@ public partial class SmtpBuilder : ISmtpBuilder
 
         var tokenFilePath = _fileProvider.MapPath(NopMessageDefaults.GmailAuthStorePath);
         var credentialRoot = _fileProvider.Combine(tokenFilePath, emailAccount.Email);
+		logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): tokenFilePath → {TokenFilePath}", emailAccount, tokenFilePath);
+		logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): credentialRoot → {CredentialRoot}", emailAccount, credentialRoot);
 
         var codeFlow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
         {
@@ -71,19 +74,23 @@ public partial class SmtpBuilder : ISmtpBuilder
 
         var authCode = new AuthorizationCodeWebApp(codeFlow, null, null);
 
+		logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): authCode → {AuthCode}", emailAccount, authCode);
         var authResult = await authCode.AuthorizeAsync(emailAccount.Email, CancellationToken.None);
 
+		logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): authResult → {AuthResult}", emailAccount, authResult);
         if (authResult.Credential is null)
             throw new NopException("Failed to obtain user credentials for the authorization server. Check the client secrets and allow the application to perform required operations.");
 
         if (authResult.Credential.Token?.IsStale == true)
             await authResult.Credential.RefreshTokenAsync(CancellationToken.None);
 
+		logger.LogDebug("<<< Exiting GetGmailCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         return new SaslMechanismOAuth2(authResult.Credential.UserId, authResult.Credential.Token.AccessToken);
     }
 
     protected virtual async Task<SaslMechanism> GetExchangeCredentialsAsync(EmailAccount emailAccount)
     {
+		logger.LogDebug(">>> Entering GetExchangeCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         if (string.IsNullOrEmpty(emailAccount.ClientId))
@@ -102,6 +109,8 @@ public partial class SmtpBuilder : ISmtpBuilder
 
         var authToken = await confidentialClientApplication.AcquireTokenForClient(NopMessageDefaults.MSALScopes).ExecuteAsync();
 
+		logger.LogDebug("GetExchangeCredentialsAsync(emailAccount={EmailAccount}): authToken → {AuthToken}", emailAccount, authToken);
+		logger.LogDebug("<<< Exiting GetExchangeCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         return new SaslMechanismOAuth2(emailAccount.Email, authToken.AccessToken);
     }
 
@@ -119,6 +128,7 @@ public partial class SmtpBuilder : ISmtpBuilder
     /// </returns>
     public virtual async Task<SmtpClient> BuildAsync(EmailAccount emailAccount = null)
     {
+		logger.LogDebug(">>> Entering BuildAsync(emailAccount={EmailAccount})", emailAccount);
         emailAccount ??= await _emailAccountService.GetEmailAccountByIdAsync(_emailAccountSettings.DefaultEmailAccountId)
                          ?? throw new NopException("Email account could not be loaded");
 
@@ -150,6 +160,7 @@ public partial class SmtpBuilder : ISmtpBuilder
                     break;
             }
 
+			logger.LogDebug("<<< Exiting BuildAsync(emailAccount={EmailAccount})", emailAccount);
             return client;
         }
         catch (Exception ex)
@@ -169,7 +180,9 @@ public partial class SmtpBuilder : ISmtpBuilder
     /// <returns>A System.Boolean value that determines whether the specified certificate is accepted for authentication</returns>
     public virtual bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
     {
+		logger.LogDebug(">>> Entering ValidateServerCertificate(sender={Sender},certificate={Certificate},chain={Chain},sslPolicyErrors={SslPolicyErrors})", sender, certificate, chain, sslPolicyErrors);
         //By default, server certificate verification is disabled.
+		logger.LogDebug("<<< Exiting ValidateServerCertificate(sender={Sender},certificate={Certificate},chain={Chain},sslPolicyErrors={SslPolicyErrors})", sender, certificate, chain, sslPolicyErrors);
         return true;
     }
 

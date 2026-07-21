@@ -17,6 +17,35 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
 
     private static DataType DbTypeToDataType(DbType dbType)
     {
+		logger.LogDebug(">>> Entering DbTypeToDataType(dbType={DbType})", dbType);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.AnsiString → {Arg1}", dbType, DbType.AnsiString);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.AnsiStringFixedLength → {Arg1}", dbType, DbType.AnsiStringFixedLength);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Binary → {Arg1}", dbType, DbType.Binary);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Boolean → {Arg1}", dbType, DbType.Boolean);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Byte → {Arg1}", dbType, DbType.Byte);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Currency → {Arg1}", dbType, DbType.Currency);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Date → {Arg1}", dbType, DbType.Date);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.DateTime → {Arg1}", dbType, DbType.DateTime);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.DateTime2 → {Arg1}", dbType, DbType.DateTime2);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.DateTimeOffset → {Arg1}", dbType, DbType.DateTimeOffset);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Decimal → {Arg1}", dbType, DbType.Decimal);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Double → {Arg1}", dbType, DbType.Double);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Guid → {Arg1}", dbType, DbType.Guid);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Int16 → {Arg1}", dbType, DbType.Int16);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Int32 → {Arg1}", dbType, DbType.Int32);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Int64 → {Arg1}", dbType, DbType.Int64);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Object → {Arg1}", dbType, DbType.Object);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.SByte → {Arg1}", dbType, DbType.SByte);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Single → {Arg1}", dbType, DbType.Single);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.String → {Arg1}", dbType, DbType.String);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.StringFixedLength → {Arg1}", dbType, DbType.StringFixedLength);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Time → {Arg1}", dbType, DbType.Time);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.UInt16 → {Arg1}", dbType, DbType.UInt16);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.UInt32 → {Arg1}", dbType, DbType.UInt32);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.UInt64 → {Arg1}", dbType, DbType.UInt64);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.VarNumeric → {Arg1}", dbType, DbType.VarNumeric);
+		logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.Xml → {Arg1}", dbType, DbType.Xml);
+		logger.LogDebug("<<< Exiting DbTypeToDataType(dbType={DbType})", dbType);
         return dbType switch
         {
             DbType.AnsiString => DataType.VarChar,
@@ -61,6 +90,7 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
     /// <returns>Array of mapping attributes.</returns>
     public MappingAttribute[] GetAttributes(Type type)
     {
+		logger.LogDebug(">>> Entering GetAttributes(type={Type})", type);
         if (!type.IsSubclassOf(typeof(BaseEntity)))
             return [];
 
@@ -68,12 +98,14 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
         {
             var entityDescriptor = NopMappingSchema.GetEntityDescriptor(type);
 
+			logger.LogDebug("GetAttributes(type={Type}): entityDescriptor → {EntityDescriptor}", type, entityDescriptor);
             if (entityDescriptor is null)
                 return null;
 
             return new TableAttribute() { Schema = entityDescriptor.SchemaName, Name = entityDescriptor.EntityName };
         });
 
+		logger.LogDebug("<<< Exiting GetAttributes(type={Type})", type);
         return [attribute];
     }
 
@@ -128,6 +160,7 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
                 result.Add(new SequenceNameAttribute($"{entityDescriptor.EntityName}_{column.Name}_seq"));
         }
 
+		logger.LogDebug("<<< Exiting GetAttributes(type={Type},memberInfo={MemberInfo})", type, memberInfo);
         return result.ToArray();
     }
 
@@ -138,6 +171,8 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
     /// <returns>All dynamic columns defined on given type.</returns>
     public MemberInfo[] GetDynamicColumns(Type type)
     {
+		logger.LogDebug(">>> Entering GetDynamicColumns(type={Type})", type);
+		logger.LogDebug("<<< Exiting GetDynamicColumns(type={Type})", type);
         return [];
     }
 
@@ -149,6 +184,8 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
     /// <returns>The object ID as string</returns>
     public string GetObjectID()
     {
+		logger.LogDebug(">>> Entering GetObjectID()");
+		logger.LogDebug("<<< Exiting GetObjectID()");
         return $".{nameof(FluentMigratorMetadataReader)}.";
     }
 

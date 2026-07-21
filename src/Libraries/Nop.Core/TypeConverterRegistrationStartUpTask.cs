@@ -15,6 +15,7 @@ public partial class TypeConverterRegistrationStartUpTask : IStartupTask
     /// </summary>
     public virtual void Execute()
     {
+		logger.LogDebug(">>> Entering Execute()");
         //lists
         TypeDescriptor.AddAttributes(typeof(List<int>), new TypeConverterAttribute(typeof(GenericListTypeConverter<int>)));
         TypeDescriptor.AddAttributes(typeof(List<decimal>), new TypeConverterAttribute(typeof(GenericListTypeConverter<decimal>)));
@@ -30,6 +31,7 @@ public partial class TypeConverterRegistrationStartUpTask : IStartupTask
 
         //pickup point
         TypeDescriptor.AddAttributes(typeof(PickupPoint), new TypeConverterAttribute(typeof(PickupPointTypeConverter)));
+		logger.LogDebug("<<< Exiting Execute()");
     }
 
     /// <summary>

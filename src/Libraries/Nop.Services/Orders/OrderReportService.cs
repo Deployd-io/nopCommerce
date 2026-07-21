@@ -637,8 +637,10 @@ public partial class OrderReportService : IOrderReportService
 
         static string formatSummary(DateTime dt, GroupByOptions groupByOption)
         {
+			logger.LogDebug(">>> Entering formatSummary(dt={Dt},groupByOption={GroupByOption})", dt, groupByOption);
             const string dayFormat = "MMM dd, yyyy";
 
+			logger.LogDebug("<<< Exiting formatSummary(dt={Dt},groupByOption={GroupByOption})", dt, groupByOption);
             return groupByOption switch
             {
                 GroupByOptions.Week => $"{dt.ToString(dayFormat)} - {dt.AddDays(6).ToString(dayFormat)}",

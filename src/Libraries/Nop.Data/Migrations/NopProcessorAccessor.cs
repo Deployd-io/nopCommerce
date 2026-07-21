@@ -13,7 +13,9 @@ public class NopProcessorAccessor : IProcessorAccessor
 
     public NopProcessorAccessor(IEnumerable<IMigrationProcessor> processors)
     {
+		logger.LogDebug(">>> Entering NopProcessorAccessor(processors={Processors})", processors);
         ConfigureProcessor(processors.ToList());
+		logger.LogDebug("<<< Exiting NopProcessorAccessor(processors={Processors})", processors);
     }
 
     #endregion
@@ -26,12 +28,16 @@ public class NopProcessorAccessor : IProcessorAccessor
     /// <param name="processors">Collection of migration processors</param>
     protected virtual void ConfigureProcessor(IList<IMigrationProcessor> processors)
     {
+		logger.LogDebug(">>> Entering ConfigureProcessor(processors={Processors})", processors);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		logger.LogDebug("ConfigureProcessor(processors={Processors}): dataSettings → {DataSettings}", processors, dataSettings);
         if (!processors.Any())
+			logger.LogDebug("<<< Exiting ConfigureProcessor(processors={Processors})", processors);
             throw new ProcessorFactoryNotFoundException("No migration processor registered.");
 
         Processor = dataSettings is null ? processors.FirstOrDefault() : dataSettings.DataProvider switch
+		logger.LogDebug("ConfigureProcessor(processors={Processors}): Processor → {Processor}", processors, Processor);
         {
             DataProviderType.SqlServer => FindProcessor(processors, ProcessorIdConstants.SqlServer),
             DataProviderType.MySql => FindProcessor(processors, ProcessorIdConstants.MySql5),

@@ -11,7 +11,10 @@ public sealed partial class ValidateAttribute : CustomizeValidatorAttribute
 {
     public ValidateAttribute()
     {
+		logger.LogDebug(">>> Entering ValidateAttribute()");
         //specify rule set
         RuleSet = NopValidationDefaults.ValidationRuleSet;
+		logger.LogDebug("<<< Exiting ValidateAttribute()");
+		logger.LogDebug("ValidateAttribute(): RuleSet → {RuleSet}", RuleSet);
     }
 }

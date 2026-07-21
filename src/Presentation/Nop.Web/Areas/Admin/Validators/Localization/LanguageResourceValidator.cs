@@ -10,6 +10,7 @@ public partial class LanguageResourceValidator : BaseNopValidator<LocaleResource
 {
     public LanguageResourceValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering LanguageResourceValidator(localizationService={LocalizationService})", localizationService);
         //if validation without this set rule is applied, in this case nothing will be validated
         //it's used to prevent auto-validation of child models
         RuleSet(NopValidationDefaults.ValidationRuleSet, () =>
@@ -24,5 +25,6 @@ public partial class LanguageResourceValidator : BaseNopValidator<LocaleResource
 
             SetDatabaseValidationRules<LocaleStringResource>();
         });
+		logger.LogDebug("<<< Exiting LanguageResourceValidator(localizationService={LocalizationService})", localizationService);
     }
 }

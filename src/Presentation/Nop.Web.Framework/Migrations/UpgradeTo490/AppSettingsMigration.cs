@@ -14,13 +14,16 @@ public class AppSettingsMigration : MigrationBase
 
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         var woConfig = Singleton<AppSettings>.Instance.Get<WebOptimizerConfig>();
         woConfig.MemoryCacheTimeToLive = TimeSpan.FromMinutes(60);
+		logger.LogDebug("Up(): woConfig → {WoConfig}", woConfig);
 
         AppSettingsHelper.SaveAppSettings(new List<IConfig> { woConfig }, EngineContext.Current.Resolve<INopFileProvider>());
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down() { }

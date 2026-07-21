@@ -22,6 +22,7 @@ public static partial class NameCompatibilityManager
 
     private static void Initialize()
     {
+		logger.LogDebug(">>> Entering Initialize()");
         //perform with locked access to resources
         using (new ReaderWriteLockDisposable(_locker))
         {
@@ -52,6 +53,7 @@ public static partial class NameCompatibilityManager
 
             _isInitialized = true;
         }
+		logger.LogDebug("<<< Exiting Initialize()");
     }
 
     #endregion
@@ -65,9 +67,11 @@ public static partial class NameCompatibilityManager
     /// <returns>Table name</returns>
     public static string GetTableName(Type type)
     {
+		logger.LogDebug(">>> Entering GetTableName(type={Type})", type);
         if (!_isInitialized)
             Initialize();
 
+		logger.LogDebug("<<< Exiting GetTableName(type={Type})", type);
         return _tableNames.TryGetValue(type, out var value) ? value : type.Name;
     }
 
@@ -79,9 +83,11 @@ public static partial class NameCompatibilityManager
     /// <returns>Column name</returns>
     public static string GetColumnName(Type type, string propertyName)
     {
+		logger.LogDebug(">>> Entering GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
         if (!_isInitialized)
             Initialize();
 
+		logger.LogDebug("<<< Exiting GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
         return _columnName.ContainsKey((type, propertyName)) ? _columnName[(type, propertyName)] : propertyName;
     }
 

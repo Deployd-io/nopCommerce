@@ -56,21 +56,27 @@ public class AddRfqComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         if (!_rfqSettings.Enabled)
             return Content(string.Empty);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customer → {Customer}", widgetZone, additionalData, customer);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): store → {Store}", widgetZone, additionalData, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): cart → {Cart}", widgetZone, additionalData, cart);
         var products = await _productService.GetProductsByIdsAsync(cart.Select(i => i.ProductId).ToArray());
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): products → {Products}", widgetZone, additionalData, products);
         //"enter your price" or rental products in the cart, so we should not show the "Request a quote" button
         if (products.Any(product => product.CustomerEntersPrice || product.IsRental))
             return Content(string.Empty);
 
         //is shopping cart created by quote
         if (await cart.AnyAwaitAsync(async shoppingCartItemModel => (await _rfqService.GetQuoteItemByShoppingCartItemIdAsync(shoppingCartItemModel.Id)) != null))
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return View("~/Plugins/Misc.RFQ/Views/Components/ClearRfq.cshtml");
 
         return View("~/Plugins/Misc.RFQ/Views/Components/AddRfq.cshtml");

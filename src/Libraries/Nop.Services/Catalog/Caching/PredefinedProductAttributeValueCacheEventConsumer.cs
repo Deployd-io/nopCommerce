@@ -15,6 +15,8 @@ public partial class PredefinedProductAttributeValueCacheEventConsumer : CacheEv
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(PredefinedProductAttributeValue entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.PredefinedProductAttributeValuesByAttributeCacheKey, entity.ProductAttributeId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

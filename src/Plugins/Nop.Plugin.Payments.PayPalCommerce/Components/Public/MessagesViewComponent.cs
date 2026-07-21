@@ -49,6 +49,7 @@ public class MessagesViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
@@ -62,6 +63,7 @@ public class MessagesViewComponent : NopViewComponent
         //get messages placement
         var routeName = HttpContext.GetEndpoint()?.Metadata.GetMetadata<RouteNameMetadata>()?.RouteName;
         var isCartPage = routeName == NopRouteNames.General.CART;
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): routeName → {RouteName}", widgetZone, additionalData, routeName);
         var isPaymentMethodPage = routeName == PayPalCommerceDefaults.Route.PaymentInfo;
         var isCheckoutPage = (HttpContext.Request.RouteValues?.TryGetValue("controller", out var controller) ?? false) &&
             string.Equals(controller.ToString(), "Checkout", StringComparison.InvariantCultureIgnoreCase);
@@ -73,6 +75,8 @@ public class MessagesViewComponent : NopViewComponent
         var placement = isCartPage ? ButtonPlacement.Cart : ButtonPlacement.PaymentMethod;
         var model = await _modelFactory.PrepareMessagesModelAsync(placement, loadScript);
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/_Messages.cshtml", model);
     }
 
