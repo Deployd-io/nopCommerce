@@ -9,6 +9,8 @@ public partial class BlogPostValidator : BaseNopValidator<BlogPostModel>
 {
     public BlogPostValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering BlogPostValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.AddNewComment.CommentText).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Blog.Comments.CommentText.Required")).When(x => x.AddNewComment != null);
+		logger.LogDebug("<<< Exiting BlogPostValidator(localizationService={LocalizationService})", localizationService);
     }
 }

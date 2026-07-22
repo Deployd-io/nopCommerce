@@ -16,7 +16,10 @@ public partial class CacheKey
     /// <param name="key">Key</param>
     public CacheKey(string key)
     {
+		logger.LogDebug(">>> Entering CacheKey(key={Key})", key);
         Key = key;
+		logger.LogDebug("<<< Exiting CacheKey(key={Key})", key);
+		logger.LogWarning("CacheKey(key={Key}): Key → {Key1}", key, Key);
     }
 
     #endregion

@@ -9,7 +9,10 @@ public class ConfigurationModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         FacebookPixelSearchModel = new FacebookPixelSearchModel();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): FacebookPixelSearchModel → {FacebookPixelSearchModel}", FacebookPixelSearchModel);
     }
 
     #endregion

@@ -10,8 +10,10 @@ public partial class SettingValidator : BaseNopValidator<SettingModel>
 {
     public SettingValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering SettingValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.AllSettings.Fields.Name.Required"));
 
         SetDatabaseValidationRules<Setting>();
+		logger.LogDebug("<<< Exiting SettingValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -17,7 +17,10 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
 
     public CustomNumberFormatter(OrderSettings orderSettings)
     {
+		logger.LogDebug(">>> Entering CustomNumberFormatter(orderSettings={OrderSettings})", orderSettings);
         _orderSettings = orderSettings;
+		logger.LogDebug("<<< Exiting CustomNumberFormatter(orderSettings={OrderSettings})", orderSettings);
+		logger.LogDebug("CustomNumberFormatter(orderSettings={OrderSettings}): _orderSettings → {_orderSettings}", orderSettings, _orderSettings);
     }
 
     #endregion
@@ -31,11 +34,13 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
     /// <returns>Custom number</returns>
     public virtual string GenerateReturnRequestCustomNumber(ReturnRequest returnRequest)
     {
+		logger.LogDebug(">>> Entering GenerateReturnRequestCustomNumber(returnRequest={ReturnRequest})", returnRequest);
         string customNumber;
 
         if (string.IsNullOrEmpty(_orderSettings.ReturnRequestNumberMask))
         {
             customNumber = returnRequest.Id.ToString();
+			logger.LogDebug("GenerateReturnRequestCustomNumber(returnRequest={ReturnRequest}): customNumber → {CustomNumber}", returnRequest, customNumber);
         }
         else
         {
@@ -62,6 +67,7 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
             //    customNumber = customNumber.Insert(0, $"{returnRequest.Id}-");
         }
 
+		logger.LogDebug("<<< Exiting GenerateReturnRequestCustomNumber(returnRequest={ReturnRequest})", returnRequest);
         return customNumber;
     }
 
@@ -72,6 +78,7 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
     /// <returns>Custom number</returns>
     public virtual string GenerateOrderCustomNumber(Order order)
     {
+		logger.LogDebug(">>> Entering GenerateOrderCustomNumber(order={Order})", order);
         if (string.IsNullOrEmpty(_orderSettings.CustomOrderNumberMask))
             return order.Id.ToString();
 
@@ -97,6 +104,7 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
         //else
         //    customNumber = customNumber.Insert(0, $"{order.Id}-");
 
+		logger.LogDebug("<<< Exiting GenerateOrderCustomNumber(order={Order})", order);
         return customNumber;
     }
 

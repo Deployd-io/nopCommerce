@@ -18,7 +18,10 @@ public partial class ClearCacheTask : IScheduleTask
 
     public ClearCacheTask(IStaticCacheManager staticCacheManager)
     {
+		logger.LogDebug(">>> Entering ClearCacheTask(staticCacheManager={StaticCacheManager})", staticCacheManager);
         _staticCacheManager = staticCacheManager;
+		logger.LogDebug("<<< Exiting ClearCacheTask(staticCacheManager={StaticCacheManager})", staticCacheManager);
+		logger.LogDebug("ClearCacheTask(staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -30,7 +33,9 @@ public partial class ClearCacheTask : IScheduleTask
     /// </summary>
     public virtual async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         await _staticCacheManager.ClearAsync();
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

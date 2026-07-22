@@ -19,6 +19,7 @@ public class AddIndexesMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         const string databaseType = "sqlserver";
 
         if (!Schema.Table(nameof(ActivityLog)).Index("IX_ActivityLog_CustomerId").Exists())
@@ -156,5 +157,6 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .OnColumn(nameof(ForumTopic.Subject)).Ascending()
                 .WithOptions().NonClustered();
 
+	logger.LogDebug("<<< Exiting Up()");
     }
 }

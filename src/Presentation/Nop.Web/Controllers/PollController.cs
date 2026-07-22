@@ -47,21 +47,26 @@ public partial class PollController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> Vote(int pollAnswerId)
     {
+		logger.LogDebug(">>> Entering Vote(pollAnswerId={PollAnswerId})", pollAnswerId);
         var pollAnswer = await _pollService.GetPollAnswerByIdAsync(pollAnswerId);
         if (pollAnswer == null)
+			logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): pollAnswer → {PollAnswer}", pollAnswerId, pollAnswer);
             return Json(new { error = "No poll answer found with the specified id" });
 
         var poll = await _pollService.GetPollByIdAsync(pollAnswer.PollId);
 
+		logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): poll → {Poll}", pollAnswerId, poll);
         if (!poll.Published || !await _storeMappingService.AuthorizeAsync(poll))
             return Json(new { error = "Poll is not available" });
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (await _customerService.IsGuestAsync(customer) && !poll.AllowGuestsToVote)
+			logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): customer → {Customer}", pollAnswerId, customer);
             return Json(new { error = await _localizationService.GetResourceAsync("Polls.OnlyRegisteredUsersVote") });
 
         var alreadyVoted = await _pollService.AlreadyVotedAsync(poll.Id, customer.Id);
         if (!alreadyVoted)
+		logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): alreadyVoted → {AlreadyVoted}", pollAnswerId, alreadyVoted);
         {
             //vote
             await _pollService.InsertPollVotingRecordAsync(new PollVotingRecord
@@ -77,6 +82,7 @@ public partial class PollController : BasePublicController
             await _pollService.UpdatePollAsync(poll);
         }
 
+		logger.LogDebug("<<< Exiting Vote(pollAnswerId={PollAnswerId})", pollAnswerId);
         return Json(new
         {
             html = await RenderPartialViewToStringAsync("_Poll", await _pollModelFactory.PreparePollModelAsync(poll, true)),

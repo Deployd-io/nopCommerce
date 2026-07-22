@@ -19,7 +19,10 @@ public partial class ResetLicenseCheckTask : IScheduleTask
 
     public ResetLicenseCheckTask(ISettingService settingService)
     {
+		logger.LogDebug(">>> Entering ResetLicenseCheckTask(settingService={SettingService})", settingService);
         _settingService = settingService;
+		logger.LogDebug("<<< Exiting ResetLicenseCheckTask(settingService={SettingService})", settingService);
+		logger.LogDebug("ResetLicenseCheckTask(settingService={SettingService}): _settingService → {_settingService}", settingService, _settingService);
     }
 
     #endregion
@@ -32,7 +35,9 @@ public partial class ResetLicenseCheckTask : IScheduleTask
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         await _settingService.SetSettingAsync($"{nameof(AdminAreaSettings)}.{nameof(AdminAreaSettings.CheckLicense)}", true);
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

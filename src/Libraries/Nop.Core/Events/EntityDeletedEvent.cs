@@ -12,7 +12,10 @@ public partial class EntityDeletedEvent<T> where T : BaseEntity
     /// <param name="entity">Entity</param>
     public EntityDeletedEvent(T entity)
     {
+		logger.LogDebug(">>> Entering EntityDeletedEvent(entity={Entity})", entity);
         Entity = entity;
+		logger.LogDebug("<<< Exiting EntityDeletedEvent(entity={Entity})", entity);
+		logger.LogDebug("EntityDeletedEvent(entity={Entity}): Entity → {Entity1}", entity, Entity);
     }
 
     /// <summary>

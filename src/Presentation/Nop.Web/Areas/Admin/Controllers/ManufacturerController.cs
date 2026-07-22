@@ -133,15 +133,20 @@ public partial class ManufacturerController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerSearchModelAsync(new ManufacturerSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -152,6 +157,7 @@ public partial class ManufacturerController : BaseAdminController
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -162,9 +168,12 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(new ManufacturerModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -220,20 +229,25 @@ public partial class ManufacturerController : BaseAdminController
         model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(id);
         if (manufacturer == null || manufacturer.Deleted)
+			logger.LogDebug("Edit(id={Id}): manufacturer → {Manufacturer}", id, manufacturer);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(null, manufacturer);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -310,6 +324,7 @@ public partial class ManufacturerController : BaseAdminController
         model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(model, manufacturer, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -317,20 +332,25 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PreTranslate(int itemId)
     {
+		logger.LogDebug(">>> Entering PreTranslate(itemId={ItemId})", itemId);
         var translationModel = new TranslationModel();
 
+		logger.LogDebug("PreTranslate(itemId={ItemId}): translationModel → {TranslationModel}", itemId, translationModel);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(itemId);
         if (manufacturer == null || manufacturer.Deleted)
+			logger.LogDebug("PreTranslate(itemId={ItemId}): manufacturer → {Manufacturer}", itemId, manufacturer);
             return Json(translationModel);
 
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(null, manufacturer);
 
+		logger.LogDebug("PreTranslate(itemId={ItemId}): model → {Model}", itemId, model);
         translationModel = await _translationModelFactory.PrepareTranslationModelAsync(model,
             (nameof(ManufacturerLocalizedModel.Name), false),
             (nameof(ManufacturerLocalizedModel.Description), true));
 
+		logger.LogDebug("<<< Exiting PreTranslate(itemId={ItemId})", itemId);
         return Json(translationModel);
     }
 
@@ -338,9 +358,11 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(id);
         if (manufacturer == null)
+			logger.LogDebug("Delete(id={Id}): manufacturer → {Manufacturer}", id, manufacturer);
             return RedirectToAction("List");
 
         await _manufacturerService.DeleteManufacturerAsync(manufacturer);
@@ -351,6 +373,7 @@ public partial class ManufacturerController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Manufacturers.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -358,16 +381,20 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var manufacturers = await _manufacturerService.GetManufacturersByIdsAsync(selectedIds.ToArray());
         await _manufacturerService.DeleteManufacturersAsync(manufacturers);
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): manufacturers → {Manufacturers}", selectedIds, manufacturers);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteManufacturer");
         await _customerActivityService.InsertActivitiesAsync("DeleteManufacturer", manufacturers, manufacturer => string.Format(activityLogFormat, manufacturer.Name));
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -378,15 +405,20 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXml()
     {
+		logger.LogDebug(">>> Entering ExportXml()");
         try
         {
             var manufacturers = await _manufacturerService.GetAllManufacturersAsync(showHidden: true);
             var xml = await _exportManager.ExportManufacturersToXmlAsync(manufacturers);
+			logger.LogDebug("ExportXml(): manufacturers → {Manufacturers}", manufacturers);
+			logger.LogDebug("ExportXml(): xml → {Xml}", xml);
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", "manufacturers.xml");
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ExportXml(): {Arg0}", ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ExportXml()");
             return RedirectToAction("List");
         }
     }
@@ -394,15 +426,19 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXlsx()
     {
+		logger.LogDebug(">>> Entering ExportXlsx()");
         try
         {
             var bytes = await _exportManager.ExportManufacturersToXlsxAsync((await _manufacturerService.GetAllManufacturersAsync(showHidden: true)).Where(p => !p.Deleted).ToList());
 
+			logger.LogDebug("ExportXlsx(): bytes → {Bytes}", bytes);
             return File(bytes, MimeTypes.TextXlsx, "manufacturers.xlsx");
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ExportXlsx(): {Arg0}", ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ExportXlsx()");
             return RedirectToAction("List");
         }
     }
@@ -411,6 +447,7 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile)
     {
+		logger.LogDebug(">>> Entering ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
         //a vendor cannot import manufacturers
         if (await _workContext.GetCurrentVendorAsync() != null)
             return AccessDeniedView();
@@ -432,7 +469,9 @@ public partial class ManufacturerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ImportFromXlsx(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }
@@ -445,6 +484,7 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_VIEW)]
     public virtual async Task<IActionResult> ProductList(ManufacturerProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductList(searchModel={SearchModel})", searchModel);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(searchModel.ManufacturerId)
             ?? throw new ArgumentException("No manufacturer found with the specified id");
@@ -452,6 +492,8 @@ public partial class ManufacturerController : BaseAdminController
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerProductListModelAsync(searchModel, manufacturer);
 
+		logger.LogDebug("ProductList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -474,6 +516,7 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductDelete(int id)
     {
+	logger.LogDebug(">>> Entering ProductDelete(id={Id})", id);
 
         //try to get a product manufacturer with the specified id
         var productManufacturer = await _manufacturerService.GetProductManufacturerByIdAsync(id)
@@ -481,15 +524,19 @@ public partial class ManufacturerController : BaseAdminController
 
         await _manufacturerService.DeleteProductManufacturerAsync(productManufacturer);
 
+		logger.LogDebug("<<< Exiting ProductDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopup(int manufacturerId)
     {
+		logger.LogDebug(">>> Entering ProductAddPopup(manufacturerId={ManufacturerId})", manufacturerId);
         //prepare model
         var model = await _manufacturerModelFactory.PrepareAddProductToManufacturerSearchModelAsync(new AddProductToManufacturerSearchModel());
 
+		logger.LogDebug("ProductAddPopup(manufacturerId={ManufacturerId}): model → {Model}", manufacturerId, model);
+		logger.LogDebug("<<< Exiting ProductAddPopup(manufacturerId={ManufacturerId})", manufacturerId);
         return View(model);
     }
 
@@ -497,9 +544,12 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopupList(AddProductToManufacturerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _manufacturerModelFactory.PrepareAddProductToManufacturerListModelAsync(searchModel);
 
+		logger.LogDebug("ProductAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

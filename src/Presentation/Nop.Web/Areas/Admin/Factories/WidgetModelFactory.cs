@@ -41,11 +41,13 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     /// </returns>
     public virtual Task<WidgetSearchModel> PrepareWidgetSearchModelAsync(WidgetSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareWidgetSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareWidgetSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -59,6 +61,7 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     /// </returns>
     public virtual async Task<WidgetListModel> PrepareWidgetListModelAsync(WidgetSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareWidgetListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get widgets
@@ -74,6 +77,7 @@ public partial class WidgetModelFactory : IWidgetModelFactory
                 //fill in model values from the entity
                 var widgetMethodModel = widget.ToPluginModel<WidgetModel>();
 
+				logger.LogDebug("PrepareWidgetListModelAsync(searchModel={SearchModel}): widgetMethodModel → {WidgetMethodModel}", searchModel, widgetMethodModel);
                 //fill in additional values (not existing in the entity)
                 widgetMethodModel.IsActive = _widgetPluginManager.IsPluginActive(widget);
                 widgetMethodModel.ConfigurationUrl = widget.GetConfigurationPageUrl();
@@ -82,6 +86,7 @@ public partial class WidgetModelFactory : IWidgetModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareWidgetListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -49,6 +49,8 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             PublicWidgetZones.HeadHtmlTag
@@ -60,6 +62,8 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(GoogleAnalyticsDefaults.ConfigurationRouteName);
     }
 
@@ -70,9 +74,11 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         ArgumentNullException.ThrowIfNull(widgetZone);
 
         if (widgetZone.Equals(PublicWidgetZones.HeadHtmlTag))
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
             return typeof(WidgetsGoogleAnalyticsViewComponent);
 
         return null;
@@ -84,12 +90,14 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         var settings = new GoogleAnalyticsSettings
         {
             GoogleId = "G-XXXXXXXXXX",
             TrackingScript = @"<!-- Global site tag (gtag.js) - Google Analytics -->
                 <script async src='https://www.googletagmanager.com/gtag/js?id={GOOGLEID}'></script>
                 <script>
+				logger.LogDebug("<<< Exiting InstallAsync()");
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
@@ -134,6 +142,7 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         if (_widgetSettings.ActiveWidgetSystemNames.Contains(GoogleAnalyticsDefaults.SystemName))
         {
@@ -146,6 +155,7 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Widgets.GoogleAnalytics");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

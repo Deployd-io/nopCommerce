@@ -51,6 +51,8 @@ public partial class CaptchaHttpClient
     /// </returns>
     public virtual async Task<CaptchaResponse> ValidateCaptchaAsync(string responseValue)
     {
+		logger.LogDebug(">>> Entering ValidateCaptchaAsync(responseValue={ResponseValue})", responseValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare URL to request
         var url = string.Format(NopSecurityDefaults.RecaptchaValidationPath,
             _captchaSettings.ReCaptchaPrivateKey,
@@ -59,6 +61,9 @@ public partial class CaptchaHttpClient
 
         //get response
         var response = await _httpClient.GetStringAsync(url);
+		logger.LogInformation("ValidateCaptchaAsync(responseValue)={ResponseValue}: external service call {Url} took {Arg2} ms", responseValue, url, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("ValidateCaptchaAsync(responseValue={ResponseValue}): response → {Response}", responseValue, response);
+		logger.LogDebug("<<< Exiting ValidateCaptchaAsync(responseValue={ResponseValue})", responseValue);
         return JsonConvert.DeserializeObject<CaptchaResponse>(response);
 
     }

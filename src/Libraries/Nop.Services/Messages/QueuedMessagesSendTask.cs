@@ -40,6 +40,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
     /// </summary>
     public virtual async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         var maxTries = 3;
         var queuedEmails = (await _queuedEmailService.SearchEmailsAsync(null, null, null, null,
             true, true, maxTries, false, 0, int.MaxValue)).GroupBy(qe => qe.EmailAccountId);
@@ -48,6 +49,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
         {
             var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(item.Key);
 
+			logger.LogDebug("ExecuteAsync(): emailAccount → {EmailAccount}", emailAccount);
             foreach (var queuedEmail in item.Take(emailAccount.MaxNumberOfEmails))
             {
                 var bcc = string.IsNullOrWhiteSpace(queuedEmail.Bcc)
@@ -75,6 +77,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
                         queuedEmail.AttachedDownloadId);
 
                     queuedEmail.SentOnUtc = DateTime.UtcNow;
+					logger.LogDebug("ExecuteAsync(): queuedEmail.SentOnUtc → {Arg0}", queuedEmail.SentOnUtc);
                 }
                 catch (Exception exc)
                 {
@@ -87,6 +90,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
                 }
             }
         }
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

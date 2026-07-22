@@ -10,8 +10,10 @@ public partial class ReturnRequestActionValidator : BaseNopValidator<ReturnReque
 {
     public ReturnRequestActionValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ReturnRequestActionValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.Order.ReturnRequestActions.Name.Required"));
 
         SetDatabaseValidationRules<ReturnRequestAction>();
+		logger.LogDebug("<<< Exiting ReturnRequestActionValidator(localizationService={LocalizationService})", localizationService);
     }
 }

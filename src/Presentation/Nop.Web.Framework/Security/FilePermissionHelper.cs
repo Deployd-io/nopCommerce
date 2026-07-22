@@ -18,6 +18,7 @@ public static class FilePermissionHelper
 
     private static bool CheckUserFilePermissions(int userFilePermission, bool checkRead, bool checkWrite, bool checkModify, bool checkDelete)
     {
+		logger.LogDebug(">>> Entering CheckUserFilePermissions(userFilePermission={UserFilePermission},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", userFilePermission, checkRead, checkWrite, checkModify, checkDelete);
         //read permissions
         var readPermissions = new[] { 5, 6, 7 };
 
@@ -25,6 +26,7 @@ public static class FilePermissionHelper
         var writePermissions = new[] { 2, 3, 6, 7 };
 
         if (checkRead && readPermissions.Contains(userFilePermission))
+		logger.LogDebug("<<< Exiting CheckUserFilePermissions(userFilePermission={UserFilePermission},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", userFilePermission, checkRead, checkWrite, checkModify, checkDelete);
             return true;
 
         return (checkWrite || checkModify || checkDelete) && writePermissions.Contains(userFilePermission);
@@ -76,6 +78,8 @@ public static class FilePermissionHelper
     [SupportedOSPlatform("windows")]
     private static bool CheckAccessRuleLocal(FileSystemAccessRule fileSystemAccessRule, FileSystemRights fileSystemRights)
     {
+		logger.LogDebug(">>> Entering CheckAccessRuleLocal(fileSystemAccessRule={FileSystemAccessRule},fileSystemRights={FileSystemRights})", fileSystemAccessRule, fileSystemRights);
+		logger.LogDebug("<<< Exiting CheckAccessRuleLocal(fileSystemAccessRule={FileSystemAccessRule},fileSystemRights={FileSystemRights})", fileSystemAccessRule, fileSystemRights);
         return (fileSystemRights & fileSystemAccessRule.FileSystemRights) == fileSystemRights;
     }
 
@@ -92,12 +96,15 @@ public static class FilePermissionHelper
     [SupportedOSPlatform("windows")]
     private static bool CheckPermissionsInWindows(INopFileProvider fileProvider, string path, bool checkRead, bool checkWrite, bool checkModify, bool checkDelete)
     {
+		logger.LogDebug(">>> Entering CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete);
         var permissionsAreGranted = true;
 
+		logger.LogDebug("CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): permissionsAreGranted → {PermissionsAreGranted}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, permissionsAreGranted);
         try
         {
             var current = WindowsIdentity.GetCurrent();
 
+			logger.LogDebug("CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): current → {Current}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, current);
             var readIsDeny = false;
             var writeIsDeny = false;
             var modifyIsDeny = false;
@@ -105,8 +112,12 @@ public static class FilePermissionHelper
 
             var readIsAllow = false;
             var writeIsAllow = false;
+			logger.LogDebug("CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): readIsAllow → {ReadIsAllow}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, readIsAllow);
+			logger.LogDebug("CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): writeIsAllow → {WriteIsAllow}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, writeIsAllow);
             var modifyIsAllow = false;
             var deleteIsAllow = false;
+			logger.LogDebug("CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): modifyIsAllow → {ModifyIsAllow}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, modifyIsAllow);
+			logger.LogDebug("CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): deleteIsAllow → {DeleteIsAllow}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, deleteIsAllow);
 
             var rules = fileProvider.GetAccessControl(path).GetAccessRules(true, true, typeof(SecurityIdentifier))
                 .Cast<FileSystemAccessRule>()
@@ -147,6 +158,7 @@ public static class FilePermissionHelper
         }
         catch (IOException)
         {
+			logger.LogError("Exception in CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): {Arg6}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, ex.Message);
             return false;
         }
         catch
@@ -154,6 +166,7 @@ public static class FilePermissionHelper
             return true;
         }
 
+		logger.LogDebug("<<< Exiting CheckPermissionsInWindows(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete);
         return permissionsAreGranted;
     }
 
@@ -168,6 +181,7 @@ public static class FilePermissionHelper
     /// <returns>Result</returns>
     private static bool CheckPermissionsInUnix(string path, bool checkRead, bool checkWrite, bool checkModify, bool checkDelete)
     {
+		logger.LogDebug(">>> Entering CheckPermissionsInUnix(path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", path, checkRead, checkWrite, checkModify, checkDelete);
         //MacOSX file permission check differs slightly from linux
         IList<string> arguments = RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
             ? ["-f", "%A %u %g", path]
@@ -193,10 +207,13 @@ public static class FilePermissionHelper
             //where 555 - file permissions, 1111 - file owner ID, 2222 - file group ID
             var result = process.StandardOutput.ReadToEnd().Trim('\n').Split(' ');
 
+			logger.LogDebug("CheckPermissionsInUnix(path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): result → {Result}", path, checkRead, checkWrite, checkModify, checkDelete, result);
             var filePermissions = result[0].Select(p => (int)char.GetNumericValue(p)).ToList();
             var isOwner = CurrentOSUser.UserId == result[1];
+			logger.LogDebug("CheckPermissionsInUnix(path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): filePermissions → {FilePermissions}", path, checkRead, checkWrite, checkModify, checkDelete, filePermissions);
             var isInGroup = CurrentOSUser.Groups.Contains(result[2]);
 
+			logger.LogDebug("CheckPermissionsInUnix(path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): isInGroup → {IsInGroup}", path, checkRead, checkWrite, checkModify, checkDelete, isInGroup);
             var filePermission =
                 isOwner ? filePermissions[0] : (isInGroup ? filePermissions[1] : filePermissions[2]);
 
@@ -204,6 +221,8 @@ public static class FilePermissionHelper
         }
         catch
         {
+			logger.LogError("Exception in CheckPermissionsInUnix(path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): {Arg5}", path, checkRead, checkWrite, checkModify, checkDelete, ex.Message);
+			logger.LogDebug("<<< Exiting CheckPermissionsInUnix(path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", path, checkRead, checkWrite, checkModify, checkDelete);
             return false;
         }
     }
@@ -224,11 +243,13 @@ public static class FilePermissionHelper
     /// <returns>Result</returns>
     public static bool CheckPermissions(this INopFileProvider fileProvider, string path, bool checkRead, bool checkWrite, bool checkModify, bool checkDelete)
     {
+		logger.LogDebug(">>> Entering CheckPermissions(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete);
         if (!(fileProvider.FileExists(path) || fileProvider.DirectoryExists(path)))
             return true;
 
         var result = false;
 
+		logger.LogDebug("CheckPermissions(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete}): result → {Result}", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete, result);
         switch (Environment.OSVersion.Platform)
         {
             case PlatformID.Win32NT:
@@ -240,6 +261,7 @@ public static class FilePermissionHelper
                 break;
         }
 
+		logger.LogDebug("<<< Exiting CheckPermissions(fileProvider={FileProvider},path={Path},checkRead={CheckRead},checkWrite={CheckWrite},checkModify={CheckModify},checkDelete={CheckDelete})", fileProvider, path, checkRead, checkWrite, checkModify, checkDelete);
         return result;
     }
 
@@ -249,8 +271,10 @@ public static class FilePermissionHelper
     /// <returns>Result</returns>
     public static IEnumerable<string> GetDirectoriesWrite(this INopFileProvider fileProvider)
     {
+		logger.LogDebug(">>> Entering GetDirectoriesWrite(fileProvider={FileProvider})", fileProvider);
         var rootDir = fileProvider.MapPath("~/");
 
+		logger.LogDebug("GetDirectoriesWrite(fileProvider={FileProvider}): rootDir → {RootDir}", fileProvider, rootDir);
         var dirsToCheck = new List<string>
         {
             fileProvider.Combine(rootDir, "App_Data"),
@@ -270,6 +294,7 @@ public static class FilePermissionHelper
             fileProvider.Combine(rootDir, @"wwwroot\sitemaps")
         };
 
+		logger.LogDebug("<<< Exiting GetDirectoriesWrite(fileProvider={FileProvider})", fileProvider);
         return dirsToCheck;
     }
 
@@ -279,6 +304,8 @@ public static class FilePermissionHelper
     /// <returns>Result</returns>
     public static IEnumerable<string> GetFilesWrite(this INopFileProvider fileProvider)
     {
+		logger.LogDebug(">>> Entering GetFilesWrite(fileProvider={FileProvider})", fileProvider);
+		logger.LogDebug("<<< Exiting GetFilesWrite(fileProvider={FileProvider})", fileProvider);
         return new List<string>
         {
             fileProvider.MapPath(NopPluginDefaults.PluginsInfoFilePath),

@@ -13,8 +13,12 @@ public partial class ExternalAuthenticationClaim
     /// <param name="value">Value</param>
     public ExternalAuthenticationClaim(string type, string value)
     {
+		logger.LogDebug(">>> Entering ExternalAuthenticationClaim(type={Type},value={Value})", type, value);
         Type = type;
         Value = value;
+		logger.LogDebug("<<< Exiting ExternalAuthenticationClaim(type={Type},value={Value})", type, value);
+		logger.LogDebug("ExternalAuthenticationClaim(type={Type},value={Value}): Value → {Value1}", type, value, Value);
+		logger.LogDebug("ExternalAuthenticationClaim(type={Type},value={Value}): Type → {Type1}", type, value, Type);
     }
 
     /// <summary>

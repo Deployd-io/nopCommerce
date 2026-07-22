@@ -27,20 +27,25 @@ public partial class ResolveLinksHelper
     /// </summary>
     protected static string ShortenUrl(string url, int max)
     {
+		logger.LogDebug(">>> Entering ShortenUrl(url={Url},max={Max})", url, max);
         if (url.Length <= max)
             return url;
 
         // Remove the protocol
         var startIndex = url.IndexOf("://", StringComparison.InvariantCultureIgnoreCase);
         if (startIndex > -1)
+			logger.LogDebug("ShortenUrl(url={Url},max={Max}): startIndex → {StartIndex}", url, max, startIndex);
             url = url[(startIndex + 3)..];
 
+		logger.LogDebug("ShortenUrl(url={Url},max={Max}): url → {Url1}", url, max, url);
         if (url.Length <= max)
             return url;
 
         // Compress folder structure
         var firstIndex = url.IndexOf("/", StringComparison.InvariantCultureIgnoreCase) + 1;
         var lastIndex = url.LastIndexOf("/", StringComparison.InvariantCultureIgnoreCase);
+		logger.LogDebug("ShortenUrl(url={Url},max={Max}): firstIndex → {FirstIndex}", url, max, firstIndex);
+		logger.LogDebug("ShortenUrl(url={Url},max={Max}): lastIndex → {LastIndex}", url, max, lastIndex);
         if (firstIndex < lastIndex)
         {
             url = url.Remove(firstIndex, lastIndex - firstIndex);
@@ -53,6 +58,7 @@ public partial class ResolveLinksHelper
         // Remove URL parameters
         var queryIndex = url.IndexOf("?", StringComparison.InvariantCultureIgnoreCase);
         if (queryIndex > -1)
+			logger.LogDebug("ShortenUrl(url={Url},max={Max}): queryIndex → {QueryIndex}", url, max, queryIndex);
             url = url[0..queryIndex];
 
         if (url.Length <= max)
@@ -61,6 +67,7 @@ public partial class ResolveLinksHelper
         // Remove URL fragment
         var fragmentIndex = url.IndexOf("#", StringComparison.InvariantCultureIgnoreCase);
         if (fragmentIndex > -1)
+			logger.LogDebug("ShortenUrl(url={Url},max={Max}): fragmentIndex → {FragmentIndex}", url, max, fragmentIndex);
             url = url[0..fragmentIndex];
 
         if (url.Length <= max)
@@ -78,6 +85,7 @@ public partial class ResolveLinksHelper
         if (page.Length > length)
             url = url.Replace(page, "..." + page[length..]);
 
+		logger.LogDebug("<<< Exiting ShortenUrl(url={Url},max={Max})", url, max);
         return url;
     }
 
@@ -92,6 +100,7 @@ public partial class ResolveLinksHelper
     /// <returns>Formatted text</returns>
     public static string FormatText(string text)
     {
+		logger.LogDebug(">>> Entering FormatText(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
@@ -104,6 +113,7 @@ public partial class ResolveLinksHelper
                     : string.Format(info, LINK, string.Empty, match.Value, ShortenUrl(match.Value, MAX_LENGTH)));
         }
 
+		logger.LogDebug("<<< Exiting FormatText(text={Text})", text);
         return text;
     }
 

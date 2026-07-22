@@ -11,6 +11,7 @@ public partial class ManufacturerValidator : BaseNopValidator<ManufacturerModel>
 {
     public ManufacturerValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ManufacturerValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Manufacturers.Fields.Name.Required"));
         RuleFor(x => x.PageSizeOptions).Must(ValidatorUtilities.PageSizeOptionsValidator).WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Manufacturers.Fields.PageSizeOptions.ShouldHaveUniqueItems"));
         RuleFor(x => x.PageSize).Must((x, context) =>
@@ -34,5 +35,6 @@ public partial class ManufacturerValidator : BaseNopValidator<ManufacturerModel>
             .When(x => x.PriceRangeFiltering && x.ManuallyPriceRange);
 
         SetDatabaseValidationRules<Manufacturer>();
+		logger.LogDebug("<<< Exiting ManufacturerValidator(localizationService={LocalizationService})", localizationService);
     }
 }

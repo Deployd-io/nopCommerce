@@ -32,9 +32,14 @@ public partial class NopLabelTagHelper : TagHelper
 
     public NopLabelTagHelper(IHtmlGenerator generator, ILocalizationService localizationService, IWorkContext workContext)
     {
+		logger.LogDebug(">>> Entering NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext})", generator, localizationService, workContext);
         Generator = generator;
         _localizationService = localizationService;
+		logger.LogDebug("NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext}): _localizationService → {_localizationService}", generator, localizationService, workContext, _localizationService);
+		logger.LogDebug("NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext}): Generator → {Generator1}", generator, localizationService, workContext, Generator);
         _workContext = workContext;
+		logger.LogDebug("<<< Exiting NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext})", generator, localizationService, workContext);
+		logger.LogDebug("NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext}): _workContext → {_workContext}", generator, localizationService, workContext, _workContext);
     }
 
     #endregion
@@ -49,11 +54,13 @@ public partial class NopLabelTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(output);
 
         string resourceValue = null;
         string resourceName = null;
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): resourceValue → {ResourceValue}", context, output, resourceValue);
         var type = For.Metadata.ContainerType;
         var propertyName = For.Metadata.Name;
 
@@ -75,6 +82,8 @@ public partial class NopLabelTagHelper : TagHelper
         {
             //create a label wrapper
             output.TagName = "div";
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
             output.TagMode = TagMode.StartTagAndEndTag;
 
             //merge classes
@@ -91,6 +100,7 @@ public partial class NopLabelTagHelper : TagHelper
             {
                 var language = await _workContext.GetWorkingLanguageAsync();
                 var hintResource = await _localizationService
+					logger.LogDebug("ProcessAsync(context={Context},output={Output}): language → {Language}", context, output, language);
                     .GetResourceAsync($"{resourceName}.Hint", language.Id, returnEmptyIfNotFound: true, logIfNotFound: false);
 
                 if (!string.IsNullOrEmpty(hintResource))
@@ -100,6 +110,7 @@ public partial class NopLabelTagHelper : TagHelper
                 }
             }
         }
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

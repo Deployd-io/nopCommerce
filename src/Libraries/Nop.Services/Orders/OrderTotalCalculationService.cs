@@ -543,6 +543,8 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
                 foreach (var discount in shippingTotalDiscounts)
                     if (!_discountService.ContainsDiscount(updateOrderParameters.AppliedDiscounts, discount))
                         updateOrderParameters.AppliedDiscounts.Add(discount);
+						logger.LogDebug(">>> Entering IsFreeShippingAsync(cart={Cart},subTotal={SubTotal})", cart, subTotal);
+						logger.LogDebug("<<< Exiting IsFreeShippingAsync(cart={Cart},subTotal={SubTotal})", cart, subTotal);
             }
         }
         else
@@ -769,6 +771,8 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     protected virtual async Task<decimal> GetShoppingCartAdditionalShippingChargeAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering GetShoppingCartAdditionalShippingChargeAsync(cart={Cart})", cart);
+		logger.LogDebug("<<< Exiting GetShoppingCartAdditionalShippingChargeAsync(cart={Cart})", cart);
         return await cart.SumAwaitAsync(async shoppingCartItem => await _shippingService.GetAdditionalShippingChargeAsync(shoppingCartItem));
     }
 
@@ -779,12 +783,15 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// <returns>Converted value</returns>
     protected virtual int ConvertAmountToRewardPoints(decimal amount)
     {
+		logger.LogDebug(">>> Entering ConvertAmountToRewardPoints(amount={Amount})", amount);
         var result = 0;
         if (amount <= 0)
+			logger.LogDebug("ConvertAmountToRewardPoints(amount={Amount}): result → {Result}", amount, result);
             return 0;
 
         if (_rewardPointsSettings.ExchangeRate > 0)
             result = (int)Math.Ceiling(amount / _rewardPointsSettings.ExchangeRate);
+		logger.LogDebug("<<< Exiting ConvertAmountToRewardPoints(amount={Amount})", amount);
         return result;
     }
 
@@ -973,6 +980,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderTotalsAsync(UpdateOrderParameters updateOrderParameters, IList<ShoppingCartItem> restoredCart)
     {
+		logger.LogDebug(">>> Entering UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters},restoredCart={RestoredCart})", updateOrderParameters, restoredCart);
         //sub total
         var (subTotalExclTax, subTotalInclTax, subTotalTaxRates, discountAmountExclTax) = await UpdateSubTotalAsync(updateOrderParameters, restoredCart);
 
@@ -982,8 +990,10 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
         //tax rates
         var taxTotal = await UpdateTaxRatesAsync(subTotalTaxRates, shippingTotalInclTax, shippingTotalExclTax, shippingTaxRate, updateOrderParameters.UpdatedOrder);
 
+		logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters},restoredCart={RestoredCart}): taxTotal → {TaxTotal}", updateOrderParameters, restoredCart, taxTotal);
         //total
         await UpdateTotalAsync(updateOrderParameters, subTotalExclTax, discountAmountExclTax, shippingTotalExclTax, taxTotal);
+		logger.LogDebug("<<< Exiting UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters},restoredCart={RestoredCart})", updateOrderParameters, restoredCart);
     }
 
     /// <summary>
@@ -997,9 +1007,11 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<bool> IsFreeShippingAsync(IList<ShoppingCartItem> cart, decimal? subTotal = null)
     {
+		logger.LogDebug(">>> Entering IsFreeShippingAsync(cart={Cart},subTotal={SubTotal})", cart, subTotal);
         //check whether customer is in a customer role with free shipping applied
         var customer = await _customerService.GetCustomerByIdAsync(cart.FirstOrDefault()?.CustomerId ?? 0);
 
+		logger.LogDebug("IsFreeShippingAsync(cart={Cart},subTotal={SubTotal}): customer → {Customer}", cart, subTotal, customer);
         if (customer != null && (await _customerService.GetCustomerRolesAsync(customer)).Any(role => role.FreeShipping))
             return true;
 
@@ -1076,7 +1088,10 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<decimal?> GetShoppingCartShippingTotalAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering GetShoppingCartShippingTotalAsync(cart={Cart})", cart);
         var includingTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+		logger.LogDebug("GetShoppingCartShippingTotalAsync(cart={Cart}): includingTax → {IncludingTax}", cart, includingTax);
+		logger.LogDebug("<<< Exiting GetShoppingCartShippingTotalAsync(cart={Cart})", cart);
         return (await GetShoppingCartShippingTotalAsync(cart, includingTax)).shippingTotal;
     }
 
@@ -1415,12 +1430,16 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<decimal> CalculatePaymentAdditionalFeeAsync(IList<ShoppingCartItem> cart, decimal fee, bool usePercentage)
     {
+		logger.LogDebug(">>> Entering CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage})", cart, fee, usePercentage);
         if (!usePercentage || fee <= 0)
             return fee;
 
         var orderTotalWithoutPaymentFee = (await GetShoppingCartTotalAsync(cart, usePaymentMethodAdditionalFee: false)).shoppingCartTotal ?? 0;
         var result = (decimal)((float)orderTotalWithoutPaymentFee * (float)fee / 100f);
+		logger.LogDebug("CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage}): orderTotalWithoutPaymentFee → {OrderTotalWithoutPaymentFee}", cart, fee, usePercentage, orderTotalWithoutPaymentFee);
+		logger.LogDebug("CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage}): result → {Result}", cart, fee, usePercentage, result);
 
+		logger.LogDebug("<<< Exiting CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage})", cart, fee, usePercentage);
         return result;
     }
 
@@ -1498,6 +1517,8 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
             return 0;
 
         var points = (int)Math.Truncate(amount / _rewardPointsSettings.PointsForPurchases_Amount) * _rewardPointsSettings.PointsForPurchases_Points;
+		logger.LogDebug("CalculateRewardPointsAsync(customer={Customer},amount={Amount}): points → {Points}", customer, amount, points);
+		logger.LogDebug("<<< Exiting CalculateRewardPointsAsync(customer={Customer},amount={Amount})", customer, amount);
         return points;
     }
 

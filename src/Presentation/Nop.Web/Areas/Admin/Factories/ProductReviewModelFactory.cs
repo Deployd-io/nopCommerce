@@ -77,6 +77,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
     /// </returns>
     public virtual async Task<ProductReviewSearchModel> PrepareProductReviewSearchModelAsync(ProductReviewSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductReviewSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -106,6 +107,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareProductReviewSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -119,6 +121,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
     /// </returns>
     public virtual async Task<ProductReviewListModel> PrepareProductReviewListModelAsync(ProductReviewSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductReviewListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter reviews
@@ -128,6 +131,8 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnTo.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var isApprovedOnly = searchModel.SearchApprovedId == 0 ? null : searchModel.SearchApprovedId == 1 ? true : (bool?)false;
         var vendor = await _workContext.GetCurrentVendorAsync();
+		logger.LogDebug("PrepareProductReviewListModelAsync(searchModel={SearchModel}): isApprovedOnly → {IsApprovedOnly}", searchModel, isApprovedOnly);
+		logger.LogDebug("PrepareProductReviewListModelAsync(searchModel={SearchModel}): vendor → {Vendor}", searchModel, vendor);
         var vendorId = vendor?.Id ?? 0;
 
         //get product reviews
@@ -150,6 +155,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
                 //fill in model values from the entity
                 var productReviewModel = productReview.ToModel<ProductReviewModel>();
 
+				logger.LogDebug("PrepareProductReviewListModelAsync(searchModel={SearchModel}): productReviewModel → {ProductReviewModel}", searchModel, productReviewModel);
                 //convert dates to the user time
                 productReviewModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(productReview.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -167,6 +173,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductReviewListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -259,6 +266,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
     /// </returns>
     public virtual async Task<ProductReviewReviewTypeMappingListModel> PrepareProductReviewReviewTypeMappingListModelAsync(ProductReviewReviewTypeMappingSearchModel searchModel, ProductReview productReview)
     {
+		logger.LogDebug(">>> Entering PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview})", searchModel, productReview);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(productReview);
@@ -279,14 +287,17 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
                 //fill in additional values (not existing in the entity)
                 var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(productReviewReviewTypeMapping.ReviewTypeId);
 
+				logger.LogDebug("PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview}): reviewType → {ReviewType}", searchModel, productReview, reviewType);
                 productReviewReviewTypeMappingModel.Name = await _localizationService.GetLocalizedAsync(reviewType, entity => entity.Name);
                 productReviewReviewTypeMappingModel.Description = await _localizationService.GetLocalizedAsync(reviewType, entity => entity.Description);
                 productReviewReviewTypeMappingModel.VisibleToAllCustomers = reviewType.VisibleToAllCustomers;
+				logger.LogDebug("PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview}): productReviewReviewTypeMappingModel.VisibleToAllCustomers → {Arg2}", searchModel, productReview, productReviewReviewTypeMappingModel.VisibleToAllCustomers);
 
                 return productReviewReviewTypeMappingModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview})", searchModel, productReview);
         return model;
     }
 

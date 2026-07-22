@@ -37,10 +37,12 @@ public class AttributeParserTests : BaseNopTest
 
     protected void PrepareTestData(Type attributeType)
     {
+		logger.LogDebug(">>> Entering PrepareTestData(attributeType={AttributeType})", attributeType);
         _attributesXml = $"<Attributes><{attributeType.Name} ID=\"1\"><{attributeType.Name}Value><Value>1</Value></{attributeType.Name}Value></{attributeType.Name}><{attributeType.Name} ID=\"2\"><{attributeType.Name}Value><Value>2</Value></{attributeType.Name}Value></{attributeType.Name}></Attributes>";
 
         if (attributeType == typeof(CustomerAttribute))
             _parser = GetService<IAttributeParser<CustomerAttribute, CustomerAttributeValue>>();
+			logger.LogDebug("PrepareTestData(attributeType={AttributeType}): _parser → {_parser}", attributeType, _parser);
 
         if (attributeType == typeof(VendorAttribute))
             _parser = GetService<IAttributeParser<VendorAttribute, VendorAttributeValue>>();
@@ -50,19 +52,26 @@ public class AttributeParserTests : BaseNopTest
 
         if (attributeType == typeof(CheckoutAttribute))
             _parser = GetService<IAttributeParser<CheckoutAttribute, CheckoutAttributeValue>>();
+			logger.LogDebug("<<< Exiting PrepareTestData(attributeType={AttributeType})", attributeType);
     }
 
 
     [OneTimeSetUp]
     public async Task SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _xmlDoc = new XmlDocument();
 
+		logger.LogDebug("SetUp(): _xmlDoc → {_xmlDoc}", _xmlDoc);
         _customerAttributeService = GetService<IAttributeService<CustomerAttribute, CustomerAttributeValue>>();
+		logger.LogDebug("SetUp(): _customerAttributeService → {_customerAttributeService}", _customerAttributeService);
         _vendorAttributeService = GetService<IAttributeService<VendorAttribute, VendorAttributeValue>>();
         _addressAttributeService = GetService<IAttributeService<AddressAttribute, AddressAttributeValue>>();
+		logger.LogDebug("SetUp(): _vendorAttributeService → {_vendorAttributeService}", _vendorAttributeService);
+		logger.LogDebug("SetUp(): _addressAttributeService → {_addressAttributeService}", _addressAttributeService);
         _checkoutAttributeService = GetService<IAttributeService<CheckoutAttribute, CheckoutAttributeValue>>();
 
+		logger.LogDebug("SetUp(): _checkoutAttributeService → {_checkoutAttributeService}", _checkoutAttributeService);
         for (var i = 0; i < 2; i++)
         {
             BaseAttribute attribute = new CustomerAttribute
@@ -75,6 +84,7 @@ public class AttributeParserTests : BaseNopTest
 
             BaseAttributeValue attributeValue = new CustomerAttributeValue { AttributeId = attribute.Id, Name = "test" };
             await _customerAttributeService.InsertAttributeValueAsync((CustomerAttributeValue)attributeValue);
+			logger.LogDebug("SetUp(): attributeValue → {AttributeValue}", attributeValue);
             _customerAttributeValuesIds.Add(attributeValue.Id);
 
             attributeValue = new CustomerAttributeValue { AttributeId = attribute.Id, Name = "test" };
@@ -165,11 +175,13 @@ public class AttributeParserTests : BaseNopTest
             await _checkoutAttributeService.InsertAttributeAsync((CheckoutAttribute)attribute);
             _checkoutAttributeIds.Add(attribute.Id);
         }
+		logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
     public async Task TearDown()
     {
+		logger.LogDebug(">>> Entering TearDown()");
         foreach (var id in _customerAttributeValuesIds)
             await _customerAttributeService.DeleteAttributeValueAsync(new CustomerAttributeValue { Id = id });
 
@@ -194,6 +206,7 @@ public class AttributeParserTests : BaseNopTest
 
         foreach (var id in _checkoutAttributeIds)
             await _checkoutAttributeService.DeleteAttributeAsync(new CheckoutAttribute { Id = id });
+			logger.LogDebug("<<< Exiting TearDown()");
     }
 
     [Test]
@@ -204,13 +217,17 @@ public class AttributeParserTests : BaseNopTest
 
     public void CanRemoveAttribute(Type attributeType)
     {
+		logger.LogDebug(">>> Entering CanRemoveAttribute(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
 
         var xml = _parser.RemoveAttribute(_attributesXml, 1) as string;
         _xmlDoc.LoadXml(xml);
+		logger.LogDebug("CanRemoveAttribute(attributeType={AttributeType}): xml → {Xml}", attributeType, xml);
         var childNodes = _xmlDoc.SelectNodes($@"//Attributes/{attributeType.Name}");
 
+		logger.LogDebug("CanRemoveAttribute(attributeType={AttributeType}): childNodes → {ChildNodes}", attributeType, childNodes);
         childNodes?.Count.Should().Be(1);
+		logger.LogDebug("<<< Exiting CanRemoveAttribute(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -221,18 +238,23 @@ public class AttributeParserTests : BaseNopTest
 
     public async Task CanAddAttribute(Type attributeType)
     {
+		logger.LogDebug(">>> Entering CanAddAttribute(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
 
         var attribute = (await _parser.ParseAttributesAsync(_attributesXml))[1];
         (attribute as BaseAttribute).Should().NotBeNull();
+		logger.LogDebug("CanAddAttribute(attributeType={AttributeType}): attribute → {Attribute}", attributeType, attribute);
 
         var values = await _parser.ParseAttributeValuesAsync(_attributesXml);
         ((int)values.Count).Should().Be(2);
+		logger.LogDebug("CanAddAttribute(attributeType={AttributeType}): values → {Values}", attributeType, values);
 
         var xml = _parser.AddAttribute(_attributesXml, attribute, "3") as string;
 
+		logger.LogDebug("CanAddAttribute(attributeType={AttributeType}): xml → {Xml}", attributeType, xml);
         values = await _parser.ParseAttributeValuesAsync(xml);
         ((int)values.Count).Should().Be(3);
+		logger.LogDebug("<<< Exiting CanAddAttribute(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -242,11 +264,14 @@ public class AttributeParserTests : BaseNopTest
     [TestCase(typeof(CheckoutAttribute))]
     public void RemoveAttributeShouldReturnEmptyStringWhenAllChildrenIsRemoved(Type attributeType)
     {
+		logger.LogDebug(">>> Entering RemoveAttributeShouldReturnEmptyStringWhenAllChildrenIsRemoved(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
         var xml = _parser.RemoveAttribute(_attributesXml, 1) as string;
         xml = _parser.RemoveAttribute(xml, 2);
+		logger.LogDebug("RemoveAttributeShouldReturnEmptyStringWhenAllChildrenIsRemoved(attributeType={AttributeType}): xml → {Xml}", attributeType, xml);
 
         xml.Should().BeEmpty();
+		logger.LogDebug("<<< Exiting RemoveAttributeShouldReturnEmptyStringWhenAllChildrenIsRemoved(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -256,10 +281,13 @@ public class AttributeParserTests : BaseNopTest
     [TestCase(typeof(CheckoutAttribute))]
     public void RemoveAttributeShouldNotChangeXmlIfAttributeValueIdNotExists(Type attributeType)
     {
+		logger.LogDebug(">>> Entering RemoveAttributeShouldNotChangeXmlIfAttributeValueIdNotExists(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
         var xml = _parser.RemoveAttribute(_attributesXml, 3) as string;
 
+		logger.LogDebug("RemoveAttributeShouldNotChangeXmlIfAttributeValueIdNotExists(attributeType={AttributeType}): xml → {Xml}", attributeType, xml);
         xml?.Equals(_attributesXml).Should().BeTrue();
+		logger.LogDebug("<<< Exiting RemoveAttributeShouldNotChangeXmlIfAttributeValueIdNotExists(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -269,13 +297,16 @@ public class AttributeParserTests : BaseNopTest
     [TestCase(typeof(CheckoutAttribute))]
     public void CanParseAttributeIds(Type attributeType)
     {
+		logger.LogDebug(">>> Entering CanParseAttributeIds(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
         var ids = _parser.ParseAttributeIds(_attributesXml) as IList<int>;
 
+		logger.LogDebug("CanParseAttributeIds(attributeType={AttributeType}): ids → {Ids}", attributeType, ids);
         var existsId = new List<int> { 1, 2 };
 
         ids?.Count.Should().Be(2);
         ids?.All(existsId.Contains).Should().BeTrue();
+		logger.LogDebug("<<< Exiting CanParseAttributeIds(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -285,10 +316,13 @@ public class AttributeParserTests : BaseNopTest
     [TestCase(typeof(CheckoutAttribute))]
     public void CanParseAttributeIdsShouldReturnEmptyListIfXmlIsEmpty(Type attributeType)
     {
+		logger.LogDebug(">>> Entering CanParseAttributeIdsShouldReturnEmptyListIfXmlIsEmpty(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
         var ids = _parser.ParseAttributeIds(string.Empty) as IList<int>;
 
+		logger.LogDebug("CanParseAttributeIdsShouldReturnEmptyListIfXmlIsEmpty(attributeType={AttributeType}): ids → {Ids}", attributeType, ids);
         ids?.Count.Should().Be(0);
+		logger.LogDebug("<<< Exiting CanParseAttributeIdsShouldReturnEmptyListIfXmlIsEmpty(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -298,14 +332,18 @@ public class AttributeParserTests : BaseNopTest
     [TestCase(typeof(CheckoutAttribute))]
     public void CanParseAttributeIdsShouldReturnEmptyListIfXmlNotContainsRightAttributes(Type attributeType)
     {
+		logger.LogDebug(">>> Entering CanParseAttributeIdsShouldReturnEmptyListIfXmlNotContainsRightAttributes(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
         var ids = _parser.ParseAttributeIds("<Attributes><Item ID=\"1\">Test 1</Item><Item ID=\"2\">Test 2</Item></Attributes>") as IList<int>;
 
+		logger.LogDebug("CanParseAttributeIdsShouldReturnEmptyListIfXmlNotContainsRightAttributes(attributeType={AttributeType}): ids → {Ids}", attributeType, ids);
+		logger.LogDebug("CanParseAttributeIdsShouldReturnEmptyListIfXmlNotContainsRightAttributes(attributeType={AttributeType}): ID → {ID}", attributeType, ID);
         ids?.Count.Should().Be(0);
 
         ids = _parser.ParseAttributeIds("<Items><Attribute ID=\"1\">Test 1</Attribute><Attribute ID=\"2\">Test 2</Attribute></Items>") as IList<int>;
 
         ids?.Count.Should().Be(0);
+		logger.LogDebug("<<< Exiting CanParseAttributeIdsShouldReturnEmptyListIfXmlNotContainsRightAttributes(attributeType={AttributeType})", attributeType);
     }
 
     [Test]
@@ -315,10 +353,13 @@ public class AttributeParserTests : BaseNopTest
     [TestCase(typeof(CheckoutAttribute))]
     public void CanParseAttributeValues(Type attributeType)
     {
+		logger.LogDebug(">>> Entering CanParseAttributeValues(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
 
         var values = _parser.ParseAttributeValuesAsync(_attributesXml).Result?.Count as int?;
         values.Should().Be(2);
+		logger.LogDebug("<<< Exiting CanParseAttributeValues(attributeType={AttributeType})", attributeType);
+		logger.LogDebug("CanParseAttributeValues(attributeType={AttributeType}): values → {Values}", attributeType, values);
     }
 
     [Test]
@@ -329,12 +370,16 @@ public class AttributeParserTests : BaseNopTest
 
     public async Task GetAttributeWarnings(Type attributeType)
     {
+		logger.LogDebug(">>> Entering GetAttributeWarnings(attributeType={AttributeType})", attributeType);
         PrepareTestData(attributeType);
 
         var attribute = (await _parser.ParseAttributesAsync(_attributesXml))[1];
         (attribute as BaseAttribute).Should().NotBeNull();
+		logger.LogDebug("GetAttributeWarnings(attributeType={AttributeType}): attribute → {Attribute}", attributeType, attribute);
 
         var values = await _parser.GetAttributeWarningsAsync(_attributesXml);
         ((int)values.Count).Should().BeGreaterOrEqualTo(1);
+		logger.LogDebug("<<< Exiting GetAttributeWarnings(attributeType={AttributeType})", attributeType);
+		logger.LogDebug("GetAttributeWarnings(attributeType={AttributeType}): values → {Values}", attributeType, values);
     }
 }

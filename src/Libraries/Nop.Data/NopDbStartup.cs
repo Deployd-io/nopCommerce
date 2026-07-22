@@ -28,6 +28,7 @@ public partial class NopDbStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var mAssemblies = typeFinder.FindClassesOfType<MigrationBase>()
             .Select(t => t.Assembly)
@@ -67,8 +68,11 @@ public partial class NopDbStartup : INopStartup
 
         using var scope = services.BuildServiceProvider().CreateScope();
         var runner = scope.ServiceProvider.GetRequiredService<IMigrationManager>();
+		logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): scope → {Scope}", services, configuration, scope);
+		logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): runner → {Runner}", services, configuration, runner);
         foreach (var assembly in mAssemblies)
             runner.ApplyUpSchemaMigrations(assembly);
+			logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -78,8 +82,10 @@ public partial class NopDbStartup : INopStartup
     public virtual void Configure(IApplicationBuilder application)
     {
         var config = Singleton<AppSettings>.Instance.Get<CacheConfig>();
+		logger.LogDebug(">>> Entering Configure(application={Application})", application);
 
         LinqToDB.Common.Configuration.Linq.DisableQueryCache = config.LinqDisableQueryCache;
+		logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

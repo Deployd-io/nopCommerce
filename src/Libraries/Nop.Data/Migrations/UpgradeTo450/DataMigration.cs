@@ -16,7 +16,10 @@ public class DataMigration : Migration
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		logger.LogDebug("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -24,9 +27,12 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         // add column
         var shipmentTableName = nameof(Shipment);
         var collectedDateUtcColumnName = "ReadyForPickupDateUtc";
+		logger.LogDebug("Up(): shipmentTableName → {ShipmentTableName}", shipmentTableName);
+		logger.LogDebug("Up(): collectedDateUtcColumnName → {CollectedDateUtcColumnName}", collectedDateUtcColumnName);
 
         if (!Schema.Table(shipmentTableName).Column(collectedDateUtcColumnName).Exists())
         {
@@ -51,6 +57,7 @@ public class DataMigration : Migration
         //#5547
         var scheduleTaskTableName = NameCompatibilityManager.GetTableName(typeof(ScheduleTask));
 
+		logger.LogDebug("Up(): scheduleTaskTableName → {ScheduleTaskTableName}", scheduleTaskTableName);
         //add column
         if (!Schema.Table(scheduleTaskTableName).Column(nameof(ScheduleTask.LastEnabledUtc)).Exists())
         {
@@ -91,6 +98,8 @@ public class DataMigration : Migration
         //add column
         var returnRequestTableName = NameCompatibilityManager.GetTableName(typeof(ReturnRequest));
         var returnedQuantityColumnName = "ReturnedQuantity";
+		logger.LogDebug("Up(): returnRequestTableName → {ReturnRequestTableName}", returnRequestTableName);
+		logger.LogDebug("Up(): returnedQuantityColumnName → {ReturnedQuantityColumnName}", returnedQuantityColumnName);
 
         if (!Schema.Table(returnRequestTableName).Column(returnedQuantityColumnName).Exists())
         {
@@ -123,10 +132,13 @@ public class DataMigration : Migration
                 }
             );
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

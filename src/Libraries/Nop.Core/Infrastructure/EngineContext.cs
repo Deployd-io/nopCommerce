@@ -15,7 +15,9 @@ public partial class EngineContext
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static IEngine Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //create NopEngine as engine
+		logger.LogDebug("<<< Exiting Create()");
         return Singleton<IEngine>.Instance ?? (Singleton<IEngine>.Instance = new NopEngine());
     }
 
@@ -26,7 +28,9 @@ public partial class EngineContext
     /// <remarks>Only use this method if you know what you're doing.</remarks>
     public static void Replace(IEngine engine)
     {
+		logger.LogDebug(">>> Entering Replace(engine={Engine})", engine);
         Singleton<IEngine>.Instance = engine;
+		logger.LogDebug("<<< Exiting Replace(engine={Engine})", engine);
     }
 
     #endregion

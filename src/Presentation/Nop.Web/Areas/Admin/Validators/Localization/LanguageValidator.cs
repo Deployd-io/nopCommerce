@@ -11,6 +11,7 @@ public partial class LanguageValidator : BaseNopValidator<LanguageModel>
 {
     public LanguageValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering LanguageValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Languages.Fields.Name.Required"));
         RuleFor(x => x.LanguageCulture)
             .Must(x =>
@@ -24,6 +25,7 @@ public partial class LanguageValidator : BaseNopValidator<LanguageModel>
                 }
                 catch
                 {
+					logger.LogError("Exception in LanguageValidator(localizationService={LocalizationService}): {Arg1}", localizationService, ex.Message);
                     return false;
                 }
             })
@@ -33,5 +35,6 @@ public partial class LanguageValidator : BaseNopValidator<LanguageModel>
         RuleFor(x => x.UniqueSeoCode).Length(2).WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Languages.Fields.UniqueSeoCode.Length"));
 
         SetDatabaseValidationRules<Language>("UniqueSeoCode");
+		logger.LogDebug("<<< Exiting LanguageValidator(localizationService={LocalizationService})", localizationService);
     }
 }

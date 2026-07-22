@@ -10,9 +10,11 @@ public partial class ManufacturerTemplateValidator : BaseNopValidator<Manufactur
 {
     public ManufacturerTemplateValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ManufacturerTemplateValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Manufacturer.Name.Required"));
         RuleFor(x => x.ViewPath).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Manufacturer.ViewPath.Required"));
 
         SetDatabaseValidationRules<ManufacturerTemplate>();
+		logger.LogDebug("<<< Exiting ManufacturerTemplateValidator(localizationService={LocalizationService})", localizationService);
     }
 }

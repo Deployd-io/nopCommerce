@@ -25,6 +25,8 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
     /// </summary>
     public CheckDiscountCouponAttribute() : base(typeof(CheckDiscountCouponFilter))
     {
+	logger.LogDebug(">>> Entering CheckDiscountCouponAttribute()");
+	logger.LogDebug("<<< Exiting CheckDiscountCouponAttribute()");
     }
 
     #endregion
@@ -72,11 +74,14 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckDiscountCouponAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering CheckDiscountCouponAsync(context={Context})", context);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ArgumentNullException.ThrowIfNull(context);
 
             //check request query parameters
             if (!context.HttpContext.Request.Query.Any())
                 return;
+				logger.LogInformation("CheckDiscountCouponAsync(context)={Context}: database query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
 
             //only in GET requests
             if (!context.HttpContext.Request.IsGetRequest())
@@ -87,6 +92,7 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
 
             var customer = await _workContext.GetCurrentCustomerAsync();
 
+			logger.LogDebug("CheckDiscountCouponAsync(context={Context}): customer → {Customer}", context, customer);
             //ignore search engines
             if (customer.IsSearchEngineAccount())
                 return;
@@ -100,6 +106,7 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
 
             var validCouponCodes = new List<string>();
             var discounts = await couponCodes
+				logger.LogDebug("CheckDiscountCouponAsync(context={Context}): validCouponCodes → {ValidCouponCodes}", context, validCouponCodes);
                 .SelectManyAwait(async couponCode => await _discountService.GetAllDiscountsAsync(couponCode: couponCode))
                 .Distinct()
                 .ToListAsync();
@@ -108,6 +115,7 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
             {
                 var result = await _discountService.ValidateDiscountAsync(discount, customer, [.. couponCodes]);
                 if (!result.IsValid)
+					logger.LogDebug("CheckDiscountCouponAsync(context={Context}): result → {Result}", context, result);
                     continue;
 
                 //apply discount coupon codes to customer
@@ -120,6 +128,7 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
             var locale = await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.Activated");
             foreach (var validCouponCode in validCouponCodes.Distinct())
             {
+			logger.LogDebug("CheckDiscountCouponAsync(context={Context}): locale → {Locale}", context, locale);
                 _notificationService.SuccessNotification(string.Format(locale, WebUtility.HtmlEncode(validCouponCode)));
             }
 
@@ -127,8 +136,10 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
             var invalidLocale = await _localizationService.GetResourceAsync("ShoppingCart.DiscountCouponCode.Invalid");
             foreach (var invalidCouponCode in couponCodes.Except(validCouponCodes.Distinct()))
             {
+			logger.LogDebug("CheckDiscountCouponAsync(context={Context}): invalidLocale → {InvalidLocale}", context, invalidLocale);
                 _notificationService.WarningNotification(string.Format(invalidLocale, WebUtility.HtmlEncode(invalidCouponCode)));
             }
+			logger.LogDebug("<<< Exiting CheckDiscountCouponAsync(context={Context})", context);
         }
 
         #endregion
@@ -143,9 +154,11 @@ public sealed class CheckDiscountCouponAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckDiscountCouponAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

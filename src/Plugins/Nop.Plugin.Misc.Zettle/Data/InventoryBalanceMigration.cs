@@ -19,7 +19,10 @@ public class InventoryBalanceMigration : MigrationBase
 
     public InventoryBalanceMigration(ISettingService settingService)
     {
+		logger.LogDebug(">>> Entering InventoryBalanceMigration(settingService={SettingService})", settingService);
         _settingService = settingService;
+		logger.LogDebug("<<< Exiting InventoryBalanceMigration(settingService={SettingService})", settingService);
+		logger.LogDebug("InventoryBalanceMigration(settingService={SettingService}): _settingService → {_settingService}", settingService, _settingService);
     }
 
     #endregion
@@ -31,6 +34,7 @@ public class InventoryBalanceMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -41,9 +45,11 @@ public class InventoryBalanceMigration : MigrationBase
         //delete settings
         var setting = _settingService.GetSetting($"{nameof(ZettleSettings)}.InventoryTrackingIds");
         if (setting is null)
+			logger.LogDebug("Up(): setting → {Setting}", setting);
             return;
 
         _settingService.DeleteSetting(setting);
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -51,7 +57,9 @@ public class InventoryBalanceMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

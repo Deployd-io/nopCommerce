@@ -11,6 +11,7 @@ public partial class TopicValidator : BaseNopValidator<TopicModel>
 {
     public TopicValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering TopicValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.SeName)
             .Length(0, NopSeoDefaults.ForumTopicLength)
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.SEO.SeName.MaxLengthValidation"), NopSeoDefaults.ForumTopicLength);
@@ -25,5 +26,6 @@ public partial class TopicValidator : BaseNopValidator<TopicModel>
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Topics.Fields.AvailableEndDateTime.GreaterThanOrEqualToStartDate"));
         
         SetDatabaseValidationRules<Topic>();
+		logger.LogDebug("<<< Exiting TopicValidator(localizationService={LocalizationService})", localizationService);
     }
 }

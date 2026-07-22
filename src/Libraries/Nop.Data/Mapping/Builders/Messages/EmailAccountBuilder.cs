@@ -16,12 +16,14 @@ public partial class EmailAccountBuilder : NopEntityBuilder<EmailAccount>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(EmailAccount.DisplayName)).AsString(255).Nullable()
             .WithColumn(nameof(EmailAccount.Email)).AsString(255).NotNullable()
             .WithColumn(nameof(EmailAccount.Host)).AsString(255).NotNullable()
             .WithColumn(nameof(EmailAccount.Username)).AsString(255).NotNullable()
             .WithColumn(nameof(EmailAccount.Password)).AsString(255).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

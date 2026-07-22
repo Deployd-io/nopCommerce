@@ -15,6 +15,8 @@ public partial class ForumGroupCacheEventConsumer : CacheEventConsumer<ForumGrou
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ForumGroup entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopForumDefaults.ForumByForumGroupCacheKey, entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

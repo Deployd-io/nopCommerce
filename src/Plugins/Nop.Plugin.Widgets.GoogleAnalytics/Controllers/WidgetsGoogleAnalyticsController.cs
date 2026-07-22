@@ -49,9 +49,12 @@ public class WidgetsGoogleAnalyticsController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var googleAnalyticsSettings = await _settingService.LoadSettingAsync<GoogleAnalyticsSettings>(storeScope);
+		logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
+		logger.LogDebug("Configure(): googleAnalyticsSettings → {GoogleAnalyticsSettings}", googleAnalyticsSettings);
 
         var model = new ConfigurationModel
         {
@@ -76,6 +79,7 @@ public class WidgetsGoogleAnalyticsController : BasePluginController
             model.IncludeCustomerId_OverrideForStore = await _settingService.SettingExistsAsync(googleAnalyticsSettings, x => x.IncludeCustomerId, storeScope);
         }
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Widgets.GoogleAnalytics/Views/Configure.cshtml", model);
     }
 

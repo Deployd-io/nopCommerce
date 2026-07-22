@@ -10,9 +10,11 @@ public partial class StoreValidator : BaseNopValidator<StoreModel>
 {
     public StoreValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering StoreValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Stores.Fields.Name.Required"));
         RuleFor(x => x.Url).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Stores.Fields.Url.Required"));
 
         SetDatabaseValidationRules<Store>();
+		logger.LogDebug("<<< Exiting StoreValidator(localizationService={LocalizationService})", localizationService);
     }
 }

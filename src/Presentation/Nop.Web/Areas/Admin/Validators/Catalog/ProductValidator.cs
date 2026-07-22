@@ -11,6 +11,7 @@ public partial class ProductValidator : BaseNopValidator<ProductModel>
 {
     public ProductValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Products.Fields.Name.Required"));
@@ -30,5 +31,6 @@ public partial class ProductValidator : BaseNopValidator<ProductModel>
             .When(x => x.AgeVerification);
 
         SetDatabaseValidationRules<Product>();
+		logger.LogDebug("<<< Exiting ProductValidator(localizationService={LocalizationService})", localizationService);
     }
 }

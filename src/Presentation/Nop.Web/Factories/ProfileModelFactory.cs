@@ -79,10 +79,13 @@ public partial class ProfileModelFactory : IProfileModelFactory
     /// </returns>
     public virtual async Task<ProfileIndexModel> PrepareProfileIndexModelAsync(Customer customer, int? page)
     {
+		logger.LogDebug(">>> Entering PrepareProfileIndexModelAsync(customer={Customer},page={Page})", customer, page);
         ArgumentNullException.ThrowIfNull(customer);
 
         var pagingPosts = false;
         var postsPage = 0;
+		logger.LogDebug("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): pagingPosts → {PagingPosts}", customer, page, pagingPosts);
+		logger.LogDebug("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): postsPage → {PostsPage}", customer, page, postsPage);
 
         if (page.HasValue)
         {
@@ -92,6 +95,8 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
         var name = await _customerService.FormatUsernameAsync(customer);
         var title = string.Format(await _localizationService.GetResourceAsync("Profile.ProfileOf"), name);
+		logger.LogDebug("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): name → {Name}", customer, page, name);
+		logger.LogDebug("PrepareProfileIndexModelAsync(customer={Customer},page={Page}): title → {Title}", customer, page, title);
 
         var model = new ProfileIndexModel
         {
@@ -101,6 +106,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
             CustomerProfileId = customer.Id,
             ForumsEnabled = _forumSettings.ForumsEnabled
         };
+		logger.LogDebug("<<< Exiting PrepareProfileIndexModelAsync(customer={Customer},page={Page})", customer, page);
         return model;
     }
 
@@ -114,11 +120,13 @@ public partial class ProfileModelFactory : IProfileModelFactory
     /// </returns>
     public virtual async Task<ProfileInfoModel> PrepareProfileInfoModelAsync(Customer customer)
     {
+		logger.LogDebug(">>> Entering PrepareProfileInfoModelAsync(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         //avatar
         var avatarUrl = "";
         if (_customerSettings.AllowCustomersToUploadAvatars)
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): avatarUrl → {AvatarUrl}", customer, avatarUrl);
         {
             avatarUrl = await _pictureService.GetPictureUrlAsync(
                 await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.AvatarPictureIdAttribute),
@@ -130,6 +138,8 @@ public partial class ProfileModelFactory : IProfileModelFactory
         //location
         var locationEnabled = false;
         var location = string.Empty;
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): locationEnabled → {LocationEnabled}", customer, locationEnabled);
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): location → {Location}", customer, location);
         if (_customerSettings.ShowCustomersLocation)
         {
             locationEnabled = true;
@@ -137,6 +147,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
             var countryId = customer.CountryId;
             var country = await _countryService.GetCountryByIdAsync(countryId);
             if (country != null)
+			logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): country → {Country}", customer, country);
             {
                 location = await _localizationService.GetLocalizedAsync(country, x => x.Name);
             }
@@ -149,9 +160,12 @@ public partial class ProfileModelFactory : IProfileModelFactory
         //private message
         var pmEnabled = _forumSettings.AllowPrivateMessages && !await _customerService.IsGuestAsync(customer);
 
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): pmEnabled → {PmEnabled}", customer, pmEnabled);
         //total forum posts
         var totalPostsEnabled = false;
         var totalPosts = 0;
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): totalPostsEnabled → {TotalPostsEnabled}", customer, totalPostsEnabled);
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): totalPosts → {TotalPosts}", customer, totalPosts);
         if (_forumSettings.ForumsEnabled && _forumSettings.ShowCustomersPostCount)
         {
             totalPostsEnabled = true;
@@ -161,6 +175,8 @@ public partial class ProfileModelFactory : IProfileModelFactory
         //registration date
         var joinDateEnabled = false;
         var joinDate = string.Empty;
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): joinDateEnabled → {JoinDateEnabled}", customer, joinDateEnabled);
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): joinDate → {JoinDate}", customer, joinDate);
 
         if (_customerSettings.ShowCustomersJoinDate)
         {
@@ -171,6 +187,8 @@ public partial class ProfileModelFactory : IProfileModelFactory
         //birth date
         var dateOfBirthEnabled = false;
         var dateOfBirth = string.Empty;
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): dateOfBirthEnabled → {DateOfBirthEnabled}", customer, dateOfBirthEnabled);
+		logger.LogDebug("PrepareProfileInfoModelAsync(customer={Customer}): dateOfBirth → {DateOfBirth}", customer, dateOfBirth);
         if (_customerSettings.DateOfBirthEnabled)
         {
             if (customer.DateOfBirth.HasValue)
@@ -195,6 +213,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
             DateOfBirth = dateOfBirth,
         };
 
+		logger.LogDebug("<<< Exiting PrepareProfileInfoModelAsync(customer={Customer})", customer);
         return model;
     }
 
@@ -209,6 +228,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
     /// </returns>
     public virtual async Task<ProfilePostsModel> PrepareProfilePostsModelAsync(Customer customer, int page)
     {
+		logger.LogDebug(">>> Entering PrepareProfilePostsModelAsync(customer={Customer},page={Page})", customer, page);
         ArgumentNullException.ThrowIfNull(customer);
 
         if (page > 0)
@@ -220,8 +240,10 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
         var list = await _forumService.GetAllPostsAsync(0, customer.Id, string.Empty, false, page, pageSize);
 
+		logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): list → {List}", customer, page, list);
         var latestPosts = new List<PostsModel>();
 
+		logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): latestPosts → {LatestPosts}", customer, page, latestPosts);
         foreach (var forumPost in list)
         {
             string posted;
@@ -229,8 +251,11 @@ public partial class ProfileModelFactory : IProfileModelFactory
             {
                 var languageCode = (await _workContext.GetWorkingLanguageAsync()).LanguageCulture;
                 var postedAgo = forumPost.CreatedOnUtc.RelativeFormat(languageCode);
+				logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): languageCode → {LanguageCode}", customer, page, languageCode);
+				logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): postedAgo → {PostedAgo}", customer, page, postedAgo);
                 posted = string.Format(await _localizationService.GetResourceAsync("Common.RelativeDateTime.Past"), postedAgo);
             }
+			logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): posted → {Posted}", customer, page, posted);
             else
             {
                 posted = (await _dateTimeHelper.ConvertToUserTimeAsync(forumPost.CreatedOnUtc, DateTimeKind.Utc)).ToString("f");
@@ -238,6 +263,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
 
             var topic = await _forumService.GetTopicByIdAsync(forumPost.TopicId);
 
+			logger.LogDebug("PrepareProfilePostsModelAsync(customer={Customer},page={Page}): topic → {Topic}", customer, page, topic);
             latestPosts.Add(new PostsModel
             {
                 ForumTopicId = topic.Id,
@@ -265,6 +291,7 @@ public partial class ProfileModelFactory : IProfileModelFactory
             Posts = latestPosts,
         };
 
+		logger.LogDebug("<<< Exiting PrepareProfilePostsModelAsync(customer={Customer},page={Page})", customer, page);
         return model;
     }
 

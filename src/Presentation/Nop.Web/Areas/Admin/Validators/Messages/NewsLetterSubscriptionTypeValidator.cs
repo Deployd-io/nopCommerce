@@ -10,8 +10,10 @@ public partial class NewsLetterSubscriptionTypeValidator : BaseNopValidator<News
 {
     public NewsLetterSubscriptionTypeValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering NewsLetterSubscriptionTypeValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Promotions.NewsLetterSubscriptionType.Fields.Name.Required"));
 
         SetDatabaseValidationRules<NewsLetterSubscriptionType>();
+		logger.LogDebug("<<< Exiting NewsLetterSubscriptionTypeValidator(localizationService={LocalizationService})", localizationService);
     }
 }

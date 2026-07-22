@@ -56,19 +56,23 @@ public partial class ThemeContext : IThemeContext
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetWorkingThemeNameAsync()
     {
+		logger.LogDebug(">>> Entering GetWorkingThemeNameAsync()");
         if (!string.IsNullOrEmpty(_cachedThemeName))
             return _cachedThemeName;
 
         var themeName = string.Empty;
 
+		logger.LogDebug("GetWorkingThemeNameAsync(): themeName → {ThemeName}", themeName);
         //whether customers are allowed to select a theme
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (_storeInformationSettings.AllowCustomerToSelectTheme &&
+			logger.LogDebug("GetWorkingThemeNameAsync(): customer → {Customer}", customer);
             customer != null)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
             themeName = await _genericAttributeService.GetAttributeAsync<string>(customer,
                 NopCustomerDefaults.WorkingThemeNameAttribute, store.Id);
+				logger.LogDebug("GetWorkingThemeNameAsync(): store → {Store}", store);
         }
 
         //if not, try to get default store theme
@@ -85,7 +89,9 @@ public partial class ThemeContext : IThemeContext
 
         //cache theme system name
         _cachedThemeName = themeName;
+		logger.LogDebug("GetWorkingThemeNameAsync(): _cachedThemeName → {_cachedThemeName}", _cachedThemeName);
 
+		logger.LogDebug("<<< Exiting GetWorkingThemeNameAsync()");
         return themeName;
     }
 
@@ -95,9 +101,11 @@ public partial class ThemeContext : IThemeContext
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetWorkingThemeNameAsync(string workingThemeName)
     {
+		logger.LogDebug(">>> Entering SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName})", workingThemeName);
         //whether customers are allowed to select a theme
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!_storeInformationSettings.AllowCustomerToSelectTheme ||
+			logger.LogDebug("SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName}): customer → {Customer}", workingThemeName, customer);
             customer == null)
             return;
 
@@ -109,6 +117,8 @@ public partial class ThemeContext : IThemeContext
 
         //clear cache
         _cachedThemeName = null;
+		logger.LogDebug("SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName}): _cachedThemeName → {_cachedThemeName}", workingThemeName, _cachedThemeName);
+		logger.LogDebug("<<< Exiting SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName})", workingThemeName);
     }
 
     #endregion

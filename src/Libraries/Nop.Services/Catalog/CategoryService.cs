@@ -187,11 +187,19 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearDiscountCategoryMappingAsync(Discount discount)
     {
+		logger.LogDebug(">>> Entering ClearDiscountCategoryMappingAsync(discount={Discount})", discount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var mappings = _discountCategoryMappingRepository.Table.Where(dcm => dcm.DiscountId == discount.Id);
 
+		logger.LogDebug("ClearDiscountCategoryMappingAsync(discount={Discount}): mappings → {Mappings}", discount, mappings);
+		logger.LogInformation("ClearDiscountCategoryMappingAsync(discount)={Discount}: external service call took {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("ClearDiscountCategoryMappingAsync(discount)={Discount}: delete query executed in {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
         await _discountCategoryMappingRepository.DeleteAsync(await mappings.ToListAsync());
+		logger.LogDebug("<<< Exiting ClearDiscountCategoryMappingAsync(discount={Discount})", discount);
+		logger.LogDebug("<<< Exiting GetCategoryBreadCrumbAsync(category={Category},allCategories={AllCategories},showHidden={ShowHidden})", category, allCategories, showHidden);
     }
 
     /// <summary>
@@ -201,8 +209,10 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCategoryAsync(Category category)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _categoryRepository.DeleteAsync(category);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //reset a "Parent category" property of all child subcategories
         var subcategories = await GetAllCategoriesByParentCategoryIdAsync(category.Id, true);
         foreach (var subcategory in subcategories)
@@ -219,6 +229,7 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCategoriesAsync(IList<Category> categories)
     {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(categories);
 
         foreach (var category in categories)
@@ -236,6 +247,8 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<IList<Category>> GetAllCategoriesAsync(int storeId = 0, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetAllCategoriesAsync(storeId={StoreId},showHidden={ShowHidden})", storeId, showHidden);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.CategoriesAllCacheKey,
             storeId,
             await _customerService.GetCustomerRoleIdsAsync(await _workContext.GetCurrentCustomerAsync()),
@@ -349,14 +362,18 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<IList<Category>> GetAllCategoriesDisplayedOnHomepageAsync(bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetAllCategoriesDisplayedOnHomepageAsync(showHidden={ShowHidden})", showHidden);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var categories = await _categoryRepository.GetAllAsync(query =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return from c in query
                 orderby c.DisplayOrder, c.Id
                 where c.Published &&
                       !c.Deleted &&
                       c.ShowOnHomepage
                 select c;
+				logger.LogInformation("GetAllCategoriesDisplayedOnHomepageAsync(showHidden)={ShowHidden}: find query executed in {Arg1} ms", showHidden, __logStart.ElapsedMilliseconds);
         }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.CategoriesHomepageCacheKey));
 
         if (showHidden)
@@ -370,8 +387,11 @@ public partial class CategoryService : ICategoryService
             return await categories
                 .WhereAwait(async c => await _aclService.AuthorizeAsync(c) && await _storeMappingService.AuthorizeAsync(c))
                 .ToListAsync();
+				logger.LogInformation("GetAllCategoriesDisplayedOnHomepageAsync(showHidden)={ShowHidden}: database query executed in {Arg1} ms", showHidden, __logStart.ElapsedMilliseconds);
         });
 
+		logger.LogInformation("GetAllCategoriesDisplayedOnHomepageAsync(showHidden)={ShowHidden}: external service call took {Arg1} ms", showHidden, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetAllCategoriesDisplayedOnHomepageAsync(showHidden={ShowHidden})", showHidden);
         return result;
     }
 
@@ -386,8 +406,10 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<IList<int>> GetAppliedCategoryIdsAsync(Discount discount, Customer customer)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopDiscountDefaults.CategoryIdsByDiscountCacheKey,
             discount,
@@ -426,6 +448,8 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<IList<int>> GetChildCategoryIdsAsync(int parentCategoryId, int storeId = 0, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetChildCategoryIdsAsync(parentCategoryId={ParentCategoryId},storeId={StoreId},showHidden={ShowHidden})", parentCategoryId, storeId, showHidden);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.CategoriesChildIdsCacheKey,
             parentCategoryId,
             await _customerService.GetCustomerRoleIdsAsync(await _workContext.GetCurrentCustomerAsync()),
@@ -441,19 +465,24 @@ public partial class CategoryService : ICategoryService
                 _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ChildCategoryIdLookupCacheKey, storeId, showHidden),
                 async () => (await GetAllCategoriesAsync(storeId: storeId, showHidden: showHidden))
                     .ToGroupedDictionary(c => c.ParentCategoryId, x => x.Id));
+				logger.LogInformation("GetChildCategoryIdsAsync(parentCategoryId,storeId,showHidden)={ParentCategoryId},{StoreId},{ShowHidden}: external service call took {Arg3} ms", parentCategoryId, storeId, showHidden, __logStart.ElapsedMilliseconds);
 
             var categoryIds = new List<int>();
             if (lookup.TryGetValue(parentCategoryId, out var categories))
+			logger.LogDebug("async(): categoryIds → {CategoryIds}", categoryIds);
             {
                 categoryIds.AddRange(categories);
                 var childCategoryIds = categories.SelectAwait(async cId => await GetChildCategoryIdsAsync(cId, storeId, showHidden));
                 // avoid allocating a new list or blocking with ToEnumerable
+				logger.LogDebug("async(): childCategoryIds → {ChildCategoryIds}", childCategoryIds);
                 await foreach (var cIds in childCategoryIds)
                     categoryIds.AddRange(cIds);
+					logger.LogDebug("<<< Exiting async()");
             }
 
             return categoryIds;
         });
+		logger.LogDebug("<<< Exiting GetChildCategoryIdsAsync(parentCategoryId={ParentCategoryId},storeId={StoreId},showHidden={ShowHidden})", parentCategoryId, storeId, showHidden);
     }
 
     /// <summary>
@@ -466,8 +495,12 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<Category> GetCategoryByIdAsync(int categoryId)
     {
+		logger.LogDebug(">>> Entering GetCategoryByIdAsync(categoryId={CategoryId})", categoryId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var category = await _categoryRepository.GetByIdAsync(categoryId, cache => default);
 
+		logger.LogDebug("GetCategoryByIdAsync(categoryId={CategoryId}): category → {Category}", categoryId, category);
+		logger.LogDebug("<<< Exiting GetCategoryByIdAsync(categoryId={CategoryId})", categoryId);
         return category;
     }
 
@@ -508,6 +541,8 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCategoryAsync(Category category)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _categoryRepository.InsertAsync(category);
     }
 
@@ -522,6 +557,8 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<DiscountCategoryMapping> GetDiscountAppliedToCategoryAsync(int categoryId, int discountId)
     {
+		logger.LogDebug(">>> Entering GetDiscountAppliedToCategoryAsync(categoryId={CategoryId},discountId={DiscountId})", categoryId, discountId);
+		logger.LogDebug("<<< Exiting GetDiscountAppliedToCategoryAsync(categoryId={CategoryId},discountId={DiscountId})", categoryId, discountId);
         return await _discountCategoryMappingRepository.Table
             .FirstOrDefaultAsync(dcm => dcm.EntityId == categoryId && dcm.DiscountId == discountId);
     }
@@ -533,9 +570,15 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertDiscountCategoryMappingAsync(DiscountCategoryMapping discountCategoryMapping)
     {
+		logger.LogDebug(">>> Entering InsertDiscountCategoryMappingAsync(discountCategoryMapping={DiscountCategoryMapping})", discountCategoryMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _discountCategoryMappingRepository.InsertAsync(discountCategoryMapping);
+		logger.LogDebug("<<< Exiting InsertDiscountCategoryMappingAsync(discountCategoryMapping={DiscountCategoryMapping})", discountCategoryMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertDiscountCategoryMappingAsync(discountCategoryMapping)={DiscountCategoryMapping}: save query executed in {Arg1} ms", discountCategoryMapping, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertDiscountCategoryMappingAsync(discountCategoryMapping)={DiscountCategoryMapping}: save query executed in {Arg1} ms", discountCategoryMapping, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a discount-category mapping record
     /// </summary>
@@ -543,9 +586,19 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteDiscountCategoryMappingAsync(DiscountCategoryMapping discountCategoryMapping)
     {
+		logger.LogDebug(">>> Entering DeleteDiscountCategoryMappingAsync(discountCategoryMapping={DiscountCategoryMapping})", discountCategoryMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _discountCategoryMappingRepository.DeleteAsync(discountCategoryMapping);
+		logger.LogDebug("<<< Exiting DeleteDiscountCategoryMappingAsync(discountCategoryMapping={DiscountCategoryMapping})", discountCategoryMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteDiscountCategoryMappingAsync(discountCategoryMapping)={DiscountCategoryMapping}: external service call took {Arg1} ms", discountCategoryMapping, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteDiscountCategoryMappingAsync(discountCategoryMapping)={DiscountCategoryMapping}: delete query executed in {Arg1} ms", discountCategoryMapping, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteDiscountCategoryMappingAsync(discountCategoryMapping)={DiscountCategoryMapping}: external service call took {Arg1} ms", discountCategoryMapping, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteDiscountCategoryMappingAsync(discountCategoryMapping)={DiscountCategoryMapping}: delete query executed in {Arg1} ms", discountCategoryMapping, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the category
     /// </summary>
@@ -553,6 +606,7 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateCategoryAsync(Category category)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(category);
 
         //validate category hierarchy
@@ -578,9 +632,19 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductCategoryAsync(ProductCategory productCategory)
     {
+		logger.LogDebug(">>> Entering DeleteProductCategoryAsync(productCategory={ProductCategory})", productCategory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productCategoryRepository.DeleteAsync(productCategory);
+		logger.LogDebug("<<< Exiting DeleteProductCategoryAsync(productCategory={ProductCategory})", productCategory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductCategoryAsync(productCategory)={ProductCategory}: external service call took {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductCategoryAsync(productCategory)={ProductCategory}: delete query executed in {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteProductCategoryAsync(productCategory)={ProductCategory}: external service call took {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteProductCategoryAsync(productCategory)={ProductCategory}: delete query executed in {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a list of product category mapping
     /// </summary>
@@ -588,9 +652,19 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductCategoriesAsync(IList<ProductCategory> productCategories)
     {
+		logger.LogDebug(">>> Entering DeleteProductCategoriesAsync(productCategories={ProductCategories})", productCategories);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productCategoryRepository.DeleteAsync(productCategories);
+		logger.LogDebug("<<< Exiting DeleteProductCategoriesAsync(productCategories={ProductCategories})", productCategories);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductCategoriesAsync(productCategories)={ProductCategories}: external service call took {Arg1} ms", productCategories, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductCategoriesAsync(productCategories)={ProductCategories}: delete query executed in {Arg1} ms", productCategories, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteProductCategoriesAsync(productCategories)={ProductCategories}: external service call took {Arg1} ms", productCategories, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteProductCategoriesAsync(productCategories)={ProductCategories}: delete query executed in {Arg1} ms", productCategories, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets product category mapping collection
     /// </summary>
@@ -643,8 +717,11 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<IList<ProductCategory>> GetProductCategoriesByProductIdAsync(int productId, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetProductCategoriesByProductIdAsync(productId={ProductId},showHidden={ShowHidden})", productId, showHidden);
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("GetProductCategoriesByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): store → {Store}", productId, showHidden, store);
+		logger.LogDebug("<<< Exiting GetProductCategoriesByProductIdAsync(productId={ProductId},showHidden={ShowHidden})", productId, showHidden);
         return await GetProductCategoriesByProductIdAsync(productId, store.Id, showHidden);
     }
 
@@ -658,6 +735,8 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<ProductCategory> GetProductCategoryByIdAsync(int productCategoryId)
     {
+		logger.LogDebug(">>> Entering GetProductCategoryByIdAsync(productCategoryId={ProductCategoryId})", productCategoryId);
+		logger.LogDebug("<<< Exiting GetProductCategoryByIdAsync(productCategoryId={ProductCategoryId})", productCategoryId);
         return await _productCategoryRepository.GetByIdAsync(productCategoryId, cache => default);
     }
 
@@ -668,9 +747,15 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductCategoryAsync(ProductCategory productCategory)
     {
+		logger.LogDebug(">>> Entering InsertProductCategoryAsync(productCategory={ProductCategory})", productCategory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productCategoryRepository.InsertAsync(productCategory);
+		logger.LogDebug("<<< Exiting InsertProductCategoryAsync(productCategory={ProductCategory})", productCategory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertProductCategoryAsync(productCategory)={ProductCategory}: save query executed in {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertProductCategoryAsync(productCategory)={ProductCategory}: save query executed in {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the product category mapping 
     /// </summary>
@@ -678,9 +763,15 @@ public partial class CategoryService : ICategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductCategoryAsync(ProductCategory productCategory)
     {
+		logger.LogDebug(">>> Entering UpdateProductCategoryAsync(productCategory={ProductCategory})", productCategory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productCategoryRepository.UpdateAsync(productCategory);
+		logger.LogDebug("<<< Exiting UpdateProductCategoryAsync(productCategory={ProductCategory})", productCategory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateProductCategoryAsync(productCategory)={ProductCategory}: update query executed in {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateProductCategoryAsync(productCategory)={ProductCategory}: update query executed in {Arg1} ms", productCategory, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Returns a list of names of not existing categories
     /// </summary>
@@ -691,14 +782,19 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<string[]> GetNotExistingCategoriesAsync(string[] categoryIdsNames)
     {
+		logger.LogDebug(">>> Entering GetNotExistingCategoriesAsync(categoryIdsNames={CategoryIdsNames})", categoryIdsNames);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(categoryIdsNames);
 
         var query = _categoryRepository.Table.Where(c => !c.Deleted);
         var queryFilter = categoryIdsNames.Distinct().ToArray();
+		logger.LogDebug("GetNotExistingCategoriesAsync(categoryIdsNames={CategoryIdsNames}): query → {Query}", categoryIdsNames, query);
+		logger.LogDebug("GetNotExistingCategoriesAsync(categoryIdsNames={CategoryIdsNames}): queryFilter → {QueryFilter}", categoryIdsNames, queryFilter);
         //filtering by name
         var filter = await query.Select(c => c.Name)
             .Where(c => queryFilter.Contains(c))
             .ToListAsync();
+			logger.LogInformation("GetNotExistingCategoriesAsync(categoryIdsNames)={CategoryIdsNames}: database query executed in {Arg1} ms", categoryIdsNames, __logStart.ElapsedMilliseconds);
 
         queryFilter = queryFilter.Except(filter).ToArray();
 
@@ -711,6 +807,7 @@ public partial class CategoryService : ICategoryService
             .Where(c => queryFilter.Contains(c))
             .ToListAsync();
 
+		logger.LogDebug("<<< Exiting GetNotExistingCategoriesAsync(categoryIdsNames={CategoryIdsNames})", categoryIdsNames);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -755,6 +852,8 @@ public partial class CategoryService : ICategoryService
     /// <returns>A ProductCategory that has the specified values; otherwise null</returns>
     public virtual ProductCategory FindProductCategory(IList<ProductCategory> source, int productId, int categoryId)
     {
+		logger.LogDebug(">>> Entering FindProductCategory(source={Source},productId={ProductId},categoryId={CategoryId})", source, productId, categoryId);
+		logger.LogDebug("<<< Exiting FindProductCategory(source={Source},productId={ProductId},categoryId={CategoryId})", source, productId, categoryId);
         return source.FirstOrDefault(pc => pc.ProductId == productId && pc.CategoryId == categoryId);
     }
 
@@ -778,6 +877,7 @@ public partial class CategoryService : ICategoryService
         var breadcrumb = await GetCategoryBreadCrumbAsync(category, allCategories, true);
         for (var i = 0; i <= breadcrumb.Count - 1; i++)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var categoryName = await _localizationService.GetLocalizedAsync(breadcrumb[i], x => x.Name, languageId);
             result = string.IsNullOrEmpty(result) ? categoryName : $"{result} {separator} {categoryName}";
         }
@@ -797,6 +897,7 @@ public partial class CategoryService : ICategoryService
     /// </returns>
     public virtual async Task<IList<Category>> GetCategoryBreadCrumbAsync(Category category, IList<Category> allCategories = null, bool showHidden = false)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(category);
 
         var breadcrumbCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.CategoryBreadcrumbCacheKey,

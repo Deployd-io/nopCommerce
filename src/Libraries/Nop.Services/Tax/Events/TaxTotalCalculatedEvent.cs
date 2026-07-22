@@ -14,8 +14,12 @@ public partial class TaxTotalCalculatedEvent
     /// <param name="taxTotalResult">Tax total result</param>
     public TaxTotalCalculatedEvent(TaxTotalRequest taxTotalRequest, TaxTotalResult taxTotalResult)
     {
+		logger.LogDebug(">>> Entering TaxTotalCalculatedEvent(taxTotalRequest={TaxTotalRequest},taxTotalResult={TaxTotalResult})", taxTotalRequest, taxTotalResult);
         TaxTotalRequest = taxTotalRequest;
         TaxTotalResult = taxTotalResult;
+		logger.LogDebug("<<< Exiting TaxTotalCalculatedEvent(taxTotalRequest={TaxTotalRequest},taxTotalResult={TaxTotalResult})", taxTotalRequest, taxTotalResult);
+		logger.LogDebug("TaxTotalCalculatedEvent(taxTotalRequest={TaxTotalRequest},taxTotalResult={TaxTotalResult}): TaxTotalResult → {TaxTotalResult1}", taxTotalRequest, taxTotalResult, TaxTotalResult);
+		logger.LogDebug("TaxTotalCalculatedEvent(taxTotalRequest={TaxTotalRequest},taxTotalResult={TaxTotalResult}): TaxTotalRequest → {TaxTotalRequest1}", taxTotalRequest, taxTotalResult, TaxTotalRequest);
     }
 
     #endregion

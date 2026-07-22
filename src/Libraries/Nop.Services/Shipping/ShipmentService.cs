@@ -59,9 +59,19 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShipmentAsync(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering DeleteShipmentAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _shipmentRepository.DeleteAsync(shipment);
+		logger.LogDebug("<<< Exiting DeleteShipmentAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteShipmentAsync(shipment)={Shipment}: external service call took {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteShipmentAsync(shipment)={Shipment}: delete query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteShipmentAsync(shipment)={Shipment}: external service call took {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteShipmentAsync(shipment)={Shipment}: delete query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Search shipments
     /// </summary>
@@ -208,6 +218,8 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IList<Shipment>> GetShipmentsByIdsAsync(int[] shipmentIds)
     {
+		logger.LogDebug(">>> Entering GetShipmentsByIdsAsync(shipmentIds={ShipmentIds})", shipmentIds);
+		logger.LogDebug("<<< Exiting GetShipmentsByIdsAsync(shipmentIds={ShipmentIds})", shipmentIds);
         return await _shipmentRepository.GetByIdsAsync(shipmentIds);
     }
 
@@ -221,6 +233,8 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<Shipment> GetShipmentByIdAsync(int shipmentId)
     {
+		logger.LogDebug(">>> Entering GetShipmentByIdAsync(shipmentId={ShipmentId})", shipmentId);
+		logger.LogDebug("<<< Exiting GetShipmentByIdAsync(shipmentId={ShipmentId})", shipmentId);
         return await _shipmentRepository.GetByIdAsync(shipmentId, cache => default, useShortTermCache: true);
     }
 
@@ -239,15 +253,18 @@ public partial class ShipmentService : IShipmentService
     {
         if (orderId == 0)
             return new List<Shipment>();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var shipments = _shipmentRepository.Table;
 
+		logger.LogDebug("GetShipmentsByOrderIdAsync(orderId={OrderId},shipped={Shipped},readyForPickup={ReadyForPickup},vendorId={VendorId}): shipments → {Shipments}", orderId, shipped, readyForPickup, vendorId, shipments);
         if (shipped.HasValue)
             shipments = shipments.Where(s => s.ShippedDateUtc.HasValue == shipped);
 
         if (readyForPickup.HasValue)
             shipments = shipments.Where(s => s.ReadyForPickupDateUtc.HasValue == readyForPickup);
 
+		logger.LogDebug("<<< Exiting GetShipmentsByOrderIdAsync(orderId={OrderId},shipped={Shipped},readyForPickup={ReadyForPickup},vendorId={VendorId})", orderId, shipped, readyForPickup, vendorId);
         return await shipments.Where(shipment => shipment.OrderId == orderId).ToListAsync();
     }
 
@@ -258,9 +275,15 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShipmentAsync(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering InsertShipmentAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _shipmentRepository.InsertAsync(shipment);
+		logger.LogDebug("<<< Exiting InsertShipmentAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertShipmentAsync(shipment)={Shipment}: save query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertShipmentAsync(shipment)={Shipment}: save query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the shipment
     /// </summary>
@@ -268,9 +291,15 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateShipmentAsync(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering UpdateShipmentAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _shipmentRepository.UpdateAsync(shipment);
+		logger.LogDebug("<<< Exiting UpdateShipmentAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateShipmentAsync(shipment)={Shipment}: update query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateShipmentAsync(shipment)={Shipment}: update query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a shipment items of shipment
     /// </summary>
@@ -281,7 +310,10 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IList<ShipmentItem>> GetShipmentItemsByShipmentIdAsync(int shipmentId)
     {
+		logger.LogDebug(">>> Entering GetShipmentItemsByShipmentIdAsync(shipmentId={ShipmentId})", shipmentId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (shipmentId == 0)
+		logger.LogDebug("<<< Exiting GetShipmentItemsByShipmentIdAsync(shipmentId={ShipmentId})", shipmentId);
             return null;
 
         return await _siRepository.Table.Where(si => si.ShipmentId == shipmentId).ToListAsync();
@@ -294,9 +326,15 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShipmentItemAsync(ShipmentItem shipmentItem)
     {
+		logger.LogDebug(">>> Entering InsertShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _siRepository.InsertAsync(shipmentItem);
+		logger.LogDebug("<<< Exiting InsertShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertShipmentItemAsync(shipmentItem)={ShipmentItem}: save query executed in {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertShipmentItemAsync(shipmentItem)={ShipmentItem}: save query executed in {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a shipment item
     /// </summary>
@@ -304,9 +342,19 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShipmentItemAsync(ShipmentItem shipmentItem)
     {
+		logger.LogDebug(">>> Entering DeleteShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _siRepository.DeleteAsync(shipmentItem);
+		logger.LogDebug("<<< Exiting DeleteShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteShipmentItemAsync(shipmentItem)={ShipmentItem}: external service call took {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteShipmentItemAsync(shipmentItem)={ShipmentItem}: delete query executed in {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteShipmentItemAsync(shipmentItem)={ShipmentItem}: external service call took {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteShipmentItemAsync(shipmentItem)={ShipmentItem}: delete query executed in {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a shipment item
     /// </summary>
@@ -314,9 +362,15 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateShipmentItemAsync(ShipmentItem shipmentItem)
     {
+		logger.LogDebug(">>> Entering UpdateShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _siRepository.UpdateAsync(shipmentItem);
+		logger.LogDebug("<<< Exiting UpdateShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateShipmentItemAsync(shipmentItem)={ShipmentItem}: update query executed in {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateShipmentItemAsync(shipmentItem)={ShipmentItem}: update query executed in {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a shipment item
     /// </summary>
@@ -327,6 +381,8 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<ShipmentItem> GetShipmentItemByIdAsync(int shipmentItemId)
     {
+		logger.LogDebug(">>> Entering GetShipmentItemByIdAsync(shipmentItemId={ShipmentItemId})", shipmentItemId);
+		logger.LogDebug("<<< Exiting GetShipmentItemByIdAsync(shipmentItemId={ShipmentItemId})", shipmentItemId);
         return await _siRepository.GetByIdAsync(shipmentItemId, cache => default, useShortTermCache: true);
     }
 
@@ -404,9 +460,14 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IShipmentTracker> GetShipmentTrackerAsync(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering GetShipmentTrackerAsync(shipment={Shipment})", shipment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var order = await _orderRepository.GetByIdAsync(shipment.OrderId, cache => default, useShortTermCache: true);
         IShipmentTracker shipmentTracker = null;
 
+		logger.LogDebug("GetShipmentTrackerAsync(shipment={Shipment}): order → {Order}", shipment, order);
+		logger.LogDebug("GetShipmentTrackerAsync(shipment={Shipment}): shipmentTracker → {ShipmentTracker}", shipment, shipmentTracker);
+		logger.LogInformation("GetShipmentTrackerAsync(shipment)={Shipment}: find query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
         if (order.PickupInStore)
         {
             var pickupPointProvider = await _pickupPluginManager
@@ -424,6 +485,7 @@ public partial class ShipmentService : IShipmentService
                 shipmentTracker = await shippingRateComputationMethod.GetShipmentTrackerAsync();
         }
 
+		logger.LogDebug("<<< Exiting GetShipmentTrackerAsync(shipment={Shipment})", shipment);
         return shipmentTracker;
     }
 

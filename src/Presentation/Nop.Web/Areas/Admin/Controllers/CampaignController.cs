@@ -72,6 +72,8 @@ public partial class CampaignController : BaseAdminController
 
     protected virtual async Task<EmailAccount> GetEmailAccountAsync(int emailAccountId)
     {
+		logger.LogDebug(">>> Entering GetEmailAccountAsync(emailAccountId={EmailAccountId})", emailAccountId);
+		logger.LogDebug("<<< Exiting GetEmailAccountAsync(emailAccountId={EmailAccountId})", emailAccountId);
         return await _emailAccountService.GetEmailAccountByIdAsync(emailAccountId)
                ?? await _emailAccountService.GetEmailAccountByIdAsync(_emailAccountSettings.DefaultEmailAccountId)
                ?? throw new NopException("Email account could not be loaded");
@@ -83,15 +85,20 @@ public partial class CampaignController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Promotions.CAMPAIGNS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _campaignModelFactory.PrepareCampaignSearchModelAsync(new CampaignSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -102,15 +109,19 @@ public partial class CampaignController : BaseAdminController
         //prepare model
         var model = await _campaignModelFactory.PrepareCampaignListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.CAMPAIGNS_CREATE_EDIT)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _campaignModelFactory.PrepareCampaignModelAsync(new CampaignModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -141,20 +152,25 @@ public partial class CampaignController : BaseAdminController
         model = await _campaignModelFactory.PrepareCampaignModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.CAMPAIGNS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a campaign with the specified id
         var campaign = await _campaignService.GetCampaignByIdAsync(id);
         if (campaign == null)
+			logger.LogDebug("Edit(id={Id}): campaign → {Campaign}", id, campaign);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _campaignModelFactory.PrepareCampaignModelAsync(null, campaign);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -191,6 +207,7 @@ public partial class CampaignController : BaseAdminController
         model = await _campaignModelFactory.PrepareCampaignModelAsync(model, campaign, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -207,6 +224,7 @@ public partial class CampaignController : BaseAdminController
         //prepare model
         model = await _campaignModelFactory.PrepareCampaignModelAsync(model, campaign);
 
+		logger.LogDebug("SendTestEmail(model={Model}): model → {Model1}", model, model);
         //ensure that the entered email is valid
         if (!CommonHelper.IsValidEmail(model.TestEmail))
         {
@@ -218,6 +236,8 @@ public partial class CampaignController : BaseAdminController
         {
             var emailAccount = await GetEmailAccountAsync(model.EmailAccountId);
             var store = await _storeContext.GetCurrentStoreAsync();
+			logger.LogDebug("SendTestEmail(model={Model}): emailAccount → {EmailAccount}", model, emailAccount);
+			logger.LogDebug("SendTestEmail(model={Model}): store → {Store}", model, store);
             var subscription = (await _newsLetterSubscriptionService
                 .GetNewsLetterSubscriptionsByEmailAsync(model.TestEmail, storeId: store.Id, subscriptionTypeId: model.NewsLetterSubscriptionTypeId))
                 .FirstOrDefault();
@@ -230,6 +250,7 @@ public partial class CampaignController : BaseAdminController
             {
                 var workingLanguage = await _workContext.GetWorkingLanguageAsync();
 
+				logger.LogDebug("SendTestEmail(model={Model}): workingLanguage → {WorkingLanguage}", model, workingLanguage);
                 //no subscription found
                 await _campaignService.SendCampaignAsync(campaign, emailAccount, model.TestEmail, workingLanguage.Id);
             }
@@ -240,6 +261,7 @@ public partial class CampaignController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in SendTestEmail(model={Model}): {Arg1}", model, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
@@ -247,6 +269,7 @@ public partial class CampaignController : BaseAdminController
         model = await _campaignModelFactory.PrepareCampaignModelAsync(model, campaign, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting SendTestEmail(model={Model})", model);
         return View(model);
     }
 
@@ -263,28 +286,34 @@ public partial class CampaignController : BaseAdminController
         //prepare model
         model = await _campaignModelFactory.PrepareCampaignModelAsync(model, campaign, true);
 
+		logger.LogDebug("SendMassEmail(model={Model}): model → {Model1}", model, model);
         try
         {
             var emailAccount = await GetEmailAccountAsync(model.EmailAccountId);
 
+			logger.LogDebug("SendMassEmail(model={Model}): emailAccount → {EmailAccount}", model, emailAccount);
             //subscribers of certain store?
             var storeId = (await _storeService.GetStoreByIdAsync(campaign.StoreId))?.Id ?? 0;
             var subscriptions = (await _newsLetterSubscriptionService.GetAllNewsLetterSubscriptionsAsync(storeId: storeId,
                 customerRoleId: model.CustomerRoleId,
                 subscriptionTypeId: model.NewsLetterSubscriptionTypeId,
                 isActive: true)).DistinctBy(x => x.Email);
+				logger.LogDebug("SendMassEmail(model={Model}): storeId → {StoreId}", model, storeId);
             var totalEmailsSent = await _campaignService.SendCampaignAsync(campaign, emailAccount, subscriptions);
 
+			logger.LogDebug("SendMassEmail(model={Model}): totalEmailsSent → {TotalEmailsSent}", model, totalEmailsSent);
             _notificationService.SuccessNotification(string.Format(await _localizationService.GetResourceAsync("Admin.Promotions.Campaigns.MassEmailSentToCustomers"), totalEmailsSent));
 
             return RedirectToAction("Edit", new { id = campaign.Id });
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in SendMassEmail(model={Model}): {Arg1}", model, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting SendMassEmail(model={Model})", model);
         return View(model);
     }
 
@@ -292,9 +321,11 @@ public partial class CampaignController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.CAMPAIGNS_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a campaign with the specified id
         var campaign = await _campaignService.GetCampaignByIdAsync(id);
         if (campaign == null)
+			logger.LogDebug("Delete(id={Id}): campaign → {Campaign}", id, campaign);
             return RedirectToAction("List");
 
         await _campaignService.DeleteCampaignAsync(campaign);
@@ -305,6 +336,7 @@ public partial class CampaignController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Promotions.Campaigns.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 

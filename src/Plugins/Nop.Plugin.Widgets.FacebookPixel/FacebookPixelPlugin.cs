@@ -49,6 +49,8 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(FacebookPixelDefaults.ConfigurationRouteName);
     }
 
@@ -61,9 +63,11 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// </returns>
     public async Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
         var widgetZones = new List<string> { PublicWidgetZones.HeadHtmlTag };
         widgetZones.AddRange(await _facebookPixelService.GetCustomEventsWidgetZonesAsync());
 
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return widgetZones;
     }
 
@@ -74,8 +78,10 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         ArgumentNullException.ThrowIfNull(widgetZone);
 
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(FacebookPixelViewComponent);
     }
 
@@ -85,6 +91,7 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
         {
             ["Plugins.Widgets.FacebookPixel.Configuration"] = "Configuration",
@@ -140,6 +147,7 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -148,12 +156,14 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         _widgetSettings.ActiveWidgetSystemNames.Remove(FacebookPixelDefaults.SystemName);
         await _settingService.SaveSettingAsync(_widgetSettings);
 
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Widgets.FacebookPixel");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

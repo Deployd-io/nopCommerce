@@ -47,6 +47,8 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
     /// <returns>List of identifier</returns>
     protected List<int> GetRecentlyViewedProductsIds()
     {
+		logger.LogDebug(">>> Entering GetRecentlyViewedProductsIds()");
+		logger.LogDebug("<<< Exiting GetRecentlyViewedProductsIds()");
         return GetRecentlyViewedProductsIds(int.MaxValue);
     }
 
@@ -70,6 +72,7 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
         var productIds = productIdsCookie.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
 
         //return list of int product identifiers
+		logger.LogDebug("<<< Exiting GetRecentlyViewedProductsIds(number={Number})", number);
         return productIds.Select(int.Parse).Distinct().Take(number).ToList();
     }
 
@@ -80,13 +83,16 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual Task AddRecentlyViewedProductsCookieAsync(IEnumerable<int> recentlyViewedProductIds)
     {
+		logger.LogDebug(">>> Entering AddRecentlyViewedProductsCookieAsync(recentlyViewedProductIds={RecentlyViewedProductIds})", recentlyViewedProductIds);
         //delete current cookie if exists
         var cookieName = $"{NopCookieDefaults.Prefix}{NopCookieDefaults.RecentlyViewedProductsCookie}";
         _httpContextAccessor.HttpContext.Response.Cookies.Delete(cookieName);
+		logger.LogDebug("AddRecentlyViewedProductsCookieAsync(recentlyViewedProductIds={RecentlyViewedProductIds}): cookieName → {CookieName}", recentlyViewedProductIds, cookieName);
 
         //create cookie value
         var productIdsCookie = string.Join(",", recentlyViewedProductIds);
 
+		logger.LogDebug("AddRecentlyViewedProductsCookieAsync(recentlyViewedProductIds={RecentlyViewedProductIds}): productIdsCookie → {ProductIdsCookie}", recentlyViewedProductIds, productIdsCookie);
         //create cookie options 
         var cookieExpires = _cookieSettings.RecentlyViewedProductsCookieExpires;
         var cookieOptions = new CookieOptions
@@ -99,6 +105,7 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
         //add cookie
         _httpContextAccessor.HttpContext.Response.Cookies.Append(cookieName, productIdsCookie, cookieOptions);
 
+		logger.LogDebug("<<< Exiting AddRecentlyViewedProductsCookieAsync(recentlyViewedProductIds={RecentlyViewedProductIds})", recentlyViewedProductIds);
         return Task.CompletedTask;
     }
 
@@ -116,10 +123,13 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
     /// </returns>
     public virtual async Task<IList<Product>> GetRecentlyViewedProductsAsync(int number)
     {
+		logger.LogDebug(">>> Entering GetRecentlyViewedProductsAsync(number={Number})", number);
         //get list of recently viewed product identifiers
         var productIds = GetRecentlyViewedProductsIds(number);
 
+		logger.LogDebug("GetRecentlyViewedProductsAsync(number={Number}): productIds → {ProductIds}", number, productIds);
         //return list of product
+		logger.LogDebug("<<< Exiting GetRecentlyViewedProductsAsync(number={Number})", number);
         return (await _productService.GetProductsByIdsAsync(productIds.ToArray()))
             .Where(product => product.Published && !product.Deleted).ToList();
     }
@@ -131,6 +141,7 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddProductToRecentlyViewedListAsync(int productId)
     {
+		logger.LogDebug(">>> Entering AddProductToRecentlyViewedListAsync(productId={ProductId})", productId);
         if (_httpContextAccessor.HttpContext?.Response == null)
             return;
 
@@ -141,6 +152,7 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
         //get list of recently viewed product identifiers
         var productIds = GetRecentlyViewedProductsIds();
 
+		logger.LogDebug("AddProductToRecentlyViewedListAsync(productId={ProductId}): productIds → {ProductIds}", productId, productIds);
         //whether product identifier to add already exist
         if (!productIds.Contains(productId))
             productIds.Insert(0, productId);
@@ -150,6 +162,7 @@ public partial class RecentlyViewedProductsService : IRecentlyViewedProductsServ
 
         //set cookie
         await AddRecentlyViewedProductsCookieAsync(productIds);
+		logger.LogDebug("<<< Exiting AddProductToRecentlyViewedListAsync(productId={ProductId})", productId);
     }
 
     #endregion

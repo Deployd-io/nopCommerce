@@ -9,6 +9,7 @@ public class PaymentInfoValidator : BaseNopValidator<PaymentInfoModel>
 {
     public PaymentInfoValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering PaymentInfoValidator(localizationService={LocalizationService})", localizationService);
         //useful links:
         //http://fluentvalidation.codeplex.com/wikipage?title=Custom&referringTitle=Documentation&ANCHOR#CustomValidator
         //http://benjii.me/2010/11/credit-card-validator-attribute-for-asp-net-mvc-3/
@@ -31,10 +32,12 @@ public class PaymentInfoValidator : BaseNopValidator<PaymentInfoModel>
             //If, for example, an expiration date reads 06/15, this means it can be used until midnight on June 30, 2015
             var enteredDate = new DateTime(int.Parse(x.ExpireYear), int.Parse(x.ExpireMonth), 1).AddMonths(1);
 
+			logger.LogDebug("PaymentInfoValidator(localizationService={LocalizationService}): enteredDate → {EnteredDate}", localizationService, enteredDate);
             if (enteredDate < DateTime.Now)
                 return false;
 
             return true;
         }).WithMessageAwait(localizationService.GetResourceAsync("Payment.ExpirationDate.Expired"));
+		logger.LogDebug("<<< Exiting PaymentInfoValidator(localizationService={LocalizationService})", localizationService);
     }
 }

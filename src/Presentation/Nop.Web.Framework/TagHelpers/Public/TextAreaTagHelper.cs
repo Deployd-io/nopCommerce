@@ -20,6 +20,8 @@ public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.Tex
 
     public TextAreaTagHelper(IHtmlGenerator generator) : base(generator)
     {
+	logger.LogDebug(">>> Entering TextAreaTagHelper(generator={Generator})", generator);
+	logger.LogDebug("<<< Exiting TextAreaTagHelper(generator={Generator})", generator);
     }
 
     #endregion
@@ -34,6 +36,7 @@ public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.Tex
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -43,6 +46,7 @@ public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.Tex
             output.Attributes.Add(new TagHelperAttribute("disabled", "disabled"));
 
         await base.ProcessAsync(context, output);
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

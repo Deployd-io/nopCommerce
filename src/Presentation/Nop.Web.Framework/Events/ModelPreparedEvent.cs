@@ -15,7 +15,10 @@ public partial class ModelPreparedEvent<T>
     /// <param name="model">Model</param>
     public ModelPreparedEvent(T model)
     {
+		logger.LogDebug(">>> Entering ModelPreparedEvent(model={Model})", model);
         Model = model;
+		logger.LogDebug("<<< Exiting ModelPreparedEvent(model={Model})", model);
+		logger.LogDebug("ModelPreparedEvent(model={Model}): Model → {Model1}", model, Model);
     }
 
     #endregion

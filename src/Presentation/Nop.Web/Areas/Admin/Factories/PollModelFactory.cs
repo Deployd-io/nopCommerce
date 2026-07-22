@@ -56,15 +56,18 @@ public partial class PollModelFactory : IPollModelFactory
     /// <returns>Poll answer search model</returns>
     protected virtual PollAnswerSearchModel PreparePollAnswerSearchModel(PollAnswerSearchModel searchModel, Poll poll)
     {
+		logger.LogDebug(">>> Entering PreparePollAnswerSearchModel(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(poll);
 
         searchModel.PollId = poll.Id;
+		logger.LogDebug("PreparePollAnswerSearchModel(searchModel={SearchModel},poll={Poll}): searchModel.PollId → {Arg2}", searchModel, poll, searchModel.PollId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PreparePollAnswerSearchModel(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         return searchModel;
     }
 
@@ -82,6 +85,7 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollSearchModel> PreparePollSearchModelAsync(PollSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePollSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -92,6 +96,7 @@ public partial class PollModelFactory : IPollModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PreparePollSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -105,6 +110,7 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollListModel> PreparePollListModelAsync(PollSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePollListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get polls
@@ -120,6 +126,7 @@ public partial class PollModelFactory : IPollModelFactory
                 //fill in model values from the entity
                 var pollModel = poll.ToModel<PollModel>();
 
+				logger.LogDebug("PreparePollListModelAsync(searchModel={SearchModel}): pollModel → {PollModel}", searchModel, pollModel);
                 //convert dates to the user time
                 if (poll.StartDateUtc.HasValue)
                     pollModel.StartDateUtc = await _dateTimeHelper.ConvertToUserTimeAsync(poll.StartDateUtc.Value, DateTimeKind.Utc);
@@ -133,6 +140,7 @@ public partial class PollModelFactory : IPollModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PreparePollListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -187,6 +195,7 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollAnswerListModel> PreparePollAnswerListModelAsync(PollAnswerSearchModel searchModel, Poll poll)
     {
+		logger.LogDebug(">>> Entering PreparePollAnswerListModelAsync(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(poll);
@@ -194,10 +203,12 @@ public partial class PollModelFactory : IPollModelFactory
         //get poll answers
         var pollAnswers = await _pollService.GetPollAnswerByPollAsync(poll.Id, searchModel.Page - 1, searchModel.PageSize);
 
+		logger.LogDebug("PreparePollAnswerListModelAsync(searchModel={SearchModel},poll={Poll}): pollAnswers → {PollAnswers}", searchModel, poll, pollAnswers);
         //prepare list model
         var model = new PollAnswerListModel().PrepareToGrid(searchModel, pollAnswers,
             () => pollAnswers.Select(pollAnswer => pollAnswer.ToModel<PollAnswerModel>()));
 
+		logger.LogDebug("<<< Exiting PreparePollAnswerListModelAsync(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         return model;
     }
 

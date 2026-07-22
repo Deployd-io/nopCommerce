@@ -11,8 +11,10 @@ public partial class DiscountManufacturerMappingCacheEventConsumer : CacheEventC
 {
     protected override async Task ClearCacheAsync(DiscountManufacturerMapping entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopDiscountDefaults.AppliedDiscountsCacheKey, nameof(Manufacturer), entity.EntityId);
 
         await base.ClearCacheAsync(entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

@@ -14,9 +14,14 @@ public partial class GenericRoutingEvent : IStopProcessingEvent
 
     public GenericRoutingEvent(HttpContext httpContext, RouteValueDictionary values, UrlRecord urlRecord)
     {
+		logger.LogDebug(">>> Entering GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord})", httpContext, values, urlRecord);
         HttpContext = httpContext;
         RouteValues = values;
+		logger.LogDebug("GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord}): RouteValues → {RouteValues}", httpContext, values, urlRecord, RouteValues);
+		logger.LogDebug("GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord}): HttpContext → {HttpContext1}", httpContext, values, urlRecord, HttpContext);
         UrlRecord = urlRecord;
+		logger.LogDebug("<<< Exiting GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord})", httpContext, values, urlRecord);
+		logger.LogDebug("GenericRoutingEvent(httpContext={HttpContext},values={Values},urlRecord={UrlRecord}): UrlRecord → {UrlRecord1}", httpContext, values, urlRecord, UrlRecord);
     }
 
     #endregion

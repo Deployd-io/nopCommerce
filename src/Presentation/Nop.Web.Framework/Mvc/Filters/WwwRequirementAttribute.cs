@@ -19,6 +19,8 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
     /// </summary>
     public WwwRequirementAttribute() : base(typeof(WwwRequirementFilter))
     {
+	logger.LogDebug(">>> Entering WwwRequirementAttribute()");
+	logger.LogDebug("<<< Exiting WwwRequirementAttribute()");
     }
 
     #endregion
@@ -57,18 +59,23 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         /// <param name="withWww">Whether URL must start with WWW</param>
         private void RedirectRequest(AuthorizationFilterContext context, bool withWww)
         {
+			logger.LogDebug(">>> Entering RedirectRequest(context={Context},withWww={WithWww})", context, withWww);
             //get scheme depending on securing connection
             var urlScheme = $"{_webHelper.GetCurrentRequestProtocol()}{Uri.SchemeDelimiter}";
 
+			logger.LogDebug("RedirectRequest(context={Context},withWww={WithWww}): urlScheme → {UrlScheme}", context, withWww, urlScheme);
             //compose start of URL with WWW
             var urlWith3W = $"{urlScheme}www.";
 
+			logger.LogDebug("RedirectRequest(context={Context},withWww={WithWww}): urlWith3W → {UrlWith3W}", context, withWww, urlWith3W);
             //get requested URL
             var currentUrl = _webHelper.GetThisPageUrl(true);
 
+			logger.LogDebug("RedirectRequest(context={Context},withWww={WithWww}): currentUrl → {CurrentUrl}", context, withWww, currentUrl);
             //whether requested URL starts with WWW
             var urlStartsWith3W = currentUrl.StartsWith(urlWith3W, StringComparison.OrdinalIgnoreCase);
 
+			logger.LogDebug("RedirectRequest(context={Context},withWww={WithWww}): urlStartsWith3W → {UrlStartsWith3W}", context, withWww, urlStartsWith3W);
             //page should have WWW prefix, so set 301 (permanent) redirection to URL with WWW
             if (withWww && !urlStartsWith3W)
                 context.Result = new RedirectResult(currentUrl.Replace(urlScheme, urlWith3W), true);
@@ -76,6 +83,7 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
             //page shouldn't have WWW prefix, so set 301 (permanent) redirection to URL without WWW
             if (!withWww && urlStartsWith3W)
                 context.Result = new RedirectResult(currentUrl.Replace(urlWith3W, urlScheme), true);
+				logger.LogDebug("<<< Exiting RedirectRequest(context={Context},withWww={WithWww})", context, withWww);
         }
 
         /// <summary>
@@ -84,6 +92,7 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         /// <param name="context">Authorization filter context</param>
         private void CheckWwwRequirement(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering CheckWwwRequirement(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in GET requests, otherwise the browser might not propagate the verb and request body correctly.
@@ -116,6 +125,7 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
                 default:
                     throw new NopException("Not supported WwwRequirement parameter");
             }
+			logger.LogDebug("<<< Exiting CheckWwwRequirement(context={Context})", context);
         }
 
         #endregion
@@ -129,7 +139,9 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             CheckWwwRequirement(context);
+			logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
             return Task.CompletedTask;
         }
 

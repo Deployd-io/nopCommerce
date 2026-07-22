@@ -10,7 +10,9 @@ public partial class ProductAttributeValidator : BaseNopValidator<ProductAttribu
 {
     public ProductAttributeValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductAttributeValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Attributes.ProductAttributes.Fields.Name.Required"));
         SetDatabaseValidationRules<ProductAttribute>();
+		logger.LogDebug("<<< Exiting ProductAttributeValidator(localizationService={LocalizationService})", localizationService);
     }
 }

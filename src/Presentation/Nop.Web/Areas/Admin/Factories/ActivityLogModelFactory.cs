@@ -47,10 +47,14 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     protected virtual async Task<IList<ActivityLogTypeModel>> PrepareActivityLogTypeModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareActivityLogTypeModelsAsync()");
         //prepare available activity log types
         var availableActivityTypes = await _customerActivityService.GetAllActivityTypesAsync();
         var models = availableActivityTypes.Select(activityType => activityType.ToModel<ActivityLogTypeModel>()).ToList();
+		logger.LogDebug("PrepareActivityLogTypeModelsAsync(): availableActivityTypes → {AvailableActivityTypes}", availableActivityTypes);
+		logger.LogDebug("PrepareActivityLogTypeModelsAsync(): models → {Models}", models);
 
+		logger.LogDebug("<<< Exiting PrepareActivityLogTypeModelsAsync()");
         return models;
     }
 
@@ -68,6 +72,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     public virtual async Task<ActivityLogTypeSearchModel> PrepareActivityLogTypeSearchModelAsync(ActivityLogTypeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareActivityLogTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.ActivityLogTypeListModel = await PrepareActivityLogTypeModelsAsync();
@@ -75,6 +80,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
         //prepare grid
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareActivityLogTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -88,6 +94,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     public virtual async Task<ActivityLogSearchModel> PrepareActivityLogSearchModelAsync(ActivityLogSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareActivityLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available activity log types
@@ -96,6 +103,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
         //prepare grid
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareActivityLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -109,6 +117,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     public virtual async Task<ActivityLogListModel> PrepareActivityLogListModelAsync(ActivityLogSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareActivityLogListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter log
@@ -130,6 +139,8 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
         //prepare list model
         var customerIds = activityLog.GroupBy(logItem => logItem.CustomerId).Select(logItem => logItem.Key);
         var activityLogCustomers = await _customerService.GetCustomersByIdsAsync(customerIds.ToArray());
+		logger.LogDebug("PrepareActivityLogListModelAsync(searchModel={SearchModel}): customerIds → {CustomerIds}", searchModel, customerIds);
+		logger.LogDebug("PrepareActivityLogListModelAsync(searchModel={SearchModel}): activityLogCustomers → {ActivityLogCustomers}", searchModel, activityLogCustomers);
         var model = await new ActivityLogListModel().PrepareToGridAsync(searchModel, activityLog, () =>
         {
             return activityLog.SelectAwait(async logItem =>
@@ -137,6 +148,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
                 //fill in model values from the entity
                 var logItemModel = logItem.ToModel<ActivityLogModel>();
                 logItemModel.ActivityLogTypeName = (await _customerActivityService.GetActivityTypeByIdAsync(logItem.ActivityLogTypeId))?.Name;
+				logger.LogDebug("PrepareActivityLogListModelAsync(searchModel={SearchModel}): logItemModel → {LogItemModel}", searchModel, logItemModel);
 
                 logItemModel.CustomerEmail = activityLogCustomers?.FirstOrDefault(x => x.Id == logItem.CustomerId)?.Email;
 
@@ -147,6 +159,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareActivityLogListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

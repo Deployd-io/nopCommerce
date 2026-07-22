@@ -44,6 +44,7 @@ public class AvalaraProductController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ExportProducts(string selectedIds)
     {
+		logger.LogDebug(">>> Entering ExportProducts(selectedIds={SelectedIds})", selectedIds);
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return RedirectToAction("List", "Product");
@@ -51,6 +52,7 @@ public class AvalaraProductController : BaseAdminController
         //export items
         var exportedItems = await _avalaraTaxManager.ExportProductsAsync(selectedIds);
         if (exportedItems.HasValue)
+		logger.LogDebug("ExportProducts(selectedIds={SelectedIds}): exportedItems → {ExportedItems}", selectedIds, exportedItems);
         {
             if (exportedItems > 0)
                 _notificationService.SuccessNotification(string.Format(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Items.Export.Success"), exportedItems));
@@ -60,6 +62,7 @@ public class AvalaraProductController : BaseAdminController
         else
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Items.Export.Error"));
 
+		logger.LogDebug("<<< Exiting ExportProducts(selectedIds={SelectedIds})", selectedIds);
         return RedirectToAction("List", "Product");
     }
 

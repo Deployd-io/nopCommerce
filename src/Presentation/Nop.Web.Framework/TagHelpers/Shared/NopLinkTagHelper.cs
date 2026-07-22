@@ -40,6 +40,7 @@ public partial class NopLinkTagHelper : UrlResolutionTagHelper
 
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -48,6 +49,7 @@ public partial class NopLinkTagHelper : UrlResolutionTagHelper
 
         output.SuppressOutput();
 
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

@@ -51,13 +51,22 @@ public partial class RemotePost
     /// <param name="webHelper">Web helper</param>
     public RemotePost(IHttpContextAccessor httpContextAccessor, IWebHelper webHelper)
     {
+		logger.LogDebug(">>> Entering RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper})", httpContextAccessor, webHelper);
         Params = new NameValueCollection();
         Url = "http://www.someurl.com";
+		logger.LogDebug("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): Params → {Params}", httpContextAccessor, webHelper, Params);
+		logger.LogDebug("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): Url → {Url}", httpContextAccessor, webHelper, Url);
+		logger.LogInformation("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): Url → {Url}", httpContextAccessor, webHelper, Url);
         Method = "post";
         FormName = "formName";
+		logger.LogDebug("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): Method → {Method}", httpContextAccessor, webHelper, Method);
+		logger.LogDebug("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): FormName → {FormName}", httpContextAccessor, webHelper, FormName);
 
         _httpContextAccessor = httpContextAccessor;
         _webHelper = webHelper;
+		logger.LogDebug("<<< Exiting RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper})", httpContextAccessor, webHelper);
+		logger.LogDebug("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): _httpContextAccessor → {_httpContextAccessor}", httpContextAccessor, webHelper, _httpContextAccessor);
+		logger.LogDebug("RemotePost(httpContextAccessor={HttpContextAccessor},webHelper={WebHelper}): _webHelper → {_webHelper}", httpContextAccessor, webHelper, _webHelper);
     }
 
     /// <summary>
@@ -67,7 +76,9 @@ public partial class RemotePost
     /// <param name="value">The value of the element to add.</param>
     public virtual void Add(string name, string value)
     {
+		logger.LogDebug(">>> Entering Add(name={Name},value={Value})", name, value);
         Params.Add(name, value);
+		logger.LogDebug("<<< Exiting Add(name={Name},value={Value})", name, value);
     }
 
     /// <summary>
@@ -75,9 +86,11 @@ public partial class RemotePost
     /// </summary>
     public virtual void Post()
     {
+		logger.LogDebug(">>> Entering Post()");
         //text
         var sb = new StringBuilder();
         sb.Append("<html><head>");
+		logger.LogDebug("Post(): sb → {Sb}", sb);
         sb.Append($"</head><body onload=\"document.{FormName}.submit()\">");
         if (!string.IsNullOrEmpty(AcceptCharset))
         {
@@ -96,6 +109,7 @@ public partial class RemotePost
             {
                 var values = Params.GetValues(key);
                 if (values != null)
+				logger.LogDebug("Post(): values → {Values}", values);
                 {
                     foreach (var value in values)
                     {
@@ -116,13 +130,17 @@ public partial class RemotePost
 
         var data = Encoding.UTF8.GetBytes(sb.ToString());
 
+		logger.LogDebug("Post(): data → {Data}", data);
         //modify the response
         var httpContext = _httpContextAccessor.HttpContext;
         var response = httpContext.Response;
 
+		logger.LogDebug("Post(): response → {Response}", response);
         //post
         response.Clear();
         response.ContentType = "text/html; charset=utf-8";
+		logger.LogDebug("Post(): response.ContentType → {Arg0}", response.ContentType);
+		logger.LogDebug("Post(): response.ContentLength → {Arg0}", response.ContentLength);
         response.ContentLength = data.Length;
 
         response.Body
@@ -131,5 +149,7 @@ public partial class RemotePost
 
         //store a value indicating whether POST has been done
         _webHelper.IsPostBeingDone = true;
+		logger.LogDebug("<<< Exiting Post()");
+		logger.LogDebug("Post(): _webHelper.IsPostBeingDone → {Arg0}", _webHelper.IsPostBeingDone);
     }
 }

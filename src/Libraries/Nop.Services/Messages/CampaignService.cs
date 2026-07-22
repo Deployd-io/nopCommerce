@@ -56,6 +56,8 @@ public partial class CampaignService : ICampaignService
     /// </returns>
     public virtual async Task<Campaign> CopyCampaignAsync(Campaign campaign, string newName)
     {
+		logger.LogDebug(">>> Entering CopyCampaignAsync(campaign={Campaign},newName={NewName})", campaign, newName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(campaign);
         ArgumentException.ThrowIfNullOrEmpty(newName);
 
@@ -71,7 +73,9 @@ public partial class CampaignService : ICampaignService
         };
 
         await _campaignRepository.InsertAsync(campaignCopy);
+		logger.LogInformation("CopyCampaignAsync(campaign,newName)={Campaign},{NewName}: save query executed in {Arg2} ms", campaign, newName, __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting CopyCampaignAsync(campaign={Campaign},newName={NewName})", campaign, newName);
         return campaignCopy;
     }
 
@@ -82,9 +86,15 @@ public partial class CampaignService : ICampaignService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCampaignAsync(Campaign campaign)
     {
+		logger.LogDebug(">>> Entering InsertCampaignAsync(campaign={Campaign})", campaign);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _campaignRepository.InsertAsync(campaign);
+		logger.LogDebug("<<< Exiting InsertCampaignAsync(campaign={Campaign})", campaign);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertCampaignAsync(campaign)={Campaign}: save query executed in {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertCampaignAsync(campaign)={Campaign}: save query executed in {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a campaign
     /// </summary>
@@ -92,9 +102,15 @@ public partial class CampaignService : ICampaignService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateCampaignAsync(Campaign campaign)
     {
+		logger.LogDebug(">>> Entering UpdateCampaignAsync(campaign={Campaign})", campaign);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _campaignRepository.UpdateAsync(campaign);
+		logger.LogDebug("<<< Exiting UpdateCampaignAsync(campaign={Campaign})", campaign);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateCampaignAsync(campaign)={Campaign}: update query executed in {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateCampaignAsync(campaign)={Campaign}: update query executed in {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deleted a queued email
     /// </summary>
@@ -102,9 +118,19 @@ public partial class CampaignService : ICampaignService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCampaignAsync(Campaign campaign)
     {
+		logger.LogDebug(">>> Entering DeleteCampaignAsync(campaign={Campaign})", campaign);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _campaignRepository.DeleteAsync(campaign);
+		logger.LogDebug("<<< Exiting DeleteCampaignAsync(campaign={Campaign})", campaign);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteCampaignAsync(campaign)={Campaign}: external service call took {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteCampaignAsync(campaign)={Campaign}: delete query executed in {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteCampaignAsync(campaign)={Campaign}: external service call took {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteCampaignAsync(campaign)={Campaign}: delete query executed in {Arg1} ms", campaign, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a campaign by identifier
     /// </summary>
@@ -115,6 +141,8 @@ public partial class CampaignService : ICampaignService
     /// </returns>
     public virtual async Task<Campaign> GetCampaignByIdAsync(int campaignId)
     {
+		logger.LogDebug(">>> Entering GetCampaignByIdAsync(campaignId={CampaignId})", campaignId);
+		logger.LogDebug("<<< Exiting GetCampaignByIdAsync(campaignId={CampaignId})", campaignId);
         return await _campaignRepository.GetByIdAsync(campaignId, cache => default);
     }
 
@@ -128,16 +156,20 @@ public partial class CampaignService : ICampaignService
     /// </returns>
     public virtual async Task<IList<Campaign>> GetAllCampaignsAsync(int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetAllCampaignsAsync(storeId={StoreId})", storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var campaigns = await _campaignRepository.GetAllAsync(query =>
         {
             if (storeId > 0)
                 query = query.Where(c => c.StoreId == storeId);
 
+			logger.LogInformation("GetAllCampaignsAsync(storeId)={StoreId}: find query executed in {Arg1} ms", storeId, __logStart.ElapsedMilliseconds);
             query = query.OrderBy(c => c.CreatedOnUtc);
 
             return query;
         });
 
+		logger.LogDebug("<<< Exiting GetAllCampaignsAsync(storeId={StoreId})", storeId);
         return campaigns;
     }
 

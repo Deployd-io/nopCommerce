@@ -17,6 +17,8 @@ public partial class StateProvinceCacheEventConsumer : CacheEventConsumer<StateP
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(StateProvince entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveByPrefixAsync(NopEntityCacheDefaults<StateProvince>.Prefix);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

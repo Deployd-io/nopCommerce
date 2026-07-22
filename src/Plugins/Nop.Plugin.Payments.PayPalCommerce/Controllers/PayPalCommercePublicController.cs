@@ -44,16 +44,21 @@ public class PayPalCommercePublicController : BasePublicController
 
     public async Task<IActionResult> PluginPaymentInfo()
     {
+		logger.LogDebug(">>> Entering PluginPaymentInfo()");
         var model = await _modelFactory.PrepareCheckoutPaymentInfoModelAsync();
 
+		logger.LogDebug("PluginPaymentInfo(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting PluginPaymentInfo()");
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/PluginPaymentInfo.cshtml", model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public async Task<IActionResult> ValidateShoppingCart()
     {
+		logger.LogDebug(">>> Entering ValidateShoppingCart()");
         var warnings = await _modelFactory.GetShoppingCartWarningsAsync();
         if (warnings?.Any() ?? false)
+			logger.LogDebug("ValidateShoppingCart(): warnings → {Warnings}", warnings);
             return ErrorJson(warnings.ToArray());
 
         return Json(new { success = true });
@@ -62,8 +67,10 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> CreateOrder(int placement, string paymentSource, int cardId, bool saveCard)
     {
+		logger.LogDebug(">>> Entering CreateOrder(placement={Placement},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard})", placement, paymentSource, cardId, saveCard);
         var model = await _modelFactory.PrepareOrderModelAsync((ButtonPlacement)placement, null, paymentSource, cardId, saveCard);
         if (model.LoginIsRequired)
+			logger.LogDebug("CreateOrder(placement={Placement},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard}): model → {Model}", placement, paymentSource, cardId, saveCard, model);
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.LOGIN, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) }) });
 
         if (!model.CheckoutIsEnabled)
@@ -74,6 +81,7 @@ public class PayPalCommercePublicController : BasePublicController
 
         //customer can complete 3D Secure if prompted
         if (cardId > 0 && !string.IsNullOrEmpty(model.PayerActionUrl))
+		logger.LogDebug("<<< Exiting CreateOrder(placement={Placement},paymentSource={PaymentSource},cardId={CardId},saveCard={SaveCard})", placement, paymentSource, cardId, saveCard);
             return Json(new { redirect = model.PayerActionUrl });
 
         return Json(new { orderId = model.OrderId, status = model.Status });
@@ -82,8 +90,10 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> GetOrderStatus(int placement, string orderId)
     {
+		logger.LogDebug(">>> Entering GetOrderStatus(placement={Placement},orderId={OrderId})", placement, orderId);
         var model = await _modelFactory.PrepareOrderModelAsync((ButtonPlacement)placement, orderId, null, null, false);
         if (!string.IsNullOrEmpty(model.Error))
+			logger.LogDebug("GetOrderStatus(placement={Placement},orderId={OrderId}): model → {Model}", placement, orderId, model);
             return ErrorJson(model.Error);
 
         return Json(new { status = model.Status, payerAction = model.PayerActionUrl });
@@ -94,6 +104,7 @@ public class PayPalCommercePublicController : BasePublicController
     {
         model = await _modelFactory.PrepareOrderShippingModelAsync(model);
         if (!string.IsNullOrEmpty(model.Error))
+			logger.LogDebug("UpdateOrderShipping(model={Model}): model → {Model1}", model, model);
             return ErrorJson(model.Error);
 
         return Json(new { success = true });
@@ -124,6 +135,7 @@ public class PayPalCommercePublicController : BasePublicController
         //or pay it right now
         var completedModel = await _modelFactory.PrepareOrderCompletedModelAsync(orderId, liabilityShift);
         if (!string.IsNullOrEmpty(completedModel.Error))
+			logger.LogDebug("ApproveOrder(orderId={OrderId},liabilityShift={LiabilityShift}): completedModel → {CompletedModel}", orderId, liabilityShift, completedModel);
             return ErrorJson(completedModel.Error);
 
         return Json(new { redirect = Url.RouteUrl(NopRouteNames.Standard.CHECKOUT_COMPLETED, new { orderId = completedModel.OrderId }) });
@@ -134,8 +146,10 @@ public class PayPalCommercePublicController : BasePublicController
         if (string.IsNullOrEmpty(liabilityShift))
             liabilityShift = _webHelper.QueryString<string>("liability_shift");
 
+		logger.LogDebug("ConfirmOrder(orderId={OrderId},token={Token},liabilityShift={LiabilityShift},approve={Approve}): liabilityShift → {LiabilityShift1}", orderId, token, liabilityShift, approve, liabilityShift);
         var model = await _modelFactory.PrepareOrderConfirmModelAsync(orderId, token, liabilityShift, approve);
         if (model.LoginIsRequired)
+			logger.LogDebug("ConfirmOrder(orderId={OrderId},token={Token},liabilityShift={LiabilityShift},approve={Approve}): model → {Model}", orderId, token, liabilityShift, approve, model);
             return RedirectToRoute(NopRouteNames.General.LOGIN, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) });
 
         if (!model.CheckoutIsEnabled)
@@ -144,6 +158,7 @@ public class PayPalCommercePublicController : BasePublicController
         if (!string.IsNullOrEmpty(model.Error))
             _notificationService.ErrorNotification(model.Error);
 
+		logger.LogDebug("<<< Exiting ConfirmOrder(orderId={OrderId},token={Token},liabilityShift={LiabilityShift},approve={Approve})", orderId, token, liabilityShift, approve);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/ConfirmOrder.cshtml", model);
     }
 
@@ -184,8 +199,10 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> AppleTransactionInfo(int placement)
     {
+		logger.LogDebug(">>> Entering AppleTransactionInfo(placement={Placement})", placement);
         var model = await _modelFactory.PrepareApplePayModelAsync((ButtonPlacement)placement);
         if (model.LoginIsRequired)
+			logger.LogDebug("AppleTransactionInfo(placement={Placement}): model → {Model}", placement, model);
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.LOGIN, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) }) });
 
         if (!model.CheckoutIsEnabled)
@@ -196,11 +213,15 @@ public class PayPalCommercePublicController : BasePublicController
 
         var totalItem = model.Items.FirstOrDefault(item => item.Type == "TOTAL");
         var items = model.Items.Where(item => item.Type != "TOTAL");
+		logger.LogDebug("AppleTransactionInfo(placement={Placement}): totalItem → {TotalItem}", placement, totalItem);
+		logger.LogDebug("AppleTransactionInfo(placement={Placement}): items → {Items}", placement, items);
 
         var transactionInfo = new
         {
             currencyCode = model.CurrencyCode,
             billingContact = model.BillingAddress is null ? null : new
+			logger.LogDebug("AppleTransactionInfo(placement={Placement}): currencyCode → {CurrencyCode}", placement, currencyCode);
+			logger.LogDebug("AppleTransactionInfo(placement={Placement}): billingContact → {BillingContact}", placement, billingContact);
             {
                 emailAddress = model.BillingAddress.Email,
                 givenName = model.BillingAddress.FirstName,
@@ -211,8 +232,17 @@ public class PayPalCommercePublicController : BasePublicController
                 administrativeArea = model.BillingAddress.State,
                 countryCode = model.BillingAddress.Country,
                 postalCode = model.BillingAddress.PostalCode
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): emailAddress → {EmailAddress}", placement, emailAddress);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): givenName → {GivenName}", placement, givenName);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): familyName → {FamilyName}", placement, familyName);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): locality → {Locality}", placement, locality);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): subAdministrativeArea → {SubAdministrativeArea}", placement, subAdministrativeArea);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): administrativeArea → {AdministrativeArea}", placement, administrativeArea);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): countryCode → {CountryCode}", placement, countryCode);
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): postalCode → {PostalCode}", placement, postalCode);
             },
             shippingContact = model.ShippingAddress is null ? null : new
+			logger.LogDebug("AppleTransactionInfo(placement={Placement}): shippingContact → {ShippingContact}", placement, shippingContact);
             {
                 emailAddress = model.ShippingAddress.Email,
                 givenName = model.ShippingAddress.FirstName,
@@ -226,14 +256,18 @@ public class PayPalCommercePublicController : BasePublicController
             //shippingType = model.ShippingAddress is null ? null : (model.ShippingAddress.PickupInStore ? "storePickup" : "shipping"),
             //shippingContactEditingMode = model.ShippingAddress is null ? null : "storePickup",
             shippingMethods = model.ShippingOptions
+				logger.LogDebug("AppleTransactionInfo(placement={Placement}): shippingMethods → {ShippingMethods}", placement, shippingMethods);
                 ?.Select(option => new { identifier = option.Id, amount = option.Price, label = option.Label, detail = option.Description })
                 .ToArray(),
             total = new { label = totalItem.Label, type = totalItem.Status, amount = totalItem.Price },
             lineItems = items
+			logger.LogDebug("AppleTransactionInfo(placement={Placement}): total → {Total}", placement, total);
+			logger.LogDebug("AppleTransactionInfo(placement={Placement}): lineItems → {LineItems}", placement, lineItems);
                 .Select(item => new { label = item.Label, type = item.Status, amount = item.Price })
                 .ToArray()
         };
 
+		logger.LogDebug("<<< Exiting AppleTransactionInfo(placement={Placement})", placement);
         return Json(new { transactionInfo = transactionInfo });
     }
 
@@ -242,10 +276,13 @@ public class PayPalCommercePublicController : BasePublicController
     {
         model = await _modelFactory.PrepareApplePayShippingModelAsync(model);
         if (!string.IsNullOrEmpty(model.Error))
+			logger.LogDebug("UpdateAppleShipping(model={Model}): model → {Model1}", model, model);
             return ErrorJson(model.Error);
 
         var totalItem = model.Items.FirstOrDefault(item => item.Type == "TOTAL");
         var items = model.Items.Where(item => item.Type != "TOTAL");
+		logger.LogDebug("UpdateAppleShipping(model={Model}): totalItem → {TotalItem}", model, totalItem);
+		logger.LogDebug("UpdateAppleShipping(model={Model}): items → {Items}", model, items);
 
         //update total, items and shipping methods
         var shippingMethods = model.ShippingOptions
@@ -253,17 +290,21 @@ public class PayPalCommercePublicController : BasePublicController
             .ToArray();
         var total = new { label = totalItem.Label, type = totalItem.Status, amount = totalItem.Price };
         var lineItems = items
+			logger.LogDebug("UpdateAppleShipping(model={Model}): total → {Total}", model, total);
             .Select(item => new { label = item.Label, type = item.Status, amount = item.Price })
             .ToArray();
 
+		logger.LogDebug("<<< Exiting UpdateAppleShipping(model={Model})", model);
         return Json(new { shippingMethods = shippingMethods, total = total, lineItems = lineItems });
     }
 
     [HttpPost]
     public async Task<IActionResult> GoogleTransactionInfo(int placement)
     {
+		logger.LogDebug(">>> Entering GoogleTransactionInfo(placement={Placement})", placement);
         var model = await _modelFactory.PrepareGooglePayModelAsync((ButtonPlacement)placement);
         if (model.LoginIsRequired)
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): model → {Model}", placement, model);
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.LOGIN, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) }) });
 
         if (!model.CheckoutIsEnabled)
@@ -274,6 +315,8 @@ public class PayPalCommercePublicController : BasePublicController
 
         var totalItem = model.Items.FirstOrDefault(item => item.Type == "TOTAL");
         var items = model.Items.Where(item => item.Type != "TOTAL");
+		logger.LogDebug("GoogleTransactionInfo(placement={Placement}): totalItem → {TotalItem}", placement, totalItem);
+		logger.LogDebug("GoogleTransactionInfo(placement={Placement}): items → {Items}", placement, items);
 
         var transactionInfo = new
         {
@@ -285,25 +328,39 @@ public class PayPalCommercePublicController : BasePublicController
             totalPriceLabel = totalItem.Label,
             displayItems = items.Select(item => new
             {
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): currencyCode → {CurrencyCode}", placement, currencyCode);
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): countryCode → {CountryCode}", placement, countryCode);
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): checkoutOption → {CheckoutOption}", placement, checkoutOption);
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): totalPriceStatus → {TotalPriceStatus}", placement, totalPriceStatus);
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): totalPrice → {TotalPrice}", placement, totalPrice);
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): totalPriceLabel → {TotalPriceLabel}", placement, totalPriceLabel);
                 type = item.Type,
                 label = item.Label,
                 price = item.Price,
                 status = item.Status
+				logger.LogDebug("GoogleTransactionInfo(placement={Placement}): type → {Type}", placement, type);
+				logger.LogDebug("GoogleTransactionInfo(placement={Placement}): label → {Label}", placement, label);
+				logger.LogDebug("GoogleTransactionInfo(placement={Placement}): price → {Price}", placement, price);
+				logger.LogDebug("GoogleTransactionInfo(placement={Placement}): status → {Status}", placement, status);
             }).ToArray()
         };
 
         var callbacks = new List<string> { "PAYMENT_AUTHORIZATION" };
         if (model.ShippingIsRequired)
+			logger.LogDebug("GoogleTransactionInfo(placement={Placement}): callbacks → {Callbacks}", placement, callbacks);
             callbacks.AddRange(new List<string> { "SHIPPING_ADDRESS", "SHIPPING_OPTION" });
 
+		logger.LogDebug("<<< Exiting GoogleTransactionInfo(placement={Placement})", placement);
         return Json(new { transactionInfo = transactionInfo, shipping = model.ShippingIsRequired, callbacks = callbacks.ToArray() });
     }
 
     [HttpPost]
     public async Task<IActionResult> CheckGoogleShipping(int placement, int? productId)
     {
+		logger.LogDebug(">>> Entering CheckGoogleShipping(placement={Placement},productId={ProductId})", placement, productId);
         var (shippingIsRequired, error) = await _modelFactory.CheckShippingIsRequiredAsync(productId);
         if (!string.IsNullOrEmpty(error))
+		logger.LogDebug("<<< Exiting CheckGoogleShipping(placement={Placement},productId={ProductId})", placement, productId);
             return ErrorJson(error);
 
         return Json(new { shippingIsRequired = shippingIsRequired && placement != (int)ButtonPlacement.PaymentMethod });
@@ -314,10 +371,13 @@ public class PayPalCommercePublicController : BasePublicController
     {
         model = await _modelFactory.PrepareGooglePayShippingModelAsync(model);
         if (!string.IsNullOrEmpty(model.Error))
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): model → {Model1}", model, model);
             return ErrorJson(model.Error);
 
         var totalItem = model.Items.FirstOrDefault(item => item.Type == "TOTAL");
         var items = model.Items.Where(item => item.Type != "TOTAL");
+		logger.LogDebug("UpdateGoogleShipping(model={Model}): totalItem → {TotalItem}", model, totalItem);
+		logger.LogDebug("UpdateGoogleShipping(model={Model}): items → {Items}", model, items);
 
         var transactionInfo = new
         {
@@ -329,10 +389,20 @@ public class PayPalCommercePublicController : BasePublicController
             totalPriceLabel = totalItem.Label,
             displayItems = items.Select(item => new
             {
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): currencyCode → {CurrencyCode}", model, currencyCode);
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): countryCode → {CountryCode}", model, countryCode);
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): checkoutOption → {CheckoutOption}", model, checkoutOption);
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): totalPriceStatus → {TotalPriceStatus}", model, totalPriceStatus);
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): totalPrice → {TotalPrice}", model, totalPrice);
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): totalPriceLabel → {TotalPriceLabel}", model, totalPriceLabel);
                 type = item.Type,
                 label = item.Label,
                 price = item.Price,
                 status = item.Status
+				logger.LogDebug("UpdateGoogleShipping(model={Model}): type → {Type}", model, type);
+				logger.LogDebug("UpdateGoogleShipping(model={Model}): label → {Label}", model, label);
+				logger.LogDebug("UpdateGoogleShipping(model={Model}): price → {Price}", model, price);
+				logger.LogDebug("UpdateGoogleShipping(model={Model}): status → {Status}", model, status);
             }).ToArray()
         };
 
@@ -341,8 +411,10 @@ public class PayPalCommercePublicController : BasePublicController
             id = option.Id,
             label = option.Label,
             description = option.Description
+			logger.LogDebug("UpdateGoogleShipping(model={Model}): description → {Description}", model, description);
         }).ToArray();
 
+		logger.LogDebug("<<< Exiting UpdateGoogleShipping(model={Model})", model);
         return Json(new { transactionInfo = transactionInfo, options = new { shippingOptions = options, defaultSelectedOptionId = model.OptionId } });
     }
 
@@ -351,14 +423,17 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> CreateSetupToken()
     {
+		logger.LogDebug(">>> Entering CreateSetupToken()");
         var model = await _modelFactory.PrepareSetupTokenModelAsync();
         if (model.LoginIsRequired)
+			logger.LogDebug("CreateSetupToken(): model → {Model}", model);
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.LOGIN, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) }) });
 
         if (!model.CheckoutIsEnabled)
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.CART) });
 
         if (!string.IsNullOrEmpty(model.Error))
+		logger.LogDebug("<<< Exiting CreateSetupToken()");
             return ErrorJson(model.Error);
 
         return Json(new { status = model.Status, redirect = model.PayerActionUrl });
@@ -366,12 +441,15 @@ public class PayPalCommercePublicController : BasePublicController
 
     public async Task<IActionResult> ApproveToken(string approvalTokenId)
     {
+		logger.LogDebug(">>> Entering ApproveToken(approvalTokenId={ApprovalTokenId})", approvalTokenId);
         if (string.IsNullOrEmpty(approvalTokenId))
             approvalTokenId = _webHelper.QueryString<string>("approval_token_id");
 
+		logger.LogDebug("ApproveToken(approvalTokenId={ApprovalTokenId}): approvalTokenId → {ApprovalTokenId1}", approvalTokenId, approvalTokenId);
         //create new recurring order
         var orderModel = await _modelFactory.PrepareRecurringOrderModelAsync(approvalTokenId);
         if (orderModel.LoginIsRequired)
+			logger.LogDebug("ApproveToken(approvalTokenId={ApprovalTokenId}): orderModel → {OrderModel}", approvalTokenId, orderModel);
             return RedirectToRoute(NopRouteNames.General.LOGIN, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) });
 
         if (!orderModel.CheckoutIsEnabled)
@@ -387,6 +465,7 @@ public class PayPalCommercePublicController : BasePublicController
         var liabilityShift = string.Empty;
         var approvedModel = await _modelFactory.PrepareOrderApprovedModelAsync(orderModel.OrderId, liabilityShift);
 
+		logger.LogDebug("ApproveToken(approvalTokenId={ApprovalTokenId}): approvedModel → {ApprovedModel}", approvalTokenId, approvedModel);
         if (!string.IsNullOrEmpty(approvedModel.Error))
         {
             _notificationService.ErrorNotification(approvedModel.Error);
@@ -400,11 +479,13 @@ public class PayPalCommercePublicController : BasePublicController
         //or pay it right now
         var completedModel = await _modelFactory.PrepareOrderCompletedModelAsync(orderModel.OrderId, liabilityShift);
         if (!string.IsNullOrEmpty(completedModel.Error))
+		logger.LogDebug("ApproveToken(approvalTokenId={ApprovalTokenId}): completedModel → {CompletedModel}", approvalTokenId, completedModel);
         {
             _notificationService.ErrorNotification(completedModel.Error);
             return RedirectToRoute(NopRouteNames.General.CART);
         }
 
+		logger.LogDebug("<<< Exiting ApproveToken(approvalTokenId={ApprovalTokenId})", approvalTokenId);
         return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_COMPLETED, new { orderId = completedModel.OrderId });
     }
 
@@ -412,13 +493,16 @@ public class PayPalCommercePublicController : BasePublicController
 
     public async Task<IActionResult> PaymentTokens()
     {
+		logger.LogDebug(">>> Entering PaymentTokens()");
         var model = await _modelFactory.PreparePaymentTokenListModelAsync();
         if (!model.VaultIsEnabled)
+			logger.LogDebug("PaymentTokens(): model → {Model}", model);
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
 
         if (!string.IsNullOrEmpty(model.Error))
             _notificationService.ErrorNotification(model.Error);
 
+		logger.LogDebug("<<< Exiting PaymentTokens()");
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/PaymentTokens.cshtml", model);
 
     }
@@ -426,11 +510,14 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> PaymentTokensDelete(int tokenId)
     {
+		logger.LogDebug(">>> Entering PaymentTokensDelete(tokenId={TokenId})", tokenId);
         var model = await _modelFactory.PreparePaymentTokenListModelAsync(deleteTokenId: tokenId);
         if (!model.VaultIsEnabled)
+			logger.LogDebug("PaymentTokensDelete(tokenId={TokenId}): model → {Model}", tokenId, model);
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.CUSTOMER_INFO) });
 
         if (!string.IsNullOrEmpty(model.Error))
+		logger.LogDebug("<<< Exiting PaymentTokensDelete(tokenId={TokenId})", tokenId);
             return ErrorJson(model.Error);
 
         return Json(new { redirect = Url.RouteUrl(PayPalCommerceDefaults.Route.PaymentTokens) });
@@ -439,11 +526,14 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> PaymentTokensMarkDefault(int tokenId)
     {
+		logger.LogDebug(">>> Entering PaymentTokensMarkDefault(tokenId={TokenId})", tokenId);
         var model = await _modelFactory.PreparePaymentTokenListModelAsync(defaultTokenId: tokenId);
         if (!model.VaultIsEnabled)
+			logger.LogDebug("PaymentTokensMarkDefault(tokenId={TokenId}): model → {Model}", tokenId, model);
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.CUSTOMER_INFO) });
 
         if (!string.IsNullOrEmpty(model.Error))
+		logger.LogDebug("<<< Exiting PaymentTokensMarkDefault(tokenId={TokenId})", tokenId);
             return ErrorJson(model.Error);
 
         return Json(new { redirect = Url.RouteUrl(PayPalCommerceDefaults.Route.PaymentTokens) });
@@ -452,8 +542,10 @@ public class PayPalCommercePublicController : BasePublicController
     [HttpPost]
     public async Task<IActionResult> GetSavedCards(int placement)
     {
+		logger.LogDebug(">>> Entering GetSavedCards(placement={Placement})", placement);
         var model = await _modelFactory.PrepareSavedCardListModelAsync((ButtonPlacement)placement);
         if (!string.IsNullOrEmpty(model.Error))
+			logger.LogDebug("GetSavedCards(placement={Placement}): model → {Model}", placement, model);
             return ErrorJson(model.Error);
 
         if (model.PaymentTokens?.Any() != true)
@@ -461,6 +553,8 @@ public class PayPalCommercePublicController : BasePublicController
 
         var cards = model.PaymentTokens.Select(token => new { id = token.Id, label = token.Title }).ToArray();
 
+		logger.LogDebug("GetSavedCards(placement={Placement}): cards → {Cards}", placement, cards);
+		logger.LogDebug("<<< Exiting GetSavedCards(placement={Placement})", placement);
         return Json(new { cards = cards, defaultId = model.PaymentTokens.FirstOrDefault().Id });
     }
 

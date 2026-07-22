@@ -66,9 +66,12 @@ public partial class ArtificialIntelligenceService : IArtificialIntelligenceServ
     /// </returns>
     protected virtual async Task<string> GetTonOfVoiceInstructionAsync(ToneOfVoiceType toneOfVoice, string customToneOfVoice)
     {
+		logger.LogDebug(">>> Entering GetTonOfVoiceInstructionAsync(toneOfVoice={ToneOfVoice},customToneOfVoice={CustomToneOfVoice})", toneOfVoice, customToneOfVoice);
         if (toneOfVoice == ToneOfVoiceType.Custom && string.IsNullOrEmpty(customToneOfVoice))
             toneOfVoice = ToneOfVoiceType.Expert;
 
+		logger.LogDebug("GetTonOfVoiceInstructionAsync(toneOfVoice={ToneOfVoice},customToneOfVoice={CustomToneOfVoice}): ToneOfVoiceType.Custom → {Arg2}", toneOfVoice, customToneOfVoice, ToneOfVoiceType.Custom);
+		logger.LogDebug("<<< Exiting GetTonOfVoiceInstructionAsync(toneOfVoice={ToneOfVoice},customToneOfVoice={CustomToneOfVoice})", toneOfVoice, customToneOfVoice);
         return toneOfVoice switch
         {
             ToneOfVoiceType.Expert or ToneOfVoiceType.Supportive => await _localizationService.GetResourceAsync(
@@ -279,18 +282,26 @@ public partial class ArtificialIntelligenceService : IArtificialIntelligenceServ
     /// </returns>
     public virtual async Task<string> CreateProductDescriptionAsync(string productName, string keywords, ToneOfVoiceType toneOfVoice, string instruction, string customToneOfVoice = null, int languageId = 0)
     {
+		logger.LogDebug(">>> Entering CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId})", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var toneOfVoiceInstruction = await GetTonOfVoiceInstructionAsync(toneOfVoice, customToneOfVoice);
 
+		logger.LogDebug("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): toneOfVoiceInstruction → {ToneOfVoiceInstruction}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, toneOfVoiceInstruction);
         if (languageId == 0)
             languageId = _localizationSettings.DefaultAdminLanguageId;
 
         var lang = await _languageService.GetLanguageByIdAsync(languageId);
 
+		logger.LogDebug("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): lang → {Lang}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, lang);
         var query = string.Format(string.IsNullOrEmpty(_artificialIntelligenceSettings.ProductDescriptionQuery) ? ArtificialIntelligenceDefaults.ProductDescriptionQuery : _artificialIntelligenceSettings.ProductDescriptionQuery, productName, keywords, toneOfVoiceInstruction, instruction, lang.Name);
 
+		logger.LogDebug("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): query → {Query}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, query);
         try
         {
             var result = await _httpClient.SendQueryAsync(query);
+			logger.LogInformation("CreateProductDescriptionAsync(productName,keywords,toneOfVoice,instruction,customToneOfVoice,languageId)={ProductName},{Keywords},{ToneOfVoice},{Instruction},{CustomToneOfVoice},{LanguageId}: external service call took {Arg6} ms", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, __logStart.ElapsedMilliseconds);
+			logger.LogDebug("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): result → {Result}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, result);
+			logger.LogDebug("<<< Exiting CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId})", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId);
             return Markdown.ToHtml(result);
         }
         catch (Exception e)

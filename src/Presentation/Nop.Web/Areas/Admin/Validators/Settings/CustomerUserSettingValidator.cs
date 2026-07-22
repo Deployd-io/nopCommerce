@@ -9,6 +9,7 @@ public partial class CustomerUserSettingValidator : BaseNopValidator<CustomerUse
 {
     public CustomerUserSettingValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CustomerUserSettingValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.CustomerSettings.PasswordMinLength)
             .GreaterThan(0)
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.CustomerUser.PasswordMinLength.GreaterThanZero"));
@@ -16,5 +17,6 @@ public partial class CustomerUserSettingValidator : BaseNopValidator<CustomerUse
         RuleFor(x => x.CustomerSettings.PasswordMaxLength)
             .GreaterThanOrEqualTo(x => x.CustomerSettings.PasswordMinLength)
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.CustomerUser.PasswordMaxLength.GreaterThanOrEqualMinLength"));
+			logger.LogDebug("<<< Exiting CustomerUserSettingValidator(localizationService={LocalizationService})", localizationService);
     }
 }

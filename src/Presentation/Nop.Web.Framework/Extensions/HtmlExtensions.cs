@@ -151,10 +151,13 @@ public static class HtmlExtensions
     /// <returns>Name</returns>
     public static string GetSelectedCardName(this IHtmlHelper helper)
     {
+		logger.LogDebug(">>> Entering GetSelectedCardName(helper={Helper})", helper);
         //keep this method synchronized with
         //"SaveSelectedCardName" method of \Area\Admin\Controllers\BaseAdminController.cs
         var cardName = string.Empty;
         const string dataKey = "nop.selected-card-name";
+		logger.LogDebug("GetSelectedCardName(helper={Helper}): cardName → {CardName}", helper, cardName);
+		logger.LogDebug("GetSelectedCardName(helper={Helper}): dataKey → {DataKey}", helper, dataKey);
 
         if (helper.ViewData.ContainsKey(dataKey))
             cardName = helper.ViewData[dataKey].ToString();
@@ -162,6 +165,7 @@ public static class HtmlExtensions
         if (helper.ViewContext.TempData.TryGetValue(dataKey, out var value))
             cardName = value.ToString();
 
+		logger.LogDebug("<<< Exiting GetSelectedCardName(helper={Helper})", helper);
         return cardName;
     }
 
@@ -173,10 +177,13 @@ public static class HtmlExtensions
     /// <returns>Name</returns>
     public static string GetSelectedTabName(this IHtmlHelper helper, string dataKeyPrefix = null)
     {
+		logger.LogDebug(">>> Entering GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix})", helper, dataKeyPrefix);
         //keep this method synchronized with
         //"SaveSelectedTab" method of \Area\Admin\Controllers\BaseAdminController.cs
         var tabName = string.Empty;
         var dataKey = "nop.selected-tab-name";
+		logger.LogDebug("GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix}): tabName → {TabName}", helper, dataKeyPrefix, tabName);
+		logger.LogDebug("GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix}): dataKey → {DataKey}", helper, dataKeyPrefix, dataKey);
         if (!string.IsNullOrEmpty(dataKeyPrefix))
             dataKey += $"-{dataKeyPrefix}";
 
@@ -186,6 +193,7 @@ public static class HtmlExtensions
         if (helper.ViewContext.TempData.TryGetValue(dataKey, out var value))
             tabName = value.ToString();
 
+		logger.LogDebug("<<< Exiting GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix})", helper, dataKeyPrefix);
         return tabName;
     }
 
@@ -242,16 +250,20 @@ public static class HtmlExtensions
     /// </returns>
     public static async Task<IHtmlContent> HintAsync(this IHtmlHelper helper, string value)
     {
+		logger.LogDebug(">>> Entering HintAsync(helper={Helper},value={Value})", helper, value);
         //create tag builder
         var builder = new TagBuilder("div");
         builder.MergeAttribute("title", value);
+		logger.LogDebug("HintAsync(helper={Helper},value={Value}): builder → {Builder}", helper, value, builder);
         builder.MergeAttribute("class", "ico-help");
         builder.MergeAttribute("data-toggle", "tooltip");
         var icon = new StringBuilder();
         icon.Append("<i class='fas fa-circle-question'></i>");
+		logger.LogDebug("HintAsync(helper={Helper},value={Value}): icon → {Icon}", helper, value, icon);
         builder.InnerHtml.AppendHtml(icon.ToString());
 
         //render tag
+		logger.LogDebug("<<< Exiting HintAsync(helper={Helper},value={Value})", helper, value);
         return new HtmlString(await builder.RenderHtmlContentAsync());
     }
 
@@ -271,8 +283,11 @@ public static class HtmlExtensions
     /// </returns>
     public static async Task<string> RenderHtmlContentAsync(this IHtmlContent htmlContent)
     {
+		logger.LogDebug(">>> Entering RenderHtmlContentAsync(htmlContent={HtmlContent})", htmlContent);
         await using var writer = new StringWriter();
         htmlContent.WriteTo(writer, HtmlEncoder.Default);
+		logger.LogDebug("RenderHtmlContentAsync(htmlContent={HtmlContent}): writer → {Writer}", htmlContent, writer);
+		logger.LogDebug("<<< Exiting RenderHtmlContentAsync(htmlContent={HtmlContent})", htmlContent);
         return writer.ToString();
     }
 

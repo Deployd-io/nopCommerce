@@ -119,20 +119,28 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<CustomerReturnRequestsModel> PrepareCustomerReturnRequestsModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCustomerReturnRequestsModelAsync()");
         var model = new CustomerReturnRequestsModel();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): model → {Model}", model);
+		logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): store → {Store}", store);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var returnRequests = await _returnRequestService.SearchReturnRequestsAsync(store.Id, customer.Id);
+		logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): customer → {Customer}", customer);
+		logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): returnRequests → {ReturnRequests}", returnRequests);
 
         foreach (var returnRequest in returnRequests)
         {
             var orderItem = await _orderService.GetOrderItemByIdAsync(returnRequest.OrderItemId);
             if (orderItem != null)
+			logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): orderItem → {OrderItem}", orderItem);
             {
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+				logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): product → {Product}", product);
                 var download = await _downloadService.GetDownloadByIdAsync(returnRequest.UploadedFileId);
 
+				logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): download → {Download}", download);
                 var itemModel = new CustomerReturnRequestsModel.ReturnRequestModel
                 {
                     Id = returnRequest.Id,
@@ -152,6 +160,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
             }
         }
 
+		logger.LogDebug("<<< Exiting PrepareCustomerReturnRequestsModelAsync()");
         return model;
     }
 
@@ -164,12 +173,15 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     protected virtual async Task<IList<SubmitReturnRequestModel.OrderItemModel>> PrepareSubmitReturnRequestOrderItemModelsAsync(Order order)
     {
+		logger.LogDebug(">>> Entering PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         var models = new List<SubmitReturnRequestModel.OrderItemModel>();
 
+		logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): models → {Models}", order, models);
         var returnRequestAvailability = await _returnRequestService.GetReturnRequestAvailabilityAsync(order.Id);
         if (returnRequestAvailability?.IsAllowed == true)
+		logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): returnRequestAvailability → {ReturnRequestAvailability}", order, returnRequestAvailability);
         {
             foreach (var returnableOrderItem in returnRequestAvailability.ReturnableOrderItems)
             {
@@ -179,6 +191,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
                 var orderItem = returnableOrderItem.OrderItem;
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+				logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): product → {Product}", order, product);
                 var model = new SubmitReturnRequestModel.OrderItemModel
                 {
                     Id = orderItem.Id,
@@ -191,24 +204,28 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 
                 var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
 
+				logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): languageId → {LanguageId}", order, languageId);
                 //unit price
                 if (order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax)
                 {
                     //including tax
                     var unitPriceInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceInclTax, order.CurrencyRate);
                     model.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
+					logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): unitPriceInclTaxInCustomerCurrency → {UnitPriceInclTaxInCustomerCurrency}", order, unitPriceInclTaxInCustomerCurrency);
                 }
                 else
                 {
                     //excluding tax
                     var unitPriceExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceExclTax, order.CurrencyRate);
                     model.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
+					logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): unitPriceExclTaxInCustomerCurrency → {UnitPriceExclTaxInCustomerCurrency}", order, unitPriceExclTaxInCustomerCurrency);
                 }
 
                 models.Add(model);
             }
         }
 
+		logger.LogDebug("<<< Exiting PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order})", order);
         return models;
     }
 

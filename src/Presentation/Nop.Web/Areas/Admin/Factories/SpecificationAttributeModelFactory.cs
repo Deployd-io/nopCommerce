@@ -95,11 +95,13 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual Task<SpecificationAttributeSearchModel> PrepareSpecificationAttributeSearchModelAsync(SpecificationAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareSpecificationAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareSpecificationAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -113,6 +115,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual async Task<SpecificationAttributeGroupListModel> PrepareSpecificationAttributeGroupListModelAsync(SpecificationAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareSpecificationAttributeGroupListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get specification attribute groups
@@ -135,6 +138,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             return specificationAttributeGroups.Select(attribute => attribute.ToModel<SpecificationAttributeGroupModel>());
         });
 
+		logger.LogDebug("<<< Exiting PrepareSpecificationAttributeGroupListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -183,6 +187,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual async Task<SpecificationAttributeListModel> PrepareSpecificationAttributeListModelAsync(SpecificationAttributeSearchModel searchModel, SpecificationAttributeGroup group = null)
     {
+		logger.LogDebug(">>> Entering PrepareSpecificationAttributeListModelAsync(searchModel={SearchModel},group={Group})", searchModel, group);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get specification attributes
@@ -198,6 +203,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             return specificationAttributes.Select(attribute => attribute.ToModel<SpecificationAttributeModel>());
         });
 
+		logger.LogDebug("<<< Exiting PrepareSpecificationAttributeListModelAsync(searchModel={SearchModel},group={Group})", searchModel, group);
         return model;
     }
 

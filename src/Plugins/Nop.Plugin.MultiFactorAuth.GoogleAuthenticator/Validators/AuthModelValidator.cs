@@ -12,9 +12,11 @@ public class AuthModelValidator : BaseNopValidator<AuthModel>
 {
     public AuthModelValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering AuthModelValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(model => model.Code).NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.MultiFactorAuth.GoogleAuthenticator.Fields.Code.Required"));
         RuleFor(model => model.Code).Matches(@"^[0-9]{6,6}$")
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.MultiFactorAuth.GoogleAuthenticator.Fields.Code.Wrong"));
+			logger.LogDebug("<<< Exiting AuthModelValidator(localizationService={LocalizationService})", localizationService);
     }
 }

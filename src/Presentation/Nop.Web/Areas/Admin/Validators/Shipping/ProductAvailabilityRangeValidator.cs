@@ -10,8 +10,10 @@ public partial class ProductAvailabilityRangeValidator : BaseNopValidator<Produc
 {
     public ProductAvailabilityRangeValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductAvailabilityRangeValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Shipping.ProductAvailabilityRanges.Fields.Name.Required"));
 
         SetDatabaseValidationRules<ProductAvailabilityRange>();
+		logger.LogDebug("<<< Exiting ProductAvailabilityRangeValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -137,15 +137,20 @@ public partial class CategoryController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _categoryModelFactory.PrepareCategorySearchModelAsync(new CategorySearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -156,6 +161,7 @@ public partial class CategoryController : BaseAdminController
         //prepare model
         var model = await _categoryModelFactory.PrepareCategoryListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -166,9 +172,12 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _categoryModelFactory.PrepareCategoryModelAsync(new CategoryModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -222,20 +231,25 @@ public partial class CategoryController : BaseAdminController
         model = await _categoryModelFactory.PrepareCategoryModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a category with the specified id
         var category = await _categoryService.GetCategoryByIdAsync(id);
         if (category == null || category.Deleted)
+			logger.LogDebug("Edit(id={Id}): category → {Category}", id, category);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _categoryModelFactory.PrepareCategoryModelAsync(null, category);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -321,6 +335,7 @@ public partial class CategoryController : BaseAdminController
         model = await _categoryModelFactory.PrepareCategoryModelAsync(model, category, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -328,20 +343,25 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PreTranslate(int itemId)
     {
+		logger.LogDebug(">>> Entering PreTranslate(itemId={ItemId})", itemId);
         var translationModel = new TranslationModel();
 
+		logger.LogDebug("PreTranslate(itemId={ItemId}): translationModel → {TranslationModel}", itemId, translationModel);
         //try to get a category with the specified id
         var category = await _categoryService.GetCategoryByIdAsync(itemId);
         if (category == null || category.Deleted)
+			logger.LogDebug("PreTranslate(itemId={ItemId}): category → {Category}", itemId, category);
             return Json(translationModel);
 
         //prepare model
         var model = await _categoryModelFactory.PrepareCategoryModelAsync(null, category);
 
+		logger.LogDebug("PreTranslate(itemId={ItemId}): model → {Model}", itemId, model);
         translationModel = await _translationModelFactory.PrepareTranslationModelAsync(model,
             (nameof(CategoryLocalizedModel.Name), false),
             (nameof(CategoryLocalizedModel.Description), true));
 
+		logger.LogDebug("<<< Exiting PreTranslate(itemId={ItemId})", itemId);
         return Json(translationModel);
     }
 
@@ -349,9 +369,11 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a category with the specified id
         var category = await _categoryService.GetCategoryByIdAsync(id);
         if (category == null)
+			logger.LogDebug("Delete(id={Id}): category → {Category}", id, category);
             return RedirectToAction("List");
 
         await _categoryService.DeleteCategoryAsync(category);
@@ -362,6 +384,7 @@ public partial class CategoryController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Categories.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -369,17 +392,21 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var categories = await _categoryService.GetCategoriesByIdsAsync(selectedIds.ToArray());
 
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): categories → {Categories}", selectedIds, categories);
         await _categoryService.DeleteCategoriesAsync(categories);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteCategory");
         await _customerActivityService.InsertActivitiesAsync("DeleteCategory", categories, category => string.Format(activityLogFormat, category.Name));
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -390,15 +417,19 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXml()
     {
+		logger.LogDebug(">>> Entering ExportXml()");
         try
         {
             var xml = await _exportManager.ExportCategoriesToXmlAsync();
 
+			logger.LogDebug("ExportXml(): xml → {Xml}", xml);
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", "categories.xml");
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ExportXml(): {Arg0}", ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ExportXml()");
             return RedirectToAction("List");
         }
     }
@@ -406,6 +437,7 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXlsx()
     {
+		logger.LogDebug(">>> Entering ExportXlsx()");
         try
         {
             var bytes = await _exportManager
@@ -415,7 +447,9 @@ public partial class CategoryController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ExportXlsx(): {Arg0}", ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ExportXlsx()");
             return RedirectToAction("List");
         }
     }
@@ -424,6 +458,7 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile)
     {
+		logger.LogDebug(">>> Entering ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
         //a vendor cannot import categories
         if (await _workContext.GetCurrentVendorAsync() != null)
             return AccessDeniedView();
@@ -446,7 +481,9 @@ public partial class CategoryController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ImportFromXlsx(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }
@@ -459,6 +496,7 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_VIEW)]
     public virtual async Task<IActionResult> ProductList(CategoryProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductList(searchModel={SearchModel})", searchModel);
         //try to get a category with the specified id
         var category = await _categoryService.GetCategoryByIdAsync(searchModel.CategoryId)
             ?? throw new ArgumentException("No category found with the specified id");
@@ -466,6 +504,8 @@ public partial class CategoryController : BaseAdminController
         //prepare model
         var model = await _categoryModelFactory.PrepareCategoryProductListModelAsync(searchModel, category);
 
+		logger.LogDebug("ProductList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -486,21 +526,26 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductDelete(int id)
     {
+		logger.LogDebug(">>> Entering ProductDelete(id={Id})", id);
         //try to get a product category with the specified id
         var productCategory = await _categoryService.GetProductCategoryByIdAsync(id)
             ?? throw new ArgumentException("No product category mapping found with the specified id", nameof(id));
 
         await _categoryService.DeleteProductCategoryAsync(productCategory);
 
+		logger.LogDebug("<<< Exiting ProductDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopup(int categoryId)
     {
+		logger.LogDebug(">>> Entering ProductAddPopup(categoryId={CategoryId})", categoryId);
         //prepare model
         var model = await _categoryModelFactory.PrepareAddProductToCategorySearchModelAsync(new AddProductToCategorySearchModel());
 
+		logger.LogDebug("ProductAddPopup(categoryId={CategoryId}): model → {Model}", categoryId, model);
+		logger.LogDebug("<<< Exiting ProductAddPopup(categoryId={CategoryId})", categoryId);
         return View(model);
     }
 
@@ -508,9 +553,12 @@ public partial class CategoryController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CATEGORIES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopupList(AddProductToCategorySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _categoryModelFactory.PrepareAddProductToCategoryListModelAsync(searchModel);
 
+		logger.LogDebug("ProductAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

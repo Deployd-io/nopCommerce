@@ -19,11 +19,13 @@ public partial class PrivateMessageBuilder : NopEntityBuilder<PrivateMessage>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(PrivateMessage.Subject)).AsString(450).NotNullable()
             .WithColumn(nameof(PrivateMessage.Text)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(PrivateMessage.FromCustomerId)).AsInt32().ForeignKey<Customer>().OnDelete(Rule.None)
             .WithColumn(nameof(PrivateMessage.ToCustomerId)).AsInt32().ForeignKey<Customer>().OnDelete(Rule.None);
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

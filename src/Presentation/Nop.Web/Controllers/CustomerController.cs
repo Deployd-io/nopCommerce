@@ -214,6 +214,7 @@ public partial class CustomerController : BasePublicController
 
     protected virtual async Task<string> ParseSelectedProviderAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering ParseSelectedProviderAsync(form={Form})", form);
         ArgumentNullException.ThrowIfNull(form);
 
         if (!form.TryGetValue("mfa_provider", out var curProvider) || StringValues.IsNullOrEmpty(curProvider))
@@ -221,29 +222,37 @@ public partial class CustomerController : BasePublicController
 
         var selectedProvider = curProvider.ToString();
         if (string.IsNullOrEmpty(selectedProvider))
+			logger.LogDebug("ParseSelectedProviderAsync(form={Form}): selectedProvider → {SelectedProvider}", form, selectedProvider);
             return string.Empty;
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("ParseSelectedProviderAsync(form={Form}): store → {Store}", form, store);
+		logger.LogDebug("ParseSelectedProviderAsync(form={Form}): customer → {Customer}", form, customer);
         var multiFactorAuthenticationProviders = await _multiFactorAuthenticationPluginManager
             .LoadActivePluginsAsync(customer, store.Id);
         
         var isValidProvider = multiFactorAuthenticationProviders
             .Any(p => p.PluginDescriptor.SystemName.Equals(selectedProvider, StringComparison.InvariantCultureIgnoreCase));
 
+		logger.LogDebug("<<< Exiting ParseSelectedProviderAsync(form={Form})", form);
         return isValidProvider ? selectedProvider : string.Empty;
     }
 
     protected virtual async Task<string> ParseCustomCustomerAttributesAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering ParseCustomCustomerAttributesAsync(form={Form})", form);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = "";
         var attributes = await _customerAttributeService.GetAllAttributesAsync();
+		logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): attributesXml → {AttributesXml}", form, attributesXml);
+		logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): attributes → {Attributes}", form, attributes);
         foreach (var attribute in attributes)
         {
             var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
             switch (attribute.AttributeControlType)
+			logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): controlId → {ControlId}", form, controlId);
             {
                 case AttributeControlType.DropdownList:
                 case AttributeControlType.RadioList:
@@ -253,6 +262,7 @@ public partial class CustomerController : BasePublicController
                     {
                         var selectedAttributeId = int.Parse(ctrlAttributes);
                         if (selectedAttributeId > 0)
+							logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): selectedAttributeId → {SelectedAttributeId}", form, selectedAttributeId);
                             attributesXml = _customerAttributeParser.AddAttribute(attributesXml,
                                 attribute, selectedAttributeId.ToString());
                     }
@@ -282,6 +292,7 @@ public partial class CustomerController : BasePublicController
                                  .Select(v => v.Id)
                                  .ToList())
                     {
+								logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): attributeValues → {AttributeValues}", form, attributeValues);
                         attributesXml = _customerAttributeParser.AddAttribute(attributesXml,
                             attribute, selectedAttributeId.ToString());
                     }
@@ -296,6 +307,7 @@ public partial class CustomerController : BasePublicController
                         var enteredText = ctrlAttributes.ToString().Trim();
                         attributesXml = _customerAttributeParser.AddAttribute(attributesXml,
                             attribute, enteredText);
+							logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): enteredText → {EnteredText}", form, enteredText);
                     }
                 }
                     break;
@@ -309,6 +321,7 @@ public partial class CustomerController : BasePublicController
             }
         }
 
+		logger.LogDebug("<<< Exiting ParseCustomCustomerAttributesAsync(form={Form})", form);
         return attributesXml;
     }
 
@@ -420,16 +433,22 @@ public partial class CustomerController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> Login(bool? checkoutAsGuest)
     {
+		logger.LogDebug(">>> Entering Login(checkoutAsGuest={CheckoutAsGuest})", checkoutAsGuest);
         var model = await _customerModelFactory.PrepareLoginModelAsync(checkoutAsGuest);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("Login(checkoutAsGuest={CheckoutAsGuest}): model → {Model}", checkoutAsGuest, model);
+		logger.LogDebug("Login(checkoutAsGuest={CheckoutAsGuest}): customer → {Customer}", checkoutAsGuest, customer);
 
         if (await _customerService.IsRegisteredAsync(customer))
         {
             var fullName = await _customerService.GetCustomerFullNameAsync(customer);
             var message = await _localizationService.GetResourceAsync("Account.Login.AlreadyLogin");
+			logger.LogDebug("Login(checkoutAsGuest={CheckoutAsGuest}): fullName → {FullName}", checkoutAsGuest, fullName);
+			logger.LogDebug("Login(checkoutAsGuest={CheckoutAsGuest}): message → {Message}", checkoutAsGuest, message);
             _notificationService.SuccessNotification(string.Format(message, _htmlEncoder.Encode(fullName)));
         }
 
+		logger.LogDebug("<<< Exiting Login(checkoutAsGuest={CheckoutAsGuest})", checkoutAsGuest);
         return View(model);
     }
 
@@ -513,6 +532,8 @@ public partial class CustomerController : BasePublicController
 
         //If we got this far, something failed, redisplay form
         model = await _customerModelFactory.PrepareLoginModelAsync(model.CheckoutAsGuest);
+		logger.LogDebug("Login(model={Model},returnUrl={ReturnUrl},captchaValid={CaptchaValid}): model → {Model1}", model, returnUrl, captchaValid, model);
+		logger.LogDebug("<<< Exiting Login(model={Model},returnUrl={ReturnUrl},captchaValid={CaptchaValid})", model, returnUrl, captchaValid);
         return View(model);
     }
 
@@ -527,6 +548,7 @@ public partial class CustomerController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> MultiFactorVerification()
     {
+		logger.LogDebug(">>> Entering MultiFactorVerification()");
         if (!await _multiFactorAuthenticationPluginManager.HasActivePluginsAsync())
             return RedirectToRoute(NopRouteNames.General.LOGIN);
 
@@ -534,10 +556,12 @@ public partial class CustomerController : BasePublicController
             NopCustomerDefaults.CustomerMultiFactorAuthenticationInfo);
         var userName = customerMultiFactorAuthenticationInfo?.UserName;
         if (string.IsNullOrEmpty(userName))
+			logger.LogDebug("MultiFactorVerification(): userName → {UserName}", userName);
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var customer = _customerSettings.UsernamesEnabled ? await _customerService.GetCustomerByUsernameAsync(userName) : await _customerService.GetCustomerByEmailAsync(userName);
         if (customer == null)
+			logger.LogDebug("MultiFactorVerification(): customer → {Customer}", customer);
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         if (!await _permissionService.AuthorizeAsync(StandardPermission.Security.ENABLE_MULTI_FACTOR_AUTHENTICATION, customer))
@@ -545,11 +569,14 @@ public partial class CustomerController : BasePublicController
 
         var selectedProvider = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute);
         if (string.IsNullOrEmpty(selectedProvider))
+			logger.LogDebug("MultiFactorVerification(): selectedProvider → {SelectedProvider}", selectedProvider);
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = new MultiFactorAuthenticationProviderModel();
         model = await _customerModelFactory.PrepareMultiFactorAuthenticationProviderModelAsync(model, selectedProvider, true);
+		logger.LogDebug("MultiFactorVerification(): model → {Model}", model);
 
+		logger.LogDebug("<<< Exiting MultiFactorVerification()");
         return View(model);
     }
 
@@ -559,8 +586,10 @@ public partial class CustomerController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> Logout()
     {
+		logger.LogDebug(">>> Entering Logout()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (_workContext.OriginalCustomerIfImpersonated != null)
+		logger.LogDebug("Logout(): customer → {Customer}", customer);
         {
             //activity log
             await _customerActivityService.InsertActivityAsync(_workContext.OriginalCustomerIfImpersonated, "Impersonation.Finished",
@@ -603,6 +632,7 @@ public partial class CustomerController : BasePublicController
             TempData[$"{NopCookieDefaults.Prefix}{NopCookieDefaults.IgnoreEuCookieLawWarning}"] = true;
         }
 
+		logger.LogDebug("<<< Exiting Logout()");
         return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
     }
 
@@ -616,9 +646,12 @@ public partial class CustomerController : BasePublicController
     [CheckAccessClosedStore(ignore: true)]
     public virtual async Task<IActionResult> PasswordRecovery()
     {
+		logger.LogDebug(">>> Entering PasswordRecovery()");
         var model = new PasswordRecoveryModel();
         model = await _customerModelFactory.PreparePasswordRecoveryModelAsync(model);
+		logger.LogDebug("PasswordRecovery(): model → {Model}", model);
 
+		logger.LogDebug("<<< Exiting PasswordRecovery()");
         return View(model);
     }
 
@@ -664,6 +697,8 @@ public partial class CustomerController : BasePublicController
 
         model = await _customerModelFactory.PreparePasswordRecoveryModelAsync(model);
 
+		logger.LogDebug("PasswordRecoverySend(model={Model},captchaValid={CaptchaValid}): model → {Model1}", model, captchaValid, model);
+		logger.LogDebug("<<< Exiting PasswordRecoverySend(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
@@ -772,13 +807,16 @@ public partial class CustomerController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> Register(string returnUrl)
     {
+		logger.LogDebug(">>> Entering Register(returnUrl={ReturnUrl})", returnUrl);
         //check whether registration is allowed
         if (_customerSettings.UserRegistrationType == UserRegistrationType.Disabled)
             return RedirectToRoute(NopRouteNames.Standard.REGISTER_RESULT, new { resultId = (int)UserRegistrationType.Disabled, returnUrl });
 
         var model = new RegisterModel();
         model = await _customerModelFactory.PrepareRegisterModelAsync(model, false, setDefaultValues: true);
+		logger.LogDebug("Register(returnUrl={ReturnUrl}): model → {Model}", returnUrl, model);
 
+		logger.LogDebug("<<< Exiting Register(returnUrl={ReturnUrl})", returnUrl);
         return View(model);
     }
 
@@ -1086,6 +1124,7 @@ public partial class CustomerController : BasePublicController
         //If we got this far, something failed, redisplay form
         model = await _customerModelFactory.PrepareRegisterModelAsync(model, true, customerAttributesXml);
 
+		logger.LogDebug("<<< Exiting Register(model={Model},returnUrl={ReturnUrl},captchaValid={CaptchaValid},form={Form})", model, returnUrl, captchaValid, form);
         return View(model);
     }
 
@@ -1093,10 +1132,14 @@ public partial class CustomerController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> RegisterResult(int resultId, string returnUrl)
     {
+		logger.LogDebug(">>> Entering RegisterResult(resultId={ResultId},returnUrl={ReturnUrl})", resultId, returnUrl);
         if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
 
+		logger.LogDebug("RegisterResult(resultId={ResultId},returnUrl={ReturnUrl}): returnUrl → {ReturnUrl1}", resultId, returnUrl, returnUrl);
         var model = await _customerModelFactory.PrepareRegisterResultModelAsync(resultId, returnUrl);
+		logger.LogDebug("RegisterResult(resultId={ResultId},returnUrl={ReturnUrl}): model → {Model}", resultId, returnUrl, model);
+		logger.LogDebug("<<< Exiting RegisterResult(resultId={ResultId},returnUrl={ReturnUrl})", resultId, returnUrl);
         return View(model);
     }
 
@@ -1105,8 +1148,11 @@ public partial class CustomerController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> CheckUsernameAvailability(string username)
     {
+		logger.LogDebug(">>> Entering CheckUsernameAvailability(username={Username})", username);
         var usernameAvailable = false;
         var statusText = await _localizationService.GetResourceAsync("Account.CheckUsernameAvailability.NotAvailable");
+		logger.LogDebug("CheckUsernameAvailability(username={Username}): usernameAvailable → {UsernameAvailable}", username, usernameAvailable);
+		logger.LogDebug("CheckUsernameAvailability(username={Username}): statusText → {StatusText}", username, statusText);
 
         if (!UsernamePropertyValidator<string, string>.IsValid(username, _customerSettings))
         {
@@ -1116,6 +1162,7 @@ public partial class CustomerController : BasePublicController
         {
             var currentCustomer = await _workContext.GetCurrentCustomerAsync();
             if (currentCustomer != null &&
+				logger.LogDebug("CheckUsernameAvailability(username={Username}): currentCustomer → {CurrentCustomer}", username, currentCustomer);
                 currentCustomer.Username != null &&
                 currentCustomer.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase))
             {
@@ -1125,6 +1172,7 @@ public partial class CustomerController : BasePublicController
             {
                 var customer = await _customerService.GetCustomerByUsernameAsync(username);
                 if (customer == null)
+				logger.LogDebug("CheckUsernameAvailability(username={Username}): customer → {Customer}", username, customer);
                 {
                     statusText = await _localizationService.GetResourceAsync("Account.CheckUsernameAvailability.Available");
                     usernameAvailable = true;
@@ -1132,6 +1180,7 @@ public partial class CustomerController : BasePublicController
             }
         }
 
+		logger.LogDebug("<<< Exiting CheckUsernameAvailability(username={Username})", username);
         return Json(new { Available = usernameAvailable, Text = statusText });
     }
 
@@ -1191,12 +1240,15 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> Info()
     {
+		logger.LogDebug(">>> Entering Info()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("Info(): customer → {Customer}", customer);
             return Challenge();
 
         var model = new CustomerInfoModel();
         model = await _customerModelFactory.PrepareCustomerInfoModelAsync(model, customer, false);
+		logger.LogDebug("Info(): model → {Model}", model);
 
         return View(model);
     }
@@ -1205,6 +1257,7 @@ public partial class CustomerController : BasePublicController
     public virtual async Task<IActionResult> Info(CustomerInfoModel model, IFormCollection form)
     {
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("<<< Exiting Info()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var language = await _workContext.GetWorkingLanguageAsync();
 
@@ -1397,19 +1450,23 @@ public partial class CustomerController : BasePublicController
         //If we got this far, something failed, redisplay form
         model = await _customerModelFactory.PrepareCustomerInfoModelAsync(model, customer, true, customerAttributesXml);
 
+		logger.LogDebug("Info(model={Model},form={Form}): model → {Model1}", model, form, model);
         return View(model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> RemoveExternalAssociation(int id)
     {
+		logger.LogDebug(">>> Entering RemoveExternalAssociation(id={Id})", id);
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("RemoveExternalAssociation(id={Id}): currentCustomer → {CurrentCustomer}", id, currentCustomer);
         if (!await _customerService.IsRegisteredAsync(currentCustomer))
             return Challenge();
         
         var ear = await _externalAuthenticationService.GetExternalAuthenticationRecordByIdAsync(id);
 
+		logger.LogDebug("RemoveExternalAssociation(id={Id}): ear → {Ear}", id, ear);
         if (ear == null)
             return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.CUSTOMER_INFO) });
 
@@ -1419,6 +1476,7 @@ public partial class CustomerController : BasePublicController
 
         await _externalAuthenticationService.DeleteExternalAuthenticationRecordAsync(ear);
 
+		logger.LogDebug("<<< Exiting RemoveExternalAssociation(id={Id})", id);
         return Json(new { redirect = Url.RouteUrl(NopRouteNames.General.CUSTOMER_INFO) });
     }
 
@@ -1478,24 +1536,30 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> Addresses()
     {
+		logger.LogDebug(">>> Entering Addresses()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
         var model = await _customerModelFactory.PrepareCustomerAddressListModelAsync();
 
+		logger.LogDebug("Addresses(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Addresses()");
         return View(model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> AddressDelete(int addressId)
     {
+		logger.LogDebug(">>> Entering AddressDelete(addressId={AddressId})", addressId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("AddressDelete(addressId={AddressId}): customer → {Customer}", addressId, customer);
             return Challenge();
 
         //find address (ensure that it belongs to the current customer)
         var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
         if (address != null)
+		logger.LogDebug("AddressDelete(addressId={AddressId}): address → {Address}", addressId, address);
         {
             await _customerService.RemoveCustomerAddressAsync(customer, address);
             await _customerService.UpdateCustomerAsync(customer);
@@ -1504,6 +1568,8 @@ public partial class CustomerController : BasePublicController
         }
 
         //redirect to the address list page
+		logger.LogDebug("AddressDelete(addressId={AddressId}): redirect → {Redirect}", addressId, redirect);
+		logger.LogDebug("<<< Exiting AddressDelete(addressId={AddressId})", addressId);
         return Json(new
         {
             redirect = Url.RouteUrl(NopRouteNames.General.CUSTOMER_ADDRESSES),
@@ -1512,6 +1578,7 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> AddressAdd()
     {
+		logger.LogDebug(">>> Entering AddressAdd()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -1521,7 +1588,9 @@ public partial class CustomerController : BasePublicController
             excludeProperties: false,
             addressSettings: _addressSettings,
             loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
+			logger.LogDebug("AddressAdd(): model → {Model}", model);
 
+		logger.LogDebug("<<< Exiting AddressAdd()");
         return View(model);
     }
 
@@ -1574,13 +1643,16 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> AddressEdit(int addressId)
     {
+		logger.LogDebug(">>> Entering AddressEdit(addressId={AddressId})", addressId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("AddressEdit(addressId={AddressId}): customer → {Customer}", addressId, customer);
             return Challenge();
 
         //find address (ensure that it belongs to the current customer)
         var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
         if (address == null)
+			logger.LogDebug("AddressEdit(addressId={AddressId}): address → {Address}", addressId, address);
             //address is not found
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_ADDRESSES);
 
@@ -1591,6 +1663,7 @@ public partial class CustomerController : BasePublicController
             addressSettings: _addressSettings,
             loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
 
+		logger.LogDebug("<<< Exiting AddressEdit(addressId={AddressId})", addressId);
         return View(model);
     }
 
@@ -1643,6 +1716,7 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> DownloadableProducts()
     {
+		logger.LogDebug(">>> Entering DownloadableProducts()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -1651,6 +1725,8 @@ public partial class CustomerController : BasePublicController
 
         var model = await _customerModelFactory.PrepareCustomerDownloadableProductsModelAsync();
 
+		logger.LogDebug("DownloadableProducts(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting DownloadableProducts()");
         return View(model);
     }
 
@@ -1658,17 +1734,22 @@ public partial class CustomerController : BasePublicController
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> UserAgreement(Guid orderItemId)
     {
+		logger.LogDebug(">>> Entering UserAgreement(orderItemId={OrderItemId})", orderItemId);
         var orderItem = await _orderService.GetOrderItemByGuidAsync(orderItemId);
         if (orderItem == null)
+			logger.LogDebug("UserAgreement(orderItemId={OrderItemId}): orderItem → {OrderItem}", orderItemId, orderItem);
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+		logger.LogDebug("UserAgreement(orderItemId={OrderItemId}): product → {Product}", orderItemId, product);
         if (product == null || !product.HasUserAgreement)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _customerModelFactory.PrepareUserAgreementModelAsync(orderItem, product);
 
+		logger.LogDebug("UserAgreement(orderItemId={OrderItemId}): model → {Model}", orderItemId, model);
+		logger.LogDebug("<<< Exiting UserAgreement(orderItemId={OrderItemId})", orderItemId);
         return View(model);
     }
 
@@ -1678,12 +1759,16 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> ChangePassword()
     {
+		logger.LogDebug(">>> Entering ChangePassword()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("ChangePassword(): customer → {Customer}", customer);
             return Challenge();
 
         var model = await _customerModelFactory.PrepareChangePasswordModelAsync(customer);
 
+		logger.LogDebug("ChangePassword(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting ChangePassword()");
         return View(model);
     }
 
@@ -1727,6 +1812,7 @@ public partial class CustomerController : BasePublicController
         //If we got this far, something failed, redisplay form
         model = await _customerModelFactory.PrepareChangePasswordModelAsync(customer);
 
+		logger.LogDebug("<<< Exiting ChangePassword(model={Model},returnUrl={ReturnUrl})", model, returnUrl);
         return View(model);
     }
 
@@ -1736,6 +1822,7 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> Avatar()
     {
+		logger.LogDebug(">>> Entering Avatar()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -1744,7 +1831,9 @@ public partial class CustomerController : BasePublicController
 
         var model = new CustomerAvatarModel();
         model = await _customerModelFactory.PrepareCustomerAvatarModelAsync(model);
+		logger.LogDebug("Avatar(): model → {Model}", model);
 
+		logger.LogDebug("<<< Exiting Avatar()");
         return View(model);
     }
 
@@ -1803,6 +1892,8 @@ public partial class CustomerController : BasePublicController
 
         //If we got this far, something failed, redisplay form
         model = await _customerModelFactory.PrepareCustomerAvatarModelAsync(model);
+		logger.LogDebug("UploadAvatar(model={Model},uploadedFile={UploadedFile}): model → {Model1}", model, uploadedFile, model);
+		logger.LogDebug("<<< Exiting UploadAvatar(model={Model},uploadedFile={UploadedFile})", model, uploadedFile);
         return View(model);
     }
 
@@ -1831,6 +1922,7 @@ public partial class CustomerController : BasePublicController
 
     public virtual async Task<IActionResult> GdprTools()
     {
+		logger.LogDebug(">>> Entering GdprTools()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -1839,6 +1931,8 @@ public partial class CustomerController : BasePublicController
 
         var model = await _customerModelFactory.PrepareGdprToolsModelAsync();
 
+		logger.LogDebug("GdprTools(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting GdprTools()");
         return View(model);
     }
 
@@ -1846,8 +1940,10 @@ public partial class CustomerController : BasePublicController
     [FormValueRequired("export-data")]
     public virtual async Task<IActionResult> GdprToolsExport()
     {
+		logger.LogDebug(">>> Entering GdprToolsExport()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("GdprToolsExport(): customer → {Customer}", customer);
             return Challenge();
 
         if (!_gdprSettings.GdprEnabled)
@@ -1858,9 +1954,12 @@ public partial class CustomerController : BasePublicController
 
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("GdprToolsExport(): store → {Store}", store);
         //export
         var bytes = await _exportManager.ExportCustomerGdprInfoToXlsxAsync(customer, store.Id);
 
+		logger.LogDebug("GdprToolsExport(): bytes → {Bytes}", bytes);
+		logger.LogDebug("<<< Exiting GdprToolsExport()");
         return File(bytes, MimeTypes.TextXlsx, "customerdata.xlsx");
     }
 
@@ -1868,8 +1967,10 @@ public partial class CustomerController : BasePublicController
     [FormValueRequired("delete-account")]
     public virtual async Task<IActionResult> GdprToolsDelete()
     {
+		logger.LogDebug(">>> Entering GdprToolsDelete()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("GdprToolsDelete(): customer → {Customer}", customer);
             return Challenge();
 
         if (!_gdprSettings.GdprEnabled)
@@ -1882,7 +1983,9 @@ public partial class CustomerController : BasePublicController
 
         var model = await _customerModelFactory.PrepareGdprToolsModelAsync();
         model.Result = await _localizationService.GetResourceAsync("Gdpr.DeleteRequested.Success");
+		logger.LogDebug("GdprToolsDelete(): model → {Model}", model);
 
+		logger.LogDebug("<<< Exiting GdprToolsDelete()");
         return View(model);
     }
 
@@ -1895,11 +1998,14 @@ public partial class CustomerController : BasePublicController
     [CheckAccessClosedStore(ignore: true)]
     public virtual async Task<IActionResult> CheckGiftCardBalance()
     {
+		logger.LogDebug(">>> Entering CheckGiftCardBalance()");
         if (!_customerSettings.AllowCustomersToCheckGiftCardBalance)
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
 
         var model = await _customerModelFactory.PrepareCheckGiftCardBalanceModelAsync();
 
+		logger.LogDebug("CheckGiftCardBalance(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CheckGiftCardBalance()");
         return View(model);
     }
 
@@ -1940,6 +2046,7 @@ public partial class CustomerController : BasePublicController
     [CheckAccessClosedStore(ignore: true)]
     public virtual async Task<IActionResult> MultiFactorAuthentication()
     {
+		logger.LogDebug(">>> Entering MultiFactorAuthentication()");
         if (!await _multiFactorAuthenticationPluginManager.HasActivePluginsAsync())
         {
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
@@ -1950,6 +2057,8 @@ public partial class CustomerController : BasePublicController
 
         var model = new MultiFactorAuthenticationModel();
         model = await _customerModelFactory.PrepareMultiFactorAuthenticationModelAsync(model);
+		logger.LogDebug("MultiFactorAuthentication(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting MultiFactorAuthentication()");
         return View(model);
     }
 
@@ -2014,11 +2123,14 @@ public partial class CustomerController : BasePublicController
 
         //If we got this far, something failed, redisplay form
         model = await _customerModelFactory.PrepareMultiFactorAuthenticationModelAsync(model);
+		logger.LogDebug("MultiFactorAuthentication(model={Model},form={Form}): model → {Model1}", model, form, model);
+		logger.LogDebug("<<< Exiting MultiFactorAuthentication(model={Model},form={Form})", model, form);
         return View(model);
     }
 
     public virtual async Task<IActionResult> ConfigureMultiFactorAuthenticationProvider(string providerSysName)
     {
+		logger.LogDebug(">>> Entering ConfigureMultiFactorAuthenticationProvider(providerSysName={ProviderSysName})", providerSysName);
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -2027,7 +2139,9 @@ public partial class CustomerController : BasePublicController
 
         var model = new MultiFactorAuthenticationProviderModel();
         model = await _customerModelFactory.PrepareMultiFactorAuthenticationProviderModelAsync(model, providerSysName);
+		logger.LogDebug("ConfigureMultiFactorAuthenticationProvider(providerSysName={ProviderSysName}): model → {Model}", providerSysName, model);
 
+		logger.LogDebug("<<< Exiting ConfigureMultiFactorAuthenticationProvider(providerSysName={ProviderSysName})", providerSysName);
         return View(model);
     }
 

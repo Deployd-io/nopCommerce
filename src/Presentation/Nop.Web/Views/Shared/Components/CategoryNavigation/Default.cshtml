@@ -24,10 +24,13 @@
 
     async Task CategoryLine(CategoryNavigationModel.CategoryLineModel lineModel)
     {
+		logger.LogDebug(">>> Entering CategoryLine(lineModel={LineModel})", lineModel);
         var active = lineModel.Category.Id == lineModel.CurrentCategoryId || lineModel.Category.SubCategories.Count(BreadCrumbContainsCurrentCategoryId) > 0;
         var last = lineModel.Category.Id == lineModel.CurrentCategoryId;
+		logger.LogDebug("CategoryLine(lineModel={LineModel}): active → {Active}", lineModel, active);
         var liClass = active ? "active" : "inactive";
         if (last)
+		logger.LogDebug("CategoryLine(lineModel={LineModel}): liClass → {LiClass}", lineModel, liClass);
         {
             liClass += " last";
         }
@@ -61,6 +64,7 @@
                 }
             }
         </li>
+		logger.LogDebug("<<< Exiting CategoryLine(lineModel={LineModel})", lineModel);
     }
 }
 

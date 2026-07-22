@@ -13,23 +13,38 @@ public partial record MenuItemModel : BaseNopEntityModel, IAclSupportedModel, IS
 
     public MenuItemModel()
     {
+		logger.LogDebug(">>> Entering MenuItemModel()");
         AvailableMenuItemTypes = new List<SelectListItem>();
         AvailableMenuItems = new List<SelectListItem>();
+		logger.LogDebug("MenuItemModel(): AvailableMenuItemTypes → {AvailableMenuItemTypes}", AvailableMenuItemTypes);
+		logger.LogDebug("MenuItemModel(): AvailableMenuItems → {AvailableMenuItems}", AvailableMenuItems);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("MenuItemModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("MenuItemModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("MenuItemModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("MenuItemModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         AvailableMenuItemTemplates = new List<SelectListItem>();
         AvailableStandardRoutes = new List<SelectListItem>();
+		logger.LogDebug("MenuItemModel(): AvailableMenuItemTemplates → {AvailableMenuItemTemplates}", AvailableMenuItemTemplates);
+		logger.LogDebug("MenuItemModel(): AvailableStandardRoutes → {AvailableStandardRoutes}", AvailableStandardRoutes);
         AvailableCategories = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("MenuItemModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("MenuItemModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableManufacturers = new List<SelectListItem>();
         AvailableTopics = new List<SelectListItem>();
+		logger.LogDebug("MenuItemModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		logger.LogDebug("MenuItemModel(): AvailableTopics → {AvailableTopics}", AvailableTopics);
 
         Locales = new List<MenuItemLocalizedModel>();
+		logger.LogDebug("<<< Exiting MenuItemModel()");
+		logger.LogDebug("MenuItemModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

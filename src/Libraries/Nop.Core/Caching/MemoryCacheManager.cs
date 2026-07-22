@@ -33,8 +33,12 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     public MemoryCacheManager(AppSettings appSettings, IMemoryCache memoryCache, ICacheKeyManager cacheKeyManager)
         : base(appSettings)
     {
+		logger.LogDebug(">>> Entering MemoryCacheManager(appSettings={AppSettings},memoryCache={MemoryCache},cacheKeyManager={CacheKeyManager})", appSettings, memoryCache, cacheKeyManager);
         _memoryCache = memoryCache;
         _keyManager = cacheKeyManager;
+		logger.LogDebug("<<< Exiting MemoryCacheManager(appSettings={AppSettings},memoryCache={MemoryCache},cacheKeyManager={CacheKeyManager})", appSettings, memoryCache, cacheKeyManager);
+		logger.LogDebug("MemoryCacheManager(appSettings={AppSettings},memoryCache={MemoryCache},cacheKeyManager={CacheKeyManager}): _keyManager → {_keyManager}", appSettings, memoryCache, cacheKeyManager, _keyManager);
+		logger.LogDebug("MemoryCacheManager(appSettings={AppSettings},memoryCache={MemoryCache},cacheKeyManager={CacheKeyManager}): _memoryCache → {_memoryCache}", appSettings, memoryCache, cacheKeyManager, _memoryCache);
     }
 
     #endregion
@@ -90,6 +94,7 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     // Protected implementation of Dispose pattern.
     protected virtual void Dispose(bool disposing)
     {
+		logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
         if (_disposed)
             return;
 
@@ -98,6 +103,9 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
             _clearToken.Dispose();
 
         _disposed = true;
+		logger.LogDebug("Dispose(disposing={Disposing}): _disposed → {_disposed}", disposing, _disposed);
+		logger.LogDebug(">>> Entering Dispose()");
+		logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
     }
 
     #endregion
@@ -112,10 +120,13 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task RemoveAsync(CacheKey cacheKey, params object[] cacheKeyParameters)
     {
+		logger.LogDebug(">>> Entering RemoveAsync(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         var key = PrepareKey(cacheKey, cacheKeyParameters).Key;
         _memoryCache.Remove(key);
+		logger.LogWarning("RemoveAsync(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters}): key → {Key}", cacheKey, cacheKeyParameters, key);
         _keyManager.RemoveKey(key);
 
+		logger.LogDebug("<<< Exiting RemoveAsync(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         return Task.CompletedTask;
     }
 
@@ -131,6 +142,7 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     /// </returns>
     public virtual async Task<T> GetAsync<T>(CacheKey key, Func<Task<T>> acquire)
     {
+		logger.LogDebug(">>> Entering GetAsync(key={Key},acquire={Acquire})", key, acquire);
         if ((key?.CacheTime ?? 0) <= 0)
             return await acquire();
 
@@ -138,6 +150,7 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
             key.Key,
             entry =>
             {
+			logger.LogDebug("GetAsync(key={Key},acquire={Acquire}): entry → {Entry}", key, acquire, entry);
                 entry.SetOptions(PrepareEntryOptions(key));
                 return new Lazy<Task<T>>(acquire, true);
             });
@@ -146,6 +159,7 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
         {
             var data = await task!.Value;
 
+			logger.LogDebug("GetAsync(key={Key},acquire={Acquire}): data → {Data}", key, acquire, data);
             //if a cached function return null, remove it from the cache
             if (data == null)
                 await RemoveAsync(key);
@@ -154,6 +168,7 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in GetAsync(key={Key},acquire={Acquire}): {Arg2}", key, acquire, ex.Message);
             //if a cached function throws an exception, remove it from the cache
             await RemoveAsync(key);
 
@@ -178,12 +193,14 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     {
         var value = _memoryCache.Get<Lazy<Task<T>>>(key.Key)?.Value;
 
+		logger.LogDebug("GetAsync(key={Key},defaultValue={DefaultValue}): value → {Value}", key, defaultValue, value);
         try
         {
             return value != null ? await value : defaultValue;
         }
         catch
         {
+			logger.LogError("Exception in GetAsync(key={Key},defaultValue={DefaultValue}): {Arg2}", key, defaultValue, ex.Message);
             //if a cached function throws an exception, remove it from the cache
             await RemoveAsync(key);
 
@@ -245,6 +262,7 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task SetAsync<T>(CacheKey key, T data)
     {
+		logger.LogDebug(">>> Entering SetAsync(key={Key},data={Data})", key, data);
         if (data != null && (key?.CacheTime ?? 0) > 0)
             _memoryCache.Set(
                 key.Key,
@@ -262,12 +280,15 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveByPrefixAsync(string prefix, params object[] prefixParameters)
     {
+		logger.LogDebug(">>> Entering RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         var deletePrefix = PrepareKeyPrefix(prefix, prefixParameters);
         foreach (var key in _keyManager.RemoveByPrefix(deletePrefix))
             _memoryCache.Remove(key);
+			logger.LogDebug("RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters}): deletePrefix → {DeletePrefix}", prefix, prefixParameters, deletePrefix);
 
         if (_memoryCache is ISynchronizedMemoryCache cache)
             await cache.RemoveByPrefixAsync(deletePrefix);
+			logger.LogDebug("<<< Exiting RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
     }
 
     /// <summary>
@@ -276,13 +297,16 @@ public partial class MemoryCacheManager : CacheKeyService, IStaticCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearAsync()
     {
+		logger.LogDebug(">>> Entering ClearAsync()");
         await _clearToken.CancelAsync();
         _clearToken.Dispose();
         _clearToken = new CancellationTokenSource();
+		logger.LogDebug("ClearAsync(): _clearToken → {_clearToken}", _clearToken);
         _keyManager.Clear();
 
         if (_memoryCache is ISynchronizedMemoryCache cache)
             await cache.ClearCacheAsync();
+			logger.LogDebug("<<< Exiting ClearAsync()");
     }
 
     public virtual void Dispose()

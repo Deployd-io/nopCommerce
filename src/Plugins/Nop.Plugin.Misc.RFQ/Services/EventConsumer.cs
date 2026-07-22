@@ -107,6 +107,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
             IconClass = "far fa-dot-circle",
             PermissionNames = new List<string> { RfqPermissionConfigManager.ADMIN_ACCESS_RFQ }
         });
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -232,6 +233,9 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
         }
 
         await _rfqService.UpdateQuoteItemsAsync(items);
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("HandleEventAsync(eventMessage)={EventMessage}: update query executed in {Arg1} ms", eventMessage, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -241,11 +245,13 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(EntityUpdatedEvent<ShoppingCartItem> eventMessage)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!_rfqSettings.Enabled)
             return;
 
         var quoteItem = await _rfqService.GetQuoteItemByShoppingCartItemIdAsync(eventMessage.Entity.Id);
         
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): quoteItem → {QuoteItem}", eventMessage, quoteItem);
         if (quoteItem == null || eventMessage.Entity.Quantity == quoteItem.OfferedQty)
             return;
 

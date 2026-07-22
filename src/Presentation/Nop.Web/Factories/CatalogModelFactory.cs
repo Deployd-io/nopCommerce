@@ -151,20 +151,27 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<PriceRangeModel> GetConvertedPriceRangeAsync(CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering GetConvertedPriceRangeAsync(command={Command})", command);
         var result = new PriceRangeModel();
 
+		logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): result → {Result}", command, result);
         if (string.IsNullOrWhiteSpace(command.Price))
             return result;
 
         var fromTo = command.Price.Trim().Split(['-']);
         if (fromTo.Length == 2)
+		logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): fromTo → {FromTo}", command, fromTo);
         {
             var rawFromPrice = fromTo[0]?.Trim();
             if (!string.IsNullOrEmpty(rawFromPrice) && decimal.TryParse(rawFromPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out var from))
+				logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): rawFromPrice → {RawFromPrice}", command, rawFromPrice);
+				logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): result.From → {Arg1}", command, result.From);
                 result.From = from;
 
             var rawToPrice = fromTo[1]?.Trim();
             if (!string.IsNullOrEmpty(rawToPrice) && decimal.TryParse(rawToPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out var to))
+				logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): rawToPrice → {RawToPrice}", command, rawToPrice);
+				logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): result.To → {Arg1}", command, result.To);
                 result.To = to;
 
             if (result.From > result.To)
@@ -172,6 +179,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
             var workingCurrency = await _workContext.GetWorkingCurrencyAsync();
 
+			logger.LogDebug("GetConvertedPriceRangeAsync(command={Command}): workingCurrency → {WorkingCurrency}", command, workingCurrency);
             if (result.From.HasValue)
                 result.From = await _currencyService.ConvertToPrimaryStoreCurrencyAsync(result.From.Value, workingCurrency);
 
@@ -179,6 +187,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                 result.To = await _currencyService.ConvertToPrimaryStoreCurrencyAsync(result.To.Value, workingCurrency);
         }
 
+		logger.LogDebug("<<< Exiting GetConvertedPriceRangeAsync(command={Command})", command);
         return result;
     }
 
@@ -193,18 +202,23 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<SpecificationFilterModel> PrepareSpecificationFilterModel(IList<int> selectedOptions, IList<SpecificationAttributeOption> availableOptions)
     {
+		logger.LogDebug(">>> Entering PrepareSpecificationFilterModel(selectedOptions={SelectedOptions},availableOptions={AvailableOptions})", selectedOptions, availableOptions);
         var model = new SpecificationFilterModel();
 
+		logger.LogDebug("PrepareSpecificationFilterModel(selectedOptions={SelectedOptions},availableOptions={AvailableOptions}): model → {Model}", selectedOptions, availableOptions, model);
         if (availableOptions?.Any() == true)
         {
             model.Enabled = true;
+			logger.LogDebug("PrepareSpecificationFilterModel(selectedOptions={SelectedOptions},availableOptions={AvailableOptions}): model.Enabled → {Arg2}", selectedOptions, availableOptions, model.Enabled);
 
             var workingLanguage = await _workContext.GetWorkingLanguageAsync();
 
+			logger.LogDebug("PrepareSpecificationFilterModel(selectedOptions={SelectedOptions},availableOptions={AvailableOptions}): workingLanguage → {WorkingLanguage}", selectedOptions, availableOptions, workingLanguage);
             foreach (var option in availableOptions)
             {
                 var attributeFilter = model.Attributes.FirstOrDefault(model => model.Id == option.SpecificationAttributeId);
                 if (attributeFilter == null)
+				logger.LogDebug("PrepareSpecificationFilterModel(selectedOptions={SelectedOptions},availableOptions={AvailableOptions}): attributeFilter → {AttributeFilter}", selectedOptions, availableOptions, attributeFilter);
                 {
                     var attribute = await _specificationAttributeService
                         .GetSpecificationAttributeByIdAsync(option.SpecificationAttributeId);
@@ -228,6 +242,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             }
         }
 
+		logger.LogDebug("<<< Exiting PrepareSpecificationFilterModel(selectedOptions={SelectedOptions},availableOptions={AvailableOptions})", selectedOptions, availableOptions);
         return model;
     }
 
@@ -242,14 +257,18 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<ManufacturerFilterModel> PrepareManufacturerFilterModel(IList<int> selectedManufacturers, IList<Manufacturer> availableManufacturers)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerFilterModel(selectedManufacturers={SelectedManufacturers},availableManufacturers={AvailableManufacturers})", selectedManufacturers, availableManufacturers);
         var model = new ManufacturerFilterModel();
 
+		logger.LogDebug("PrepareManufacturerFilterModel(selectedManufacturers={SelectedManufacturers},availableManufacturers={AvailableManufacturers}): model → {Model}", selectedManufacturers, availableManufacturers, model);
         if (availableManufacturers?.Any() == true)
         {
             model.Enabled = true;
+			logger.LogDebug("PrepareManufacturerFilterModel(selectedManufacturers={SelectedManufacturers},availableManufacturers={AvailableManufacturers}): model.Enabled → {Arg2}", selectedManufacturers, availableManufacturers, model.Enabled);
 
             var workingLanguage = await _workContext.GetWorkingLanguageAsync();
 
+			logger.LogDebug("PrepareManufacturerFilterModel(selectedManufacturers={SelectedManufacturers},availableManufacturers={AvailableManufacturers}): workingLanguage → {WorkingLanguage}", selectedManufacturers, availableManufacturers, workingLanguage);
             foreach (var manufacturer in availableManufacturers)
             {
                 model.Manufacturers.Add(new SelectListItem
@@ -263,6 +282,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             }
         }
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerFilterModel(selectedManufacturers={SelectedManufacturers},availableManufacturers={AvailableManufacturers})", selectedManufacturers, availableManufacturers);
         return model;
     }
 
@@ -341,6 +361,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             model.Products = (await _productModelFactory.PrepareProductOverviewModelsAsync(products)).ToList();
             model.LoadPagedList(products);
         }
+		logger.LogDebug("<<< Exiting PrepareCatalogProductsAsync(model={Model},products={Products},isFiltering={IsFiltering})", model, products, isFiltering);
     }
 
     /// <summary>
@@ -353,6 +374,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<PictureModel> PrepareCategoryPictureModelAsync(Category category)
     {
+		logger.LogDebug(">>> Entering PrepareCategoryPictureModelAsync(category={Category})", category);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var pictureSize = _mediaSettings.CategoryThumbPictureSize;
         var categoryPictureCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.CategoryPictureModelKey,
             category, pictureSize, true, await _workContext.GetWorkingLanguageAsync(), _webHelper.IsCurrentConnectionSecured(), await _storeContext.GetCurrentStoreAsync());
@@ -377,6 +400,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                 AlternateText = string.Format(altLocale, localizedName)
             };
         });
+		logger.LogInformation("PrepareCategoryPictureModelAsync(category)={Category}: external service call took {Arg1} ms", category, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareCategoryPictureModelAsync(category={Category})", category);
     }
 
     /// <summary>
@@ -389,6 +414,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<PictureModel> PrepareManufacturerPictureModelAsync(Manufacturer manufacturer)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerPictureModelAsync(manufacturer={Manufacturer})", manufacturer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var pictureSize = _mediaSettings.ManufacturerThumbPictureSize;
         var manufacturerPictureCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.ManufacturerPictureModelKey,
             manufacturer, pictureSize, true, await _workContext.GetWorkingLanguageAsync(),
@@ -414,6 +441,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
             return pictureModel;
         });
+		logger.LogInformation("PrepareManufacturerPictureModelAsync(manufacturer)={Manufacturer}: external service call took {Arg1} ms", manufacturer, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareManufacturerPictureModelAsync(manufacturer={Manufacturer})", manufacturer);
     }
 
     /// <summary>
@@ -426,6 +455,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<PictureModel> PrepareVendorPictureModelAsync(Vendor vendor)
     {
+		logger.LogDebug(">>> Entering PrepareVendorPictureModelAsync(vendor={Vendor})", vendor);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var pictureSize = _mediaSettings.VendorThumbPictureSize;
         var pictureCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.VendorPictureModelKey,
             vendor, pictureSize, true, await _workContext.GetWorkingLanguageAsync(), _webHelper.IsCurrentConnectionSecured(), await _storeContext.GetCurrentStoreAsync());
@@ -450,6 +481,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
             return pictureModel;
         });
+		logger.LogInformation("PrepareVendorPictureModelAsync(vendor)={Vendor}: external service call took {Arg1} ms", vendor, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareVendorPictureModelAsync(vendor={Vendor})", vendor);
     }
 
     /// <summary>
@@ -461,14 +494,22 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     protected virtual async Task<List<CategorySimpleModel>> PrepareCategorySimpleModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCategorySimpleModelsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load and cache them
         var language = await _workContext.GetWorkingLanguageAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareCategorySimpleModelsAsync(): language → {Language}", language);
+		logger.LogDebug("PrepareCategorySimpleModelsAsync(): customer → {Customer}", customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareCategorySimpleModelsAsync(): customerRoleIds → {CustomerRoleIds}", customerRoleIds);
+		logger.LogDebug("PrepareCategorySimpleModelsAsync(): store → {Store}", store);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.CategoryAllModelKey,
             language, customerRoleIds, store);
 
+		logger.LogInformation("PrepareCategorySimpleModelsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareCategorySimpleModelsAsync()");
         return await _staticCacheManager.GetAsync(cacheKey, async () => await PrepareCategorySimpleModelsAsync(0));
     }
 
@@ -543,6 +584,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CategoryModel> PrepareCategoryModelAsync(Category category, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareCategoryModelAsync(category={Category},command={Command})", category, command);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(category);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -564,6 +607,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         if (_catalogSettings.CategoryBreadcrumbEnabled)
         {
             model.DisplayCategoryBreadcrumb = true;
+			logger.LogDebug("PrepareCategoryModelAsync(category={Category},command={Command}): model.DisplayCategoryBreadcrumb → {Arg2}", category, command, model.DisplayCategoryBreadcrumb);
 
             model.CategoryBreadcrumb = await (await _categoryService.GetCategoryBreadCrumbAsync(category)).SelectAwait(async catBr =>
                 new CategoryModel
@@ -572,11 +616,15 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                     Name = await _localizationService.GetLocalizedAsync(catBr, x => x.Name),
                     SeName = await _urlRecordService.GetSeNameAsync(catBr)
                 }).ToListAsync();
+				logger.LogInformation("PrepareCategoryModelAsync(category,command)={Category},{Command}: database query executed in {Arg2} ms", category, command, __logStart.ElapsedMilliseconds);
 
             if (_seoSettings.MicrodataEnabled)
             {
                 var categoryBreadcrumb = model.CategoryBreadcrumb.Select(c => new CategorySimpleModel { Id = c.Id, Name = c.Name, SeName = c.SeName }).ToList();
                 var jsonLdModel = await _jsonLdModelFactory.PrepareJsonLdCategoryBreadcrumbAsync(categoryBreadcrumb);
+				logger.LogDebug("PrepareCategoryModelAsync(category={Category},command={Command}): categoryBreadcrumb → {CategoryBreadcrumb}", category, command, categoryBreadcrumb);
+				logger.LogDebug("PrepareCategoryModelAsync(category={Category},command={Command}): jsonLdModel → {JsonLdModel}", category, command, jsonLdModel);
+				logger.LogDebug("PrepareCategoryModelAsync(category={Category},command={Command}): model.JsonLd → {Arg2}", category, command, model.JsonLd);
                 model.JsonLd = JsonConvert
                     .SerializeObject(jsonLdModel, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
             }
@@ -601,10 +649,13 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         {
             var currentStore = await _storeContext.GetCurrentStoreAsync();
             var featuredProducts = await _productService.GetCategoryFeaturedProductsAsync(category.Id, currentStore.Id);
+			logger.LogDebug("PrepareCategoryModelAsync(category={Category},command={Command}): currentStore → {CurrentStore}", category, command, currentStore);
+			logger.LogDebug("PrepareCategoryModelAsync(category={Category},command={Command}): featuredProducts → {FeaturedProducts}", category, command, featuredProducts);
             if (featuredProducts != null)
                 model.FeaturedProducts = (await _productModelFactory.PrepareProductOverviewModelsAsync(featuredProducts)).ToList();
         }
 
+		logger.LogDebug("<<< Exiting PrepareCategoryModelAsync(category={Category},command={Command})", category, command);
         return model;
     }
 
@@ -618,9 +669,11 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<string> PrepareCategoryTemplateViewPathAsync(int templateId)
     {
+		logger.LogDebug(">>> Entering PrepareCategoryTemplateViewPathAsync(templateId={TemplateId})", templateId);
         var template = (await _categoryTemplateService.GetCategoryTemplateByIdAsync(templateId) ??
                         (await _categoryTemplateService.GetAllCategoryTemplatesAsync()).FirstOrDefault()) ?? throw new Exception("No default template could be loaded");
 
+		logger.LogDebug("<<< Exiting PrepareCategoryTemplateViewPathAsync(templateId={TemplateId})", templateId);
         return template.ViewPath;
     }
 
@@ -635,9 +688,11 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CategoryNavigationModel> PrepareCategoryNavigationModelAsync(int currentCategoryId, int currentProductId)
     {
+		logger.LogDebug(">>> Entering PrepareCategoryNavigationModelAsync(currentCategoryId={CurrentCategoryId},currentProductId={CurrentProductId})", currentCategoryId, currentProductId);
         //get active category
         var activeCategoryId = 0;
         if (currentCategoryId > 0)
+		logger.LogDebug("PrepareCategoryNavigationModelAsync(currentCategoryId={CurrentCategoryId},currentProductId={CurrentProductId}): activeCategoryId → {ActiveCategoryId}", currentCategoryId, currentProductId, activeCategoryId);
         {
             //category details page
             activeCategoryId = currentCategoryId;
@@ -647,16 +702,19 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             //product details page
             var productCategories = await _categoryService.GetProductCategoriesByProductIdAsync(currentProductId);
             if (productCategories.Any())
+				logger.LogDebug("PrepareCategoryNavigationModelAsync(currentCategoryId={CurrentCategoryId},currentProductId={CurrentProductId}): productCategories → {ProductCategories}", currentCategoryId, currentProductId, productCategories);
                 activeCategoryId = productCategories[0].CategoryId;
         }
 
         var cachedCategoriesModel = await PrepareCategorySimpleModelsAsync();
         var model = new CategoryNavigationModel
+		logger.LogDebug("PrepareCategoryNavigationModelAsync(currentCategoryId={CurrentCategoryId},currentProductId={CurrentProductId}): cachedCategoriesModel → {CachedCategoriesModel}", currentCategoryId, currentProductId, cachedCategoriesModel);
         {
             CurrentCategoryId = activeCategoryId,
             Categories = cachedCategoriesModel
         };
 
+		logger.LogDebug("<<< Exiting PrepareCategoryNavigationModelAsync(currentCategoryId={CurrentCategoryId},currentProductId={CurrentProductId})", currentCategoryId, currentProductId);
         return model;
     }
 
@@ -669,19 +727,27 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<List<CategoryModel>> PrepareHomepageCategoryModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareHomepageCategoryModelsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var language = await _workContext.GetWorkingLanguageAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("PrepareHomepageCategoryModelsAsync(): language → {Language}", language);
+		logger.LogDebug("PrepareHomepageCategoryModelsAsync(): customer → {Customer}", customer);
+		logger.LogDebug("PrepareHomepageCategoryModelsAsync(): customerRoleIds → {CustomerRoleIds}", customerRoleIds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var pictureSize = _mediaSettings.CategoryThumbPictureSize;
         var categoriesCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.CategoryHomepageKey,
             store, customerRoleIds, pictureSize, language, _webHelper.IsCurrentConnectionSecured());
+			logger.LogDebug("PrepareHomepageCategoryModelsAsync(): store → {Store}", store);
 
         var model = await _staticCacheManager.GetAsync(categoriesCacheKey, async () =>
         {
             var homepageCategories = await _categoryService.GetAllCategoriesDisplayedOnHomepageAsync();
             return await homepageCategories.SelectAwait(async category =>
             {
+			logger.LogDebug("PrepareHomepageCategoryModelsAsync(): homepageCategories → {HomepageCategories}", homepageCategories);
                 var catModel = new CategoryModel
                 {
                     Id = category.Id,
@@ -696,8 +762,11 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
                 return catModel;
             }).ToListAsync();
+			logger.LogInformation("PrepareHomepageCategoryModelsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         });
 
+		logger.LogInformation("PrepareHomepageCategoryModelsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareHomepageCategoryModelsAsync()");
         return model;
     }
 
@@ -712,6 +781,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareCategoryProductsModelAsync(Category category, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareCategoryProductsModelAsync(category={Category},command={Command})", category, command);
         ArgumentNullException.ThrowIfNull(category);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -723,6 +793,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrepareCategoryProductsModelAsync(category={Category},command={Command}): currentStore → {CurrentStore}", category, command, currentStore);
         //sorting
         await PrepareSortingOptionsAsync(model, command);
         //view mode
@@ -740,6 +811,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         //price range
         PriceRangeModel selectedPriceRange = null;
         if (_catalogSettings.EnablePriceRangeFiltering && category.PriceRangeFiltering)
+		logger.LogDebug("PrepareCategoryProductsModelAsync(category={Category},command={Command}): selectedPriceRange → {SelectedPriceRange}", category, command, selectedPriceRange);
         {
             selectedPriceRange = await GetConvertedPriceRangeAsync(command);
 
@@ -755,6 +827,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                         excludeFeaturedProducts: !_catalogSettings.IgnoreFeaturedProducts && !_catalogSettings.IncludeFeaturedProductsInNormalLists,
                         orderBy: orderBy);
 
+					logger.LogDebug("<<< Exiting getProductPriceAsync(orderBy={OrderBy})", orderBy);
                     return products?.FirstOrDefault()?.Price ?? 0;
                 }
 
@@ -812,6 +885,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         var isFiltering = filterableOptions.Any() || selectedPriceRange?.From is not null;
         await PrepareCatalogProductsAsync(model, products, isFiltering);
 
+		logger.LogDebug("<<< Exiting PrepareCategoryProductsModelAsync(category={Category},command={Command})", category, command);
         return model;
     }
 
@@ -830,6 +904,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<ManufacturerModel> PrepareManufacturerModelAsync(Manufacturer manufacturer, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerModelAsync(manufacturer={Manufacturer},command={Command})", manufacturer, command);
         ArgumentNullException.ThrowIfNull(manufacturer);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -849,14 +924,17 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrepareManufacturerModelAsync(manufacturer={Manufacturer},command={Command}): store → {Store}", manufacturer, command, store);
         //featured products
         if (!_catalogSettings.IgnoreFeaturedProducts)
         {
             var featuredProducts = await _productService.GetManufacturerFeaturedProductsAsync(manufacturer.Id, store.Id);
             if (featuredProducts != null)
+				logger.LogDebug("PrepareManufacturerModelAsync(manufacturer={Manufacturer},command={Command}): featuredProducts → {FeaturedProducts}", manufacturer, command, featuredProducts);
                 model.FeaturedProducts = (await _productModelFactory.PrepareProductOverviewModelsAsync(featuredProducts)).ToList();
         }
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerModelAsync(manufacturer={Manufacturer},command={Command})", manufacturer, command);
         return model;
     }
 
@@ -871,6 +949,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareManufacturerProductsModelAsync(Manufacturer manufacturer, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerProductsModelAsync(manufacturer={Manufacturer},command={Command})", manufacturer, command);
         ArgumentNullException.ThrowIfNull(manufacturer);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -883,6 +962,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         var manufacturerIds = new List<int> { manufacturer.Id };
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrepareManufacturerProductsModelAsync(manufacturer={Manufacturer},command={Command}): currentStore → {CurrentStore}", manufacturer, command, currentStore);
         //sorting
         await PrepareSortingOptionsAsync(model, command);
         //view mode
@@ -894,6 +974,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         //price range
         PriceRangeModel selectedPriceRange = null;
         if (_catalogSettings.EnablePriceRangeFiltering && manufacturer.PriceRangeFiltering)
+		logger.LogDebug("PrepareManufacturerProductsModelAsync(manufacturer={Manufacturer},command={Command}): selectedPriceRange → {SelectedPriceRange}", manufacturer, command, selectedPriceRange);
         {
             selectedPriceRange = await GetConvertedPriceRangeAsync(command);
 
@@ -957,6 +1038,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         var isFiltering = filterableOptions.Any() || selectedPriceRange?.From is not null;
         await PrepareCatalogProductsAsync(model, products, isFiltering);
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerProductsModelAsync(manufacturer={Manufacturer},command={Command})", manufacturer, command);
         return model;
     }
 
@@ -970,9 +1052,11 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<string> PrepareManufacturerTemplateViewPathAsync(int templateId)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerTemplateViewPathAsync(templateId={TemplateId})", templateId);
         var template = (await _manufacturerTemplateService.GetManufacturerTemplateByIdAsync(templateId) ??
                         (await _manufacturerTemplateService.GetAllManufacturerTemplatesAsync()).FirstOrDefault()) ?? throw new Exception("No default template could be loaded");
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerTemplateViewPathAsync(templateId={TemplateId})", templateId);
         return template.ViewPath;
     }
 
@@ -985,10 +1069,14 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<List<ManufacturerModel>> PrepareManufacturerAllModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerAllModelsAsync()");
         var model = new List<ManufacturerModel>();
 
+		logger.LogDebug("PrepareManufacturerAllModelsAsync(): model → {Model}", model);
         var currentStore = await _storeContext.GetCurrentStoreAsync();
         var manufacturers = await _manufacturerService.GetAllManufacturersAsync(storeId: currentStore.Id);
+		logger.LogDebug("PrepareManufacturerAllModelsAsync(): currentStore → {CurrentStore}", currentStore);
+		logger.LogDebug("PrepareManufacturerAllModelsAsync(): manufacturers → {Manufacturers}", manufacturers);
         foreach (var manufacturer in manufacturers)
         {
             var modelMan = new ManufacturerModel
@@ -1007,6 +1095,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             model.Add(modelMan);
         }
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerAllModelsAsync()");
         return model;
     }
 
@@ -1020,16 +1109,23 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<ManufacturerNavigationModel> PrepareManufacturerNavigationModelAsync(int currentManufacturerId)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId})", currentManufacturerId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var language = await _workContext.GetWorkingLanguageAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId}): language → {Language}", currentManufacturerId, language);
+		logger.LogDebug("PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId}): customer → {Customer}", currentManufacturerId, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId}): customerRoleIds → {CustomerRoleIds}", currentManufacturerId, customerRoleIds);
+		logger.LogDebug("PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId}): store → {Store}", currentManufacturerId, store);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.ManufacturerNavigationModelKey,
             currentManufacturerId, language, customerRoleIds, store);
         var cachedModel = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var currentManufacturer = await _manufacturerService.GetManufacturerByIdAsync(currentManufacturerId);
 
+			logger.LogDebug("PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId}): currentManufacturer → {CurrentManufacturer}", currentManufacturerId, currentManufacturer);
             var manufacturers = await _manufacturerService.GetAllManufacturersAsync(storeId: store.Id,
                 pageSize: _catalogSettings.ManufacturersBlockItemsToDisplay);
             var model = new ManufacturerNavigationModel
@@ -1052,6 +1148,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             return model;
         });
 
+		logger.LogInformation("PrepareManufacturerNavigationModelAsync(currentManufacturerId)={CurrentManufacturerId}: external service call took {Arg1} ms", currentManufacturerId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareManufacturerNavigationModelAsync(currentManufacturerId={CurrentManufacturerId})", currentManufacturerId);
         return cachedModel;
     }
 
@@ -1070,6 +1168,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<VendorModel> PrepareVendorModelAsync(Vendor vendor, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareVendorModelAsync(vendor={Vendor},command={Command})", vendor, command);
         ArgumentNullException.ThrowIfNull(vendor);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -1091,7 +1190,9 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         if (_forumSettings.AllowPrivateMessages)
             model.PmCustomerId = vendor.PmCustomerId;
+			logger.LogDebug("PrepareVendorModelAsync(vendor={Vendor},command={Command}): model.PmCustomerId → {Arg2}", vendor, command, model.PmCustomerId);
 
+		logger.LogDebug("<<< Exiting PrepareVendorModelAsync(vendor={Vendor},command={Command})", vendor, command);
         return model;
     }
 
@@ -1106,6 +1207,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareVendorProductsModelAsync(Vendor vendor, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareVendorProductsModelAsync(vendor={Vendor},command={Command})", vendor, command);
         ArgumentNullException.ThrowIfNull(vendor);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -1126,6 +1228,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         //price range
         PriceRangeModel selectedPriceRange = null;
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareVendorProductsModelAsync(vendor={Vendor},command={Command}): selectedPriceRange → {SelectedPriceRange}", vendor, command, selectedPriceRange);
+		logger.LogDebug("PrepareVendorProductsModelAsync(vendor={Vendor},command={Command}): store → {Store}", vendor, command, store);
         if (_catalogSettings.EnablePriceRangeFiltering && vendor.PriceRangeFiltering)
         {
             selectedPriceRange = await GetConvertedPriceRangeAsync(command);
@@ -1176,6 +1280,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         var isFiltering = selectedPriceRange?.From is not null;
         await PrepareCatalogProductsAsync(model, products, isFiltering);
 
+		logger.LogDebug("<<< Exiting PrepareVendorProductsModelAsync(vendor={Vendor},command={Command})", vendor, command);
         return model;
     }
 
@@ -1188,8 +1293,11 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<List<VendorModel>> PrepareVendorAllModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareVendorAllModelsAsync()");
         var model = new List<VendorModel>();
         var vendors = await _vendorService.GetAllVendorsAsync();
+		logger.LogDebug("PrepareVendorAllModelsAsync(): model → {Model}", model);
+		logger.LogDebug("PrepareVendorAllModelsAsync(): vendors → {Vendors}", vendors);
         foreach (var vendor in vendors)
         {
             var vendorModel = new VendorModel
@@ -1208,6 +1316,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             model.Add(vendorModel);
         }
 
+		logger.LogDebug("<<< Exiting PrepareVendorAllModelsAsync()");
         return model;
     }
 
@@ -1220,11 +1329,14 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<VendorNavigationModel> PrepareVendorNavigationModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareVendorNavigationModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cacheKey = NopModelCacheDefaults.VendorNavigationModelKey;
         var cachedModel = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var vendors = await _vendorService.GetAllVendorsAsync(pageSize: _vendorSettings.VendorsBlockItemsToDisplay);
             var model = new VendorNavigationModel
+			logger.LogDebug("PrepareVendorNavigationModelAsync(): vendors → {Vendors}", vendors);
             {
                 TotalVendors = vendors.TotalCount
             };
@@ -1242,6 +1354,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             return model;
         });
 
+		logger.LogInformation("PrepareVendorNavigationModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareVendorNavigationModelAsync()");
         return cachedModel;
     }
 
@@ -1257,13 +1371,18 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<VendorProductReviewsListModel> PrepareVendorProductReviewsModelAsync(Vendor vendor, VendorReviewsPagingFilteringModel pagingModel)
     {
+		logger.LogDebug(">>> Entering PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel})", vendor, pagingModel);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(vendor);
         ArgumentNullException.ThrowIfNull(pagingModel);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         if (pagingModel.PageSize <= 0)
             pagingModel.PageSize = _catalogSettings.VendorProductReviewsPageSize;
+			logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): pagingModel.PageSize → {Arg2}", vendor, pagingModel, pagingModel.PageSize);
         if (pagingModel.PageNumber <= 0)
             pagingModel.PageNumber = 1;
+			logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): pagingModel.PageNumber → {Arg2}", vendor, pagingModel, pagingModel.PageNumber);
 
         var model = new VendorProductReviewsListModel
         {
@@ -1274,6 +1393,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.VendorReviewsModelKey, vendor, currentStore);
+		logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): currentStore → {CurrentStore}", vendor, pagingModel, currentStore);
+		logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): cacheKey → {CacheKey}", vendor, pagingModel, cacheKey);
         var vendorReviewModels = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var vendorReviews = await _productReviewService.GetAllProductReviewsAsync(
@@ -1285,6 +1406,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             {
                 var customer = await _customerService.GetCustomerByIdAsync(pr.CustomerId);
                 var product = await _productService.GetProductByIdAsync(pr.ProductId);
+				logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): customer → {Customer}", vendor, pagingModel, customer);
+				logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): product → {Product}", vendor, pagingModel, product);
 
                 var model = new VendorProductReviewModel
                 {
@@ -1317,15 +1440,20 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             })
             .OrderBy(m => m.CreatedOnUtc)
             .ToListAsync();
+			logger.LogInformation("PrepareVendorProductReviewsModelAsync(vendor,pagingModel)={Vendor},{PagingModel}: database query executed in {Arg2} ms", vendor, pagingModel, __logStart.ElapsedMilliseconds);
         });
 
         var pagedVendorReviews = new PagedList<VendorProductReviewModel>(vendorReviewModels, pagingModel.PageNumber - 1, pagingModel.PageSize);
 
+		logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): pagedVendorReviews → {PagedVendorReviews}", vendor, pagingModel, pagedVendorReviews);
         //re-init pager
         model.PagingFilteringContext.LoadPagedList(pagedVendorReviews);
 
         model.Reviews = pagedVendorReviews;
+		logger.LogDebug("PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel}): model.Reviews → {Arg2}", vendor, pagingModel, model.Reviews);
 
+		logger.LogInformation("PrepareVendorProductReviewsModelAsync(vendor,pagingModel)={Vendor},{PagingModel}: external service call took {Arg2} ms", vendor, pagingModel, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareVendorProductReviewsModelAsync(vendor={Vendor},pagingModel={PagingModel})", vendor, pagingModel);
         return model;
     }
 
@@ -1343,12 +1471,18 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<PopularProductTagsModel> PreparePopularProductTagsModelAsync(int numberTagsToReturn = 0)
     {
+		logger.LogDebug(">>> Entering PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn})", numberTagsToReturn);
         var model = new PopularProductTagsModel();
 
+		logger.LogDebug("PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn}): model → {Model}", numberTagsToReturn, model);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn}): currentStore → {CurrentStore}", numberTagsToReturn, currentStore);
         var tagStats = await _productTagService.GetProductCountAsync(currentStore.Id);
 
+		logger.LogDebug("PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn}): tagStats → {TagStats}", numberTagsToReturn, tagStats);
+		logger.LogDebug("PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn}): model.TotalTags → {Arg1}", numberTagsToReturn, model.TotalTags);
         model.TotalTags = tagStats.Count;
 
         model.Tags.AddRange(await tagStats
@@ -1358,6 +1492,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             {
                 var tag = await _productTagService.GetProductTagByIdAsync(tagStat.Key);
 
+				logger.LogDebug("PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn}): tag → {Tag}", numberTagsToReturn, tag);
                 return new ProductTagModel
                 {
                     Id = tag.Id,
@@ -1369,7 +1504,9 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             //sorting result
             .OrderBy(x => x.Name)
             .ToListAsync());
+			logger.LogInformation("PreparePopularProductTagsModelAsync(numberTagsToReturn)={NumberTagsToReturn}: database query executed in {Arg1} ms", numberTagsToReturn, __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting PreparePopularProductTagsModelAsync(numberTagsToReturn={NumberTagsToReturn})", numberTagsToReturn);
         return model;
     }
 
@@ -1384,6 +1521,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<ProductsByTagModel> PrepareProductsByTagModelAsync(ProductTag productTag, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareProductsByTagModelAsync(productTag={ProductTag},command={Command})", productTag, command);
         ArgumentNullException.ThrowIfNull(productTag);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -1399,6 +1537,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             CatalogProductsModel = await PrepareTagProductsModelAsync(productTag, command)
         };
 
+		logger.LogDebug("<<< Exiting PrepareProductsByTagModelAsync(productTag={ProductTag},command={Command})", productTag, command);
         return model;
     }
 
@@ -1413,6 +1552,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareTagProductsModelAsync(ProductTag productTag, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareTagProductsModelAsync(productTag={ProductTag},command={Command})", productTag, command);
         ArgumentNullException.ThrowIfNull(productTag);
 
         ArgumentNullException.ThrowIfNull(command);
@@ -1433,6 +1573,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         //price range
         PriceRangeModel selectedPriceRange = null;
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareTagProductsModelAsync(productTag={ProductTag},command={Command}): selectedPriceRange → {SelectedPriceRange}", productTag, command, selectedPriceRange);
+		logger.LogDebug("PrepareTagProductsModelAsync(productTag={ProductTag},command={Command}): store → {Store}", productTag, command, store);
         if (_catalogSettings.EnablePriceRangeFiltering && _catalogSettings.ProductsByTagPriceRangeFiltering)
         {
             selectedPriceRange = await GetConvertedPriceRangeAsync(command);
@@ -1464,6 +1606,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                     From = _catalogSettings.ProductsByTagPriceFrom,
                     To = _catalogSettings.ProductsByTagPriceTo
                 };
+				logger.LogDebug(">>> Entering getProductPriceAsync(orderBy={OrderBy})", orderBy);
             }
 
             model.PriceRangeFilter = await PreparePriceRangeFilterAsync(selectedPriceRange, availablePriceRange);
@@ -1483,6 +1626,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         var isFiltering = selectedPriceRange?.From is not null;
         await PrepareCatalogProductsAsync(model, products, isFiltering);
 
+		logger.LogDebug("<<< Exiting PrepareTagProductsModelAsync(productTag={ProductTag},command={Command})", productTag, command);
         return model;
     }
 
@@ -1500,6 +1644,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareNewProductsModelAsync(CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareNewProductsModelAsync(command={Command})", command);
         ArgumentNullException.ThrowIfNull(command);
 
         var model = new CatalogProductsModel
@@ -1509,6 +1654,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("PrepareNewProductsModelAsync(command={Command}): currentStore → {CurrentStore}", command, currentStore);
         //page size
         await PreparePageSizeOptionsAsync(model, command, _catalogSettings.NewProductsAllowCustomersToSelectPageSize,
             _catalogSettings.NewProductsPageSizeOptions, _catalogSettings.NewProductsPageSize);
@@ -1520,6 +1666,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         await PrepareCatalogProductsAsync(model, products);
 
+		logger.LogDebug("<<< Exiting PrepareNewProductsModelAsync(command={Command})", command);
         return model;
     }
 
@@ -1639,6 +1786,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareSearchProductsModelAsync(SearchModel searchModel, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command})", searchModel, command);
         ArgumentNullException.ThrowIfNull(command);
 
         var model = new CatalogProductsModel
@@ -1660,11 +1808,13 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         IPagedList<Product> products = new PagedList<Product>(new List<Product>(), 0, 1);
         //only search if query string search keyword is set (used to avoid searching or displaying search term min length error message on /search page load)
+		logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): products → {Products}", searchModel, command, products);
         //we don't use "!string.IsNullOrEmpty(searchTerms)" in cases of "ProductSearchTermMinimumLength" set to 0 but searching by other parameters (e.g. category or price filter)
         var request = _httpContextAccessor.HttpContext.Request;
 
         var isSearchTermSpecified = request.Query.ContainsKey("q");
 
+		logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): isSearchTermSpecified → {IsSearchTermSpecified}", searchModel, command, isSearchTermSpecified);
         if (!isSearchTermSpecified && request.HasFormContentType)
             isSearchTermSpecified = request.Form.ContainsKey("q");
 
@@ -1672,6 +1822,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         {
             var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+			logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): currentStore → {CurrentStore}", searchModel, command, currentStore);
             if (searchTerms.Length < _catalogSettings.ProductSearchTermMinimumLength)
             {
                 model.WarningMessage =
@@ -1682,10 +1833,15 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             {
                 var categoryIds = new List<int>();
                 var manufacturerId = 0;
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): categoryIds → {CategoryIds}", searchModel, command, categoryIds);
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): manufacturerId → {ManufacturerId}", searchModel, command, manufacturerId);
                 var searchInDescriptions = false;
                 var searchInProductTags = false;
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): searchInDescriptions → {SearchInDescriptions}", searchModel, command, searchInDescriptions);
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): searchInProductTags → {SearchInProductTags}", searchModel, command, searchInProductTags);
                 var vendorId = 0;
 
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): vendorId → {VendorId}", searchModel, command, vendorId);
                 if (searchModel.advs)
                 {
                     //advanced search
@@ -1712,9 +1868,11 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
                 var workingLanguage = await _workContext.GetWorkingLanguageAsync();
 
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): workingLanguage → {WorkingLanguage}", searchModel, command, workingLanguage);
                 //price range
                 PriceRangeModel selectedPriceRange = null;
                 if (_catalogSettings.EnablePriceRangeFiltering && _catalogSettings.SearchPagePriceRangeFiltering)
+				logger.LogDebug("PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command}): selectedPriceRange → {SelectedPriceRange}", searchModel, command, selectedPriceRange);
                 {
                     selectedPriceRange = await GetConvertedPriceRangeAsync(command);
 
@@ -1811,6 +1969,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         var isFiltering = !string.IsNullOrEmpty(searchTerms);
         await PrepareCatalogProductsAsync(model, products, isFiltering);
 
+		logger.LogDebug("<<< Exiting PrepareSearchProductsModelAsync(searchModel={SearchModel},command={Command})", searchModel, command);
         return model;
     }
 
@@ -1825,6 +1984,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<CatalogProductsModel> PrepareSearchProductsByFilterLevelValuesModelAsync(SearchFilterLevelValueModel searchModel, CatalogProductsCommand command)
     {
+		logger.LogDebug(">>> Entering PrepareSearchProductsByFilterLevelValuesModelAsync(searchModel={SearchModel},command={Command})", searchModel, command);
         ArgumentNullException.ThrowIfNull(command);
 
         var model = new CatalogProductsModel
@@ -1854,18 +2014,21 @@ public partial class CatalogModelFactory : ICatalogModelFactory
 
         IPagedList<Product> products = new PagedList<Product>(new List<Product>(), 0, 1);
 
+		logger.LogDebug("PrepareSearchProductsByFilterLevelValuesModelAsync(searchModel={SearchModel},command={Command}): products → {Products}", searchModel, command, products);
         var (filterLevel1Disabled, _, _) = _filterLevelValueService.IsFilterLevelDisabled();
 
         if (!string.IsNullOrEmpty(flv1) && !filterLevel1Disabled)
         {
             var filterLevelValue = (await _filterLevelValueService.GetAllFilterLevelValuesAsync(flv1, flv2, flv3)).FirstOrDefault();
             if (filterLevelValue == null)
+			logger.LogDebug("PrepareSearchProductsByFilterLevelValuesModelAsync(searchModel={SearchModel},command={Command}): filterLevelValue → {FilterLevelValue}", searchModel, command, filterLevelValue);
             {
                 return model;
             }
 
             var store = await _storeContext.GetCurrentStoreAsync();
 
+			logger.LogDebug("PrepareSearchProductsByFilterLevelValuesModelAsync(searchModel={SearchModel},command={Command}): store → {Store}", searchModel, command, store);
             //products
             products = await _filterLevelValueService.GetProductsByFilterLevelValueIdAsync(filterLevelValue.Id,
             pageIndex: command.PageNumber - 1,
@@ -1876,6 +2039,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             await PrepareCatalogProductsAsync(model, products, true);
         }
 
+		logger.LogDebug("<<< Exiting PrepareSearchProductsByFilterLevelValuesModelAsync(searchModel={SearchModel},command={Command})", searchModel, command);
         return model;
     }
 
@@ -1888,6 +2052,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
     /// </returns>
     public virtual async Task<SearchBoxModel> PrepareSearchBoxModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareSearchBoxModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = new SearchBoxModel
         {
             AutoCompleteEnabled = _catalogSettings.ProductSearchAutoCompleteEnabled,
@@ -1902,12 +2068,16 @@ public partial class CatalogModelFactory : ICatalogModelFactory
         {
             var store = await _storeContext.GetCurrentStoreAsync();
             var language = await _workContext.GetWorkingLanguageAsync();
+			logger.LogDebug("PrepareSearchBoxModelAsync(): store → {Store}", store);
+			logger.LogDebug("PrepareSearchBoxModelAsync(): language → {Language}", language);
             var categoriesCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.SearchBoxCategoryListModelKey, store, language);
 
+			logger.LogDebug("PrepareSearchBoxModelAsync(): categoriesCacheKey → {CategoriesCacheKey}", categoriesCacheKey);
             model.AvailableCategories = await _staticCacheManager.GetAsync(categoriesCacheKey, async () =>
             {
                 var allCategories = await _categoryService.GetAllCategoriesAsync(storeId: store.Id);
                 var result = new List<SelectListItem>
+				logger.LogDebug("PrepareSearchBoxModelAsync(): allCategories → {AllCategories}", allCategories);
                 {
                     //empty entry
                     new()
@@ -1925,6 +2095,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                         Value = c.Id.ToString(),
                         Text = await _localizationService.GetLocalizedAsync(c, x => x.Name, language.Id),
                         Selected = model.SearchCategoryId == c.Id
+						logger.LogDebug("PrepareSearchBoxModelAsync(): Value → {Value}", Value);
+						logger.LogDebug("PrepareSearchBoxModelAsync(): Text → {Text}", Text);
                     });
                 }
 
@@ -1932,6 +2104,8 @@ public partial class CatalogModelFactory : ICatalogModelFactory
             });
         }
 
+		logger.LogInformation("PrepareSearchBoxModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareSearchBoxModelAsync()");
         return model;
     }
 
@@ -1977,6 +2151,7 @@ public partial class CatalogModelFactory : ICatalogModelFactory
                 Selected = option.Id == command.OrderBy
             });
         }
+		logger.LogDebug("<<< Exiting PrepareSortingOptionsAsync(model={Model},command={Command})", model, command);
     }
 
     /// <summary>

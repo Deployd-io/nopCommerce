@@ -21,7 +21,10 @@ public class WebApiFrontendController : BasePluginController
 
     public WebApiFrontendController(IPermissionService permissionService)
     {
+		logger.LogDebug(">>> Entering WebApiFrontendController(permissionService={PermissionService})", permissionService);
         _permissionService = permissionService;
+		logger.LogDebug("<<< Exiting WebApiFrontendController(permissionService={PermissionService})", permissionService);
+		logger.LogDebug("WebApiFrontendController(permissionService={PermissionService}): _permissionService → {_permissionService}", permissionService, _permissionService);
     }
 
     #endregion
@@ -31,6 +34,8 @@ public class WebApiFrontendController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.WebApi.Frontend/Views/Configure.cshtml");
     }
 

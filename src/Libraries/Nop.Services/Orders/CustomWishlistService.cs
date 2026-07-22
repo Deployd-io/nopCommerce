@@ -37,12 +37,15 @@ public partial class CustomWishlistService : ICustomWishlistService
     /// an empty list is returned.</returns>
     public virtual async Task<IList<CustomWishlist>> GetAllCustomWishlistsAsync(int customerId)
     {
+		logger.LogDebug(">>> Entering GetAllCustomWishlistsAsync(customerId={CustomerId})", customerId);
         if (!_shoppingCartSettings.AllowMultipleWishlist)
             return new List<CustomWishlist>();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var query = _customWishlistRepository.Table
             .Where(w => w.CustomerId == customerId)
             .OrderByDescending(w => w.CreatedOnUtc);
+		logger.LogDebug("<<< Exiting GetAllCustomWishlistsAsync(customerId={CustomerId})", customerId);
         return await query.ToListAsync();
     }
 
@@ -52,6 +55,7 @@ public partial class CustomWishlistService : ICustomWishlistService
     /// <param name="item">The custom wishlist item to add. Cannot be <see langword="null"/>.</param>
     public virtual async Task AddCustomWishlistAsync(CustomWishlist item)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         await _customWishlistRepository.InsertAsync(item);
     }
@@ -62,11 +66,19 @@ public partial class CustomWishlistService : ICustomWishlistService
     /// <param name="itemId">The unique identifier of the custom wishlist item to remove. Must be a valid identifier of an existing item.</param>
     public virtual async Task RemoveCustomWishlistAsync(int itemId)
     {
+		logger.LogDebug(">>> Entering RemoveCustomWishlistAsync(itemId={ItemId})", itemId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var item = await _customWishlistRepository.GetByIdAsync(itemId);
         if (item != null)
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("RemoveCustomWishlistAsync(itemId)={ItemId}: find query executed in {Arg1} ms", itemId, __logStart.ElapsedMilliseconds);
         {
             await _customWishlistRepository.DeleteAsync(item);
         }
+		logger.LogDebug("<<< Exiting RemoveCustomWishlistAsync(itemId={ItemId})", itemId);
+		logger.LogInformation("RemoveCustomWishlistAsync(itemId)={ItemId}: external service call took {Arg1} ms", itemId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("RemoveCustomWishlistAsync(itemId={ItemId}): item → {Item}", itemId, item);
+		logger.LogInformation("RemoveCustomWishlistAsync(itemId)={ItemId}: delete query executed in {Arg1} ms", itemId, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -77,6 +89,8 @@ public partial class CustomWishlistService : ICustomWishlistService
     /// null if no wishlist is found with the given identifier.</returns>
     public virtual async Task<CustomWishlist> GetCustomWishlistByIdAsync(int itemId)
     {
+		logger.LogDebug(">>> Entering GetCustomWishlistByIdAsync(itemId={ItemId})", itemId);
+		logger.LogDebug("<<< Exiting GetCustomWishlistByIdAsync(itemId={ItemId})", itemId);
         return await _customWishlistRepository.GetByIdAsync(itemId);
     }
 

@@ -15,9 +15,11 @@ public partial class LanguageCacheEventConsumer : CacheEventConsumer<Language>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Language entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopLocalizationDefaults.LocaleStringResourcesAllPublicCacheKey, entity);
         await RemoveAsync(NopLocalizationDefaults.LocaleStringResourcesAllAdminCacheKey, entity);
         await RemoveAsync(NopLocalizationDefaults.LocaleStringResourcesAllCacheKey, entity);
         await RemoveByPrefixAsync(NopLocalizationDefaults.LocaleStringResourcesByNamePrefix, entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

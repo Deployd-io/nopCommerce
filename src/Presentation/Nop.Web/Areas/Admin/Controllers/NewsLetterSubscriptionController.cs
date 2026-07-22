@@ -60,15 +60,20 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Promotions.SUBSCRIBERS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _newsletterSubscriptionModelFactory.PrepareNewsLetterSubscriptionSearchModelAsync(new NewsLetterSubscriptionSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -79,15 +84,19 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
         //prepare model
         var model = await _newsletterSubscriptionModelFactory.PrepareNewsLetterSubscriptionListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.SUBSCRIBERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _newsletterSubscriptionModelFactory.PrepareNewsLetterSubscriptionModelAsync(new NewsLetterSubscriptionModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -127,19 +136,24 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
         model = await _newsletterSubscriptionModelFactory.PrepareNewsLetterSubscriptionModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.SUBSCRIBERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         var subscription = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionByIdAsync(id);
         if (subscription == null)
+			logger.LogDebug("Edit(id={Id}): subscription → {Subscription}", id, subscription);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _newsletterSubscriptionModelFactory.PrepareNewsLetterSubscriptionModelAsync(null, subscription);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -184,6 +198,7 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
         model = await _newsletterSubscriptionModelFactory.PrepareNewsLetterSubscriptionModelAsync(model, subscription, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -191,8 +206,10 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.SUBSCRIBERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var subscription = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionByIdAsync(id);
         if (subscription == null)
+			logger.LogDebug("Delete(id={Id}): subscription → {Subscription}", id, subscription);
             return RedirectToAction("List");
 
         try
@@ -205,7 +222,9 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = subscription.Id });
         }
     }
@@ -242,12 +261,14 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.SUBSCRIBERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportCsv(IFormFile importcsvfile)
     {
+		logger.LogDebug(">>> Entering ImportCsv(importcsvfile={Importcsvfile})", importcsvfile);
         try
         {
             if (importcsvfile != null && importcsvfile.Length > 0)
             {
                 var count = await _importManager.ImportNewsLetterSubscribersFromTxtAsync(importcsvfile.OpenReadStream());
 
+				logger.LogDebug("ImportCsv(importcsvfile={Importcsvfile}): count → {Count}", importcsvfile, count);
                 _notificationService.SuccessNotification(string.Format(await _localizationService.GetResourceAsync("Admin.Promotions.NewsLetterSubscriptions.ImportEmailsSuccess"), count));
 
                 return RedirectToAction("List");
@@ -258,7 +279,9 @@ public partial class NewsLetterSubscriptionController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ImportCsv(importcsvfile={Importcsvfile}): {Arg1}", importcsvfile, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ImportCsv(importcsvfile={Importcsvfile})", importcsvfile);
             return RedirectToAction("List");
         }
     }
