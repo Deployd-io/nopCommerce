@@ -39,16 +39,19 @@ public partial class StoreMappingSupportedModelFactory : IStoreMappingSupportedM
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareModelStoresAsync<TModel>(TModel model) where TModel : IStoreMappingSupportedModel
     {
+		logger.LogDebug(">>> Entering PrepareModelStoresAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available stores
         var availableStores = await _storeService.GetAllStoresAsync();
         model.AvailableStores = availableStores.Select(store => new SelectListItem
         {
+		logger.LogDebug("PrepareModelStoresAsync(model={Model}): availableStores → {AvailableStores}", model, availableStores);
             Text = store.Name,
             Value = store.Id.ToString(),
             Selected = model.SelectedStoreIds.Contains(store.Id)
         }).ToList();
+		logger.LogDebug("<<< Exiting PrepareModelStoresAsync(model={Model})", model);
     }
 
     /// <summary>

@@ -16,10 +16,12 @@ public partial class BaseRouteProvider
     /// <returns></returns>
     protected string GetLanguageRoutePattern()
     {
+		logger.LogDebug(">>> Entering GetLanguageRoutePattern()");
         if (DataSettingsManager.IsDatabaseInstalled())
         {
             var localizationSettings = EngineContext.Current.Resolve<LocalizationSettings>();
             if (localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
+			logger.LogDebug("GetLanguageRoutePattern(): localizationSettings → {LocalizationSettings}", localizationSettings);
             {
                 //by default we use empty for the language template, later it'll be specified with the working language code
                 var code = string.Empty;
@@ -27,6 +29,7 @@ public partial class BaseRouteProvider
             }
         }
 
+		logger.LogDebug("<<< Exiting GetLanguageRoutePattern()");
         return string.Empty;
     }
 }

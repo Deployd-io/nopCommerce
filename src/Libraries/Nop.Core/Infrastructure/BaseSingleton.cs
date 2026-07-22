@@ -7,7 +7,10 @@ public partial class BaseSingleton
 {
     static BaseSingleton()
     {
+		logger.LogDebug(">>> Entering BaseSingleton()");
         AllSingletons = new Dictionary<Type, object>();
+		logger.LogDebug("<<< Exiting BaseSingleton()");
+		logger.LogDebug("BaseSingleton(): AllSingletons → {AllSingletons}", AllSingletons);
     }
 
     /// <summary>

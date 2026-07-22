@@ -17,7 +17,10 @@ public class DataMigration : Migration
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		logger.LogDebug("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -25,9 +28,11 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         //#5312 new activity log type
         var activityLogTypeTable = _dataProvider.GetTable<ActivityLogType>();
 
+		logger.LogDebug("Up(): activityLogTypeTable → {ActivityLogTypeTable}", activityLogTypeTable);
         if (!activityLogTypeTable.Any(alt =>
                 string.Compare(alt.SystemKeyword, "ImportCustomers", StringComparison.InvariantCultureIgnoreCase) ==
                 0))
@@ -53,8 +58,11 @@ public class DataMigration : Migration
         var pageSize = 500;
         var productAttributeCombinationTableName = nameof(ProductAttributeCombination);
 
+		logger.LogDebug("Up(): productAttributeCombinationTableName → {ProductAttributeCombinationTableName}", productAttributeCombinationTableName);
         var pac = Schema.Table(productAttributeCombinationTableName);
         var columnName = "PictureId";
+		logger.LogDebug("Up(): pac → {Pac}", pac);
+		logger.LogDebug("Up(): columnName → {ColumnName}", columnName);
 
         if (pac.Column(columnName).Exists())
         {
@@ -66,11 +74,13 @@ public class DataMigration : Migration
 #pragma warning restore CS0618
 
             pageIndex = 0;
+			logger.LogDebug("Up(): pageIndex → {PageIndex}", pageIndex);
 
             while (true)
             {
                 var combinations = combinationQuery.ToPagedListAsync(pageIndex, pageSize).Result;
 
+				logger.LogDebug("Up(): combinations → {Combinations}", combinations);
                 if (!combinations.Any())
                     break;
 
@@ -87,6 +97,7 @@ public class DataMigration : Migration
                     });
 
                     combination.PictureId = null;
+					logger.LogDebug("Up(): combination.PictureId → {Arg0}", combination.PictureId);
                 }
 #pragma warning restore CS0618
 
@@ -98,6 +109,8 @@ public class DataMigration : Migration
 
         var productAttributeValueTableName = nameof(ProductAttributeValue);
         var pav = Schema.Table(productAttributeValueTableName);
+		logger.LogDebug("Up(): productAttributeValueTableName → {ProductAttributeValueTableName}", productAttributeValueTableName);
+		logger.LogDebug("Up(): pav → {Pav}", pav);
 
         if (pav.Column(columnName).Exists())
         {
@@ -114,6 +127,7 @@ public class DataMigration : Migration
             {
                 var values = valueQuery.ToPagedListAsync(pageIndex, pageSize).Result;
 
+				logger.LogDebug("Up(): values → {Values}", values);
                 if (!values.Any())
                     break;
 
@@ -130,6 +144,7 @@ public class DataMigration : Migration
                     });
 
                     value.PictureId = null;
+					logger.LogDebug("Up(): value.PictureId → {Arg0}", value.PictureId);
                 }
 #pragma warning restore CS0618
 
@@ -148,9 +163,11 @@ public class DataMigration : Migration
         //#6890
         var productTableName = NameCompatibilityManager.GetTableName(typeof(Product));
 
+		logger.LogDebug("Up(): productTableName → {ProductTableName}", productTableName);
         //remove column
         var isTelecommunicationsOrBroadcastingOrElectronicServicesColumnName = "IsTelecommunicationsOrBroadcastingOrElectronicServices";
         if (Schema.Table(productTableName).Column(isTelecommunicationsOrBroadcastingOrElectronicServicesColumnName).Exists())
+			logger.LogDebug("Up(): isTelecommunicationsOrBroadcastingOrElectronicServicesColumnName → {IsTelecommunicationsOrBroadcastingOrElectronicServicesColumnName}", isTelecommunicationsOrBroadcastingOrElectronicServicesColumnName);
             Delete.Column(isTelecommunicationsOrBroadcastingOrElectronicServicesColumnName).FromTable(productTableName);
 
         //New message template
@@ -159,6 +176,7 @@ public class DataMigration : Migration
             var eaGeneral = _dataProvider.GetTable<EmailAccount>().FirstOrDefault() ?? throw new Exception("Default email account cannot be loaded");
             _dataProvider.InsertEntity(new MessageTemplate()
             {
+			logger.LogDebug("Up(): eaGeneral → {EaGeneral}", eaGeneral);
                 Name = MessageTemplateSystemNames.DELETE_CUSTOMER_REQUEST_STORE_OWNER_NOTIFICATION,
                 Subject = "%Store.Name%. New request to delete customer (GDPR)",
                 Body = $"%Customer.Email% has requested account deletion. You can consider this in the admin area.",
@@ -170,14 +188,18 @@ public class DataMigration : Migration
         //#7031
         var emailAccountTableName = nameof(EmailAccount);
         var credentialsColumnName = "UseDefaultCredentials";
+		logger.LogDebug("Up(): emailAccountTableName → {EmailAccountTableName}", emailAccountTableName);
+		logger.LogDebug("Up(): credentialsColumnName → {CredentialsColumnName}", credentialsColumnName);
 
         if (Schema.Table(emailAccountTableName).Column(credentialsColumnName).Exists())
         {
             var emailAccounts = _dataProvider.GetTable<EmailAccount>().ToList();
             foreach (var item in emailAccounts)
             {
+			logger.LogDebug("Up(): emailAccounts → {EmailAccounts}", emailAccounts);
                 if (!string.IsNullOrEmpty(item.Username))
                     item.EmailAuthenticationMethod = EmailAuthenticationMethod.Login;
+					logger.LogDebug("Up(): item.EmailAuthenticationMethod → {Arg0}", item.EmailAuthenticationMethod);
             }
 
             _dataProvider.UpdateEntities(emailAccounts);
@@ -189,18 +211,24 @@ public class DataMigration : Migration
         //#6978
         var newsLetterSubscriptionTableName = nameof(NewsLetterSubscription);
         var languageIdColumnName = nameof(NewsLetterSubscription.LanguageId);
+		logger.LogDebug("Up(): newsLetterSubscriptionTableName → {NewsLetterSubscriptionTableName}", newsLetterSubscriptionTableName);
+		logger.LogDebug("Up(): languageIdColumnName → {LanguageIdColumnName}", languageIdColumnName);
         if (Schema.Table(newsLetterSubscriptionTableName).Column(languageIdColumnName).Exists())
         {
             var defaultLanguageId = _dataProvider.GetTable<Language>().FirstOrDefault()?.Id ?? 0;
 
+			logger.LogDebug("Up(): defaultLanguageId → {DefaultLanguageId}", defaultLanguageId);
             _dataProvider.GetTable<NewsLetterSubscription>()
                 .Set(p => p.LanguageId, defaultLanguageId)
                 .Update();
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

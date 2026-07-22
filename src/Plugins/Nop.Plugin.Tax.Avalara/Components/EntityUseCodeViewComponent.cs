@@ -78,6 +78,8 @@ public class EntityUseCodeViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //ensure that model is passed
         if (additionalData is not BaseNopEntityModel entityModel)
             return Content(string.Empty);
@@ -101,6 +103,8 @@ public class EntityUseCodeViewComponent : NopViewComponent
         //get Avalara pre-defined entity use codes
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(AvalaraTaxDefaults.EntityUseCodesCacheKey);
         var cachedEntityUseCodes = await _staticCacheManager.GetAsync(cacheKey, async () => await _avalaraTaxManager.GetEntityUseCodesAsync());
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): cacheKey → {CacheKey}", widgetZone, additionalData, cacheKey);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): cachedEntityUseCodes → {CachedEntityUseCodes}", widgetZone, additionalData, cachedEntityUseCodes);
 
         var entityUseCodes = cachedEntityUseCodes?.Select(useCode => new SelectListItem
         {
@@ -112,6 +116,7 @@ public class EntityUseCodeViewComponent : NopViewComponent
         var defaultValue = Guid.Empty.ToString();
         entityUseCodes.Insert(0, new SelectListItem
         {
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): defaultValue → {DefaultValue}", widgetZone, additionalData, defaultValue);
             Value = defaultValue,
             Text = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.EntityUseCode.None")
         });
@@ -126,6 +131,7 @@ public class EntityUseCodeViewComponent : NopViewComponent
         //get entity by the model identifier
         BaseEntity entity = null;
         if (widgetZone.Equals(AdminWidgetZones.CustomerDetailsBlock))
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): entity → {Entity}", widgetZone, additionalData, entity);
         {
             model.PrecedingElementId = nameof(CustomerModel.IsTaxExempt);
             entity = await _customerService.GetCustomerByIdAsync(entityModel.Id);
@@ -153,6 +159,8 @@ public class EntityUseCodeViewComponent : NopViewComponent
         model.AvalaraEntityUseCode = entity == null ? defaultValue :
             await _genericAttributeService.GetAttributeAsync<string>(entity, AvalaraTaxDefaults.EntityUseCodeAttribute);
 
+		logger.LogInformation("InvokeAsync(widgetZone,additionalData)={WidgetZone},{AdditionalData}: external service call took {Arg2} ms", widgetZone, additionalData, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Tax.Avalara/Views/EntityUseCode/EntityUseCode.cshtml", model);
     }
 

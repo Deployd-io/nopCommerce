@@ -10,8 +10,10 @@ public partial class CustomerAttributeValidator : BaseNopValidator<CustomerAttri
 {
     public CustomerAttributeValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CustomerAttributeValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Customers.CustomerAttributes.Fields.Name.Required"));
 
         SetDatabaseValidationRules<CustomerAttribute>();
+		logger.LogDebug("<<< Exiting CustomerAttributeValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -47,8 +47,10 @@ public partial class TopicController : BasePublicController
 
     public virtual async Task<IActionResult> TopicDetails(int topicId)
     {
+		logger.LogDebug(">>> Entering TopicDetails(topicId={TopicId})", topicId);
         var topic = await _topicService.GetTopicByIdAsync(topicId);
 
+		logger.LogDebug("TopicDetails(topicId={TopicId}): topic → {Topic}", topicId, topic);
         if (topic == null)
             return InvokeHttp404();
 
@@ -63,39 +65,51 @@ public partial class TopicController : BasePublicController
         //allow administrators to preview any topic
         var hasAdminAccess = await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL) && await _permissionService.AuthorizeAsync(StandardPermission.ContentManagement.TOPICS_VIEW);
 
+		logger.LogDebug("TopicDetails(topicId={TopicId}): hasAdminAccess → {HasAdminAccess}", topicId, hasAdminAccess);
         if (notAvailable && !hasAdminAccess)
             return InvokeHttp404();
 
         var model = await _topicModelFactory.PrepareTopicModelAsync(topic);
 
+		logger.LogDebug("TopicDetails(topicId={TopicId}): model → {Model}", topicId, model);
         //display "edit" (manage) link
         if (hasAdminAccess)
             DisplayEditLink(Url.Action("Edit", "Topic", new { id = model.Id, area = AreaNames.ADMIN }));
 
         //template
         var templateViewPath = await _topicModelFactory.PrepareTemplateViewPathAsync(model.TopicTemplateId);
+		logger.LogDebug("TopicDetails(topicId={TopicId}): templateViewPath → {TemplateViewPath}", topicId, templateViewPath);
+		logger.LogDebug("<<< Exiting TopicDetails(topicId={TopicId})", topicId);
         return View(templateViewPath, model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> TopicDetailsPopup(string systemName)
     {
+		logger.LogDebug(">>> Entering TopicDetailsPopup(systemName={SystemName})", systemName);
         var model = await _topicModelFactory.PrepareTopicModelBySystemNameAsync(systemName);
         if (model == null)
+			logger.LogDebug("TopicDetailsPopup(systemName={SystemName}): model → {Model}", systemName, model);
             return InvokeHttp404();
 
         ViewBag.IsPopup = true;
+		logger.LogDebug("TopicDetailsPopup(systemName={SystemName}): ViewBag.IsPopup → {Arg1}", systemName, ViewBag.IsPopup);
 
         //template
         var templateViewPath = await _topicModelFactory.PrepareTemplateViewPathAsync(model.TopicTemplateId);
+		logger.LogDebug("TopicDetailsPopup(systemName={SystemName}): templateViewPath → {TemplateViewPath}", systemName, templateViewPath);
+		logger.LogDebug("<<< Exiting TopicDetailsPopup(systemName={SystemName})", systemName);
         return PartialView(templateViewPath, model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> Authenticate(int id, string password)
     {
+		logger.LogDebug(">>> Entering Authenticate(id={Id},password={Password})", id, password);
         var authResult = new AuthenticatedTopicModel();
         var topic = await _topicService.GetTopicByIdAsync(id);
+		logger.LogDebug("Authenticate(id={Id},password={Password}): authResult → {AuthResult}", id, password, authResult);
+		logger.LogDebug("Authenticate(id={Id},password={Password}): topic → {Topic}", id, password, topic);
 
         if (topic == null ||
             !topic.Published ||
@@ -115,6 +129,7 @@ public partial class TopicController : BasePublicController
                     Title = await _localizationService.GetLocalizedAsync(topic, x => x.Title),
                     Body = await _localizationService.GetLocalizedAsync(topic, x => x.Body)
                 });
+					logger.LogDebug("Authenticate(id={Id},password={Password}): Authenticated → {Authenticated}", id, password, Authenticated);
             }
             else
             {
@@ -122,6 +137,7 @@ public partial class TopicController : BasePublicController
             }
         }
 
+		logger.LogDebug("<<< Exiting Authenticate(id={Id},password={Password})", id, password);
         return Json(authResult);
     }
 

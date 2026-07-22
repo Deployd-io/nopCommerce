@@ -34,6 +34,8 @@ public static class ModelStateExtensions
     /// <returns>Result</returns>
     public static object SerializeErrors(this ModelStateDictionary modelStateDictionary)
     {
+		logger.LogDebug(">>> Entering SerializeErrors(modelStateDictionary={ModelStateDictionary})", modelStateDictionary);
+		logger.LogDebug("<<< Exiting SerializeErrors(modelStateDictionary={ModelStateDictionary})", modelStateDictionary);
         return modelStateDictionary.Where(entry => entry.Value.Errors.Any())
             .ToDictionary(entry => entry.Key, entry => SerializeModelState(entry.Value));
     }

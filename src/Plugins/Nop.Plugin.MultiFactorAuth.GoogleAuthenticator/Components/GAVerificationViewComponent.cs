@@ -13,7 +13,9 @@ public class GAVerificationViewComponent : NopViewComponent
 
     public GAVerificationViewComponent()
     {
+	logger.LogDebug(">>> Entering GAVerificationViewComponent()");
 
+	logger.LogDebug("<<< Exiting GAVerificationViewComponent()");
     }
 
     #endregion
@@ -28,7 +30,10 @@ public class GAVerificationViewComponent : NopViewComponent
     /// <returns>View component result</returns>
     public IViewComponentResult Invoke(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var model = new TokenModel();
+		logger.LogDebug("Invoke(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
+		logger.LogDebug("<<< Exiting Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/MultiFactorAuth.GoogleAuthenticator/Views/Customer/GAVefification.cshtml", model);
     }
 

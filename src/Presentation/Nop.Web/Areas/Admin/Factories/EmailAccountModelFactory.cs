@@ -42,11 +42,13 @@ public partial class EmailAccountModelFactory : IEmailAccountModelFactory
     /// </returns>
     public virtual Task<EmailAccountSearchModel> PrepareEmailAccountSearchModelAsync(EmailAccountSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareEmailAccountSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareEmailAccountSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -60,11 +62,13 @@ public partial class EmailAccountModelFactory : IEmailAccountModelFactory
     /// </returns>
     public virtual async Task<EmailAccountListModel> PrepareEmailAccountListModelAsync(EmailAccountSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareEmailAccountListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get email accounts
         var emailAccounts = (await _emailAccountService.GetAllEmailAccountsAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareEmailAccountListModelAsync(searchModel={SearchModel}): emailAccounts → {EmailAccounts}", searchModel, emailAccounts);
         //prepare grid model
         var model = new EmailAccountListModel().PrepareToGrid(searchModel, emailAccounts, () =>
         {
@@ -73,6 +77,7 @@ public partial class EmailAccountModelFactory : IEmailAccountModelFactory
                 //fill in model values from the entity
                 var emailAccountModel = emailAccount.ToModel<EmailAccountModel>();
 
+				logger.LogDebug("PrepareEmailAccountListModelAsync(searchModel={SearchModel}): emailAccountModel → {EmailAccountModel}", searchModel, emailAccountModel);
                 //fill in additional values (not existing in the entity)
                 emailAccountModel.IsDefaultEmailAccount = emailAccount.Id == _emailAccountSettings.DefaultEmailAccountId;
 
@@ -80,6 +85,7 @@ public partial class EmailAccountModelFactory : IEmailAccountModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareEmailAccountListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -48,6 +48,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
             return string.Empty;
 
         if (!string.IsNullOrWhiteSpace(emailAccount.DisplayName))
+		logger.LogDebug("<<< Exiting GetEmailAccountName(emailAccount={EmailAccount})", emailAccount);
             return emailAccount.Email + " (" + emailAccount.DisplayName + ")";
 
         return emailAccount.Email;
@@ -67,14 +68,17 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
     /// </returns>
     public virtual Task<QueuedEmailSearchModel> PrepareQueuedEmailSearchModelAsync(QueuedEmailSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareQueuedEmailSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare default search values
         searchModel.SearchMaxSentTries = 10;
+		logger.LogDebug("PrepareQueuedEmailSearchModelAsync(searchModel={SearchModel}): searchModel.SearchMaxSentTries → {Arg1}", searchModel, searchModel.SearchMaxSentTries);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareQueuedEmailSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -88,6 +92,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
     /// </returns>
     public virtual async Task<QueuedEmailListModel> PrepareQueuedEmailListModelAsync(QueuedEmailSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareQueuedEmailListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter emails
@@ -115,8 +120,10 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
                 //fill in model values from the entity
                 var queuedEmailModel = queuedEmail.ToModel<QueuedEmailModel>();
 
+				logger.LogDebug("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): queuedEmailModel → {QueuedEmailModel}", searchModel, queuedEmailModel);
                 //little performance optimization: ensure that "Body" is not returned
                 queuedEmailModel.Body = string.Empty;
+				logger.LogDebug("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): queuedEmailModel.Body → {Arg1}", searchModel, queuedEmailModel.Body);
 
                 //convert dates to the user time
                 queuedEmailModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(queuedEmail.CreatedOnUtc, DateTimeKind.Utc);
@@ -124,11 +131,13 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
                 //fill in additional values (not existing in the entity)
                 var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(queuedEmail.EmailAccountId);
                 queuedEmailModel.EmailAccountName = GetEmailAccountName(emailAccount);
+				logger.LogDebug("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): emailAccount → {EmailAccount}", searchModel, emailAccount);
                 queuedEmailModel.PriorityName = await _localizationService.GetLocalizedEnumAsync(queuedEmail.Priority);
 
                 if (queuedEmail.DontSendBeforeDateUtc.HasValue)
                 {
                     queuedEmailModel.DontSendBeforeDate = await _dateTimeHelper
+						logger.LogDebug("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): queuedEmailModel.DontSendBeforeDate → {Arg1}", searchModel, queuedEmailModel.DontSendBeforeDate);
                         .ConvertToUserTimeAsync(queuedEmail.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
                 }
 
@@ -139,6 +148,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareQueuedEmailListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -21,6 +21,8 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
     /// </summary>
     public CheckAffiliateAttribute() : base(typeof(CheckAffiliateFilter))
     {
+	logger.LogDebug(">>> Entering CheckAffiliateAttribute()");
+	logger.LogDebug("<<< Exiting CheckAffiliateAttribute()");
     }
 
     #endregion
@@ -83,6 +85,7 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
             //update affiliate identifier
             customer.AffiliateId = affiliate.Id;
             await _customerService.UpdateCustomerAsync(customer);
+			logger.LogDebug("<<< Exiting SetCustomerAffiliateIdAsync(affiliate={Affiliate},customer={Customer})", affiliate, customer);
         }
 
         /// <summary>
@@ -92,6 +95,7 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckAffiliateAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering CheckAffiliateAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //check request query parameters
@@ -105,11 +109,13 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
             //try to find by ID
             var customer = await _workContext.GetCurrentCustomerAsync();
             var affiliateIds = request.Query[AFFILIATE_ID_QUERY_PARAMETER_NAME];
+			logger.LogDebug("CheckAffiliateAsync(context={Context}): customer → {Customer}", context, customer);
 
             if (int.TryParse(affiliateIds.FirstOrDefault(), out var affiliateId) && affiliateId > 0 && affiliateId != customer.AffiliateId)
             {
                 var affiliate = await _affiliateService.GetAffiliateByIdAsync(affiliateId);
                 await SetCustomerAffiliateIdAsync(affiliate, customer);
+				logger.LogDebug("CheckAffiliateAsync(context={Context}): affiliate → {Affiliate}", context, affiliate);
                 return;
             }
 
@@ -117,10 +123,12 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
             var affiliateNames = request.Query[AFFILIATE_FRIENDLYURLNAME_QUERY_PARAMETER_NAME];
             var affiliateName = affiliateNames.FirstOrDefault();
             if (!string.IsNullOrEmpty(affiliateName))
+			logger.LogDebug("CheckAffiliateAsync(context={Context}): affiliateName → {AffiliateName}", context, affiliateName);
             {
                 var affiliate = await _affiliateService.GetAffiliateByFriendlyUrlNameAsync(affiliateName);
                 await SetCustomerAffiliateIdAsync(affiliate, customer);
             }
+			logger.LogDebug("<<< Exiting CheckAffiliateAsync(context={Context})", context);
         }
 
         #endregion
@@ -135,9 +143,11 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckAffiliateAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

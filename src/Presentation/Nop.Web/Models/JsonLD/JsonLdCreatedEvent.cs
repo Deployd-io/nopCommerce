@@ -13,7 +13,10 @@ public partial class JsonLdCreatedEvent<T> where T : JsonLdModel
     /// <param name="model">Created model</param>
     public JsonLdCreatedEvent(T model)
     {
+		logger.LogDebug(">>> Entering JsonLdCreatedEvent(model={Model})", model);
         Model = model;
+		logger.LogDebug("<<< Exiting JsonLdCreatedEvent(model={Model})", model);
+		logger.LogDebug("JsonLdCreatedEvent(model={Model}): Model → {Model1}", model, Model);
     }
 
     #endregion

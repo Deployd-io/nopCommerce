@@ -21,7 +21,10 @@ public class NopMobileAppController : BasePluginController
 
     public NopMobileAppController(IPermissionService permissionService)
     {
+		logger.LogDebug(">>> Entering NopMobileAppController(permissionService={PermissionService})", permissionService);
         _permissionService = permissionService;
+		logger.LogDebug("<<< Exiting NopMobileAppController(permissionService={PermissionService})", permissionService);
+		logger.LogDebug("NopMobileAppController(permissionService={PermissionService}): _permissionService → {_permissionService}", permissionService, _permissionService);
     }
 
     #endregion
@@ -31,6 +34,8 @@ public class NopMobileAppController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.NopMobileApp/Views/Configure.cshtml");
     }
 

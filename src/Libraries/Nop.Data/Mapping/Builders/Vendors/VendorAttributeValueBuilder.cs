@@ -17,9 +17,11 @@ public partial class VendorAttributeValueBuilder : NopEntityBuilder<VendorAttrib
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(VendorAttributeValue.Name)).AsString(400).NotNullable()
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(VendorAttributeValue), nameof(VendorAttributeValue.AttributeId))).AsInt32().ForeignKey<VendorAttribute>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

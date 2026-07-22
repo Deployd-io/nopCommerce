@@ -9,7 +9,10 @@ public class CustomEvent
 
     public CustomEvent()
     {
+		logger.LogDebug(">>> Entering CustomEvent()");
         WidgetZones = new List<string>();
+		logger.LogDebug("<<< Exiting CustomEvent()");
+		logger.LogDebug("CustomEvent(): WidgetZones → {WidgetZones}", WidgetZones);
     }
 
     #endregion

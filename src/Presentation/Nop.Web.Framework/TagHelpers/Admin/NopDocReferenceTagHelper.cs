@@ -26,7 +26,10 @@ public partial class NopDocReferenceTagHelper : TagHelper
 
     public NopDocReferenceTagHelper(AdminAreaSettings adminAreaSettings)
     {
+		logger.LogDebug(">>> Entering NopDocReferenceTagHelper(adminAreaSettings={AdminAreaSettings})", adminAreaSettings);
         _adminAreaSettings = adminAreaSettings;
+		logger.LogDebug("<<< Exiting NopDocReferenceTagHelper(adminAreaSettings={AdminAreaSettings})", adminAreaSettings);
+		logger.LogDebug("NopDocReferenceTagHelper(adminAreaSettings={AdminAreaSettings}): _adminAreaSettings → {_adminAreaSettings}", adminAreaSettings, _adminAreaSettings);
     }
 
     #endregion
@@ -41,6 +44,7 @@ public partial class NopDocReferenceTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -54,14 +58,18 @@ public partial class NopDocReferenceTagHelper : TagHelper
             if (AddWrapper)
             {
                 output.TagName = "div";
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
                 output.TagMode = TagMode.StartTagAndEndTag;
                 output.Attributes.SetAttribute("class", "documentation-reference");
             }
 
             var hintHtml = $"<span>{StringResource}</span>";
             output.Content.AppendHtml(hintHtml);
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): hintHtml → {HintHtml}", context, output, hintHtml);
         }
 
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

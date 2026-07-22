@@ -54,9 +54,12 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _templateModelFactory.PrepareTemplatesModelAsync(new TemplatesModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -66,9 +69,12 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> CategoryTemplates(CategoryTemplateSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering CategoryTemplates(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _templateModelFactory.PrepareCategoryTemplateListModelAsync(searchModel);
 
+		logger.LogDebug("CategoryTemplates(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting CategoryTemplates(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -107,6 +113,7 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> CategoryTemplateDelete(int id)
     {
+		logger.LogDebug(">>> Entering CategoryTemplateDelete(id={Id})", id);
         if ((await _categoryTemplateService.GetAllCategoryTemplatesAsync()).Count == 1)
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.System.Templates.NotDeleteOnlyOne"));
 
@@ -116,6 +123,7 @@ public partial class TemplateController : BaseAdminController
 
         await _categoryTemplateService.DeleteCategoryTemplateAsync(template);
 
+		logger.LogDebug("<<< Exiting CategoryTemplateDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -127,9 +135,12 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> ManufacturerTemplates(ManufacturerTemplateSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ManufacturerTemplates(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _templateModelFactory.PrepareManufacturerTemplateListModelAsync(searchModel);
 
+		logger.LogDebug("ManufacturerTemplates(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ManufacturerTemplates(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -168,6 +179,7 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> ManufacturerTemplateDelete(int id)
     {
+		logger.LogDebug(">>> Entering ManufacturerTemplateDelete(id={Id})", id);
         if ((await _manufacturerTemplateService.GetAllManufacturerTemplatesAsync()).Count == 1)
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.System.Templates.NotDeleteOnlyOne"));
 
@@ -177,6 +189,7 @@ public partial class TemplateController : BaseAdminController
 
         await _manufacturerTemplateService.DeleteManufacturerTemplateAsync(template);
 
+		logger.LogDebug("<<< Exiting ManufacturerTemplateDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -188,9 +201,12 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> ProductTemplates(ProductTemplateSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductTemplates(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _templateModelFactory.PrepareProductTemplateListModelAsync(searchModel);
 
+		logger.LogDebug("ProductTemplates(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductTemplates(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -229,6 +245,7 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> ProductTemplateDelete(int id)
     {
+		logger.LogDebug(">>> Entering ProductTemplateDelete(id={Id})", id);
         if ((await _productTemplateService.GetAllProductTemplatesAsync()).Count == 1)
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.System.Templates.NotDeleteOnlyOne"));
 
@@ -238,6 +255,7 @@ public partial class TemplateController : BaseAdminController
 
         await _productTemplateService.DeleteProductTemplateAsync(template);
 
+		logger.LogDebug("<<< Exiting ProductTemplateDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -249,9 +267,12 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> TopicTemplates(TopicTemplateSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering TopicTemplates(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _templateModelFactory.PrepareTopicTemplateListModelAsync(searchModel);
 
+		logger.LogDebug("TopicTemplates(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting TopicTemplates(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -290,6 +311,7 @@ public partial class TemplateController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> TopicTemplateDelete(int id)
     {
+		logger.LogDebug(">>> Entering TopicTemplateDelete(id={Id})", id);
         if ((await _topicTemplateService.GetAllTopicTemplatesAsync()).Count == 1)
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.System.Templates.NotDeleteOnlyOne"));
 
@@ -299,6 +321,7 @@ public partial class TemplateController : BaseAdminController
 
         await _topicTemplateService.DeleteTopicTemplateAsync(template);
 
+		logger.LogDebug("<<< Exiting TopicTemplateDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

@@ -6,7 +6,10 @@ public partial record CustomerNavigationModel : BaseNopModel
 {
     public CustomerNavigationModel()
     {
+		logger.LogDebug(">>> Entering CustomerNavigationModel()");
         CustomerNavigationItems = new List<CustomerNavigationItemModel>();
+		logger.LogDebug("<<< Exiting CustomerNavigationModel()");
+		logger.LogDebug("CustomerNavigationModel(): CustomerNavigationItems → {CustomerNavigationItems}", CustomerNavigationItems);
     }
 
     public IList<CustomerNavigationItemModel> CustomerNavigationItems { get; set; }

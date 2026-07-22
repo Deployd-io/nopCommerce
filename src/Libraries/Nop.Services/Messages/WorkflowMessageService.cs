@@ -105,9 +105,11 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     protected virtual async Task<IList<MessageTemplate>> GetActiveMessageTemplatesAsync(string messageTemplateName, int storeId)
     {
+		logger.LogDebug(">>> Entering GetActiveMessageTemplatesAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
         //get message templates by the name
         var messageTemplates = await _messageTemplateService.GetMessageTemplatesByNameAsync(messageTemplateName, storeId);
 
+		logger.LogDebug("GetActiveMessageTemplatesAsync(messageTemplateName={MessageTemplateName},storeId={StoreId}): messageTemplates → {MessageTemplates}", messageTemplateName, storeId, messageTemplates);
         //no template found
         if (!messageTemplates?.Any() ?? true)
             return new List<MessageTemplate>();
@@ -115,6 +117,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
         //filter active templates
         messageTemplates = messageTemplates.Where(messageTemplate => messageTemplate.IsActive).ToList();
 
+		logger.LogDebug("<<< Exiting GetActiveMessageTemplatesAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
         return messageTemplates;
     }
 
@@ -239,6 +242,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendCustomerFailedLoginAttemptNotificationAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -268,6 +272,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendCustomerFailedLoginAttemptNotificationAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     /// <summary>
@@ -281,6 +286,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendCustomerRegisteredStoreOwnerNotificationMessageAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -312,6 +318,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendCustomerRegisteredStoreOwnerNotificationMessageAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     /// <summary>
@@ -325,6 +332,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendCustomerWelcomeMessageAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -354,6 +362,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendCustomerWelcomeMessageAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     /// <summary>
@@ -367,6 +376,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendCustomerEmailValidationMessageAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -396,6 +406,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendCustomerEmailValidationMessageAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     /// <summary>
@@ -409,6 +420,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendCustomerEmailRevalidationMessageAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -439,6 +451,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendCustomerEmailRevalidationMessageAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     /// <summary>
@@ -452,6 +465,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendCustomerPasswordRecoveryMessageAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -481,6 +495,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendCustomerPasswordRecoveryMessageAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     /// <summary>
@@ -494,6 +509,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendDeleteCustomerRequestStoreOwnerNotificationAsync(Customer customer, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -524,6 +540,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendDeleteCustomerRequestStoreOwnerNotificationAsync(customer={Customer},languageId={LanguageId})", customer, languageId);
     }
 
     #endregion
@@ -542,6 +559,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderPlacedVendorNotificationAsync(Order order, Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -574,6 +592,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderPlacedVendorNotificationAsync(order={Order},vendor={Vendor},languageId={LanguageId})", order, vendor, languageId);
     }
 
     /// <summary>
@@ -587,6 +606,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderPlacedStoreOwnerNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -618,6 +638,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderPlacedStoreOwnerNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -631,6 +652,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderPlacedAffiliateNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(order.AffiliateId);
@@ -666,6 +688,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderPlacedAffiliateNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -679,6 +702,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderPaidStoreOwnerNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -710,6 +734,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderPaidStoreOwnerNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -723,6 +748,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderPaidAffiliateNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(order.AffiliateId);
@@ -758,6 +784,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderPaidAffiliateNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -821,6 +848,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderPaidVendorNotificationAsync(Order order, Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -853,6 +881,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderPaidVendorNotificationAsync(order={Order},vendor={Vendor},languageId={LanguageId})", order, vendor, languageId);
     }
 
     /// <summary>
@@ -915,20 +944,25 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendShipmentSentCustomerNotificationAsync(Shipment shipment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("Order cannot be loaded");
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendShipmentSentCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): store → {Store}", shipment, languageId, store);
+		logger.LogDebug("SendShipmentSentCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): languageId → {LanguageId1}", shipment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.SHIPMENT_SENT_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendShipmentSentCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", shipment, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddShipmentTokensAsync(commonTokens, shipment, languageId);
+		logger.LogDebug("SendShipmentSentCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): commonTokens → {CommonTokens}", shipment, languageId, commonTokens);
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
 
@@ -950,6 +984,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendShipmentSentCustomerNotificationAsync(shipment,languageId)={Shipment},{LanguageId}: database query executed in {Arg2} ms", shipment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendShipmentSentCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId})", shipment, languageId);
     }
 
     /// <summary>
@@ -965,16 +1001,21 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     {
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("Order cannot be loaded");
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendShipmentReadyForPickupNotificationAsync(shipment={Shipment},languageId={LanguageId}): store → {Store}", shipment, languageId, store);
+		logger.LogDebug("SendShipmentReadyForPickupNotificationAsync(shipment={Shipment},languageId={LanguageId}): languageId → {LanguageId1}", shipment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.SHIPMENT_READY_FOR_PICKUP_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendShipmentReadyForPickupNotificationAsync(shipment={Shipment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", shipment, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddShipmentTokensAsync(commonTokens, shipment, languageId);
+		logger.LogDebug("SendShipmentReadyForPickupNotificationAsync(shipment={Shipment},languageId={LanguageId}): commonTokens → {CommonTokens}", shipment, languageId, commonTokens);
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
 
@@ -996,6 +1037,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendShipmentReadyForPickupNotificationAsync(shipment,languageId)={Shipment},{LanguageId}: database query executed in {Arg2} ms", shipment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendShipmentReadyForPickupNotificationAsync(shipment={Shipment},languageId={LanguageId})", shipment, languageId);
     }
 
     /// <summary>
@@ -1009,20 +1052,25 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendShipmentDeliveredCustomerNotificationAsync(Shipment shipment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("Order cannot be loaded");
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendShipmentDeliveredCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): store → {Store}", shipment, languageId, store);
+		logger.LogDebug("SendShipmentDeliveredCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): languageId → {LanguageId1}", shipment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.SHIPMENT_DELIVERED_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendShipmentDeliveredCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", shipment, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddShipmentTokensAsync(commonTokens, shipment, languageId);
+		logger.LogDebug("SendShipmentDeliveredCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId}): commonTokens → {CommonTokens}", shipment, languageId, commonTokens);
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
 
@@ -1044,6 +1092,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendShipmentDeliveredCustomerNotificationAsync(shipment,languageId)={Shipment},{LanguageId}: database query executed in {Arg2} ms", shipment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendShipmentDeliveredCustomerNotificationAsync(shipment={Shipment},languageId={LanguageId})", shipment, languageId);
     }
 
     /// <summary>
@@ -1155,6 +1205,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderCompletedStoreOwnerNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -1186,6 +1237,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderCompletedStoreOwnerNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -1199,6 +1251,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderCancelledCustomerNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -1231,6 +1284,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderCancelledCustomerNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -1244,6 +1298,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderCancelledStoreOwnerNotificationAsync(Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -1275,6 +1330,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderCancelledStoreOwnerNotificationAsync(order={Order},languageId={LanguageId})", order, languageId);
     }
 
     /// <summary>
@@ -1289,6 +1345,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderCancelledVendorNotificationAsync(Order order, Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -1321,6 +1378,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderCancelledVendorNotificationAsync(order={Order},vendor={Vendor},languageId={LanguageId})", order, vendor, languageId);
     }
 
     /// <summary>
@@ -1335,6 +1393,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderRefundedStoreOwnerNotificationAsync(Order order, decimal refundedAmount, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -1367,6 +1426,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderRefundedStoreOwnerNotificationAsync(order={Order},refundedAmount={RefundedAmount},languageId={LanguageId})", order, refundedAmount, languageId);
     }
 
     /// <summary>
@@ -1381,6 +1441,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendOrderRefundedCustomerNotificationAsync(Order order, decimal refundedAmount, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(order);
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -1414,6 +1475,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendOrderRefundedCustomerNotificationAsync(order={Order},refundedAmount={RefundedAmount},languageId={LanguageId})", order, refundedAmount, languageId);
     }
 
     /// <summary>
@@ -1427,20 +1489,25 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewOrderNoteAddedCustomerNotificationAsync(OrderNote orderNote, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(orderNote);
 
         var order = await _orderService.GetOrderByIdAsync(orderNote.OrderId) ?? throw new Exception("Order cannot be loaded");
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendNewOrderNoteAddedCustomerNotificationAsync(orderNote={OrderNote},languageId={LanguageId}): store → {Store}", orderNote, languageId, store);
+		logger.LogDebug("SendNewOrderNoteAddedCustomerNotificationAsync(orderNote={OrderNote},languageId={LanguageId}): languageId → {LanguageId1}", orderNote, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.NEW_ORDER_NOTE_ADDED_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendNewOrderNoteAddedCustomerNotificationAsync(orderNote={OrderNote},languageId={LanguageId}): messageTemplates → {MessageTemplates}", orderNote, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddOrderNoteTokensAsync(commonTokens, orderNote);
+		logger.LogDebug("SendNewOrderNoteAddedCustomerNotificationAsync(orderNote={OrderNote},languageId={LanguageId}): commonTokens → {CommonTokens}", orderNote, languageId, commonTokens);
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
 
@@ -1462,6 +1529,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendNewOrderNoteAddedCustomerNotificationAsync(orderNote,languageId)={OrderNote},{LanguageId}: database query executed in {Arg2} ms", orderNote, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendNewOrderNoteAddedCustomerNotificationAsync(orderNote={OrderNote},languageId={LanguageId})", orderNote, languageId);
     }
 
     /// <summary>
@@ -1475,20 +1544,25 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendRecurringPaymentCancelledStoreOwnerNotificationAsync(RecurringPayment recurringPayment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId) ?? throw new Exception("Order cannot be loaded");
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendRecurringPaymentCancelledStoreOwnerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): store → {Store}", recurringPayment, languageId, store);
+		logger.LogDebug("SendRecurringPaymentCancelledStoreOwnerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): languageId → {LanguageId1}", recurringPayment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RECURRING_PAYMENT_CANCELLED_STORE_OWNER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendRecurringPaymentCancelledStoreOwnerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", recurringPayment, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
+		logger.LogDebug("SendRecurringPaymentCancelledStoreOwnerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): commonTokens → {CommonTokens}", recurringPayment, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
         await _messageTokenProvider.AddRecurringPaymentTokensAsync(commonTokens, recurringPayment);
 
@@ -1509,6 +1583,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogInformation("SendRecurringPaymentCancelledStoreOwnerNotificationAsync(recurringPayment,languageId)={RecurringPayment},{LanguageId}: database query executed in {Arg2} ms", recurringPayment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendRecurringPaymentCancelledStoreOwnerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId})", recurringPayment, languageId);
     }
 
     /// <summary>
@@ -1522,20 +1598,25 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendRecurringPaymentCancelledCustomerNotificationAsync(RecurringPayment recurringPayment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId) ?? throw new Exception("Order cannot be loaded");
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendRecurringPaymentCancelledCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): store → {Store}", recurringPayment, languageId, store);
+		logger.LogDebug("SendRecurringPaymentCancelledCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): languageId → {LanguageId1}", recurringPayment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RECURRING_PAYMENT_CANCELLED_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendRecurringPaymentCancelledCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", recurringPayment, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
+		logger.LogDebug("SendRecurringPaymentCancelledCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): commonTokens → {CommonTokens}", recurringPayment, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
         await _messageTokenProvider.AddRecurringPaymentTokensAsync(commonTokens, recurringPayment);
 
@@ -1557,6 +1638,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendRecurringPaymentCancelledCustomerNotificationAsync(recurringPayment,languageId)={RecurringPayment},{LanguageId}: database query executed in {Arg2} ms", recurringPayment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendRecurringPaymentCancelledCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId})", recurringPayment, languageId);
     }
 
     /// <summary>
@@ -1570,20 +1653,25 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendRecurringPaymentFailedCustomerNotificationAsync(RecurringPayment recurringPayment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId) ?? throw new Exception("Order cannot be loaded");
 
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): store → {Store}", recurringPayment, languageId, store);
+		logger.LogDebug("SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): languageId → {LanguageId1}", recurringPayment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.RECURRING_PAYMENT_FAILED_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", recurringPayment, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddOrderTokensAsync(commonTokens, order, languageId);
+		logger.LogDebug("SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId}): commonTokens → {CommonTokens}", recurringPayment, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, order.CustomerId);
         await _messageTokenProvider.AddRecurringPaymentTokensAsync(commonTokens, recurringPayment);
 
@@ -1605,6 +1693,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment,languageId)={RecurringPayment},{LanguageId}: database query executed in {Arg2} ms", recurringPayment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment={RecurringPayment},languageId={LanguageId})", recurringPayment, languageId);
     }
 
     #endregion
@@ -1621,18 +1711,24 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewsLetterSubscriptionActivationMessageAsync(NewsLetterSubscription subscription)
     {
+		logger.LogDebug(">>> Entering SendNewsLetterSubscriptionActivationMessageAsync(subscription={Subscription})", subscription);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(subscription);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var languageId = await EnsureLanguageIsActiveAsync(subscription.LanguageId, store.Id);
+		logger.LogDebug("SendNewsLetterSubscriptionActivationMessageAsync(subscription={Subscription}): store → {Store}", subscription, store);
+		logger.LogDebug("SendNewsLetterSubscriptionActivationMessageAsync(subscription={Subscription}): languageId → {LanguageId}", subscription, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.NEWSLETTER_SUBSCRIPTION_ACTIVATION_MESSAGE, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendNewsLetterSubscriptionActivationMessageAsync(subscription={Subscription}): messageTemplates → {MessageTemplates}", subscription, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddNewsLetterSubscriptionTokensAsync(commonTokens, subscription);
+		logger.LogDebug("SendNewsLetterSubscriptionActivationMessageAsync(subscription={Subscription}): commonTokens → {CommonTokens}", subscription, commonTokens);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
         {
@@ -1647,6 +1743,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, subscription.Email, string.Empty);
         }).ToListAsync();
+		logger.LogInformation("SendNewsLetterSubscriptionActivationMessageAsync(subscription)={Subscription}: database query executed in {Arg1} ms", subscription, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendNewsLetterSubscriptionActivationMessageAsync(subscription={Subscription})", subscription);
     }
 
     /// <summary>
@@ -1659,18 +1757,24 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewsLetterSubscriptionDeactivationMessageAsync(NewsLetterSubscription subscription)
     {
+		logger.LogDebug(">>> Entering SendNewsLetterSubscriptionDeactivationMessageAsync(subscription={Subscription})", subscription);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(subscription);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var languageId = await EnsureLanguageIsActiveAsync(subscription.LanguageId, store.Id);
+		logger.LogDebug("SendNewsLetterSubscriptionDeactivationMessageAsync(subscription={Subscription}): store → {Store}", subscription, store);
+		logger.LogDebug("SendNewsLetterSubscriptionDeactivationMessageAsync(subscription={Subscription}): languageId → {LanguageId}", subscription, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.NEWSLETTER_SUBSCRIPTION_DEACTIVATION_MESSAGE, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendNewsLetterSubscriptionDeactivationMessageAsync(subscription={Subscription}): messageTemplates → {MessageTemplates}", subscription, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddNewsLetterSubscriptionTokensAsync(commonTokens, subscription);
+		logger.LogDebug("SendNewsLetterSubscriptionDeactivationMessageAsync(subscription={Subscription}): commonTokens → {CommonTokens}", subscription, commonTokens);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
         {
@@ -1685,6 +1789,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, subscription.Email, string.Empty);
         }).ToListAsync();
+		logger.LogInformation("SendNewsLetterSubscriptionDeactivationMessageAsync(subscription)={Subscription}: database query executed in {Arg1} ms", subscription, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendNewsLetterSubscriptionDeactivationMessageAsync(subscription={Subscription})", subscription);
     }
 
     #endregion
@@ -1804,6 +1910,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewReturnRequestStoreOwnerNotificationAsync(ReturnRequest returnRequest, OrderItem orderItem, Order order, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(returnRequest);
 
         ArgumentNullException.ThrowIfNull(orderItem);
@@ -1840,6 +1947,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendNewReturnRequestStoreOwnerNotificationAsync(returnRequest={ReturnRequest},orderItem={OrderItem},order={Order},languageId={LanguageId})", returnRequest, orderItem, order, languageId);
     }
 
     /// <summary>
@@ -1854,6 +1962,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewReturnRequestCustomerNotificationAsync(ReturnRequest returnRequest, OrderItem orderItem, Order order)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(returnRequest);
 
         ArgumentNullException.ThrowIfNull(orderItem);
@@ -1897,6 +2006,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendNewReturnRequestCustomerNotificationAsync(returnRequest={ReturnRequest},orderItem={OrderItem},order={Order})", returnRequest, orderItem, order);
     }
 
     /// <summary>
@@ -1911,6 +2021,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendReturnRequestStatusChangedCustomerNotificationAsync(ReturnRequest returnRequest, OrderItem orderItem, Order order)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(returnRequest);
 
         ArgumentNullException.ThrowIfNull(orderItem);
@@ -1954,6 +2065,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendReturnRequestStatusChangedCustomerNotificationAsync(returnRequest={ReturnRequest},orderItem={OrderItem},order={Order})", returnRequest, orderItem, order);
     }
 
     #endregion
@@ -1973,6 +2085,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewForumTopicMessageAsync(Customer customer, ForumTopic forumTopic, Forum forum, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -2003,6 +2116,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendNewForumTopicMessageAsync(customer={Customer},forumTopic={ForumTopic},forum={Forum},languageId={LanguageId})", customer, forumTopic, forum, languageId);
     }
 
     /// <summary>
@@ -2065,6 +2179,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendPrivateMessageNotificationAsync(PrivateMessage privateMessage, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(privateMessage);
 
         var store = await _storeService.GetStoreByIdAsync(privateMessage.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
@@ -2095,6 +2210,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendPrivateMessageNotificationAsync(privateMessage={PrivateMessage},languageId={LanguageId})", privateMessage, languageId);
     }
 
     #endregion
@@ -2113,6 +2229,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewVendorAccountApplyStoreOwnerNotificationAsync(Customer customer, Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -2149,6 +2266,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting SendNewVendorAccountApplyStoreOwnerNotificationAsync(customer={Customer},vendor={Vendor},languageId={LanguageId})", customer, vendor, languageId);
     }
 
     /// <summary>
@@ -2162,18 +2280,23 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendVendorInformationChangeStoreOwnerNotificationAsync(Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(vendor);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendVendorInformationChangeStoreOwnerNotificationAsync(vendor={Vendor},languageId={LanguageId}): store → {Store}", vendor, languageId, store);
+		logger.LogDebug("SendVendorInformationChangeStoreOwnerNotificationAsync(vendor={Vendor},languageId={LanguageId}): languageId → {LanguageId1}", vendor, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.VENDOR_INFORMATION_CHANGE_STORE_OWNER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendVendorInformationChangeStoreOwnerNotificationAsync(vendor={Vendor},languageId={LanguageId}): messageTemplates → {MessageTemplates}", vendor, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddVendorTokensAsync(commonTokens, vendor);
+		logger.LogDebug("SendVendorInformationChangeStoreOwnerNotificationAsync(vendor={Vendor},languageId={LanguageId}): commonTokens → {CommonTokens}", vendor, languageId, commonTokens);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
         {
@@ -2195,6 +2318,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogInformation("SendVendorInformationChangeStoreOwnerNotificationAsync(vendor,languageId)={Vendor},{LanguageId}: database query executed in {Arg2} ms", vendor, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendVendorInformationChangeStoreOwnerNotificationAsync(vendor={Vendor},languageId={LanguageId})", vendor, languageId);
     }
 
     /// <summary>
@@ -2208,6 +2333,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendGiftCardNotificationAsync(GiftCard giftCard, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(giftCard);
 
         var order = await _orderService.GetOrderByOrderItemAsync(giftCard.PurchasedWithOrderItemId ?? 0);
@@ -2216,13 +2342,16 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
 
+		logger.LogDebug("SendGiftCardNotificationAsync(giftCard={GiftCard},languageId={LanguageId}): languageId → {LanguageId1}", giftCard, languageId, languageId);
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.GIFT_CARD_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendGiftCardNotificationAsync(giftCard={GiftCard},languageId={LanguageId}): messageTemplates → {MessageTemplates}", giftCard, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddGiftCardTokensAsync(commonTokens, giftCard, languageId);
+		logger.LogDebug("SendGiftCardNotificationAsync(giftCard={GiftCard},languageId={LanguageId}): commonTokens → {CommonTokens}", giftCard, languageId, commonTokens);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
         {
@@ -2240,6 +2369,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendGiftCardNotificationAsync(giftCard,languageId)={GiftCard},{LanguageId}: database query executed in {Arg2} ms", giftCard, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendGiftCardNotificationAsync(giftCard={GiftCard},languageId={LanguageId})", giftCard, languageId);
     }
 
     /// <summary>
@@ -2253,18 +2384,23 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendProductReviewStoreOwnerNotificationMessageAsync(ProductReview productReview, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(productReview);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendProductReviewStoreOwnerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): store → {Store}", productReview, languageId, store);
+		logger.LogDebug("SendProductReviewStoreOwnerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): languageId → {LanguageId1}", productReview, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.PRODUCT_REVIEW_STORE_OWNER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendProductReviewStoreOwnerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): messageTemplates → {MessageTemplates}", productReview, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddProductReviewTokensAsync(commonTokens, productReview);
+		logger.LogDebug("SendProductReviewStoreOwnerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): commonTokens → {CommonTokens}", productReview, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, productReview.CustomerId);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
@@ -2286,6 +2422,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogInformation("SendProductReviewStoreOwnerNotificationMessageAsync(productReview,languageId)={ProductReview},{LanguageId}: database query executed in {Arg2} ms", productReview, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendProductReviewStoreOwnerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId})", productReview, languageId);
     }
 
     /// <summary>
@@ -2299,17 +2437,22 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendProductReviewReplyCustomerNotificationMessageAsync(ProductReview productReview, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(productReview);
 
         var store = await _storeService.GetStoreByIdAsync(productReview.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendProductReviewReplyCustomerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): store → {Store}", productReview, languageId, store);
+		logger.LogDebug("SendProductReviewReplyCustomerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): languageId → {LanguageId1}", productReview, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.PRODUCT_REVIEW_REPLY_CUSTOMER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendProductReviewReplyCustomerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): messageTemplates → {MessageTemplates}", productReview, languageId, messageTemplates);
             return new List<int>();
 
         var customer = await _customerService.GetCustomerByIdAsync(productReview.CustomerId);
 
+		logger.LogDebug("SendProductReviewReplyCustomerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): customer → {Customer}", productReview, languageId, customer);
         //We should not send notifications to guests
         if (await _customerService.IsGuestAsync(customer))
             return new List<int>();
@@ -2317,6 +2460,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddProductReviewTokensAsync(commonTokens, productReview);
+		logger.LogDebug("SendProductReviewReplyCustomerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId}): commonTokens → {CommonTokens}", productReview, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, customer);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
@@ -2335,6 +2479,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendProductReviewReplyCustomerNotificationMessageAsync(productReview,languageId)={ProductReview},{LanguageId}: database query executed in {Arg2} ms", productReview, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendProductReviewReplyCustomerNotificationMessageAsync(productReview={ProductReview},languageId={LanguageId})", productReview, languageId);
     }
 
     /// <summary>
@@ -2348,6 +2494,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendQuantityBelowStoreOwnerNotificationAsync(Product product, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -2375,6 +2522,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug("<<< Exiting SendQuantityBelowStoreOwnerNotificationAsync(product={Product},languageId={LanguageId})", product, languageId);
     }
 
     /// <summary>
@@ -2388,17 +2537,23 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendQuantityBelowStoreOwnerNotificationAsync(ProductAttributeCombination combination, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(combination);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendQuantityBelowStoreOwnerNotificationAsync(combination={Combination},languageId={LanguageId}): store → {Store}", combination, languageId, store);
+		logger.LogDebug("SendQuantityBelowStoreOwnerNotificationAsync(combination={Combination},languageId={LanguageId}): languageId → {LanguageId1}", combination, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_STORE_OWNER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendQuantityBelowStoreOwnerNotificationAsync(combination={Combination},languageId={LanguageId}): messageTemplates → {MessageTemplates}", combination, languageId, messageTemplates);
             return new List<int>();
 
         var commonTokens = new List<Token>();
         var product = await _productService.GetProductByIdAsync(combination.ProductId);
+		logger.LogDebug("SendQuantityBelowStoreOwnerNotificationAsync(combination={Combination},languageId={LanguageId}): commonTokens → {CommonTokens}", combination, languageId, commonTokens);
+		logger.LogDebug("SendQuantityBelowStoreOwnerNotificationAsync(combination={Combination},languageId={LanguageId}): product → {Product}", combination, languageId, product);
 
         await _messageTokenProvider.AddProductTokensAsync(commonTokens, product, languageId);
         await _messageTokenProvider.AddAttributeCombinationTokensAsync(commonTokens, combination, languageId);
@@ -2418,6 +2573,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendQuantityBelowStoreOwnerNotificationAsync(combination,languageId)={Combination},{LanguageId}: database query executed in {Arg2} ms", combination, languageId, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -2432,6 +2588,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendQuantityBelowVendorNotificationAsync(Product product, Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
         ArgumentNullException.ThrowIfNull(vendor);
 
@@ -2461,6 +2618,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug("<<< Exiting SendQuantityBelowVendorNotificationAsync(product={Product},vendor={Vendor},languageId={LanguageId})", product, vendor, languageId);
     }
 
     /// <summary>
@@ -2475,18 +2634,24 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendQuantityBelowVendorNotificationAsync(ProductAttributeCombination combination, Vendor vendor, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(combination);
         ArgumentNullException.ThrowIfNull(vendor);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendQuantityBelowVendorNotificationAsync(combination={Combination},vendor={Vendor},languageId={LanguageId}): store → {Store}", combination, vendor, languageId, store);
+		logger.LogDebug("SendQuantityBelowVendorNotificationAsync(combination={Combination},vendor={Vendor},languageId={LanguageId}): languageId → {LanguageId1}", combination, vendor, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_VENDOR_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendQuantityBelowVendorNotificationAsync(combination={Combination},vendor={Vendor},languageId={LanguageId}): messageTemplates → {MessageTemplates}", combination, vendor, languageId, messageTemplates);
             return new List<int>();
 
         var commonTokens = new List<Token>();
         var product = await _productService.GetProductByIdAsync(combination.ProductId);
+		logger.LogDebug("SendQuantityBelowVendorNotificationAsync(combination={Combination},vendor={Vendor},languageId={LanguageId}): commonTokens → {CommonTokens}", combination, vendor, languageId, commonTokens);
+		logger.LogDebug("SendQuantityBelowVendorNotificationAsync(combination={Combination},vendor={Vendor},languageId={LanguageId}): product → {Product}", combination, vendor, languageId, product);
 
         await _messageTokenProvider.AddProductTokensAsync(commonTokens, product, languageId);
         await _messageTokenProvider.AddAttributeCombinationTokensAsync(commonTokens, combination, languageId);
@@ -2507,6 +2672,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendQuantityBelowVendorNotificationAsync(combination,vendor,languageId)={Combination},{Vendor},{LanguageId}: database query executed in {Arg3} ms", combination, vendor, languageId, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -2567,20 +2733,26 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendBlogCommentStoreOwnerNotificationMessageAsync(BlogComment blogComment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(blogComment);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment={BlogComment},languageId={LanguageId}): store → {Store}", blogComment, languageId, store);
+		logger.LogDebug("SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment={BlogComment},languageId={LanguageId}): languageId → {LanguageId1}", blogComment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.BLOG_COMMENT_STORE_OWNER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment={BlogComment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", blogComment, languageId, messageTemplates);
             return new List<int>();
 
         var customer = await _customerService.GetCustomerByIdAsync(blogComment.CustomerId);
 
+		logger.LogDebug("SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment={BlogComment},languageId={LanguageId}): customer → {Customer}", blogComment, languageId, customer);
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddBlogCommentTokensAsync(commonTokens, blogComment);
+		logger.LogDebug("SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment={BlogComment},languageId={LanguageId}): commonTokens → {CommonTokens}", blogComment, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, blogComment.CustomerId);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
@@ -2600,6 +2772,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogInformation("SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment,languageId)={BlogComment},{LanguageId}: database query executed in {Arg2} ms", blogComment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendBlogCommentStoreOwnerNotificationMessageAsync(blogComment={BlogComment},languageId={LanguageId})", blogComment, languageId);
     }
 
     /// <summary>
@@ -2613,20 +2787,26 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendNewsCommentStoreOwnerNotificationMessageAsync(NewsComment newsComment, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(newsComment);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment={NewsComment},languageId={LanguageId}): store → {Store}", newsComment, languageId, store);
+		logger.LogDebug("SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment={NewsComment},languageId={LanguageId}): languageId → {LanguageId1}", newsComment, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.NEWS_COMMENT_STORE_OWNER_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment={NewsComment},languageId={LanguageId}): messageTemplates → {MessageTemplates}", newsComment, languageId, messageTemplates);
             return new List<int>();
 
         var customer = await _customerService.GetCustomerByIdAsync(newsComment.CustomerId);
 
+		logger.LogDebug("SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment={NewsComment},languageId={LanguageId}): customer → {Customer}", newsComment, languageId, customer);
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddNewsCommentTokensAsync(commonTokens, newsComment);
+		logger.LogDebug("SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment={NewsComment},languageId={LanguageId}): commonTokens → {CommonTokens}", newsComment, languageId, commonTokens);
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, newsComment.CustomerId);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
@@ -2646,6 +2826,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName,
                 replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogInformation("SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment,languageId)={NewsComment},{LanguageId}: database query executed in {Arg2} ms", newsComment, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendNewsCommentStoreOwnerNotificationMessageAsync(newsComment={NewsComment},languageId={LanguageId})", newsComment, languageId);
     }
 
     /// <summary>
@@ -2659,6 +2841,7 @@ public partial class WorkflowMessageService : IWorkflowMessageService
     /// </returns>
     public virtual async Task<IList<int>> SendBackInStockNotificationAsync(BackInStockSubscription subscription, int languageId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(subscription);
 
         var customer = await _customerService.GetCustomerByIdAsync(subscription.CustomerId);
@@ -2671,14 +2854,18 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
         var store = await _storeService.GetStoreByIdAsync(subscription.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         languageId = await EnsureLanguageIsActiveAsync(languageId, store.Id);
+		logger.LogDebug("SendBackInStockNotificationAsync(subscription={Subscription},languageId={LanguageId}): store → {Store}", subscription, languageId, store);
+		logger.LogDebug("SendBackInStockNotificationAsync(subscription={Subscription},languageId={LanguageId}): languageId → {LanguageId1}", subscription, languageId, languageId);
 
         var messageTemplates = await GetActiveMessageTemplatesAsync(MessageTemplateSystemNames.BACK_IN_STOCK_NOTIFICATION, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("SendBackInStockNotificationAsync(subscription={Subscription},languageId={LanguageId}): messageTemplates → {MessageTemplates}", subscription, languageId, messageTemplates);
             return new List<int>();
 
         //tokens
         var commonTokens = new List<Token>();
         await _messageTokenProvider.AddCustomerTokensAsync(commonTokens, customer);
+		logger.LogDebug("SendBackInStockNotificationAsync(subscription={Subscription},languageId={LanguageId}): commonTokens → {CommonTokens}", subscription, languageId, commonTokens);
         await _messageTokenProvider.AddBackInStockTokensAsync(commonTokens, subscription);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
@@ -2697,6 +2884,8 @@ public partial class WorkflowMessageService : IWorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName);
         }).ToListAsync();
+		logger.LogInformation("SendBackInStockNotificationAsync(subscription,languageId)={Subscription},{LanguageId}: database query executed in {Arg2} ms", subscription, languageId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SendBackInStockNotificationAsync(subscription={Subscription},languageId={LanguageId})", subscription, languageId);
     }
 
     /// <summary>

@@ -85,6 +85,8 @@ public class ModelCacheEventConsumer :
     {
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(TAXRATE_PATTERN_KEY);
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -96,18 +98,21 @@ public class ModelCacheEventConsumer :
     {
         var taxCategory = eventMessage?.Entity;
         if (taxCategory == null)
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
             return;
 
         //delete an appropriate record when tax category is deleted
         var recordsToDelete = (await _taxRateService.GetAllTaxRatesAsync()).Where(taxRate => taxRate.TaxCategoryId == taxCategory.Id).ToList();
         foreach (var taxRate in recordsToDelete)
         {
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): recordsToDelete → {RecordsToDelete}", eventMessage, recordsToDelete);
             await _taxRateService.DeleteTaxRateAsync(taxRate);
         }
 
         //delete saved fixed rate if exists
         var setting = await _settingService.GetSettingAsync(string.Format(FixedOrByCountryStateZipDefaults.FIXED_RATE_SETTINGS_KEY, taxCategory.Id));
         if (setting != null)
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): setting → {Setting}", eventMessage, setting);
             await _settingService.DeleteSettingAsync(setting);
     }
 

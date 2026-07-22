@@ -9,11 +9,13 @@ public partial class VendorInfoValidator : BaseNopValidator<VendorInfoModel>
 {
     public VendorInfoValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering VendorInfoValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Account.VendorInfo.Name.Required"));
 
         RuleFor(x => x.Email).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Account.VendorInfo.Email.Required"));
         RuleFor(x => x.Email)
             .IsEmailAddress()
             .WithMessageAwait(localizationService.GetResourceAsync("Common.WrongEmail"));
+			logger.LogDebug("<<< Exiting VendorInfoValidator(localizationService={LocalizationService})", localizationService);
     }
 }

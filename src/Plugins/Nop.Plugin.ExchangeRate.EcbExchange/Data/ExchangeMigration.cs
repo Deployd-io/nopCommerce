@@ -33,14 +33,17 @@ public class ExchangeEcbMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //settings
         if (!_settingService.SettingExists(_ecbExchangeRateSettings, settings => settings.EcbLink))
             _ecbExchangeRateSettings.EcbLink = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+			logger.LogDebug("Up(): _ecbExchangeRateSettings.EcbLink → {Arg0}", _ecbExchangeRateSettings.EcbLink);
 
         _settingService.SaveSetting(_ecbExchangeRateSettings);
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -48,7 +51,9 @@ public class ExchangeEcbMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

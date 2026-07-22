@@ -40,6 +40,8 @@ public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginM
     /// </returns>
     public virtual async Task<ITaxProvider> LoadPrimaryPluginAsync(Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		logger.LogDebug("<<< Exiting LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadPrimaryPluginAsync(_taxSettings.ActiveTaxProviderSystemName, customer, storeId);
     }
 
@@ -65,7 +67,10 @@ public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginM
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var taxProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): taxProvider → {TaxProvider}", systemName, customer, storeId, taxProvider);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(taxProvider);
     }
 

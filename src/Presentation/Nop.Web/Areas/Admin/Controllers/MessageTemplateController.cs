@@ -85,15 +85,20 @@ public partial class MessageTemplateController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _messageTemplateModelFactory.PrepareMessageTemplateSearchModelAsync(new MessageTemplateSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -104,20 +109,25 @@ public partial class MessageTemplateController : BaseAdminController
         //prepare model
         var model = await _messageTemplateModelFactory.PrepareMessageTemplateListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(id);
         if (messageTemplate == null)
+			logger.LogDebug("Edit(id={Id}): messageTemplate → {MessageTemplate}", id, messageTemplate);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _messageTemplateModelFactory.PrepareMessageTemplateModelAsync(null, messageTemplate);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -164,6 +174,7 @@ public partial class MessageTemplateController : BaseAdminController
         model = await _messageTemplateModelFactory.PrepareMessageTemplateModelAsync(model, messageTemplate, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -171,9 +182,11 @@ public partial class MessageTemplateController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(id);
         if (messageTemplate == null)
+			logger.LogDebug("Delete(id={Id}): messageTemplate → {MessageTemplate}", id, messageTemplate);
             return RedirectToAction("List");
 
         await _messageTemplateService.DeleteMessageTemplateAsync(messageTemplate);
@@ -184,6 +197,7 @@ public partial class MessageTemplateController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.MessageTemplates.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -215,9 +229,11 @@ public partial class MessageTemplateController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_VIEW)]
     public virtual async Task<IActionResult> TestTemplate(int id, int languageId = 0)
     {
+		logger.LogDebug(">>> Entering TestTemplate(id={Id},languageId={LanguageId})", id, languageId);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(id);
         if (messageTemplate == null)
+			logger.LogDebug("TestTemplate(id={Id},languageId={LanguageId}): messageTemplate → {MessageTemplate}", id, languageId, messageTemplate);
             return RedirectToAction("List");
 
         //prepare model

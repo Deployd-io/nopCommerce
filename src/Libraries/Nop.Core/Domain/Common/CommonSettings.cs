@@ -9,7 +9,10 @@ public partial class CommonSettings : ISettings
 {
     public CommonSettings()
     {
+		logger.LogDebug(">>> Entering CommonSettings()");
         IgnoreLogWordlist = new List<string>();
+		logger.LogDebug("<<< Exiting CommonSettings()");
+		logger.LogDebug("CommonSettings(): IgnoreLogWordlist → {IgnoreLogWordlist}", IgnoreLogWordlist);
     }
 
     /// <summary>

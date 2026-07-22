@@ -105,12 +105,16 @@ public class MarketingAutomationManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleShoppingCartChangedEventAsync(ShoppingCartItem cartItem)
     {
+		logger.LogDebug(">>> Entering HandleShoppingCartChangedEventAsync(cartItem={CartItem})", cartItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //whether marketing automation is enabled
         if (!_brevoSettings.UseMarketingAutomation)
             return;
 
         var customer = await _customerService.GetCustomerByIdAsync(cartItem.CustomerId);
         var email = customer.Email;
+		logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): customer → {Customer}", cartItem, customer);
+		logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): email → {Email}", cartItem, email);
 
         if (string.IsNullOrEmpty(email))
             return;
@@ -123,6 +127,7 @@ public class MarketingAutomationManager
             //get shopping cart GUID
             var shoppingCartGuid = await _genericAttributeService
                 .GetAttributeAsync<Guid?>(customer, BrevoDefaults.ShoppingCartGuidAttribute);
+				logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): shoppingCartGuid → {ShoppingCartGuid}", cartItem, shoppingCartGuid);
 
             //create track event object
             var trackEvent = new TrackEventRequest { Email = email };
@@ -130,6 +135,7 @@ public class MarketingAutomationManager
             //get current customer's shopping cart
             var store = await _storeContext.GetCurrentStoreAsync();
             var cart = await _shoppingCartService
+				logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): store → {Store}", cartItem, store);
                 .GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
             if (cart.Any())
@@ -139,6 +145,8 @@ public class MarketingAutomationManager
                     await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax);
                 var cartTax = await _orderTotalCalculationService.GetTaxTotalAsync(cart, false);
                 var cartShipping = await _orderTotalCalculationService.GetShoppingCartShippingTotalAsync(cart);
+				logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): cartTax → {CartTax}", cartItem, cartTax);
+				logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): cartShipping → {CartShipping}", cartItem, cartShipping);
                 var (cartTotal, _, _, _, _, _) = await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart, false, false);
 
                 //get products data by shopping cart items
@@ -146,12 +154,15 @@ public class MarketingAutomationManager
                 {
                     var product = await _productService.GetProductByIdAsync(item.ProductId);
 
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): product → {Product}", cartItem, product);
                     //try to get product attribute combination
                     var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, item.AttributesXml);
 
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): combination → {Combination}", cartItem, combination);
                     //get default product picture
                     var picture = await _pictureService.GetProductPictureAsync(product, item.AttributesXml);
 
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): picture → {Picture}", cartItem, picture);
                     //create product data
                     return new
                     {
@@ -162,14 +173,23 @@ public class MarketingAutomationManager
                         sku = combination?.Sku ?? product.Sku,
                         category = await (await _categoryService.GetProductCategoriesByProductIdAsync(item.ProductId)).AggregateAwaitAsync(",", async (all, pc) =>
                         {
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): name → {Name}", cartItem, name);
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): variant_id → {Variant_id}", cartItem, variant_id);
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): variant_name → {Variant_name}", cartItem, variant_name);
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): sku → {Sku}", cartItem, sku);
                             var res = (await _categoryService.GetCategoryByIdAsync(pc.CategoryId)).Name;
                             res = all == "," ? res : all + ", " + res;
+							logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): res → {Res}", cartItem, res);
                             return res;
                         }),
                         url = await _nopUrlHelper.RouteGenericUrlAsync(product, _webHelper.GetCurrentRequestProtocol()),
                         image = (await _pictureService.GetPictureUrlAsync(picture)).Url,
                         quantity = item.Quantity,
                         price = (await _shoppingCartService.GetSubTotalAsync(item, true)).subTotal
+						logger.LogInformation("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): url → {Url}", cartItem, url);
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): image → {Image}", cartItem, image);
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): quantity → {Quantity}", cartItem, quantity);
+						logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): price → {Price}", cartItem, price);
                     };
                 }).ToArrayAsync();
 
@@ -186,7 +206,16 @@ public class MarketingAutomationManager
                     url = _nopUrlHelper.RouteUrl(NopRouteNames.General.CART, null, _webHelper.GetCurrentRequestProtocol()),
                     currency = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode,
                     //gift_wrapping = string.Empty, //currently we can't get this value
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): affiliation → {Affiliation}", cartItem, affiliation);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): subtotal → {Subtotal}", cartItem, subtotal);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): shipping → {Shipping}", cartItem, shipping);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): total_before_tax → {Total_before_tax}", cartItem, total_before_tax);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): tax → {Tax}", cartItem, tax);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): discount → {Discount}", cartItem, discount);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): revenue → {Revenue}", cartItem, revenue);
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): currency → {Currency}", cartItem, currency);
                     items = itemsData
+					logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): items → {Items}", cartItem, items);
                 };
 
                 //if there is a single item in the cart, so the cart is just created
@@ -200,6 +229,8 @@ public class MarketingAutomationManager
                     shoppingCartGuid ??= Guid.NewGuid();
                 }
                 trackEvent.EventName = BrevoDefaults.CartUpdatedEventName;
+				logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): trackEvent.EventName → {Arg1}", cartItem, trackEvent.EventName);
+				logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): trackEvent.EventData → {Arg1}", cartItem, trackEvent.EventData);
                 trackEvent.EventData = new { id = $"cart:{shoppingCartGuid}", data = cartData };
             }
             else
@@ -221,6 +252,8 @@ public class MarketingAutomationManager
             //log full error
             await _logger.ErrorAsync($"Brevo Marketing Automation error: {exception.Message}.", exception, customer);
         }
+		logger.LogInformation("HandleShoppingCartChangedEventAsync(cartItem)={CartItem}: external service call took {Arg1} ms", cartItem, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting HandleShoppingCartChangedEventAsync(cartItem={CartItem})", cartItem);
     }
 
     /// <summary>
@@ -230,6 +263,8 @@ public class MarketingAutomationManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleOrderCompletedEventAsync(Order order)
     {
+		logger.LogDebug(">>> Entering HandleOrderCompletedEventAsync(order={Order})", order);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //whether marketing automation is enabled
         if (!_brevoSettings.UseMarketingAutomation)
             return;
@@ -238,8 +273,12 @@ public class MarketingAutomationManager
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
         var shippingAddress = await _addressService.GetAddressByIdAsync(order.ShippingAddressId ?? 0);
+		logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): customer → {Customer}", order, customer);
+		logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): shippingAddress → {ShippingAddress}", order, shippingAddress);
         var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
         var email = customer.Email ?? billingAddress?.Email;
+		logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): billingAddress → {BillingAddress}", order, billingAddress);
+		logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): email → {Email}", order, email);
 
         if (string.IsNullOrEmpty(email))
             return;
@@ -254,12 +293,15 @@ public class MarketingAutomationManager
             {
                 var product = await _productService.GetProductByIdAsync(item.ProductId);
 
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): product → {Product}", order, product);
                 //try to get product attribute combination
                 var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, item.AttributesXml);
 
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): combination → {Combination}", order, combination);
                 //get default product picture
                 var picture = await _pictureService.GetProductPictureAsync(product, item.AttributesXml);
 
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): picture → {Picture}", order, picture);
                 //create product data
                 return new
                 {
@@ -270,8 +312,13 @@ public class MarketingAutomationManager
                     sku = combination?.Sku ?? product.Sku,
                     category = await (await _categoryService.GetProductCategoriesByProductIdAsync(item.ProductId)).AggregateAwaitAsync(",", async (all, pc) =>
                     {
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): name → {Name}", order, name);
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): variant_id → {Variant_id}", order, variant_id);
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): variant_name → {Variant_name}", order, variant_name);
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): sku → {Sku}", order, sku);
                         var res = (await _categoryService.GetCategoryByIdAsync(pc.CategoryId)).Name;
                         res = all == "," ? res : all + ", " + res;
+						logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): res → {Res}", order, res);
                         return res;
                     }),
                     url = await _nopUrlHelper.RouteGenericUrlAsync(product, _webHelper.GetCurrentRequestProtocol()),
@@ -279,6 +326,10 @@ public class MarketingAutomationManager
                     quantity = item.Quantity,
                     price = item.PriceInclTax,
                 };
+					logger.LogInformation("HandleOrderCompletedEventAsync(order={Order}): url → {Url}", order, url);
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): image → {Image}", order, image);
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): quantity → {Quantity}", order, quantity);
+					logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): price → {Price}", order, price);
             }).ToArrayAsync();
 
             var shippingAddressData = new
@@ -293,6 +344,16 @@ public class MarketingAutomationManager
                 country = (await _countryService.GetCountryByAddressAsync(shippingAddress))?.Name,
                 state = (await _stateProvinceService.GetStateProvinceByAddressAsync(shippingAddress))?.Name,
                 zipcode = shippingAddress?.ZipPostalCode
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): firstname → {Firstname}", order, firstname);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): lastname → {Lastname}", order, lastname);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): company → {Company}", order, company);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): phone → {Phone}", order, phone);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): address1 → {Address1}", order, address1);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): address2 → {Address2}", order, address2);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): city → {City}", order, city);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): country → {Country}", order, country);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): state → {State}", order, state);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): zipcode → {Zipcode}", order, zipcode);
             };
 
             var billingAddressData = new
@@ -311,6 +372,7 @@ public class MarketingAutomationManager
 
             var store = await _storeContext.GetCurrentStoreAsync();
 
+			logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): store → {Store}", order, store);
             //prepare cart data
             var cartData = new
             {
@@ -326,9 +388,21 @@ public class MarketingAutomationManager
                 url = _nopUrlHelper.RouteUrl(NopRouteNames.Standard.ORDER_DETAILS, new { orderId = order.Id }, _webHelper.GetCurrentRequestProtocol()),
                 currency = order.CustomerCurrencyCode,
                 //gift_wrapping = string.Empty, //currently we can't get this value
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): affiliation → {Affiliation}", order, affiliation);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): date → {Date}", order, date);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): subtotal → {Subtotal}", order, subtotal);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): shipping → {Shipping}", order, shipping);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): total_before_tax → {Total_before_tax}", order, total_before_tax);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): tax → {Tax}", order, tax);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): discount → {Discount}", order, discount);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): revenue → {Revenue}", order, revenue);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): currency → {Currency}", order, currency);
                 items = itemsData,
                 shipping_address = shippingAddressData,
                 billing_address = billingAddressData
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): items → {Items}", order, items);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): shipping_address → {Shipping_address}", order, shipping_address);
+				logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): billing_address → {Billing_address}", order, billing_address);
             };
 
             //get shopping cart GUID
@@ -354,6 +428,8 @@ public class MarketingAutomationManager
             //log full error
             await _logger.ErrorAsync($"Brevo Marketing Automation error: {exception.Message}.", exception, customer);
         }
+		logger.LogInformation("HandleOrderCompletedEventAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting HandleOrderCompletedEventAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -363,6 +439,7 @@ public class MarketingAutomationManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleOrderPlacedEventAsync(Order order)
     {
+		logger.LogDebug(">>> Entering HandleOrderPlacedEventAsync(order={Order})", order);
         //whether marketing automation is enabled
         if (!_brevoSettings.UseMarketingAutomation)
             return;
@@ -370,6 +447,8 @@ public class MarketingAutomationManager
         //copy shopping cart GUID to order
         var shoppingCartGuid = await _genericAttributeService.GetAttributeAsync<Customer, Guid?>(order.CustomerId, BrevoDefaults.ShoppingCartGuidAttribute);
         await _genericAttributeService.SaveAttributeAsync(order, BrevoDefaults.ShoppingCartGuidAttribute, shoppingCartGuid);
+		logger.LogDebug("HandleOrderPlacedEventAsync(order={Order}): shoppingCartGuid → {ShoppingCartGuid}", order, shoppingCartGuid);
+		logger.LogDebug("<<< Exiting HandleOrderPlacedEventAsync(order={Order})", order);
     }
 
     #endregion

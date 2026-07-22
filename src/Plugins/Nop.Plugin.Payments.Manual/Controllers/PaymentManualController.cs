@@ -49,9 +49,12 @@ public class PaymentManualController : BasePaymentController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var manualPaymentSettings = await _settingService.LoadSettingAsync<ManualPaymentSettings>(storeScope);
+		logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
+		logger.LogDebug("Configure(): manualPaymentSettings → {ManualPaymentSettings}", manualPaymentSettings);
 
         var model = new ConfigurationModel
         {
@@ -68,6 +71,7 @@ public class PaymentManualController : BasePaymentController
             model.AdditionalFeePercentage_OverrideForStore = await _settingService.SettingExistsAsync(manualPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
         }
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Payments.Manual/Views/Configure.cshtml", model);
     }
 

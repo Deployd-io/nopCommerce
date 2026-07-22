@@ -15,7 +15,9 @@ public partial class ProductReviewReviewTypeMappingCacheEventConsumer : CacheEve
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductReviewReviewTypeMapping entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.ProductReviewTypeMappingByReviewIdCacheKey, entity.ProductReviewId);
         await base.ClearCacheAsync(entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

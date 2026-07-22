@@ -11,7 +11,10 @@ public partial class OrderPaidEvent
     /// <param name="order">Order</param>
     public OrderPaidEvent(Order order)
     {
+		logger.LogDebug(">>> Entering OrderPaidEvent(order={Order})", order);
         Order = order;
+		logger.LogDebug("<<< Exiting OrderPaidEvent(order={Order})", order);
+		logger.LogDebug("OrderPaidEvent(order={Order}): Order → {Order1}", order, Order);
     }
 
     /// <summary>

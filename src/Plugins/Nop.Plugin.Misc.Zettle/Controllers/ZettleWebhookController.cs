@@ -15,7 +15,10 @@ public class ZettleWebhookController : Controller
 
     public ZettleWebhookController(ZettleService zettleService)
     {
+		logger.LogDebug(">>> Entering ZettleWebhookController(zettleService={ZettleService})", zettleService);
         _zettleService = zettleService;
+		logger.LogDebug("<<< Exiting ZettleWebhookController(zettleService={ZettleService})", zettleService);
+		logger.LogDebug("ZettleWebhookController(zettleService={ZettleService}): _zettleService → {_zettleService}", zettleService, _zettleService);
     }
 
     #endregion
@@ -25,7 +28,9 @@ public class ZettleWebhookController : Controller
     [HttpPost]
     public async Task<IActionResult> Webhook()
     {
+		logger.LogDebug(">>> Entering Webhook()");
         await _zettleService.HandleWebhookAsync(Request);
+		logger.LogDebug("<<< Exiting Webhook()");
         return Ok();
     }
 

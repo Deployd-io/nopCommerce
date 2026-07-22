@@ -9,11 +9,16 @@ public partial class PermissionConfig
 
     public PermissionConfig(string name, string systemName, string category, params string[] defaultCustomerRoles)
     {
+		logger.LogDebug(">>> Entering PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles})", name, systemName, category, defaultCustomerRoles);
         Name = name;
         SystemName = systemName;
+		logger.LogDebug("PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles}): Name → {Name1}", name, systemName, category, defaultCustomerRoles, Name);
+		logger.LogDebug("PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles}): SystemName → {SystemName1}", name, systemName, category, defaultCustomerRoles, SystemName);
         Category = category;
 
+		logger.LogDebug("PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles}): Category → {Category1}", name, systemName, category, defaultCustomerRoles, Category);
         DefaultCustomerRoles.AddRange(defaultCustomerRoles);
+		logger.LogDebug("<<< Exiting PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles})", name, systemName, category, defaultCustomerRoles);
     }
 
     #endregion

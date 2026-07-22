@@ -17,9 +17,11 @@ public partial class OrderNoteBuilder : NopEntityBuilder<OrderNote>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(OrderNote.Note)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(OrderNote.OrderId)).AsInt32().ForeignKey<Order>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

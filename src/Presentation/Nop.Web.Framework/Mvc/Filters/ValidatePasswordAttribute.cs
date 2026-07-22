@@ -20,6 +20,8 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
     /// </summary>
     public ValidatePasswordAttribute() : base(typeof(ValidatePasswordFilter))
     {
+	logger.LogDebug(">>> Entering ValidatePasswordAttribute()");
+	logger.LogDebug("<<< Exiting ValidatePasswordAttribute()");
     }
 
     #endregion
@@ -61,6 +63,7 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidatePasswordAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering ValidatePasswordAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.HttpContext.Request == null)
@@ -106,6 +109,7 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
             var returnUrl = _webHelper.GetRawUrl(context.HttpContext.Request);
             //redirect to ChangePassword page if expires
             context.Result = new RedirectToRouteResult(NopRouteNames.Standard.CUSTOMER_CHANGE_PASSWORD, new { returnUrl = returnUrl });
+			logger.LogDebug("<<< Exiting ValidatePasswordAsync(context={Context})", context);
         }
 
         #endregion
@@ -120,9 +124,11 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await ValidatePasswordAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

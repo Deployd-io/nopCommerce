@@ -107,8 +107,12 @@ public partial class ModelCacheEventConsumer :
 
     public ModelCacheEventConsumer(CatalogSettings catalogSettings, IStaticCacheManager staticCacheManager)
     {
+		logger.LogDebug(">>> Entering ModelCacheEventConsumer(catalogSettings={CatalogSettings},staticCacheManager={StaticCacheManager})", catalogSettings, staticCacheManager);
         _staticCacheManager = staticCacheManager;
         _catalogSettings = catalogSettings;
+		logger.LogDebug("<<< Exiting ModelCacheEventConsumer(catalogSettings={CatalogSettings},staticCacheManager={StaticCacheManager})", catalogSettings, staticCacheManager);
+		logger.LogDebug("ModelCacheEventConsumer(catalogSettings={CatalogSettings},staticCacheManager={StaticCacheManager}): _catalogSettings → {_catalogSettings}", catalogSettings, staticCacheManager, _catalogSettings);
+		logger.LogDebug("ModelCacheEventConsumer(catalogSettings={CatalogSettings},staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", catalogSettings, staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -142,6 +146,8 @@ public partial class ModelCacheEventConsumer :
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.ManufacturerNavigationPrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.CategoryAllPrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.CategoryXmlAllPrefixCacheKey);
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

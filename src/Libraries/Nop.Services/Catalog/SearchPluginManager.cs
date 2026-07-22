@@ -21,7 +21,10 @@ using Nop.Services.Plugins;
      public SearchPluginManager(CatalogSettings catalogSettings, ICustomerService customerService, IPluginService pluginService)
          : base(customerService, pluginService)
      {
+		logger.LogDebug(">>> Entering SearchPluginManager(catalogSettings={CatalogSettings},customerService={CustomerService},pluginService={PluginService})", catalogSettings, customerService, pluginService);
          _catalogSettings = catalogSettings;
+		logger.LogDebug("<<< Exiting SearchPluginManager(catalogSettings={CatalogSettings},customerService={CustomerService},pluginService={PluginService})", catalogSettings, customerService, pluginService);
+		logger.LogDebug("SearchPluginManager(catalogSettings={CatalogSettings},customerService={CustomerService},pluginService={PluginService}): _catalogSettings → {_catalogSettings}", catalogSettings, customerService, pluginService, _catalogSettings);
      }
 
      #endregion
@@ -39,7 +42,9 @@ using Nop.Services.Plugins;
      /// </returns>
      public virtual async Task<ISearchProvider> LoadPrimaryPluginAsync(Customer customer = null, int storeId = 0)
      {
+		logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
          if (string.IsNullOrEmpty(_catalogSettings.ActiveSearchProviderSystemName))
+		logger.LogDebug("<<< Exiting LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
              return null;
 
          return await LoadPrimaryPluginAsync(_catalogSettings.ActiveSearchProviderSystemName, customer, storeId);
@@ -67,7 +72,10 @@ using Nop.Services.Plugins;
      /// </returns>
      public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
      {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
          var searchProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): searchProvider → {SearchProvider}", systemName, customer, storeId, searchProvider);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
          return IsPluginActive(searchProvider);
      }
 

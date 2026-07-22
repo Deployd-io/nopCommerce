@@ -17,7 +17,9 @@ public partial class PictureBinaryBuilder : NopEntityBuilder<PictureBinary>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table.WithColumn(nameof(PictureBinary.PictureId)).AsInt32().ForeignKey<Picture>();
+		logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -20,7 +20,10 @@ public partial class EncryptionService : IEncryptionService
 
     public EncryptionService(SecuritySettings securitySettings)
     {
+		logger.LogDebug(">>> Entering EncryptionService(securitySettings={SecuritySettings})", securitySettings);
         _securitySettings = securitySettings;
+		logger.LogDebug("<<< Exiting EncryptionService(securitySettings={SecuritySettings})", securitySettings);
+		logger.LogDebug("EncryptionService(securitySettings={SecuritySettings}): _securitySettings → {_securitySettings}", securitySettings, _securitySettings);
     }
 
     #endregion
@@ -68,15 +71,18 @@ public partial class EncryptionService : IEncryptionService
     /// <returns>Encryption algorithm</returns>
     protected virtual SymmetricAlgorithm GetEncryptionAlgorithm(string encryptionKey)
     {
+		logger.LogDebug(">>> Entering GetEncryptionAlgorithm(encryptionKey={EncryptionKey})", encryptionKey);
         ArgumentException.ThrowIfNullOrEmpty(encryptionKey);
 
         SymmetricAlgorithm provider = _securitySettings.UseAesEncryptionAlgorithm ? Aes.Create() : TripleDES.Create();
 
+		logger.LogDebug("GetEncryptionAlgorithm(encryptionKey={EncryptionKey}): provider → {Provider}", encryptionKey, provider);
         var vectorBlockSize = provider.BlockSize / 8;
 
         provider.Key = Encoding.ASCII.GetBytes(encryptionKey[0..16]);
         provider.IV = Encoding.ASCII.GetBytes(encryptionKey[^vectorBlockSize..]);
 
+		logger.LogDebug("<<< Exiting GetEncryptionAlgorithm(encryptionKey={EncryptionKey})", encryptionKey);
         return provider;
     }
 
@@ -91,12 +97,15 @@ public partial class EncryptionService : IEncryptionService
     /// <returns>Salt key</returns>
     public virtual string CreateSaltKey(int size)
     {
+		logger.LogDebug(">>> Entering CreateSaltKey(size={Size})", size);
         //generate a cryptographic random number
         using var provider = RandomNumberGenerator.Create();
         var buff = new byte[size];
+		logger.LogDebug("CreateSaltKey(size={Size}): provider → {Provider}", size, provider);
         provider.GetBytes(buff);
 
         // Return a Base64 string representation of the random number
+		logger.LogDebug("<<< Exiting CreateSaltKey(size={Size})", size);
         return Convert.ToBase64String(buff);
     }
 
@@ -109,6 +118,8 @@ public partial class EncryptionService : IEncryptionService
     /// <returns>Password hash</returns>
     public virtual string CreatePasswordHash(string password, string saltkey, string passwordFormat)
     {
+		logger.LogDebug(">>> Entering CreatePasswordHash(password={Password},saltkey={Saltkey},passwordFormat={PasswordFormat})", password, saltkey, passwordFormat);
+		logger.LogDebug("<<< Exiting CreatePasswordHash(password={Password},saltkey={Saltkey},passwordFormat={PasswordFormat})", password, saltkey, passwordFormat);
         return HashHelper.CreateHash(Encoding.UTF8.GetBytes(string.Concat(password, saltkey)), passwordFormat);
     }
 
@@ -120,6 +131,7 @@ public partial class EncryptionService : IEncryptionService
     /// <returns>Encrypted text</returns>
     public virtual string EncryptText(string plainText, string encryptionPrivateKey = "")
     {
+		logger.LogDebug(">>> Entering EncryptText(plainText={PlainText},encryptionPrivateKey={EncryptionPrivateKey})", plainText, encryptionPrivateKey);
         if (string.IsNullOrEmpty(plainText))
             return plainText;
 
@@ -128,7 +140,10 @@ public partial class EncryptionService : IEncryptionService
 
         using var provider = GetEncryptionAlgorithm(encryptionPrivateKey);
         var encryptedBinary = EncryptTextToMemory(plainText, provider);
+		logger.LogDebug("EncryptText(plainText={PlainText},encryptionPrivateKey={EncryptionPrivateKey}): provider → {Provider}", plainText, encryptionPrivateKey, provider);
+		logger.LogDebug("EncryptText(plainText={PlainText},encryptionPrivateKey={EncryptionPrivateKey}): encryptedBinary → {EncryptedBinary}", plainText, encryptionPrivateKey, encryptedBinary);
 
+		logger.LogDebug("<<< Exiting EncryptText(plainText={PlainText},encryptionPrivateKey={EncryptionPrivateKey})", plainText, encryptionPrivateKey);
         return Convert.ToBase64String(encryptedBinary);
     }
 
@@ -140,6 +155,7 @@ public partial class EncryptionService : IEncryptionService
     /// <returns>Decrypted text</returns>
     public virtual string DecryptText(string cipherText, string encryptionPrivateKey = "")
     {
+		logger.LogDebug(">>> Entering DecryptText(cipherText={CipherText},encryptionPrivateKey={EncryptionPrivateKey})", cipherText, encryptionPrivateKey);
         if (string.IsNullOrEmpty(cipherText))
             return cipherText;
 
@@ -148,7 +164,10 @@ public partial class EncryptionService : IEncryptionService
 
         using var provider = GetEncryptionAlgorithm(encryptionPrivateKey);
 
+		logger.LogDebug("DecryptText(cipherText={CipherText},encryptionPrivateKey={EncryptionPrivateKey}): provider → {Provider}", cipherText, encryptionPrivateKey, provider);
         var buffer = Convert.FromBase64String(cipherText);
+		logger.LogDebug("DecryptText(cipherText={CipherText},encryptionPrivateKey={EncryptionPrivateKey}): buffer → {Buffer}", cipherText, encryptionPrivateKey, buffer);
+		logger.LogDebug("<<< Exiting DecryptText(cipherText={CipherText},encryptionPrivateKey={EncryptionPrivateKey})", cipherText, encryptionPrivateKey);
         return DecryptTextFromMemory(buffer, provider);
     }
 

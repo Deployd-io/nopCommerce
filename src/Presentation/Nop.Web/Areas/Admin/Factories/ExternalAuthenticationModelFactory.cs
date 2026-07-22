@@ -20,7 +20,10 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
 
     public ExternalAuthenticationMethodModelFactory(IAuthenticationPluginManager authenticationPluginManager)
     {
+		logger.LogDebug(">>> Entering ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager})", authenticationPluginManager);
         _authenticationPluginManager = authenticationPluginManager;
+		logger.LogDebug("<<< Exiting ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager})", authenticationPluginManager);
+		logger.LogDebug("ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager}): _authenticationPluginManager → {_authenticationPluginManager}", authenticationPluginManager, _authenticationPluginManager);
     }
 
     #endregion

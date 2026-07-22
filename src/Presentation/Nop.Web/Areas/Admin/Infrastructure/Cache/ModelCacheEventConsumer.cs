@@ -39,7 +39,10 @@ public partial class ModelCacheEventConsumer :
 
     public ModelCacheEventConsumer(IStaticCacheManager staticCacheManager)
     {
+		logger.LogDebug(">>> Entering ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
         _staticCacheManager = staticCacheManager;
+		logger.LogDebug("<<< Exiting ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
+		logger.LogDebug("ModelCacheEventConsumer(staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -49,8 +52,10 @@ public partial class ModelCacheEventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(EntityUpdatedEvent<Setting> eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         //clear models which depend on settings
         await _staticCacheManager.RemoveAsync(NopModelCacheDefaults.OfficialNewsModelKey); //depends on AdminAreaSettings.HideAdvertisementsOnAdminArea
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     //categories

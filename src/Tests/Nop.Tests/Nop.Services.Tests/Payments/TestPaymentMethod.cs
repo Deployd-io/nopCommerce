@@ -17,9 +17,12 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Result</returns>
     public Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
     {
+		logger.LogDebug(">>> Entering RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
         var result = new RefundPaymentResult();
         result.AddError("Refund method not supported");
+		logger.LogDebug("RefundAsync(refundPaymentRequest={RefundPaymentRequest}): result → {Result}", refundPaymentRequest, result);
 
+		logger.LogDebug("<<< Exiting RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -30,9 +33,12 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Result</returns>
     public Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
     {
+		logger.LogDebug(">>> Entering VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
         var result = new VoidPaymentResult();
         result.AddError("Void method not supported");
+		logger.LogDebug("VoidAsync(voidPaymentRequest={VoidPaymentRequest}): result → {Result}", voidPaymentRequest, result);
 
+		logger.LogDebug("<<< Exiting VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -43,9 +49,12 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Process payment result</returns>
     public Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		logger.LogDebug(">>> Entering ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         var result = new ProcessPaymentResult();
         result.AddError("Recurring method not supported");
+		logger.LogDebug("ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest}): result → {Result}", processPaymentRequest, result);
 
+		logger.LogDebug("<<< Exiting ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -56,9 +65,12 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Result</returns>
     public Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
     {
+		logger.LogDebug(">>> Entering CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         var result = new CancelRecurringPaymentResult();
         result.AddError("Cancelling recurring orders not supported");
+		logger.LogDebug("CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest}): result → {Result}", cancelPaymentRequest, result);
 
+		logger.LogDebug("<<< Exiting CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -69,9 +81,12 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Result</returns>
     public Task<bool> CanRePostProcessPaymentAsync(Order order)
     {
+		logger.LogDebug(">>> Entering CanRePostProcessPaymentAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         //it's not a redirection payment method. So we always return false
+		logger.LogDebug(">>> Entering PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
+		logger.LogDebug("<<< Exiting PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         return Task.FromResult(false);
     }
 
@@ -82,6 +97,8 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>List of validating errors</returns>
     public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering ValidatePaymentFormAsync(form={Form})", form);
+		logger.LogDebug("<<< Exiting ValidatePaymentFormAsync(form={Form})", form);
         return Task.FromResult<IList<string>>(new List<string>());
     }
 
@@ -92,6 +109,8 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Payment info holder</returns>
     public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering GetPaymentInfoAsync(form={Form})", form);
+		logger.LogDebug("<<< Exiting GetPaymentInfoAsync(form={Form})", form);
         return Task.FromResult(new ProcessPaymentRequest());
     }
 
@@ -102,6 +121,7 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Process payment result</returns>
     public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		logger.LogDebug(">>> Entering ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         var result = new ProcessPaymentResult
         {
             NewPaymentStatus = PaymentStatus.Paid
@@ -116,6 +136,7 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <param name="postProcessPaymentRequest">Payment info required for an order processing</param>
     public Task PostProcessPaymentAsync(PostProcessPaymentRequest postProcessPaymentRequest)
     {
+		logger.LogDebug("<<< Exiting ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.CompletedTask;
     }
 
@@ -126,6 +147,8 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>true - hide; false - display.</returns>
     public Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering HidePaymentMethodAsync(cart={Cart})", cart);
+		logger.LogDebug("<<< Exiting HidePaymentMethodAsync(cart={Cart})", cart);
         return Task.FromResult(false);
     }
 
@@ -136,6 +159,8 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Additional handling fee</returns>
     public Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
+		logger.LogDebug("<<< Exiting GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
         return Task.FromResult(AdditionalHandlingFee);
     }
 
@@ -146,9 +171,12 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>Capture payment result</returns>
     public Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
     {
+		logger.LogDebug(">>> Entering CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
         var result = new CapturePaymentResult();
         result.AddError("Capture method not supported");
+		logger.LogDebug("CaptureAsync(capturePaymentRequest={CapturePaymentRequest}): result → {Result}", capturePaymentRequest, result);
 
+		logger.LogDebug("<<< Exiting CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -158,11 +186,15 @@ public class TestPaymentMethod : BasePlugin, IPaymentMethod
     /// <returns>View component type</returns>
     public Type GetPublicViewComponent()
     {
+		logger.LogDebug(">>> Entering GetPublicViewComponent()");
+		logger.LogDebug("<<< Exiting GetPublicViewComponent()");
         return null;
     }
 
     public Task<string> GetPaymentMethodDescriptionAsync()
     {
+		logger.LogDebug(">>> Entering GetPaymentMethodDescriptionAsync()");
+		logger.LogDebug("<<< Exiting GetPaymentMethodDescriptionAsync()");
         return Task.FromResult(PaymentMethodDescription);
     }
 

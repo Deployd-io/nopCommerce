@@ -9,7 +9,10 @@ public partial class SystemWarningCreatedEvent
 
     public SystemWarningCreatedEvent()
     {
+		logger.LogDebug(">>> Entering SystemWarningCreatedEvent()");
         SystemWarnings = new List<SystemWarningModel>();
+		logger.LogDebug("<<< Exiting SystemWarningCreatedEvent()");
+		logger.LogDebug("SystemWarningCreatedEvent(): SystemWarnings → {SystemWarnings}", SystemWarnings);
     }
 
     #endregion

@@ -18,6 +18,7 @@ public partial class NewsItemBuilder : NopEntityBuilder<NewsItem>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(NewsItem.Title)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(NewsItem.Short)).AsString(int.MaxValue).NotNullable()
@@ -25,6 +26,7 @@ public partial class NewsItemBuilder : NopEntityBuilder<NewsItem>
             .WithColumn(nameof(NewsItem.MetaKeywords)).AsString(400).Nullable()
             .WithColumn(nameof(NewsItem.MetaTitle)).AsString(400).Nullable()
             .WithColumn(nameof(NewsItem.LanguageId)).AsInt32().ForeignKey<Language>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

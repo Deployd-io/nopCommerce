@@ -21,10 +21,14 @@ public partial class InvariantNumberModelBinder : IModelBinder
 
     public InvariantNumberModelBinder(NumberStyles supportedStyles, IModelBinder globalizedBinder)
     {
+		logger.LogDebug(">>> Entering InvariantNumberModelBinder(supportedStyles={SupportedStyles},globalizedBinder={GlobalizedBinder})", supportedStyles, globalizedBinder);
         ArgumentNullException.ThrowIfNull(globalizedBinder);
 
         _globalizedBinder = globalizedBinder;
+		logger.LogDebug("InvariantNumberModelBinder(supportedStyles={SupportedStyles},globalizedBinder={GlobalizedBinder}): _globalizedBinder → {_globalizedBinder}", supportedStyles, globalizedBinder, _globalizedBinder);
         _supportedStyles = supportedStyles;
+		logger.LogDebug("<<< Exiting InvariantNumberModelBinder(supportedStyles={SupportedStyles},globalizedBinder={GlobalizedBinder})", supportedStyles, globalizedBinder);
+		logger.LogDebug("InvariantNumberModelBinder(supportedStyles={SupportedStyles},globalizedBinder={GlobalizedBinder}): _supportedStyles → {_supportedStyles}", supportedStyles, globalizedBinder, _supportedStyles);
     }
 
     #endregion
@@ -49,11 +53,13 @@ public partial class InvariantNumberModelBinder : IModelBinder
     /// <param name="bindingContext">Model binding context</param>
     public virtual Task BindModelAsync(ModelBindingContext bindingContext)
     {
+		logger.LogDebug(">>> Entering BindModelAsync(bindingContext={BindingContext})", bindingContext);
         ArgumentNullException.ThrowIfNull(bindingContext);
 
         var modelName = bindingContext.ModelName;
         var valueProviderResult = bindingContext.ValueProvider.GetValue(modelName);
 
+		logger.LogDebug("BindModelAsync(bindingContext={BindingContext}): valueProviderResult → {ValueProviderResult}", bindingContext, valueProviderResult);
         if (valueProviderResult == ValueProviderResult.None)
             return Task.CompletedTask;
 
@@ -61,6 +67,7 @@ public partial class InvariantNumberModelBinder : IModelBinder
 
         var value = valueProviderResult.FirstValue;
 
+		logger.LogDebug("BindModelAsync(bindingContext={BindingContext}): value → {Value}", bindingContext, value);
         if (string.IsNullOrEmpty(value))
             return Task.CompletedTask;
 
@@ -88,6 +95,7 @@ public partial class InvariantNumberModelBinder : IModelBinder
 
         bindingContext.Result = ModelBindingResult.Success(model);
 
+		logger.LogDebug("<<< Exiting BindModelAsync(bindingContext={BindingContext})", bindingContext);
         return Task.CompletedTask;
     }
 

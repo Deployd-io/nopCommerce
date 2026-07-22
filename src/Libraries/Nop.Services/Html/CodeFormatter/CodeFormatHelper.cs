@@ -25,6 +25,7 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     protected static string CodeEvaluatorSimple(Match match)
     {
+		logger.LogDebug(">>> Entering CodeEvaluatorSimple(match={Match})", match);
         if (!match.Success)
             return match.Value;
 
@@ -39,6 +40,8 @@ public partial class CodeFormatHelper
 
         var result = match.Value;
         result = Highlight(options, result);
+		logger.LogDebug("CodeEvaluatorSimple(match={Match}): result → {Result}", match, result);
+		logger.LogDebug("<<< Exiting CodeEvaluatorSimple(match={Match})", match);
         return result;
     }
 
@@ -49,7 +52,9 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     protected static string StripHtml(string html)
     {
+		logger.LogDebug(">>> Entering StripHtml(html={Html})", html);
         if (string.IsNullOrEmpty(html))
+		logger.LogDebug("<<< Exiting StripHtml(html={Html})", html);
             return string.Empty;
 
         return _regexHtml.Replace(html, string.Empty);
@@ -141,6 +146,7 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     public static string FormatTextSimple(string text)
     {
+		logger.LogDebug(">>> Entering FormatTextSimple(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
@@ -149,6 +155,8 @@ public partial class CodeFormatHelper
 
         text = _regexCode.Replace(text, CodeEvaluatorSimple);
         text = _regexCode.Replace(text, "$1");
+		logger.LogDebug("FormatTextSimple(text={Text}): text → {Text1}", text, text);
+		logger.LogDebug("<<< Exiting FormatTextSimple(text={Text})", text);
         return text;
     }
 

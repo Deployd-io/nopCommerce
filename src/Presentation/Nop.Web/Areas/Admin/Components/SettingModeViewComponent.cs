@@ -19,7 +19,10 @@ public partial class SettingModeViewComponent : NopViewComponent
 
     public SettingModeViewComponent(ISettingModelFactory settingModelFactory)
     {
+		logger.LogDebug(">>> Entering SettingModeViewComponent(settingModelFactory={SettingModelFactory})", settingModelFactory);
         _settingModelFactory = settingModelFactory;
+		logger.LogDebug("<<< Exiting SettingModeViewComponent(settingModelFactory={SettingModelFactory})", settingModelFactory);
+		logger.LogDebug("SettingModeViewComponent(settingModelFactory={SettingModelFactory}): _settingModelFactory → {_settingModelFactory}", settingModelFactory, _settingModelFactory);
     }
 
     #endregion
@@ -36,9 +39,12 @@ public partial class SettingModeViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string modeName = "settings-advanced-mode")
     {
+		logger.LogDebug(">>> Entering InvokeAsync(modeName={ModeName})", modeName);
         //prepare model
         var model = await _settingModelFactory.PrepareSettingModeModelAsync(modeName);
 
+		logger.LogDebug("InvokeAsync(modeName={ModeName}): model → {Model}", modeName, model);
+		logger.LogDebug("<<< Exiting InvokeAsync(modeName={ModeName})", modeName);
         return View(model);
     }
 

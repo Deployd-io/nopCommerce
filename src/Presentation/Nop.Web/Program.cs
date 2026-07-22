@@ -9,13 +9,16 @@ public partial class Program
 {
     public static async Task Main(string[] args)
     {
+		logger.LogDebug(">>> Entering Main(args={Args})", args);
         var builder = WebApplication.CreateBuilder(args);
 
+		logger.LogDebug("Main(args={Args}): builder → {Builder}", args, builder);
         builder.Configuration.AddJsonFile(NopConfigurationDefaults.AppSettingsFilePath, true, true);
         if (!string.IsNullOrEmpty(builder.Environment?.EnvironmentName))
         {
             var path = string.Format(NopConfigurationDefaults.AppSettingsEnvironmentFilePath, builder.Environment.EnvironmentName);
             builder.Configuration.AddJsonFile(path, true, true);
+			logger.LogDebug("Main(args={Args}): path → {Path}", args, path);
         }
         builder.Configuration.AddEnvironmentVariables();
 
@@ -25,6 +28,7 @@ public partial class Program
         var appSettings = Singleton<AppSettings>.Instance;
         var useAutofac = appSettings.Get<CommonConfig>().UseAutofac;
 
+		logger.LogDebug("Main(args={Args}): useAutofac → {UseAutofac}", args, useAutofac);
         if (useAutofac)
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
         else
@@ -33,6 +37,8 @@ public partial class Program
                 //we don't validate the scopes, since at the app start and the initial configuration we need 
                 //to resolve some services (registered as "scoped") through the root container
                 options.ValidateScopes = false;
+				logger.LogDebug("Main(args={Args}): options.ValidateScopes → {Arg1}", args, options.ValidateScopes);
+				logger.LogDebug("Main(args={Args}): options.ValidateOnBuild → {Arg1}", args, options.ValidateOnBuild);
                 options.ValidateOnBuild = true;
             });
 
@@ -41,10 +47,12 @@ public partial class Program
 
         var app = builder.Build();
 
+		logger.LogDebug("Main(args={Args}): app → {App}", args, app);
         //configure the application HTTP request pipeline
         app.ConfigureRequestPipeline();
         await app.PublishAppStartedEventAsync();
 
         await app.RunAsync();
+		logger.LogDebug("<<< Exiting Main(args={Args})", args);
     }
 }

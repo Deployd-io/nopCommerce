@@ -13,12 +13,16 @@ public partial class UpdateOrderParameters
 
     public UpdateOrderParameters(Order updatedOrder, OrderItem updatedOrderItem)
     {
+		logger.LogDebug(">>> Entering UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem})", updatedOrder, updatedOrderItem);
         ArgumentNullException.ThrowIfNull(updatedOrder);
 
         ArgumentNullException.ThrowIfNull(updatedOrderItem);
 
         UpdatedOrder = updatedOrder;
+		logger.LogDebug("UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem}): UpdatedOrder → {UpdatedOrder1}", updatedOrder, updatedOrderItem, UpdatedOrder);
         UpdatedOrderItem = updatedOrderItem;
+		logger.LogDebug("<<< Exiting UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem})", updatedOrder, updatedOrderItem);
+		logger.LogDebug("UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem}): UpdatedOrderItem → {UpdatedOrderItem1}", updatedOrder, updatedOrderItem, UpdatedOrderItem);
     }
 
     #endregion

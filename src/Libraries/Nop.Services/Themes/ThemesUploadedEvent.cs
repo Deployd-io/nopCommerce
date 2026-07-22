@@ -13,7 +13,10 @@ public partial class ThemesUploadedEvent
     /// <param name="uploadedThemes">Uploaded themes</param>
     public ThemesUploadedEvent(IList<ThemeDescriptor> uploadedThemes)
     {
+		logger.LogDebug(">>> Entering ThemesUploadedEvent(uploadedThemes={UploadedThemes})", uploadedThemes);
         UploadedThemes = uploadedThemes;
+		logger.LogDebug("<<< Exiting ThemesUploadedEvent(uploadedThemes={UploadedThemes})", uploadedThemes);
+		logger.LogDebug("ThemesUploadedEvent(uploadedThemes={UploadedThemes}): UploadedThemes → {UploadedThemes1}", uploadedThemes, UploadedThemes);
     }
 
     #endregion

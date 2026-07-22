@@ -11,7 +11,10 @@ public partial class ClearShoppingCartEvent
     /// <param name="cart">Shopping cart</param>
     public ClearShoppingCartEvent(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering ClearShoppingCartEvent(cart={Cart})", cart);
         Cart = cart;
+		logger.LogDebug("<<< Exiting ClearShoppingCartEvent(cart={Cart})", cart);
+		logger.LogDebug("ClearShoppingCartEvent(cart={Cart}): Cart → {Cart1}", cart, Cart);
     }
 
     /// <summary>

@@ -16,7 +16,9 @@ public partial class ShippingMethodBuilder : NopEntityBuilder<ShippingMethod>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table.WithColumn(nameof(ShippingMethod.Name)).AsString(400).NotNullable();
+		logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

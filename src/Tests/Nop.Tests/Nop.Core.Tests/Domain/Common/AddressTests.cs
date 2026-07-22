@@ -13,12 +13,16 @@ public class AddressTests : BaseNopTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _addressService = GetService<IAddressService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _addressService → {_addressService}", _addressService);
     }
 
     [Test]
     public void CanCloneAddress()
     {
+		logger.LogDebug(">>> Entering CanCloneAddress()");
         var address = new Address
         {
             Id = 1,
@@ -40,6 +44,7 @@ public class AddressTests : BaseNopTest
 
         var newAddress = _addressService.CloneAddress(address);
         newAddress.Should().NotBeNull();
+		logger.LogDebug("CanCloneAddress(): newAddress → {NewAddress}", newAddress);
         newAddress.Id.Should().Be(0);
         newAddress.FirstName.Should().Be("FirstName 1");
         newAddress.LastName.Should().Be("LastName 1");
@@ -55,11 +60,13 @@ public class AddressTests : BaseNopTest
         newAddress.CreatedOnUtc.Should().Be(new DateTime(2010, 01, 01));
         newAddress.CountryId.Should().Be(3);
         newAddress.StateProvinceId.Should().Be(4);
+		logger.LogDebug("<<< Exiting CanCloneAddress()");
     }
 
     [Test]
     public async Task CanValidateAddressAsync()
     {
+		logger.LogDebug(">>> Entering CanValidateAddressAsync()");
         //Valid address
         var validAddress = new Address
         {
@@ -82,6 +89,7 @@ public class AddressTests : BaseNopTest
 
         var isAddressValid = await _addressService.IsAddressValidAsync(validAddress);
         isAddressValid.Should().BeTrue();
+		logger.LogDebug("CanValidateAddressAsync(): isAddressValid → {IsAddressValid}", isAddressValid);
 
         //InValid address 1 - empty FirstName
         var invalidAddress1 = new Address
@@ -151,5 +159,6 @@ public class AddressTests : BaseNopTest
 
         isAddressValid = await _addressService.IsAddressValidAsync(invalidAddress3);
         isAddressValid.Should().BeFalse();
+		logger.LogDebug("<<< Exiting CanValidateAddressAsync()");
     }
 }

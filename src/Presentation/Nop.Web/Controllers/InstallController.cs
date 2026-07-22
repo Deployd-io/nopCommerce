@@ -127,6 +127,7 @@ public partial class InstallController : Controller
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -146,6 +147,7 @@ public partial class InstallController : Controller
         PrepareLanguageList(model);
         PrepareCountryList(model);
 
+		logger.LogDebug("<<< Exiting Index()");
         return View(model);
     }
 
@@ -335,19 +337,23 @@ public partial class InstallController : Controller
 
     public virtual IActionResult ChangeLanguage(string language)
     {
+		logger.LogDebug(">>> Entering ChangeLanguage(language={Language})", language);
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         _locService.Value.SaveCurrentLanguage(language);
 
         //Reload the page
+		logger.LogDebug("<<< Exiting ChangeLanguage(language={Language})", language);
         return RedirectToAction("Index", "Install");
     }
 
     [HttpPost]
     public virtual IActionResult RestartInstall()
     {
+		logger.LogDebug(">>> Entering RestartInstall()");
         if (DataSettingsManager.IsDatabaseInstalled())
+		logger.LogDebug("<<< Exiting RestartInstall()");
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         return View("Index", new InstallModel { RestartUrl = Url.RouteUrl(NopRouteNames.Standard.INSTALLATION) });
@@ -355,12 +361,14 @@ public partial class InstallController : Controller
 
     public virtual IActionResult RestartApplication()
     {
+		logger.LogDebug(">>> Entering RestartApplication()");
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         //restart application
         _webHelper.Value.RestartAppDomain();
 
+		logger.LogDebug("<<< Exiting RestartApplication()");
         return new EmptyResult();
     }
 

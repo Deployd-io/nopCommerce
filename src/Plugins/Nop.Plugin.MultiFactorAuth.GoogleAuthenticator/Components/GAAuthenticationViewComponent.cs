@@ -20,7 +20,10 @@ public class GAAuthenticationViewComponent : NopViewComponent
 
     public GAAuthenticationViewComponent(AuthenticationModelFactory authenticationModelFactory)
     {
+		logger.LogDebug(">>> Entering GAAuthenticationViewComponent(authenticationModelFactory={AuthenticationModelFactory})", authenticationModelFactory);
         _authenticationModelFactory = authenticationModelFactory;
+		logger.LogDebug("<<< Exiting GAAuthenticationViewComponent(authenticationModelFactory={AuthenticationModelFactory})", authenticationModelFactory);
+		logger.LogDebug("GAAuthenticationViewComponent(authenticationModelFactory={AuthenticationModelFactory}): _authenticationModelFactory → {_authenticationModelFactory}", authenticationModelFactory, _authenticationModelFactory);
     }
 
     #endregion
@@ -38,9 +41,12 @@ public class GAAuthenticationViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var model = new AuthModel();
         model = await _authenticationModelFactory.PrepareAuthModel(model);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/MultiFactorAuth.GoogleAuthenticator/Views/Customer/GAAuthentication.cshtml", model);
     }
 

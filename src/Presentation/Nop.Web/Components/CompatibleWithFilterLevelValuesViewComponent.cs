@@ -23,6 +23,7 @@ public partial class CompatibleWithFilterLevelValuesViewComponent : NopViewCompo
 
     public async Task<IViewComponentResult> InvokeAsync(int productId)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(productId={ProductId})", productId);
         if (_filterLevelSettings.FilterLevelEnabled && _filterLevelSettings.DisplayOnProductDetailsPage)
         {
             //get filter level values
@@ -31,9 +32,11 @@ public partial class CompatibleWithFilterLevelValuesViewComponent : NopViewCompo
 
             var model = _filterLevelValueModelFactory.PrepareFilterLevelValueOverviewModel(filterLevelValues);
 
+			logger.LogDebug("InvokeAsync(productId={ProductId}): model → {Model}", productId, model);
             return View(model);
         }
 
+		logger.LogDebug("<<< Exiting InvokeAsync(productId={ProductId})", productId);
         return Content(string.Empty);
     }
 }

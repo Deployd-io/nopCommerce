@@ -25,8 +25,10 @@ public partial class NopMigrationAttribute : MigrationAttribute
     public NopMigrationAttribute(string dateTime, MigrationProcessType targetMigrationProcess = MigrationProcessType.NoMatter) :
         this(new MigrationConfig
         {
+			logger.LogDebug(">>> Entering NopMigrationAttribute(dateTime={DateTime},targetMigrationProcess={TargetMigrationProcess})", dateTime, targetMigrationProcess);
             DateTime = dateTime,
             TargetMigrationProcess = targetMigrationProcess
+			logger.LogDebug("<<< Exiting NopMigrationAttribute(dateTime={DateTime},targetMigrationProcess={TargetMigrationProcess})", dateTime, targetMigrationProcess);
         })
     {
     }
@@ -43,6 +45,7 @@ public partial class NopMigrationAttribute : MigrationAttribute
             DateTime = dateTime,
             Description = description,
             TargetMigrationProcess = targetMigrationProcess
+			logger.LogDebug(">>> Entering NopMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},updateMigrationType={UpdateMigrationType},targetMigrationProcess={TargetMigrationProcess})", dateTime, nopVersion, updateMigrationType, targetMigrationProcess);
         })
     {
     }
@@ -71,7 +74,9 @@ public partial class NopMigrationAttribute : MigrationAttribute
     /// <param name="config">The migration configuration data</param>
     protected NopMigrationAttribute(MigrationConfig config) : base(config.Version, config.Description)
     {
+		logger.LogDebug(">>> Entering NopMigrationAttribute(config={Config})", config);
         _config = config;
+		logger.LogDebug("NopMigrationAttribute(config={Config}): _config → {_config}", config, _config);
     }
 
     #endregion

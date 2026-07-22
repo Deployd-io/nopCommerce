@@ -16,9 +16,11 @@ public partial class ScheduleTaskBuilder : NopEntityBuilder<ScheduleTask>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ScheduleTask.Name)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(ScheduleTask.Type)).AsString(int.MaxValue).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -10,6 +10,7 @@ public partial class GdprConsentValidator : BaseNopValidator<GdprConsentModel>
 {
     public GdprConsentValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering GdprConsentValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Message).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.Gdpr.Consent.Message.Required"));
         RuleFor(x => x.RequiredMessage)
             .NotEmpty()
@@ -17,5 +18,6 @@ public partial class GdprConsentValidator : BaseNopValidator<GdprConsentModel>
             .When(x => x.IsRequired);
 
         SetDatabaseValidationRules<GdprConsent>();
+		logger.LogDebug("<<< Exiting GdprConsentValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -10,9 +10,11 @@ public partial class MessageTemplateValidator : BaseNopValidator<MessageTemplate
 {
     public MessageTemplateValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering MessageTemplateValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Subject).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.MessageTemplates.Fields.Subject.Required"));
         RuleFor(x => x.Body).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.MessageTemplates.Fields.Body.Required"));
 
         SetDatabaseValidationRules<MessageTemplate>();
+		logger.LogDebug("<<< Exiting MessageTemplateValidator(localizationService={LocalizationService})", localizationService);
     }
 }

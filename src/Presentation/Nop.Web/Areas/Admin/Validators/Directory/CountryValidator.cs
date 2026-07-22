@@ -10,6 +10,7 @@ public partial class CountryValidator : BaseNopValidator<CountryModel>
 {
     public CountryValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CountryValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Countries.Fields.Name.Required"));
@@ -30,5 +31,6 @@ public partial class CountryValidator : BaseNopValidator<CountryModel>
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Countries.Fields.ThreeLetterIsoCode.Length"));
 
         SetDatabaseValidationRules<Country>();
+		logger.LogDebug("<<< Exiting CountryValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -14,6 +14,7 @@ public class LonLatUpdateMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Alter.Table(nameof(StorePickupPoint))
             .AlterColumn(nameof(StorePickupPoint.Latitude))
                 .AsDecimal(18, 8)
@@ -23,6 +24,7 @@ public class LonLatUpdateMigration : MigrationBase
             .AlterColumn(nameof(StorePickupPoint.Longitude))
                 .AsDecimal(18, 8)
                 .Nullable();
+				logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -30,7 +32,9 @@ public class LonLatUpdateMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

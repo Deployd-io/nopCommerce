@@ -84,14 +84,17 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareExchangeRateModelsAsync(IList<CurrencyExchangeRateModel> models)
     {
+		logger.LogDebug(">>> Entering PrepareExchangeRateModelsAsync(models={Models})", models);
         ArgumentNullException.ThrowIfNull(models);
 
         //get exchange rates
         var exchangeRates = await _currencyService.GetCurrencyLiveRatesAsync();
 
+		logger.LogDebug("PrepareExchangeRateModelsAsync(models={Models}): exchangeRates → {ExchangeRates}", models, exchangeRates);
         //filter by existing currencies
         var currencies = await _currencyService.GetAllCurrenciesAsync(true);
         exchangeRates = exchangeRates
+			logger.LogDebug("PrepareExchangeRateModelsAsync(models={Models}): currencies → {Currencies}", models, currencies);
             .Where(rate => currencies
                 .Any(currency => currency.CurrencyCode.Equals(rate.CurrencyCode, StringComparison.InvariantCultureIgnoreCase))).ToList();
 
@@ -100,6 +103,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
         {
             models.Add(new CurrencyExchangeRateModel { CurrencyCode = rate.CurrencyCode, Rate = rate.Rate });
         }
+		logger.LogDebug("<<< Exiting PrepareExchangeRateModelsAsync(models={Models})", models);
     }
 
     #endregion
@@ -117,6 +121,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
     /// </returns>
     public virtual async Task<CurrencySearchModel> PrepareCurrencySearchModelAsync(CurrencySearchModel searchModel, bool prepareExchangeRates = false)
     {
+		logger.LogDebug(">>> Entering PrepareCurrencySearchModelAsync(searchModel={SearchModel},prepareExchangeRates={PrepareExchangeRates})", searchModel, prepareExchangeRates);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare exchange rate provider model
@@ -125,6 +130,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCurrencySearchModelAsync(searchModel={SearchModel},prepareExchangeRates={PrepareExchangeRates})", searchModel, prepareExchangeRates);
         return searchModel;
     }
 
@@ -138,11 +144,13 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
     /// </returns>
     public virtual async Task<CurrencyListModel> PrepareCurrencyListModelAsync(CurrencySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCurrencyListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get currencies
         var currencies = (await _currencyService.GetAllCurrenciesAsync(showHidden: true)).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareCurrencyListModelAsync(searchModel={SearchModel}): currencies → {Currencies}", searchModel, currencies);
         //prepare list model
         var model = new CurrencyListModel().PrepareToGrid(searchModel, currencies, () =>
         {
@@ -151,6 +159,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
                 //fill in model values from the entity
                 var currencyModel = currency.ToModel<CurrencyModel>();
 
+				logger.LogDebug("PrepareCurrencyListModelAsync(searchModel={SearchModel}): currencyModel → {CurrencyModel}", searchModel, currencyModel);
                 //fill in additional values (not existing in the entity)
                 currencyModel.IsPrimaryExchangeRateCurrency = currency.Id == _currencySettings.PrimaryExchangeRateCurrencyId;
                 currencyModel.IsPrimaryStoreCurrency = currency.Id == _currencySettings.PrimaryStoreCurrencyId;
@@ -159,6 +168,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCurrencyListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

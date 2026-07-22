@@ -16,7 +16,9 @@ public abstract partial class BaseNopResult
     /// <param name="error">Error</param>
     public virtual void AddError(string error)
     {
+		logger.LogDebug(">>> Entering AddError(error={Error})", error);
         Errors.Add(error);
+		logger.LogDebug("<<< Exiting AddError(error={Error})", error);
     }
 
     /// <summary>

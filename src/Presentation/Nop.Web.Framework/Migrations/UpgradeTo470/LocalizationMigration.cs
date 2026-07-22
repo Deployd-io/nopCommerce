@@ -13,12 +13,14 @@ public class LocalizationMigration : MigrationBase
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
         var (languageId, languages) = this.GetLanguageData();
 
         #region Delete locales
@@ -274,11 +276,14 @@ public class LocalizationMigration : MigrationBase
         }, languageId);
 
         #endregion
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

@@ -13,7 +13,10 @@ public partial class AppStartedEvent
     /// </summary>
     public AppStartedEvent()
     {
+		logger.LogDebug(">>> Entering AppStartedEvent()");
         StartedAtUtc = DateTime.UtcNow;
+		logger.LogDebug("<<< Exiting AppStartedEvent()");
+		logger.LogDebug("AppStartedEvent(): StartedAtUtc → {StartedAtUtc}", StartedAtUtc);
     }
 
     /// <summary>

@@ -19,11 +19,13 @@ public static class TagHelperExtensions
     /// <returns>Matching name</returns>
     public static async Task<string> GetAttributeValueAsync(this TagHelperOutput output, string attributeName)
     {
+	logger.LogDebug(">>> Entering GetAttributeValueAsync(output={Output},attributeName={AttributeName})", output, attributeName);
 
         if (string.IsNullOrEmpty(attributeName) || !output.Attributes.TryGetAttribute(attributeName, out var attr))
             return null;
 
         if (attr.Value is string stringValue)
+		logger.LogDebug("<<< Exiting GetAttributeValueAsync(output={Output},attributeName={AttributeName})", output, attributeName);
             return stringValue;
 
         return attr.Value switch

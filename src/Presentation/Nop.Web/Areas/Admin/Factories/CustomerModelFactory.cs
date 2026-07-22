@@ -507,9 +507,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerSearchModel> PrepareCustomerSearchModelAsync(CustomerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.UsernamesEnabled = _customerSettings.UsernamesEnabled;
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.UsernamesEnabled → {Arg1}", searchModel, searchModel.UsernamesEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.AvatarEnabled → {Arg1}", searchModel, searchModel.AvatarEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.FirstNameEnabled → {Arg1}", searchModel, searchModel.FirstNameEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.LastNameEnabled → {Arg1}", searchModel, searchModel.LastNameEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.DateOfBirthEnabled → {Arg1}", searchModel, searchModel.DateOfBirthEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.CompanyEnabled → {Arg1}", searchModel, searchModel.CompanyEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.PhoneEnabled → {Arg1}", searchModel, searchModel.PhoneEnabled);
+		logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.ZipPostalCodeEnabled → {Arg1}", searchModel, searchModel.ZipPostalCodeEnabled);
         searchModel.AvatarEnabled = _customerSettings.AllowCustomersToUploadAvatars;
         searchModel.FirstNameEnabled = _customerSettings.FirstNameEnabled;
         searchModel.LastNameEnabled = _customerSettings.LastNameEnabled;
@@ -521,9 +530,11 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         //search registered customers by default
         var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
         if (registeredRole != null)
+			logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): registeredRole → {RegisteredRole}", searchModel, registeredRole);
             searchModel.SelectedCustomerRoleIds.Add(registeredRole.Id);
 
         searchModel.AvailableActiveValues = new List<SelectListItem> {
+			logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.AvailableActiveValues → {Arg1}", searchModel, searchModel.AvailableActiveValues);
             new(await _localizationService.GetResourceAsync("Admin.Common.All"), string.Empty),
             new(await _localizationService.GetResourceAsync("Admin.Common.Yes"), true.ToString(), true),
             new(await _localizationService.GetResourceAsync("Admin.Common.No"), false.ToString())
@@ -532,6 +543,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -545,11 +557,13 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerListModel> PrepareCustomerListModelAsync(CustomerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter customers
         _ = int.TryParse(searchModel.SearchDayOfBirth, out var dayOfBirth);
         _ = int.TryParse(searchModel.SearchMonthOfBirth, out var monthOfBirth);
+		logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): _ → {_}", searchModel, _);
         var createdFromUtc = !searchModel.SearchRegistrationDateFrom.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.SearchRegistrationDateFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var createdToUtc = !searchModel.SearchRegistrationDateTo.HasValue ? null
@@ -566,12 +580,15 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 var customerRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
                 searchModel.SelectedCustomerRoleIds = customerRoles
+					logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerRoles → {CustomerRoles}", searchModel, customerRoles);
+					logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): searchModel.SelectedCustomerRoleIds → {Arg1}", searchModel, searchModel.SelectedCustomerRoleIds);
                     .Where(cr => cr.SystemName != NopCustomerDefaults.GuestsRoleName).Select(cr => cr.Id).ToList();
             }
             else
             {
                 var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
                 if (guestRole != null)
+					logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): guestRole → {GuestRole}", searchModel, guestRole);
                     searchModel.SelectedCustomerRoleIds.Remove(guestRole.Id);
             }
         }
@@ -603,12 +620,16 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 //fill in model values from the entity
                 var customerModel = customer.ToModel<CustomerModel>();
 
+				logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel → {CustomerModel}", searchModel, customerModel);
                 //convert dates to the user time
                 customerModel.Email = (await _customerService.IsRegisteredAsync(customer))
                     ? customer.Email
                     : await _localizationService.GetResourceAsync("Admin.Customers.Guest");
                 customerModel.FullName = await _customerService.GetCustomerFullNameAsync(customer);
                 customerModel.Company = customer.Company;
+				logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.Company → {Arg1}", searchModel, customerModel.Company);
+				logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.Phone → {Arg1}", searchModel, customerModel.Phone);
+				logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.ZipPostalCode → {Arg1}", searchModel, customerModel.ZipPostalCode);
                 customerModel.Phone = customer.Phone;
                 customerModel.ZipPostalCode = customer.ZipPostalCode;
 
@@ -622,6 +643,8 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 {
                     var avatarPictureId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.AvatarPictureIdAttribute);
                     customerModel.AvatarUrl = await _pictureService
+						logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): avatarPictureId → {AvatarPictureId}", searchModel, avatarPictureId);
+						logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.AvatarUrl → {Arg1}", searchModel, customerModel.AvatarUrl);
                         .GetPictureUrlAsync(avatarPictureId, _mediaSettings.AvatarPictureSize, _customerSettings.DefaultAvatarEnabled, defaultPictureType: PictureType.Avatar);
                 }
 
@@ -629,6 +652,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1123,11 +1147,13 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual Task<OnlineCustomerSearchModel> PrepareOnlineCustomerSearchModelAsync(OnlineCustomerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOnlineCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareOnlineCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -1141,11 +1167,13 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<OnlineCustomerListModel> PrepareOnlineCustomerListModelAsync(OnlineCustomerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOnlineCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter customers
         var lastActivityFrom = DateTime.UtcNow.AddMinutes(-_customerSettings.OnlineCustomerMinutes);
 
+		logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): lastActivityFrom → {LastActivityFrom}", searchModel, lastActivityFrom);
         //get online customers
         var customers = await _customerService.GetOnlineCustomersAsync(customerRoleIds: searchModel.SelectedCustomerRoleIds.ToArray(),
             lastActivityFromUtc: lastActivityFrom,
@@ -1159,6 +1187,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 //fill in model values from the entity
                 var customerModel = customer.ToModel<OnlineCustomerModel>();
 
+				logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): customerModel → {CustomerModel}", searchModel, customerModel);
                 //convert dates to the user time
                 customerModel.LastActivityDate = await _dateTimeHelper.ConvertToUserTimeAsync(customer.LastActivityDateUtc, DateTimeKind.Utc);
 
@@ -1167,10 +1196,12 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                     ? customer.Email
                     : await _localizationService.GetResourceAsync("Admin.Customers.Guest");
                 customerModel.LastIpAddress = _customerSettings.StoreIpAddresses
+					logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): customerModel.LastIpAddress → {Arg1}", searchModel, customerModel.LastIpAddress);
                     ? customer.LastIpAddress
                     : await _localizationService.GetResourceAsync("Admin.Customers.OnlineCustomers.Fields.IPAddress.Disabled");
                 customerModel.Location = _geoLookupService.LookupCountryName(customer.LastIpAddress);
                 customerModel.LastVisitedPage = _customerSettings.StoreLastVisitedPage
+					logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): customerModel.LastVisitedPage → {Arg1}", searchModel, customerModel.LastVisitedPage);
                     ? await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastVisitedPageAttribute)
                     : await _localizationService.GetResourceAsync("Admin.Customers.OnlineCustomers.Fields.LastVisitedPage.Disabled");
 
@@ -1178,6 +1209,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareOnlineCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1191,6 +1223,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<GdprLogSearchModel> PrepareGdprLogSearchModelAsync(GdprLogSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareGdprLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare request types
@@ -1199,6 +1232,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareGdprLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1212,14 +1246,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<GdprLogListModel> PrepareGdprLogListModelAsync(GdprLogSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareGdprLogListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var customerId = 0;
         var customerInfo = "";
+		logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): customerId → {CustomerId}", searchModel, customerId);
+		logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): customerInfo → {CustomerInfo}", searchModel, customerInfo);
         if (!string.IsNullOrEmpty(searchModel.SearchEmail))
         {
             var customer = await _customerService.GetCustomerByEmailAsync(searchModel.SearchEmail);
             if (customer != null)
+				logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): customer → {Customer}", searchModel, customer);
                 customerId = customer.Id;
             else
             {
@@ -1244,6 +1282,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
 
                 var requestModel = log.ToModel<GdprLogModel>();
 
+				logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): requestModel → {RequestModel}", searchModel, requestModel);
                 //fill in additional values (not existing in the entity)
                 requestModel.CustomerInfo = customer != null && !customer.Deleted && !string.IsNullOrEmpty(customer.Email)
                     ? customer.Email
@@ -1256,6 +1295,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareGdprLogListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

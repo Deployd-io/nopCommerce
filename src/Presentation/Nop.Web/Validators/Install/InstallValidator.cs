@@ -10,6 +10,7 @@ public partial class InstallValidator : BaseNopValidator<InstallModel>
 {
     public InstallValidator(IInstallationLocalizationService locService)
     {
+		logger.LogDebug(">>> Entering InstallValidator(locService={LocService})", locService);
         RuleFor(x => x.AdminEmail).NotEmpty().WithMessage(locService.GetResource("AdminEmailRequired"));
         RuleFor(x => x.AdminEmail)
             .IsEmailAddress();
@@ -39,5 +40,6 @@ public partial class InstallValidator : BaseNopValidator<InstallModel>
             .NotEmpty()
             .When(x => x.UseCustomCollation)
             .WithMessage(locService.GetResource("CollationRequired"));
+			logger.LogDebug("<<< Exiting InstallValidator(locService={LocService})", locService);
     }
 }

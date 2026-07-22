@@ -94,6 +94,7 @@ public class BrevoController : BasePluginController
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task PrepareModelAsync(ConfigurationModel model)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load settings for active store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
@@ -215,6 +216,7 @@ public class BrevoController : BasePluginController
                 _settingService.ClearCache();
             }
         }
+		logger.LogDebug("<<< Exiting PrepareModelAsync(model={Model})", model);
     }
 
     #endregion
@@ -225,9 +227,12 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel();
         await PrepareModelAsync(model);
+		logger.LogDebug("Configure(): model → {Model}", model);
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.Brevo/Views/Configure.cshtml", model);
     }
 
@@ -311,9 +316,14 @@ public class BrevoController : BasePluginController
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetSynchronizationInfo()
     {
+		logger.LogDebug(">>> Entering GetSynchronizationInfo()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var res = await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(BrevoDefaults.SyncKeyCache), () => string.Empty);
         await _staticCacheManager.RemoveAsync(BrevoDefaults.SyncKeyCache);
+		logger.LogDebug("GetSynchronizationInfo(): res → {Res}", res);
 
+		logger.LogInformation("GetSynchronizationInfo(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetSynchronizationInfo()");
         return res;
     }
 
@@ -381,8 +391,11 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> MessageList(BrevoMessageTemplateSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering MessageList(searchModel={SearchModel})", searchModel);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var messageTemplates = (await _messageTemplateService.GetAllMessageTemplatesAsync(storeId)).ToPagedList(searchModel);
+		logger.LogDebug("MessageList(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
+		logger.LogDebug("MessageList(searchModel={SearchModel}): messageTemplates → {MessageTemplates}", searchModel, messageTemplates);
 
         //prepare list model
         var model = await new BrevoMessageTemplateListModel().PrepareToGridAsync(searchModel, messageTemplates, () =>
@@ -396,6 +409,7 @@ public class BrevoController : BasePluginController
                                                    || (await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate)).Contains(store.Id))
                         .AggregateAsync(string.Empty, (current, next) => $"{current}, {next.Name}"))
                     .Trim(',');
+						logger.LogDebug("MessageList(searchModel={SearchModel}): templateId → {TemplateId}", searchModel, templateId);
 
                 return new BrevoMessageTemplateModel
                 {
@@ -411,6 +425,7 @@ public class BrevoController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting MessageList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -486,11 +501,14 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> SMSList(SmsSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering SMSList(searchModel={SearchModel})", searchModel);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
 
+		logger.LogDebug("SMSList(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
         //get message templates which are sending in SMS
         var allMessageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(storeId);
         var messageTemplates = await allMessageTemplates
+		logger.LogDebug("SMSList(searchModel={SearchModel}): allMessageTemplates → {AllMessageTemplates}", searchModel, allMessageTemplates);
 
             .WhereAwait(async messageTemplate => await _genericAttributeService.GetAttributeAsync<bool>(messageTemplate, BrevoDefaults.UseSmsAttribute))
             .ToPagedListAsync(searchModel);
@@ -502,6 +520,7 @@ public class BrevoController : BasePluginController
             {
                 var phoneTypeID = await _genericAttributeService.GetAttributeAsync<int>(messageTemplate, BrevoDefaults.PhoneTypeAttribute);
 
+				logger.LogDebug("SMSList(searchModel={SearchModel}): phoneTypeID → {PhoneTypeID}", searchModel, phoneTypeID);
                 var smsModel = new SmsModel
                 {
                     Id = messageTemplate.Id,
@@ -518,6 +537,8 @@ public class BrevoController : BasePluginController
                     {
                         var storeIds = await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate);
                         var storeNames = (await _storeService.GetAllStoresAsync()).Where(store => storeIds.Contains(store.Id)).Select(store => store.Name);
+						logger.LogDebug("SMSList(searchModel={SearchModel}): storeIds → {StoreIds}", searchModel, storeIds);
+						logger.LogDebug("SMSList(searchModel={SearchModel}): storeNames → {StoreNames}", searchModel, storeNames);
 
                         smsModel.Name = $"{smsModel.Name} ({string.Join(',', storeNames)})";
                     }
@@ -544,6 +565,7 @@ public class BrevoController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting SMSList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

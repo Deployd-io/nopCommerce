@@ -10,8 +10,10 @@ public partial class ShippingMethodValidator : BaseNopValidator<ShippingMethodMo
 {
     public ShippingMethodValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ShippingMethodValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Shipping.Methods.Fields.Name.Required"));
 
         SetDatabaseValidationRules<ShippingMethod>();
+		logger.LogDebug("<<< Exiting ShippingMethodValidator(localizationService={LocalizationService})", localizationService);
     }
 }

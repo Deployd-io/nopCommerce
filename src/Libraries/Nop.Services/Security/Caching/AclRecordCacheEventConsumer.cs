@@ -15,7 +15,9 @@ public partial class AclRecordCacheEventConsumer : CacheEventConsumer<AclRecord>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(AclRecord entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopSecurityDefaults.AclRecordCacheKey, entity.EntityId, entity.EntityName);
         await RemoveAsync(NopSecurityDefaults.EntityAclRecordExistsCacheKey, entity.EntityName);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

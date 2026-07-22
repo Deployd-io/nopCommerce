@@ -19,7 +19,10 @@ public partial class NopCommerceNewsViewComponent : NopViewComponent
 
     public NopCommerceNewsViewComponent(IHomeModelFactory homeModelFactory)
     {
+		logger.LogDebug(">>> Entering NopCommerceNewsViewComponent(homeModelFactory={HomeModelFactory})", homeModelFactory);
         _homeModelFactory = homeModelFactory;
+		logger.LogDebug("<<< Exiting NopCommerceNewsViewComponent(homeModelFactory={HomeModelFactory})", homeModelFactory);
+		logger.LogDebug("NopCommerceNewsViewComponent(homeModelFactory={HomeModelFactory}): _homeModelFactory → {_homeModelFactory}", homeModelFactory, _homeModelFactory);
     }
 
     #endregion
@@ -35,15 +38,19 @@ public partial class NopCommerceNewsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         try
         {
             //prepare model
             var model = await _homeModelFactory.PrepareNopCommerceNewsModelAsync();
 
+			logger.LogDebug("InvokeAsync(): model → {Model}", model);
             return View(model);
         }
         catch
         {
+			logger.LogError("Exception in InvokeAsync(): {Arg0}", ex.Message);
+			logger.LogDebug("<<< Exiting InvokeAsync()");
             return Content(string.Empty);
         }
     }

@@ -10,12 +10,14 @@ internal class NopLinksDefaultsTests : ServiceTest
 {
     protected static async Task TestUrlsAsync(IList<PropertyInfo> properties)
     {
+		logger.LogDebug(">>> Entering TestUrlsAsync(properties={Properties})", properties);
         //skip external URL validation in automated test environments
         //instead, just validate that the URLs are well-formed
         foreach (var propertyInfo in properties)
         {
             var url = propertyInfo.GetValue(null)?.ToString();
 
+			logger.LogDebug("TestUrlsAsync(properties={Properties}): url → {Url}", properties, url);
             if (string.IsNullOrEmpty(url))
                 continue;
 
@@ -30,27 +32,32 @@ internal class NopLinksDefaultsTests : ServiceTest
             }
         }
         await Task.CompletedTask;
+		logger.LogDebug("<<< Exiting TestUrlsAsync(properties={Properties})", properties);
     }
 
     [Test]
     public async Task TestOfficialSiteLinksAsync()
     {
+		logger.LogDebug(">>> Entering TestOfficialSiteLinksAsync()");
         var prop = typeof(OfficialSite).GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty)
             .Where(p => p.PropertyType == typeof(string)).ToList();
 
         prop.Should().NotBeEmpty();
 
         await TestUrlsAsync(prop);
+		logger.LogDebug("<<< Exiting TestOfficialSiteLinksAsync()");
     }
 
     [Test]
     public async Task TestDocsLinksAsync()
     {
+		logger.LogDebug(">>> Entering TestDocsLinksAsync()");
         var prop = typeof(Docs).GetProperties(BindingFlags.Public | BindingFlags.Static | BindingFlags.GetProperty)
             .Where(p => p.PropertyType == typeof(string)).ToList();
 
         prop.Should().NotBeEmpty();
 
         await TestUrlsAsync(prop);
+		logger.LogDebug("<<< Exiting TestDocsLinksAsync()");
     }
 }

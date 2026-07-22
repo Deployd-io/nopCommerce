@@ -107,6 +107,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
             }, returnUrl);
 
         //or the user try to log in as himself. bit weird
+		logger.LogDebug("<<< Exiting ErrorAuthenticationAsync(errors={Errors},returnUrl={ReturnUrl})", errors, returnUrl);
         return SuccessfulAuthentication(returnUrl);
     }
 
@@ -149,6 +150,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     protected virtual async Task<IActionResult> RegisterNewUserAsync(ExternalAuthenticationParameters parameters, string returnUrl)
     {
+		logger.LogDebug(">>> Entering RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl})", parameters, returnUrl);
         //check whether the specified email has been already registered
         if (await _customerService.GetCustomerByEmailAsync(parameters.Email) != null)
         {
@@ -164,6 +166,8 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
         //create registration request
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): customer → {Customer}", parameters, returnUrl, customer);
+		logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): store → {Store}", parameters, returnUrl, store);
         var registrationRequest = new CustomerRegistrationRequest(customer,
             parameters.Email, parameters.Email,
             CommonHelper.GenerateRandomDigitCode(20),
@@ -174,6 +178,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
         //whether registration request has been completed successfully
         var registrationResult = await _customerRegistrationService.RegisterCustomerAsync(registrationRequest);
         if (!registrationResult.Success)
+			logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): registrationResult → {RegistrationResult}", parameters, returnUrl, registrationResult);
             return await ErrorAuthenticationAsync(registrationResult.Errors, returnUrl);
 
         //allow to save other customer values by consuming this event
@@ -192,6 +197,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
         //authenticate
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
         if (registrationIsApproved)
+		logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): currentLanguage → {CurrentLanguage}", parameters, returnUrl, currentLanguage);
         {
             await _workflowMessageService.SendCustomerWelcomeMessageAsync(customer, currentLanguage.Id);
 
@@ -213,6 +219,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
 
         //registration is succeeded but isn't approved by admin
         if (_customerSettings.UserRegistrationType == UserRegistrationType.AdminApproval)
+		logger.LogDebug("<<< Exiting RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl})", parameters, returnUrl);
             return new RedirectToRouteResult(NopRouteNames.Standard.REGISTER_RESULT, new { resultId = (int)UserRegistrationType.AdminApproval, returnUrl });
 
         return await ErrorAuthenticationAsync(new[] { "Error on registration" }, returnUrl);
@@ -247,10 +254,13 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>Result of an authentication</returns>
     protected virtual IActionResult SuccessfulAuthentication(string returnUrl)
     {
+		logger.LogDebug(">>> Entering SuccessfulAuthentication(returnUrl={ReturnUrl})", returnUrl);
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
+		logger.LogDebug("SuccessfulAuthentication(returnUrl={ReturnUrl}): urlHelper → {UrlHelper}", returnUrl, urlHelper);
         //redirect to the return URL if it's specified
         if (!string.IsNullOrEmpty(returnUrl) && urlHelper.IsLocalUrl(returnUrl))
+		logger.LogDebug("<<< Exiting SuccessfulAuthentication(returnUrl={ReturnUrl})", returnUrl);
             return new RedirectResult(returnUrl);
 
         return new RedirectToRouteResult(NopRouteNames.General.HOMEPAGE, null);
@@ -273,19 +283,24 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<IActionResult> AuthenticateAsync(ExternalAuthenticationParameters parameters, string returnUrl = null)
     {
+		logger.LogDebug(">>> Entering AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl})", parameters, returnUrl);
         ArgumentNullException.ThrowIfNull(parameters);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): customer → {Customer}", parameters, returnUrl, customer);
+		logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): store → {Store}", parameters, returnUrl, store);
         if (!await _authenticationPluginManager.IsPluginActiveAsync(parameters.ProviderSystemName, customer, store.Id))
             return await ErrorAuthenticationAsync(new[] { "External authentication method cannot be loaded" }, returnUrl);
 
         //get current logged-in user
         var currentLoggedInUser = await _customerService.IsRegisteredAsync(customer) ? customer : null;
 
+		logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): currentLoggedInUser → {CurrentLoggedInUser}", parameters, returnUrl, currentLoggedInUser);
         //authenticate associated user if already exists
         var associatedUser = await GetUserByExternalAuthenticationParametersAsync(parameters);
         if (associatedUser != null)
+			logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): associatedUser → {AssociatedUser}", parameters, returnUrl, associatedUser);
             return await AuthenticateExistingUserAsync(associatedUser, currentLoggedInUser, returnUrl);
 
         //or associate and authenticate new user
@@ -304,6 +319,8 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<ExternalAuthenticationRecord> GetExternalAuthenticationRecordByIdAsync(int externalAuthenticationRecordId)
     {
+		logger.LogDebug(">>> Entering GetExternalAuthenticationRecordByIdAsync(externalAuthenticationRecordId={ExternalAuthenticationRecordId})", externalAuthenticationRecordId);
+		logger.LogDebug("<<< Exiting GetExternalAuthenticationRecordByIdAsync(externalAuthenticationRecordId={ExternalAuthenticationRecordId})", externalAuthenticationRecordId);
         return await _externalAuthenticationRecordRepository.GetByIdAsync(externalAuthenticationRecordId, cache => default, useShortTermCache: true);
     }
 
@@ -317,6 +334,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<IList<ExternalAuthenticationRecord>> GetCustomerExternalAuthenticationRecordsAsync(Customer customer)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var associationRecords = _externalAuthenticationRecordRepository.Table.Where(ear => ear.CustomerId == customer.Id);
@@ -331,6 +349,9 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteExternalAuthenticationRecordAsync(ExternalAuthenticationRecord externalAuthenticationRecord)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(externalAuthenticationRecord);
 
         await _externalAuthenticationRecordRepository.DeleteAsync(externalAuthenticationRecord, false);
@@ -346,11 +367,15 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<ExternalAuthenticationRecord> GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(ExternalAuthenticationParameters parameters)
     {
+		logger.LogDebug(">>> Entering GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(parameters);
 
         var associationRecord = await _externalAuthenticationRecordRepository.Table.FirstOrDefaultAsync(record =>
             record.ExternalIdentifier.Equals(parameters.ExternalIdentifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
+			logger.LogInformation("GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(parameters)={Parameters}: database query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
         return associationRecord;
     }
 
@@ -362,6 +387,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AssociateExternalAccountWithUserAsync(Customer customer, ExternalAuthenticationParameters parameters)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var externalAuthenticationRecord = new ExternalAuthenticationRecord
@@ -387,11 +413,15 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<Customer> GetUserByExternalAuthenticationParametersAsync(ExternalAuthenticationParameters parameters)
     {
+		logger.LogDebug(">>> Entering GetUserByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(parameters);
 
         var associationRecord = await _externalAuthenticationRecordRepository.Table.FirstOrDefaultAsync(record =>
             record.ExternalIdentifier.Equals(parameters.ExternalIdentifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
+			logger.LogInformation("GetUserByExternalAuthenticationParametersAsync(parameters)={Parameters}: database query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
         if (associationRecord == null)
+		logger.LogDebug("<<< Exiting GetUserByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
             return null;
 
         return await _customerService.GetCustomerByIdAsync(associationRecord.CustomerId);
@@ -404,13 +434,20 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveAssociationAsync(ExternalAuthenticationParameters parameters)
     {
+		logger.LogDebug(">>> Entering RemoveAssociationAsync(parameters={Parameters})", parameters);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(parameters);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var associationRecord = await _externalAuthenticationRecordRepository.Table.FirstOrDefaultAsync(record =>
             record.ExternalIdentifier.Equals(parameters.ExternalIdentifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
+			logger.LogInformation("RemoveAssociationAsync(parameters)={Parameters}: database query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
 
         if (associationRecord != null)
             await _externalAuthenticationRecordRepository.DeleteAsync(associationRecord, false);
+			logger.LogDebug("<<< Exiting RemoveAssociationAsync(parameters={Parameters})", parameters);
+			logger.LogInformation("RemoveAssociationAsync(parameters)={Parameters}: external service call took {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
+			logger.LogInformation("RemoveAssociationAsync(parameters)={Parameters}: delete query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
     }
 
 

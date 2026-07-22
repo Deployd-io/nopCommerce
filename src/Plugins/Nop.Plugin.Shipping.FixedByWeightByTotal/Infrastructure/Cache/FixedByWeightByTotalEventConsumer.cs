@@ -20,7 +20,10 @@ public class FixedByWeightByTotalEventConsumer : IConsumer<EntityDeletedEvent<Sh
 
     public FixedByWeightByTotalEventConsumer(ISettingService settingService)
     {
+		logger.LogDebug(">>> Entering FixedByWeightByTotalEventConsumer(settingService={SettingService})", settingService);
         _settingService = settingService;
+		logger.LogDebug("<<< Exiting FixedByWeightByTotalEventConsumer(settingService={SettingService})", settingService);
+		logger.LogDebug("FixedByWeightByTotalEventConsumer(settingService={SettingService}): _settingService → {_settingService}", settingService, _settingService);
     }
 
     #endregion
@@ -34,6 +37,7 @@ public class FixedByWeightByTotalEventConsumer : IConsumer<EntityDeletedEvent<Sh
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(EntityDeletedEvent<ShippingMethod> eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         var shippingMethod = eventMessage?.Entity;
         if (shippingMethod == null)
             return;
@@ -41,7 +45,9 @@ public class FixedByWeightByTotalEventConsumer : IConsumer<EntityDeletedEvent<Sh
         //delete saved fixed rate if exists
         var setting = await _settingService.GetSettingAsync(string.Format(FixedByWeightByTotalDefaults.FIXED_RATE_SETTINGS_KEY, shippingMethod.Id));
         if (setting != null)
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): setting → {Setting}", eventMessage, setting);
             await _settingService.DeleteSettingAsync(setting);
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

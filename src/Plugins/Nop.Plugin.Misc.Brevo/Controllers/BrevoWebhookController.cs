@@ -15,7 +15,10 @@ public class BrevoWebhookController : Controller
 
     public BrevoWebhookController(BrevoManager brevoEmailManager)
     {
+		logger.LogDebug(">>> Entering BrevoWebhookController(brevoEmailManager={BrevoEmailManager})", brevoEmailManager);
         _brevoEmailManager = brevoEmailManager;
+		logger.LogDebug("<<< Exiting BrevoWebhookController(brevoEmailManager={BrevoEmailManager})", brevoEmailManager);
+		logger.LogDebug("BrevoWebhookController(brevoEmailManager={BrevoEmailManager}): _brevoEmailManager → {_brevoEmailManager}", brevoEmailManager, _brevoEmailManager);
     }
 
     #endregion
@@ -25,7 +28,9 @@ public class BrevoWebhookController : Controller
     [HttpPost]
     public async Task<IActionResult> UnsubscribeWebHook()
     {
+		logger.LogDebug(">>> Entering UnsubscribeWebHook()");
         await _brevoEmailManager.HandleWebhookAsync(Request);
+		logger.LogDebug("<<< Exiting UnsubscribeWebHook()");
         return Ok();
     }
 

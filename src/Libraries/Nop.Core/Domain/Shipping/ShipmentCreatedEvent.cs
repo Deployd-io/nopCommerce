@@ -9,7 +9,10 @@ public partial class ShipmentCreatedEvent
 
     public ShipmentCreatedEvent(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering ShipmentCreatedEvent(shipment={Shipment})", shipment);
         Shipment = shipment;
+		logger.LogDebug("<<< Exiting ShipmentCreatedEvent(shipment={Shipment})", shipment);
+		logger.LogDebug("ShipmentCreatedEvent(shipment={Shipment}): Shipment → {Shipment1}", shipment, Shipment);
     }
 
     #endregion

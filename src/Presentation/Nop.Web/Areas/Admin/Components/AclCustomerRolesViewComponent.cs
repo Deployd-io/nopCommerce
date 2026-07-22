@@ -13,7 +13,9 @@ public partial class AclCustomerRolesViewComponent : NopViewComponent
 
     public IViewComponentResult Invoke(object additionalData)
     {
+		logger.LogDebug(">>> Entering Invoke(additionalData={AdditionalData})", additionalData);
         if (additionalData is not IAclSupportedModel model)
+		logger.LogDebug("<<< Exiting Invoke(additionalData={AdditionalData})", additionalData);
             return Content(string.Empty);
         
         return View(model);

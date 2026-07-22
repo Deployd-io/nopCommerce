@@ -12,7 +12,10 @@ public partial class TaxTotalRequest
 
     public TaxTotalRequest()
     {
+		logger.LogDebug(">>> Entering TaxTotalRequest()");
         ShoppingCart = new List<ShoppingCartItem>();
+		logger.LogDebug("<<< Exiting TaxTotalRequest()");
+		logger.LogDebug("TaxTotalRequest(): ShoppingCart → {ShoppingCart}", ShoppingCart);
     }
 
     #endregion

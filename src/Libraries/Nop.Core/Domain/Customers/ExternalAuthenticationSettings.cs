@@ -12,7 +12,10 @@ public partial class ExternalAuthenticationSettings : ISettings
     /// </summary>
     public ExternalAuthenticationSettings()
     {
+		logger.LogDebug(">>> Entering ExternalAuthenticationSettings()");
         ActiveAuthenticationMethodSystemNames = new List<string>();
+		logger.LogDebug("<<< Exiting ExternalAuthenticationSettings()");
+		logger.LogDebug("ExternalAuthenticationSettings(): ActiveAuthenticationMethodSystemNames → {ActiveAuthenticationMethodSystemNames}", ActiveAuthenticationMethodSystemNames);
     }
 
     /// <summary>

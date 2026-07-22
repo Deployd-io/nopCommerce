@@ -12,8 +12,12 @@ public partial class OrderRefundedEvent
     /// <param name="amount">Amount</param>
     public OrderRefundedEvent(Order order, decimal amount)
     {
+		logger.LogDebug(">>> Entering OrderRefundedEvent(order={Order},amount={Amount})", order, amount);
         Order = order;
         Amount = amount;
+		logger.LogDebug("<<< Exiting OrderRefundedEvent(order={Order},amount={Amount})", order, amount);
+		logger.LogWarning("OrderRefundedEvent(order={Order},amount={Amount}): Amount → {Amount1}", order, amount, Amount);
+		logger.LogDebug("OrderRefundedEvent(order={Order},amount={Amount}): Order → {Order1}", order, amount, Order);
     }
 
     /// <summary>

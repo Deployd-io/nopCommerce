@@ -16,8 +16,12 @@ public partial class PageRenderingEvent
     /// <param name="overriddenRouteName">Overridden route name</param>
     public PageRenderingEvent(INopHtmlHelper helper, string overriddenRouteName = null)
     {
+		logger.LogDebug(">>> Entering PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName})", helper, overriddenRouteName);
         Helper = helper;
         OverriddenRouteName = overriddenRouteName;
+		logger.LogDebug("<<< Exiting PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName})", helper, overriddenRouteName);
+		logger.LogDebug("PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName}): OverriddenRouteName → {OverriddenRouteName1}", helper, overriddenRouteName, OverriddenRouteName);
+		logger.LogDebug("PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName}): Helper → {Helper1}", helper, overriddenRouteName, Helper);
     }
 
     #endregion
@@ -45,9 +49,11 @@ public partial class PageRenderingEvent
     /// <returns>Route name</returns>
     public string GetRouteName(bool handleDefaultRoutes = false)
     {
+		logger.LogDebug(">>> Entering GetRouteName(handleDefaultRoutes={HandleDefaultRoutes})", handleDefaultRoutes);
         //if an overridden route name is specified, then use it
         //we use it to specify a custom route name when some custom page uses a custom route. But we still need this event to be invoked
         if (!string.IsNullOrEmpty(OverriddenRouteName))
+		logger.LogDebug("<<< Exiting GetRouteName(handleDefaultRoutes={HandleDefaultRoutes})", handleDefaultRoutes);
             return OverriddenRouteName;
 
         //or try to get a registered endpoint route name

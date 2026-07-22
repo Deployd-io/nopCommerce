@@ -19,7 +19,10 @@ public partial class EmailAccountService : IEmailAccountService
 
     public EmailAccountService(IRepository<EmailAccount> emailAccountRepository)
     {
+		logger.LogDebug(">>> Entering EmailAccountService(emailAccountRepository={EmailAccountRepository})", emailAccountRepository);
         _emailAccountRepository = emailAccountRepository;
+		logger.LogDebug("<<< Exiting EmailAccountService(emailAccountRepository={EmailAccountRepository})", emailAccountRepository);
+		logger.LogDebug("EmailAccountService(emailAccountRepository={EmailAccountRepository}): _emailAccountRepository → {_emailAccountRepository}", emailAccountRepository, _emailAccountRepository);
     }
 
     #endregion
@@ -33,6 +36,8 @@ public partial class EmailAccountService : IEmailAccountService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertEmailAccountAsync(EmailAccount emailAccount)
     {
+		logger.LogDebug(">>> Entering InsertEmailAccountAsync(emailAccount={EmailAccount})", emailAccount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         emailAccount.Email = CommonHelper.EnsureNotNull(emailAccount.Email);
@@ -54,6 +59,8 @@ public partial class EmailAccountService : IEmailAccountService
         emailAccount.Password = CommonHelper.EnsureMaximumLength(emailAccount.Password, 255);
 
         await _emailAccountRepository.InsertAsync(emailAccount);
+		logger.LogDebug("<<< Exiting InsertEmailAccountAsync(emailAccount={EmailAccount})", emailAccount);
+		logger.LogInformation("InsertEmailAccountAsync(emailAccount)={EmailAccount}: save query executed in {Arg1} ms", emailAccount, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -63,6 +70,8 @@ public partial class EmailAccountService : IEmailAccountService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateEmailAccountAsync(EmailAccount emailAccount)
     {
+		logger.LogDebug(">>> Entering UpdateEmailAccountAsync(emailAccount={EmailAccount})", emailAccount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         emailAccount.Email = CommonHelper.EnsureNotNull(emailAccount.Email);
@@ -84,6 +93,8 @@ public partial class EmailAccountService : IEmailAccountService
         emailAccount.Password = CommonHelper.EnsureMaximumLength(emailAccount.Password, 255);
 
         await _emailAccountRepository.UpdateAsync(emailAccount);
+		logger.LogDebug("<<< Exiting UpdateEmailAccountAsync(emailAccount={EmailAccount})", emailAccount);
+		logger.LogInformation("UpdateEmailAccountAsync(emailAccount)={EmailAccount}: update query executed in {Arg1} ms", emailAccount, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -93,12 +104,17 @@ public partial class EmailAccountService : IEmailAccountService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteEmailAccountAsync(EmailAccount emailAccount)
     {
+		logger.LogDebug(">>> Entering DeleteEmailAccountAsync(emailAccount={EmailAccount})", emailAccount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         if ((await GetAllEmailAccountsAsync()).Count == 1)
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             throw new NopException("You cannot delete this email account. At least one account is required.");
 
         await _emailAccountRepository.DeleteAsync(emailAccount);
+		logger.LogInformation("DeleteEmailAccountAsync(emailAccount)={EmailAccount}: external service call took {Arg1} ms", emailAccount, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("DeleteEmailAccountAsync(emailAccount)={EmailAccount}: delete query executed in {Arg1} ms", emailAccount, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -111,6 +127,8 @@ public partial class EmailAccountService : IEmailAccountService
     /// </returns>
     public virtual async Task<EmailAccount> GetEmailAccountByIdAsync(int emailAccountId)
     {
+		logger.LogDebug(">>> Entering GetEmailAccountByIdAsync(emailAccountId={EmailAccountId})", emailAccountId);
+		logger.LogDebug("<<< Exiting GetEmailAccountByIdAsync(emailAccountId={EmailAccountId})", emailAccountId);
         return await _emailAccountRepository.GetByIdAsync(emailAccountId, cache => default);
     }
 
@@ -123,13 +141,17 @@ public partial class EmailAccountService : IEmailAccountService
     /// </returns>
     public virtual async Task<IList<EmailAccount>> GetAllEmailAccountsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllEmailAccountsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var emailAccounts = await _emailAccountRepository.GetAllAsync(query =>
         {
             return from ea in query
                 orderby ea.Id
                 select ea;
+				logger.LogInformation("GetAllEmailAccountsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		logger.LogDebug("<<< Exiting GetAllEmailAccountsAsync()");
         return emailAccounts;
     }
 

@@ -39,6 +39,8 @@ public partial class AuthenticationPluginManager : PluginManager<IExternalAuthen
     /// </returns>
     public virtual async Task<IList<IExternalAuthenticationMethod>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadActivePluginsAsync(_externalAuthenticationSettings.ActiveAuthenticationMethodSystemNames, customer, storeId);
     }
 
@@ -64,7 +66,10 @@ public partial class AuthenticationPluginManager : PluginManager<IExternalAuthen
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var authenticationMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): authenticationMethod → {AuthenticationMethod}", systemName, customer, storeId, authenticationMethod);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(authenticationMethod);
     }
 

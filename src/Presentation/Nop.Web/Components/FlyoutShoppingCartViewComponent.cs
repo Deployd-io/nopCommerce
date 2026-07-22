@@ -23,6 +23,7 @@ public partial class FlyoutShoppingCartViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (!_shoppingCartSettings.MiniShoppingCartEnabled)
             return Content("");
 
@@ -30,6 +31,8 @@ public partial class FlyoutShoppingCartViewComponent : NopViewComponent
             return Content("");
 
         var model = await _shoppingCartModelFactory.PrepareMiniShoppingCartModelAsync();
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 }

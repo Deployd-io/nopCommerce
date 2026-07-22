@@ -29,7 +29,10 @@ public partial class NopTabsTagHelper : TagHelper
 
     public NopTabsTagHelper(IHtmlHelper htmlHelper)
     {
+		logger.LogDebug(">>> Entering NopTabsTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
         _htmlHelper = htmlHelper;
+		logger.LogDebug("<<< Exiting NopTabsTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
+		logger.LogDebug("NopTabsTagHelper(htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", htmlHelper, _htmlHelper);
     }
 
     #endregion
@@ -44,6 +47,7 @@ public partial class NopTabsTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -55,11 +59,13 @@ public partial class NopTabsTagHelper : TagHelper
         //create context item
         var tabContext = new List<NopTabContextItem>();
         context.Items.Add(typeof(NopTabsTagHelper), tabContext);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabContext → {TabContext}", context, output, tabContext);
 
         //get tab name which should be selected
         //first try get tab name from query
         var tabNameToSelect = ViewContext.HttpContext.Request.Query["tabNameToSelect"];
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabNameToSelect → {TabNameToSelect}", context, output, tabNameToSelect);
         //then from attribute
         if (!string.IsNullOrEmpty(TabNameToSelect))
             tabNameToSelect = TabNameToSelect;
@@ -74,9 +80,11 @@ public partial class NopTabsTagHelper : TagHelper
         //tabs title
         var tabsTitlediv = new TagBuilder("div");
         tabsTitlediv.AddCssClass("card-header p-0 pt-1 border-bottom-0");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabsTitlediv → {TabsTitlediv}", context, output, tabsTitlediv);
 
         var tabsTitle = new TagBuilder("ul");
         tabsTitle.AddCssClass("nav");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabsTitle → {TabsTitle}", context, output, tabsTitle);
         tabsTitle.AddCssClass("nav-tabs");
         tabsTitle.Attributes.Add("id", "custom-content-above-tab");
         tabsTitle.Attributes.Add("role", "tablist");
@@ -84,12 +92,15 @@ public partial class NopTabsTagHelper : TagHelper
         //tabs content
         var tabsContentout = new TagBuilder("div");
         tabsContentout.AddCssClass("card-body");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabsContentout → {TabsContentout}", context, output, tabsContentout);
 
         var tabsContent = new TagBuilder("div");
         tabsContent.AddCssClass("tab-content");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabsContent → {TabsContent}", context, output, tabsContent);
 
         var outputiner = new TagBuilder("div");
         outputiner.AddCssClass("card card-primary card-outline card-outline-tabs");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): outputiner → {Outputiner}", context, output, outputiner);
 
         foreach (var tabItem in tabContext)
         {
@@ -105,10 +116,12 @@ public partial class NopTabsTagHelper : TagHelper
 
         _ = bool.TryParse(RenderSelectedTabInput, out var renderSelectedTabInput);
         if (string.IsNullOrEmpty(RenderSelectedTabInput) || renderSelectedTabInput)
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): _ → {_}", context, output, _);
         {
             //render input contains selected tab name
             var selectedTabInput = new TagBuilder("input");
             selectedTabInput.Attributes.Add("type", "hidden");
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): selectedTabInput → {SelectedTabInput}", context, output, selectedTabInput);
             selectedTabInput.Attributes.Add("id", "selected-tab-name");
             selectedTabInput.Attributes.Add("name", "selected-tab-name");
             selectedTabInput.Attributes.Add("value", _htmlHelper.GetSelectedTabName());
@@ -122,20 +135,25 @@ public partial class NopTabsTagHelper : TagHelper
                     "$(function() {" +
                     "bindBootstrapTabSelectEvent('" + output.Attributes["id"].Value + "', 'selected-tab-name');" +
                     "});");
+					logger.LogDebug("ProcessAsync(context={Context},output={Output}): script → {Script}", context, output, script);
                 var scriptTag = await script.RenderHtmlContentAsync();
                 output.PostContent.SetHtmlContent(scriptTag);
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): scriptTag → {ScriptTag}", context, output, scriptTag);
             }
         }
 
         output.TagName = "div";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
 
         var itemClass = "card card-primary card-outline card-outline-tabs nav-tabs-custom";
         //merge classes
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): itemClass → {ItemClass}", context, output, itemClass);
         var classValue = output.Attributes.ContainsName("class")
             ? $"{output.Attributes["class"].Value} {itemClass}"
             : itemClass;
 
         output.Attributes.SetAttribute("class", classValue);
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

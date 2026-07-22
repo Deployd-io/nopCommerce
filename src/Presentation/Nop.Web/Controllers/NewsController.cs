@@ -89,44 +89,56 @@ public partial class NewsController : BasePublicController
 
     public virtual async Task<IActionResult> List(NewsPagingFilteringModel command)
     {
+		logger.LogDebug(">>> Entering List(command={Command})", command);
         if (!_newsSettings.Enabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _newsModelFactory.PrepareNewsItemListModelAsync(command);
+		logger.LogDebug("List(command={Command}): model → {Model}", command, model);
+		logger.LogDebug("<<< Exiting List(command={Command})", command);
         return View(model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> ListRss(int languageId)
     {
+		logger.LogDebug(">>> Entering ListRss(languageId={LanguageId})", languageId);
         var store = await _storeContext.GetCurrentStoreAsync();
         var feed = new RssFeed(
             $"{await _localizationService.GetLocalizedAsync(store, x => x.Name)}: News",
             "News",
             new Uri(_webHelper.GetStoreLocation()),
             DateTime.UtcNow);
+			logger.LogDebug("ListRss(languageId={LanguageId}): store → {Store}", languageId, store);
 
         if (!_newsSettings.Enabled)
             return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
 
         var items = new List<RssItem>();
         var newsItems = await _newsService.GetAllNewsAsync(languageId, store.Id);
+		logger.LogDebug("ListRss(languageId={LanguageId}): items → {Items}", languageId, items);
+		logger.LogDebug("ListRss(languageId={LanguageId}): newsItems → {NewsItems}", languageId, newsItems);
         foreach (var n in newsItems)
         {
             var newsUrl = await _nopUrlHelper.RouteGenericUrlAsync(n, _webHelper.GetCurrentRequestProtocol(), languageId: n.LanguageId, ensureTwoPublishedLanguages: false);
             items.Add(new RssItem(n.Title, n.Short, new Uri(newsUrl), $"urn:store:{store.Id}:news:blog:{n.Id}", n.CreatedOnUtc));
+			logger.LogDebug("ListRss(languageId={LanguageId}): newsUrl → {NewsUrl}", languageId, newsUrl);
         }
         feed.Items = items;
+		logger.LogDebug("ListRss(languageId={LanguageId}): feed.Items → {Arg1}", languageId, feed.Items);
+		logger.LogDebug("<<< Exiting ListRss(languageId={LanguageId})", languageId);
         return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
     }
 
     public virtual async Task<IActionResult> NewsItem(int newsItemId)
     {
+		logger.LogDebug(">>> Entering NewsItem(newsItemId={NewsItemId})", newsItemId);
         if (!_newsSettings.Enabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var newsItem = await _newsService.GetNewsByIdAsync(newsItemId);
         if (newsItem == null)
+			logger.LogDebug("NewsItem(newsItemId={NewsItemId}): newsItem → {NewsItem}", newsItemId, newsItem);
             return InvokeHttp404();
 
         var notAvailable =
@@ -140,15 +152,18 @@ public partial class NewsController : BasePublicController
         //We should allows him (her) to use "Preview" functionality
         var hasAdminAccess = await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL) && await _permissionService.AuthorizeAsync(StandardPermission.ContentManagement.NEWS_VIEW);
         if (notAvailable && !hasAdminAccess)
+			logger.LogDebug("NewsItem(newsItemId={NewsItemId}): hasAdminAccess → {HasAdminAccess}", newsItemId, hasAdminAccess);
             return InvokeHttp404();
 
         var model = new NewsItemModel();
         model = await _newsModelFactory.PrepareNewsItemModelAsync(model, newsItem, true);
+		logger.LogDebug("NewsItem(newsItemId={NewsItemId}): model → {Model}", newsItemId, model);
 
         //display "edit" (manage) link
         if (hasAdminAccess)
             DisplayEditLink(Url.Action("NewsItemEdit", "News", new { id = newsItem.Id, area = AreaNames.ADMIN }));
 
+		logger.LogDebug("<<< Exiting NewsItem(newsItemId={NewsItemId})", newsItemId);
         return View(model);
     }
 
@@ -217,6 +232,8 @@ public partial class NewsController : BasePublicController
         //If we got this far, something failed, redisplay form
         RouteData.Values["action"] = "NewsItem";
         model = await _newsModelFactory.PrepareNewsItemModelAsync(model, newsItem, true);
+		logger.LogDebug("NewsCommentAdd(newsItemId={NewsItemId},model={Model},captchaValid={CaptchaValid}): model → {Model1}", newsItemId, model, captchaValid, model);
+		logger.LogDebug("<<< Exiting NewsCommentAdd(newsItemId={NewsItemId},model={Model},captchaValid={CaptchaValid})", newsItemId, model, captchaValid);
         return View(model);
     }
 

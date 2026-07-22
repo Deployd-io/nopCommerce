@@ -9,8 +9,10 @@ public class ChangeDecimalPrecision : Migration
 {
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         var tableName = nameof(ShippingByWeightByTotalRecord);
 
+		logger.LogDebug("Up(): tableName → {TableName}", tableName);
         foreach (var columnName in new[]
                  {
                      nameof(ShippingByWeightByTotalRecord.WeightFrom),
@@ -29,10 +31,13 @@ public class ChangeDecimalPrecision : Migration
             Alter.Table(tableName)
                 .AlterColumn(columnName).AsDecimal(18, 4);
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

@@ -7,7 +7,10 @@ public partial class CustomerPassword : BaseEntity
 {
     public CustomerPassword()
     {
+		logger.LogDebug(">>> Entering CustomerPassword()");
         PasswordFormat = PasswordFormat.Clear;
+		logger.LogDebug("<<< Exiting CustomerPassword()");
+		logger.LogDebug("CustomerPassword(): PasswordFormat → {PasswordFormat}", PasswordFormat);
     }
 
     /// <summary>

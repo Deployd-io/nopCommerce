@@ -21,6 +21,7 @@ public class UpgradeTo470 : Migration
 
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         _localizationService.DeleteLocaleResources(new[]
         {
             "Plugins.Shipping.UPS.Fields.Password",
@@ -40,26 +41,34 @@ public class UpgradeTo470 : Migration
 
         var setting = _settingService.LoadSetting<UPSSettings>();
         if (!_settingService.SettingExists(setting, settings => settings.RequestTimeout))
+		logger.LogDebug("Up(): setting → {Setting}", setting);
         {
             setting.RequestTimeout = UPSDefaults.RequestTimeout;
+			logger.LogDebug("Up(): setting.RequestTimeout → {Arg0}", setting.RequestTimeout);
             _settingService.SaveSetting(setting, settings => settings.RequestTimeout);
         }
             
         var accessKey = _settingService.GetSetting("upssettings.accesskey");
         if (accessKey is not null) 
+			logger.LogDebug("Up(): accessKey → {AccessKey}", accessKey);
             _settingService.DeleteSetting(accessKey);
 
         var username = _settingService.GetSetting("upssettings.username");
         if (username is not null)
+			logger.LogDebug("Up(): username → {Username}", username);
             _settingService.DeleteSetting(username);
 
         var password = _settingService.GetSetting("upssettings.password");
         if (password is not null)
+			logger.LogWarning("Up(): password → {Password}", password);
             _settingService.DeleteSetting(password);
+			logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

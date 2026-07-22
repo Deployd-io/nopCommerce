@@ -78,21 +78,27 @@ public partial class AddressAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     public virtual IActionResult ListBlock()
     {
+		logger.LogDebug(">>> Entering ListBlock()");
+		logger.LogDebug("<<< Exiting ListBlock()");
         return PartialView("ListBlock");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult List()
     {
+		logger.LogDebug(">>> Entering List()");
         //select an appropriate card
         SaveSelectedCardName("customersettings-addressformfields");
 
         //we just redirect a user to the address settings page
+		logger.LogDebug("<<< Exiting List()");
         return RedirectToAction("CustomerUser", "Setting");
     }
 
@@ -103,15 +109,19 @@ public partial class AddressAttributeController : BaseAdminController
         //prepare model
         var model = await _addressAttributeModelFactory.PrepareAddressAttributeListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _addressAttributeModelFactory.PrepareAddressAttributeModelAsync(new AddressAttributeModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -144,20 +154,25 @@ public partial class AddressAttributeController : BaseAdminController
         model = await _addressAttributeModelFactory.PrepareAddressAttributeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an address attribute with the specified id
         var addressAttribute = await _addressAttributeService.GetAttributeByIdAsync(id);
         if (addressAttribute == null)
+			logger.LogDebug("Edit(id={Id}): addressAttribute → {AddressAttribute}", id, addressAttribute);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _addressAttributeModelFactory.PrepareAddressAttributeModelAsync(null, addressAttribute);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -195,6 +210,7 @@ public partial class AddressAttributeController : BaseAdminController
         model = await _addressAttributeModelFactory.PrepareAddressAttributeModelAsync(model, addressAttribute, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -202,9 +218,11 @@ public partial class AddressAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an address attribute with the specified id
         var addressAttribute = await _addressAttributeService.GetAttributeByIdAsync(id);
         if (addressAttribute == null)
+			logger.LogDebug("Delete(id={Id}): addressAttribute → {AddressAttribute}", id, addressAttribute);
             return RedirectToAction("List");
 
         await _addressAttributeService.DeleteAttributeAsync(addressAttribute);
@@ -216,6 +234,7 @@ public partial class AddressAttributeController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Address.AddressAttributes.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -227,6 +246,7 @@ public partial class AddressAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueList(AddressAttributeValueSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ValueList(searchModel={SearchModel})", searchModel);
         //try to get an address attribute with the specified id
         var addressAttribute = await _addressAttributeService.GetAttributeByIdAsync(searchModel.AddressAttributeId)
             ?? throw new ArgumentException("No address attribute found with the specified id");
@@ -234,21 +254,26 @@ public partial class AddressAttributeController : BaseAdminController
         //prepare model
         var model = await _addressAttributeModelFactory.PrepareAddressAttributeValueListModelAsync(searchModel, addressAttribute);
 
+		logger.LogDebug("ValueList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ValueList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueCreatePopup(int addressAttributeId)
     {
+		logger.LogDebug(">>> Entering ValueCreatePopup(addressAttributeId={AddressAttributeId})", addressAttributeId);
         //try to get an address attribute with the specified id
         var addressAttribute = await _addressAttributeService.GetAttributeByIdAsync(addressAttributeId);
         if (addressAttribute == null)
+			logger.LogDebug("ValueCreatePopup(addressAttributeId={AddressAttributeId}): addressAttribute → {AddressAttribute}", addressAttributeId, addressAttribute);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _addressAttributeModelFactory
             .PrepareAddressAttributeValueModelAsync(new AddressAttributeValueModel(), addressAttribute, null);
 
+		logger.LogDebug("<<< Exiting ValueCreatePopup(addressAttributeId={AddressAttributeId})", addressAttributeId);
         return View(model);
     }
 
@@ -282,25 +307,31 @@ public partial class AddressAttributeController : BaseAdminController
         model = await _addressAttributeModelFactory.PrepareAddressAttributeValueModelAsync(model, addressAttribute, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting ValueCreatePopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueEditPopup(int id)
     {
+		logger.LogDebug(">>> Entering ValueEditPopup(id={Id})", id);
         //try to get an address attribute value with the specified id
         var addressAttributeValue = await _addressAttributeService.GetAttributeValueByIdAsync(id);
         if (addressAttributeValue == null)
+			logger.LogDebug("ValueEditPopup(id={Id}): addressAttributeValue → {AddressAttributeValue}", id, addressAttributeValue);
             return RedirectToAction("List");
 
         //try to get an address attribute with the specified id
         var addressAttribute = await _addressAttributeService.GetAttributeByIdAsync(addressAttributeValue.AttributeId);
         if (addressAttribute == null)
+			logger.LogDebug("ValueEditPopup(id={Id}): addressAttribute → {AddressAttribute}", id, addressAttribute);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _addressAttributeModelFactory.PrepareAddressAttributeValueModelAsync(null, addressAttribute, addressAttributeValue);
 
+		logger.LogDebug("ValueEditPopup(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting ValueEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -339,6 +370,7 @@ public partial class AddressAttributeController : BaseAdminController
         model = await _addressAttributeModelFactory.PrepareAddressAttributeValueModelAsync(model, addressAttribute, addressAttributeValue, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting ValueEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -346,6 +378,7 @@ public partial class AddressAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueDelete(int id)
     {
+		logger.LogDebug(">>> Entering ValueDelete(id={Id})", id);
         //try to get an address attribute value with the specified id
         var addressAttributeValue = await _addressAttributeService.GetAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No address attribute value found with the specified id", nameof(id));
@@ -357,6 +390,7 @@ public partial class AddressAttributeController : BaseAdminController
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteAddressAttributeValue"), addressAttributeValue.Id),
             addressAttributeValue);
 
+		logger.LogDebug("<<< Exiting ValueDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

@@ -9,9 +9,11 @@ public partial class TestMessageTemplateValidator : BaseNopValidator<TestMessage
 {
     public TestMessageTemplateValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering TestMessageTemplateValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.SendTo).NotEmpty();
         RuleFor(x => x.SendTo)
             .IsEmailAddress()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Common.WrongEmail"));
+			logger.LogDebug("<<< Exiting TestMessageTemplateValidator(localizationService={LocalizationService})", localizationService);
     }
 }

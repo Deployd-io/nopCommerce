@@ -28,6 +28,7 @@ public partial class OrderSummaryViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(bool? prepareAndDisplayOrderReviewData, ShoppingCartModel overriddenModel)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData},overriddenModel={OverriddenModel})", prepareAndDisplayOrderReviewData, overriddenModel);
         //use already prepared (shared) model
         if (overriddenModel != null)
             return View(overriddenModel);
@@ -35,11 +36,15 @@ public partial class OrderSummaryViewComponent : NopViewComponent
         //if not passed, then create a new model
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, store.Id);
+		logger.LogDebug("InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData},overriddenModel={OverriddenModel}): store → {Store}", prepareAndDisplayOrderReviewData, overriddenModel, store);
+		logger.LogDebug("InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData},overriddenModel={OverriddenModel}): cart → {Cart}", prepareAndDisplayOrderReviewData, overriddenModel, cart);
 
         var model = new ShoppingCartModel();
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart,
             isEditable: false,
             prepareAndDisplayOrderReviewData: prepareAndDisplayOrderReviewData.GetValueOrDefault());
+			logger.LogDebug("InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData},overriddenModel={OverriddenModel}): model → {Model}", prepareAndDisplayOrderReviewData, overriddenModel, model);
+		logger.LogDebug("<<< Exiting InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData},overriddenModel={OverriddenModel})", prepareAndDisplayOrderReviewData, overriddenModel);
         return View(model);
     }
 }

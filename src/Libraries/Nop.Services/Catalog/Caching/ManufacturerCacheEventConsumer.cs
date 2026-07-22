@@ -17,6 +17,7 @@ public partial class ManufacturerCacheEventConsumer : CacheEventConsumer<Manufac
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Manufacturer entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveByPrefixAsync(NopDiscountDefaults.ManufacturerIdsPrefix);
 
         if (entityEventType != EntityEventType.Insert)
@@ -31,5 +32,6 @@ public partial class ManufacturerCacheEventConsumer : CacheEventConsumer<Manufac
         await RemoveAsync(NopDiscountDefaults.AppliedDiscountsCacheKey, nameof(Manufacturer), entity);
 
         await base.ClearCacheAsync(entity, entityEventType);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

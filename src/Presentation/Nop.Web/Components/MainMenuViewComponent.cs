@@ -18,7 +18,10 @@ public partial class MainMenuViewComponent : NopViewComponent
 
     public MainMenuViewComponent(IMenuModelFactory menuModelFactory)
     {
+		logger.LogDebug(">>> Entering MainMenuViewComponent(menuModelFactory={MenuModelFactory})", menuModelFactory);
         _menuModelFactory = menuModelFactory;
+		logger.LogDebug("<<< Exiting MainMenuViewComponent(menuModelFactory={MenuModelFactory})", menuModelFactory);
+		logger.LogDebug("MainMenuViewComponent(menuModelFactory={MenuModelFactory}): _menuModelFactory → {_menuModelFactory}", menuModelFactory, _menuModelFactory);
     }
 
     #endregion
@@ -27,7 +30,10 @@ public partial class MainMenuViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         var menus = await _menuModelFactory.PrepareMenuModelsAsync(MenuType.Main);
+		logger.LogDebug("InvokeAsync(): menus → {Menus}", menus);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(menus?.FirstOrDefault() ?? new MenuModel());
     }
 

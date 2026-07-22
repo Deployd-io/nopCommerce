@@ -59,6 +59,8 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string> { PublicWidgetZones.HomepageTop });
     }
 
@@ -67,6 +69,8 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _webHelper.GetStoreLocation() + "Admin/WidgetSwiper/Configure";
     }
 
@@ -77,6 +81,8 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// <returns>View component name</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(WidgetSwiperViewComponent);
     }
 
@@ -86,9 +92,11 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //pictures
         var sampleImagesPath = _fileProvider.MapPath("~/Plugins/Widgets.Swiper/Content/sample-images/");
 
+		logger.LogDebug("InstallAsync(): sampleImagesPath → {SampleImagesPath}", sampleImagesPath);
         //settings
 
         var slides = new List<Slide>
@@ -155,6 +163,7 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -163,6 +172,7 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<SwiperSettings>();
         if (_widgetSettings.ActiveWidgetSystemNames.Contains(PluginDescriptor.SystemName))
@@ -175,6 +185,7 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Widgets.Swiper");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

@@ -24,8 +24,12 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
 
     public NopGenerateCaptchaTagHelper(CaptchaSettings captchaSettings, IHtmlHelper htmlHelper)
     {
+		logger.LogDebug(">>> Entering NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper})", captchaSettings, htmlHelper);
         _captchaSettings = captchaSettings;
         _htmlHelper = htmlHelper;
+		logger.LogDebug("<<< Exiting NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper})", captchaSettings, htmlHelper);
+		logger.LogDebug("NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", captchaSettings, htmlHelper, _htmlHelper);
+		logger.LogDebug("NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper}): _captchaSettings → {_captchaSettings}", captchaSettings, htmlHelper, _captchaSettings);
     }
 
     #endregion
@@ -40,6 +44,7 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -54,6 +59,7 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
             case CaptchaType.CheckBoxReCaptchaV2:
                 output.Attributes.Add("class", "captcha-box");
                 captchaHtmlContent = await _htmlHelper.GenerateCheckBoxReCaptchaV2Async(_captchaSettings);
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): captchaHtmlContent → {CaptchaHtmlContent}", context, output, captchaHtmlContent);
                 break;
             case CaptchaType.ReCaptchaV3:
                 captchaHtmlContent = await _htmlHelper.GenerateReCaptchaV3Async(_captchaSettings, ActionName);
@@ -64,8 +70,11 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
 
         //tag details
         output.TagName = "div";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Content.SetHtmlContent(captchaHtmlContent);
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

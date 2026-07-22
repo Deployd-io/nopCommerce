@@ -16,10 +16,12 @@ public partial class FilterLevelValueBuilder : NopEntityBuilder<FilterLevelValue
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(FilterLevelValue.FilterLevel1Value)).AsString(100).Nullable()
             .WithColumn(nameof(FilterLevelValue.FilterLevel2Value)).AsString(100).Nullable()
             .WithColumn(nameof(FilterLevelValue.FilterLevel3Value)).AsString(100).Nullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

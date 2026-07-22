@@ -16,9 +16,11 @@ public partial class CustomerRoleBuilder : NopEntityBuilder<CustomerRole>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(CustomerRole.Name)).AsString(255).NotNullable()
             .WithColumn(nameof(CustomerRole.SystemName)).AsString(255).Nullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

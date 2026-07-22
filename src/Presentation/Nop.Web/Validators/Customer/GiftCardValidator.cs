@@ -9,6 +9,8 @@ public partial class GiftCardValidator : BaseNopValidator<CheckGiftCardBalanceMo
 {
     public GiftCardValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering GiftCardValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.GiftCardCode).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("CheckGiftCardBalance.GiftCardCouponCode.Empty"));
+		logger.LogDebug("<<< Exiting GiftCardValidator(localizationService={LocalizationService})", localizationService);
     }
 }

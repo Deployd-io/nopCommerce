@@ -49,11 +49,13 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     /// </returns>
     public virtual Task<NewsLetterSubscriptionTypeSearchModel> PrepareNewsLetterSubscriptionTypeSearchModelAsync(NewsLetterSubscriptionTypeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -67,11 +69,13 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionTypeListModel> PrepareNewsLetterSubscriptionTypeListModelAsync(NewsLetterSubscriptionTypeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get newsletter subscription type
         var subscriptionTypes = (await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel}): subscriptionTypes → {SubscriptionTypes}", searchModel, subscriptionTypes);
         //prepare list model
         var model = new NewsLetterSubscriptionTypeListModel().PrepareToGrid(searchModel, subscriptionTypes, () =>
         {
@@ -79,6 +83,7 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
             return subscriptionTypes.Select(subscriptionType => subscriptionType.ToModel<NewsLetterSubscriptionTypeModel>());
         });
 
+		logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

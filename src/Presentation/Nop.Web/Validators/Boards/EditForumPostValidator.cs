@@ -9,6 +9,8 @@ public partial class EditForumPostValidator : BaseNopValidator<EditForumPostMode
 {
     public EditForumPostValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering EditForumPostValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Text).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Forum.TextCannotBeEmpty"));
+		logger.LogDebug("<<< Exiting EditForumPostValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -16,11 +16,13 @@ public partial class CustomerAddressMappingCacheEventConsumer : CacheEventConsum
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(CustomerAddressMapping entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveAsync(NopCustomerServicesDefaults.CustomerAddressesCacheKey, entity.CustomerId);
 
         if (entityEventType == EntityEventType.Delete)
             await RemoveAsync(NopCustomerServicesDefaults.CustomerAddressCacheKey, entity.CustomerId, entity.AddressId);
 
         await base.ClearCacheAsync(entity, entityEventType);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

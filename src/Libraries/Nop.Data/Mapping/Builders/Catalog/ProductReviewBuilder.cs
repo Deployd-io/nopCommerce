@@ -19,10 +19,12 @@ public partial class ProductReviewBuilder : NopEntityBuilder<ProductReview>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ProductReview.CustomerId)).AsInt32().ForeignKey<Customer>()
             .WithColumn(nameof(ProductReview.ProductId)).AsInt32().ForeignKey<Product>()
             .WithColumn(nameof(ProductReview.StoreId)).AsInt32().ForeignKey<Store>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

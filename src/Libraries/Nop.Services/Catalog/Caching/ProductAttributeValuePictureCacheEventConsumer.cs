@@ -15,6 +15,8 @@ public partial class ProductAttributeValuePictureCacheEventConsumer : CacheEvent
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductAttributeValuePicture entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.ProductAttributeValuePicturesByValueCacheKey, entity.ProductAttributeValueId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

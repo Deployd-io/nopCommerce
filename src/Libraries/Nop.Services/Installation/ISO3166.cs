@@ -13,6 +13,8 @@ public static partial class ISO3166
     /// <returns>ISO3166Country</returns>
     public static ISO3166Country FromISOCode(int codeISO)
     {
+		logger.LogDebug(">>> Entering FromISOCode(codeISO={CodeISO})", codeISO);
+		logger.LogDebug("<<< Exiting FromISOCode(codeISO={CodeISO})", codeISO);
         return GetCollection().FirstOrDefault(p => p.NumericCode == codeISO);
     }
 
@@ -23,6 +25,8 @@ public static partial class ISO3166
     /// <returns>ISO3166Country</returns>
     public static ISO3166Country FromCountryCode(string countryCode)
     {
+		logger.LogDebug(">>> Entering FromCountryCode(countryCode={CountryCode})", countryCode);
+		logger.LogDebug("<<< Exiting FromCountryCode(countryCode={CountryCode})", countryCode);
         return GetCollection().FirstOrDefault(p => p.Alpha2 == countryCode);
     }
 
@@ -33,6 +37,9 @@ public static partial class ISO3166
     /// <returns>IEnumerable<LocalizationInfo></returns>
     public static IEnumerable<LocalizationInfo> GetLocalizationInfo(string countryCode)
     {
+		logger.LogDebug(">>> Entering GetLocalizationInfo(countryCode={CountryCode})", countryCode);
+		logger.LogDebug(">>> Entering LocalizationInfo(culture={Culture},language={Language})", culture, language);
+		logger.LogDebug("<<< Exiting LocalizationInfo(culture={Culture},language={Language})", culture, language);
         return FromCountryCode(countryCode).LocalizationInfo;
     }
 
@@ -43,7 +50,9 @@ public static partial class ISO3166
     /// <returns>IEnumerable<ISO3166Country></returns>
     public static IEnumerable<ISO3166Country> GetCollection()
     {
+		logger.LogDebug(">>> Entering GetCollection()");
         // This collection built from Wikipedia entry on ISO3166-1 on 8th Dec 2020
+		logger.LogDebug("<<< Exiting GetCollection()");
         return new[] {
             new ISO3166Country("Afghanistan", "AF", "AFG", 4, ["93"]),
             new ISO3166Country("Åland Islands", "AX", "ALA", 248, ["358"]),
@@ -306,13 +315,22 @@ public partial class ISO3166Country
 {
     public ISO3166Country(string name, string alpha2, string alpha3, int numericCode, string[] dialCodes = null, bool subjectToVat = false, IEnumerable<LocalizationInfo> localizationInfo = null)
     {
+		logger.LogDebug(">>> Entering ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo})", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo);
         Name = name;
         Alpha2 = alpha2;
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): Name → {Name1}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, Name);
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): Alpha2 → {Alpha21}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, Alpha2);
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): NumericCode → {NumericCode1}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, NumericCode);
         Alpha3 = alpha3;
         NumericCode = numericCode;
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): Alpha3 → {Alpha31}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, Alpha3);
         DialCodes = dialCodes;
         SubjectToVat = subjectToVat;
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): DialCodes → {DialCodes1}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, DialCodes);
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): SubjectToVat → {SubjectToVat1}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, SubjectToVat);
         LocalizationInfo = localizationInfo ?? (new[] { new LocalizationInfo("en-US", "English") });
+		logger.LogDebug("<<< Exiting ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo})", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo);
+		logger.LogDebug("ISO3166Country(name={Name},alpha2={Alpha2},alpha3={Alpha3},numericCode={NumericCode},dialCodes={DialCodes},subjectToVat={SubjectToVat},localizationInfo={LocalizationInfo}): LocalizationInfo → {LocalizationInfo1}", name, alpha2, alpha3, numericCode, dialCodes, subjectToVat, localizationInfo, LocalizationInfo);
     }
 
     /// <summary>
