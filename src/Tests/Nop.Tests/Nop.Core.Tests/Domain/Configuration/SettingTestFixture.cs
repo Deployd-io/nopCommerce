@@ -10,8 +10,11 @@ public class SettingTestFixture
     [Test]
     public void CanCreateSetting()
     {
+		logger.LogDebug(">>> Entering CanCreateSetting()");
         var setting = new Setting("Setting1", "Value1");
         setting.Name.Should().Be("Setting1");
+		logger.LogDebug("CanCreateSetting(): setting → {Setting}", setting);
         setting.Value.Should().Be("Value1");
+		logger.LogDebug("<<< Exiting CanCreateSetting()");
     }
 }

@@ -8,6 +8,7 @@ public class StoreMigration : ForwardOnlyMigration
 {
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!Schema.Table(nameof(Store)).Column(nameof(Store.Deleted)).Exists())
         {
             //add new column
@@ -52,5 +53,6 @@ public class StoreMigration : ForwardOnlyMigration
                 .AddColumn(nameof(Store.HomepageTitle)).AsString(int.MaxValue).Nullable();
         else
             Alter.Table(nameof(Store)).AlterColumn(nameof(Store.HomepageTitle)).AsString(int.MaxValue).Nullable();
+			logger.LogDebug("<<< Exiting Up()");
     }
 }

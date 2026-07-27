@@ -51,6 +51,7 @@ export default moment.defineLocale('ko', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(일|월|주)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -64,12 +65,14 @@ export default moment.defineLocale('ko', {
             default:
                 return number;
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
     meridiemParse: /오전|오후/,
     isPM: function (token) {
         return token === '오후';
     },
     meridiem: function (hour, minute, isUpper) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isUpper=${isUpper})`);
         return hour < 12 ? '오전' : '오후';
     },
 });

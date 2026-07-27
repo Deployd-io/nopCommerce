@@ -16,9 +16,11 @@ public partial class ActivityLogTypeBuilder : NopEntityBuilder<ActivityLogType>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ActivityLogType.SystemKeyword)).AsString(100).NotNullable()
             .WithColumn(nameof(ActivityLogType.Name)).AsString(200).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

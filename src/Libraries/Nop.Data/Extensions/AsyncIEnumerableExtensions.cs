@@ -78,7 +78,10 @@ public static class AsyncIEnumerableExtensions
     {
         async ValueTask<IAsyncEnumerable<TResult>> getAsyncEnumerable(TSource items)
         {
+			logger.LogDebug(">>> Entering getAsyncEnumerable(items={Items})", items);
             var rez = await predicate(items);
+			logger.LogDebug("getAsyncEnumerable(items={Items}): rez → {Rez}", items, rez);
+			logger.LogDebug("<<< Exiting getAsyncEnumerable(items={Items})", items);
             return rez.ToAsyncEnumerable();
         }
 
@@ -177,10 +180,13 @@ public static class AsyncIEnumerableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static Task<List<TSource>> ToListAsync<TSource>(this IEnumerable<TSource> source)
     {
+		logger.LogDebug(">>> Entering ToListAsync(source={Source})", source);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return source.ToAsyncEnumerable().ToListAsync().AsTask();
     }
 
     /// <summary>
+	logger.LogInformation("ToListAsync(source)={Source}: database query executed in {Arg1} ms", source, __logStart.ElapsedMilliseconds);
     /// Sorts the elements of a sequence in descending order according to a key obtained
     /// by invoking a transform function on each element and awaiting the result
     /// </summary>

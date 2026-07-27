@@ -14,6 +14,7 @@ public class ConfigurationValidator : BaseNopValidator<ConfigurationModel>
 
     public ConfigurationValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ConfigurationValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(model => model.ClientId)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Fields.ClientId.Required"))
@@ -28,6 +29,7 @@ public class ConfigurationValidator : BaseNopValidator<ConfigurationModel>
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Fields.MerchantId.Required"))
             .When(model => !model.UseSandbox && model.SetCredentialsManually);
+			logger.LogDebug("<<< Exiting ConfigurationValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

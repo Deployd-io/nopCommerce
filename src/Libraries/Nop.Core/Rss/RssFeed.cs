@@ -86,23 +86,32 @@ public partial class RssFeed
     /// </returns>
     public static async Task<RssFeed> LoadAsync(Stream stream)
     {
+		logger.LogDebug(">>> Entering LoadAsync(stream={Stream})", stream);
         try
         {
             var document = await XDocument.LoadAsync(stream, LoadOptions.None, default);
 
+			logger.LogDebug("LoadAsync(stream={Stream}): document → {Document}", stream, document);
             var channel = document.Root?.Element(NopRssDefaults.Channel);
 
+			logger.LogDebug("LoadAsync(stream={Stream}): channel → {Channel}", stream, channel);
             if (channel == null)
                 return null;
 
             var title = channel.Element(NopRssDefaults.Title)?.Value ?? string.Empty;
             var description = channel.Element(NopRssDefaults.Description)?.Value ?? string.Empty;
+			logger.LogDebug("LoadAsync(stream={Stream}): title → {Title}", stream, title);
+			logger.LogDebug("LoadAsync(stream={Stream}): description → {Description}", stream, description);
             var link = new Uri(channel.Element(NopRssDefaults.Link)?.Value ?? string.Empty);
             var lastBuildDateValue = channel.Element(NopRssDefaults.LastBuildDate)?.Value;
+			logger.LogDebug("LoadAsync(stream={Stream}): link → {Link}", stream, link);
             var lastBuildDate = lastBuildDateValue == null ? DateTimeOffset.Now : DateTimeOffset.ParseExact(lastBuildDateValue, "r", null);
+			logger.LogDebug("LoadAsync(stream={Stream}): lastBuildDateValue → {LastBuildDateValue}", stream, lastBuildDateValue);
+			logger.LogDebug("LoadAsync(stream={Stream}): lastBuildDate → {LastBuildDate}", stream, lastBuildDate);
 
             var feed = new RssFeed(title, description, link, lastBuildDate);
 
+			logger.LogDebug("LoadAsync(stream={Stream}): feed → {Feed}", stream, feed);
             foreach (var item in channel.Elements(NopRssDefaults.Item))
             {
                 feed.Items.Add(new RssItem(item));
@@ -112,6 +121,8 @@ public partial class RssFeed
         }
         catch
         {
+			logger.LogError("Exception in LoadAsync(stream={Stream}): {Arg1}", stream, ex.Message);
+			logger.LogDebug("<<< Exiting LoadAsync(stream={Stream})", stream);
             return null;
         }
     }
@@ -122,8 +133,11 @@ public partial class RssFeed
     /// <returns>Content of RSS feed</returns>
     public string GetContent()
     {
+		logger.LogDebug(">>> Entering GetContent()");
         var document = new XDocument();
         var root = new XElement(NopRssDefaults.RSS, new XAttribute("version", "2.0"));
+		logger.LogDebug("GetContent(): document → {Document}", document);
+		logger.LogWarning("GetContent(): root → {Root}", root);
         var channel = new XElement(NopRssDefaults.Channel,
             new XAttribute(XName.Get(AttributeExtension.Key.Name, AttributeExtension.Key.Namespace), AttributeExtension.Value));
 
@@ -142,6 +156,7 @@ public partial class RssFeed
         root.Add(channel);
         document.Add(root);
 
+		logger.LogDebug("<<< Exiting GetContent()");
         return document.ToString();
     }
 

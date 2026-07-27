@@ -34,11 +34,14 @@ public partial class CommonHelper
     /// <returns></returns>
     public static string EnsureSubscriberEmailOrThrow(string email)
     {
+		logger.LogDebug(">>> Entering EnsureSubscriberEmailOrThrow(email={Email})", email);
         var output = EnsureNotNull(email);
         output = output.Trim();
+		logger.LogDebug("EnsureSubscriberEmailOrThrow(email={Email}): output → {Output}", email, output);
         output = EnsureMaximumLength(output, 255);
 
         if (!IsValidEmail(output))
+		logger.LogDebug("<<< Exiting EnsureSubscriberEmailOrThrow(email={Email})", email);
             throw new NopException("Email is not valid.");
 
         return output;
@@ -51,11 +54,14 @@ public partial class CommonHelper
     /// <returns>true if the string is a valid email address and false if it's not</returns>
     public static bool IsValidEmail(string email)
     {
+		logger.LogDebug(">>> Entering IsValidEmail(email={Email})", email);
         if (string.IsNullOrEmpty(email))
             return false;
 
         email = email.Trim();
 
+		logger.LogDebug("IsValidEmail(email={Email}): email → {Email1}", email, email);
+		logger.LogDebug("<<< Exiting IsValidEmail(email={Email})", email);
         return GetEmailRegex().IsMatch(email);
     }
 
@@ -66,6 +72,8 @@ public partial class CommonHelper
     /// <returns>true if the string is a valid IpAddress and false if it's not</returns>
     public static bool IsValidIpAddress(string ipAddress)
     {
+		logger.LogDebug(">>> Entering IsValidIpAddress(ipAddress={IpAddress})", ipAddress);
+		logger.LogDebug("<<< Exiting IsValidIpAddress(ipAddress={IpAddress})", ipAddress);
         return IPAddress.TryParse(ipAddress, out var _);
     }
 
@@ -76,10 +84,14 @@ public partial class CommonHelper
     /// <returns>Result string</returns>
     public static string GenerateRandomDigitCode(int length)
     {
+		logger.LogDebug(">>> Entering GenerateRandomDigitCode(length={Length})", length);
         using var random = new SecureRandomNumberGenerator();
         var str = string.Empty;
+		logger.LogDebug("GenerateRandomDigitCode(length={Length}): random → {Random}", length, random);
+		logger.LogDebug("GenerateRandomDigitCode(length={Length}): str → {Str}", length, str);
         for (var i = 0; i < length; i++)
             str = string.Concat(str, random.Next(10).ToString());
+		logger.LogDebug("<<< Exiting GenerateRandomDigitCode(length={Length})", length);
         return str;
     }
 
@@ -91,7 +103,10 @@ public partial class CommonHelper
     /// <returns>Result</returns>
     public static int GenerateRandomInteger(int min = 0, int max = int.MaxValue)
     {
+		logger.LogDebug(">>> Entering GenerateRandomInteger(min={Min},max={Max})", min, max);
         using var random = new SecureRandomNumberGenerator();
+		logger.LogDebug("GenerateRandomInteger(min={Min},max={Max}): random → {Random}", min, max, random);
+		logger.LogDebug("<<< Exiting GenerateRandomInteger(min={Min},max={Max})", min, max);
         return random.Next(min, max);
     }
 
@@ -146,6 +161,8 @@ public partial class CommonHelper
     /// <returns>Boolean</returns>
     public static bool AreNullOrEmpty(params string[] stringsToValidate)
     {
+		logger.LogDebug(">>> Entering AreNullOrEmpty(stringsToValidate={StringsToValidate})", stringsToValidate);
+		logger.LogDebug("<<< Exiting AreNullOrEmpty(stringsToValidate={StringsToValidate})", stringsToValidate);
         return stringsToValidate.Any(string.IsNullOrEmpty);
     }
 
@@ -158,6 +175,7 @@ public partial class CommonHelper
     /// <returns>Result</returns>
     public static bool ArraysEqual<T>(T[] a1, T[] a2)
     {
+		logger.LogDebug(">>> Entering ArraysEqual(a1={A1},a2={A2})", a1, a2);
         //also see Enumerable.SequenceEqual(a1, a2);
         if (ReferenceEquals(a1, a2))
             return true;
@@ -180,18 +198,22 @@ public partial class CommonHelper
     /// <param name="value">The value to set the property to.</param>
     public static void SetProperty(object instance, string propertyName, object value)
     {
+		logger.LogDebug(">>> Entering SetProperty(instance={Instance},propertyName={PropertyName},value={Value})", instance, propertyName, value);
         ArgumentNullException.ThrowIfNull(instance);
         ArgumentNullException.ThrowIfNull(propertyName);
 
         var instanceType = instance.GetType();
         var pi = instanceType.GetProperty(propertyName)
             ?? throw new NopException("No property '{0}' found on the instance of type '{1}'.", propertyName, instanceType);
+			logger.LogDebug("SetProperty(instance={Instance},propertyName={PropertyName},value={Value}): instanceType → {InstanceType}", instance, propertyName, value, instanceType);
 
         if (!pi.CanWrite)
+			logger.LogDebug("<<< Exiting SetProperty(instance={Instance},propertyName={PropertyName},value={Value})", instance, propertyName, value);
             throw new NopException("The property '{0}' on the instance of type '{1}' does not have a setter.", propertyName, instanceType);
         if (value != null && !value.GetType().IsAssignableFrom(pi.PropertyType))
             value = To(value, pi.PropertyType);
         pi.SetValue(instance, value, Array.Empty<object>());
+		logger.LogDebug("SetProperty(instance={Instance},propertyName={PropertyName},value={Value}): value → {Value1}", instance, propertyName, value, value);
     }
 
     /// <summary>
@@ -202,6 +224,9 @@ public partial class CommonHelper
     /// <returns>The converted value.</returns>
     public static object To(object value, Type destinationType)
     {
+		logger.LogDebug(">>> Entering To(value={Value},destinationType={DestinationType})", value, destinationType);
+		logger.LogDebug("<<< Exiting To(value={Value},destinationType={DestinationType})", value, destinationType);
+		logger.LogDebug("<<< Exiting To(value={Value})", value);
         return To(value, destinationType, CultureInfo.InvariantCulture);
     }
 
@@ -293,11 +318,13 @@ public partial class CommonHelper
     /// <returns></returns>
     public static int GetDifferenceInYears(DateTime startDate, DateTime endDate)
     {
+		logger.LogDebug(">>> Entering GetDifferenceInYears(startDate={StartDate},endDate={EndDate})", startDate, endDate);
         //source: http://stackoverflow.com/questions/9/how-do-i-calculate-someones-age-in-c
         //this assumes you are looking for the western idea of age and not using East Asian reckoning.
         var age = endDate.Year - startDate.Year;
         if (startDate > endDate.AddYears(-age))
             age--;
+		logger.LogDebug("<<< Exiting GetDifferenceInYears(startDate={StartDate},endDate={EndDate})", startDate, endDate);
         return age;
     }
 
@@ -310,15 +337,18 @@ public partial class CommonHelper
     /// <returns>An instance of the Nullable<System.DateTime></returns>
     public static DateTime? ParseDate(int? year, int? month, int? day)
     {
+		logger.LogDebug(">>> Entering ParseDate(year={Year},month={Month},day={Day})", year, month, day);
         if (!year.HasValue || !month.HasValue || !day.HasValue)
             return null;
 
         DateTime? date = null;
         try
+		logger.LogDebug("ParseDate(year={Year},month={Month},day={Day}): date → {Date}", year, month, day, date);
         {
             date = new DateTime(year.Value, month.Value, day.Value, CultureInfo.CurrentCulture.Calendar);
         }
         catch { }
+		logger.LogDebug("<<< Exiting ParseDate(year={Year},month={Month},day={Day})", year, month, day);
         return date;
     }
 

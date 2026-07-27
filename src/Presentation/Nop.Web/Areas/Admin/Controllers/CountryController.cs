@@ -95,15 +95,20 @@ public partial class CountryController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _countryModelFactory.PrepareCountrySearchModelAsync(new CountrySearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -111,18 +116,24 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> CountryList(CountrySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering CountryList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _countryModelFactory.PrepareCountryListModelAsync(searchModel);
 
+		logger.LogDebug("CountryList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting CountryList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _countryModelFactory.PrepareCountryModelAsync(new CountryModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -157,20 +168,25 @@ public partial class CountryController : BaseAdminController
         model = await _countryModelFactory.PrepareCountryModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(id);
         if (country == null)
+			logger.LogDebug("Edit(id={Id}): country → {Country}", id, country);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _countryModelFactory.PrepareCountryModelAsync(null, country);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -210,6 +226,7 @@ public partial class CountryController : BaseAdminController
         model = await _countryModelFactory.PrepareCountryModelAsync(model, country, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -217,9 +234,11 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(id);
         if (country == null)
+			logger.LogDebug("Delete(id={Id}): country → {Country}", id, country);
             return RedirectToAction("List");
 
         try
@@ -239,7 +258,9 @@ public partial class CountryController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = country.Id });
         }
     }
@@ -248,16 +269,19 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> PublishSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering PublishSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var countries = await _countryService.GetCountriesByIdsAsync([.. selectedIds]);
         foreach (var country in countries)
         {
+		logger.LogDebug("PublishSelected(selectedIds={SelectedIds}): countries → {Countries}", selectedIds, countries);
             country.Published = true;
             await _countryService.UpdateCountryAsync(country);
         }
 
+		logger.LogDebug("<<< Exiting PublishSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -265,16 +289,19 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> UnpublishSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering UnpublishSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var countries = await _countryService.GetCountriesByIdsAsync(selectedIds.ToArray());
         foreach (var country in countries)
         {
+		logger.LogDebug("UnpublishSelected(selectedIds={SelectedIds}): countries → {Countries}", selectedIds, countries);
             country.Published = false;
             await _countryService.UpdateCountryAsync(country);
         }
 
+		logger.LogDebug("<<< Exiting UnpublishSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -286,6 +313,7 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> States(StateProvinceSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering States(searchModel={SearchModel})", searchModel);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(searchModel.CountryId)
             ?? throw new ArgumentException("No country found with the specified id");
@@ -293,20 +321,26 @@ public partial class CountryController : BaseAdminController
         //prepare model
         var model = await _countryModelFactory.PrepareStateProvinceListModelAsync(searchModel, country);
 
+		logger.LogDebug("States(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting States(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> StateCreatePopup(int countryId)
     {
+		logger.LogDebug(">>> Entering StateCreatePopup(countryId={CountryId})", countryId);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(countryId);
         if (country == null)
+			logger.LogDebug("StateCreatePopup(countryId={CountryId}): country → {Country}", countryId, country);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _countryModelFactory.PrepareStateProvinceModelAsync(new StateProvinceModel(), country, null);
 
+		logger.LogDebug("StateCreatePopup(countryId={CountryId}): model → {Model}", countryId, model);
+		logger.LogDebug("<<< Exiting StateCreatePopup(countryId={CountryId})", countryId);
         return View(model);
     }
 
@@ -340,25 +374,31 @@ public partial class CountryController : BaseAdminController
         model = await _countryModelFactory.PrepareStateProvinceModelAsync(model, country, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting StateCreatePopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> StateEditPopup(int id)
     {
+		logger.LogDebug(">>> Entering StateEditPopup(id={Id})", id);
         //try to get a state with the specified id
         var state = await _stateProvinceService.GetStateProvinceByIdAsync(id);
         if (state == null)
+			logger.LogDebug("StateEditPopup(id={Id}): state → {State}", id, state);
             return RedirectToAction("List");
 
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(state.CountryId);
         if (country == null)
+			logger.LogDebug("StateEditPopup(id={Id}): country → {Country}", id, country);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _countryModelFactory.PrepareStateProvinceModelAsync(null, country, state);
 
+		logger.LogDebug("StateEditPopup(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting StateEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -396,6 +436,7 @@ public partial class CountryController : BaseAdminController
         model = await _countryModelFactory.PrepareStateProvinceModelAsync(model, country, state, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting StateEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -403,6 +444,7 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> StateDelete(int id)
     {
+		logger.LogDebug(">>> Entering StateDelete(id={Id})", id);
         //try to get a state with the specified id
         var state = await _stateProvinceService.GetStateProvinceByIdAsync(id)
             ?? throw new ArgumentException("No state found with the specified id");
@@ -419,11 +461,13 @@ public partial class CountryController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteStateProvince",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteStateProvince"), state.Id), state);
 
+		logger.LogDebug("<<< Exiting StateDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     public virtual async Task<IActionResult> GetStatesByCountryId(string countryId, bool? addSelectStateItem, bool? addAsterisk)
     {
+		logger.LogDebug(">>> Entering GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk})", countryId, addSelectStateItem, addAsterisk);
         //permission validation is not required here
 
         // This action method gets called via an ajax request
@@ -431,6 +475,8 @@ public partial class CountryController : BaseAdminController
 
         var country = await _countryService.GetCountryByIdAsync(Convert.ToInt32(countryId));
         var states = country != null ? (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country.Id, showHidden: true)).ToList() : new List<StateProvince>();
+		logger.LogDebug("GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk}): country → {Country}", countryId, addSelectStateItem, addAsterisk, country);
+		logger.LogDebug("GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk}): states → {States}", countryId, addSelectStateItem, addAsterisk, states);
         var result = (from s in states
             select new { id = s.Id, name = s.Name }).ToList();
         if (addAsterisk.HasValue && addAsterisk.Value)
@@ -471,6 +517,7 @@ public partial class CountryController : BaseAdminController
             }
         }
 
+		logger.LogDebug("<<< Exiting GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk})", countryId, addSelectStateItem, addAsterisk);
         return Json(result);
     }
 
@@ -481,11 +528,16 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> ExportCsv()
     {
+		logger.LogDebug(">>> Entering ExportCsv()");
         var fileName = $"states_{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_{CommonHelper.GenerateRandomDigitCode(4)}.csv";
 
+		logger.LogDebug("ExportCsv(): fileName → {FileName}", fileName);
         var states = await _stateProvinceService.GetStateProvincesAsync(true);
         var result = await _exportManager.ExportStatesToTxtAsync(states);
+		logger.LogDebug("ExportCsv(): states → {States}", states);
+		logger.LogDebug("ExportCsv(): result → {Result}", result);
 
+		logger.LogDebug("<<< Exiting ExportCsv()");
         return File(Encoding.UTF8.GetBytes(result), MimeTypes.TextCsv, fileName);
     }
 
@@ -493,12 +545,14 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> ImportCsv(IFormFile importcsvfile)
     {
+		logger.LogDebug(">>> Entering ImportCsv(importcsvfile={Importcsvfile})", importcsvfile);
         try
         {
             if (importcsvfile != null && importcsvfile.Length > 0)
             {
                 var count = await _importManager.ImportStatesFromTxtAsync(importcsvfile.OpenReadStream());
 
+				logger.LogDebug("ImportCsv(importcsvfile={Importcsvfile}): count → {Count}", importcsvfile, count);
                 _notificationService.SuccessNotification(string.Format(await _localizationService.GetResourceAsync("Admin.Configuration.Countries.ImportSuccess"), count));
 
                 return RedirectToAction("List");
@@ -510,7 +564,9 @@ public partial class CountryController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ImportCsv(importcsvfile={Importcsvfile}): {Arg1}", importcsvfile, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ImportCsv(importcsvfile={Importcsvfile})", importcsvfile);
             return RedirectToAction("List");
         }
     }

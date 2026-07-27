@@ -44,6 +44,7 @@ public class CloudflareImagesController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             Enabled = _cloudflareImagesSettings.Enabled,
@@ -53,6 +54,7 @@ public class CloudflareImagesController : BasePluginController
             RequestTimeout = _cloudflareImagesSettings.RequestTimeout
         };
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.CloudflareImages/Views/Configure.cshtml", model);
     }
 

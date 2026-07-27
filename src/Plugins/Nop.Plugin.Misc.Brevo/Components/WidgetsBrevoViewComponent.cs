@@ -44,6 +44,7 @@ public class WidgetsBrevoViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var trackingScript = string.Empty;
 
         //ensure Marketing Automation is enabled
@@ -55,12 +56,14 @@ public class WidgetsBrevoViewComponent : NopViewComponent
         var customerEmail = !await _customerService.IsGuestAsync(customer)
             ? customer.Email?.Replace("'", "\\'")
             : string.Empty;
+			logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customer → {Customer}", widgetZone, additionalData, customer);
 
         //prepare tracking script
         trackingScript = $"{_brevoSettings.TrackingScript}{Environment.NewLine}"
             .Replace(BrevoDefaults.TrackingScriptId, _brevoSettings.MarketingAutomationKey)
             .Replace(BrevoDefaults.TrackingScriptCustomerEmail, customerEmail);
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Misc.Brevo/Views/PublicInfo.cshtml", trackingScript);
     }
 

@@ -11,6 +11,7 @@ public partial class CategoryValidator : BaseNopValidator<CategoryModel>
 {
     public CategoryValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CategoryValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Categories.Fields.Name.Required"));
         RuleFor(x => x.PageSizeOptions).Must(ValidatorUtilities.PageSizeOptionsValidator).WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Categories.Fields.PageSizeOptions.ShouldHaveUniqueItems"));
         RuleFor(x => x.PageSize).Must((x, context) =>
@@ -34,5 +35,6 @@ public partial class CategoryValidator : BaseNopValidator<CategoryModel>
             .When(x => x.PriceRangeFiltering && x.ManuallyPriceRange);
 
         SetDatabaseValidationRules<Category>();
+		logger.LogDebug("<<< Exiting CategoryValidator(localizationService={LocalizationService})", localizationService);
     }
 }

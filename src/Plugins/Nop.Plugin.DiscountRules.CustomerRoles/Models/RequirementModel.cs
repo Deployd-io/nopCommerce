@@ -7,7 +7,10 @@ public class RequirementModel
 {
     public RequirementModel()
     {
+		logger.LogDebug(">>> Entering RequirementModel()");
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting RequirementModel()");
+		logger.LogDebug("RequirementModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
     }
 
     [NopResourceDisplayName("Plugins.DiscountRules.CustomerRoles.Fields.CustomerRole")]

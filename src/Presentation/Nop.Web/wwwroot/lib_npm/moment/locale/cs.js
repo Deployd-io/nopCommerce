@@ -35,9 +35,12 @@ var months = {
         /^(leden|únor|březen|duben|květen|červenec|července|červen|června|srpen|září|říjen|listopad|prosinec|led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i;
 
 function plural(n) {
+	logger.debug(`>>> Entering plural(n=${n})`);
+	logger.debug(`<<< Exiting plural(n=${n})`);
     return n > 1 && n < 5 && ~~(n / 10) !== 1;
 }
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     switch (key) {
         case 's': // a few seconds / in a few seconds / a few seconds ago
@@ -86,6 +89,7 @@ function translate(number, withoutSuffix, key, isFuture) {
             if (withoutSuffix || isFuture) {
                 return result + (plural(number) ? 'roky' : 'let');
             } else {
+				logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
                 return result + 'lety';
             }
     }
@@ -121,6 +125,7 @@ export default moment.defineLocale('cs', {
         sameDay: '[dnes v] LT',
         nextDay: '[zítra v] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[v neděli v] LT';
@@ -136,9 +141,11 @@ export default moment.defineLocale('cs', {
                 case 6:
                     return '[v sobotu v] LT';
             }
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: '[včera v] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[minulou neděli v] LT';
@@ -153,6 +160,7 @@ export default moment.defineLocale('cs', {
                 case 6:
                     return '[minulou sobotu v] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

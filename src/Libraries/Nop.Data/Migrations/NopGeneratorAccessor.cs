@@ -12,7 +12,9 @@ public class NopGeneratorAccessor : IGeneratorAccessor
 
     public NopGeneratorAccessor(IEnumerable<IMigrationGenerator> generators)
     {
+		logger.LogDebug(">>> Entering NopGeneratorAccessor(generators={Generators})", generators);
         ConfigureGenerator(generators.ToList());
+		logger.LogDebug("<<< Exiting NopGeneratorAccessor(generators={Generators})", generators);
     }
 
     #endregion
@@ -25,12 +27,16 @@ public class NopGeneratorAccessor : IGeneratorAccessor
     /// <param name="generators">Collection of migration generators</param>
     protected virtual void ConfigureGenerator(IList<IMigrationGenerator> generators)
     {
+		logger.LogDebug(">>> Entering ConfigureGenerator(generators={Generators})", generators);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		logger.LogDebug("ConfigureGenerator(generators={Generators}): dataSettings → {DataSettings}", generators, dataSettings);
         if (!generators.Any())
+			logger.LogDebug("<<< Exiting ConfigureGenerator(generators={Generators})", generators);
             throw new InvalidOperationException("No migration generator registered.");
 
         Generator = dataSettings is null ? generators.FirstOrDefault() : dataSettings.DataProvider switch
+		logger.LogDebug("ConfigureGenerator(generators={Generators}): Generator → {Generator}", generators, Generator);
         {
             DataProviderType.SqlServer => FindGenerator(generators, GeneratorIdConstants.SqlServer),
             DataProviderType.MySql => FindGenerator(generators, GeneratorIdConstants.MySql5),

@@ -26,6 +26,8 @@ public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBase
     /// <returns>An integer that indicates whether this instance precedes, follows, or appears in the same position in the sort order as the specified parameter</returns>
     public int CompareTo(PluginDescriptorBaseInfo other)
     {
+		logger.LogDebug(">>> Entering CompareTo(other={Other})", other);
+		logger.LogDebug("<<< Exiting CompareTo(other={Other})", other);
         return string.Compare(SystemName, other.SystemName, StringComparison.InvariantCultureIgnoreCase);
     }
 
@@ -36,6 +38,8 @@ public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBase
     /// <returns>True if the SystemName of the value parameter is the same as the SystemName of this instance; otherwise, false</returns>
     public override bool Equals(object value)
     {
+		logger.LogDebug(">>> Entering Equals(value={Value})", value);
+		logger.LogDebug("<<< Exiting Equals(value={Value})", value);
         return SystemName?.Equals((value as PluginDescriptorBaseInfo)?.SystemName) ?? false;
     }
 
@@ -45,6 +49,8 @@ public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBase
     /// <returns>A 32-bit signed integer hash code</returns>
     public override int GetHashCode()
     {
+		logger.LogDebug(">>> Entering GetHashCode()");
+		logger.LogDebug("<<< Exiting GetHashCode()");
         return SystemName.GetHashCode();
     }
 

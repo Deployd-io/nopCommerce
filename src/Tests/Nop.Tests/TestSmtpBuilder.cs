@@ -19,6 +19,8 @@ public class TestSmtpBuilder : SmtpBuilder
 
     public override Task<SmtpClient> BuildAsync(EmailAccount emailAccount = null)
     {
+		logger.LogDebug(">>> Entering BuildAsync(emailAccount={EmailAccount})", emailAccount);
+		logger.LogDebug("<<< Exiting BuildAsync(emailAccount={EmailAccount})", emailAccount);
         return Task.FromResult<SmtpClient>(new TestSmtpClient());
     }
 

@@ -22,6 +22,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>The connection string builder</returns>
     protected virtual SqlConnectionStringBuilder GetConnectionStringBuilder()
     {
+		logger.LogDebug(">>> Entering GetConnectionStringBuilder()");
+		logger.LogDebug("<<< Exiting GetConnectionStringBuilder()");
         return new SqlConnectionStringBuilder(DataSettings.ConnectionString);
     }
 
@@ -32,8 +34,10 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection to a database</returns>
     protected override DbConnection GetInternalDbConnection(string connectionString)
     {
+		logger.LogDebug(">>> Entering GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
+		logger.LogDebug("<<< Exiting GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         return new SqlConnection(connectionString);
     }
 
@@ -47,28 +51,37 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <param name="triesToConnect">Count of tries to connect to the database after creating; set 0 if no need to connect after creating</param>
     public virtual void CreateDatabase(int triesToConnect = 10)
     {
+		logger.LogDebug(">>> Entering CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (DatabaseExists())
             return;
 
         var builder = GetConnectionStringBuilder();
 
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): builder → {Builder}", triesToConnect, builder);
         //gets database name
         var databaseName = builder.InitialCatalog;
 
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): databaseName → {DatabaseName}", triesToConnect, databaseName);
         //now create connection string to 'master' database. It always exists.
         builder.InitialCatalog = "master";
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): builder.InitialCatalog → {Arg1}", triesToConnect, builder.InitialCatalog);
 
         using (var connection = GetInternalDbConnection(builder.ConnectionString))
         {
             var query = $"CREATE DATABASE [{databaseName}]";
             if (!string.IsNullOrWhiteSpace(DataSettings.Collation))
+				logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): query → {Query}", triesToConnect, query);
                 query = $"{query} COLLATE {DataSettings.Collation}";
 
             var command = connection.CreateCommand();
             command.CommandText = query;
+			logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): command → {Command}", triesToConnect, command);
+			logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): command.CommandText → {Arg1}", triesToConnect, command.CommandText);
             command.Connection.Open();
 
             command.ExecuteNonQuery();
+			logger.LogInformation("CreateDatabase(triesToConnect)={TriesToConnect}: database query executed in {Arg1} ms", triesToConnect, __logStart.ElapsedMilliseconds);
         }
 
         //try connect
@@ -89,6 +102,7 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
             else
                 break;
         }
+		logger.LogDebug("<<< Exiting CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
     }
 
     /// <summary>
@@ -100,10 +114,12 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual async Task<bool> DatabaseExistsAsync()
     {
+		logger.LogDebug(">>> Entering DatabaseExistsAsync()");
         try
         {
             await using var connection = GetInternalDbConnection(DataSettings.ConnectionString);
 
+			logger.LogDebug("DatabaseExistsAsync(): connection → {Connection}", connection);
             //just try to connect
             await connection.OpenAsync();
 
@@ -111,6 +127,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
         }
         catch
         {
+			logger.LogError("Exception in DatabaseExistsAsync(): {Arg0}", ex.Message);
+			logger.LogDebug("<<< Exiting DatabaseExistsAsync()");
             return false;
         }
     }
@@ -121,16 +139,20 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Returns true if the database exists.</returns>
     public virtual bool DatabaseExists()
     {
+		logger.LogDebug(">>> Entering DatabaseExists()");
         try
         {
             using var connection = GetInternalDbConnection(DataSettings.ConnectionString);
             //just try to connect
+			logger.LogDebug("DatabaseExists(): connection → {Connection}", connection);
             connection.Open();
 
             return true;
         }
         catch
         {
+			logger.LogError("Exception in DatabaseExists(): {Arg0}", ex.Message);
+			logger.LogDebug("<<< Exiting DatabaseExists()");
             return false;
         }
     }
@@ -143,8 +165,10 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Queryable source</returns>
     public override IQueryable<TEntity> GetTable<TEntity>()
     {
+		logger.LogDebug(">>> Entering GetTable()");
         var table = (ITable<TEntity>)base.GetTable<TEntity>();
 
+		logger.LogDebug("GetTable(): table → {Table}", table);
         return DataSettingsManager.UseNoLock() ? table.With("NOLOCK") : table;
     }
 
@@ -158,8 +182,11 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual Task<int?> GetTableIdentAsync<TEntity>() where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering GetTableIdentAsync()");
         using var currentConnection = CreateDataConnection();
         var tableName = NopMappingSchema.GetEntityDescriptor(typeof(TEntity)).EntityName;
+		logger.LogDebug("GetTableIdentAsync(): currentConnection → {CurrentConnection}", currentConnection);
+		logger.LogDebug("GetTableIdentAsync(): tableName → {TableName}", tableName);
 
         var result = currentConnection.Query<decimal?>($"SELECT IDENT_CURRENT('[{tableName}]') as Value")
             .FirstOrDefault();
@@ -175,13 +202,18 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetTableIdentAsync<TEntity>(int ident) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering SetTableIdentAsync(ident={Ident})", ident);
         using var currentConnection = CreateDataConnection();
         var currentIdent = await GetTableIdentAsync<TEntity>();
+		logger.LogDebug("SetTableIdentAsync(ident={Ident}): currentConnection → {CurrentConnection}", ident, currentConnection);
+		logger.LogDebug("SetTableIdentAsync(ident={Ident}): currentIdent → {CurrentIdent}", ident, currentIdent);
         if (!currentIdent.HasValue || ident <= currentIdent.Value)
+			logger.LogDebug("<<< Exiting SetTableIdentAsync(ident={Ident})", ident);
             return;
 
         var tableName = NopMappingSchema.GetEntityDescriptor(typeof(TEntity)).EntityName;
 
+		logger.LogDebug("SetTableIdentAsync(ident={Ident}): tableName → {TableName}", ident, tableName);
         await currentConnection.ExecuteAsync($"DBCC CHECKIDENT([{tableName}], RESEED, {ident})");
     }
 
@@ -191,10 +223,14 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BackupDatabaseAsync(string fileName)
     {
+		logger.LogDebug(">>> Entering BackupDatabaseAsync(fileName={FileName})", fileName);
         using var currentConnection = CreateDataConnection();
         
+		logger.LogDebug("BackupDatabaseAsync(fileName={FileName}): currentConnection → {CurrentConnection}", fileName, currentConnection);
         var commandText = $"BACKUP DATABASE [{GetConnectionStringBuilder().InitialCatalog}] TO DISK = '{fileName}' WITH FORMAT";
         await currentConnection.ExecuteAsync(commandText);
+		logger.LogDebug("<<< Exiting BackupDatabaseAsync(fileName={FileName})", fileName);
+		logger.LogDebug("BackupDatabaseAsync(fileName={FileName}): commandText → {CommandText}", fileName, commandText);
     }
 
     /// <summary>
@@ -204,6 +240,7 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RestoreDatabaseAsync(string backupFileName)
     {
+		logger.LogDebug(">>> Entering RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
         using var currentConnection = CreateDataConnection();
         var commandText = string.Format(
             "DECLARE @ErrorMessage NVARCHAR(4000)\n" +
@@ -221,8 +258,11 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
             "END",
             GetConnectionStringBuilder().InitialCatalog,
             backupFileName);
+			logger.LogDebug("RestoreDatabaseAsync(backupFileName={BackupFileName}): currentConnection → {CurrentConnection}", backupFileName, currentConnection);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         await currentConnection.ExecuteAsync(commandText);
+		logger.LogDebug("<<< Exiting RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
     }
 
     /// <summary>
@@ -231,8 +271,10 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ReIndexTablesAsync()
     {
+		logger.LogDebug(">>> Entering ReIndexTablesAsync()");
         using var currentConnection = CreateDataConnection();
         var commandText = $@"
+					logger.LogDebug("ReIndexTablesAsync(): currentConnection → {CurrentConnection}", currentConnection);
                     DECLARE @TableName sysname 
                     DECLARE cur_reindex CURSOR FOR
                     SELECT table_name
@@ -249,6 +291,7 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
                     DEALLOCATE cur_reindex";
 
         await currentConnection.ExecuteAsync(commandText);
+		logger.LogDebug("<<< Exiting ReIndexTablesAsync()");
     }
 
     /// <summary>
@@ -257,8 +300,11 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ShrinkDatabaseAsync()
     {
+		logger.LogDebug(">>> Entering ShrinkDatabaseAsync()");
         using var currentConnection = CreateDataConnection();
         await currentConnection.ExecuteAsync($"DBCC SHRINKDATABASE ([{GetConnectionStringBuilder().InitialCatalog}]);");
+		logger.LogDebug("<<< Exiting ShrinkDatabaseAsync()");
+		logger.LogDebug("ShrinkDatabaseAsync(): currentConnection → {CurrentConnection}", currentConnection);
     }
 
     /// <summary>
@@ -268,6 +314,7 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection string</returns>
     public virtual string BuildConnectionString(INopConnectionStringInfo nopConnectionString)
     {
+		logger.LogDebug(">>> Entering BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         ArgumentNullException.ThrowIfNull(nopConnectionString);
 
         var builder = new SqlConnectionStringBuilder
@@ -282,9 +329,12 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
         if (!nopConnectionString.IntegratedSecurity)
         {
             builder.UserID = nopConnectionString.Username;
+			logger.LogDebug("BuildConnectionString(nopConnectionString={NopConnectionString}): builder.UserID → {Arg1}", nopConnectionString, builder.UserID);
+			logger.LogDebug("BuildConnectionString(nopConnectionString={NopConnectionString}): builder.Password → {Arg1}", nopConnectionString, builder.Password);
             builder.Password = nopConnectionString.Password;
         }
 
+		logger.LogDebug("<<< Exiting BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         return builder.ConnectionString;
     }
 
@@ -298,6 +348,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of a foreign key</returns>
     public virtual string CreateForeignKeyName(string foreignTable, string foreignColumn, string primaryTable, string primaryColumn)
     {
+		logger.LogDebug(">>> Entering CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
+		logger.LogDebug("<<< Exiting CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
         return $"FK_{foreignTable}_{foreignColumn}_{primaryTable}_{primaryColumn}";
     }
 
@@ -309,6 +361,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of an index</returns>
     public virtual string GetIndexName(string targetTable, string targetColumn)
     {
+		logger.LogDebug(">>> Entering GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
+		logger.LogDebug("<<< Exiting GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
         return $"IX_{targetTable}_{targetColumn}";
     }
 
@@ -321,6 +375,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UpdateEntitiesAsync<TEntity>(IEnumerable<TEntity> entities)
     {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering UpdateEntitiesAsync(entities={Entities})", entities);
         using var dataContext = CreateDataConnection();
         await dataContext.GetTable<TEntity>()
             .Merge()
@@ -328,7 +384,9 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
             .OnTargetKey()
             .UpdateWhenMatched()
             .MergeAsync();
+			logger.LogDebug("UpdateEntitiesAsync(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
     }
+	logger.LogInformation("UpdateEntitiesAsync(entities)={Entities}: update query executed in {Arg1} ms", entities, __logStart.ElapsedMilliseconds);
 
     /// <summary>
     /// Updates records in table, using values from entity parameter.
@@ -338,6 +396,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override void UpdateEntities<TEntity>(IEnumerable<TEntity> entities)
     {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering UpdateEntities(entities={Entities})", entities);
         using var dataContext = CreateDataConnection();
         dataContext.GetTable<TEntity>()
             .Merge()
@@ -345,7 +405,9 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
             .OnTargetKey()
             .UpdateWhenMatched()
             .Merge();
+			logger.LogDebug("UpdateEntities(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
     }
+	logger.LogInformation("UpdateEntities(entities)={Entities}: update query executed in {Arg1} ms", entities, __logStart.ElapsedMilliseconds);
     
     /// <summary>
     /// Gets the name of the database collation
@@ -357,6 +419,8 @@ public partial class MsSqlNopDataProvider : BaseDataProvider, INopDataProvider
     public virtual Task<string> GetDataBaseCollationAsync()
     {
         var builder = GetConnectionStringBuilder();
+		logger.LogDebug(">>> Entering GetDataBaseCollationAsync()");
+		logger.LogDebug("<<< Exiting GetDataBaseCollationAsync()");
         return GetSqlStringValueAsync($"SELECT CONVERT (varchar(256), DATABASEPROPERTYEX('{builder.InitialCatalog}','collation'));");
     }
 

@@ -9,8 +9,12 @@ public partial class ShippingSettings : ISettings
 {
     public ShippingSettings()
     {
+		logger.LogDebug(">>> Entering ShippingSettings()");
         ActiveShippingRateComputationMethodSystemNames = new List<string>();
         ActivePickupPointProviderSystemNames = new List<string>();
+		logger.LogDebug("<<< Exiting ShippingSettings()");
+		logger.LogDebug("ShippingSettings(): ActiveShippingRateComputationMethodSystemNames → {ActiveShippingRateComputationMethodSystemNames}", ActiveShippingRateComputationMethodSystemNames);
+		logger.LogDebug("ShippingSettings(): ActivePickupPointProviderSystemNames → {ActivePickupPointProviderSystemNames}", ActivePickupPointProviderSystemNames);
     }
 
     /// <summary>

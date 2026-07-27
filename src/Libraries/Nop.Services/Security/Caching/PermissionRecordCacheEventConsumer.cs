@@ -15,6 +15,8 @@ public partial class PermissionRecordCacheEventConsumer : CacheEventConsumer<Per
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(PermissionRecord entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(NopSecurityDefaults.PermissionAllowedPrefix, entity.SystemName);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

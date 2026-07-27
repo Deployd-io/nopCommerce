@@ -24,8 +24,10 @@ public class MySqlDateTimeWithPrecisionMigration : ForwardOnlyMigration
 {
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		logger.LogDebug("Up(): dataSettings → {DataSettings}", dataSettings);
         //update the types only in MySql 
         if (dataSettings.DataProvider != DataProviderType.MySql)
             return;
@@ -338,5 +340,6 @@ public class MySqlDateTimeWithPrecisionMigration : ForwardOnlyMigration
         Alter.Table(NameCompatibilityManager.GetTableName(typeof(VendorNote)))
             .AlterColumn(NameCompatibilityManager.GetColumnName(typeof(VendorNote), nameof(VendorNote.CreatedOnUtc)))
             .AsCustom("datetime(6)");
+			logger.LogDebug("<<< Exiting Up()");
     }
 }

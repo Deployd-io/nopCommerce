@@ -20,7 +20,10 @@ public partial class FullDescriptionGeneratorViewComponent : NopViewComponent
 
     public FullDescriptionGeneratorViewComponent(ArtificialIntelligenceSettings artificialIntelligenceSettings)
     {
+		logger.LogDebug(">>> Entering FullDescriptionGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings})", artificialIntelligenceSettings);
         _artificialIntelligenceSettings = artificialIntelligenceSettings;
+		logger.LogDebug("<<< Exiting FullDescriptionGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings})", artificialIntelligenceSettings);
+		logger.LogDebug("FullDescriptionGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings}): _artificialIntelligenceSettings → {_artificialIntelligenceSettings}", artificialIntelligenceSettings, _artificialIntelligenceSettings);
     }
 
     #endregion
@@ -29,7 +32,9 @@ public partial class FullDescriptionGeneratorViewComponent : NopViewComponent
 
     public IViewComponentResult Invoke(FullDescriptionGeneratorModel model)
     {
+		logger.LogDebug(">>> Entering Invoke(model={Model})", model);
         if (!_artificialIntelligenceSettings.Enabled)
+		logger.LogDebug("<<< Exiting Invoke(model={Model})", model);
             return Content(string.Empty);
 
         return View(model);

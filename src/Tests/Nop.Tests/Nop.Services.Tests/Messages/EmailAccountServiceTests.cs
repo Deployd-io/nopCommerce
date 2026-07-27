@@ -12,7 +12,10 @@ public class EmailAccountServiceTests : ServiceTest<EmailAccount>
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _emailAccountService = GetService<IEmailAccountService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _emailAccountService → {_emailAccountService}", _emailAccountService);
     }
 
     protected override CrudData<EmailAccount> CrudData

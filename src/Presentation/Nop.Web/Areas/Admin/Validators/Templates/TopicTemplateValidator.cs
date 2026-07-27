@@ -10,9 +10,11 @@ public partial class TopicTemplateValidator : BaseNopValidator<TopicTemplateMode
 {
     public TopicTemplateValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering TopicTemplateValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Topic.Name.Required"));
         RuleFor(x => x.ViewPath).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Topic.ViewPath.Required"));
 
         SetDatabaseValidationRules<TopicTemplate>();
+		logger.LogDebug("<<< Exiting TopicTemplateValidator(localizationService={LocalizationService})", localizationService);
     }
 }

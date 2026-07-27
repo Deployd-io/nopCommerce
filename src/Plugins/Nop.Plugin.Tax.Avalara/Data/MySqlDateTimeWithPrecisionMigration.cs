@@ -15,8 +15,10 @@ public class MySqlDateTimeWithPrecisionMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		logger.LogDebug("Up(): dataSettings → {DataSettings}", dataSettings);
         //update the types only in MySql 
         if (dataSettings.DataProvider != DataProviderType.MySql)
             return;
@@ -24,6 +26,7 @@ public class MySqlDateTimeWithPrecisionMigration : Migration
         Alter.Table(NameCompatibilityManager.GetTableName(typeof(TaxTransactionLog)))
             .AlterColumn(NameCompatibilityManager.GetColumnName(typeof(TaxTransactionLog), nameof(TaxTransactionLog.CreatedDateUtc)))
             .AsCustom("datetime(6)");
+			logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -31,6 +34,8 @@ public class MySqlDateTimeWithPrecisionMigration : Migration
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //nothing
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

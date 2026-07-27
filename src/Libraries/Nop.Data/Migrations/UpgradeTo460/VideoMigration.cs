@@ -14,10 +14,12 @@ public class VideoMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!Schema.Table(NameCompatibilityManager.GetTableName(typeof(Video))).Exists())
             Create.TableFor<Video>();
 
         if (!Schema.Table(NameCompatibilityManager.GetTableName(typeof(ProductVideo))).Exists())
             Create.TableFor<ProductVideo>();
+			logger.LogDebug("<<< Exiting Up()");
     }
 }

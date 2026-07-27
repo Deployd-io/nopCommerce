@@ -10,8 +10,10 @@ public partial class TaxCategoryValidator : BaseNopValidator<TaxCategoryModel>
 {
     public TaxCategoryValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering TaxCategoryValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Tax.Categories.Fields.Name.Required"));
 
         SetDatabaseValidationRules<TaxCategory>();
+		logger.LogDebug("<<< Exiting TaxCategoryValidator(localizationService={LocalizationService})", localizationService);
     }
 }

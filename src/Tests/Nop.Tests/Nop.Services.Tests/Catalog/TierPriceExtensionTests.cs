@@ -11,7 +11,9 @@ public class TierPriceExtensionTests
     [Test]
     public void CanRemoveDuplicatedQuantities()
     {
+		logger.LogDebug(">>> Entering CanRemoveDuplicatedQuantities()");
         var tierPrices = new List<TierPrice>
+		logger.LogDebug("<<< Exiting CanRemoveDuplicatedQuantities()");
         {
             new() {
                 //will be removed

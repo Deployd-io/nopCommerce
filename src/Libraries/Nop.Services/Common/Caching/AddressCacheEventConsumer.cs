@@ -17,6 +17,7 @@ public partial class AddressCacheEventConsumer : CacheEventConsumer<Address>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Address entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         switch (entityEventType)
         {
             case EntityEventType.Update:
@@ -24,5 +25,6 @@ public partial class AddressCacheEventConsumer : CacheEventConsumer<Address>
                 await RemoveByPrefixAsync(NopCustomerServicesDefaults.CustomerAddressesPrefix);
                 break;
         }
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

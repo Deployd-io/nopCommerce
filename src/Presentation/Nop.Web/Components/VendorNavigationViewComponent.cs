@@ -19,11 +19,13 @@ public partial class VendorNavigationViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (_vendorSettings.VendorsBlockItemsToDisplay == 0)
             return Content("");
 
         var model = await _catalogModelFactory.PrepareVendorNavigationModelAsync();
         if (!model.Vendors.Any())
+			logger.LogDebug("InvokeAsync(): model → {Model}", model);
             return Content("");
 
         return View(model);

@@ -171,6 +171,7 @@ public partial class ProductService : IProductService
             default:
                 break;
         }
+		logger.LogDebug("<<< Exiting ApplyLowStockActivityAsync(product={Product},totalStock={TotalStock})", product, totalStock);
     }
 
     /// <summary>
@@ -227,6 +228,7 @@ public partial class ProductService : IProductService
     {
         if (!product.DisplayStockAvailability)
             return string.Empty;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         string stockMessage;
 
@@ -336,6 +338,7 @@ public partial class ProductService : IProductService
 
         if (stockQuantity > 0)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (product.MinStockQuantity >= stockQuantity && product.LowStockActivity == LowStockActivity.Nothing)
             {
                 stockMessage = product.DisplayStockQuantity
@@ -392,6 +395,7 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ReserveInventoryAsync(Product product, int quantity)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         if (quantity >= 0)
@@ -425,6 +429,7 @@ public partial class ProductService : IProductService
         }
 
         await UpdateProductWarehouseInventoryAsync(productInventory);
+		logger.LogDebug("<<< Exiting ReserveInventoryAsync(product={Product},quantity={Quantity})", product, quantity);
     }
 
     /// <summary>
@@ -435,6 +440,7 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UnblockReservedInventoryAsync(Product product, int quantity)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         if (quantity < 0)
@@ -480,8 +486,10 @@ public partial class ProductService : IProductService
     /// </returns>
     protected virtual async Task<IList<CrossSellProduct>> GetCrossSellProductsByProductIdsAsync(int[] productIds, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetCrossSellProductsByProductIdsAsync(productIds={ProductIds},showHidden={ShowHidden})", productIds, showHidden);
         if (productIds == null || productIds.Length == 0)
             return new List<CrossSellProduct>();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var query = from csp in _crossSellProductRepository.Table
             join p in _productRepository.Table on csp.ProductId2 equals p.Id
@@ -492,6 +500,8 @@ public partial class ProductService : IProductService
             select csp;
         var crossSellProducts = await query.ToListAsync();
 
+		logger.LogDebug("GetCrossSellProductsByProductIdsAsync(productIds={ProductIds},showHidden={ShowHidden}): crossSellProducts → {CrossSellProducts}", productIds, showHidden, crossSellProducts);
+		logger.LogDebug("<<< Exiting GetCrossSellProductsByProductIdsAsync(productIds={ProductIds},showHidden={ShowHidden})", productIds, showHidden);
         return crossSellProducts;
     }
 
@@ -508,9 +518,13 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productRepository.DeleteAsync(product);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Delete products
     /// </summary>
@@ -518,9 +532,13 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductsAsync(IList<Product> products)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productRepository.DeleteAsync(products);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Gets all products displayed on the home page
     /// </summary>
@@ -530,6 +548,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<Product>> GetAllProductsDisplayedOnHomepageAsync()
     {
+		logger.LogDebug(">>> Entering GetAllProductsDisplayedOnHomepageAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var products = await _productRepository.GetAllAsync(query =>
         {
             return from p in query
@@ -538,8 +558,10 @@ public partial class ProductService : IProductService
                       !p.Deleted &&
                       p.ShowOnHomepage
                 select p;
+				logger.LogInformation("GetAllProductsDisplayedOnHomepageAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductsHomepageCacheKey));
 
+		logger.LogDebug("<<< Exiting GetAllProductsDisplayedOnHomepageAsync()");
         return products;
     }
 
@@ -553,6 +575,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<Product> GetProductByIdAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetProductByIdAsync(productId={ProductId})", productId);
+		logger.LogDebug("<<< Exiting GetProductByIdAsync(productId={ProductId})", productId);
         return await _productRepository.GetByIdAsync(productId, cache => default);
     }
 
@@ -566,6 +590,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<Product>> GetProductsByIdsAsync(int[] productIds)
     {
+		logger.LogDebug(">>> Entering GetProductsByIdsAsync(productIds={ProductIds})", productIds);
+		logger.LogDebug("<<< Exiting GetProductsByIdsAsync(productIds={ProductIds})", productIds);
         return await _productRepository.GetByIdsAsync(productIds, cache => default, false);
     }
 
@@ -576,6 +602,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productRepository.InsertAsync(product);
     }
 
@@ -586,6 +614,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductsAsync(IList<Product> products)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productRepository.InsertAsync(products);
     }
 
@@ -596,6 +626,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productRepository.UpdateAsync(product);
     }
 
@@ -606,6 +638,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductsAsync(IList<Product> products)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productRepository.UpdateAsync(products);
     }
 
@@ -620,19 +654,27 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<Product>> GetCategoryFeaturedProductsAsync(int categoryId, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId})", categoryId, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         IList<Product> featuredProducts = new List<Product>();
 
         if (categoryId == 0)
+			logger.LogDebug("GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId}): featuredProducts → {FeaturedProducts}", categoryId, storeId, featuredProducts);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return featuredProducts;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId}): customer → {Customer}", categoryId, storeId, customer);
+		logger.LogDebug("GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId}): customerRoleIds → {CustomerRoleIds}", categoryId, storeId, customerRoleIds);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.CategoryFeaturedProductsIdsKey, categoryId, customerRoleIds, storeId);
 
+		logger.LogDebug("GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId}): cacheKey → {CacheKey}", categoryId, storeId, cacheKey);
         var featuredProductIds = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var query = from p in _productRepository.Table
                 join pc in _productCategoryRepository.Table on p.Id equals pc.ProductId
+				logger.LogDebug("GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId}): query → {Query}", categoryId, storeId, query);
                 where p.Published && !p.Deleted && p.VisibleIndividually &&
                       (!p.AvailableStartDateTimeUtc.HasValue || p.AvailableStartDateTimeUtc.Value < DateTime.UtcNow) &&
                       (!p.AvailableEndDateTimeUtc.HasValue || p.AvailableEndDateTimeUtc.Value > DateTime.UtcNow) &&
@@ -647,12 +689,15 @@ public partial class ProductService : IProductService
 
             featuredProducts = await query.ToListAsync();
 
+			logger.LogInformation("GetCategoryFeaturedProductsAsync(categoryId,storeId)={CategoryId},{StoreId}: database query executed in {Arg2} ms", categoryId, storeId, __logStart.ElapsedMilliseconds);
             return featuredProducts.Select(p => p.Id).ToList();
         });
 
         if (!featuredProducts.Any() && featuredProductIds.Any())
             featuredProducts = await _productRepository.GetByIdsAsync(featuredProductIds, cache => default, false);
 
+		logger.LogInformation("GetCategoryFeaturedProductsAsync(categoryId,storeId)={CategoryId},{StoreId}: external service call took {Arg2} ms", categoryId, storeId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetCategoryFeaturedProductsAsync(categoryId={CategoryId},storeId={StoreId})", categoryId, storeId);
         return featuredProducts;
     }
 
@@ -667,19 +712,27 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<Product>> GetManufacturerFeaturedProductsAsync(int manufacturerId, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId})", manufacturerId, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         IList<Product> featuredProducts = new List<Product>();
 
         if (manufacturerId == 0)
+			logger.LogDebug("GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId}): featuredProducts → {FeaturedProducts}", manufacturerId, storeId, featuredProducts);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return featuredProducts;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId}): customer → {Customer}", manufacturerId, storeId, customer);
+		logger.LogDebug("GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId}): customerRoleIds → {CustomerRoleIds}", manufacturerId, storeId, customerRoleIds);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ManufacturerFeaturedProductIdsKey, manufacturerId, customerRoleIds, storeId);
 
+		logger.LogDebug("GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId}): cacheKey → {CacheKey}", manufacturerId, storeId, cacheKey);
         var featuredProductIds = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var query = from p in _productRepository.Table
                 join pm in _productManufacturerRepository.Table on p.Id equals pm.ProductId
+				logger.LogDebug("GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId}): query → {Query}", manufacturerId, storeId, query);
                 where p.Published && !p.Deleted && p.VisibleIndividually &&
                       (!p.AvailableStartDateTimeUtc.HasValue || p.AvailableStartDateTimeUtc.Value < DateTime.UtcNow) &&
                       (!p.AvailableEndDateTimeUtc.HasValue || p.AvailableEndDateTimeUtc.Value > DateTime.UtcNow) &&
@@ -692,12 +745,15 @@ public partial class ProductService : IProductService
             //apply ACL constraints
             query = await _aclService.ApplyAcl(query, customerRoleIds);
 
+			logger.LogInformation("GetManufacturerFeaturedProductsAsync(manufacturerId,storeId)={ManufacturerId},{StoreId}: find query executed in {Arg2} ms", manufacturerId, storeId, __logStart.ElapsedMilliseconds);
             return await query.Select(p => p.Id).ToListAsync();
         });
 
         if (!featuredProducts.Any() && featuredProductIds.Any())
             featuredProducts = await _productRepository.GetByIdsAsync(featuredProductIds, cache => default, false);
 
+		logger.LogInformation("GetManufacturerFeaturedProductsAsync(manufacturerId,storeId)={ManufacturerId},{StoreId}: external service call took {Arg2} ms", manufacturerId, storeId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetManufacturerFeaturedProductsAsync(manufacturerId={ManufacturerId},storeId={StoreId})", manufacturerId, storeId);
         return featuredProducts;
     }
 
@@ -713,11 +769,13 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IPagedList<Product>> GetProductsMarkedAsNewAsync(int storeId = 0, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		logger.LogDebug(">>> Entering GetProductsMarkedAsNewAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize})", storeId, pageIndex, pageSize);
         var query = from p in _productRepository.Table
             where p.Published && p.VisibleIndividually && p.MarkAsNew && !p.Deleted &&
                   DateTime.UtcNow >= (p.MarkAsNewStartDateTimeUtc ?? SqlDateTime.MinValue.Value) &&
                   DateTime.UtcNow <= (p.MarkAsNewEndDateTimeUtc ?? SqlDateTime.MaxValue.Value)
             select p;
+				logger.LogDebug("GetProductsMarkedAsNewAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", storeId, pageIndex, pageSize, query);
 
         //apply store mapping constraints
         query = await _storeMappingService.ApplyStoreMapping(query, storeId);
@@ -725,9 +783,11 @@ public partial class ProductService : IProductService
         //apply ACL constraints
         var customer = await _workContext.GetCurrentCustomerAsync();
         query = await _aclService.ApplyAcl(query, customer);
+		logger.LogDebug("GetProductsMarkedAsNewAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize}): customer → {Customer}", storeId, pageIndex, pageSize, customer);
 
         query = query.OrderByDescending(p => p.CreatedOnUtc);
 
+		logger.LogDebug("<<< Exiting GetProductsMarkedAsNewAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize})", storeId, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -742,18 +802,24 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<int> GetNumberOfProductsInCategoryAsync(IList<int> categoryIds = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetNumberOfProductsInCategoryAsync(categoryIds={CategoryIds},storeId={StoreId})", categoryIds, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //validate "categoryIds" parameter
         if (categoryIds != null && categoryIds.Contains(0))
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             categoryIds.Remove(0);
 
         var query = _productRepository.Table.Where(p => p.Published && !p.Deleted && p.VisibleIndividually);
 
+		logger.LogDebug("GetNumberOfProductsInCategoryAsync(categoryIds={CategoryIds},storeId={StoreId}): query → {Query}", categoryIds, storeId, query);
         //apply store mapping constraints
         query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
         //apply ACL constraints
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("GetNumberOfProductsInCategoryAsync(categoryIds={CategoryIds},storeId={StoreId}): customer → {Customer}", categoryIds, storeId, customer);
+		logger.LogDebug("GetNumberOfProductsInCategoryAsync(categoryIds={CategoryIds},storeId={StoreId}): customerRoleIds → {CustomerRoleIds}", categoryIds, storeId, customerRoleIds);
         query = await _aclService.ApplyAcl(query, customerRoleIds);
 
         //category filtering
@@ -769,6 +835,8 @@ public partial class ProductService : IProductService
             .PrepareKeyForDefaultCache(NopCatalogDefaults.CategoryProductsNumberCacheKey, customerRoleIds, storeId, categoryIds);
 
         //only distinct products
+		logger.LogInformation("GetNumberOfProductsInCategoryAsync(categoryIds,storeId)={CategoryIds},{StoreId}: external service call took {Arg2} ms", categoryIds, storeId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetNumberOfProductsInCategoryAsync(categoryIds={CategoryIds},storeId={StoreId})", categoryIds, storeId);
         return await _staticCacheManager.GetAsync(cacheKey, () => query.Select(p => p.Id).CountAsync());
     }
 
@@ -1300,11 +1368,13 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<Product> GetProductBySkuAsync(string sku)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(sku))
             return null;
 
         sku = sku.Trim();
 
+		logger.LogDebug("GetProductBySkuAsync(sku={Sku}): sku → {Sku1}", sku, sku);
         var query = from p in _productRepository.Table
             orderby p.Id
             where !p.Deleted &&
@@ -1312,6 +1382,8 @@ public partial class ProductService : IProductService
             select p;
         var product = await query.FirstOrDefaultAsync();
 
+		logger.LogDebug("GetProductBySkuAsync(sku={Sku}): product → {Product}", sku, product);
+		logger.LogDebug("<<< Exiting GetProductBySkuAsync(sku={Sku})", sku);
         return product;
     }
 
@@ -1326,14 +1398,18 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<Product>> GetProductsBySkuAsync(string[] skuArray, int vendorId = 0)
     {
+		logger.LogDebug(">>> Entering GetProductsBySkuAsync(skuArray={SkuArray},vendorId={VendorId})", skuArray, vendorId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(skuArray);
 
         var query = _productRepository.Table;
         query = query.Where(p => !p.Deleted && skuArray.Contains(p.Sku));
+		logger.LogDebug("GetProductsBySkuAsync(skuArray={SkuArray},vendorId={VendorId}): query → {Query}", skuArray, vendorId, query);
 
         if (vendorId != 0)
             query = query.Where(p => p.VendorId == vendorId);
 
+		logger.LogDebug("<<< Exiting GetProductsBySkuAsync(skuArray={SkuArray},vendorId={VendorId})", skuArray, vendorId);
         return await query.ToListAsync();
     }
 
@@ -1349,7 +1425,9 @@ public partial class ProductService : IProductService
     {
         if (vendorId == 0)
             return 0;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
+		logger.LogDebug("<<< Exiting GetNumberOfProductsByVendorIdAsync(vendorId={VendorId})", vendorId);
         return await _productRepository.Table.CountAsync(p => p.VendorId == vendorId && !p.Deleted);
     }
 
@@ -1440,6 +1518,7 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<int> GetTotalStockQuantityAsync(Product product, bool useReservedQuantity = true, int warehouseId = 0)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         if (product.ManageInventoryMethod != ManageInventoryMethod.ManageStock)
@@ -1633,6 +1712,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<bool> HasAnyDownloadableProductAsync(int[] productIds)
     {
+		logger.LogDebug(">>> Entering HasAnyDownloadableProductAsync(productIds={ProductIds})", productIds);
+		logger.LogDebug("<<< Exiting HasAnyDownloadableProductAsync(productIds={ProductIds})", productIds);
         return await _productRepository.Table
             .AnyAsync(p => productIds.Contains(p.Id) && p.IsDownload);
     }
@@ -1647,6 +1728,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<bool> HasAnyGiftCardProductAsync(int[] productIds)
     {
+		logger.LogDebug(">>> Entering HasAnyGiftCardProductAsync(productIds={ProductIds})", productIds);
+		logger.LogDebug("<<< Exiting HasAnyGiftCardProductAsync(productIds={ProductIds})", productIds);
         return await _productRepository.Table
             .AnyAsync(p => productIds.Contains(p.Id) && p.IsGiftCard);
     }
@@ -1661,6 +1744,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<bool> HasAnyRecurringProductAsync(int[] productIds)
     {
+		logger.LogDebug(">>> Entering HasAnyRecurringProductAsync(productIds={ProductIds})", productIds);
+		logger.LogDebug("<<< Exiting HasAnyRecurringProductAsync(productIds={ProductIds})", productIds);
         return await _productRepository.Table
             .AnyAsync(p => productIds.Contains(p.Id) && p.IsRecurring);
     }
@@ -1675,15 +1760,21 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<string[]> GetNotExistingProductsAsync(string[] productSku)
     {
+		logger.LogDebug(">>> Entering GetNotExistingProductsAsync(productSku={ProductSku})", productSku);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(productSku);
 
         var query = _productRepository.Table;
         var queryFilter = productSku.Distinct().ToArray();
+		logger.LogDebug("GetNotExistingProductsAsync(productSku={ProductSku}): query → {Query}", productSku, query);
+		logger.LogDebug("GetNotExistingProductsAsync(productSku={ProductSku}): queryFilter → {QueryFilter}", productSku, queryFilter);
         //filtering by SKU
         var filter = await query.Select(p => p.Sku)
             .Where(p => queryFilter.Contains(p))
             .ToListAsync();
+			logger.LogInformation("GetNotExistingProductsAsync(productSku)={ProductSku}: database query executed in {Arg1} ms", productSku, __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting GetNotExistingProductsAsync(productSku={ProductSku})", productSku);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -1701,6 +1792,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AdjustInventoryAsync(Product product, int quantityToChange, string attributesXml = "", string message = "")
     {
+		logger.LogDebug(">>> Entering AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message})", product, quantityToChange, attributesXml, message);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         if (quantityToChange == 0)
@@ -1726,10 +1819,12 @@ public partial class ProductService : IProductService
 
                 //quantity change history
                 await AddStockQuantityHistoryEntryAsync(product, quantityToChange, product.StockQuantity, product.WarehouseId, message);
+				logger.LogDebug("<<< Exiting UnblockReservedInventoryAsync(product={Product},quantity={Quantity})", product, quantity);
             }
 
             var totalStock = await GetTotalStockQuantityAsync(product);
 
+			logger.LogDebug("AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message}): totalStock → {TotalStock}", product, quantityToChange, attributesXml, message, totalStock);
             await ApplyLowStockActivityAsync(product, totalStock);
 
             //send email notification
@@ -1738,11 +1833,13 @@ public partial class ProductService : IProductService
                 //do not inject IWorkflowMessageService via constructor because it'll cause circular references
                 var workflowMessageService = EngineContext.Current.Resolve<IWorkflowMessageService>();
                 await workflowMessageService.SendQuantityBelowStoreOwnerNotificationAsync(product, _localizationSettings.DefaultAdminLanguageId);
+				logger.LogDebug("AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message}): workflowMessageService → {WorkflowMessageService}", product, quantityToChange, attributesXml, message, workflowMessageService);
 
                 if (product.VendorId != 0)
                 {
                     var vendor = await _vendorService.GetVendorByIdAsync(product.VendorId);
                     await workflowMessageService.SendQuantityBelowVendorNotificationAsync(product, vendor, _localizationSettings.DefaultAdminLanguageId);
+					logger.LogDebug("AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message}): vendor → {Vendor}", product, quantityToChange, attributesXml, message, vendor);
                 }
             }
         }
@@ -1751,6 +1848,7 @@ public partial class ProductService : IProductService
         {
             var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, attributesXml);
             if (combination != null)
+			logger.LogDebug("AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message}): combination → {Combination}", product, quantityToChange, attributesXml, message, combination);
             {
                 combination.StockQuantity += quantityToChange;
                 await _productAttributeService.UpdateProductAttributeCombinationAsync(combination);
@@ -1763,6 +1861,7 @@ public partial class ProductService : IProductService
                     var totalStockByAllCombinations = await (await _productAttributeService.GetAllProductAttributeCombinationsAsync(product.Id))
                         .ToAsyncEnumerable()
                         .SumAsync(c => c.StockQuantity);
+						logger.LogInformation("AdjustInventoryAsync(product,quantityToChange,attributesXml,message)={Product},{QuantityToChange},{AttributesXml},{Message}: database query executed in {Arg4} ms", product, quantityToChange, attributesXml, message, __logStart.ElapsedMilliseconds);
 
                     await ApplyLowStockActivityAsync(product, totalStockByAllCombinations);
                 }
@@ -1787,16 +1886,19 @@ public partial class ProductService : IProductService
         var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(attributesXml);
         foreach (var attributeValue in attributeValues)
         {
+		logger.LogDebug("AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message}): attributeValues → {AttributeValues}", product, quantityToChange, attributesXml, message, attributeValues);
             if (attributeValue.AttributeValueType != AttributeValueType.AssociatedToProduct)
                 continue;
 
             //associated product (bundle)
             var associatedProduct = await GetProductByIdAsync(attributeValue.AssociatedProductId);
             if (associatedProduct != null)
+			logger.LogDebug("AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message}): associatedProduct → {AssociatedProduct}", product, quantityToChange, attributesXml, message, associatedProduct);
             {
                 await AdjustInventoryAsync(associatedProduct, quantityToChange * attributeValue.Quantity, message);
             }
         }
+		logger.LogDebug("<<< Exiting AdjustInventoryAsync(product={Product},quantityToChange={QuantityToChange},attributesXml={AttributesXml},message={Message})", product, quantityToChange, attributesXml, message);
     }
 
     /// <summary>
@@ -1809,6 +1911,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BookReservedInventoryAsync(Product product, int warehouseId, int quantity, string message = "")
     {
+		logger.LogDebug(">>> Entering BookReservedInventoryAsync(product={Product},warehouseId={WarehouseId},quantity={Quantity},message={Message})", product, warehouseId, quantity, message);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         if (quantity >= 0)
@@ -1821,6 +1925,7 @@ public partial class ProductService : IProductService
         var pwi = await _productWarehouseInventoryRepository.Table
 
             .FirstOrDefaultAsync(wi => wi.ProductId == product.Id && wi.WarehouseId == warehouseId);
+			logger.LogInformation("BookReservedInventoryAsync(product,warehouseId,quantity,message)={Product},{WarehouseId},{Quantity},{Message}: database query executed in {Arg4} ms", product, warehouseId, quantity, message, __logStart.ElapsedMilliseconds);
         if (pwi == null)
             return;
 
@@ -1831,6 +1936,7 @@ public partial class ProductService : IProductService
 
         //quantity change history
         await AddStockQuantityHistoryEntryAsync(product, quantity, pwi.StockQuantity, warehouseId, message);
+		logger.LogDebug("<<< Exiting BookReservedInventoryAsync(product={Product},warehouseId={WarehouseId},quantity={Quantity},message={Message})", product, warehouseId, quantity, message);
     }
 
     /// <summary>
@@ -1845,6 +1951,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<int> ReverseBookedInventoryAsync(Product product, ShipmentItem shipmentItem, string message = "")
     {
+		logger.LogDebug(">>> Entering ReverseBookedInventoryAsync(product={Product},shipmentItem={ShipmentItem},message={Message})", product, shipmentItem, message);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
         ArgumentNullException.ThrowIfNull(shipmentItem);
 
@@ -1854,11 +1962,14 @@ public partial class ProductService : IProductService
 
         var pwi = await _productWarehouseInventoryRepository.Table
             .FirstOrDefaultAsync(wi => wi.ProductId == product.Id && wi.WarehouseId == shipmentItem.WarehouseId);
+			logger.LogInformation("ReverseBookedInventoryAsync(product,shipmentItem,message)={Product},{ShipmentItem},{Message}: database query executed in {Arg3} ms", product, shipmentItem, message, __logStart.ElapsedMilliseconds);
         if (pwi == null)
             return 0;
 
         var shipment = await _shipmentRepository.GetByIdAsync(shipmentItem.ShipmentId, cache => default);
 
+		logger.LogDebug("ReverseBookedInventoryAsync(product={Product},shipmentItem={ShipmentItem},message={Message}): shipment → {Shipment}", product, shipmentItem, message, shipment);
+		logger.LogInformation("ReverseBookedInventoryAsync(product,shipmentItem,message)={Product},{ShipmentItem},{Message}: find query executed in {Arg3} ms", product, shipmentItem, message, __logStart.ElapsedMilliseconds);
         //not shipped yet? hence "BookReservedInventory" method was not invoked
         if (!shipment.ShippedDateUtc.HasValue)
             return 0;
@@ -1873,6 +1984,7 @@ public partial class ProductService : IProductService
         //quantity change history
         await AddStockQuantityHistoryEntryAsync(product, qty, pwi.StockQuantity, shipmentItem.WarehouseId, message);
 
+		logger.LogDebug("<<< Exiting ReverseBookedInventoryAsync(product={Product},shipmentItem={ShipmentItem},message={Message})", product, shipmentItem, message);
         return qty;
     }
 
@@ -1887,9 +1999,19 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteRelatedProductAsync(RelatedProduct relatedProduct)
     {
+		logger.LogDebug(">>> Entering DeleteRelatedProductAsync(relatedProduct={RelatedProduct})", relatedProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _relatedProductRepository.DeleteAsync(relatedProduct);
+		logger.LogDebug("<<< Exiting DeleteRelatedProductAsync(relatedProduct={RelatedProduct})", relatedProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteRelatedProductAsync(relatedProduct)={RelatedProduct}: external service call took {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteRelatedProductAsync(relatedProduct)={RelatedProduct}: delete query executed in {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteRelatedProductAsync(relatedProduct)={RelatedProduct}: external service call took {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteRelatedProductAsync(relatedProduct)={RelatedProduct}: delete query executed in {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets related products by product identifier
     /// </summary>
@@ -1901,8 +2023,11 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<RelatedProduct>> GetRelatedProductsByProductId1Async(int productId, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetRelatedProductsByProductId1Async(productId={ProductId},showHidden={ShowHidden})", productId, showHidden);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from rp in _relatedProductRepository.Table
             join p in _productRepository.Table on rp.ProductId2 equals p.Id
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             where rp.ProductId1 == productId &&
                   !p.Deleted &&
                   (showHidden || p.Published)
@@ -1911,6 +2036,9 @@ public partial class ProductService : IProductService
 
         var relatedProducts = await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.RelatedProductsCacheKey, productId, showHidden), async () => await query.ToListAsync());
 
+		logger.LogDebug("GetRelatedProductsByProductId1Async(productId={ProductId},showHidden={ShowHidden}): relatedProducts → {RelatedProducts}", productId, showHidden, relatedProducts);
+		logger.LogInformation("GetRelatedProductsByProductId1Async(productId,showHidden)={ProductId},{ShowHidden}: external service call took {Arg2} ms", productId, showHidden, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetRelatedProductsByProductId1Async(productId={ProductId},showHidden={ShowHidden})", productId, showHidden);
         return relatedProducts;
     }
 
@@ -1924,6 +2052,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<RelatedProduct> GetRelatedProductByIdAsync(int relatedProductId)
     {
+		logger.LogDebug(">>> Entering GetRelatedProductByIdAsync(relatedProductId={RelatedProductId})", relatedProductId);
+		logger.LogDebug("<<< Exiting GetRelatedProductByIdAsync(relatedProductId={RelatedProductId})", relatedProductId);
         return await _relatedProductRepository.GetByIdAsync(relatedProductId, cache => default);
     }
 
@@ -1934,9 +2064,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertRelatedProductAsync(RelatedProduct relatedProduct)
     {
+		logger.LogDebug(">>> Entering InsertRelatedProductAsync(relatedProduct={RelatedProduct})", relatedProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _relatedProductRepository.InsertAsync(relatedProduct);
+		logger.LogDebug("<<< Exiting InsertRelatedProductAsync(relatedProduct={RelatedProduct})", relatedProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertRelatedProductAsync(relatedProduct)={RelatedProduct}: save query executed in {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertRelatedProductAsync(relatedProduct)={RelatedProduct}: save query executed in {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a related product
     /// </summary>
@@ -1944,9 +2080,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateRelatedProductAsync(RelatedProduct relatedProduct)
     {
+		logger.LogDebug(">>> Entering UpdateRelatedProductAsync(relatedProduct={RelatedProduct})", relatedProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _relatedProductRepository.UpdateAsync(relatedProduct);
+		logger.LogDebug("<<< Exiting UpdateRelatedProductAsync(relatedProduct={RelatedProduct})", relatedProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateRelatedProductAsync(relatedProduct)={RelatedProduct}: update query executed in {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateRelatedProductAsync(relatedProduct)={RelatedProduct}: update query executed in {Arg1} ms", relatedProduct, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Finds a related product item by specified identifiers
     /// </summary>
@@ -1956,6 +2098,8 @@ public partial class ProductService : IProductService
     /// <returns>Related product</returns>
     public virtual RelatedProduct FindRelatedProduct(IList<RelatedProduct> source, int productId1, int productId2)
     {
+		logger.LogDebug(">>> Entering FindRelatedProduct(source={Source},productId1={ProductId1},productId2={ProductId2})", source, productId1, productId2);
+		logger.LogDebug("<<< Exiting FindRelatedProduct(source={Source},productId1={ProductId1},productId2={ProductId2})", source, productId1, productId2);
         return source.FirstOrDefault(rp => rp.ProductId1 == productId1 && rp.ProductId2 == productId2);
     }
 
@@ -1970,9 +2114,19 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCrossSellProductAsync(CrossSellProduct crossSellProduct)
     {
+		logger.LogDebug(">>> Entering DeleteCrossSellProductAsync(crossSellProduct={CrossSellProduct})", crossSellProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _crossSellProductRepository.DeleteAsync(crossSellProduct);
+		logger.LogDebug("<<< Exiting DeleteCrossSellProductAsync(crossSellProduct={CrossSellProduct})", crossSellProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteCrossSellProductAsync(crossSellProduct)={CrossSellProduct}: external service call took {Arg1} ms", crossSellProduct, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteCrossSellProductAsync(crossSellProduct)={CrossSellProduct}: delete query executed in {Arg1} ms", crossSellProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteCrossSellProductAsync(crossSellProduct)={CrossSellProduct}: external service call took {Arg1} ms", crossSellProduct, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteCrossSellProductAsync(crossSellProduct)={CrossSellProduct}: delete query executed in {Arg1} ms", crossSellProduct, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets cross-sell products by product identifier
     /// </summary>
@@ -1984,6 +2138,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<CrossSellProduct>> GetCrossSellProductsByProductId1Async(int productId1, bool showHidden = false)
     {
+		logger.LogDebug(">>> Entering GetCrossSellProductsByProductId1Async(productId1={ProductId1},showHidden={ShowHidden})", productId1, showHidden);
+		logger.LogDebug("<<< Exiting GetCrossSellProductsByProductId1Async(productId1={ProductId1},showHidden={ShowHidden})", productId1, showHidden);
         return await GetCrossSellProductsByProductIdsAsync([productId1], showHidden);
     }
 
@@ -1997,6 +2153,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<CrossSellProduct> GetCrossSellProductByIdAsync(int crossSellProductId)
     {
+		logger.LogDebug(">>> Entering GetCrossSellProductByIdAsync(crossSellProductId={CrossSellProductId})", crossSellProductId);
+		logger.LogDebug("<<< Exiting GetCrossSellProductByIdAsync(crossSellProductId={CrossSellProductId})", crossSellProductId);
         return await _crossSellProductRepository.GetByIdAsync(crossSellProductId, cache => default);
     }
 
@@ -2007,9 +2165,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCrossSellProductAsync(CrossSellProduct crossSellProduct)
     {
+		logger.LogDebug(">>> Entering InsertCrossSellProductAsync(crossSellProduct={CrossSellProduct})", crossSellProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _crossSellProductRepository.InsertAsync(crossSellProduct);
+		logger.LogDebug("<<< Exiting InsertCrossSellProductAsync(crossSellProduct={CrossSellProduct})", crossSellProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertCrossSellProductAsync(crossSellProduct)={CrossSellProduct}: save query executed in {Arg1} ms", crossSellProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertCrossSellProductAsync(crossSellProduct)={CrossSellProduct}: save query executed in {Arg1} ms", crossSellProduct, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a cross-sells
     /// </summary>
@@ -2021,12 +2185,17 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<Product>> GetCrossSellProductsByShoppingCartAsync(IList<ShoppingCartItem> cart, int numberOfProducts)
     {
+		logger.LogDebug(">>> Entering GetCrossSellProductsByShoppingCartAsync(cart={Cart},numberOfProducts={NumberOfProducts})", cart, numberOfProducts);
         var result = new List<Product>();
 
+		logger.LogDebug("GetCrossSellProductsByShoppingCartAsync(cart={Cart},numberOfProducts={NumberOfProducts}): result → {Result}", cart, numberOfProducts, result);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (numberOfProducts == 0 || cart?.Any() != true)
             return result;
 
         var cartProductIds = cart.Select(sci => sci.ProductId).ToHashSet();
+		logger.LogDebug("GetCrossSellProductsByShoppingCartAsync(cart={Cart},numberOfProducts={NumberOfProducts}): cartProductIds → {CartProductIds}", cart, numberOfProducts, cartProductIds);
+		logger.LogDebug("<<< Exiting GetCrossSellProductsByShoppingCartAsync(cart={Cart},numberOfProducts={NumberOfProducts})", cart, numberOfProducts);
         return await (await GetCrossSellProductsByProductIdsAsync(cartProductIds.ToArray()))
             .Select(cs => cs.ProductId2)
             .Except(cartProductIds)
@@ -2045,6 +2214,8 @@ public partial class ProductService : IProductService
     /// <returns>Cross-sell product</returns>
     public virtual CrossSellProduct FindCrossSellProduct(IList<CrossSellProduct> source, int productId1, int productId2)
     {
+		logger.LogDebug(">>> Entering FindCrossSellProduct(source={Source},productId1={ProductId1},productId2={ProductId2})", source, productId1, productId2);
+		logger.LogDebug("<<< Exiting FindCrossSellProduct(source={Source},productId1={ProductId1},productId2={ProductId2})", source, productId1, productId2);
         return source.FirstOrDefault(csp => csp.ProductId1 == productId1 && csp.ProductId2 == productId2);
     }
 
@@ -2081,6 +2252,10 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<IList<TierPrice>> GetTierPricesByProductAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetTierPricesByProductAsync(productId={ProductId})", productId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("GetTierPricesByProductAsync(productId)={ProductId}: external service call took {Arg1} ms", productId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetTierPricesByProductAsync(productId={ProductId})", productId);
         return await _staticCacheManager.GetAsync(
             _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.TierPricesByProductCacheKey, productId),
             async () => await _tierPriceRepository.Table.Where(tp => tp.ProductId == productId).ToListAsync());
@@ -2093,9 +2268,19 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTierPriceAsync(TierPrice tierPrice)
     {
+		logger.LogDebug(">>> Entering DeleteTierPriceAsync(tierPrice={TierPrice})", tierPrice);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _tierPriceRepository.DeleteAsync(tierPrice);
+		logger.LogDebug("<<< Exiting DeleteTierPriceAsync(tierPrice={TierPrice})", tierPrice);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTierPriceAsync(tierPrice)={TierPrice}: external service call took {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTierPriceAsync(tierPrice)={TierPrice}: delete query executed in {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteTierPriceAsync(tierPrice)={TierPrice}: external service call took {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteTierPriceAsync(tierPrice)={TierPrice}: delete query executed in {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a tier price
     /// </summary>
@@ -2106,6 +2291,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<TierPrice> GetTierPriceByIdAsync(int tierPriceId)
     {
+		logger.LogDebug(">>> Entering GetTierPriceByIdAsync(tierPriceId={TierPriceId})", tierPriceId);
+		logger.LogDebug("<<< Exiting GetTierPriceByIdAsync(tierPriceId={TierPriceId})", tierPriceId);
         return await _tierPriceRepository.GetByIdAsync(tierPriceId, cache => default);
     }
 
@@ -2116,9 +2303,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTierPriceAsync(TierPrice tierPrice)
     {
+		logger.LogDebug(">>> Entering InsertTierPriceAsync(tierPrice={TierPrice})", tierPrice);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _tierPriceRepository.InsertAsync(tierPrice);
+		logger.LogDebug("<<< Exiting InsertTierPriceAsync(tierPrice={TierPrice})", tierPrice);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertTierPriceAsync(tierPrice)={TierPrice}: save query executed in {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertTierPriceAsync(tierPrice)={TierPrice}: save query executed in {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the tier price
     /// </summary>
@@ -2126,9 +2319,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTierPriceAsync(TierPrice tierPrice)
     {
+		logger.LogDebug(">>> Entering UpdateTierPriceAsync(tierPrice={TierPrice})", tierPrice);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _tierPriceRepository.UpdateAsync(tierPrice);
+		logger.LogDebug("<<< Exiting UpdateTierPriceAsync(tierPrice={TierPrice})", tierPrice);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateTierPriceAsync(tierPrice)={TierPrice}: update query executed in {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateTierPriceAsync(tierPrice)={TierPrice}: update query executed in {Arg1} ms", tierPrice, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a preferred tier price
     /// </summary>
@@ -2160,9 +2359,19 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductPictureAsync(ProductPicture productPicture)
     {
+		logger.LogDebug(">>> Entering DeleteProductPictureAsync(productPicture={ProductPicture})", productPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productPictureRepository.DeleteAsync(productPicture);
+		logger.LogDebug("<<< Exiting DeleteProductPictureAsync(productPicture={ProductPicture})", productPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductPictureAsync(productPicture)={ProductPicture}: external service call took {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductPictureAsync(productPicture)={ProductPicture}: delete query executed in {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteProductPictureAsync(productPicture)={ProductPicture}: external service call took {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteProductPictureAsync(productPicture)={ProductPicture}: delete query executed in {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a product pictures by product identifier
     /// </summary>
@@ -2173,6 +2382,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<ProductPicture>> GetProductPicturesByProductIdAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetProductPicturesByProductIdAsync(productId={ProductId})", productId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from pp in _productPictureRepository.Table
             where pp.ProductId == productId
             orderby pp.DisplayOrder, pp.Id
@@ -2180,6 +2391,8 @@ public partial class ProductService : IProductService
 
         var productPictures = await query.ToListAsync();
 
+		logger.LogDebug("GetProductPicturesByProductIdAsync(productId={ProductId}): productPictures → {ProductPictures}", productId, productPictures);
+		logger.LogDebug("<<< Exiting GetProductPicturesByProductIdAsync(productId={ProductId})", productId);
         return productPictures;
     }
 
@@ -2193,6 +2406,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<ProductPicture> GetProductPictureByIdAsync(int productPictureId)
     {
+		logger.LogDebug(">>> Entering GetProductPictureByIdAsync(productPictureId={ProductPictureId})", productPictureId);
+		logger.LogDebug("<<< Exiting GetProductPictureByIdAsync(productPictureId={ProductPictureId})", productPictureId);
         return await _productPictureRepository.GetByIdAsync(productPictureId, cache => default);
     }
 
@@ -2203,9 +2418,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductPictureAsync(ProductPicture productPicture)
     {
+		logger.LogDebug(">>> Entering InsertProductPictureAsync(productPicture={ProductPicture})", productPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productPictureRepository.InsertAsync(productPicture);
+		logger.LogDebug("<<< Exiting InsertProductPictureAsync(productPicture={ProductPicture})", productPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertProductPictureAsync(productPicture)={ProductPicture}: save query executed in {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertProductPictureAsync(productPicture)={ProductPicture}: save query executed in {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a product picture
     /// </summary>
@@ -2213,9 +2434,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductPictureAsync(ProductPicture productPicture)
     {
+		logger.LogDebug(">>> Entering UpdateProductPictureAsync(productPicture={ProductPicture})", productPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productPictureRepository.UpdateAsync(productPicture);
+		logger.LogDebug("<<< Exiting UpdateProductPictureAsync(productPicture={ProductPicture})", productPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateProductPictureAsync(productPicture)={ProductPicture}: update query executed in {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateProductPictureAsync(productPicture)={ProductPicture}: update query executed in {Arg1} ms", productPicture, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Get the IDs of all product images 
     /// </summary>
@@ -2274,9 +2501,19 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductVideoAsync(ProductVideo productVideo)
     {
+		logger.LogDebug(">>> Entering DeleteProductVideoAsync(productVideo={ProductVideo})", productVideo);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productVideoRepository.DeleteAsync(productVideo);
+		logger.LogDebug("<<< Exiting DeleteProductVideoAsync(productVideo={ProductVideo})", productVideo);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductVideoAsync(productVideo)={ProductVideo}: external service call took {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteProductVideoAsync(productVideo)={ProductVideo}: delete query executed in {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteProductVideoAsync(productVideo)={ProductVideo}: external service call took {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteProductVideoAsync(productVideo)={ProductVideo}: delete query executed in {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a product videos by product identifier
     /// </summary>
@@ -2287,6 +2524,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<IList<ProductVideo>> GetProductVideosByProductIdAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetProductVideosByProductIdAsync(productId={ProductId})", productId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from pvm in _productVideoRepository.Table
             where pvm.ProductId == productId
             orderby pvm.DisplayOrder, pvm.Id
@@ -2294,6 +2533,8 @@ public partial class ProductService : IProductService
 
         var productVideos = await query.ToListAsync();
 
+		logger.LogDebug("GetProductVideosByProductIdAsync(productId={ProductId}): productVideos → {ProductVideos}", productId, productVideos);
+		logger.LogDebug("<<< Exiting GetProductVideosByProductIdAsync(productId={ProductId})", productId);
         return productVideos;
     }
 
@@ -2307,6 +2548,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<ProductVideo> GetProductVideoByIdAsync(int productVideoId)
     {
+		logger.LogDebug(">>> Entering GetProductVideoByIdAsync(productVideoId={ProductVideoId})", productVideoId);
+		logger.LogDebug("<<< Exiting GetProductVideoByIdAsync(productVideoId={ProductVideoId})", productVideoId);
         return await _productVideoRepository.GetByIdAsync(productVideoId, cache => default);
     }
 
@@ -2317,9 +2560,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductVideoAsync(ProductVideo productVideo)
     {
+		logger.LogDebug(">>> Entering InsertProductVideoAsync(productVideo={ProductVideo})", productVideo);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productVideoRepository.InsertAsync(productVideo);
+		logger.LogDebug("<<< Exiting InsertProductVideoAsync(productVideo={ProductVideo})", productVideo);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertProductVideoAsync(productVideo)={ProductVideo}: save query executed in {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertProductVideoAsync(productVideo)={ProductVideo}: save query executed in {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a product video
     /// </summary>
@@ -2327,9 +2576,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductVideoAsync(ProductVideo productVideo)
     {
+		logger.LogDebug(">>> Entering UpdateProductVideoAsync(productVideo={ProductVideo})", productVideo);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productVideoRepository.UpdateAsync(productVideo);
+		logger.LogDebug("<<< Exiting UpdateProductVideoAsync(productVideo={ProductVideo})", productVideo);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateProductVideoAsync(productVideo)={ProductVideo}: update query executed in {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateProductVideoAsync(productVideo)={ProductVideo}: update query executed in {Arg1} ms", productVideo, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Product warehouses
@@ -2341,6 +2596,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<IList<ProductWarehouseInventory>> GetAllProductWarehouseInventoryRecordsAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetAllProductWarehouseInventoryRecordsAsync(productId={ProductId})", productId);
+		logger.LogDebug("<<< Exiting GetAllProductWarehouseInventoryRecordsAsync(productId={ProductId})", productId);
         return await _productWarehouseInventoryRepository.GetAllAsync(query => query.Where(pwi => pwi.ProductId == productId));
     }
 
@@ -2351,9 +2608,13 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductWarehouseInventoryAsync(ProductWarehouseInventory pwi)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productWarehouseInventoryRepository.DeleteAsync(pwi);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Inserts a record to manage product inventory per warehouse
     /// </summary>
@@ -2361,6 +2622,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductWarehouseInventoryAsync(ProductWarehouseInventory pwi)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productWarehouseInventoryRepository.InsertAsync(pwi);
     }
 
@@ -2371,6 +2634,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductWarehouseInventoryAsync(ProductWarehouseInventory pwi)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productWarehouseInventoryRepository.UpdateAsync(pwi);
     }
 
@@ -2381,7 +2646,12 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductWarehouseInventoryAsync(IList<ProductWarehouseInventory> pwis)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering UpdateProductWarehouseInventoryAsync(pwis={Pwis})", pwis);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateProductWarehouseInventoryAsync(pwis)={Pwis}: update query executed in {Arg1} ms", pwis, __logStart.ElapsedMilliseconds);
         await _productWarehouseInventoryRepository.UpdateAsync(pwis);
+		logger.LogDebug("<<< Exiting UpdateProductWarehouseInventoryAsync(pwis={Pwis})", pwis);
     }
 
     #endregion
@@ -2461,13 +2731,20 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearDiscountProductMappingAsync(Discount discount)
     {
+		logger.LogDebug(">>> Entering ClearDiscountProductMappingAsync(discount={Discount})", discount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var mappingsWithProducts = await _discountProductMappingRepository.Table
             .Where(dpm => dpm.DiscountId == discount.Id)
             .ToListAsync();
+			logger.LogInformation("ClearDiscountProductMappingAsync(discount)={Discount}: database query executed in {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
 
         await _discountProductMappingRepository.DeleteAsync(mappingsWithProducts);
+		logger.LogDebug("<<< Exiting ClearDiscountProductMappingAsync(discount={Discount})", discount);
+		logger.LogInformation("ClearDiscountProductMappingAsync(discount)={Discount}: external service call took {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("ClearDiscountProductMappingAsync(discount)={Discount}: delete query executed in {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -2477,6 +2754,8 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<IList<DiscountProductMapping>> GetAllDiscountsAppliedToProductAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetAllDiscountsAppliedToProductAsync(productId={ProductId})", productId);
+		logger.LogDebug("<<< Exiting GetAllDiscountsAppliedToProductAsync(productId={ProductId})", productId);
         return await _discountProductMappingRepository.GetAllAsync(query => query.Where(dcm => dcm.EntityId == productId));
     }
 
@@ -2491,6 +2770,8 @@ public partial class ProductService : IProductService
     /// </returns>
     public virtual async Task<DiscountProductMapping> GetDiscountAppliedToProductAsync(int productId, int discountId)
     {
+		logger.LogDebug(">>> Entering GetDiscountAppliedToProductAsync(productId={ProductId},discountId={DiscountId})", productId, discountId);
+		logger.LogDebug("<<< Exiting GetDiscountAppliedToProductAsync(productId={ProductId},discountId={DiscountId})", productId, discountId);
         return await _discountProductMappingRepository.Table
             .FirstOrDefaultAsync(dcm => dcm.EntityId == productId && dcm.DiscountId == discountId);
     }
@@ -2502,9 +2783,15 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertDiscountProductMappingAsync(DiscountProductMapping discountProductMapping)
     {
+		logger.LogDebug(">>> Entering InsertDiscountProductMappingAsync(discountProductMapping={DiscountProductMapping})", discountProductMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _discountProductMappingRepository.InsertAsync(discountProductMapping);
+		logger.LogDebug("<<< Exiting InsertDiscountProductMappingAsync(discountProductMapping={DiscountProductMapping})", discountProductMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertDiscountProductMappingAsync(discountProductMapping)={DiscountProductMapping}: save query executed in {Arg1} ms", discountProductMapping, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertDiscountProductMappingAsync(discountProductMapping)={DiscountProductMapping}: save query executed in {Arg1} ms", discountProductMapping, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a discount-product mapping record
     /// </summary>
@@ -2512,9 +2799,19 @@ public partial class ProductService : IProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteDiscountProductMappingAsync(DiscountProductMapping discountProductMapping)
     {
+		logger.LogDebug(">>> Entering DeleteDiscountProductMappingAsync(discountProductMapping={DiscountProductMapping})", discountProductMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _discountProductMappingRepository.DeleteAsync(discountProductMapping);
+		logger.LogDebug("<<< Exiting DeleteDiscountProductMappingAsync(discountProductMapping={DiscountProductMapping})", discountProductMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteDiscountProductMappingAsync(discountProductMapping)={DiscountProductMapping}: external service call took {Arg1} ms", discountProductMapping, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteDiscountProductMappingAsync(discountProductMapping)={DiscountProductMapping}: delete query executed in {Arg1} ms", discountProductMapping, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteDiscountProductMappingAsync(discountProductMapping)={DiscountProductMapping}: external service call took {Arg1} ms", discountProductMapping, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteDiscountProductMappingAsync(discountProductMapping)={DiscountProductMapping}: delete query executed in {Arg1} ms", discountProductMapping, __logStart.ElapsedMilliseconds);
     #endregion
 
     #endregion

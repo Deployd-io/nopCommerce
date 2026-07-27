@@ -62,6 +62,8 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// <returns>Datetime string in the ISO 8601 format</returns>
     protected virtual string ConvertDateTimeToIso8601String(DateTime? dateTime)
     {
+		logger.LogDebug(">>> Entering ConvertDateTimeToIso8601String(dateTime={DateTime})", dateTime);
+		logger.LogDebug("<<< Exiting ConvertDateTimeToIso8601String(dateTime={DateTime})", dateTime);
         return dateTime == null ? null : new DateTimeOffset(dateTime.Value).ToString("O", CultureInfo.InvariantCulture);
     }
 
@@ -74,8 +76,10 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     protected virtual async Task<JsonLdBreadcrumbListModel> PrepareJsonLdBreadcrumbListAsync(IList<CategorySimpleModel> categoryModels)
     {
+		logger.LogDebug(">>> Entering PrepareJsonLdBreadcrumbListAsync(categoryModels={CategoryModels})", categoryModels);
         var breadcrumbList = new JsonLdBreadcrumbListModel();
         var position = 1;
+		logger.LogDebug("PrepareJsonLdBreadcrumbListAsync(categoryModels={CategoryModels}): breadcrumbList → {BreadcrumbList}", categoryModels, breadcrumbList);
 
         foreach (var cat in categoryModels)
         {
@@ -92,6 +96,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
             position++;
         }
 
+		logger.LogDebug("<<< Exiting PrepareJsonLdBreadcrumbListAsync(categoryModels={CategoryModels})", categoryModels);
         return breadcrumbList;
     }
 
@@ -108,10 +113,13 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     public virtual async Task<JsonLdBreadcrumbListModel> PrepareJsonLdCategoryBreadcrumbAsync(IList<CategorySimpleModel> categoryModels)
     {
+		logger.LogDebug(">>> Entering PrepareJsonLdCategoryBreadcrumbAsync(categoryModels={CategoryModels})", categoryModels);
         var breadcrumbList = await PrepareJsonLdBreadcrumbListAsync(categoryModels);
 
+		logger.LogDebug("PrepareJsonLdCategoryBreadcrumbAsync(categoryModels={CategoryModels}): breadcrumbList → {BreadcrumbList}", categoryModels, breadcrumbList);
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdBreadcrumbListModel>(breadcrumbList));
 
+		logger.LogDebug("<<< Exiting PrepareJsonLdCategoryBreadcrumbAsync(categoryModels={CategoryModels})", categoryModels);
         return breadcrumbList;
     }
 
@@ -124,8 +132,10 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     public virtual async Task<JsonLdBreadcrumbListModel> PrepareJsonLdProductBreadcrumbAsync(ProductDetailsModel.ProductBreadcrumbModel breadcrumbModel)
     {
+		logger.LogDebug(">>> Entering PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel})", breadcrumbModel);
         var breadcrumbList = await PrepareJsonLdBreadcrumbListAsync(breadcrumbModel.CategoryBreadcrumb);
 
+		logger.LogDebug("PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel}): breadcrumbList → {BreadcrumbList}", breadcrumbModel, breadcrumbList);
         breadcrumbList.ItemListElement.Add(new JsonLdBreadcrumbListItemModel
         {
             Position = breadcrumbList.ItemListElement.Count + 1,
@@ -138,6 +148,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
 
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdBreadcrumbListModel>(breadcrumbList));
 
+		logger.LogDebug("<<< Exiting PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel})", breadcrumbModel);
         return breadcrumbList;
     }
 
@@ -151,6 +162,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     public virtual async Task<JsonLdProductModel> PrepareJsonLdProductAsync(ProductDetailsModel model, string productUrl = null)
     {
+		logger.LogDebug(">>> Entering PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl})", model, productUrl);
         productUrl ??= await _nopUrlHelper.RouteGenericUrlAsync<Product>(new { SeName = model.SeName }, _webHelper.GetCurrentRequestProtocol());
 
         var productPrice = model.AssociatedProducts.Any()
@@ -182,6 +194,8 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
 
             var ratingValue = ratingPercent / (decimal)20;
 
+			logger.LogDebug("PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl}): ratingValue → {RatingValue}", model, productUrl, ratingValue);
+			logger.LogDebug("PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl}): product.AggregateRating → {Arg2}", model, productUrl, product.AggregateRating);
             product.AggregateRating = new JsonLdAggregateRatingModel
             {
                 RatingValue = ratingValue.ToString("0.0", CultureInfo.InvariantCulture),
@@ -209,6 +223,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
 
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdProductModel>(product));
 
+		logger.LogDebug("<<< Exiting PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl})", model, productUrl);
         return product;
     }
 

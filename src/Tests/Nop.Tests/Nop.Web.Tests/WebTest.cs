@@ -13,14 +13,18 @@ public abstract class WebTest : BaseNopTest
 {
     protected WebTest()
     {
+		logger.LogDebug(">>> Entering WebTest()");
         //init plugins
         InitPlugins();
+		logger.LogDebug("<<< Exiting WebTest()");
     }
 
     private void InitPlugins()
     {
+		logger.LogDebug(">>> Entering InitPlugins()");
         var webHostEnvironment = new Mock<IWebHostEnvironment>();
         webHostEnvironment.Setup(x => x.ContentRootPath).Returns(System.Reflection.Assembly.GetExecutingAssembly().Location);
+		logger.LogDebug("InitPlugins(): webHostEnvironment → {WebHostEnvironment}", webHostEnvironment);
         webHostEnvironment.Setup(x => x.WebRootPath).Returns(System.IO.Directory.GetCurrentDirectory());
         CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment.Object);
 
@@ -38,5 +42,6 @@ public abstract class WebTest : BaseNopTest
                 }, true)
             }
         };
+		logger.LogDebug("<<< Exiting InitPlugins()");
     }
 }

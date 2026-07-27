@@ -50,6 +50,7 @@ export default moment.defineLocale('ss', {
     },
     meridiemParse: /ekuseni|emini|entsambama|ebusuku/,
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 11) {
             return 'ekuseni';
         } else if (hours < 15) {
@@ -61,6 +62,7 @@ export default moment.defineLocale('ss', {
         }
     },
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -70,8 +72,10 @@ export default moment.defineLocale('ss', {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'entsambama' || meridiem === 'ebusuku') {
             if (hour === 0) {
+				logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
                 return 0;
             }
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return hour + 12;
         }
     },

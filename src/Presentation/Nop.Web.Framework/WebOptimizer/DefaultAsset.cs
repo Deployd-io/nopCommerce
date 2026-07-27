@@ -12,8 +12,12 @@ public partial class DefaultAsset : IAsset
 
     public DefaultAsset(string route, string contentType)
     {
+		logger.LogDebug(">>> Entering DefaultAsset(route={Route},contentType={ContentType})", route, contentType);
         Route = route;
         ContentType = contentType;
+		logger.LogDebug("<<< Exiting DefaultAsset(route={Route},contentType={ContentType})", route, contentType);
+		logger.LogDebug("DefaultAsset(route={Route},contentType={ContentType}): ContentType → {ContentType1}", route, contentType, ContentType);
+		logger.LogDebug("DefaultAsset(route={Route},contentType={ContentType}): Route → {Route1}", route, contentType, Route);
     }
 
     #endregion
@@ -27,6 +31,7 @@ public partial class DefaultAsset : IAsset
     /// <param name="options">Configuration options</param>
     public virtual Task<byte[]> ExecuteAsync(HttpContext context, IWebOptimizerOptions options)
     {
+		logger.LogDebug(">>> Entering ExecuteAsync(context={Context},options={Options})", context, options);
         throw new NotImplementedException();
     }
 
@@ -38,6 +43,8 @@ public partial class DefaultAsset : IAsset
     /// <returns></returns>
     public virtual string GenerateCacheKey(HttpContext context, IWebOptimizerOptions options)
     {
+		logger.LogDebug(">>> Entering GenerateCacheKey(context={Context},options={Options})", context, options);
+		logger.LogDebug("<<< Exiting GenerateCacheKey(context={Context},options={Options})", context, options);
         return string.Empty;
     }
 
@@ -47,6 +54,7 @@ public partial class DefaultAsset : IAsset
     /// <param name="route">Relative path of a source file</param>
     public virtual void TryAddSourceFile(string route)
     {
+		logger.LogDebug(">>> Entering TryAddSourceFile(route={Route})", route);
         throw new NotImplementedException();
     }
     

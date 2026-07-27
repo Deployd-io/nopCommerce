@@ -90,16 +90,21 @@ public partial class NopHtmlHelper : INopHtmlHelper
 
     protected static string GetAssetKey(string[] keys, string suffix)
     {
+		logger.LogDebug(">>> Entering GetAssetKey(keys={Keys},suffix={Suffix})", keys, suffix);
         ArgumentNullException.ThrowIfNull(keys?.Length > 0 ? keys : null, nameof(keys));
 
         var hashInput = string.Join(',', keys);
         var input = MD5.HashData(Encoding.Unicode.GetBytes(hashInput));
+		logger.LogDebug("GetAssetKey(keys={Keys},suffix={Suffix}): hashInput → {HashInput}", keys, suffix, hashInput);
+		logger.LogDebug("GetAssetKey(keys={Keys},suffix={Suffix}): input → {Input}", keys, suffix, input);
 
         var key = string.Concat(WebEncoders.Base64UrlEncode(input));
 
+		logger.LogWarning("GetAssetKey(keys={Keys},suffix={Suffix}): key → {Key}", keys, suffix, key);
         if (!string.IsNullOrEmpty(suffix))
             key += suffix;
 
+		logger.LogDebug("<<< Exiting GetAssetKey(keys={Keys},suffix={Suffix})", keys, suffix);
         return key.ToLower();
     }
 
@@ -110,13 +115,17 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>URL; check result</returns>
     protected virtual (string Url, bool IsLocal) GetSrcUrl(string src)
     {
+		logger.LogDebug(">>> Entering GetSrcUrl(Url={Url},IsLocal={IsLocal})", Url, IsLocal);
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
+		logger.LogDebug("GetSrcUrl(Url={Url},IsLocal={IsLocal}): urlHelper → {UrlHelper}", Url, IsLocal, urlHelper);
         var isLocal = urlHelper.IsLocalUrl(src);
         var url = isLocal
+			logger.LogDebug("GetSrcUrl(Url={Url},IsLocal={IsLocal}): isLocal → {IsLocal1}", Url, IsLocal, isLocal);
             ? urlHelper.Content(src).RemoveApplicationPathFromRawUrl(_httpContextAccessor.HttpContext.Request.PathBase)
             : src;
 
+		logger.LogDebug("<<< Exiting GetSrcUrl(Url={Url},IsLocal={IsLocal})", Url, IsLocal);
         return (url, isLocal);
     }
 
@@ -130,10 +139,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Title part</param>
     public virtual void AddTitleParts(string part)
     {
+		logger.LogDebug(">>> Entering AddTitleParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _titleParts.Add(part);
+		logger.LogDebug("<<< Exiting AddTitleParts(part={Part})", part);
     }
 
     /// <summary>
@@ -142,10 +153,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Title part</param>
     public virtual void AppendTitleParts(string part)
     {
+		logger.LogDebug(">>> Entering AppendTitleParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _titleParts.Insert(0, part);
+		logger.LogDebug("<<< Exiting AppendTitleParts(part={Part})", part);
     }
 
     /// <summary>
@@ -157,12 +170,16 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// The task result contains generated HTML string</returns>
     public virtual async Task<IHtmlContent> GenerateTitleAsync(bool addDefaultTitle = true, string part = "")
     {
+		logger.LogDebug(">>> Entering GenerateTitleAsync(addDefaultTitle={AddDefaultTitle},part={Part})", addDefaultTitle, part);
         AppendTitleParts(part);
         var store = await _storeContext.GetCurrentStoreAsync();
         var defaultTitle = await _localizationService.Value.GetLocalizedAsync(store, s => s.DefaultTitle);
+		logger.LogDebug("GenerateTitleAsync(addDefaultTitle={AddDefaultTitle},part={Part}): store → {Store}", addDefaultTitle, part, store);
+		logger.LogDebug("GenerateTitleAsync(addDefaultTitle={AddDefaultTitle},part={Part}): defaultTitle → {DefaultTitle}", addDefaultTitle, part, defaultTitle);
 
         var specificTitle = string.Join(_seoSettings.PageTitleSeparator, _titleParts.AsEnumerable().Reverse().ToArray());
         string result;
+		logger.LogDebug("GenerateTitleAsync(addDefaultTitle={AddDefaultTitle},part={Part}): specificTitle → {SpecificTitle}", addDefaultTitle, part, specificTitle);
         if (!string.IsNullOrEmpty(specificTitle))
         {
             if (addDefaultTitle)
@@ -174,6 +191,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
                         {
                             result = string.Join(_seoSettings.PageTitleSeparator, defaultTitle, specificTitle);
                         }
+						logger.LogDebug("GenerateTitleAsync(addDefaultTitle={AddDefaultTitle},part={Part}): result → {Result}", addDefaultTitle, part, result);
                         break;
                     case PageTitleSeoAdjustment.StorenameAfterPagename:
                     default:
@@ -195,6 +213,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             result = defaultTitle;
         }
 
+		logger.LogDebug("<<< Exiting GenerateTitleAsync(addDefaultTitle={AddDefaultTitle},part={Part})", addDefaultTitle, part);
         return new HtmlString(_htmlEncoder.Encode(result ?? string.Empty));
     }
 
@@ -204,10 +223,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Meta description part</param>
     public virtual void AddMetaDescriptionParts(string part)
     {
+		logger.LogDebug(">>> Entering AddMetaDescriptionParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _metaDescriptionParts.Add(part);
+		logger.LogDebug("<<< Exiting AddMetaDescriptionParts(part={Part})", part);
     }
 
     /// <summary>
@@ -216,10 +237,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Meta description part</param>
     public virtual void AppendMetaDescriptionParts(string part)
     {
+		logger.LogDebug(">>> Entering AppendMetaDescriptionParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _metaDescriptionParts.Insert(0, part);
+		logger.LogDebug("<<< Exiting AppendMetaDescriptionParts(part={Part})", part);
     }
 
     /// <summary>
@@ -230,14 +253,17 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// The task result contains generated HTML string</returns>
     public virtual async Task<IHtmlContent> GenerateMetaDescriptionAsync(string part = "")
     {
+		logger.LogDebug(">>> Entering GenerateMetaDescriptionAsync(part={Part})", part);
         AppendMetaDescriptionParts(part);
 
         var metaDescription = string.Join(", ", _metaDescriptionParts.AsEnumerable().Reverse().ToArray());
         var result = !string.IsNullOrEmpty(metaDescription)
             ? metaDescription
+			logger.LogDebug("GenerateMetaDescriptionAsync(part={Part}): metaDescription → {MetaDescription}", part, metaDescription);
             : await _localizationService.Value.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(),
                 s => s.DefaultMetaDescription);
 
+		logger.LogDebug("<<< Exiting GenerateMetaDescriptionAsync(part={Part})", part);
         return new HtmlString(_htmlEncoder.Encode(result ?? string.Empty));
     }
 
@@ -247,10 +273,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Meta keyword part</param>
     public virtual void AddMetaKeywordParts(string part)
     {
+		logger.LogDebug(">>> Entering AddMetaKeywordParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _metaKeywordParts.Add(part);
+		logger.LogDebug("<<< Exiting AddMetaKeywordParts(part={Part})", part);
     }
 
     /// <summary>
@@ -259,10 +287,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Meta keyword part</param>
     public virtual void AppendMetaKeywordParts(string part)
     {
+		logger.LogDebug(">>> Entering AppendMetaKeywordParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _metaKeywordParts.Insert(0, part);
+		logger.LogDebug("<<< Exiting AppendMetaKeywordParts(part={Part})", part);
     }
 
     /// <summary>
@@ -273,14 +303,17 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// The task result contains generated HTML string</returns>
     public virtual async Task<IHtmlContent> GenerateMetaKeywordsAsync(string part = "")
     {
+		logger.LogDebug(">>> Entering GenerateMetaKeywordsAsync(part={Part})", part);
         AppendMetaKeywordParts(part);
 
         var metaKeyword = string.Join(", ", _metaKeywordParts.AsEnumerable().Reverse().ToArray());
         var result = !string.IsNullOrEmpty(metaKeyword)
             ? metaKeyword
+			logger.LogDebug("GenerateMetaKeywordsAsync(part={Part}): metaKeyword → {MetaKeyword}", part, metaKeyword);
             : await _localizationService.Value.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(),
                 s => s.DefaultMetaKeywords);
 
+		logger.LogDebug("<<< Exiting GenerateMetaKeywordsAsync(part={Part})", part);
         return new HtmlString(_htmlEncoder.Encode(result ?? string.Empty));
     }
 
@@ -293,6 +326,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="excludeFromBundle">A value indicating whether to exclude this script from bundling</param>
     public virtual void AddScriptParts(ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false)
     {
+		logger.LogDebug(">>> Entering AddScriptParts(location={Location},src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", location, src, debugSrc, excludeFromBundle);
         if (!_scriptParts.ContainsKey(location))
             _scriptParts.Add(location, new List<ScriptReferenceMeta>());
 
@@ -309,6 +343,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             IsLocal = isLocal,
             Src = url
         });
+		logger.LogDebug("<<< Exiting AddScriptParts(location={Location},src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", location, src, debugSrc, excludeFromBundle);
     }
 
     /// <summary>
@@ -320,6 +355,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="excludeFromBundle">A value indicating whether to exclude this script from bundling</param>
     public virtual void AppendScriptParts(ResourceLocation location, string src, string debugSrc = "", bool excludeFromBundle = false)
     {
+		logger.LogDebug(">>> Entering AppendScriptParts(location={Location},src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", location, src, debugSrc, excludeFromBundle);
         if (!_scriptParts.ContainsKey(location))
             _scriptParts.Add(location, new List<ScriptReferenceMeta>());
 
@@ -336,6 +372,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             IsLocal = isLocal,
             Src = url
         });
+		logger.LogDebug("<<< Exiting AppendScriptParts(location={Location},src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", location, src, debugSrc, excludeFromBundle);
     }
 
     /// <summary>
@@ -345,6 +382,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Generated HTML string</returns>
     public virtual IHtmlContent GenerateScripts(ResourceLocation location)
     {
+		logger.LogDebug(">>> Entering GenerateScripts(location={Location})", location);
         if (!_scriptParts.TryGetValue(location, out var value) || value == null)
             return HtmlString.Empty;
 
@@ -353,6 +391,8 @@ public partial class NopHtmlHelper : INopHtmlHelper
 
         var result = new StringBuilder();
         var woConfig = _appSettings.Get<WebOptimizerConfig>();
+		logger.LogDebug("GenerateScripts(location={Location}): result → {Result}", location, result);
+		logger.LogDebug("GenerateScripts(location={Location}): woConfig → {WoConfig}", location, woConfig);
         var pathBase = _httpContextAccessor.HttpContext.Request.PathBase;
 
         if (woConfig.EnableJavaScriptBundling && value.Any(item => !item.ExcludeFromBundle))
@@ -363,8 +403,11 @@ public partial class NopHtmlHelper : INopHtmlHelper
 
             var bundleKey = $"/js/{GetAssetKey(sources, woConfig.JavaScriptBundleSuffix)}.js";
 
+			logger.LogDebug("GenerateScripts(location={Location}): bundleKey → {BundleKey}", location, bundleKey);
             var bundleAsset = _bundleHelper.GetOrCreateJavaScriptAsset(bundleKey, sources);
             var route = _bundleHelper.CacheBusting(bundleAsset);
+			logger.LogDebug("GenerateScripts(location={Location}): bundleAsset → {BundleAsset}", location, bundleAsset);
+			logger.LogDebug("GenerateScripts(location={Location}): route → {Route}", location, route);
 
             result.AppendFormat("<script type=\"{0}\" src=\"{1}{2}\"></script>",
                 MimeTypes.TextJavascript, pathBase, route);
@@ -384,6 +427,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
 
             var asset = _bundleHelper.GetOrCreateJavaScriptAsset(item.Src);
             var route = _bundleHelper.CacheBusting(asset);
+			logger.LogDebug("GenerateScripts(location={Location}): asset → {Asset}", location, asset);
 
             result.AppendFormat("<script type=\"{0}\" src=\"{1}{2}\"></script>",
                 MimeTypes.TextJavascript, pathBase, route);
@@ -391,6 +435,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             result.Append(Environment.NewLine);
         }
 
+		logger.LogDebug("<<< Exiting GenerateScripts(location={Location})", location);
         return new HtmlString(result.ToString());
     }
 
@@ -401,6 +446,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="script">Script</param>
     public virtual void AddInlineScriptParts(ResourceLocation location, string script)
     {
+		logger.LogDebug(">>> Entering AddInlineScriptParts(location={Location},script={Script})", location, script);
         if (!_inlineScriptParts.ContainsKey(location))
             _inlineScriptParts.Add(location, new());
 
@@ -411,6 +457,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             return;
 
         _inlineScriptParts[location].Add(script);
+		logger.LogDebug("<<< Exiting AddInlineScriptParts(location={Location},script={Script})", location, script);
     }
 
     /// <summary>
@@ -420,6 +467,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="script">Script</param>
     public virtual void AppendInlineScriptParts(ResourceLocation location, string script)
     {
+		logger.LogDebug(">>> Entering AppendInlineScriptParts(location={Location},script={Script})", location, script);
         if (!_inlineScriptParts.ContainsKey(location))
             _inlineScriptParts.Add(location, new());
 
@@ -430,6 +478,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             return;
 
         _inlineScriptParts[location].Insert(0, script);
+		logger.LogDebug("<<< Exiting AppendInlineScriptParts(location={Location},script={Script})", location, script);
     }
 
     /// <summary>
@@ -439,6 +488,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Generated HTML string</returns>
     public virtual IHtmlContent GenerateInlineScripts(ResourceLocation location)
     {
+		logger.LogDebug(">>> Entering GenerateInlineScripts(location={Location})", location);
         if (!_inlineScriptParts.TryGetValue(location, out var value) || value == null)
             return HtmlString.Empty;
 
@@ -448,9 +498,11 @@ public partial class NopHtmlHelper : INopHtmlHelper
         var result = new StringBuilder();
         foreach (var item in value)
         {
+		logger.LogDebug("GenerateInlineScripts(location={Location}): result → {Result}", location, result);
             result.Append(item);
             result.Append(Environment.NewLine);
         }
+		logger.LogDebug("<<< Exiting GenerateInlineScripts(location={Location})", location);
         return new HtmlString(result.ToString());
     }
 
@@ -462,6 +514,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="excludeFromBundle">A value indicating whether to exclude this style sheet from bundling</param>
     public virtual void AddCssFileParts(string src, string debugSrc = "", bool excludeFromBundle = false)
     {
+		logger.LogDebug(">>> Entering AddCssFileParts(src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", src, debugSrc, excludeFromBundle);
         if (string.IsNullOrEmpty(src))
             return;
 
@@ -475,6 +528,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             IsLocal = isLocal,
             Src = url
         });
+		logger.LogDebug("<<< Exiting AddCssFileParts(src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", src, debugSrc, excludeFromBundle);
     }
 
     /// <summary>
@@ -485,6 +539,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="excludeFromBundle">A value indicating whether to exclude this style sheet from bundling</param>
     public virtual void AppendCssFileParts(string src, string debugSrc = "", bool excludeFromBundle = false)
     {
+		logger.LogDebug(">>> Entering AppendCssFileParts(src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", src, debugSrc, excludeFromBundle);
         if (string.IsNullOrEmpty(src))
             return;
 
@@ -498,6 +553,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             IsLocal = isLocal,
             Src = url
         });
+		logger.LogDebug("<<< Exiting AppendCssFileParts(src={Src},debugSrc={DebugSrc},excludeFromBundle={ExcludeFromBundle})", src, debugSrc, excludeFromBundle);
     }
 
     /// <summary>
@@ -506,13 +562,16 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Generated HTML string</returns>
     public virtual IHtmlContent GenerateCssFiles()
     {
+		logger.LogDebug(">>> Entering GenerateCssFiles()");
         if (!_cssParts.Any())
             return HtmlString.Empty;
 
         var result = new StringBuilder();
 
+		logger.LogDebug("GenerateCssFiles(): result → {Result}", result);
         var woConfig = _appSettings.Get<WebOptimizerConfig>();
         var pathBase = _httpContextAccessor.HttpContext.Request.PathBase;
+		logger.LogDebug("GenerateCssFiles(): woConfig → {WoConfig}", woConfig);
 
         if (woConfig.EnableCssBundling && _cssParts.Any(item => !item.ExcludeFromBundle))
         {
@@ -529,8 +588,11 @@ public partial class NopHtmlHelper : INopHtmlHelper
 
             var bundleKey = $"/css/{GetAssetKey(sources, bundleSuffix)}.css";
 
+			logger.LogDebug("GenerateCssFiles(): bundleKey → {BundleKey}", bundleKey);
             var bundleAsset = _bundleHelper.GetOrCreateCssAsset(bundleKey, sources);
             var route = _bundleHelper.CacheBusting(bundleAsset);
+			logger.LogDebug("GenerateCssFiles(): bundleAsset → {BundleAsset}", bundleAsset);
+			logger.LogDebug("GenerateCssFiles(): route → {Route}", route);
 
 
             result.AppendFormat("<link rel=\"stylesheet\" type=\"{0}\" href=\"{1}{2}\" />",
@@ -552,12 +614,14 @@ public partial class NopHtmlHelper : INopHtmlHelper
 
             var asset = _bundleHelper.GetOrCreateCssAsset(item.Src);
             var route = _bundleHelper.CacheBusting(asset);
+			logger.LogDebug("GenerateCssFiles(): asset → {Asset}", asset);
 
             result.AppendFormat("<link rel=\"stylesheet\" type=\"{0}\" href=\"{1}{2}\" />",
                 MimeTypes.TextCss, pathBase, route);
             result.AppendLine();
         }
 
+		logger.LogDebug("<<< Exiting GenerateCssFiles()");
         return new HtmlString(result.ToString());
     }
 
@@ -568,6 +632,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="withQueryString">Whether to use canonical URLs with query string parameters</param>
     public virtual void AddCanonicalUrlParts(string part, bool withQueryString = false)
     {
+		logger.LogDebug(">>> Entering AddCanonicalUrlParts(part={Part},withQueryString={WithQueryString})", part, withQueryString);
         if (string.IsNullOrEmpty(part))
             return;
 
@@ -579,8 +644,10 @@ public partial class NopHtmlHelper : INopHtmlHelper
                 .ToDictionary(parameter => parameter.Key, parameter => parameter.Value.ToString());
             part = QueryHelpers.AddQueryString(part, queryParameters);
         }
+		logger.LogDebug("AddCanonicalUrlParts(part={Part},withQueryString={WithQueryString}): part → {Part1}", part, withQueryString, part);
 
         _canonicalUrlParts.Add(part);
+		logger.LogDebug("<<< Exiting AddCanonicalUrlParts(part={Part},withQueryString={WithQueryString})", part, withQueryString);
     }
 
     /// <summary>
@@ -589,10 +656,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">Canonical URL part</param>
     public virtual void AppendCanonicalUrlParts(string part)
     {
+		logger.LogDebug(">>> Entering AppendCanonicalUrlParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _canonicalUrlParts.Insert(0, part);
+		logger.LogDebug("<<< Exiting AppendCanonicalUrlParts(part={Part})", part);
     }
 
     /// <summary>
@@ -601,12 +670,15 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Generated HTML string</returns>
     public virtual IHtmlContent GenerateCanonicalUrls()
     {
+		logger.LogDebug(">>> Entering GenerateCanonicalUrls()");
         var result = new StringBuilder();
         foreach (var canonicalUrl in _canonicalUrlParts)
         {
+		logger.LogDebug("GenerateCanonicalUrls(): result → {Result}", result);
             result.AppendFormat("<link rel=\"canonical\" href=\"{0}\" />", canonicalUrl);
             result.Append(Environment.NewLine);
         }
+		logger.LogDebug("<<< Exiting GenerateCanonicalUrls()");
         return new HtmlString(result.ToString());
     }
 
@@ -616,10 +688,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">The entire element. For example, <![CDATA[<meta name="msvalidate.01" content="123121231231313123123" />]]></param>
     public virtual void AddHeadCustomParts(string part)
     {
+		logger.LogDebug(">>> Entering AddHeadCustomParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _headCustomParts.Add(part);
+		logger.LogDebug("<<< Exiting AddHeadCustomParts(part={Part})", part);
     }
 
     /// <summary>
@@ -628,10 +702,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">The entire element. For example, <![CDATA[<meta name="msvalidate.01" content="123121231231313123123" />]]></param>
     public virtual void AppendHeadCustomParts(string part)
     {
+		logger.LogDebug(">>> Entering AppendHeadCustomParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _headCustomParts.Insert(0, part);
+		logger.LogDebug("<<< Exiting AppendHeadCustomParts(part={Part})", part);
     }
 
     /// <summary>
@@ -640,17 +716,21 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Generated HTML string</returns>
     public virtual IHtmlContent GenerateHeadCustom()
     {
+		logger.LogDebug(">>> Entering GenerateHeadCustom()");
         //use only distinct rows
         var distinctParts = _headCustomParts.Distinct().ToList();
         if (!distinctParts.Any())
+			logger.LogDebug("GenerateHeadCustom(): distinctParts → {DistinctParts}", distinctParts);
             return HtmlString.Empty;
 
         var result = new StringBuilder();
         foreach (var path in distinctParts)
         {
+		logger.LogDebug("GenerateHeadCustom(): result → {Result}", result);
             result.Append(path);
             result.Append(Environment.NewLine);
         }
+		logger.LogDebug("<<< Exiting GenerateHeadCustom()");
         return new HtmlString(result.ToString());
     }
 
@@ -660,10 +740,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">CSS class</param>
     public virtual void AddPageCssClassParts(string part)
     {
+		logger.LogDebug(">>> Entering AddPageCssClassParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _pageCssClassParts.Add(part);
+		logger.LogDebug("<<< Exiting AddPageCssClassParts(part={Part})", part);
     }
 
     /// <summary>
@@ -672,10 +754,12 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="part">CSS class</param>
     public virtual void AppendPageCssClassParts(string part)
     {
+		logger.LogDebug(">>> Entering AppendPageCssClassParts(part={Part})", part);
         if (string.IsNullOrEmpty(part))
             return;
 
         _pageCssClassParts.Insert(0, part);
+		logger.LogDebug("<<< Exiting AppendPageCssClassParts(part={Part})", part);
     }
 
     /// <summary>
@@ -685,11 +769,14 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Generated string</returns>
     public virtual string GeneratePageCssClasses(string part = "")
     {
+		logger.LogDebug(">>> Entering GeneratePageCssClasses(part={Part})", part);
         AppendPageCssClassParts(part);
 
         var result = string.Join(" ", _pageCssClassParts.AsEnumerable().Reverse().ToArray());
 
+		logger.LogDebug("GeneratePageCssClasses(part={Part}): result → {Result}", part, result);
         if (string.IsNullOrEmpty(result))
+		logger.LogDebug("<<< Exiting GeneratePageCssClasses(part={Part})", part);
             return string.Empty;
 
         return _htmlEncoder.Encode(result);
@@ -710,6 +797,8 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>URL</returns>
     public virtual string GetEditPageUrl()
     {
+		logger.LogDebug(">>> Entering GetEditPageUrl()");
+		logger.LogDebug("<<< Exiting GetEditPageUrl()");
         return _editPageUrl;
     }
 
@@ -719,7 +808,10 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="systemName">System name</param>
     public virtual void SetActiveMenuItemSystemName(string systemName)
     {
+		logger.LogDebug(">>> Entering SetActiveMenuItemSystemName(systemName={SystemName})", systemName);
         _activeAdminMenuSystemName = systemName;
+		logger.LogDebug("<<< Exiting SetActiveMenuItemSystemName(systemName={SystemName})", systemName);
+		logger.LogDebug("SetActiveMenuItemSystemName(systemName={SystemName}): _activeAdminMenuSystemName → {_activeAdminMenuSystemName}", systemName, _activeAdminMenuSystemName);
     }
 
     /// <summary>
@@ -728,6 +820,8 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>System name</returns>
     public virtual string GetActiveMenuItemSystemName()
     {
+		logger.LogDebug(">>> Entering GetActiveMenuItemSystemName()");
+		logger.LogDebug("<<< Exiting GetActiveMenuItemSystemName()");
         return _activeAdminMenuSystemName;
     }
 
@@ -738,9 +832,11 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <returns>Route name</returns>
     public virtual string GetRouteName(bool handleDefaultRoutes = false)
     {
+		logger.LogDebug(">>> Entering GetRouteName(handleDefaultRoutes={HandleDefaultRoutes})", handleDefaultRoutes);
         var httpContext = _httpContextAccessor.HttpContext;
         var routeName = httpContext.GetEndpoint()?.Metadata.GetMetadata<RouteNameMetadata>()?.RouteName ?? string.Empty;
 
+		logger.LogDebug("GetRouteName(handleDefaultRoutes={HandleDefaultRoutes}): routeName → {RouteName}", handleDefaultRoutes, routeName);
         if (!string.IsNullOrEmpty(routeName) && routeName != "areaRoute")
             return routeName;
 
@@ -762,6 +858,7 @@ public partial class NopHtmlHelper : INopHtmlHelper
             };
         }
 
+		logger.LogDebug("<<< Exiting GetRouteName(handleDefaultRoutes={HandleDefaultRoutes})", handleDefaultRoutes);
         return routeName;
     }
 
@@ -771,8 +868,10 @@ public partial class NopHtmlHelper : INopHtmlHelper
     /// <param name="jsonLd">The JSON-LD serialized model></param>
     public virtual void AddJsonLdParts(string jsonLd)
     {
+		logger.LogDebug(">>> Entering AddJsonLdParts(jsonLd={JsonLd})", jsonLd);
         if (_seoSettings.MicrodataEnabled)
             AddHeadCustomParts("<script type=\"application/ld+json\">" + _htmlHelper.Raw(jsonLd) + "</script>");
+			logger.LogDebug("<<< Exiting AddJsonLdParts(jsonLd={JsonLd})", jsonLd);
     }
 
     #endregion

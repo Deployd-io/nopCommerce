@@ -16,9 +16,11 @@ public partial class ReviewTypeBuilder : NopEntityBuilder<ReviewType>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ReviewType.Name)).AsString(400).NotNullable()
             .WithColumn(nameof(ReviewType.Description)).AsString(400).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

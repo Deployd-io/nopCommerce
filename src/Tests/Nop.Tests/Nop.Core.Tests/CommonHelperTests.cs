@@ -10,7 +10,9 @@ public class CommonHelperTests
     [Test]
     public void CanGetTypedValue()
     {
+		logger.LogDebug(">>> Entering CanGetTypedValue()");
         CommonHelper.To<int>("1000").Should().BeOfType(typeof(int));
         CommonHelper.To<int>("1000").Should().Be(1000);
+		logger.LogDebug("<<< Exiting CanGetTypedValue()");
     }
 }

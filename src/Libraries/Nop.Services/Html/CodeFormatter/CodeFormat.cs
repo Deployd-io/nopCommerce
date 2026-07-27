@@ -83,11 +83,15 @@ public abstract partial class CodeFormat : SourceFormat
     /// <summary/>
     protected CodeFormat()
     {
+		logger.LogDebug(">>> Entering CodeFormat()");
         //generate the keyword and preprocessor regexes from the keyword lists
         var r = new Regex(@"\w+|-\w+|#\w+|@@\w+|#(?:\\(?:s|w)(?:\*|\+)?\w+)+|@\\w\*+");
         var regKeyword = r.Replace(Keywords, @"(?<=^|\W)$0(?=\W)");
+		logger.LogDebug("CodeFormat(): r → {R}", r);
+		logger.LogDebug("CodeFormat(): regKeyword → {RegKeyword}", regKeyword);
         var regPreproc = r.Replace(Preprocessors, @"(?<=^|\s)$0(?=\s|$)");
         r = new Regex(@" +");
+		logger.LogDebug("CodeFormat(): regPreproc → {RegPreproc}", regPreproc);
         regKeyword = r.Replace(regKeyword, @"|");
         regPreproc = r.Replace(regPreproc, @"|");
 
@@ -99,6 +103,7 @@ public abstract partial class CodeFormat : SourceFormat
         //build a master regex with capturing groups
         var regAll = new StringBuilder();
         regAll.Append('(');
+		logger.LogDebug("CodeFormat(): regAll → {RegAll}", regAll);
         regAll.Append(CommentRegex);
         regAll.Append(")|(");
         regAll.Append(StringRegex);
@@ -113,6 +118,8 @@ public abstract partial class CodeFormat : SourceFormat
 
         var caseInsensitive = CaseSensitive ? 0 : RegexOptions.IgnoreCase;
         CodeRegex = new Regex(regAll.ToString(), RegexOptions.Singleline | caseInsensitive);
+		logger.LogDebug("<<< Exiting CodeFormat()");
+		logger.LogDebug("CodeFormat(): CodeRegex → {CodeRegex}", CodeRegex);
     }
 
     /// <summary>
@@ -124,12 +131,15 @@ public abstract partial class CodeFormat : SourceFormat
     /// <returns>A string containing the HTML code fragment.</returns>
     protected override string MatchEval(Match match)
     {
+		logger.LogDebug(">>> Entering MatchEval(match={Match})", match);
         if (match.Groups[1].Success) //comment
         {
             var reader = new StringReader(match.ToString());
             string line;
+			logger.LogDebug("MatchEval(match={Match}): reader → {Reader}", match, reader);
             var sb = new StringBuilder();
             while ((line = reader.ReadLine()) != null)
+			logger.LogDebug("MatchEval(match={Match}): sb → {Sb}", match, sb);
             {
                 if (sb.Length > 0)
                 {
@@ -159,6 +169,7 @@ public abstract partial class CodeFormat : SourceFormat
             return "<span class=\"kwrd\">" + match + "</span>";
         }
 
+		logger.LogDebug("<<< Exiting MatchEval(match={Match})", match);
         return string.Empty; //none of the above
     }
 }

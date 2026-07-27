@@ -10,12 +10,18 @@ public partial class LogoViewComponent : NopViewComponent
 
     public LogoViewComponent(ICommonModelFactory commonModelFactory)
     {
+		logger.LogDebug(">>> Entering LogoViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
         _commonModelFactory = commonModelFactory;
+		logger.LogDebug("<<< Exiting LogoViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
+		logger.LogDebug("LogoViewComponent(commonModelFactory={CommonModelFactory}): _commonModelFactory → {_commonModelFactory}", commonModelFactory, _commonModelFactory);
     }
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         var model = await _commonModelFactory.PrepareLogoModelAsync();
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 }

@@ -68,15 +68,20 @@ public partial class ProductReviewController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewSearchModelAsync(new ProductReviewSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -87,25 +92,31 @@ public partial class ProductReviewController : BaseAdminController
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a product review with the specified id
         var productReview = await _productReviewService.GetProductReviewByIdAsync(id);
         if (productReview == null)
+			logger.LogDebug("Edit(id={Id}): productReview → {ProductReview}", id, productReview);
             return RedirectToAction("List");
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && (await _productService.GetProductByIdAsync(productReview.ProductId)).VendorId != currentVendor.Id)
+			logger.LogDebug("Edit(id={Id}): currentVendor → {CurrentVendor}", id, currentVendor);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewModelAsync(null, productReview);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -178,6 +189,7 @@ public partial class ProductReviewController : BaseAdminController
         model = await _productReviewModelFactory.PrepareProductReviewModelAsync(model, productReview, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -185,9 +197,11 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a product review with the specified id
         var productReview = await _productReviewService.GetProductReviewByIdAsync(id);
         if (productReview == null)
+			logger.LogDebug("Delete(id={Id}): productReview → {ProductReview}", id, productReview);
             return RedirectToAction("List");
 
         //a vendor does not have access to this functionality
@@ -202,11 +216,13 @@ public partial class ProductReviewController : BaseAdminController
 
         var product = await _productService.GetProductByIdAsync(productReview.ProductId);
 
+		logger.LogDebug("Delete(id={Id}): product → {Product}", id, product);
         //update product totals
         await _productReviewService.UpdateProductReviewTotalsAsync(product);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.ProductReviews.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -214,6 +230,7 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ApproveSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         //a vendor does not have access to this functionality
         if (await _workContext.GetCurrentVendorAsync() != null)
             return RedirectToAction("List");
@@ -224,6 +241,7 @@ public partial class ProductReviewController : BaseAdminController
         //filter not approved reviews
         var productReviews = (await _productReviewService.GetProductReviewsByIdsAsync(selectedIds.ToArray())).Where(review => !review.IsApproved);
 
+		logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): productReviews → {ProductReviews}", selectedIds, productReviews);
         foreach (var productReview in productReviews)
         {
             productReview.IsApproved = true;
@@ -231,6 +249,7 @@ public partial class ProductReviewController : BaseAdminController
 
             var product = await _productService.GetProductByIdAsync(productReview.ProductId);
 
+			logger.LogDebug("ApproveSelected(selectedIds={SelectedIds}): product → {Product}", selectedIds, product);
             //update product totals
             await _productReviewService.UpdateProductReviewTotalsAsync(product);
 
@@ -238,6 +257,7 @@ public partial class ProductReviewController : BaseAdminController
             await _eventPublisher.PublishAsync(new ProductReviewApprovedEvent(productReview));
         }
 
+		logger.LogDebug("<<< Exiting ApproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -245,6 +265,7 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DisapproveSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         //a vendor does not have access to this functionality
         if (await _workContext.GetCurrentVendorAsync() != null)
             return RedirectToAction("List");
@@ -255,6 +276,7 @@ public partial class ProductReviewController : BaseAdminController
         //filter approved reviews
         var productReviews = (await _productReviewService.GetProductReviewsByIdsAsync(selectedIds.ToArray())).Where(review => review.IsApproved);
 
+		logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): productReviews → {ProductReviews}", selectedIds, productReviews);
         foreach (var productReview in productReviews)
         {
             productReview.IsApproved = false;
@@ -262,10 +284,12 @@ public partial class ProductReviewController : BaseAdminController
 
             var product = await _productService.GetProductByIdAsync(productReview.ProductId);
 
+			logger.LogDebug("DisapproveSelected(selectedIds={SelectedIds}): product → {Product}", selectedIds, product);
             //update product totals
             await _productReviewService.UpdateProductReviewTotalsAsync(product);
         }
 
+		logger.LogDebug("<<< Exiting DisapproveSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -273,6 +297,7 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         //a vendor does not have access to this functionality
         if (await _workContext.GetCurrentVendorAsync() != null)
             return RedirectToAction("List");
@@ -282,12 +307,15 @@ public partial class ProductReviewController : BaseAdminController
 
         var productReviews = await _productReviewService.GetProductReviewsByIdsAsync(selectedIds.ToArray());
         var products = await _productService.GetProductsByIdsAsync(productReviews.Select(p => p.ProductId).Distinct().ToArray());
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): productReviews → {ProductReviews}", selectedIds, productReviews);
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): products → {Products}", selectedIds, products);
 
         await _productReviewService.DeleteProductReviewsAsync(productReviews);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteProductReview");
         await _customerActivityService.InsertActivitiesAsync("DeleteProductReview", productReviews, productReview => string.Format(activityLogFormat, productReview.Id));
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
         //update product totals
         foreach (var product in products)
@@ -295,6 +323,7 @@ public partial class ProductReviewController : BaseAdminController
             await _productReviewService.UpdateProductReviewTotalsAsync(product);
         }
 
+		logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -302,12 +331,15 @@ public partial class ProductReviewController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_REVIEWS_VIEW)]
     public virtual async Task<IActionResult> ProductReviewReviewTypeMappingList(ProductReviewReviewTypeMappingSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductReviewReviewTypeMappingList(searchModel={SearchModel})", searchModel);
         var productReview = await _productReviewService.GetProductReviewByIdAsync(searchModel.ProductReviewId)
             ?? throw new ArgumentException("No product review found with the specified id");
 
         //prepare model
         var model = await _productReviewModelFactory.PrepareProductReviewReviewTypeMappingListModelAsync(searchModel, productReview);
 
+		logger.LogDebug("ProductReviewReviewTypeMappingList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductReviewReviewTypeMappingList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

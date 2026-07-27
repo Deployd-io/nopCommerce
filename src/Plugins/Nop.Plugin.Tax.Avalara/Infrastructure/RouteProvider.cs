@@ -17,8 +17,10 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         var lang = GetLanguageRoutePattern();
 
+		logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         endpointRouteBuilder.MapControllerRoute(name: AvalaraTaxDefaults.ConfigurationRouteName,
             pattern: "Admin/Avalara/Configure",
             defaults: new { controller = "Avalara", action = "Configure" });
@@ -39,6 +41,7 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: AvalaraTaxDefaults.ItemClassificationWebhookRouteName,
             pattern: "avalara/item-classification-webhook",
             defaults: new { controller = "AvalaraWebhook", action = "ItemClassificationWebhook" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

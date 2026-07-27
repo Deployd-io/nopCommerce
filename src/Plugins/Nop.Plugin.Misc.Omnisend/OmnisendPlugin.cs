@@ -47,6 +47,8 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(OmnisendDefaults.ConfigurationRouteName);
     }
 
@@ -57,11 +59,14 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         if (widgetZone is null)
             throw new ArgumentNullException(nameof(widgetZone));
 
         var zones = GetWidgetZonesAsync().Result;
 
+		logger.LogDebug("GetWidgetViewComponent(widgetZone={WidgetZone}): zones → {Zones}", widgetZone, zones);
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return zones.Any(widgetZone.Equals) ? typeof(WidgetsOmnisendViewComponent) : null;
     }
 
@@ -74,6 +79,8 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string> { PublicWidgetZones.BodyStartHtmlTagAfter, PublicWidgetZones.ProductDetailsBottom });
     }
 
@@ -83,6 +90,7 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //ensure MediaSettings.UseAbsoluteImagePath is enabled (used for images uploading)
         await _settingService.SetSettingAsync($"{nameof(MediaSettings)}.{nameof(MediaSettings.UseAbsoluteImagePath)}", true, clearCache: false);
 
@@ -91,6 +99,7 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 <script type=""text/javascript"">
     //OMNISEND-SNIPPET-SOURCE-CODE-V1
     window.omnisend = window.omnisend || [];
+	logger.LogDebug("InstallAsync(): window.omnisend → {Arg0}", window.omnisend);
     omnisend.push([""accountID"", ""{OmnisendDefaults.BrandId}""]);
     omnisend.push([""track"", ""$pageViewed""]);
     !function(){{var e=document.createElement(""script"");e.type=""text/javascript"",e.async=!0,e.src=""https://omnisnippet1.com/inshop/launcher-v2.js"";var t=document.getElementsByTagName(""script"")[0];t.parentNode.insertBefore(e,t)}}();
@@ -162,6 +171,7 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -170,6 +180,7 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         if (_widgetSettings.ActiveWidgetSystemNames.Contains(OmnisendDefaults.SystemName))
         {
             _widgetSettings.ActiveWidgetSystemNames.Remove(OmnisendDefaults.SystemName);
@@ -180,6 +191,7 @@ public class OmnisendPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Misc.Omnisend");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

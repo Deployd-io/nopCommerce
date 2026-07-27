@@ -31,7 +31,10 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
 
     public NopOverrideStoreCheckboxHelper(IHtmlHelper htmlHelper)
     {
+		logger.LogDebug(">>> Entering NopOverrideStoreCheckboxHelper(htmlHelper={HtmlHelper})", htmlHelper);
         _htmlHelper = htmlHelper;
+		logger.LogDebug("<<< Exiting NopOverrideStoreCheckboxHelper(htmlHelper={HtmlHelper})", htmlHelper);
+		logger.LogDebug("NopOverrideStoreCheckboxHelper(htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", htmlHelper, _htmlHelper);
     }
 
     #endregion
@@ -46,6 +49,7 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -62,12 +66,14 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
 
             var dataInputIds = new List<string>();
             if (Input != null)
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): dataInputIds → {DataInputIds}", context, output, dataInputIds);
                 dataInputIds.Add(_htmlHelper.Id(Input.Name));
             if (Input2 != null)
                 dataInputIds.Add(_htmlHelper.Id(Input2.Name));
 
             const string cssClass = "multi-store-override-option";
             var dataInputSelector = "";
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): dataInputSelector → {DataInputSelector}", context, output, dataInputSelector);
             if (!string.IsNullOrEmpty(ParentContainer))
                 dataInputSelector = "#" + ParentContainer + " input, #" + ParentContainer + " textarea, #" + ParentContainer + " select";
 
@@ -76,15 +82,20 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
 
             var onClick = $"checkOverriddenStoreValue(this, '{dataInputSelector}')";
 
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): onClick → {OnClick}", context, output, onClick);
             var htmlAttributes = new
             {
                 @class = cssClass,
                 onclick = onClick,
                 data_for_input_selector = dataInputSelector
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): onclick → {Onclick}", context, output, onclick);
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): data_for_input_selector → {Data_for_input_selector}", context, output, data_for_input_selector);
             };
             var htmlOutput = await _htmlHelper.CheckBox(For.Name, null, htmlAttributes).RenderHtmlContentAsync();
             output.Content.SetHtmlContent(htmlOutput);
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlOutput → {HtmlOutput}", context, output, htmlOutput);
         }
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

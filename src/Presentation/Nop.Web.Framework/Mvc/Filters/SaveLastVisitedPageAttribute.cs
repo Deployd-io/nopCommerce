@@ -21,6 +21,8 @@ public sealed class SaveLastVisitedPageAttribute : TypeFilterAttribute
     /// </summary>
     public SaveLastVisitedPageAttribute() : base(typeof(SaveLastVisitedPageFilter))
     {
+	logger.LogDebug(">>> Entering SaveLastVisitedPageAttribute()");
+	logger.LogDebug("<<< Exiting SaveLastVisitedPageAttribute()");
     }
 
     #endregion
@@ -68,6 +70,8 @@ public sealed class SaveLastVisitedPageAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SaveLastVisitedPageAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering SaveLastVisitedPageAsync(context={Context})", context);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ArgumentNullException.ThrowIfNull(context);
 
             //only in GET requests
@@ -84,6 +88,7 @@ public sealed class SaveLastVisitedPageAttribute : TypeFilterAttribute
             //get current page
             var pageUrl = _webHelper.GetThisPageUrl(true);
 
+			logger.LogDebug("SaveLastVisitedPageAsync(context={Context}): pageUrl → {PageUrl}", context, pageUrl);
             if (string.IsNullOrEmpty(pageUrl))
                 return;
 
@@ -93,6 +98,7 @@ public sealed class SaveLastVisitedPageAttribute : TypeFilterAttribute
                     .GetAttributesForEntityAsync(customer.Id, nameof(Customer)))
                 .FirstOrDefault(attribute => attribute.Key
                     .Equals(NopCustomerDefaults.LastVisitedPageAttribute, StringComparison.InvariantCultureIgnoreCase));
+					logger.LogDebug("SaveLastVisitedPageAsync(context={Context}): customer → {Customer}", context, customer);
 
             //save new one if don't match
             if (previousPageAttribute == null)
@@ -106,15 +112,20 @@ public sealed class SaveLastVisitedPageAttribute : TypeFilterAttribute
                     Value = pageUrl,
                     CreatedOrUpdatedDateUTC = DateTime.UtcNow
                 }, false);
+				logger.LogInformation("SaveLastVisitedPageAsync(context)={Context}: save query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
             }
             else if (!pageUrl.Equals(previousPageAttribute.Value, StringComparison.InvariantCultureIgnoreCase))
             {
                 //update without event notification
                 previousPageAttribute.Value = pageUrl;
+				logger.LogDebug("SaveLastVisitedPageAsync(context={Context}): previousPageAttribute.Value → {Arg1}", context, previousPageAttribute.Value);
+				logger.LogDebug("SaveLastVisitedPageAsync(context={Context}): previousPageAttribute.CreatedOrUpdatedDateUTC → {Arg1}", context, previousPageAttribute.CreatedOrUpdatedDateUTC);
                 previousPageAttribute.CreatedOrUpdatedDateUTC = DateTime.UtcNow;
 
                 await _genericAttributeRepository.UpdateAsync(previousPageAttribute, false);
+				logger.LogInformation("SaveLastVisitedPageAsync(context)={Context}: update query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
             }
+			logger.LogDebug("<<< Exiting SaveLastVisitedPageAsync(context={Context})", context);
         }
 
         #endregion
@@ -129,9 +140,11 @@ public sealed class SaveLastVisitedPageAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await SaveLastVisitedPageAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

@@ -46,7 +46,11 @@ public sealed class ParameterBasedOnFormNameAndValueAttribute : TypeFilterAttrib
         {
             _formKeyName = formKeyName;
             _formValue = formValue;
+			logger.LogDebug("ParameterBasedOnFormNameAndValueFilter(formKeyName={FormKeyName},formValue={FormValue},actionParameterName={ActionParameterName}): _formValue → {_formValue}", formKeyName, formValue, actionParameterName, _formValue);
+			logger.LogDebug("ParameterBasedOnFormNameAndValueFilter(formKeyName={FormKeyName},formValue={FormValue},actionParameterName={ActionParameterName}): _formKeyName → {_formKeyName}", formKeyName, formValue, actionParameterName, _formKeyName);
             _actionParameterName = actionParameterName;
+			logger.LogDebug("<<< Exiting ParameterBasedOnFormNameAndValueFilter(formKeyName={FormKeyName},formValue={FormValue},actionParameterName={ActionParameterName})", formKeyName, formValue, actionParameterName);
+			logger.LogDebug("ParameterBasedOnFormNameAndValueFilter(formKeyName={FormKeyName},formValue={FormValue},actionParameterName={ActionParameterName}): _actionParameterName → {_actionParameterName}", formKeyName, formValue, actionParameterName, _actionParameterName);
         }
 
         #endregion
@@ -60,12 +64,15 @@ public sealed class ParameterBasedOnFormNameAndValueAttribute : TypeFilterAttrib
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckParameterBasedOnFormNameAndValueAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering CheckParameterBasedOnFormNameAndValueAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //if form key with '_formKeyName' exists and value of this form parameter equals passed '_formValue', 
             //then set specified '_actionParameterName' to true
             var formValue = await context.HttpContext.Request.GetFormValueAsync(_formKeyName);
             context.ActionArguments[_actionParameterName] = !string.IsNullOrEmpty(formValue) && formValue.Equals(_formValue);
+			logger.LogDebug("<<< Exiting CheckParameterBasedOnFormNameAndValueAsync(context={Context})", context);
+			logger.LogDebug("CheckParameterBasedOnFormNameAndValueAsync(context={Context}): formValue → {FormValue}", context, formValue);
         }
 
         #endregion
@@ -80,9 +87,11 @@ public sealed class ParameterBasedOnFormNameAndValueAttribute : TypeFilterAttrib
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckParameterBasedOnFormNameAndValueAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

@@ -12,34 +12,45 @@ public class NopConventionSet : IConventionSet
 
     public NopConventionSet(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering NopConventionSet(dataProvider={DataProvider})", dataProvider);
         ArgumentNullException.ThrowIfNull(dataProvider);
 
         var defaultConventionSet = new DefaultConventionSet();
 
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): defaultConventionSet → {DefaultConventionSet}", dataProvider, defaultConventionSet);
         ForeignKeyConventions = new List<IForeignKeyConvention>()
         {
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): ForeignKeyConventions → {ForeignKeyConventions}", dataProvider, ForeignKeyConventions);
             new NopForeignKeyConvention(dataProvider),
             defaultConventionSet.SchemaConvention,
         };
 
         IndexConventions = new List<IIndexConvention>()
         {
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): IndexConventions → {IndexConventions}", dataProvider, IndexConventions);
             new NopIndexConvention(dataProvider),
             defaultConventionSet.SchemaConvention
         };
 
         ColumnsConventions = new List<IColumnsConvention>()
         {
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): ColumnsConventions → {ColumnsConventions}", dataProvider, ColumnsConventions);
             new NopColumnsConvention(),
             new DefaultPrimaryKeyNameConvention()
         };
 
         ConstraintConventions = defaultConventionSet.ConstraintConventions;
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): ConstraintConventions → {ConstraintConventions}", dataProvider, ConstraintConventions);
 
         SequenceConventions = defaultConventionSet.SequenceConventions;
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): SequenceConventions → {SequenceConventions}", dataProvider, SequenceConventions);
         AutoNameConventions = defaultConventionSet.AutoNameConventions;
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): AutoNameConventions → {AutoNameConventions}", dataProvider, AutoNameConventions);
         SchemaConvention = defaultConventionSet.SchemaConvention;
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): SchemaConvention → {SchemaConvention}", dataProvider, SchemaConvention);
         RootPathConvention = defaultConventionSet.RootPathConvention;
+		logger.LogDebug("<<< Exiting NopConventionSet(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): RootPathConvention → {RootPathConvention}", dataProvider, RootPathConvention);
     }
 
     #endregion

@@ -23,8 +23,12 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public CheckAccessClosedStoreAttribute(bool ignore = false) : base(typeof(CheckAccessClosedStoreFilter))
     {
+		logger.LogDebug(">>> Entering CheckAccessClosedStoreAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		logger.LogDebug("<<< Exiting CheckAccessClosedStoreAttribute(ignore={Ignore})", ignore);
+		logger.LogDebug("CheckAccessClosedStoreAttribute(ignore={Ignore}): Arguments → {Arguments}", ignore, Arguments);
+		logger.LogDebug("CheckAccessClosedStoreAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
     }
 
     #endregion
@@ -81,6 +85,7 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckAccessClosedStoreAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering CheckAccessClosedStoreAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -119,10 +124,12 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
                 var allowedTopicIds = (await _topicService.GetAllTopicsAsync(store.Id))
                     .Where(topic => topic.AccessibleWhenStoreClosed)
                     .Select(topic => topic.Id);
+					logger.LogDebug("CheckAccessClosedStoreAsync(context={Context}): store → {Store}", context, store);
 
                 //check whether requested topic is allowed
                 var requestedTopicId = context.RouteData.Values["topicId"] as int?;
                 if (requestedTopicId.HasValue && allowedTopicIds.Contains(requestedTopicId.Value))
+					logger.LogDebug("CheckAccessClosedStoreAsync(context={Context}): requestedTopicId → {RequestedTopicId}", context, requestedTopicId);
                     return;
             }
 
@@ -132,6 +139,7 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
 
             //store is closed and no access, so redirect to 'StoreClosed' page
             context.Result = new RedirectToRouteResult(NopRouteNames.Standard.STORE_CLOSED, null);
+			logger.LogDebug("<<< Exiting CheckAccessClosedStoreAsync(context={Context})", context);
         }
 
         #endregion
@@ -146,9 +154,11 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckAccessClosedStoreAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

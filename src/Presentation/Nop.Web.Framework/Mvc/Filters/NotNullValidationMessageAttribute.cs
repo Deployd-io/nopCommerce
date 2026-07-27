@@ -22,6 +22,8 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
     /// </summary>
     public NotNullValidationMessageAttribute() : base(typeof(NotNullValidationMessageFilter))
     {
+	logger.LogDebug(">>> Entering NotNullValidationMessageAttribute()");
+	logger.LogDebug("<<< Exiting NotNullValidationMessageAttribute()");
     }
 
     #endregion
@@ -43,7 +45,10 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
 
         public NotNullValidationMessageFilter(ILocalizationService localizationService)
         {
+			logger.LogDebug(">>> Entering NotNullValidationMessageFilter(localizationService={LocalizationService})", localizationService);
             _localizationService = localizationService;
+			logger.LogDebug("<<< Exiting NotNullValidationMessageFilter(localizationService={LocalizationService})", localizationService);
+			logger.LogDebug("NotNullValidationMessageFilter(localizationService={LocalizationService}): _localizationService → {_localizationService}", localizationService, _localizationService);
         }
 
         #endregion
@@ -57,6 +62,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckNotNullValidationAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering CheckNotNullValidationAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in POST requests
@@ -80,14 +86,18 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
             //get model passed to the action
             var model = context.ActionArguments.Values.OfType<BaseNopModel>().FirstOrDefault();
             if (model is null)
+				logger.LogDebug("CheckNotNullValidationAsync(context={Context}): model → {Model}", context, model);
                 return;
 
             //get model properties that failed validation
             var modelType = model.GetType();
             var properties = modelType.GetProperties();
+			logger.LogDebug("CheckNotNullValidationAsync(context={Context}): modelType → {ModelType}", context, modelType);
+			logger.LogDebug("CheckNotNullValidationAsync(context={Context}): properties → {Properties}", context, properties);
             var locale = await _localizationService.GetResourceAsync(NopValidationDefaults.NotNullValidationLocaleName);
             foreach (var modelState in nullModelValues)
             {
+			logger.LogDebug("CheckNotNullValidationAsync(context={Context}): locale → {Locale}", context, locale);
                 if (modelState.Value == null)
                     continue;
 
@@ -103,6 +113,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
                 
                 string resourceValue = null;
 
+				logger.LogDebug("CheckNotNullValidationAsync(context={Context}): resourceValue → {ResourceValue}", context, resourceValue);
                 if (!string.IsNullOrEmpty(resourceName))
                     //get locale resource value
                     resourceValue = await _localizationService.GetResourceAsync(resourceName);
@@ -114,6 +125,7 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
                 modelState.Value.Errors.Clear();
                 modelState.Value.Errors.Add(string.Format(locale, resourceValue));
             }
+			logger.LogDebug("<<< Exiting CheckNotNullValidationAsync(context={Context})", context);
         }
 
         #endregion
@@ -128,9 +140,11 @@ public sealed class NotNullValidationMessageAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckNotNullValidationAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

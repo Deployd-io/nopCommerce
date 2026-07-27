@@ -9,8 +9,12 @@ public record StorePickupPointModel : BaseNopEntityModel
 {
     public StorePickupPointModel()
     {
+		logger.LogDebug(">>> Entering StorePickupPointModel()");
         Address = new AddressModel();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting StorePickupPointModel()");
+		logger.LogDebug("StorePickupPointModel(): Address → {Address}", Address);
+		logger.LogDebug("StorePickupPointModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     public AddressModel Address { get; set; }
@@ -52,8 +56,12 @@ public class AddressModel
 {
     public AddressModel()
     {
+		logger.LogDebug(">>> Entering AddressModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddressModel()");
+		logger.LogDebug("AddressModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("AddressModel(): AvailableStates → {AvailableStates}", AvailableStates);
     }
 
     [NopResourceDisplayName("Admin.Address.Fields.Country")]

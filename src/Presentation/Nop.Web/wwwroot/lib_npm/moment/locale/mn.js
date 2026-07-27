@@ -5,6 +5,7 @@
 import moment from '../moment';
 
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     switch (key) {
         case 's':
             return withoutSuffix ? 'хэдхэн секунд' : 'хэдхэн секундын';
@@ -26,6 +27,7 @@ function translate(number, withoutSuffix, key, isFuture) {
         case 'yy':
             return number + (withoutSuffix ? ' жил' : ' жилийн');
         default:
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
             return number;
     }
 }
@@ -56,9 +58,11 @@ export default moment.defineLocale('mn', {
         return input === 'ҮХ';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ҮӨ';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'ҮХ';
         }
     },
@@ -88,6 +92,7 @@ export default moment.defineLocale('mn', {
     },
     dayOfMonthOrdinalParse: /\d{1,2} өдөр/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -96,5 +101,6 @@ export default moment.defineLocale('mn', {
             default:
                 return number;
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
 });

@@ -54,15 +54,20 @@ public partial class AffiliateController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateSearchModelAsync(new AffiliateSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -73,15 +78,19 @@ public partial class AffiliateController : BaseAdminController
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateModelAsync(new AffiliateModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -126,20 +135,25 @@ public partial class AffiliateController : BaseAdminController
         model = await _affiliateModelFactory.PrepareAffiliateModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(id);
         if (affiliate == null || affiliate.Deleted)
+			logger.LogDebug("Edit(id={Id}): affiliate → {Affiliate}", id, affiliate);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateModelAsync(null, affiliate);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -190,6 +204,7 @@ public partial class AffiliateController : BaseAdminController
         model = await _affiliateModelFactory.PrepareAffiliateModelAsync(model, affiliate, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -198,9 +213,11 @@ public partial class AffiliateController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(id);
         if (affiliate == null)
+			logger.LogDebug("Delete(id={Id}): affiliate → {Affiliate}", id, affiliate);
             return RedirectToAction("List");
 
         await _affiliateService.DeleteAffiliateAsync(affiliate);
@@ -211,6 +228,7 @@ public partial class AffiliateController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Affiliates.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -218,6 +236,7 @@ public partial class AffiliateController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> AffiliatedOrderListGrid(AffiliatedOrderSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering AffiliatedOrderListGrid(searchModel={SearchModel})", searchModel);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(searchModel.AffliateId)
                         ?? throw new ArgumentException("No affiliate found with the specified id");
@@ -225,6 +244,8 @@ public partial class AffiliateController : BaseAdminController
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliatedOrderListModelAsync(searchModel, affiliate);
 
+		logger.LogDebug("AffiliatedOrderListGrid(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting AffiliatedOrderListGrid(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -232,6 +253,7 @@ public partial class AffiliateController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> AffiliatedCustomerList(AffiliatedCustomerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering AffiliatedCustomerList(searchModel={SearchModel})", searchModel);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(searchModel.AffliateId)
                         ?? throw new ArgumentException("No affiliate found with the specified id");
@@ -239,6 +261,8 @@ public partial class AffiliateController : BaseAdminController
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliatedCustomerListModelAsync(searchModel, affiliate);
 
+		logger.LogDebug("AffiliatedCustomerList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting AffiliatedCustomerList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

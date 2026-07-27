@@ -10,6 +10,7 @@ public partial class ProductAttributeValueModelValidator : BaseNopValidator<Prod
 {
     public ProductAttributeValueModelValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductAttributeValueModelValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Products.ProductAttributes.Attributes.Values.Fields.Name.Required"));
@@ -25,5 +26,6 @@ public partial class ProductAttributeValueModelValidator : BaseNopValidator<Prod
             .When(x => x.AttributeValueTypeId == (int)AttributeValueType.AssociatedToProduct);
 
         SetDatabaseValidationRules<ProductAttributeValue>();
+		logger.LogDebug("<<< Exiting ProductAttributeValueModelValidator(localizationService={LocalizationService})", localizationService);
     }
 }

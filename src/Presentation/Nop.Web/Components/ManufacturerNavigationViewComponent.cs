@@ -12,17 +12,23 @@ public partial class ManufacturerNavigationViewComponent : NopViewComponent
 
     public ManufacturerNavigationViewComponent(CatalogSettings catalogSettings, ICatalogModelFactory catalogModelFactory)
     {
+		logger.LogDebug(">>> Entering ManufacturerNavigationViewComponent(catalogSettings={CatalogSettings},catalogModelFactory={CatalogModelFactory})", catalogSettings, catalogModelFactory);
         _catalogSettings = catalogSettings;
         _catalogModelFactory = catalogModelFactory;
+		logger.LogDebug("<<< Exiting ManufacturerNavigationViewComponent(catalogSettings={CatalogSettings},catalogModelFactory={CatalogModelFactory})", catalogSettings, catalogModelFactory);
+		logger.LogDebug("ManufacturerNavigationViewComponent(catalogSettings={CatalogSettings},catalogModelFactory={CatalogModelFactory}): _catalogModelFactory → {_catalogModelFactory}", catalogSettings, catalogModelFactory, _catalogModelFactory);
+		logger.LogDebug("ManufacturerNavigationViewComponent(catalogSettings={CatalogSettings},catalogModelFactory={CatalogModelFactory}): _catalogSettings → {_catalogSettings}", catalogSettings, catalogModelFactory, _catalogSettings);
     }
 
     public async Task<IViewComponentResult> InvokeAsync(int currentManufacturerId)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(currentManufacturerId={CurrentManufacturerId})", currentManufacturerId);
         if (_catalogSettings.ManufacturersBlockItemsToDisplay == 0)
             return Content("");
 
         var model = await _catalogModelFactory.PrepareManufacturerNavigationModelAsync(currentManufacturerId);
         if (!model.Manufacturers.Any())
+			logger.LogDebug("InvokeAsync(currentManufacturerId={CurrentManufacturerId}): model → {Model}", currentManufacturerId, model);
             return Content("");
 
         return View(model);

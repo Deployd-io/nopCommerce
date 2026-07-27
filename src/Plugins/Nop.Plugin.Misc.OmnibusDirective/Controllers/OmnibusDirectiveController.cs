@@ -16,6 +16,8 @@ public class OmnibusDirectiveController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.OmnibusDirective/Views/Configure.cshtml");
     }
 

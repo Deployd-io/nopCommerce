@@ -14,12 +14,15 @@ public class LocalizationMigration : MigrationBase
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
         var (languageId, languages) = this.GetLanguageData();
 
         #region Delete locales
@@ -507,6 +510,7 @@ public class LocalizationMigration : MigrationBase
             ["Admin.System.Maintenance.DeleteThumbFiles.IsNotSupported"] = "Delete image thumbs is not supported by current picture thumb service.",
             ["Admin.System.Maintenance.DeleteThumbFiles.Deleted"] = "All image thumbs were deleted.",
 
+			logger.LogInformation("Up(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             //#7730
             ["Admin.Catalog.Products.AiGenerateFullDescription"] = "Generate product description with AI",
             ["Admin.Catalog.Products.AiFullDescription.Generate"] = "Generate description with AI",
@@ -683,13 +687,17 @@ public class LocalizationMigration : MigrationBase
             ["Search.FilterLevelValues"] = "Search by Year Make Model",
 
         }, languageId);
+		logger.LogInformation("Up(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         #endregion
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

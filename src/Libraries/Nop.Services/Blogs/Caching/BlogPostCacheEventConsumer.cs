@@ -15,6 +15,8 @@ public partial class BlogPostCacheEventConsumer : CacheEventConsumer<BlogPost>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(BlogPost entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(NopBlogsDefaults.BlogTagsPrefix);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

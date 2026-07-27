@@ -27,7 +27,10 @@ public partial class NopAntiForgeryTokenTagHelper : TagHelper
 
     public NopAntiForgeryTokenTagHelper(IHtmlGenerator generator)
     {
+		logger.LogDebug(">>> Entering NopAntiForgeryTokenTagHelper(generator={Generator})", generator);
         Generator = generator;
+		logger.LogDebug("<<< Exiting NopAntiForgeryTokenTagHelper(generator={Generator})", generator);
+		logger.LogDebug("NopAntiForgeryTokenTagHelper(generator={Generator}): Generator → {Generator1}", generator, Generator);
     }
 
     #endregion
@@ -42,6 +45,7 @@ public partial class NopAntiForgeryTokenTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -52,8 +56,10 @@ public partial class NopAntiForgeryTokenTagHelper : TagHelper
         //generate antiforgery
         var antiforgeryTag = Generator.GenerateAntiforgery(ViewContext);
         if (antiforgeryTag != null)
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): antiforgeryTag → {AntiforgeryTag}", context, output, antiforgeryTag);
             output.Content.SetHtmlContent(antiforgeryTag);
 
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

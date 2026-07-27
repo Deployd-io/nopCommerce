@@ -8,7 +8,9 @@ public partial class SingletonList<T> : Singleton<IList<T>>
 {
     static SingletonList()
     {
+		logger.LogDebug(">>> Entering SingletonList()");
         Singleton<IList<T>>.Instance = new List<T>();
+		logger.LogDebug("<<< Exiting SingletonList()");
     }
 
     /// <summary>

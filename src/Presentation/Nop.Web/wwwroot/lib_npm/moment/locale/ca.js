@@ -40,18 +40,23 @@ export default moment.defineLocale('ca', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
             return '[avui a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
             return '[demà a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return 'dddd [a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
             return '[ahir a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return (
                 '[el] dddd [passat a ' +
                 (this.hours() !== 1 ? 'les' : 'la') +
@@ -78,6 +83,7 @@ export default moment.defineLocale('ca', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(r|n|t|è|a)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         var output =
             number === 1
                 ? 'r'
@@ -89,7 +95,9 @@ export default moment.defineLocale('ca', {
                       ? 't'
                       : 'è';
         if (period === 'w' || period === 'W') {
+			logger.debug(`ordinal(number=${number},period=${period}): output → ${output}`);
             output = 'a';
+			logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
         }
         return number + output;
     },

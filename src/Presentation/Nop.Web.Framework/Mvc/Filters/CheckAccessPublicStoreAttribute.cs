@@ -18,8 +18,12 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public CheckAccessPublicStoreAttribute(bool ignore = false) : base(typeof(CheckAccessPublicStoreFilter))
     {
+		logger.LogDebug(">>> Entering CheckAccessPublicStoreAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		logger.LogDebug("<<< Exiting CheckAccessPublicStoreAttribute(ignore={Ignore})", ignore);
+		logger.LogDebug("CheckAccessPublicStoreAttribute(ignore={Ignore}): Arguments → {Arguments}", ignore, Arguments);
+		logger.LogDebug("CheckAccessPublicStoreAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
     }
 
     #endregion
@@ -51,8 +55,12 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
 
         public CheckAccessPublicStoreFilter(bool ignoreFilter, IPermissionService permissionService)
         {
+			logger.LogDebug(">>> Entering CheckAccessPublicStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
             _ignoreFilter = ignoreFilter;
             _permissionService = permissionService;
+			logger.LogDebug("<<< Exiting CheckAccessPublicStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
+			logger.LogDebug("CheckAccessPublicStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _permissionService → {_permissionService}", ignoreFilter, permissionService, _permissionService);
+			logger.LogDebug("CheckAccessPublicStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, permissionService, _ignoreFilter);
         }
 
         #endregion
@@ -66,6 +74,7 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckAccessPublicStoreAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering CheckAccessPublicStoreAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -88,6 +97,7 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
 
             //customer hasn't access to a public store
             context.Result = new ChallengeResult();
+			logger.LogDebug("<<< Exiting CheckAccessPublicStoreAsync(context={Context})", context);
         }
 
         #endregion
@@ -101,7 +111,9 @@ public sealed class CheckAccessPublicStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await CheckAccessPublicStoreAsync(context);
+			logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

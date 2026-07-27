@@ -544,6 +544,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual Task<LoginModel> PrepareLoginModelAsync(bool? checkoutAsGuest)
     {
+		logger.LogDebug(">>> Entering PrepareLoginModelAsync(checkoutAsGuest={CheckoutAsGuest})", checkoutAsGuest);
         var model = new LoginModel
         {
             UsernamesEnabled = _customerSettings.UsernamesEnabled,
@@ -552,6 +553,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnLoginPage
         };
 
+		logger.LogDebug("<<< Exiting PrepareLoginModelAsync(checkoutAsGuest={CheckoutAsGuest})", checkoutAsGuest);
         return Task.FromResult(model);
     }
 
@@ -583,6 +585,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<RegisterResultModel> PrepareRegisterResultModelAsync(int resultId, string returnUrl)
     {
+		logger.LogDebug(">>> Entering PrepareRegisterResultModelAsync(resultId={ResultId},returnUrl={ReturnUrl})", resultId, returnUrl);
         var resultText = (UserRegistrationType)resultId switch
         {
             UserRegistrationType.Disabled => await _localizationService.GetResourceAsync("Account.Register.Result.Disabled"),
@@ -598,6 +601,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             ReturnUrl = returnUrl
         };
 
+		logger.LogDebug("<<< Exiting PrepareRegisterResultModelAsync(resultId={ResultId},returnUrl={ReturnUrl})", resultId, returnUrl);
         return model;
     }
 
@@ -611,8 +615,10 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerNavigationModel> PrepareCustomerNavigationModelAsync(int selectedTabId = 0)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerNavigationModelAsync(selectedTabId={SelectedTabId})", selectedTabId);
         var model = new CustomerNavigationModel();
 
+		logger.LogDebug("PrepareCustomerNavigationModelAsync(selectedTabId={SelectedTabId}): model → {Model}", selectedTabId, model);
         model.CustomerNavigationItems.Add(new CustomerNavigationItemModel
         {
             RouteName = NopRouteNames.General.CUSTOMER_INFO,
@@ -647,6 +653,8 @@ public partial class CustomerModelFactory : ICustomerModelFactory
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareCustomerNavigationModelAsync(selectedTabId={SelectedTabId}): store → {Store}", selectedTabId, store);
+		logger.LogDebug("PrepareCustomerNavigationModelAsync(selectedTabId={SelectedTabId}): customer → {Customer}", selectedTabId, customer);
 
         if (_orderSettings.ReturnRequestsEnabled &&
             (await _returnRequestService.SearchReturnRequestsAsync(store.Id,
@@ -778,7 +786,9 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         }
 
         model.SelectedTab = selectedTabId;
+		logger.LogDebug("PrepareCustomerNavigationModelAsync(selectedTabId={SelectedTabId}): model.SelectedTab → {Arg1}", selectedTabId, model.SelectedTab);
 
+		logger.LogDebug("<<< Exiting PrepareCustomerNavigationModelAsync(selectedTabId={SelectedTabId})", selectedTabId);
         return model;
     }
 
@@ -791,24 +801,31 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerAddressListModel> PrepareCustomerAddressListModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCustomerAddressListModelAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("PrepareCustomerAddressListModelAsync(): customer → {Customer}", customer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var addresses = await (await _customerService.GetAddressesByCustomerIdAsync(customer.Id))
             //enabled for the current store
             .WhereAwait(async a => a.CountryId == null || await _storeMappingService.AuthorizeAsync(await _countryService.GetCountryByAddressAsync(a)))
             .ToListAsync();
+			logger.LogInformation("PrepareCustomerAddressListModelAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         var model = new CustomerAddressListModel();
         foreach (var address in addresses)
         {
+		logger.LogDebug("PrepareCustomerAddressListModelAsync(): model → {Model}", model);
             var addressModel = new AddressModel();
             await _addressModelFactory.PrepareAddressModelAsync(addressModel,
                 address: address,
                 excludeProperties: false,
                 addressSettings: _addressSettings,
                 loadCountries: async () => await _countryService.GetAllCountriesAsync((await _workContext.GetWorkingLanguageAsync()).Id));
+				logger.LogDebug("PrepareCustomerAddressListModelAsync(): addressModel → {AddressModel}", addressModel);
             model.Addresses.Add(addressModel);
         }
+		logger.LogDebug("<<< Exiting PrepareCustomerAddressListModelAsync()");
         return model;
     }
 
@@ -821,13 +838,19 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerDownloadableProductsModel> PrepareCustomerDownloadableProductsModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCustomerDownloadableProductsModelAsync()");
         var model = new CustomerDownloadableProductsModel();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): model → {Model}", model);
+		logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): customer → {Customer}", customer);
         var items = await _orderService.GetDownloadableOrderItemsAsync(customer.Id);
         foreach (var item in items)
         {
+		logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): items → {Items}", items);
             var order = await _orderService.GetOrderByIdAsync(item.OrderId);
             var product = await _productService.GetProductByIdAsync(item.ProductId);
+			logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): order → {Order}", order);
+			logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): product → {Product}", product);
 
             var itemModel = new CustomerDownloadableProductsModel.DownloadableProductsModel
             {
@@ -844,11 +867,14 @@ public partial class CustomerModelFactory : ICustomerModelFactory
 
             if (await _orderService.IsDownloadAllowedAsync(item))
                 itemModel.DownloadId = product.DownloadId;
+				logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): itemModel.DownloadId → {Arg0}", itemModel.DownloadId);
 
             if (await _orderService.IsLicenseDownloadAllowedAsync(item))
                 itemModel.LicenseId = item.LicenseDownloadId ?? 0;
+				logger.LogDebug("PrepareCustomerDownloadableProductsModelAsync(): itemModel.LicenseId → {Arg0}", itemModel.LicenseId);
         }
 
+		logger.LogDebug("<<< Exiting PrepareCustomerDownloadableProductsModelAsync()");
         return model;
     }
 
@@ -924,8 +950,11 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual Task<GdprToolsModel> PrepareGdprToolsModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareGdprToolsModelAsync()");
         var model = new GdprToolsModel();
 
+		logger.LogDebug("PrepareGdprToolsModelAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting PrepareGdprToolsModelAsync()");
         return Task.FromResult(model);
     }
 
@@ -938,8 +967,10 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual Task<CheckGiftCardBalanceModel> PrepareCheckGiftCardBalanceModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCheckGiftCardBalanceModelAsync()");
         var model = new CheckGiftCardBalanceModel { DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnCheckGiftCardBalance };
 
+		logger.LogDebug("<<< Exiting PrepareCheckGiftCardBalanceModelAsync()");
         return Task.FromResult(model);
     }
 
@@ -1013,13 +1044,16 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<IList<CustomerAttributeModel>> PrepareCustomCustomerAttributesAsync(Customer customer, string overrideAttributesXml = "")
     {
+		logger.LogDebug(">>> Entering PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml})", customer, overrideAttributesXml);
         ArgumentNullException.ThrowIfNull(customer);
 
         var result = new List<CustomerAttributeModel>();
 
+		logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): result → {Result}", customer, overrideAttributesXml, result);
         var customerAttributes = await _customerAttributeService.GetAllAttributesAsync();
         foreach (var attribute in customerAttributes)
         {
+		logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): customerAttributes → {CustomerAttributes}", customer, overrideAttributesXml, customerAttributes);
             var attributeModel = new CustomerAttributeModel
             {
                 Id = attribute.Id,
@@ -1034,6 +1068,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 var attributeValues = await _customerAttributeService.GetAttributeValuesAsync(attribute.Id);
                 foreach (var attributeValue in attributeValues)
                 {
+				logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): attributeValues → {AttributeValues}", customer, overrideAttributesXml, attributeValues);
                     var valueModel = new CustomerAttributeValueModel
                     {
                         Id = attributeValue.Id,
@@ -1062,12 +1097,14 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                         //clear default selection                                
                         foreach (var item in attributeModel.Values)
                             item.IsPreSelected = false;
+							logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): item.IsPreSelected → {Arg2}", customer, overrideAttributesXml, item.IsPreSelected);
 
                         //select new values
                         var selectedValues = await _customerAttributeParser.ParseAttributeValuesAsync(selectedAttributesXml);
                         foreach (var attributeValue in selectedValues)
                         foreach (var item in attributeModel.Values)
                             if (attributeValue.Id == item.Id)
+						logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): selectedValues → {SelectedValues}", customer, overrideAttributesXml, selectedValues);
                                 item.IsPreSelected = true;
                     }
                 }
@@ -1085,6 +1122,8 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                     {
                         var enteredText = _customerAttributeParser.ParseValues(selectedAttributesXml, attribute.Id);
                         if (enteredText.Any())
+							logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): enteredText → {EnteredText}", customer, overrideAttributesXml, enteredText);
+							logger.LogDebug("PrepareCustomCustomerAttributesAsync(customer={Customer},overrideAttributesXml={OverrideAttributesXml}): attributeModel.DefaultValue → {Arg2}", customer, overrideAttributesXml, attributeModel.DefaultValue);
                             attributeModel.DefaultValue = enteredText[0];
                     }
                 }

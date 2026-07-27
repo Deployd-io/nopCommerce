@@ -10,9 +10,11 @@ public partial class ForumValidator : BaseNopValidator<ForumModel>
 {
     public ForumValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ForumValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Forums.Forum.Fields.Name.Required"));
         RuleFor(x => x.ForumGroupId).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Forums.Forum.Fields.ForumGroupId.Required"));
 
         SetDatabaseValidationRules<Forum>();
+		logger.LogDebug("<<< Exiting ForumValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -12,10 +12,16 @@ public partial class MigrationVersionInfo : BaseEntity, IVersionTableMetaData
 
     public MigrationVersionInfo()
     {
+		logger.LogDebug(">>> Entering MigrationVersionInfo()");
         TableName = nameof(MigrationVersionInfo);
         ColumnName = nameof(Version);
+		logger.LogDebug("MigrationVersionInfo(): TableName → {TableName}", TableName);
         DescriptionColumnName = nameof(Description);
+		logger.LogDebug("MigrationVersionInfo(): ColumnName → {ColumnName}", ColumnName);
+		logger.LogDebug("MigrationVersionInfo(): DescriptionColumnName → {DescriptionColumnName}", DescriptionColumnName);
         AppliedOnColumnName = nameof(AppliedOn);
+		logger.LogDebug("<<< Exiting MigrationVersionInfo()");
+		logger.LogDebug("MigrationVersionInfo(): AppliedOnColumnName → {AppliedOnColumnName}", AppliedOnColumnName);
     }
 
     #endregion

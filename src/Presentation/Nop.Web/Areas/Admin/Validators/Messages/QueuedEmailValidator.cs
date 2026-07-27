@@ -10,6 +10,7 @@ public partial class QueuedEmailValidator : BaseNopValidator<QueuedEmailModel>
 {
     public QueuedEmailValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering QueuedEmailValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.From).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.QueuedEmails.Fields.From.Required"));
         RuleFor(x => x.To).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.QueuedEmails.Fields.To.Required"));
 
@@ -18,5 +19,6 @@ public partial class QueuedEmailValidator : BaseNopValidator<QueuedEmailModel>
 
         SetDatabaseValidationRules<QueuedEmail>();
 
+	logger.LogDebug("<<< Exiting QueuedEmailValidator(localizationService={LocalizationService})", localizationService);
     }
 }

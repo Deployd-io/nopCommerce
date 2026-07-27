@@ -38,8 +38,10 @@ public partial class DownloadController : BaseAdminController
 
     public virtual async Task<IActionResult> DownloadFile(Guid downloadGuid)
     {
+		logger.LogDebug(">>> Entering DownloadFile(downloadGuid={DownloadGuid})", downloadGuid);
         var download = await _downloadService.GetDownloadByGuidAsync(downloadGuid);
         if (download == null)
+			logger.LogDebug("DownloadFile(downloadGuid={DownloadGuid}): download → {Download}", downloadGuid, download);
             return Content("No download record found with the specified id");
 
         //A warning (SCS0027 - Open Redirect) from the "Security Code Scan" analyzer may appear at this point. 
@@ -51,10 +53,13 @@ public partial class DownloadController : BaseAdminController
         if (download.DownloadBinary == null)
             return Content($"Download data is not available any more. Download GD={download.Id}");
 
+		logger.LogDebug("DownloadFile(downloadGuid={DownloadGuid}): GD → {GD}", downloadGuid, GD);
         var fileName = !string.IsNullOrWhiteSpace(download.Filename) ? download.Filename : download.Id.ToString();
         var contentType = !string.IsNullOrWhiteSpace(download.ContentType)
             ? download.ContentType
+			logger.LogDebug("DownloadFile(downloadGuid={DownloadGuid}): fileName → {FileName}", downloadGuid, fileName);
             : MimeTypes.ApplicationOctetStream;
+		logger.LogDebug("<<< Exiting DownloadFile(downloadGuid={DownloadGuid})", downloadGuid);
         return new FileContentResult(download.DownloadBinary, contentType)
         {
             FileDownloadName = fileName + download.Extension
@@ -64,6 +69,7 @@ public partial class DownloadController : BaseAdminController
     [HttpPost]
     public virtual async Task<IActionResult> SaveDownloadUrl(string downloadUrl)
     {
+		logger.LogDebug(">>> Entering SaveDownloadUrl(downloadUrl={DownloadUrl})", downloadUrl);
         //don't allow to save empty download object
         if (string.IsNullOrEmpty(downloadUrl))
         {
@@ -71,6 +77,8 @@ public partial class DownloadController : BaseAdminController
             {
                 success = false,
                 message = "Please enter URL"
+				logger.LogDebug("SaveDownloadUrl(downloadUrl={DownloadUrl}): success → {Success}", downloadUrl, success);
+				logger.LogDebug("SaveDownloadUrl(downloadUrl={DownloadUrl}): message → {Message}", downloadUrl, message);
             });
         }
 
@@ -84,6 +92,7 @@ public partial class DownloadController : BaseAdminController
         };
         await _downloadService.InsertDownloadAsync(download);
 
+		logger.LogDebug("<<< Exiting SaveDownloadUrl(downloadUrl={DownloadUrl})", downloadUrl);
         return Json(new { success = true, downloadId = download.Id });
     }
 
@@ -92,20 +101,26 @@ public partial class DownloadController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> AsyncUpload()
     {
+		logger.LogDebug(">>> Entering AsyncUpload()");
         var httpPostedFile = await Request.GetFirstOrDefaultFileAsync();
         if (httpPostedFile == null)
+		logger.LogDebug("AsyncUpload(): httpPostedFile → {HttpPostedFile}", httpPostedFile);
         {
             return Json(new
             {
                 success = false,
                 message = "No file uploaded"
+				logger.LogDebug("AsyncUpload(): success → {Success}", success);
+				logger.LogDebug("AsyncUpload(): message → {Message}", message);
             });
         }
 
         var fileBinary = await _downloadService.GetDownloadBitsAsync(httpPostedFile);
 
+		logger.LogDebug("AsyncUpload(): fileBinary → {FileBinary}", fileBinary);
         var fileName = httpPostedFile.FileName;
 
+		logger.LogDebug("AsyncUpload(): fileName → {FileName}", fileName);
         //remove path (passed in IE)
         fileName = _fileProvider.GetFileName(fileName);
 
@@ -113,6 +128,7 @@ public partial class DownloadController : BaseAdminController
 
         var fileExtension = _fileProvider.GetFileExtension(fileName);
         if (!string.IsNullOrEmpty(fileExtension))
+			logger.LogDebug("AsyncUpload(): fileExtension → {FileExtension}", fileExtension);
             fileExtension = fileExtension.ToLowerInvariant();
 
         var download = new Download
@@ -140,11 +156,13 @@ public partial class DownloadController : BaseAdminController
                 downloadId = download.Id,
                 downloadUrl = Url.Action("DownloadFile", new { downloadGuid = download.DownloadGuid })
             });
+				logger.LogDebug("AsyncUpload(): downloadId → {DownloadId}", downloadId);
         }
         catch (Exception exc)
         {
             await _logger.ErrorAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
 
+			logger.LogDebug("<<< Exiting AsyncUpload()");
             return Json(new
             {
                 success = false,

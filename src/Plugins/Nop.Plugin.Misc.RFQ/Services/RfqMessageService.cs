@@ -120,18 +120,25 @@ public class RfqMessageService : WorkflowMessageService
     /// </returns>
     public async Task<IList<int>> CustomerSentNewRequestQuoteAsync(RequestQuote requestQuote)
     {
+		logger.LogDebug(">>> Entering CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote})", requestQuote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(requestQuote);
 
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote}): store → {Store}", requestQuote, store);
         var messageTemplates = await GetActiveMessageTemplatesAsync(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote}): messageTemplates → {MessageTemplates}", requestQuote, messageTemplates);
             return new List<int>();
 
         var languageId = await EnsureLanguageIsActiveAsync(_localizationSettings.DefaultAdminLanguageId, store.Id);
         var language = await _languageService.GetLanguageByIdAsync(languageId);
+		logger.LogDebug("CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote}): languageId → {LanguageId}", requestQuote, languageId);
+		logger.LogDebug("CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote}): language → {Language}", requestQuote, language);
         var customer = await _customerService.GetCustomerByIdAsync(requestQuote.CustomerId);
 
+		logger.LogDebug("CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote}): customer → {Customer}", requestQuote, customer);
         return await messageTemplates.SelectAwait(async messageTemplate =>
         {
             //email account
@@ -153,6 +160,8 @@ public class RfqMessageService : WorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, toEmail, toName, replyToEmailAddress: replyToEmail, replyToName: replyToName);
         }).ToListAsync();
+		logger.LogInformation("CustomerSentNewRequestQuoteAsync(requestQuote)={RequestQuote}: database query executed in {Arg1} ms", requestQuote, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting CustomerSentNewRequestQuoteAsync(requestQuote={RequestQuote})", requestQuote);
     }
 
     /// <summary>
@@ -165,18 +174,25 @@ public class RfqMessageService : WorkflowMessageService
     /// </returns>
     public async Task<IList<int>> AdminSentNewQuoteAsync(Quote quote)
     {
+		logger.LogDebug(">>> Entering AdminSentNewQuoteAsync(quote={Quote})", quote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(quote);
 
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("AdminSentNewQuoteAsync(quote={Quote}): store → {Store}", quote, store);
         var messageTemplates = await GetActiveMessageTemplatesAsync(RfqDefaults.ADMIN_SENT_NEW_QUOTE, store.Id);
         if (!messageTemplates.Any())
+			logger.LogDebug("AdminSentNewQuoteAsync(quote={Quote}): messageTemplates → {MessageTemplates}", quote, messageTemplates);
             return new List<int>();
 
         var customer = await _customerService.GetCustomerByIdAsync(quote.CustomerId);
         var languageId = await EnsureLanguageIsActiveAsync(customer.LanguageId ?? 0, store.Id);
+		logger.LogDebug("AdminSentNewQuoteAsync(quote={Quote}): customer → {Customer}", quote, customer);
+		logger.LogDebug("AdminSentNewQuoteAsync(quote={Quote}): languageId → {LanguageId}", quote, languageId);
         var language = await _languageService.GetLanguageByIdAsync(languageId);
 
+logger.LogDebug("AdminSentNewQuoteAsync(quote={Quote}): language → {Language}", quote, language);
 
         return await messageTemplates.SelectAwait(async messageTemplate =>
         {
@@ -194,6 +210,8 @@ public class RfqMessageService : WorkflowMessageService
 
             return await SendNotificationAsync(messageTemplate, emailAccount, languageId, tokens, customer.Email, $"{customer.FirstName} {customer.LastName}");
         }).ToListAsync();
+		logger.LogInformation("AdminSentNewQuoteAsync(quote)={Quote}: database query executed in {Arg1} ms", quote, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting AdminSentNewQuoteAsync(quote={Quote})", quote);
     }
 
     #endregion

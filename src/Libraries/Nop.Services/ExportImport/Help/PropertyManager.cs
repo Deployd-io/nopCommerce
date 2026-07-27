@@ -41,10 +41,15 @@ public partial class PropertyManager<T>
     /// <param name="languages">Languages</param>
     public PropertyManager(IEnumerable<PropertyByName<T>> defaultProperties, CatalogSettings catalogSettings, IEnumerable<PropertyByName<T>> localizedProperties = null, IList<Language> languages = null)
     {
+		logger.LogDebug(">>> Entering PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages})", defaultProperties, catalogSettings, localizedProperties, languages);
         _defaultProperties = new Dictionary<string, PropertyByName<T>>();
         _catalogSettings = catalogSettings;
+		logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _defaultProperties → {_defaultProperties}", defaultProperties, catalogSettings, localizedProperties, languages, _defaultProperties);
+		logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _catalogSettings → {_catalogSettings}", defaultProperties, catalogSettings, localizedProperties, languages, _catalogSettings);
         _localizedProperties = new Dictionary<string, PropertyByName<T>>();
         _languages = new List<Language>();
+		logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _localizedProperties → {_localizedProperties}", defaultProperties, catalogSettings, localizedProperties, languages, _localizedProperties);
+		logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): _languages → {_languages}", defaultProperties, catalogSettings, localizedProperties, languages, _languages);
 
         if (languages != null)
             _languages = languages;
@@ -53,6 +58,7 @@ public partial class PropertyManager<T>
         foreach (var propertyByName in defaultProperties.Where(p => !p.Ignore))
         {
             propertyByName.PropertyOrderPosition = poz;
+			logger.LogDebug("PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages}): propertyByName.PropertyOrderPosition → {Arg4}", defaultProperties, catalogSettings, localizedProperties, languages, propertyByName.PropertyOrderPosition);
             poz++;
             _defaultProperties.Add(propertyByName.PropertyName, propertyByName);
         }
@@ -67,6 +73,7 @@ public partial class PropertyManager<T>
                 _localizedProperties.Add(propertyByName.PropertyName, propertyByName);
             }
         }
+		logger.LogDebug("<<< Exiting PropertyManager(defaultProperties={DefaultProperties},catalogSettings={CatalogSettings},localizedProperties={LocalizedProperties},languages={Languages})", defaultProperties, catalogSettings, localizedProperties, languages);
     }
 
     /// <summary>
@@ -93,6 +100,7 @@ public partial class PropertyManager<T>
             float floatValue => floatValue,
             _ => value.ToString()
         };
+		logger.LogDebug("<<< Exiting SetCellValue(cell={Cell},value={Value})", cell, value);
     }
 
     /// <summary>
@@ -106,8 +114,10 @@ public partial class PropertyManager<T>
     /// </returns>
     public virtual async Task<byte[]> ExportToXlsxAsync(IEnumerable<T> itemsToExport)
     {
+		logger.LogDebug(">>> Entering ExportToXlsxAsync(itemsToExport={ItemsToExport})", itemsToExport);
         await using var stream = new MemoryStream();
         // ok, we can run the real code of the sample now
+		logger.LogDebug("ExportToXlsxAsync(itemsToExport={ItemsToExport}): stream → {Stream}", itemsToExport, stream);
         using (var workbook = new XLWorkbook())
         {
             // uncomment this line if you want the XML written out to the outputDir
@@ -143,6 +153,7 @@ public partial class PropertyManager<T>
                 {
                     CurrentLanguage = lws.Key;
                     await WriteLocalizedToXlsxAsync(lws.Value, row, fWorksheet: fWorksheet);
+					logger.LogDebug("<<< Exiting WriteDefaultToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet})", worksheet, row, cellOffset, fWorksheet);
                 }
 
                 row++;
@@ -152,6 +163,8 @@ public partial class PropertyManager<T>
         }
 
         CurrentObject = default;
+		logger.LogDebug("ExportToXlsxAsync(itemsToExport={ItemsToExport}): CurrentObject → {CurrentObject}", itemsToExport, CurrentObject);
+		logger.LogDebug("<<< Exiting ExportToXlsxAsync(itemsToExport={ItemsToExport})", itemsToExport);
         return stream.ToArray();
     }
 
@@ -172,7 +185,9 @@ public partial class PropertyManager<T>
     /// <returns></returns>
     public virtual int GetIndex(string propertyName)
     {
+		logger.LogDebug(">>> Entering GetIndex(propertyName={PropertyName})", propertyName);
         if (!_defaultProperties.TryGetValue(propertyName, out var value))
+		logger.LogDebug("<<< Exiting GetIndex(propertyName={PropertyName})", propertyName);
             return -1;
 
         return value.PropertyOrderPosition;
@@ -184,7 +199,9 @@ public partial class PropertyManager<T>
     /// <param name="propertyName">Property name</param>
     public virtual void Remove(string propertyName)
     {
+		logger.LogDebug(">>> Entering Remove(propertyName={PropertyName})", propertyName);
         _defaultProperties.Remove(propertyName);
+		logger.LogDebug("<<< Exiting Remove(propertyName={PropertyName})", propertyName);
     }
 
     /// <summary>
@@ -326,6 +343,7 @@ public partial class PropertyManager<T>
         {
             prop.PropertyValue = worksheet.Row(row).Cell(prop.PropertyOrderPosition + cellOffset).Value;
         }
+		logger.LogDebug("<<< Exiting ReadDefaultFromXlsx(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
     }
 
     /// <summary>
@@ -343,6 +361,7 @@ public partial class PropertyManager<T>
         {
             prop.PropertyValue = worksheet.Row(row).Cell(prop.PropertyOrderPosition + cellOffset).Value;
         }
+		logger.LogDebug("<<< Exiting ReadLocalizedFromXlsx(worksheet={Worksheet},row={Row},cellOffset={CellOffset})", worksheet, row, cellOffset);
     }
 
     /// <summary>
@@ -402,6 +421,8 @@ public partial class PropertyManager<T>
     /// <returns></returns>
     public virtual PropertyByName<T> GetDefaultProperty(string propertyName)
     {
+		logger.LogDebug(">>> Entering GetDefaultProperty(propertyName={PropertyName})", propertyName);
+		logger.LogDebug("<<< Exiting GetDefaultProperty(propertyName={PropertyName})", propertyName);
         return _defaultProperties.TryGetValue(propertyName, out var value) ? value : null;
     }
 
@@ -412,6 +433,8 @@ public partial class PropertyManager<T>
     /// <returns></returns>
     public virtual PropertyByName<T> GetLocalizedProperty(string propertyName)
     {
+		logger.LogDebug(">>> Entering GetLocalizedProperty(propertyName={PropertyName})", propertyName);
+		logger.LogDebug("<<< Exiting GetLocalizedProperty(propertyName={PropertyName})", propertyName);
         return _localizedProperties.TryGetValue(propertyName, out var value) ? value : null;
     }
 
@@ -432,9 +455,13 @@ public partial class PropertyManager<T>
     /// <param name="list">SelectList</param>
     public virtual void SetSelectList(string propertyName, SelectList list)
     {
+		logger.LogDebug(">>> Entering SetSelectList(propertyName={PropertyName},list={List})", propertyName, list);
         var tempProperty = GetDefaultProperty(propertyName);
         if (tempProperty != null)
+			logger.LogDebug("SetSelectList(propertyName={PropertyName},list={List}): tempProperty → {TempProperty}", propertyName, list, tempProperty);
+			logger.LogDebug("SetSelectList(propertyName={PropertyName},list={List}): tempProperty.DropDownElements → {Arg2}", propertyName, list, tempProperty.DropDownElements);
             tempProperty.DropDownElements = list;
+			logger.LogDebug("<<< Exiting SetSelectList(propertyName={PropertyName},list={List})", propertyName, list);
     }
 
     /// <summary>
@@ -446,4 +473,5 @@ public partial class PropertyManager<T>
     /// Gets a value indicating whether need create dropdown list for export
     /// </summary>
     public bool UseDropdownLists => _catalogSettings.ExportImportUseDropdownlistsForAssociatedEntities && _catalogSettings.ExportImportRelatedEntitiesByName;
+	logger.LogDebug("<<< Exiting WriteLocalizedToXlsxAsync(worksheet={Worksheet},row={Row},cellOffset={CellOffset},fWorksheet={FWorksheet})", worksheet, row, cellOffset, fWorksheet);
 }
