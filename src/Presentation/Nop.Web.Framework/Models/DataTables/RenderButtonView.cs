@@ -13,8 +13,12 @@ public partial class RenderButtonView : IRender
     /// <param name="url">URL to the edit action</param>
     public RenderButtonView(DataUrl url)
     {
+		logger.LogDebug(">>> Entering RenderButtonView(url={Url})", url);
         Url = url;
         ClassName = NopButtonClassDefaults.Default;
+		logger.LogDebug("<<< Exiting RenderButtonView(url={Url})", url);
+		logger.LogDebug("RenderButtonView(url={Url}): ClassName → {ClassName}", url, ClassName);
+		logger.LogInformation("RenderButtonView(url={Url}): Url → {Url1}", url, Url);
     }
 
     #endregion

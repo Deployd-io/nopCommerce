@@ -126,8 +126,12 @@ public partial class Pager : IHtmlContent
 
     public Pager(IPageableModel model, ViewContext context)
     {
+		logger.LogDebug(">>> Entering Pager(model={Model},context={Context})", model, context);
         _model = model;
         ViewContext = context;
+		logger.LogDebug("<<< Exiting Pager(model={Model},context={Context})", model, context);
+		logger.LogDebug("Pager(model={Model},context={Context}): ViewContext → {ViewContext}", model, context, ViewContext);
+		logger.LogDebug("Pager(model={Model},context={Context}): _model → {_model}", model, context, _model);
     }
 
     #endregion
@@ -254,7 +258,9 @@ public partial class Pager : IHtmlContent
     /// <returns>Pager</returns>
     public virtual Pager BooleanParameterName(string paramName)
     {
+		logger.LogDebug(">>> Entering BooleanParameterName(paramName={ParamName})", paramName);
         _booleanParameterNames.Add(paramName);
+		logger.LogDebug("<<< Exiting BooleanParameterName(paramName={ParamName})", paramName);
         return this;
     }
 
@@ -344,7 +350,9 @@ public partial class Pager : IHtmlContent
     /// <param name="encoder">Encoder</param>
     public virtual void WriteTo(TextWriter writer, HtmlEncoder encoder)
     {
+		logger.LogDebug(">>> Entering WriteTo(writer={Writer},encoder={Encoder})", writer, encoder);
         writer.Write(ToString());
+		logger.LogDebug("<<< Exiting WriteTo(writer={Writer},encoder={Encoder})", writer, encoder);
     }
 
     /// <summary>
@@ -353,6 +361,8 @@ public partial class Pager : IHtmlContent
     /// <returns>HTML control</returns>
     public override string ToString()
     {
+		logger.LogDebug(">>> Entering ToString()");
+		logger.LogDebug("<<< Exiting ToString()");
         return GenerateHtmlStringAsync().Result;
     }
 
@@ -365,6 +375,8 @@ public partial class Pager : IHtmlContent
     /// </returns>
     public virtual async Task<bool> IsEmpty()
     {
+		logger.LogDebug(">>> Entering IsEmpty()");
+		logger.LogDebug("<<< Exiting IsEmpty()");
         return string.IsNullOrEmpty(await GenerateHtmlStringAsync());
     }
 
@@ -381,13 +393,16 @@ public partial class Pager : IHtmlContent
     /// </returns>
     protected virtual async Task<string> GenerateHtmlStringAsync()
     {
+		logger.LogDebug(">>> Entering GenerateHtmlStringAsync()");
         if (_model.TotalItems == 0)
             return null;
 
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		logger.LogDebug("GenerateHtmlStringAsync(): localizationService → {LocalizationService}", localizationService);
         var links = new StringBuilder();
         if (_showTotalSummary && (_model.TotalPages > 0))
+		logger.LogDebug("GenerateHtmlStringAsync(): links → {Links}", links);
         {
             links.Append("<li class=\"total-summary\">");
 
@@ -418,6 +433,8 @@ public partial class Pager : IHtmlContent
                 //individual pages
                 var firstIndividualPageIndex = GetFirstIndividualPageIndex();
                 var lastIndividualPageIndex = GetLastIndividualPageIndex();
+				logger.LogDebug("GenerateHtmlStringAsync(): firstIndividualPageIndex → {FirstIndividualPageIndex}", firstIndividualPageIndex);
+				logger.LogDebug("GenerateHtmlStringAsync(): lastIndividualPageIndex → {LastIndividualPageIndex}", lastIndividualPageIndex);
                 for (var i = firstIndividualPageIndex; i <= lastIndividualPageIndex; i++)
                 {
                     if (_model.PageIndex == i)
@@ -439,13 +456,17 @@ public partial class Pager : IHtmlContent
                 //last page
                 if (((_model.PageIndex + 3) < _model.TotalPages) && (_model.TotalPages > _individualPagesDisplayedCount))
                     links.Append(await CreatePageLinkAsync(_model.TotalPages, await localizationService.GetResourceAsync("Pager.Last"), _lastPageCssClass));
+					logger.LogDebug(">>> Entering CreatePageLinkAsync(pageNumber={PageNumber},text={Text},cssClass={CssClass})", pageNumber, text, cssClass);
+					logger.LogDebug("<<< Exiting CreatePageLinkAsync(pageNumber={PageNumber},text={Text},cssClass={CssClass})", pageNumber, text, cssClass);
             }
         }
 
         var result = links.ToString();
         if (!string.IsNullOrEmpty(result))
+			logger.LogDebug("GenerateHtmlStringAsync(): result → {Result}", result);
             result = string.Format("<ul{0}>", string.IsNullOrEmpty(_mainUlCssClass) ? "" : " class=\"" + _mainUlCssClass + "\"") + result + "</ul>";
 
+		logger.LogDebug("<<< Exiting GenerateHtmlStringAsync()");
         return result;
     }
 
@@ -455,10 +476,12 @@ public partial class Pager : IHtmlContent
     /// <returns>Page index</returns>
     protected virtual int GetFirstIndividualPageIndex()
     {
+		logger.LogDebug(">>> Entering GetFirstIndividualPageIndex()");
         if ((_model.TotalPages < _individualPagesDisplayedCount) || ((_model.PageIndex - (_individualPagesDisplayedCount / 2)) < 0))
             return 0;
 
         if ((_model.PageIndex + (_individualPagesDisplayedCount / 2)) >= _model.TotalPages)
+		logger.LogDebug("<<< Exiting GetFirstIndividualPageIndex()");
             return _model.TotalPages - _individualPagesDisplayedCount;
 
         return _model.PageIndex - (_individualPagesDisplayedCount / 2);
@@ -470,6 +493,7 @@ public partial class Pager : IHtmlContent
     /// <returns>Page index</returns>
     protected virtual int GetLastIndividualPageIndex()
     {
+		logger.LogDebug(">>> Entering GetLastIndividualPageIndex()");
         var num = _individualPagesDisplayedCount / 2;
         if ((_individualPagesDisplayedCount % 2) == 0)
             num--;
@@ -478,6 +502,7 @@ public partial class Pager : IHtmlContent
             return _model.TotalPages - 1;
 
         if ((_model.PageIndex - (_individualPagesDisplayedCount / 2)) < 0)
+		logger.LogDebug("<<< Exiting GetLastIndividualPageIndex()");
             return _individualPagesDisplayedCount - 1;
 
         return _model.PageIndex + num;
@@ -495,16 +520,20 @@ public partial class Pager : IHtmlContent
     /// </returns>
     protected virtual async Task<string> CreatePageLinkAsync(int pageNumber, string text, string cssClass)
     {
+		logger.LogDebug(">>> Entering CreatePageLinkAsync(pageNumber={PageNumber},text={Text},cssClass={CssClass})", pageNumber, text, cssClass);
         var liBuilder = new TagBuilder("li");
         if (!string.IsNullOrWhiteSpace(cssClass))
+			logger.LogDebug("CreatePageLinkAsync(pageNumber={PageNumber},text={Text},cssClass={CssClass}): liBuilder → {LiBuilder}", pageNumber, text, cssClass, liBuilder);
             liBuilder.AddCssClass(cssClass);
 
         var aBuilder = new TagBuilder("a");
         aBuilder.InnerHtml.AppendHtml(text);
+		logger.LogDebug("CreatePageLinkAsync(pageNumber={PageNumber},text={Text},cssClass={CssClass}): aBuilder → {ABuilder}", pageNumber, text, cssClass, aBuilder);
         aBuilder.MergeAttribute("data-page", pageNumber.ToString());
         aBuilder.MergeAttribute("href", CreateDefaultUrl(pageNumber));
 
         liBuilder.InnerHtml.AppendHtml(aBuilder);
+		logger.LogDebug("<<< Exiting CreatePageLinkAsync(pageNumber={PageNumber},text={Text},cssClass={CssClass})", pageNumber, text, cssClass);
         return await liBuilder.RenderHtmlContentAsync();
     }
 
@@ -515,13 +544,17 @@ public partial class Pager : IHtmlContent
     /// <returns>URL</returns>
     protected virtual string CreateDefaultUrl(int pageNumber)
     {
+		logger.LogDebug(">>> Entering CreateDefaultUrl(pageNumber={PageNumber})", pageNumber);
         var routeValues = new RouteValueDictionary();
 
+		logger.LogDebug("CreateDefaultUrl(pageNumber={PageNumber}): routeValues → {RouteValues}", pageNumber, routeValues);
         var parametersWithEmptyValues = new List<string>();
         foreach (var key in ViewContext.HttpContext.Request.Query.Keys.Where(key => key != null))
         {
+		logger.LogDebug("CreateDefaultUrl(pageNumber={PageNumber}): parametersWithEmptyValues → {ParametersWithEmptyValues}", pageNumber, parametersWithEmptyValues);
             var value = ViewContext.HttpContext.Request.Query[key].ToString();
             if (_renderEmptyParameters && string.IsNullOrEmpty(value))
+			logger.LogDebug("CreateDefaultUrl(pageNumber={PageNumber}): value → {Value}", pageNumber, value);
             {
                 //we store query string parameters with empty values separately
                 //we need to do it because they are not properly processed in the UrlHelper.GenerateUrl method (dropped for some reasons)
@@ -552,6 +585,8 @@ public partial class Pager : IHtmlContent
 
         var webHelper = EngineContext.Current.Resolve<IWebHelper>();
         var url = webHelper.GetThisPageUrl(false);
+		logger.LogDebug("CreateDefaultUrl(pageNumber={PageNumber}): webHelper → {WebHelper}", pageNumber, webHelper);
+		logger.LogDebug("CreateDefaultUrl(pageNumber={PageNumber}): url → {Url}", pageNumber, url);
         foreach (var routeValue in routeValues)
             url = webHelper.ModifyQueryString(url, routeValue.Key, routeValue.Value?.ToString());
 
@@ -559,6 +594,7 @@ public partial class Pager : IHtmlContent
             foreach (var key in parametersWithEmptyValues)
                 url = webHelper.ModifyQueryString(url, key);
 
+		logger.LogDebug("<<< Exiting CreateDefaultUrl(pageNumber={PageNumber})", pageNumber);
         return url;
     }
 

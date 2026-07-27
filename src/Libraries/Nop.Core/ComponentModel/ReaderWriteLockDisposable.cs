@@ -25,8 +25,11 @@ public partial class ReaderWriteLockDisposable : IDisposable
     /// <param name="readerWriteLockType">Lock type</param>
     public ReaderWriteLockDisposable(ReaderWriterLockSlim rwLock, ReaderWriteLockType readerWriteLockType = ReaderWriteLockType.Write)
     {
+		logger.LogDebug(">>> Entering ReaderWriteLockDisposable(rwLock={RwLock},readerWriteLockType={ReaderWriteLockType})", rwLock, readerWriteLockType);
         _rwLock = rwLock;
         _readerWriteLockType = readerWriteLockType;
+		logger.LogDebug("ReaderWriteLockDisposable(rwLock={RwLock},readerWriteLockType={ReaderWriteLockType}): _readerWriteLockType → {_readerWriteLockType}", rwLock, readerWriteLockType, _readerWriteLockType);
+		logger.LogDebug("ReaderWriteLockDisposable(rwLock={RwLock},readerWriteLockType={ReaderWriteLockType}): _rwLock → {_rwLock}", rwLock, readerWriteLockType, _rwLock);
 
         switch (_readerWriteLockType)
         {
@@ -40,6 +43,7 @@ public partial class ReaderWriteLockDisposable : IDisposable
                 _rwLock.EnterUpgradeableReadLock();
                 break;
         }
+		logger.LogDebug("<<< Exiting ReaderWriteLockDisposable(rwLock={RwLock},readerWriteLockType={ReaderWriteLockType})", rwLock, readerWriteLockType);
     }
 
     #endregion
@@ -52,6 +56,7 @@ public partial class ReaderWriteLockDisposable : IDisposable
     /// <param name="disposing">Specifies whether to dispose resources</param>
     protected virtual void Dispose(bool disposing)
     {
+		logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
         if (_disposed)
             return;
 
@@ -70,6 +75,9 @@ public partial class ReaderWriteLockDisposable : IDisposable
             }
 
         _disposed = true;
+		logger.LogDebug("Dispose(disposing={Disposing}): _disposed → {_disposed}", disposing, _disposed);
+		logger.LogDebug(">>> Entering Dispose()");
+		logger.LogDebug("<<< Exiting Dispose(disposing={Disposing})", disposing);
     }
 
     #endregion

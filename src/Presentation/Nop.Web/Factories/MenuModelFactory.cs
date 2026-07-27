@@ -265,9 +265,12 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<List<MenuItemModel>> PrepareAllCategoriesMenuItemModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareAllCategoriesMenuItemModelsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //root categories
         var categories = await _categoryService.GetAllCategoriesByParentCategoryIdAsync(parentCategoryId: 0);
 
+		logger.LogDebug("PrepareAllCategoriesMenuItemModelsAsync(): categories → {Categories}", categories);
         return await categories.SelectAwait(async c =>
         {
             var localizedName = await _localizationService.GetLocalizedAsync(c, x => x.Name);
@@ -284,6 +287,8 @@ public partial class MenuModelFactory : IMenuModelFactory
 
             return item;
         }).ToListAsync();
+		logger.LogInformation("PrepareAllCategoriesMenuItemModelsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareAllCategoriesMenuItemModelsAsync()");
     }
 
     /// <summary>
@@ -296,6 +301,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<MenuItemModel> PrepareMenuItemModelAsync(MenuItem menuItem)
     {
+		logger.LogDebug(">>> Entering PrepareMenuItemModelAsync(menuItem={MenuItem})", menuItem);
         var entityId = menuItem.EntityId ?? 0;
         var title = string.Empty;
         var url = string.Empty;
@@ -323,6 +329,7 @@ public partial class MenuModelFactory : IMenuModelFactory
             await _logger.ErrorAsync(ex.Message);
         }
 
+		logger.LogDebug("<<< Exiting PrepareMenuItemModelAsync(menuItem={MenuItem})", menuItem);
         return new MenuItemModel
         {
             Id = menuItem.Id,
@@ -338,6 +345,7 @@ public partial class MenuModelFactory : IMenuModelFactory
             Url = url,
             ChildrenItems = new()
         };
+		logger.LogDebug("<<< Exiting PrepareSubMenuItemsAsync(menuItemModel={MenuItemModel},limitItems={LimitItems},loadChildren={LoadChildren})", menuItemModel, limitItems, loadChildren);
     }
 
     /// <summary>
@@ -350,20 +358,27 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<List<MenuItemModel>> PrepareMenuItemModelsAsync(Menu menu)
     {
+		logger.LogDebug(">>> Entering PrepareMenuItemModelsAsync(menu={Menu})", menu);
         var store = await _storeContext.GetCurrentStoreAsync();
         var allItems = await _menuService.GetAllMenuItemsAsync(menuId: menu.Id, storeId: store.Id);
+		logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): store → {Store}", menu, store);
+		logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): allItems → {AllItems}", menu, allItems);
         var result = new List<MenuItemModel>();
         var rootItems = allItems.Where(item => item.ParentId == 0);
+		logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): result → {Result}", menu, result);
+		logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): rootItems → {RootItems}", menu, rootItems);
 
         foreach (var rootItem in rootItems)
         {
             var rootItemModel = await PrepareMenuItemModelAsync(rootItem);
 
+			logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): rootItemModel → {RootItemModel}", menu, rootItemModel);
             if (string.IsNullOrEmpty(rootItemModel.Title) && string.IsNullOrEmpty(rootItemModel.Url))
                 continue;
 
             if (allItems.Any(i => i.ParentId == rootItemModel.Id))
                 rootItemModel.Template = MenuItemTemplate.Simple;
+				logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): rootItemModel.Template → {Arg1}", menu, rootItemModel.Template);
 
             await getItemTree(rootItemModel);
 
@@ -382,6 +397,7 @@ public partial class MenuModelFactory : IMenuModelFactory
 
         async Task getItemTree(MenuItemModel parentItem)
         {
+			logger.LogDebug(">>> Entering getItemTree(parentItem={ParentItem})", parentItem);
             var children = allItems
                 .Where(item => item.ParentId == parentItem.Id);
 
@@ -389,6 +405,7 @@ public partial class MenuModelFactory : IMenuModelFactory
             {
                 var menuItemModel = await PrepareMenuItemModelAsync(item);
 
+				logger.LogDebug("getItemTree(parentItem={ParentItem}): menuItemModel → {MenuItemModel}", parentItem, menuItemModel);
                 if (string.IsNullOrEmpty(menuItemModel.Title) && string.IsNullOrEmpty(menuItemModel.Url))
                     continue;
 
@@ -396,7 +413,12 @@ public partial class MenuModelFactory : IMenuModelFactory
 
                 parentItem.ChildrenItems.Add(menuItemModel);
             }
+			logger.LogDebug("<<< Exiting getItemTree(parentItem={ParentItem})", parentItem);
+			logger.LogDebug(">>> Entering PrepareSubMenuItemsAsync(menuItemModel={MenuItemModel},limitItems={LimitItems},loadChildren={LoadChildren})", menuItemModel, limitItems, loadChildren);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			logger.LogInformation("PrepareSubMenuItemsAsync(menuItemModel,limitItems,loadChildren)={MenuItemModel},{LimitItems},{LoadChildren}: database query executed in {Arg3} ms", menuItemModel, limitItems, loadChildren, __logStart.ElapsedMilliseconds);
         }
+		logger.LogDebug("<<< Exiting PrepareMenuItemModelsAsync(menu={Menu})", menu);
     }
 
     /// <summary>
@@ -413,6 +435,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     {
         if (menuItemModel.Template == MenuItemTemplate.Simple)
             return new();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var store = await _storeContext.GetCurrentStoreAsync();
 
@@ -490,12 +513,20 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<IList<MenuModel>> PrepareMenuModelsAsync(MenuType menuType)
     {
+		logger.LogDebug(">>> Entering PrepareMenuModelsAsync(menuType={MenuType})", menuType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var language = await _workContext.GetWorkingLanguageAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): language → {Language}", menuType, language);
+		logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): customer → {Customer}", menuType, customer);
+		logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): customerRoleIds → {CustomerRoleIds}", menuType, customerRoleIds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var menuCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.MenuByTypeModelKey, menuType, customerRoleIds, store, language);
 
+		logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): store → {Store}", menuType, store);
+		logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): menuCacheKey → {MenuCacheKey}", menuType, menuCacheKey);
         return await _staticCacheManager.GetAsync(menuCacheKey, async () =>
         {
             var menus = await _menuService.GetAllMenusAsync(menuType, store.Id);
@@ -508,7 +539,10 @@ public partial class MenuModelFactory : IMenuModelFactory
                 CssClass = menu.CssClass,
                 Items = await PrepareMenuItemModelsAsync(menu)
             }).ToListAsync();
+			logger.LogInformation("PrepareMenuModelsAsync(menuType)={MenuType}: database query executed in {Arg1} ms", menuType, __logStart.ElapsedMilliseconds);
         });
+		logger.LogInformation("PrepareMenuModelsAsync(menuType)={MenuType}: external service call took {Arg1} ms", menuType, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareMenuModelsAsync(menuType={MenuType})", menuType);
     }
 
     #endregion

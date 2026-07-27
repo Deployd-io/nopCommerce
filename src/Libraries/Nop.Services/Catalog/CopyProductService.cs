@@ -113,6 +113,7 @@ public partial class CopyProductService : ICopyProductService
             associatedProductCopy.ParentGroupedProductId = productCopy.Id;
             await _productService.UpdateProductAsync(associatedProductCopy);
         }
+		logger.LogDebug("<<< Exiting CopyAssociatedProductsAsync(product={Product},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts},productCopy={ProductCopy})", product, isPublished, copyMultimedia, copyAssociatedProducts, productCopy);
     }
 
     /// <summary>
@@ -630,13 +631,17 @@ public partial class CopyProductService : ICopyProductService
     /// </returns>
     protected virtual async Task<Product> CopyBaseProductDataAsync(Product product, string newName, bool isPublished)
     {
+		logger.LogDebug(">>> Entering CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished})", product, newName, isPublished);
         //product download & sample download
         var downloadId = product.DownloadId;
         var sampleDownloadId = product.SampleDownloadId;
+		logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): downloadId → {DownloadId}", product, newName, isPublished, downloadId);
+		logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): sampleDownloadId → {SampleDownloadId}", product, newName, isPublished, sampleDownloadId);
         if (product.IsDownload)
         {
             var download = await _downloadService.GetDownloadByIdAsync(product.DownloadId);
             if (download != null)
+			logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): download → {Download}", product, newName, isPublished, download);
             {
                 var downloadCopy = new Download
                 {
@@ -657,6 +662,7 @@ public partial class CopyProductService : ICopyProductService
             {
                 var sampleDownload = await _downloadService.GetDownloadByIdAsync(product.SampleDownloadId);
                 if (sampleDownload != null)
+				logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): sampleDownload → {SampleDownload}", product, newName, isPublished, sampleDownload);
                 {
                     var sampleDownloadCopy = new Download
                     {
@@ -786,6 +792,7 @@ public partial class CopyProductService : ICopyProductService
 
         //search engine name
         await _urlRecordService.SaveSlugAsync(productCopy, await _urlRecordService.ValidateSeNameAsync(productCopy, string.Empty, productCopy.Name, true), 0);
+		logger.LogDebug("<<< Exiting CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished})", product, newName, isPublished);
         return productCopy;
     }
 

@@ -27,7 +27,10 @@ public partial class BBCodeHelper : IBBCodeHelper
 
     public BBCodeHelper(CommonSettings commonSettings)
     {
+		logger.LogDebug(">>> Entering BBCodeHelper(commonSettings={CommonSettings})", commonSettings);
         _commonSettings = commonSettings;
+		logger.LogDebug("<<< Exiting BBCodeHelper(commonSettings={CommonSettings})", commonSettings);
+		logger.LogDebug("BBCodeHelper(commonSettings={CommonSettings}): _commonSettings → {_commonSettings}", commonSettings, _commonSettings);
     }
 
     #endregion
@@ -98,8 +101,11 @@ public partial class BBCodeHelper : IBBCodeHelper
     /// <returns>string</returns>
     public virtual string RemoveQuotes(string str)
     {
+		logger.LogDebug(">>> Entering RemoveQuotes(str={Str})", str);
         str = Regex.Replace(str, @"\[quote=(.+?)\]", string.Empty, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         str = Regex.Replace(str, @"\[/quote\]", string.Empty, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		logger.LogDebug("RemoveQuotes(str={Str}): str → {Str1}", str, str);
+		logger.LogDebug("<<< Exiting RemoveQuotes(str={Str})", str);
         return str;
     }
 

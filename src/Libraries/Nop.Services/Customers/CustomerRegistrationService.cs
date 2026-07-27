@@ -108,6 +108,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         var savedPassword = string.Empty;
         switch (customerPassword.PasswordFormat)
+		logger.LogDebug("PasswordsMatch(customerPassword={CustomerPassword},enteredPassword={EnteredPassword}): savedPassword → {SavedPassword}", customerPassword, enteredPassword, savedPassword);
         {
             case PasswordFormat.Clear:
                 savedPassword = enteredPassword;
@@ -121,6 +122,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         }
 
         if (customerPassword.Password == null)
+		logger.LogDebug("<<< Exiting PasswordsMatch(customerPassword={CustomerPassword},enteredPassword={EnteredPassword})", customerPassword, enteredPassword);
             return false;
 
         return customerPassword.Password.Equals(savedPassword);
@@ -141,6 +143,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<CustomerLoginResults> ValidateCustomerAsync(string usernameOrEmail, string password)
     {
+		logger.LogDebug(">>> Entering ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password})", usernameOrEmail, password);
         var customer = _customerSettings.UsernamesEnabled ?
             await _customerService.GetCustomerByUsernameAsync(usernameOrEmail) :
             await _customerService.GetCustomerByEmailAsync(usernameOrEmail);
@@ -169,6 +172,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
                 customer.CannotLoginUntilDateUtc = DateTime.UtcNow.AddMinutes(_customerSettings.FailedPasswordLockoutMinutes);
                 //reset the counter
                 customer.FailedLoginAttempts = 0;
+				logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password}): customer.FailedLoginAttempts → {Arg2}", usernameOrEmail, password, customer.FailedLoginAttempts);
             }
 
             await _customerService.UpdateCustomerAsync(customer);
@@ -181,6 +185,8 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             : null;
         var store = await _storeContext.GetCurrentStoreAsync();
         var methodIsActive = await _multiFactorAuthenticationPluginManager.IsPluginActiveAsync(selectedProvider, customer, store.Id);
+		logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password}): store → {Store}", usernameOrEmail, password, store);
+		logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password}): methodIsActive → {MethodIsActive}", usernameOrEmail, password, methodIsActive);
         if (methodIsActive)
             return CustomerLoginResults.MultiFactorAuthenticationRequired;
 
@@ -189,11 +195,15 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         //update login details
         customer.FailedLoginAttempts = 0;
+		logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password}): customer.CannotLoginUntilDateUtc → {Arg2}", usernameOrEmail, password, customer.CannotLoginUntilDateUtc);
+		logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password}): customer.RequireReLogin → {Arg2}", usernameOrEmail, password, customer.RequireReLogin);
+		logger.LogDebug("ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password}): customer.LastLoginDateUtc → {Arg2}", usernameOrEmail, password, customer.LastLoginDateUtc);
         customer.CannotLoginUntilDateUtc = null;
         customer.RequireReLogin = false;
         customer.LastLoginDateUtc = DateTime.UtcNow;
         await _customerService.UpdateCustomerAsync(customer);
 
+		logger.LogDebug("<<< Exiting ValidateCustomerAsync(usernameOrEmail={UsernameOrEmail},password={Password})", usernameOrEmail, password);
         return CustomerLoginResults.Successful;
     }
 
@@ -207,6 +217,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<CustomerRegistrationResult> RegisterCustomerAsync(CustomerRegistrationRequest request)
     {
+		logger.LogDebug(">>> Entering RegisterCustomerAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         if (request.Customer == null)
@@ -214,6 +225,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         var result = new CustomerRegistrationResult();
         if (request.Customer.IsSearchEngineAccount())
+		logger.LogDebug("RegisterCustomerAsync(request={Request}): result → {Result}", request, result);
         {
             result.AddError("Search engine can't be registered");
             return result;
@@ -282,6 +294,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             case PasswordFormat.Clear:
                 customerPassword.Password = request.Password;
+				logger.LogDebug("RegisterCustomerAsync(request={Request}): customerPassword.Password → {Arg1}", request, customerPassword.Password);
                 break;
             case PasswordFormat.Encrypted:
                 customerPassword.Password = _encryptionService.EncryptText(request.Password);
@@ -289,6 +302,8 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             case PasswordFormat.Hashed:
                 var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
                 customerPassword.PasswordSalt = saltKey;
+				logger.LogDebug("RegisterCustomerAsync(request={Request}): saltKey → {SaltKey}", request, saltKey);
+				logger.LogDebug("RegisterCustomerAsync(request={Request}): customerPassword.PasswordSalt → {Arg1}", request, customerPassword.PasswordSalt);
                 customerPassword.Password = _encryptionService.CreatePasswordHash(request.Password, saltKey, _customerSettings.HashedPasswordFormat);
                 break;
         }
@@ -300,6 +315,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         //add to 'Registered' role
         var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName) ?? throw new NopException("'Registered' role could not be loaded");
 
+		logger.LogDebug("RegisterCustomerAsync(request={Request}): registeredRole → {RegisteredRole}", request, registeredRole);
         await _customerService.AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = request.Customer.Id, CustomerRoleId = registeredRole.Id });
 
         //remove from 'Guests' role            
@@ -307,6 +323,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
             await _customerService.RemoveCustomerRoleMappingAsync(request.Customer, guestRole);
+			logger.LogDebug("RegisterCustomerAsync(request={Request}): guestRole → {GuestRole}", request, guestRole);
         }
 
         //add reward points for customer registration (if enabled)
@@ -320,6 +337,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         await _customerService.UpdateCustomerAsync(request.Customer);
 
+		logger.LogDebug("<<< Exiting RegisterCustomerAsync(request={Request})", request);
         return result;
     }
 
@@ -333,10 +351,12 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<ChangePasswordResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
+		logger.LogDebug(">>> Entering ChangePasswordAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         var result = new ChangePasswordResult();
         if (string.IsNullOrWhiteSpace(request.Email))
+		logger.LogDebug("ChangePasswordAsync(request={Request}): result → {Result}", request, result);
         {
             result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.EmailIsNotProvided"));
             return result;
@@ -350,6 +370,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         var customer = await _customerService.GetCustomerByEmailAsync(request.Email);
         if (customer == null)
+		logger.LogDebug("ChangePasswordAsync(request={Request}): customer → {Customer}", request, customer);
         {
             result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.EmailNotFound"));
             return result;
@@ -368,8 +389,10 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             //get some of previous passwords
             var previousPasswords = await _customerService.GetCustomerPasswordsAsync(customer.Id, passwordsToReturn: _customerSettings.UnduplicatedPasswordsNumber);
 
+			logger.LogDebug("ChangePasswordAsync(request={Request}): previousPasswords → {PreviousPasswords}", request, previousPasswords);
             var newPasswordMatchesWithPrevious = previousPasswords.Any(password => PasswordsMatch(password, request.NewPassword));
             if (newPasswordMatchesWithPrevious)
+			logger.LogDebug("ChangePasswordAsync(request={Request}): newPasswordMatchesWithPrevious → {NewPasswordMatchesWithPrevious}", request, newPasswordMatchesWithPrevious);
             {
                 result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.PasswordMatchesWithPrevious"));
                 return result;
@@ -387,6 +410,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             case PasswordFormat.Clear:
                 customerPassword.Password = request.NewPassword;
+				logger.LogDebug("ChangePasswordAsync(request={Request}): customerPassword.Password → {Arg1}", request, customerPassword.Password);
                 break;
             case PasswordFormat.Encrypted:
                 customerPassword.Password = _encryptionService.EncryptText(request.NewPassword);
@@ -394,6 +418,8 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
             case PasswordFormat.Hashed:
                 var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
                 customerPassword.PasswordSalt = saltKey;
+				logger.LogDebug("ChangePasswordAsync(request={Request}): saltKey → {SaltKey}", request, saltKey);
+				logger.LogDebug("ChangePasswordAsync(request={Request}): customerPassword.PasswordSalt → {Arg1}", request, customerPassword.PasswordSalt);
                 customerPassword.Password = _encryptionService.CreatePasswordHash(request.NewPassword, saltKey,
                     request.HashedPasswordFormat ?? _customerSettings.HashedPasswordFormat);
                 break;
@@ -404,12 +430,14 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         if (customer.MustChangePassword)
         {
             customer.MustChangePassword = false;
+			logger.LogDebug("ChangePasswordAsync(request={Request}): customer.MustChangePassword → {Arg1}", request, customer.MustChangePassword);
             await _customerService.UpdateCustomerAsync(customer);
         }
 
         //publish event
         await _eventPublisher.PublishAsync(new CustomerPasswordChangedEvent(customerPassword));
 
+		logger.LogDebug("<<< Exiting ChangePasswordAsync(request={Request})", request);
         return result;
     }
 
@@ -524,6 +552,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
                 await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(subscription);
             }
         }
+		logger.LogDebug("<<< Exiting SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation})", customer, newEmail, requireValidation);
     }
 
     /// <summary>

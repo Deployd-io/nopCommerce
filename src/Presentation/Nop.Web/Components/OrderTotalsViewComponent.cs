@@ -27,10 +27,15 @@ public partial class OrderTotalsViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(bool isEditable)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(isEditable={IsEditable})", isEditable);
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, store.Id);
+		logger.LogDebug("InvokeAsync(isEditable={IsEditable}): store → {Store}", isEditable, store);
+		logger.LogDebug("InvokeAsync(isEditable={IsEditable}): cart → {Cart}", isEditable, cart);
 
         var model = await _shoppingCartModelFactory.PrepareOrderTotalsModelAsync(cart, isEditable);
+		logger.LogDebug("InvokeAsync(isEditable={IsEditable}): model → {Model}", isEditable, model);
+		logger.LogDebug("<<< Exiting InvokeAsync(isEditable={IsEditable})", isEditable);
         return View(model);
     }
 }

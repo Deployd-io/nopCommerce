@@ -12,7 +12,10 @@ public class DataMigration : Migration
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		logger.LogDebug("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -20,12 +23,14 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         //#3425
         if (!_dataProvider.GetTable<MessageTemplate>().Any(st => string.Compare(st.Name, MessageTemplateSystemNames.ORDER_COMPLETED_STORE_OWNER_NOTIFICATION, StringComparison.InvariantCultureIgnoreCase) == 0))
         {
             var eaGeneral = _dataProvider.GetTable<EmailAccount>().FirstOrDefault() ?? throw new Exception("Default email account cannot be loaded");
             _dataProvider.InsertEntity(new MessageTemplate()
             {
+			logger.LogDebug("Up(): eaGeneral → {EaGeneral}", eaGeneral);
                 Name = MessageTemplateSystemNames.ORDER_COMPLETED_STORE_OWNER_NOTIFICATION,
                 Subject = "%Store.Name%. Order #%Order.OrderNumber% completed",
                 Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\">%Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Order.CustomerFullName% has just completed an order. Below is the summary of the order.{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% %Order.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
@@ -36,6 +41,7 @@ public class DataMigration : Migration
 
         var activityLogTypeTable = _dataProvider.GetTable<ActivityLogType>();
 
+		logger.LogDebug("Up(): activityLogTypeTable → {ActivityLogTypeTable}", activityLogTypeTable);
         //#6407
         if (!activityLogTypeTable.Any(alt => string.Compare(alt.SystemKeyword, "PublicStore.PasswordChanged", StringComparison.InvariantCultureIgnoreCase) == 0))
         {
@@ -52,6 +58,7 @@ public class DataMigration : Migration
         //#6874 Multiple newsletter lists
         var newsLetterSubscriptionTypeTable = _dataProvider.GetTable<NewsLetterSubscriptionType>();
         if (!newsLetterSubscriptionTypeTable.Any(alt => string.Compare(alt.Name, "Newsletter", StringComparison.InvariantCultureIgnoreCase) == 0))
+		logger.LogDebug("Up(): newsLetterSubscriptionTypeTable → {NewsLetterSubscriptionTypeTable}", newsLetterSubscriptionTypeTable);
         {
             var subscriptionType = _dataProvider.InsertEntity(
                 new NewsLetterSubscriptionType
@@ -69,8 +76,11 @@ public class DataMigration : Migration
 
         var newsLetterSubscriptionTableName = nameof(NewsLetterSubscription);
         var typeIdIndexName = "IX_NewsLetterSubscription_TypeId";
+		logger.LogDebug("Up(): newsLetterSubscriptionTableName → {NewsLetterSubscriptionTableName}", newsLetterSubscriptionTableName);
+		logger.LogDebug("Up(): typeIdIndexName → {TypeIdIndexName}", typeIdIndexName);
         var typeIdCollumnName = nameof(NewsLetterSubscription.TypeId);
 
+		logger.LogDebug("Up(): typeIdCollumnName → {TypeIdCollumnName}", typeIdCollumnName);
         //delete the index if it already exists to prevent a problem
         //with altering NewsLetterSubscription table
         if (Schema.Table(newsLetterSubscriptionTableName).Index(typeIdIndexName).Exists()) 
@@ -131,6 +141,7 @@ public class DataMigration : Migration
             is ActivityLogType loginActivity)
         {
             loginActivity.SystemKeyword = "PublicStore.SuccessfulLogin";
+			logger.LogDebug("Up(): loginActivity.SystemKeyword → {Arg0}", loginActivity.SystemKeyword);
             _dataProvider.UpdateEntity(loginActivity);
         }
         else
@@ -317,10 +328,13 @@ public class DataMigration : Migration
                 EmailAccountId = eaGeneral.Id
             });
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

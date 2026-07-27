@@ -33,8 +33,10 @@ public class ZettleSyncTask : IScheduleTask
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         if (ZettleService.IsConfigured(_zettleSettings))
             await _zettleService.ImportAsync();
+			logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

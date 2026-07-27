@@ -11,7 +11,10 @@ public class TaxCategoryServiceTests : ServiceTest<TaxCategory>
 
     public TaxCategoryServiceTests()
     {
+		logger.LogDebug(">>> Entering TaxCategoryServiceTests()");
         _taxCategoryService = GetService<ITaxCategoryService>();
+		logger.LogDebug("<<< Exiting TaxCategoryServiceTests()");
+		logger.LogDebug("TaxCategoryServiceTests(): _taxCategoryService → {_taxCategoryService}", _taxCategoryService);
     }
 
     protected override CrudData<TaxCategory> CrudData

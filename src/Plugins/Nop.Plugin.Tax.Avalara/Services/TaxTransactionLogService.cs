@@ -19,7 +19,10 @@ public class TaxTransactionLogService
 
     public TaxTransactionLogService(IRepository<TaxTransactionLog> taxTransactionLogRepository)
     {
+		logger.LogDebug(">>> Entering TaxTransactionLogService(taxTransactionLogRepository={TaxTransactionLogRepository})", taxTransactionLogRepository);
         _taxTransactionLogRepository = taxTransactionLogRepository;
+		logger.LogDebug("<<< Exiting TaxTransactionLogService(taxTransactionLogRepository={TaxTransactionLogRepository})", taxTransactionLogRepository);
+		logger.LogDebug("TaxTransactionLogService(taxTransactionLogRepository={TaxTransactionLogRepository}): _taxTransactionLogRepository → {_taxTransactionLogRepository}", taxTransactionLogRepository, _taxTransactionLogRepository);
     }
 
     #endregion
@@ -72,6 +75,8 @@ public class TaxTransactionLogService
     /// </returns>
     public async Task<TaxTransactionLog> GetTaxTransactionLogByIdAsync(int logItemId)
     {
+		logger.LogDebug(">>> Entering GetTaxTransactionLogByIdAsync(logItemId={LogItemId})", logItemId);
+		logger.LogDebug("<<< Exiting GetTaxTransactionLogByIdAsync(logItemId={LogItemId})", logItemId);
         return await _taxTransactionLogRepository.GetByIdAsync(logItemId);
     }
 
@@ -82,9 +87,13 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task InsertTaxTransactionLogAsync(TaxTransactionLog logItem)
     {
+		logger.LogDebug(">>> Entering InsertTaxTransactionLogAsync(logItem={LogItem})", logItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(logItem);
 
         await _taxTransactionLogRepository.InsertAsync(logItem, false);
+		logger.LogDebug("<<< Exiting InsertTaxTransactionLogAsync(logItem={LogItem})", logItem);
+		logger.LogInformation("InsertTaxTransactionLogAsync(logItem)={LogItem}: save query executed in {Arg1} ms", logItem, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -94,9 +103,13 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateTaxTransactionLogAsync(TaxTransactionLog logItem)
     {
+		logger.LogDebug(">>> Entering UpdateTaxTransactionLogAsync(logItem={LogItem})", logItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(logItem);
 
         await _taxTransactionLogRepository.UpdateAsync(logItem, false);
+		logger.LogDebug("<<< Exiting UpdateTaxTransactionLogAsync(logItem={LogItem})", logItem);
+		logger.LogInformation("UpdateTaxTransactionLogAsync(logItem)={LogItem}: update query executed in {Arg1} ms", logItem, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -106,9 +119,19 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteTaxTransactionLogAsync(TaxTransactionLog logItem)
     {
+		logger.LogDebug(">>> Entering DeleteTaxTransactionLogAsync(logItem={LogItem})", logItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _taxTransactionLogRepository.DeleteAsync(logItem, false);
+		logger.LogDebug("<<< Exiting DeleteTaxTransactionLogAsync(logItem={LogItem})", logItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTaxTransactionLogAsync(logItem)={LogItem}: external service call took {Arg1} ms", logItem, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTaxTransactionLogAsync(logItem)={LogItem}: delete query executed in {Arg1} ms", logItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteTaxTransactionLogAsync(logItem)={LogItem}: external service call took {Arg1} ms", logItem, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteTaxTransactionLogAsync(logItem)={LogItem}: delete query executed in {Arg1} ms", logItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete log items
     /// </summary>
@@ -116,7 +139,15 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteTaxTransactionLogAsync(int[] ids)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering DeleteTaxTransactionLogAsync(ids={Ids})", ids);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTaxTransactionLogAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteTaxTransactionLogAsync(ids)={Ids}: delete query executed in {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
         await _taxTransactionLogRepository.DeleteAsync(logItem => ids.Contains(logItem.Id));
+		logger.LogDebug("<<< Exiting DeleteTaxTransactionLogAsync(ids={Ids})", ids);
     }
 
     /// <summary>
@@ -125,8 +156,14 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ClearLogAsync()
     {
+		logger.LogDebug(">>> Entering ClearLogAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _taxTransactionLogRepository.TruncateAsync();
+		logger.LogDebug("<<< Exiting ClearLogAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("ClearLogAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("ClearLogAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     #endregion
 }

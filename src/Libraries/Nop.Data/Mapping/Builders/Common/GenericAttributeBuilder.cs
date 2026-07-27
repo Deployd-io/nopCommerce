@@ -16,10 +16,12 @@ public partial class GenericAttributeBuilder : NopEntityBuilder<GenericAttribute
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(GenericAttribute.KeyGroup)).AsString(400).NotNullable()
             .WithColumn(nameof(GenericAttribute.Key)).AsString(400).NotNullable()
             .WithColumn(nameof(GenericAttribute.Value)).AsString(int.MaxValue).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

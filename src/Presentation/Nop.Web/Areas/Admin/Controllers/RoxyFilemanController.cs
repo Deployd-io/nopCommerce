@@ -25,9 +25,14 @@ public partial class RoxyFilemanController : BaseAdminController
 
     public RoxyFilemanController(IPermissionService permissionService, IRoxyFilemanService roxyFilemanService, IWebHelper webHelper)
     {
+		logger.LogDebug(">>> Entering RoxyFilemanController(permissionService={PermissionService},roxyFilemanService={RoxyFilemanService},webHelper={WebHelper})", permissionService, roxyFilemanService, webHelper);
         _permissionService = permissionService;
         _roxyFilemanService = roxyFilemanService;
+		logger.LogDebug("RoxyFilemanController(permissionService={PermissionService},roxyFilemanService={RoxyFilemanService},webHelper={WebHelper}): _roxyFilemanService → {_roxyFilemanService}", permissionService, roxyFilemanService, webHelper, _roxyFilemanService);
+		logger.LogDebug("RoxyFilemanController(permissionService={PermissionService},roxyFilemanService={RoxyFilemanService},webHelper={WebHelper}): _permissionService → {_permissionService}", permissionService, roxyFilemanService, webHelper, _permissionService);
         _webHelper = webHelper;
+		logger.LogDebug("<<< Exiting RoxyFilemanController(permissionService={PermissionService},roxyFilemanService={RoxyFilemanService},webHelper={WebHelper})", permissionService, roxyFilemanService, webHelper);
+		logger.LogDebug("RoxyFilemanController(permissionService={PermissionService},roxyFilemanService={RoxyFilemanService},webHelper={WebHelper}): _webHelper → {_webHelper}", permissionService, roxyFilemanService, webHelper, _webHelper);
     }
 
     #endregion
@@ -36,11 +41,15 @@ public partial class RoxyFilemanController : BaseAdminController
 
     protected virtual JsonResult JsonOk()
     {
+		logger.LogDebug(">>> Entering JsonOk()");
+		logger.LogDebug("<<< Exiting JsonOk()");
         return Json(new { res = "ok" });
     }
 
     protected virtual JsonResult JsonError(string message)
     {
+		logger.LogDebug(">>> Entering JsonError(message={Message})", message);
+		logger.LogDebug("<<< Exiting JsonError(message={Message})", message);
         return Json(new { res = "error", msg = message });
     }
 
@@ -53,13 +62,17 @@ public partial class RoxyFilemanController : BaseAdminController
     /// </summary>
     public virtual async Task CreateConfiguration()
     {
+		logger.LogDebug(">>> Entering CreateConfiguration()");
         var currentPathBase = Request.PathBase.ToString();
         await _roxyFilemanService.ConfigureAsync(currentPathBase);
+		logger.LogDebug("<<< Exiting CreateConfiguration()");
+		logger.LogDebug("CreateConfiguration(): currentPathBase → {CurrentPathBase}", currentPathBase);
     }
 
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> DirectoriesList(string type)
     {
+		logger.LogDebug(">>> Entering DirectoriesList(type={Type})", type);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -70,6 +83,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in DirectoriesList(type={Type}): {Arg1}", type, ex.Message);
+			logger.LogDebug("<<< Exiting DirectoriesList(type={Type})", type);
             return JsonError(ex.Message);
         }
     }
@@ -77,6 +92,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> FilesList(string d, string type)
     {
+		logger.LogDebug(">>> Entering FilesList(d={D},type={Type})", d, type);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -84,16 +100,20 @@ public partial class RoxyFilemanController : BaseAdminController
 
             var directories = _roxyFilemanService.GetFiles(d, type);
 
+			logger.LogDebug("FilesList(d={D},type={Type}): directories → {Directories}", d, type, directories);
             return Json(directories);
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in FilesList(d={D},type={Type}): {Arg2}", d, type, ex.Message);
+			logger.LogDebug("<<< Exiting FilesList(d={D},type={Type})", d, type);
             return JsonError(ex.Message);
         }
     }
 
     public virtual async Task<IActionResult> DownloadFile(string f)
     {
+		logger.LogDebug(">>> Entering DownloadFile(f={F})", f);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -103,11 +123,14 @@ public partial class RoxyFilemanController : BaseAdminController
 
             if (!new FileExtensionContentTypeProvider().TryGetContentType(f, out var contentType))
                 contentType = MimeTypes.ApplicationOctetStream;
+				logger.LogDebug("DownloadFile(f={F}): contentType → {ContentType}", f, contentType);
 
             return File(stream, contentType, name);
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in DownloadFile(f={F}): {Arg1}", f, ex.Message);
+			logger.LogDebug("<<< Exiting DownloadFile(f={F})", f);
             return JsonError(ex.Message);
         }
     }
@@ -115,6 +138,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> CopyDirectory(string d, string n)
     {
+		logger.LogDebug(">>> Entering CopyDirectory(d={D},n={N})", d, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -126,6 +150,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in CopyDirectory(d={D},n={N}): {Arg2}", d, n, ex.Message);
+			logger.LogDebug("<<< Exiting CopyDirectory(d={D},n={N})", d, n);
             return JsonError(ex.Message);
         }
     }
@@ -133,6 +159,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> CopyFile(string f, string n)
     {
+		logger.LogDebug(">>> Entering CopyFile(f={F},n={N})", f, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -144,6 +171,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in CopyFile(f={F},n={N}): {Arg2}", f, n, ex.Message);
+			logger.LogDebug("<<< Exiting CopyFile(f={F},n={N})", f, n);
             return JsonError(ex.Message);
         }
     }
@@ -151,6 +180,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> CreateDirectory(string d, string n)
     {
+		logger.LogDebug(">>> Entering CreateDirectory(d={D},n={N})", d, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -162,6 +192,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in CreateDirectory(d={D},n={N}): {Arg2}", d, n, ex.Message);
+			logger.LogDebug("<<< Exiting CreateDirectory(d={D},n={N})", d, n);
             return JsonError(ex.Message);
         }
     }
@@ -169,6 +201,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> DeleteDirectory(string d)
     {
+		logger.LogDebug(">>> Entering DeleteDirectory(d={D})", d);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -180,6 +213,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in DeleteDirectory(d={D}): {Arg1}", d, ex.Message);
+			logger.LogDebug("<<< Exiting DeleteDirectory(d={D})", d);
             return JsonError(ex.Message);
         }
     }
@@ -187,6 +222,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> DeleteFile(string f)
     {
+		logger.LogDebug(">>> Entering DeleteFile(f={F})", f);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -198,23 +234,29 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in DeleteFile(f={F}): {Arg1}", f, ex.Message);
+			logger.LogDebug("<<< Exiting DeleteFile(f={F})", f);
             return JsonError(ex.Message);
         }
     }
 
     public virtual async Task<IActionResult> DownloadDirectory(string d)
     {
+		logger.LogDebug(">>> Entering DownloadDirectory(d={D})", d);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
             throw new Exception("You don't have required permission");
 
         var fileContents = _roxyFilemanService.DownloadDirectory(d);
 
+		logger.LogDebug("DownloadDirectory(d={D}): fileContents → {FileContents}", d, fileContents);
+		logger.LogDebug("<<< Exiting DownloadDirectory(d={D})", d);
         return File(fileContents, MimeTypes.ApplicationZip);
     }
 
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> MoveDirectory(string d, string n)
     {
+		logger.LogDebug(">>> Entering MoveDirectory(d={D},n={N})", d, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -226,6 +268,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in MoveDirectory(d={D},n={N}): {Arg2}", d, n, ex.Message);
+			logger.LogDebug("<<< Exiting MoveDirectory(d={D},n={N})", d, n);
             return JsonError(ex.Message);
         }
     }
@@ -233,6 +277,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> MoveFile(string f, string n)
     {
+		logger.LogDebug(">>> Entering MoveFile(f={F},n={N})", f, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -244,6 +289,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in MoveFile(f={F},n={N}): {Arg2}", f, n, ex.Message);
+			logger.LogDebug("<<< Exiting MoveFile(f={F},n={N})", f, n);
             return JsonError(ex.Message);
         }
     }
@@ -251,6 +298,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> RenameDirectory(string d, string n)
     {
+		logger.LogDebug(">>> Entering RenameDirectory(d={D},n={N})", d, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -262,6 +310,8 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in RenameDirectory(d={D},n={N}): {Arg2}", d, n, ex.Message);
+			logger.LogDebug("<<< Exiting RenameDirectory(d={D},n={N})", d, n);
             return JsonError(ex.Message);
         }
     }
@@ -269,6 +319,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> RenameFile(string f, string n)
     {
+		logger.LogDebug(">>> Entering RenameFile(f={F},n={N})", f, n);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -280,12 +331,15 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in RenameFile(f={F},n={N}): {Arg2}", f, n, ex.Message);
+			logger.LogDebug("<<< Exiting RenameFile(f={F},n={N})", f, n);
             return JsonError(ex.Message);
         }
     }
 
     public virtual async Task<IActionResult> CreateImageThumbnail(string f)
     {
+		logger.LogDebug(">>> Entering CreateImageThumbnail(f={F})", f);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -293,14 +347,19 @@ public partial class RoxyFilemanController : BaseAdminController
 
             var provider = new FileExtensionContentTypeProvider();
             if (!provider.TryGetContentType(f, out var contentType))
+				logger.LogDebug("CreateImageThumbnail(f={F}): provider → {Provider}", f, provider);
                 contentType = MimeTypes.ImageJpeg;
+				logger.LogDebug("CreateImageThumbnail(f={F}): contentType → {ContentType}", f, contentType);
 
             var fileContents = _roxyFilemanService.CreateImageThumbnail(f, contentType);
 
+			logger.LogDebug("CreateImageThumbnail(f={F}): fileContents → {FileContents}", f, fileContents);
             return File(fileContents, contentType);
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in CreateImageThumbnail(f={F}): {Arg1}", f, ex.Message);
+			logger.LogDebug("<<< Exiting CreateImageThumbnail(f={F})", f);
             return JsonError(ex.Message);
         }
     }
@@ -309,6 +368,7 @@ public partial class RoxyFilemanController : BaseAdminController
     [HttpPost]
     public virtual async Task<IActionResult> UploadFiles([FromForm] RoxyFilemanUploadModel uploadModel)
     {
+		logger.LogDebug(">>> Entering UploadFiles(uploadModel={UploadModel})", uploadModel);
         try
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.System.HTML_EDITOR_MANAGE_PICTURES))
@@ -316,6 +376,7 @@ public partial class RoxyFilemanController : BaseAdminController
 
             var form = await HttpContext.Request.ReadFormAsync();
 
+			logger.LogDebug("UploadFiles(uploadModel={UploadModel}): form → {Form}", uploadModel, form);
             if (!form.Files.Any())
                 throw new RoxyFilemanException("E_UploadNoFiles");
 
@@ -325,12 +386,14 @@ public partial class RoxyFilemanController : BaseAdminController
         }
         catch (Exception ex)
         {
+			logger.LogError("Exception in UploadFiles(uploadModel={UploadModel}): {Arg1}", uploadModel, ex.Message);
             if (!_webHelper.IsAjaxRequest(Request))
             {
                 var roxyError = new { res = "error", msg = ex.Message };
                 return Content($"<script>parent.fileUploaded({JsonConvert.SerializeObject(roxyError)});</script>");
             }
 
+			logger.LogDebug("<<< Exiting UploadFiles(uploadModel={UploadModel})", uploadModel);
             return JsonError(ex.Message);
         }
     }

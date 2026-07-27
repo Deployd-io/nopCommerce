@@ -71,11 +71,13 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     /// </returns>
     public virtual Task<VendorAttributeSearchModel> PrepareVendorAttributeSearchModelAsync(VendorAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareVendorAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareVendorAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -89,11 +91,13 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     /// </returns>
     public virtual async Task<VendorAttributeListModel> PrepareVendorAttributeListModelAsync(VendorAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareVendorAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get vendor attributes
         var vendorAttributes = (await _vendorAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareVendorAttributeListModelAsync(searchModel={SearchModel}): vendorAttributes → {VendorAttributes}", searchModel, vendorAttributes);
         //prepare list model
         var model = await new VendorAttributeListModel().PrepareToGridAsync(searchModel, vendorAttributes, () =>
         {
@@ -102,6 +106,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<VendorAttributeModel>();
 
+				logger.LogDebug("PrepareVendorAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
 
@@ -109,6 +114,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareVendorAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

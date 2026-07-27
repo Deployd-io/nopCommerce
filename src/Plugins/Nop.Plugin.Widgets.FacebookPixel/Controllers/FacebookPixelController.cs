@@ -80,6 +80,8 @@ public class FacebookPixelController : BasePluginController
     /// <returns>Available widget zones</returns>
     public IList<SelectListItem> PreparePublicWidgetZones()
     {
+		logger.LogDebug(">>> Entering PreparePublicWidgetZones()");
+		logger.LogDebug("<<< Exiting PreparePublicWidgetZones()");
         return typeof(PublicWidgetZones)
             .GetProperties(BindingFlags.Public | BindingFlags.Static)
             .Where(property => property.PropertyType == typeof(string))
@@ -95,15 +97,18 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //prepare plugin configuration model
         var model = new ConfigurationModel();
         await _baseAdminModelFactory.PrepareStoresAsync(model.FacebookPixelSearchModel.AvailableStores);
+		logger.LogDebug("Configure(): model → {Model}", model);
         model.FacebookPixelSearchModel.HideStoresList = model.FacebookPixelSearchModel.AvailableStores.SelectionIsNotPossible();
         model.FacebookPixelSearchModel.HideSearchBlock = await _genericAttributeService
             .GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), FacebookPixelDefaults.HideSearchBlockAttribute);
         model.FacebookPixelSearchModel.SetGridPageSize();
         model.HideList = !(await _facebookPixelService.GetPagedConfigurationsAsync()).Any();
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Widgets.FacebookPixel/Views/Configuration/Configure.cshtml", model);
     }
 
@@ -111,9 +116,11 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> List(FacebookPixelSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         var configurations = await _facebookPixelService.GetPagedConfigurationsAsync(searchModel.StoreId, searchModel.Page - 1, searchModel.PageSize);
         var model = await new FacebookPixelListModel().PrepareToGridAsync(searchModel, configurations, () =>
         {
+		logger.LogDebug("List(searchModel={SearchModel}): configurations → {Configurations}", searchModel, configurations);
             //fill in model values from the configuration
             return configurations.SelectAwait(async configuration => new FacebookPixelModel
             {
@@ -127,12 +134,14 @@ public class FacebookPixelController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //set default values
         var model = new FacebookPixelModel
         {
@@ -147,6 +156,7 @@ public class FacebookPixelController : BasePluginController
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores, false);
         model.HideStoresList = model.AvailableStores.SelectionIsNotPossible();
 
+		logger.LogDebug("<<< Exiting Create()");
         return View("~/Plugins/Widgets.FacebookPixel/Views/Configuration/Create.cshtml", model);
     }
 
@@ -177,13 +187,16 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         var configuration = await _facebookPixelService.GetConfigurationByIdAsync(id);
         if (configuration == null)
+			logger.LogDebug("Edit(id={Id}): configuration → {Configuration}", id, configuration);
             return RedirectToAction("Configure", "FacebookPixel");
 
         //fill in model values from the configuration
         var model = configuration.ToModel<FacebookPixelModel>();
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
         //prepare other model properties
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores, false);
         model.HideStoresList = model.AvailableStores.SelectionIsNotPossible();
@@ -192,6 +205,7 @@ public class FacebookPixelController : BasePluginController
         model.CustomEventSearchModel.AddCustomEvent.AvailableWidgetZones = PreparePublicWidgetZones();
         model.CustomEventSearchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View("~/Plugins/Widgets.FacebookPixel/Views/Configuration/Edit.cshtml", model);
     }
 
@@ -233,8 +247,10 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var configuration = await _facebookPixelService.GetConfigurationByIdAsync(id);
         if (configuration == null)
+			logger.LogDebug("Delete(id={Id}): configuration → {Configuration}", id, configuration);
             return RedirectToAction("Configure", "FacebookPixel");
 
         //delete configuration
@@ -242,6 +258,7 @@ public class FacebookPixelController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("Configure", "FacebookPixel");
     }
 
@@ -249,12 +266,14 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> CustomEventList(CustomEventSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering CustomEventList(searchModel={SearchModel})", searchModel);
         var configuration = await _facebookPixelService.GetConfigurationByIdAsync(searchModel.ConfigurationId)
             ?? throw new ArgumentException("No configuration found with the specified id", nameof(searchModel.ConfigurationId));
 
         var customEvents = (await _facebookPixelService.GetCustomEventsAsync(configuration.Id, searchModel.WidgetZone)).ToPagedList(searchModel);
         var model = new CustomEventListModel().PrepareToGrid(searchModel, customEvents, () =>
         {
+		logger.LogDebug("CustomEventList(searchModel={SearchModel}): customEvents → {CustomEvents}", searchModel, customEvents);
             //fill in model values from the configuration
             return customEvents.Select(customEvent => new CustomEventModel
             {
@@ -264,6 +283,7 @@ public class FacebookPixelController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting CustomEventList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -285,16 +305,19 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> CustomEventDelete(int configurationId, string id)
     {
+		logger.LogDebug(">>> Entering CustomEventDelete(configurationId={ConfigurationId},id={Id})", configurationId, id);
         //save custom events configuration
         var eventName = id;
         await _facebookPixelService.SaveCustomEventsAsync(configurationId, eventName, null);
 
+		logger.LogDebug("<<< Exiting CustomEventDelete(configurationId={ConfigurationId},id={Id})", configurationId, id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> CookieSettingsWarning(bool disableForUsersNotAcceptingCookieConsent)
     {
+		logger.LogDebug(">>> Entering CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent={DisableForUsersNotAcceptingCookieConsent})", disableForUsersNotAcceptingCookieConsent);
         if (!disableForUsersNotAcceptingCookieConsent || _storeInformationSettings.DisplayEuCookieLawWarning)
             return Json(new { Result = string.Empty });
 
@@ -302,6 +325,9 @@ public class FacebookPixelController : BasePluginController
         //but merchant want to disable Facebook Pixel for users not accepting Cookie Consent
         var url = Url.Action("GeneralCommon", "Setting");
         var warning = string.Format(await _localizationService.GetResourceAsync("Plugins.Widgets.FacebookPixel.Configuration.CookieSettingsWarning"), url);
+		logger.LogDebug("CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent={DisableForUsersNotAcceptingCookieConsent}): url → {Url}", disableForUsersNotAcceptingCookieConsent, url);
+		logger.LogDebug("CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent={DisableForUsersNotAcceptingCookieConsent}): warning → {Warning}", disableForUsersNotAcceptingCookieConsent, warning);
+		logger.LogDebug("<<< Exiting CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent={DisableForUsersNotAcceptingCookieConsent})", disableForUsersNotAcceptingCookieConsent);
         return Json(new { Result = warning });
     }
 

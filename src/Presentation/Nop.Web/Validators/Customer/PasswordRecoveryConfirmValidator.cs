@@ -10,8 +10,10 @@ public partial class PasswordRecoveryConfirmValidator : BaseNopValidator<Passwor
 {
     public PasswordRecoveryConfirmValidator(ILocalizationService localizationService, CustomerSettings customerSettings)
     {
+		logger.LogDebug(">>> Entering PasswordRecoveryConfirmValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
         RuleFor(x => x.NewPassword).IsPassword(localizationService, customerSettings);
         RuleFor(x => x.ConfirmNewPassword).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Account.PasswordRecovery.ConfirmNewPassword.Required"));
         RuleFor(x => x.ConfirmNewPassword).Equal(x => x.NewPassword).WithMessageAwait(localizationService.GetResourceAsync("Account.PasswordRecovery.NewPassword.EnteredPasswordsDoNotMatch"));
+		logger.LogDebug("<<< Exiting PasswordRecoveryConfirmValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
     }
 }

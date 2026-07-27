@@ -64,6 +64,7 @@ public class OmnisendAdminController : BasePluginController
         model.BlockSyncOrders = model.Batches.Any(p => needBlock(p, OmnisendDefaults.OrdersEndpoint));
         model.BlockSyncProducts = model.Batches.Any(p => needBlock(p, OmnisendDefaults.ProductsEndpoint)) ||
             batches.Any(p => needBlock(p, OmnisendDefaults.CategoriesEndpoint));
+			logger.LogDebug("<<< Exiting FillBatchesAsync(model={Model})", model);
     }
 
     #endregion
@@ -72,6 +73,7 @@ public class OmnisendAdminController : BasePluginController
 
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             ApiKey = _omnisendSettings.ApiKey,
@@ -80,6 +82,7 @@ public class OmnisendAdminController : BasePluginController
 
         await FillBatchesAsync(model);
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.Omnisend/Views/Configure.cshtml", model);
     }
 
@@ -121,11 +124,13 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-contacts")]
     public async Task<IActionResult> SyncContacts()
     {
+		logger.LogDebug(">>> Entering SyncContacts()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncContactsAsync();
 
+		logger.LogDebug("<<< Exiting SyncContacts()");
         return await Configure();
     }
 
@@ -133,12 +138,14 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-products")]
     public async Task<IActionResult> SyncProducts()
     {
+		logger.LogDebug(">>> Entering SyncProducts()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncCategoriesAsync();
         await _omnisendService.SyncProductsAsync();
 
+		logger.LogDebug("<<< Exiting SyncProducts()");
         return await Configure();
     }
 
@@ -146,12 +153,14 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-orders")]
     public async Task<IActionResult> SyncOrders()
     {
+		logger.LogDebug(">>> Entering SyncOrders()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncOrdersAsync();
         await _omnisendService.SyncCartsAsync();
 
+		logger.LogDebug("<<< Exiting SyncOrders()");
         return await Configure();
     }
 

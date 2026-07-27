@@ -41,8 +41,10 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
     /// </returns>
     public virtual async Task<IList<IPickupPointProvider>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0, string systemName = null)
     {
+		logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         var pickupPointProviders = await LoadActivePluginsAsync(_shippingSettings.ActivePickupPointProviderSystemNames, customer, storeId);
 
+		logger.LogDebug("LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName}): pickupPointProviders → {PickupPointProviders}", customer, storeId, systemName, pickupPointProviders);
         //filter by passed system name
         if (!string.IsNullOrEmpty(systemName))
         {
@@ -51,6 +53,7 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
                 .ToList();
         }
 
+		logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         return pickupPointProviders;
     }
 
@@ -76,7 +79,10 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var pickupPointProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): pickupPointProvider → {PickupPointProvider}", systemName, customer, storeId, pickupPointProvider);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(pickupPointProvider);
     }
 

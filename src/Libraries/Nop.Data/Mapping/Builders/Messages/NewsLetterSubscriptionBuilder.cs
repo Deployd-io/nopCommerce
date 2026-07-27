@@ -18,9 +18,11 @@ public partial class NewsLetterSubscriptionBuilder : NopEntityBuilder<NewsLetter
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(NewsLetterSubscription.TypeId)).AsInt32().ForeignKey<NewsLetterSubscriptionType>(onDelete: Rule.Cascade).NotNullable()
             .WithColumn(nameof(NewsLetterSubscription.Email)).AsString(255).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

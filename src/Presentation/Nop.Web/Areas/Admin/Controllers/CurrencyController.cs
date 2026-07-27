@@ -73,14 +73,18 @@ public partial class CurrencyController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> List(bool liveRates = false)
     {
+		logger.LogDebug(">>> Entering List(liveRates={LiveRates})", liveRates);
         var model = new CurrencySearchModel();
 
+		logger.LogDebug("List(liveRates={LiveRates}): model → {Model}", liveRates, model);
         try
         {
             //prepare model
@@ -88,6 +92,7 @@ public partial class CurrencyController : BaseAdminController
         }
         catch (Exception e)
         {
+			logger.LogError("Exception in List(liveRates={LiveRates}): {Arg1}", liveRates, ex.Message);
             await _notificationService.ErrorNotificationAsync(e);
         }
 
@@ -110,9 +115,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> ListGrid(CurrencySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ListGrid(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _currencyModelFactory.PrepareCurrencyListModelAsync(searchModel);
 
+		logger.LogDebug("ListGrid(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ListGrid(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -120,17 +128,22 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> ApplyRates(IEnumerable<CurrencyExchangeRateModel> rateModels)
     {
+		logger.LogDebug(">>> Entering ApplyRates(rateModels={RateModels})", rateModels);
         foreach (var rate in rateModels)
         {
             var currency = await _currencyService.GetCurrencyByCodeAsync(rate.CurrencyCode);
             if (currency == null)
+				logger.LogDebug("ApplyRates(rateModels={RateModels}): currency → {Currency}", rateModels, currency);
                 continue;
 
             currency.Rate = rate.Rate;
+			logger.LogDebug("ApplyRates(rateModels={RateModels}): currency.Rate → {Arg1}", rateModels, currency.Rate);
+			logger.LogDebug("ApplyRates(rateModels={RateModels}): currency.UpdatedOnUtc → {Arg1}", rateModels, currency.UpdatedOnUtc);
             currency.UpdatedOnUtc = DateTime.UtcNow;
             await _currencyService.UpdateCurrencyAsync(currency);
         }
 
+		logger.LogDebug("<<< Exiting ApplyRates(rateModels={RateModels})", rateModels);
         return Json(new { result = true });
     }
 
@@ -138,9 +151,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> MarkAsPrimaryExchangeRateCurrency(int id)
     {
+		logger.LogDebug(">>> Entering MarkAsPrimaryExchangeRateCurrency(id={Id})", id);
         _currencySettings.PrimaryExchangeRateCurrencyId = id;
         await _settingService.SaveSettingAsync(_currencySettings);
+		logger.LogDebug("MarkAsPrimaryExchangeRateCurrency(id={Id}): _currencySettings.PrimaryExchangeRateCurrencyId → {Arg1}", id, _currencySettings.PrimaryExchangeRateCurrencyId);
 
+		logger.LogDebug("<<< Exiting MarkAsPrimaryExchangeRateCurrency(id={Id})", id);
         return Json(new { result = true });
     }
 
@@ -148,9 +164,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> MarkAsPrimaryStoreCurrency(int id)
     {
+		logger.LogDebug(">>> Entering MarkAsPrimaryStoreCurrency(id={Id})", id);
         _currencySettings.PrimaryStoreCurrencyId = id;
         await _settingService.SaveSettingAsync(_currencySettings);
+		logger.LogDebug("MarkAsPrimaryStoreCurrency(id={Id}): _currencySettings.PrimaryStoreCurrencyId → {Arg1}", id, _currencySettings.PrimaryStoreCurrencyId);
 
+		logger.LogDebug("<<< Exiting MarkAsPrimaryStoreCurrency(id={Id})", id);
         return Json(new { result = true });
     }
 
@@ -161,9 +180,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _currencyModelFactory.PrepareCurrencyModelAsync(new CurrencyModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -200,20 +222,25 @@ public partial class CurrencyController : BaseAdminController
         model = await _currencyModelFactory.PrepareCurrencyModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a currency with the specified id
         var currency = await _currencyService.GetCurrencyByIdAsync(id);
         if (currency == null)
+			logger.LogDebug("Edit(id={Id}): currency → {Currency}", id, currency);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _currencyModelFactory.PrepareCurrencyModelAsync(null, currency);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -262,6 +289,7 @@ public partial class CurrencyController : BaseAdminController
         model = await _currencyModelFactory.PrepareCurrencyModelAsync(model, currency, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -269,9 +297,11 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a currency with the specified id
         var currency = await _currencyService.GetCurrencyByIdAsync(id);
         if (currency == null)
+			logger.LogDebug("Delete(id={Id}): currency → {Currency}", id, currency);
             return RedirectToAction("List");
 
         try
@@ -285,6 +315,7 @@ public partial class CurrencyController : BaseAdminController
             //ensure we have at least one published currency
             var allCurrencies = await _currencyService.GetAllCurrenciesAsync();
             if (allCurrencies.Count == 1 && allCurrencies[0].Id == currency.Id)
+			logger.LogDebug("Delete(id={Id}): allCurrencies → {AllCurrencies}", id, allCurrencies);
             {
                 _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Currencies.PublishedCurrencyRequired"));
                 return RedirectToAction("Edit", new { id = currency.Id });
@@ -302,7 +333,9 @@ public partial class CurrencyController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = currency.Id });
         }
     }

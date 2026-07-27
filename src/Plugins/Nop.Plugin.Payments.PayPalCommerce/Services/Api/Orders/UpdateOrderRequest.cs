@@ -13,6 +13,8 @@ public class UpdateOrderRequest<TValue> : List<Patch<TValue>>, IAuthorizedReques
 
     public UpdateOrderRequest(IEnumerable<Patch<TValue>> collection) : base(collection)
     {
+	logger.LogDebug(">>> Entering UpdateOrderRequest(collection={Collection})", collection);
+	logger.LogDebug("<<< Exiting UpdateOrderRequest(collection={Collection})", collection);
     }
 
     #endregion

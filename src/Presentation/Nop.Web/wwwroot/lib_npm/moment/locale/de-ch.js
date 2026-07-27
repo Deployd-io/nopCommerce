@@ -7,6 +7,7 @@
 import moment from '../moment';
 
 function processRelativeTime(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var format = {
         m: ['eine Minute', 'einer Minute'],
         h: ['eine Stunde', 'einer Stunde'],
@@ -18,6 +19,7 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
         y: ['ein Jahr', 'einem Jahr'],
         yy: [number + ' Jahre', number + ' Jahren'],
     };
+	logger.debug(`<<< Exiting processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return withoutSuffix ? format[key][0] : format[key][1];
 }
 

@@ -57,46 +57,56 @@ public class SpecificationAttributeValidatorTests : BaseNopTest
             Name = "Screen Size"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameIsSpecified()");
+		logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameIsSpecified()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameIsMinimalValidValue()
     {
+		logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameIsMinimalValidValue()");
         var model = new SpecificationAttributeModel
         {
             Name = "A"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameIsMinimalValidValue()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameContainsSpecialCharacters()
     {
+		logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameContainsSpecialCharacters()");
         var model = new SpecificationAttributeModel
         {
             Name = "CPU Speed (GHz)"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameContainsSpecialCharacters()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameContainsNumbers()
     {
+		logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameContainsNumbers()");
         var model = new SpecificationAttributeModel
         {
             Name = "USB 3.0 Ports"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameContainsNumbers()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameContainsUnicodeCharacters()
     {
+		logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameContainsUnicodeCharacters()");
         var model = new SpecificationAttributeModel
         {
             Name = "Größe"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameContainsUnicodeCharacters()");
     }
 
     #endregion
@@ -120,6 +130,7 @@ public class SpecificationAttributeValidatorTests : BaseNopTest
     [Test]
     public void ShouldFailValidationOnlyForNameWhenNameIsInvalid()
     {
+		logger.LogDebug(">>> Entering ShouldFailValidationOnlyForNameWhenNameIsInvalid()");
         var model = new SpecificationAttributeModel
         {
             Id = 1,
@@ -129,12 +140,15 @@ public class SpecificationAttributeValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug("ShouldFailValidationOnlyForNameWhenNameIsInvalid(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.DisplayOrder);
+		logger.LogDebug("<<< Exiting ShouldFailValidationOnlyForNameWhenNameIsInvalid()");
     }
 
     [Test]
     public void ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid()
     {
+		logger.LogDebug(">>> Entering ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid()");
         var model = new SpecificationAttributeModel
         {
             Name = "Battery Life",
@@ -143,7 +157,9 @@ public class SpecificationAttributeValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug("ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.DisplayOrder);
+		logger.LogDebug("<<< Exiting ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid()");
     }
 
     #endregion
@@ -153,6 +169,7 @@ public class SpecificationAttributeValidatorTests : BaseNopTest
     [Test]
     public void ShouldInheritDatabaseValidationRules()
     {
+		logger.LogDebug(">>> Entering ShouldInheritDatabaseValidationRules()");
         // The validator calls SetDatabaseValidationRules<SpecificationAttribute>()
         // This test ensures the method is called and basic validation works
         var model = new SpecificationAttributeModel
@@ -162,6 +179,8 @@ public class SpecificationAttributeValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveAnyValidationErrors();
+		logger.LogDebug("<<< Exiting ShouldInheritDatabaseValidationRules()");
+		logger.LogDebug("ShouldInheritDatabaseValidationRules(): result → {Result}", result);
     }
 
     #endregion
@@ -176,6 +195,8 @@ public class SpecificationAttributeGroupValidatorTests : BaseNopTest
     public void Setup()
     {
         _validator = new SpecificationAttributeGroupValidator(GetService<ILocalizationService>());
+		logger.LogDebug(">>> Entering Setup()");
+		logger.LogDebug("<<< Exiting Setup()");
     }
 
     #region Name Validation Tests
@@ -188,6 +209,8 @@ public class SpecificationAttributeGroupValidatorTests : BaseNopTest
             Name = null
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug(">>> Entering ShouldHaveErrorWhenNameIsNull()");
+		logger.LogDebug("<<< Exiting ShouldHaveErrorWhenNameIsNull()");
     }
 
     [Test]
@@ -198,6 +221,8 @@ public class SpecificationAttributeGroupValidatorTests : BaseNopTest
             Name = string.Empty
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug(">>> Entering ShouldHaveErrorWhenNameIsEmpty()");
+		logger.LogDebug("<<< Exiting ShouldHaveErrorWhenNameIsEmpty()");
     }
 
     [Test]
@@ -208,6 +233,8 @@ public class SpecificationAttributeGroupValidatorTests : BaseNopTest
             Name = "   "
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Name);
+		logger.LogDebug(">>> Entering ShouldHaveErrorWhenNameIsWhitespace()");
+		logger.LogDebug("<<< Exiting ShouldHaveErrorWhenNameIsWhitespace()");
     }
 
     [Test]
@@ -232,6 +259,8 @@ public class SpecificationAttributeGroupValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveAnyValidationErrors();
+		logger.LogDebug(">>> Entering ShouldPassValidationWhenAllPropertiesAreValid()");
+		logger.LogDebug("<<< Exiting ShouldPassValidationWhenAllPropertiesAreValid()");
     }
 
     #endregion
@@ -246,6 +275,7 @@ public class SpecificationAttributeOptionValidatorTests : BaseNopTest
     public void Setup()
     {
         _validator = new SpecificationAttributeOptionValidator(GetService<ILocalizationService>());
+		logger.LogDebug("Setup(): _validator → {_validator}", _validator);
     }
 
     #region Name Validation Tests
@@ -303,6 +333,7 @@ public class SpecificationAttributeOptionValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveAnyValidationErrors();
+		logger.LogDebug("ShouldPassValidationWhenAllPropertiesAreValid(): result → {Result}", result);
     }
 
     #endregion

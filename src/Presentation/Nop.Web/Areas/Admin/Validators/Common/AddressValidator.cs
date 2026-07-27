@@ -10,6 +10,7 @@ public partial class AddressValidator : BaseNopValidator<AddressModel>
 {
     public AddressValidator(AddressSettings addressSettings, ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering AddressValidator(addressSettings={AddressSettings},localizationService={LocalizationService})", addressSettings, localizationService);
         RuleFor(x => x.FirstName)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Address.Fields.FirstName.Required"))
@@ -67,5 +68,6 @@ public partial class AddressValidator : BaseNopValidator<AddressModel>
             .When(x => addressSettings.FaxEnabled && x.FaxRequired);
 
         SetDatabaseValidationRules<Address>();
+		logger.LogDebug("<<< Exiting AddressValidator(addressSettings={AddressSettings},localizationService={LocalizationService})", addressSettings, localizationService);
     }
 }

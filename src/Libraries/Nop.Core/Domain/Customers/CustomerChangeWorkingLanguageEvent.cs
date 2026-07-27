@@ -11,7 +11,10 @@ public partial class CustomerChangeWorkingLanguageEvent
     /// <param name="customer">Customer</param>
     public CustomerChangeWorkingLanguageEvent(Customer customer)
     {
+		logger.LogDebug(">>> Entering CustomerChangeWorkingLanguageEvent(customer={Customer})", customer);
         Customer = customer;
+		logger.LogDebug("<<< Exiting CustomerChangeWorkingLanguageEvent(customer={Customer})", customer);
+		logger.LogDebug("CustomerChangeWorkingLanguageEvent(customer={Customer}): Customer → {Customer1}", customer, Customer);
     }
 
     /// <summary>

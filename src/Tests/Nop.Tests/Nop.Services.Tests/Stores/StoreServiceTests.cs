@@ -13,12 +13,16 @@ public class StoreExtensionsTests : ServiceTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _storeService = GetService<IStoreService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _storeService → {_storeService}", _storeService);
     }
 
     [Test]
     public void CanFindHostValue()
     {
+		logger.LogDebug(">>> Entering CanFindHostValue()");
         var store = new Store
         {
             Hosts = "yourstore.com, www.yourstore.com, "
@@ -30,5 +34,6 @@ public class StoreExtensionsTests : ServiceTest
         _storeService.ContainsHostValue(store, "yourstore.com").Should().BeTrue();
         _storeService.ContainsHostValue(store, "yoursTore.com").Should().BeTrue();
         _storeService.ContainsHostValue(store, "www.yourstore.com").Should().BeTrue();
+		logger.LogDebug("<<< Exiting CanFindHostValue()");
     }
 }

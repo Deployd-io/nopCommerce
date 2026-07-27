@@ -82,6 +82,8 @@ public class EventConsumer :
     /// </returns>
     protected override async Task<bool> CheckAccessAsync()
     {
+		logger.LogDebug(">>> Entering CheckAccessAsync()");
+		logger.LogDebug("<<< Exiting CheckAccessAsync()");
         return await _permissionService.AuthorizeAsync(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS);
     }
 
@@ -95,8 +97,10 @@ public class EventConsumer :
     /// </returns>
     protected override async Task<AdminMenuItem> GetAdminMenuItemAsync(IPlugin plugin)
     {
+		logger.LogDebug(">>> Entering GetAdminMenuItemAsync(plugin={Plugin})", plugin);
         var descriptor = plugin.PluginDescriptor;
 
+		logger.LogDebug("<<< Exiting GetAdminMenuItemAsync(plugin={Plugin})", plugin);
         return new AdminMenuItem
         {
             Visible = true,
@@ -138,6 +142,9 @@ public class EventConsumer :
     {
         //delete customer's payment tokens
         await _serviceManager.DeletePaymentTokensAsync(_settings, eventMessage.CustomerId);
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): Title → {Title}", eventMessage, Title);
     }
 
     /// <summary>
@@ -160,11 +167,14 @@ public class EventConsumer :
 
         var (tokens, _) = await _serviceManager.GetPaymentTokensAsync(_settings);
         if (!_settings.UseVault && !tokens.Any())
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
             return;
 
         //add a new menu item in the customer navigation
         var orderItem = navigationModel.CustomerNavigationItems.FirstOrDefault(item => item.Tab == (int)CustomerNavigationEnum.Orders);
         var position = navigationModel.CustomerNavigationItems.IndexOf(orderItem) + 1;
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): orderItem → {OrderItem}", eventMessage, orderItem);
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): position → {Position}", eventMessage, position);
         navigationModel.CustomerNavigationItems.Insert(position, new()
         {
             RouteName = PayPalCommerceDefaults.Route.PaymentTokens,
@@ -172,6 +182,9 @@ public class EventConsumer :
             Tab = PayPalCommerceDefaults.PaymentTokensMenuTab,
             Title = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.PaymentTokens")
         });
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): RouteName → {RouteName}", eventMessage, RouteName);
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): ItemClass → {ItemClass}", eventMessage, ItemClass);
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): Tab → {Tab}", eventMessage, Tab);
     }
 
     /// <summary>

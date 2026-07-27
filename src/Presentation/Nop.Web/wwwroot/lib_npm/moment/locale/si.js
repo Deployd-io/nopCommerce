@@ -53,6 +53,7 @@ export default moment.defineLocale('si', {
     },
     dayOfMonthOrdinalParse: /\d{1,2} වැනි/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return number + ' වැනි';
     },
     meridiemParse: /පෙර වරු|පස් වරු|පෙ.ව|ප.ව./,
@@ -60,9 +61,11 @@ export default moment.defineLocale('si', {
         return input === 'ප.ව.' || input === 'පස් වරු';
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours > 11) {
             return isLower ? 'ප.ව.' : 'පස් වරු';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'පෙ.ව.' : 'පෙර වරු';
         }
     },

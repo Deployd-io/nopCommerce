@@ -11,21 +11,28 @@ public class ShippingOptionListTypeConverterTests
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         TypeDescriptor.AddAttributes(typeof(List<ShippingOption>),
             new TypeConverterAttribute(typeof(ShippingOptionListTypeConverter)));
+			logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [Test]
     public void CanGetTypeConverter()
     {
+		logger.LogDebug(">>> Entering CanGetTypeConverter()");
         var converter = TypeDescriptor.GetConverter(typeof(List<ShippingOption>));
         converter.GetType().Should().Be(typeof(ShippingOptionListTypeConverter));
+		logger.LogDebug("<<< Exiting CanGetTypeConverter()");
+		logger.LogDebug("CanGetTypeConverter(): converter → {Converter}", converter);
     }
 
     [Test]
     public void CanConvertShippingOptionListToStringAndBack()
     {
+		logger.LogDebug(">>> Entering CanConvertShippingOptionListToStringAndBack()");
         var shippingOptionsInput = new List<ShippingOption>
+		logger.LogDebug("<<< Exiting CanConvertShippingOptionListToStringAndBack()");
         {
             new() {
                 Name = "a1",

@@ -16,17 +16,28 @@ public class MeasureServiceTests : ServiceTest
     [OneTimeSetUp]
     public async Task SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _measureService = GetService<IMeasureService>();
 
+		logger.LogDebug("SetUp(): _measureService → {_measureService}", _measureService);
         _measureDimensionInches = await _measureService.GetMeasureDimensionBySystemKeywordAsync("inches");
+		logger.LogDebug("SetUp(): _measureDimensionInches → {_measureDimensionInches}", _measureDimensionInches);
         _measureDimensionFeet = await _measureService.GetMeasureDimensionBySystemKeywordAsync("feet");
         _measureDimensionMeters = await _measureService.GetMeasureDimensionBySystemKeywordAsync("meters");
+		logger.LogDebug("SetUp(): _measureDimensionFeet → {_measureDimensionFeet}", _measureDimensionFeet);
+		logger.LogDebug("SetUp(): _measureDimensionMeters → {_measureDimensionMeters}", _measureDimensionMeters);
         _measureDimensionMillimetres = await _measureService.GetMeasureDimensionBySystemKeywordAsync("millimetres");
 
+		logger.LogDebug("SetUp(): _measureDimensionMillimetres → {_measureDimensionMillimetres}", _measureDimensionMillimetres);
         _measureWeightOunce = await _measureService.GetMeasureWeightBySystemKeywordAsync("ounce");
         _measureWeightLb = await _measureService.GetMeasureWeightBySystemKeywordAsync("lb");
+		logger.LogDebug("SetUp(): _measureWeightOunce → {_measureWeightOunce}", _measureWeightOunce);
+		logger.LogDebug("SetUp(): _measureWeightLb → {_measureWeightLb}", _measureWeightLb);
         _measureWeightKg = await _measureService.GetMeasureWeightBySystemKeywordAsync("kg");
         _measureWeightGrams = await _measureService.GetMeasureWeightBySystemKeywordAsync("grams");
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _measureWeightKg → {_measureWeightKg}", _measureWeightKg);
+		logger.LogDebug("SetUp(): _measureWeightGrams → {_measureWeightGrams}", _measureWeightGrams);
     }
 
     [Test]
@@ -35,6 +46,7 @@ public class MeasureServiceTests : ServiceTest
         //from meter(s) to feet
         var newDimension = await _measureService.ConvertDimensionAsync(10, _measureDimensionMeters, _measureDimensionFeet);
         newDimension.Should().Be(32.81M);
+		logger.LogDebug("CanConvertDimension(): newDimension → {NewDimension}", newDimension);
         //from inch(es) to meter(s)
         newDimension = await _measureService.ConvertDimensionAsync(10, _measureDimensionInches, _measureDimensionMeters);
         newDimension.Should().Be(0.25M);
@@ -47,14 +59,17 @@ public class MeasureServiceTests : ServiceTest
         //from millimeter(s) to meter(s)
         newDimension = await _measureService.ConvertDimensionAsync(10000, _measureDimensionMillimetres, _measureDimensionMeters);
         newDimension.Should().Be(10);
+		logger.LogDebug("<<< Exiting CanConvertDimension()");
     }
 
     [Test]
     public async Task CanConvertWeight()
     {
+		logger.LogDebug(">>> Entering CanConvertWeight()");
         //from ounce(s) to lb(s)
         var newWeight = await _measureService.ConvertWeightAsync(11, _measureWeightOunce, _measureWeightLb);
         newWeight.Should().Be(0.69M);
+		logger.LogDebug("CanConvertWeight(): newWeight → {NewWeight}", newWeight);
         //from lb(s) to ounce(s)
         newWeight = await _measureService.ConvertWeightAsync(11, _measureWeightLb, _measureWeightOunce);
         newWeight.Should().Be(176);
@@ -67,6 +82,7 @@ public class MeasureServiceTests : ServiceTest
         //from kg(s) to gram(s)
         newWeight = await _measureService.ConvertWeightAsync(10, _measureWeightKg, _measureWeightGrams);
         newWeight.Should().Be(10000);
+		logger.LogDebug("<<< Exiting CanConvertWeight()");
     }
 
 }

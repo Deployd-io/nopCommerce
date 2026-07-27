@@ -72,11 +72,14 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// </returns>
     protected virtual async Task<IList<VendorAttributeModel>> PrepareVendorAttributesAsync(string vendorAttributesXml)
     {
+		logger.LogDebug(">>> Entering PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml})", vendorAttributesXml);
         var result = new List<VendorAttributeModel>();
 
+		logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): result → {Result}", vendorAttributesXml, result);
         var vendorAttributes = await _vendorAttributeService.GetAllAttributesAsync();
         foreach (var attribute in vendorAttributes)
         {
+		logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): vendorAttributes → {VendorAttributes}", vendorAttributesXml, vendorAttributes);
             var attributeModel = new VendorAttributeModel
             {
                 Id = attribute.Id,
@@ -91,6 +94,7 @@ public partial class VendorModelFactory : IVendorModelFactory
                 var attributeValues = await _vendorAttributeService.GetAttributeValuesAsync(attribute.Id);
                 foreach (var attributeValue in attributeValues)
                 {
+				logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): attributeValues → {AttributeValues}", vendorAttributesXml, attributeValues);
                     var valueModel = new VendorAttributeValueModel
                     {
                         Id = attributeValue.Id,
@@ -112,12 +116,14 @@ public partial class VendorModelFactory : IVendorModelFactory
                         //clear default selection
                         foreach (var item in attributeModel.Values)
                             item.IsPreSelected = false;
+							logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): item.IsPreSelected → {Arg1}", vendorAttributesXml, item.IsPreSelected);
 
                         //select new values
                         var selectedValues = await _vendorAttributeParser.ParseAttributeValuesAsync(vendorAttributesXml);
                         foreach (var attributeValue in selectedValues)
                         foreach (var item in attributeModel.Values)
                             if (attributeValue.Id == item.Id)
+						logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): selectedValues → {SelectedValues}", vendorAttributesXml, selectedValues);
                                 item.IsPreSelected = true;
                     }
                 }
@@ -135,6 +141,8 @@ public partial class VendorModelFactory : IVendorModelFactory
                     {
                         var enteredText = _vendorAttributeParser.ParseValues(vendorAttributesXml, attribute.Id);
                         if (enteredText.Any())
+							logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): enteredText → {EnteredText}", vendorAttributesXml, enteredText);
+							logger.LogDebug("PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml}): attributeModel.DefaultValue → {Arg1}", vendorAttributesXml, attributeModel.DefaultValue);
                             attributeModel.DefaultValue = enteredText[0];
                     }
                 }
@@ -151,6 +159,7 @@ public partial class VendorModelFactory : IVendorModelFactory
             result.Add(attributeModel);
         }
 
+		logger.LogDebug("<<< Exiting PrepareVendorAttributesAsync(vendorAttributesXml={VendorAttributesXml})", vendorAttributesXml);
         return result;
     }
 

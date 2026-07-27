@@ -65,6 +65,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionSearchModel> PrepareNewsLetterSubscriptionSearchModelAsync(NewsLetterSubscriptionSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -98,6 +99,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -111,11 +113,13 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionListModel> PrepareNewsLetterSubscriptionListModelAsync(NewsLetterSubscriptionSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter newsletter subscriptions
         var isActivatedOnly = searchModel.ActiveId == 0 ? null : searchModel.ActiveId == 1 ? true : (bool?)false;
         var startDateValue = !searchModel.StartDate.HasValue ? null
+			logger.LogDebug("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): isActivatedOnly → {IsActivatedOnly}", searchModel, isActivatedOnly);
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
@@ -132,6 +136,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
 
         var types = await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync(searchModel.StoreId);
 
+		logger.LogDebug("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): types → {Types}", searchModel, types);
         //prepare list model
         var model = await new NewsLetterSubscriptionListModel().PrepareToGridAsync(searchModel, newsletterSubscriptions, () =>
         {
@@ -140,6 +145,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
                 //fill in model values from the entity
                 var subscriptionModel = subscription.ToModel<NewsLetterSubscriptionModel>();
 
+				logger.LogDebug("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): subscriptionModel → {SubscriptionModel}", searchModel, subscriptionModel);
                 //convert dates to the user time
                 subscriptionModel.CreatedOn = (await _dateTimeHelper.ConvertToUserTimeAsync(subscription.CreatedOnUtc, DateTimeKind.Utc)).ToString();
 
@@ -153,6 +159,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

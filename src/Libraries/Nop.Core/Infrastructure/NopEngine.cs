@@ -21,12 +21,15 @@ public partial class NopEngine : IEngine
     /// <returns>IServiceProvider</returns>
     protected virtual IServiceProvider GetServiceProvider(IServiceScope scope = null)
     {
+		logger.LogDebug(">>> Entering GetServiceProvider(scope={Scope})", scope);
         if (scope == null)
         {
             var accessor = ServiceProvider?.GetService<IHttpContextAccessor>();
             var context = accessor?.HttpContext;
+			logger.LogDebug("GetServiceProvider(scope={Scope}): accessor → {Accessor}", scope, accessor);
             return context?.RequestServices ?? ServiceProvider;
         }
+		logger.LogDebug("<<< Exiting GetServiceProvider(scope={Scope})", scope);
         return scope.ServiceProvider;
     }
 
@@ -35,10 +38,12 @@ public partial class NopEngine : IEngine
     /// </summary>
     protected virtual void RunStartupTasks()
     {
+		logger.LogDebug(">>> Entering RunStartupTasks()");
         //find startup tasks provided by other assemblies
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var startupTasks = typeFinder.FindClassesOfType<IStartupTask>();
 
+		logger.LogDebug("RunStartupTasks(): startupTasks → {StartupTasks}", startupTasks);
         //create and sort instances of startup tasks
         //we startup this interface even for not installed plugins. 
         //otherwise, DbContext initializers won't run and a plugin installation won't work
@@ -50,6 +55,7 @@ public partial class NopEngine : IEngine
         //execute tasks
         foreach (var task in instances)
             task.Execute();
+			logger.LogDebug("<<< Exiting RunStartupTasks()");
     }
 
     /// <summary>
@@ -57,10 +63,12 @@ public partial class NopEngine : IEngine
     /// </summary>
     protected virtual void AddAutoMapper()
     {
+		logger.LogDebug(">>> Entering AddAutoMapper()");
         //find mapper configurations provided by other assemblies
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var mapperConfigurations = typeFinder.FindClassesOfType<IOrderedMapperProfile>();
 
+		logger.LogDebug("AddAutoMapper(): mapperConfigurations → {MapperConfigurations}", mapperConfigurations);
         //create and sort instances of mapper configurations
         var instances = mapperConfigurations
             .Select(mapperConfiguration => (IOrderedMapperProfile)Activator.CreateInstance(mapperConfiguration))
@@ -76,20 +84,25 @@ public partial class NopEngine : IEngine
 
         //register
         AutoMapperConfiguration.Init(config);
+		logger.LogDebug("<<< Exiting AddAutoMapper()");
     }
 
     protected virtual Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
     {
+		logger.LogDebug(">>> Entering CurrentDomain_AssemblyResolve(sender={Sender},args={Args})", sender, args);
         var assemblyFullName = args.Name;
 
         //check for assembly already loaded
         var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == assemblyFullName);
         if (assembly != null)
+			logger.LogDebug("CurrentDomain_AssemblyResolve(sender={Sender},args={Args}): assembly → {Assembly}", sender, args, assembly);
             return assembly;
 
         //get assembly from TypeFinder
         var typeFinder = Singleton<ITypeFinder>.Instance;
 
+		logger.LogDebug(">>> Entering Resolve(scope={Scope})", scope);
+		logger.LogDebug("<<< Exiting Resolve(scope={Scope})", scope);
         return typeFinder?.GetAssemblyByName(assemblyFullName);
     }
 
@@ -104,6 +117,7 @@ public partial class NopEngine : IEngine
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //register engine
         services.AddSingleton<IEngine>(this);
 
@@ -111,6 +125,7 @@ public partial class NopEngine : IEngine
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var startupConfigurations = typeFinder.FindClassesOfType<INopStartup>();
 
+		logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): startupConfigurations → {StartupConfigurations}", services, configuration, startupConfigurations);
         //create and sort instances of startup configurations
         var instances = startupConfigurations
             .Select(startup => (INopStartup)Activator.CreateInstance(startup))
@@ -131,6 +146,7 @@ public partial class NopEngine : IEngine
 
         //resolve assemblies here. otherwise, plugins can throw an exception when rendering views
         AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+		logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -139,12 +155,15 @@ public partial class NopEngine : IEngine
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void ConfigureRequestPipeline(IApplicationBuilder application)
     {
+		logger.LogDebug(">>> Entering ConfigureRequestPipeline(application={Application})", application);
         ServiceProvider = application.ApplicationServices;
 
+		logger.LogDebug("ConfigureRequestPipeline(application={Application}): ServiceProvider → {ServiceProvider}", application, ServiceProvider);
         //find startup configurations provided by other assemblies
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var startupConfigurations = typeFinder.FindClassesOfType<INopStartup>();
 
+		logger.LogDebug("ConfigureRequestPipeline(application={Application}): startupConfigurations → {StartupConfigurations}", application, startupConfigurations);
         //create and sort instances of startup configurations
         var instances = startupConfigurations
             .Select(startup => (INopStartup)Activator.CreateInstance(startup))
@@ -154,6 +173,7 @@ public partial class NopEngine : IEngine
         //configure request pipeline
         foreach (var instance in instances)
             instance.Configure(application);
+			logger.LogDebug("<<< Exiting ConfigureRequestPipeline(application={Application})", application);
     }
 
     /// <summary>
@@ -185,6 +205,7 @@ public partial class NopEngine : IEngine
     /// <returns>Collection of resolved services</returns>
     public virtual IEnumerable<T> ResolveAll<T>()
     {
+		logger.LogDebug(">>> Entering ResolveAll()");
         return (IEnumerable<T>)GetServiceProvider().GetServices(typeof(T));
     }
 
@@ -195,9 +216,11 @@ public partial class NopEngine : IEngine
     /// <returns>Resolved service</returns>
     public virtual object ResolveUnregistered(Type type)
     {
+		logger.LogDebug(">>> Entering ResolveUnregistered(type={Type})", type);
         Exception innerException = null;
         foreach (var constructor in type.GetConstructors())
             try
+			logger.LogDebug("ResolveUnregistered(type={Type}): innerException → {InnerException}", type, innerException);
             {
                 //try to resolve constructor parameters
                 var parameters = constructor.GetParameters().Select(parameter =>
@@ -207,6 +230,7 @@ public partial class NopEngine : IEngine
                 });
 
                 //all is ok, so create instance
+				logger.LogDebug("<<< Exiting ResolveUnregistered(type={Type})", type);
                 return Activator.CreateInstance(type, parameters.ToArray());
             }
             catch (Exception ex)

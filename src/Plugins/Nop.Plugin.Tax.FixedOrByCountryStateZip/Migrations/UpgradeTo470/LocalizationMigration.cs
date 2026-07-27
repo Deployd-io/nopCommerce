@@ -12,15 +12,19 @@ public class LocalizationMigration : MigrationBase
 {
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
         var (languageId, _) = this.GetLanguageData();
 
         //use localizationService to add, update and delete localization resources
@@ -35,5 +39,6 @@ public class LocalizationMigration : MigrationBase
                     </p>",
 
         }, languageId);
+		logger.LogDebug("<<< Exiting Up()");
     }
 }

@@ -77,6 +77,8 @@ public class EventConsumer :
     {
         if (eventMessage?.Model is ProductDetailsModel productDetailsModel)
             await _facebookPixelService.SendViewContentEventAsync(productDetailsModel);
+			logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -86,8 +88,10 @@ public class EventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(PageRenderingEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         var routeName = eventMessage.GetRouteName() ?? string.Empty;
         if (routeName == NopRouteNames.Standard.CHECKOUT || routeName == NopRouteNames.Standard.CHECKOUT_ONE_PAGE)
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): routeName → {RouteName}", eventMessage, routeName);
             await _facebookPixelService.SendInitiateCheckoutEventAsync();
 
         if (_httpContextAccessor.HttpContext.GetRouteValue("area") is not string area || area != AreaNames.ADMIN)

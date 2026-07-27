@@ -15,6 +15,7 @@ public class SpecificationAttributeGroupingMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!Schema.Table(NameCompatibilityManager.GetTableName(typeof(SpecificationAttributeGroup))).Exists())
             Create.TableFor<SpecificationAttributeGroup>();
 
@@ -24,6 +25,7 @@ public class SpecificationAttributeGroupingMigration : ForwardOnlyMigration
             Alter.Table(NameCompatibilityManager.GetTableName(typeof(SpecificationAttribute)))
                 .AddColumn(nameof(SpecificationAttribute.SpecificationAttributeGroupId)).AsInt32().Nullable().ForeignKey<SpecificationAttributeGroup>();
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     #endregion

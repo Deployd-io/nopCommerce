@@ -15,6 +15,8 @@ public partial class GenericAttributeCacheEventConsumer : CacheEventConsumer<Gen
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(GenericAttribute entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCommonDefaults.GenericAttributeCacheKey, entity.EntityId, entity.KeyGroup);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

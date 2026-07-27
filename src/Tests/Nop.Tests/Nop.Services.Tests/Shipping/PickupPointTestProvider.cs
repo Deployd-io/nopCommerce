@@ -45,10 +45,13 @@ internal class PickupPointTestProvider : BasePlugin, IPickupPointProvider
     /// </returns>
     public async Task<GetPickupPointsResponse> GetPickupPointsAsync(IList<ShoppingCartItem> cart, Address address)
     {
+		logger.LogDebug(">>> Entering GetPickupPointsAsync(cart={Cart},address={Address})", cart, address);
         var result = new GetPickupPointsResponse();
 
+		logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address}): result → {Result}", cart, address, result);
         var pointAddress = await _addressService.GetAddressByIdAsync(1);
 
+		logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address}): pointAddress → {PointAddress}", cart, address, pointAddress);
         for (var point = 1; point <= 3; point++)
             result.PickupPoints.Add(new PickupPoint
             {
@@ -65,11 +68,14 @@ internal class PickupPointTestProvider : BasePlugin, IPickupPointProvider
                 ProviderSystemName = PluginDescriptor.SystemName
             });
 
+		logger.LogDebug("<<< Exiting GetPickupPointsAsync(cart={Cart},address={Address})", cart, address);
         return result;
     }
 
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 

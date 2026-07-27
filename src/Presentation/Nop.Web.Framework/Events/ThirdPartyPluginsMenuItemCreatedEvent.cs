@@ -16,7 +16,10 @@ public partial class ThirdPartyPluginsMenuItemCreatedEvent : BaseMenuItemCreated
     /// <param name="rootMenuItem">Third party plugins menu item</param>
     public ThirdPartyPluginsMenuItemCreatedEvent(IAdminMenu adminMenu, AdminMenuItem rootMenuItem) : base(adminMenu)
     {
+		logger.LogDebug(">>> Entering ThirdPartyPluginsMenuItemCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem})", adminMenu, rootMenuItem);
         MenuItem = rootMenuItem;
+		logger.LogDebug("<<< Exiting ThirdPartyPluginsMenuItemCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem})", adminMenu, rootMenuItem);
+		logger.LogDebug("ThirdPartyPluginsMenuItemCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem}): MenuItem → {MenuItem}", adminMenu, rootMenuItem, MenuItem);
     }
 
     #endregion

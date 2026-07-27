@@ -11,7 +11,9 @@ public partial class ReviewTypeCacheEventConsumer : CacheEventConsumer<ReviewTyp
 {
     public override async Task HandleEventAsync(EntityDeletedEvent<ReviewType> eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductReviewTypeMappingByReviewIdPrefix);
         await base.HandleEventAsync(eventMessage);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 }

@@ -24,17 +24,24 @@ public class AddressModelFactoryTests : BaseNopTest
     [OneTimeSetUp]
     public async Task SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _addressModelFactory = GetService<IAddressModelFactory>();
 
+		logger.LogDebug("SetUp(): _addressModelFactory → {_addressModelFactory}", _addressModelFactory);
         _address = await GetService<IAddressService>().GetAddressByIdAsync(1);
+		logger.LogDebug("SetUp(): _address → {_address}", _address);
         _addressSettings = GetService<AddressSettings>();
         _countryService = GetService<ICountryService>();
+		logger.LogDebug("SetUp(): _addressSettings → {_addressSettings}", _addressSettings);
+		logger.LogDebug("SetUp(): _countryService → {_countryService}", _countryService);
 
         _addressAttributeService = GetService<IAttributeService<AddressAttribute, AddressAttributeValue>>();
         _testAddressAttribute = new AddressAttribute
+		logger.LogDebug("SetUp(): _addressAttributeService → {_addressAttributeService}", _addressAttributeService);
         {
             Name = "Test address attribute",
             AttributeControlType = AttributeControlType.Checkboxes
+			logger.LogDebug("SetUp(): _testAddressAttribute → {_testAddressAttribute}", _testAddressAttribute);
         };
 
         await _addressAttributeService.InsertAttributeAsync(_testAddressAttribute);
@@ -54,20 +61,26 @@ public class AddressModelFactoryTests : BaseNopTest
             AttributeId = _testAddressAttribute.Id,
             Name = "Value 3"
         });
+		logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
     public async Task TearDown()
     {
+		logger.LogDebug(">>> Entering TearDown()");
         var addressAttributes = await _addressAttributeService.GetAllAttributesAsync();
         await _addressAttributeService.DeleteAttributesAsync(addressAttributes);
+		logger.LogDebug("<<< Exiting TearDown()");
+		logger.LogDebug("TearDown(): addressAttributes → {AddressAttributes}", addressAttributes);
     }
 
     [Test]
     public async Task PrepareAddressModelShouldPopulatingPropertiesFromEntity()
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelShouldPopulatingPropertiesFromEntity()");
         var model = new AddressModel();
         await _addressModelFactory.PrepareAddressModelAsync(model, _address, false, _addressSettings);
+		logger.LogDebug("PrepareAddressModelShouldPopulatingPropertiesFromEntity(): model → {Model}", model);
 
         model.Id.Should().Be(_address.Id);
         model.FirstName.Should().Be(_address.FirstName);
@@ -84,13 +97,16 @@ public class AddressModelFactoryTests : BaseNopTest
         model.PhoneNumber.Should().Be(_address.PhoneNumber);
         model.FaxNumber.Should().Be(_address.FaxNumber);
         model.CustomAddressAttributes.Any().Should().BeTrue();
+		logger.LogDebug("<<< Exiting PrepareAddressModelShouldPopulatingPropertiesFromEntity()");
     }
 
     [Test]
     public async Task PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfExcludePropertiesFlagEnabled()
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfExcludePropertiesFlagEnabled()");
         var model = new AddressModel();
         await _addressModelFactory.PrepareAddressModelAsync(model, _address, true, _addressSettings);
+		logger.LogDebug("PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfExcludePropertiesFlagEnabled(): model → {Model}", model);
 
         model.Id.Should().Be(0);
         model.FirstName.Should().BeNull();
@@ -107,13 +123,16 @@ public class AddressModelFactoryTests : BaseNopTest
         model.PhoneNumber.Should().BeNull();
         model.FaxNumber.Should().BeNull();
         model.CustomAddressAttributes.Any().Should().BeTrue();
+		logger.LogDebug("<<< Exiting PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfExcludePropertiesFlagEnabled()");
     }
 
     [Test]
     public async Task PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfEntityIsNull()
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfEntityIsNull()");
         var model = new AddressModel();
         await _addressModelFactory.PrepareAddressModelAsync(model, null, false, _addressSettings);
+		logger.LogDebug("PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfEntityIsNull(): model → {Model}", model);
 
         model.Id.Should().Be(0);
         model.FirstName.Should().BeNull();
@@ -130,22 +149,29 @@ public class AddressModelFactoryTests : BaseNopTest
         model.PhoneNumber.Should().BeNull();
         model.FaxNumber.Should().BeNull();
         model.CustomAddressAttributes.Any().Should().BeTrue();
+		logger.LogDebug("<<< Exiting PrepareAddressModelShouldNotPopulatingPropertiesFromEntityIfEntityIsNull()");
     }
 
     [Test]
     public void PrepareAddressModelShouldRaiseExceptionIfPrePopulateWithCustomerFieldsFlagEnabledButCustomerNotPassed()
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelShouldRaiseExceptionIfPrePopulateWithCustomerFieldsFlagEnabledButCustomerNotPassed()");
         var model = new AddressModel();
 
+		logger.LogDebug("PrepareAddressModelShouldRaiseExceptionIfPrePopulateWithCustomerFieldsFlagEnabledButCustomerNotPassed(): model → {Model}", model);
         Assert.Throws<AggregateException>(() =>
             _addressModelFactory.PrepareAddressModelAsync(model, null, false, _addressSettings,
                 prePopulateWithCustomerFields: true).Wait());
+				logger.LogDebug("<<< Exiting PrepareAddressModelShouldRaiseExceptionIfPrePopulateWithCustomerFieldsFlagEnabledButCustomerNotPassed()");
     }
 
     [Test]
     public async Task PrepareAddressModelShouldFillAvailableCountriesAndAvailableStates()
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelShouldFillAvailableCountriesAndAvailableStates()");
         var model = new AddressModel();
+		logger.LogDebug("<<< Exiting PrepareAddressModelShouldFillAvailableCountriesAndAvailableStates()");
+		logger.LogDebug("PrepareAddressModelShouldFillAvailableCountriesAndAvailableStates(): model → {Model}", model);
         await _addressModelFactory.PrepareAddressModelAsync(model, null, false, _addressSettings,
             async () => await _countryService.GetAllCountriesAsync());
         model.AvailableCountries.Any().Should().BeTrue();
@@ -175,8 +201,11 @@ public class AddressModelFactoryTests : BaseNopTest
     [Test]
     public async Task PrepareAddressModelShouldFillCustomersInfoIfPrePopulateWithCustomerFieldsFlagEnabledAndCustomerPassed()
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelShouldFillCustomersInfoIfPrePopulateWithCustomerFieldsFlagEnabledAndCustomerPassed()");
         var model = new AddressModel();
         var customer = await GetService<IWorkContext>().GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareAddressModelShouldFillCustomersInfoIfPrePopulateWithCustomerFieldsFlagEnabledAndCustomerPassed(): model → {Model}", model);
+		logger.LogDebug("PrepareAddressModelShouldFillCustomersInfoIfPrePopulateWithCustomerFieldsFlagEnabledAndCustomerPassed(): customer → {Customer}", customer);
         await _addressModelFactory.PrepareAddressModelAsync(model, null, false, _addressSettings,
             prePopulateWithCustomerFields: true, customer: customer);
 
@@ -192,5 +221,6 @@ public class AddressModelFactoryTests : BaseNopTest
         model.County.Should().Be(customer.County);
         model.PhoneNumber.Should().Be(customer.Phone);
         model.FaxNumber.Should().Be(customer.Fax);
+		logger.LogDebug("<<< Exiting PrepareAddressModelShouldFillCustomersInfoIfPrePopulateWithCustomerFieldsFlagEnabledAndCustomerPassed()");
     }
 }

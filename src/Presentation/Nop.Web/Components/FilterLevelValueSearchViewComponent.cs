@@ -20,13 +20,16 @@ public partial class FilterLevelValueSearchViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (_filterLevelSettings.FilterLevelEnabled && _filterLevelSettings.DisplayOnHomePage)
         {
             var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueSearchModelAsync(new FilterLevelValueSearchModel());
 
+			logger.LogDebug("InvokeAsync(): model → {Model}", model);
             return View(model);
         }
 
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return Content(string.Empty);
     }
 }

@@ -15,9 +15,11 @@ public partial class DiscountCacheEventConsumer : CacheEventConsumer<Discount>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Discount entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopDiscountDefaults.DiscountRequirementsByDiscountCacheKey, entity);
         await RemoveByPrefixAsync(NopDiscountDefaults.CategoryIdsByDiscountPrefix, entity);
         await RemoveByPrefixAsync(NopDiscountDefaults.ManufacturerIdsByDiscountPrefix, entity);
         await RemoveByPrefixAsync(NopDiscountDefaults.AppliedDiscountsCachePrefix);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

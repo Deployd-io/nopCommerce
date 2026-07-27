@@ -10,6 +10,7 @@ public partial class LoginValidator : BaseNopValidator<LoginModel>
 {
     public LoginValidator(ILocalizationService localizationService, CustomerSettings customerSettings)
     {
+		logger.LogDebug(">>> Entering LoginValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
         if (!customerSettings.UsernamesEnabled)
         {
             //login by email
@@ -18,5 +19,6 @@ public partial class LoginValidator : BaseNopValidator<LoginModel>
                 .IsEmailAddress()
                 .WithMessageAwait(localizationService.GetResourceAsync("Common.WrongEmail"));
         }
+		logger.LogDebug("<<< Exiting LoginValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
     }
 }

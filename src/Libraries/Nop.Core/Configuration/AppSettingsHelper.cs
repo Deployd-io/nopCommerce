@@ -27,6 +27,7 @@ public partial class AppSettingsHelper
     /// <returns>App settings</returns>
     public static AppSettings SaveAppSettings(IList<IConfig> configurations, INopFileProvider fileProvider, bool overwrite = true)
     {
+		logger.LogDebug(">>> Entering SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite})", configurations, fileProvider, overwrite);
         ArgumentNullException.ThrowIfNull(configurations);
 
         _configurationOrder = configurations.ToDictionary(config => config.Name, config => config.GetOrder());
@@ -34,11 +35,14 @@ public partial class AppSettingsHelper
         //create app settings
         var appSettings = Singleton<AppSettings>.Instance ?? new AppSettings();
         appSettings.Update(configurations);
+		logger.LogDebug("SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite}): appSettings → {AppSettings}", configurations, fileProvider, overwrite, appSettings);
         Singleton<AppSettings>.Instance = appSettings;
 
         //create file if not exists
         var filePath = fileProvider.MapPath(NopConfigurationDefaults.AppSettingsFilePath);
         var fileExists = fileProvider.FileExists(filePath);
+		logger.LogDebug("SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite}): filePath → {FilePath}", configurations, fileProvider, overwrite, filePath);
+		logger.LogDebug("SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite}): fileExists → {FileExists}", configurations, fileProvider, overwrite, fileExists);
         fileProvider.CreateFile(filePath);
 
         //get raw configuration parameters
@@ -52,6 +56,7 @@ public partial class AppSettingsHelper
 
         //sort configurations for display by order (e.g. data configuration with 0 will be the first)
         appSettings.Configuration = configuration
+			logger.LogDebug("SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite}): appSettings.Configuration → {Arg3}", configurations, fileProvider, overwrite, appSettings.Configuration);
             .SelectMany(outConfig => _configurationOrder.Where(inConfig => inConfig.Key == outConfig.Key).DefaultIfEmpty(),
                 (outConfig, inConfig) => new { OutConfig = outConfig, InConfig = inConfig })
             .OrderBy(config => config.InConfig.Value)
@@ -63,8 +68,10 @@ public partial class AppSettingsHelper
         {
             var text = JsonConvert.SerializeObject(appSettings, Formatting.Indented);
             fileProvider.WriteAllText(filePath, text, Encoding.UTF8);
+			logger.LogDebug("SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite}): text → {Text}", configurations, fileProvider, overwrite, text);
         }
 
+		logger.LogDebug("<<< Exiting SaveAppSettings(configurations={Configurations},fileProvider={FileProvider},overwrite={Overwrite})", configurations, fileProvider, overwrite);
         return appSettings;
     }
 

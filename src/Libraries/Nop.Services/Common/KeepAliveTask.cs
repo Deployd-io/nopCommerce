@@ -17,7 +17,10 @@ public partial class KeepAliveTask : IScheduleTask
 
     public KeepAliveTask(StoreHttpClient storeHttpClient)
     {
+		logger.LogDebug(">>> Entering KeepAliveTask(storeHttpClient={StoreHttpClient})", storeHttpClient);
         _storeHttpClient = storeHttpClient;
+		logger.LogDebug("<<< Exiting KeepAliveTask(storeHttpClient={StoreHttpClient})", storeHttpClient);
+		logger.LogDebug("KeepAliveTask(storeHttpClient={StoreHttpClient}): _storeHttpClient → {_storeHttpClient}", storeHttpClient, _storeHttpClient);
     }
 
     #endregion
@@ -29,8 +32,14 @@ public partial class KeepAliveTask : IScheduleTask
     /// </summary>
     public virtual async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _storeHttpClient.KeepAliveAsync();
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("ExecuteAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("ExecuteAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     #endregion
 }

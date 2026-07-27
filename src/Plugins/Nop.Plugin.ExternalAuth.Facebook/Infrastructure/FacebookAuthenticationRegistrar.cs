@@ -18,19 +18,23 @@ public class FacebookAuthenticationRegistrar : IExternalAuthenticationRegistrar
     /// <param name="builder">Authentication builder</param>
     public void Configure(AuthenticationBuilder builder)
     {
+		logger.LogDebug(">>> Entering Configure(builder={Builder})", builder);
         builder.AddFacebook(FacebookDefaults.AuthenticationScheme, options =>
         {
             //set credentials
             var settings = EngineContext.Current.Resolve<FacebookExternalAuthSettings>();
 
+			logger.LogDebug("Configure(builder={Builder}): settings → {Settings}", builder, settings);
             options.AppId = string.IsNullOrEmpty(settings?.ClientKeyIdentifier) ? nameof(options.AppId) : settings.ClientKeyIdentifier;
             options.AppSecret = string.IsNullOrEmpty(settings?.ClientSecret) ? nameof(options.AppSecret) : settings.ClientSecret;
 
             //store access and refresh tokens for the further usage
             options.SaveTokens = true;
+			logger.LogDebug("Configure(builder={Builder}): options.SaveTokens → {Arg1}", builder, options.SaveTokens);
 
             //set custom events handlers
             options.Events = new OAuthEvents
+			logger.LogDebug("Configure(builder={Builder}): options.Events → {Arg1}", builder, options.Events);
             {
                 //in case of error, redirect the user to the specified URL
                 OnRemoteFailure = context =>
@@ -44,5 +48,6 @@ public class FacebookAuthenticationRegistrar : IExternalAuthenticationRegistrar
                 }
             };
         });
+		logger.LogDebug("<<< Exiting Configure(builder={Builder})", builder);
     }
 }

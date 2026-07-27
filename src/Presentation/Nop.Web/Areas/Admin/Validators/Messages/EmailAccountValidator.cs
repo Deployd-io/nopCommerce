@@ -10,6 +10,7 @@ public partial class EmailAccountValidator : BaseNopValidator<EmailAccountModel>
 {
     public EmailAccountValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering EmailAccountValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Email).NotEmpty();
         RuleFor(x => x.Email)
             .IsEmailAddress()
@@ -30,5 +31,6 @@ public partial class EmailAccountValidator : BaseNopValidator<EmailAccountModel>
             .When(x => x.EmailAuthenticationMethod == EmailAuthenticationMethod.MicrosoftOAuth2);
 
         SetDatabaseValidationRules<EmailAccount>();
+		logger.LogDebug("<<< Exiting EmailAccountValidator(localizationService={LocalizationService})", localizationService);
     }
 }

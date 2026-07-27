@@ -68,6 +68,7 @@ public class GoogleAuthenticatorController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //prepare model
         var model = new ConfigurationModel
         {
@@ -77,6 +78,7 @@ public class GoogleAuthenticatorController : BasePluginController
         model.GoogleAuthenticatorSearchModel.HideSearchBlock = await _genericAttributeService
             .GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), GoogleAuthenticatorDefaults.HideSearchBlockAttribute);
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/MultiFactorAuth.GoogleAuthenticator/Views/Configure.cshtml", model);
     }
 
@@ -101,6 +103,7 @@ public class GoogleAuthenticatorController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public async Task<IActionResult> GoogleAuthenticatorList(GoogleAuthenticatorSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering GoogleAuthenticatorList(searchModel={SearchModel})", searchModel);
         //get GoogleAuthenticator configuration records
         var configurations = await _googleAuthenticatorService.GetPagedConfigurationsAsync(searchModel.SearchEmail,
             searchModel.Page - 1, searchModel.PageSize);
@@ -115,6 +118,7 @@ public class GoogleAuthenticatorController : BasePluginController
             });
         });
 
+		logger.LogDebug("<<< Exiting GoogleAuthenticatorList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

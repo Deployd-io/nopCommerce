@@ -46,6 +46,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
     /// </summary>
     protected virtual async Task PerformTaskAsync(ScheduleTask scheduleTask)
     {
+		logger.LogDebug(">>> Entering PerformTaskAsync(scheduleTask={ScheduleTask})", scheduleTask);
         var type = (Type.GetType(scheduleTask.Type) ??
                     //ensure that it works fine when only the type name is specified (do not require fully qualified names)
                     AppDomain.CurrentDomain.GetAssemblies()
@@ -54,12 +55,14 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
 
         object instance = null;
 
+		logger.LogDebug("PerformTaskAsync(scheduleTask={ScheduleTask}): instance → {Instance}", scheduleTask, instance);
         try
         {
             instance = EngineContext.Current.Resolve(type);
         }
         catch
         {
+			logger.LogError("Exception in PerformTaskAsync(scheduleTask={ScheduleTask}): {Arg1}", scheduleTask, ex.Message);
             // ignored
         }
 
@@ -69,12 +72,15 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
             return;
 
         scheduleTask.LastStartUtc = DateTime.UtcNow;
+		logger.LogDebug("PerformTaskAsync(scheduleTask={ScheduleTask}): scheduleTask.LastStartUtc → {Arg1}", scheduleTask, scheduleTask.LastStartUtc);
         //update appropriate datetime properties
         await _scheduleTaskService.UpdateTaskAsync(scheduleTask);
         await task.ExecuteAsync();
         scheduleTask.LastEndUtc = scheduleTask.LastSuccessUtc = DateTime.UtcNow;
+		logger.LogDebug("PerformTaskAsync(scheduleTask={ScheduleTask}): scheduleTask.LastEndUtc → {Arg1}", scheduleTask, scheduleTask.LastEndUtc);
         //update appropriate datetime properties
         await _scheduleTaskService.UpdateTaskAsync(scheduleTask);
+		logger.LogDebug("<<< Exiting PerformTaskAsync(scheduleTask={ScheduleTask})", scheduleTask);
     }
 
     /// <summary>
@@ -84,6 +90,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
     /// <returns>Result</returns>
     protected virtual bool IsTaskAlreadyRunning(ScheduleTask scheduleTask)
     {
+		logger.LogDebug(">>> Entering IsTaskAlreadyRunning(scheduleTask={ScheduleTask})", scheduleTask);
         //task run for the first time
         if (!scheduleTask.LastStartUtc.HasValue && !scheduleTask.LastEndUtc.HasValue)
             return false;
@@ -96,6 +103,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
 
         //task wasn't finished last time
         if (lastStartUtc.AddSeconds(scheduleTask.Seconds) <= DateTime.UtcNow)
+		logger.LogDebug("<<< Exiting IsTaskAlreadyRunning(scheduleTask={ScheduleTask})", scheduleTask);
             return false;
 
         return true;
@@ -114,8 +122,10 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
     /// <param name="ensureRunOncePerPeriod">A value indicating whether we should ensure this task is run once per run period</param>
     public virtual async Task ExecuteAsync(ScheduleTask scheduleTask, bool forceRun = false, bool throwException = false, bool ensureRunOncePerPeriod = true)
     {
+		logger.LogDebug(">>> Entering ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod})", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod);
         var enabled = forceRun || (scheduleTask?.Enabled ?? false);
 
+		logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): enabled → {Enabled}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, enabled);
         if (scheduleTask == null || !enabled)
             return;
 
@@ -136,16 +146,23 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
             //get expiration time
             var expirationInSeconds = Math.Min(scheduleTask.Seconds, 300) - 1;
             var expiration = TimeSpan.FromSeconds(expirationInSeconds);
+			logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): expirationInSeconds → {ExpirationInSeconds}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, expirationInSeconds);
+			logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): expiration → {Expiration}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, expiration);
 
             //execute task with lock
             await _locker.PerformActionWithLockAsync(scheduleTask.Type, expiration, () => PerformTaskAsync(scheduleTask));
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): {Arg4}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, ex.Message);
             var store = await _storeContext.GetCurrentStoreAsync();
 
+			logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): store → {Store}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, store);
             var scheduleTaskUrl = $"{store.Url}{NopTaskDefaults.ScheduleTaskPath}";
 
+			logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): scheduleTaskUrl → {ScheduleTaskUrl}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, scheduleTaskUrl);
+			logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): scheduleTask.Enabled → {Arg4}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, scheduleTask.Enabled);
+			logger.LogDebug("ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod}): scheduleTask.LastEndUtc → {Arg4}", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod, scheduleTask.LastEndUtc);
             scheduleTask.Enabled = scheduleTask.Enabled && !scheduleTask.StopOnError;
             scheduleTask.LastEndUtc = DateTime.UtcNow;
             await _scheduleTaskService.UpdateTaskAsync(scheduleTask);
@@ -158,6 +175,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
             if (throwException)
                 throw;
         }
+		logger.LogDebug("<<< Exiting ExecuteAsync(scheduleTask={ScheduleTask},forceRun={ForceRun},throwException={ThrowException},ensureRunOncePerPeriod={EnsureRunOncePerPeriod})", scheduleTask, forceRun, throwException, ensureRunOncePerPeriod);
     }
 
     #endregion

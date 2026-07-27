@@ -10,6 +10,8 @@ const targetPath = './wwwroot/lib_npm/';
 
 export default function copyDependencies()
 {
+logger.debug('>>> Entering copyDependencies()');
+logger.debug('<<< Exiting copyDependencies()');
   return merge(
     [
     //common dependencies
@@ -17,7 +19,9 @@ export default function copyDependencies()
       .src(`${nodeModules}/**`)
       .pipe(filter(Object.keys(pkg.dependencies).map(module => `${nodeModules}${module}/dist/**/*.min*`)))
       .pipe(rename(function (path) {
+		logger.debug(`>>> Entering pipe(path.dirname=${path.dirname})`);
         path.dirname = path.dirname.replace(/\/dist/, '').replace(/\\dist/, '');
+		logger.debug(`<<< Exiting pipe(path.dirname=${path.dirname})`);
       }))
       .pipe(gulp.dest(targetPath)),
 

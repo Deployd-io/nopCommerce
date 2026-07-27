@@ -57,15 +57,20 @@ public partial class CustomerRoleController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMER_ROLES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleSearchModelAsync(new CustomerRoleSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -76,6 +81,7 @@ public partial class CustomerRoleController : BaseAdminController
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -83,9 +89,12 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleModelAsync(new CustomerRoleModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -112,6 +121,7 @@ public partial class CustomerRoleController : BaseAdminController
         model = await _customerRoleModelFactory.PrepareCustomerRoleModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -119,14 +129,18 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a customer role with the specified id
         var customerRole = await _customerService.GetCustomerRoleByIdAsync(id);
         if (customerRole == null)
+			logger.LogDebug("Edit(id={Id}): customerRole → {CustomerRole}", id, customerRole);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleModelAsync(null, customerRole);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -175,6 +189,7 @@ public partial class CustomerRoleController : BaseAdminController
         catch (Exception exc)
         {
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
             return RedirectToAction("Edit", new { id = customerRole.Id });
         }
     }
@@ -184,9 +199,11 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a customer role with the specified id
         var customerRole = await _customerService.GetCustomerRoleByIdAsync(id);
         if (customerRole == null)
+			logger.LogDebug("Delete(id={Id}): customerRole → {CustomerRole}", id, customerRole);
             return RedirectToAction("List");
 
         try
@@ -203,7 +220,9 @@ public partial class CustomerRoleController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             _notificationService.ErrorNotification(exc.Message);
+			logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = customerRole.Id });
         }
     }
@@ -212,9 +231,12 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> AssociateProductToCustomerRolePopup()
     {
+		logger.LogDebug(">>> Entering AssociateProductToCustomerRolePopup()");
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleProductSearchModelAsync(new CustomerRoleProductSearchModel());
 
+		logger.LogDebug("AssociateProductToCustomerRolePopup(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting AssociateProductToCustomerRolePopup()");
         return View(model);
     }
 
@@ -223,9 +245,12 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> AssociateProductToCustomerRolePopupList(CustomerRoleProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering AssociateProductToCustomerRolePopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleProductListModelAsync(searchModel);
 
+		logger.LogDebug("AssociateProductToCustomerRolePopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting AssociateProductToCustomerRolePopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

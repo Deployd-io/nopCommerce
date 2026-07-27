@@ -39,12 +39,15 @@ public class AddressValidationController : BaseController
     [HttpPost]
     public async Task<IActionResult> UseValidatedAddress(int addressId, bool isNewAddress)
     {
+		logger.LogDebug(">>> Entering UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress})", addressId, isNewAddress);
         //try to get an address by the passed identifier
         var address = await _addressService.GetAddressByIdAsync(addressId);
         if (address != null)
+		logger.LogDebug("UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress}): address → {Address}", addressId, isNewAddress, address);
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
             //add address to customer collection if it's a new
+			logger.LogDebug("UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress}): customer → {Customer}", addressId, isNewAddress, customer);
             if (isNewAddress)
                 await _customerService.InsertCustomerAddressAsync(customer, address);
 
@@ -57,6 +60,7 @@ public class AddressValidationController : BaseController
         }
 
         //nothing to return
+		logger.LogDebug("<<< Exiting UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress})", addressId, isNewAddress);
         return Content(string.Empty);
     }
 

@@ -106,6 +106,8 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 
@@ -114,6 +116,8 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/PickupInStore/Configure";
     }
 
@@ -123,9 +127,12 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //sample pickup point
         var country = await _countryService.GetCountryByThreeLetterIsoCodeAsync("USA");
         var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync("NY", country?.Id);
+		logger.LogDebug("InstallAsync(): country → {Country}", country);
+		logger.LogDebug("InstallAsync(): state → {State}", state);
 
         var address = new Address
         {
@@ -179,6 +186,7 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -187,10 +195,12 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Pickup.PickupInStore");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

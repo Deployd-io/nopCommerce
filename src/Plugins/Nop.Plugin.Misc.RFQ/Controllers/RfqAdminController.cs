@@ -84,11 +84,13 @@ public class RfqAdminController : BasePluginController
 
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             Enabled = _rfqSettings.Enabled
         };
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.RFQ/Views/Admin/Configure.cshtml", model);
     }
 
@@ -117,9 +119,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public async Task<IActionResult> AddNewProduct(ProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering AddNewProduct(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _modelFactory.PrepareProductListModelAsync(searchModel);
 
+		logger.LogDebug("AddNewProduct(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting AddNewProduct(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -196,25 +201,33 @@ public class RfqAdminController : BasePluginController
     [HttpPost]
     public async Task<IActionResult> ProductDetailsAttributeChange(int productId, bool validateAttributeConditions, IFormCollection form)
     {
+		logger.LogDebug(">>> Entering ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form})", productId, validateAttributeConditions, form);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null)
+			logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): product → {Product}", productId, validateAttributeConditions, form, product);
             return new NullJsonResult();
 
         var errors = new List<string>();
         var attributeXml = await _productAttributeParser.ParseProductAttributesAsync(product, form, errors);
+		logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): errors → {Errors}", productId, validateAttributeConditions, form, errors);
+		logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): attributeXml → {AttributeXml}", productId, validateAttributeConditions, form, attributeXml);
 
         //conditional attributes
         var enabledAttributeMappingIds = new List<int>();
         var disabledAttributeMappingIds = new List<int>();
+		logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): enabledAttributeMappingIds → {EnabledAttributeMappingIds}", productId, validateAttributeConditions, form, enabledAttributeMappingIds);
+		logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): disabledAttributeMappingIds → {DisabledAttributeMappingIds}", productId, validateAttributeConditions, form, disabledAttributeMappingIds);
 
         if (validateAttributeConditions)
         {
             var attributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
 
+			logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): attributes → {Attributes}", productId, validateAttributeConditions, form, attributes);
             foreach (var attribute in attributes)
             {
                 var conditionMet = await _productAttributeParser.IsConditionMetAsync(attribute, attributeXml);
 
+				logger.LogDebug("ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): conditionMet → {ConditionMet}", productId, validateAttributeConditions, form, conditionMet);
                 if (!conditionMet.HasValue)
                     continue;
 
@@ -225,6 +238,7 @@ public class RfqAdminController : BasePluginController
             }
         }
 
+		logger.LogDebug("<<< Exiting ProductDetailsAttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form})", productId, validateAttributeConditions, form);
         return Json(new
         {
             enabledattributemappingids = enabledAttributeMappingIds.ToArray(),
@@ -238,9 +252,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public async Task<IActionResult> CustomerList(CustomerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering CustomerList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerListModelAsync(searchModel);
 
+		logger.LogDebug("CustomerList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting CustomerList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -248,9 +265,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public async Task<IActionResult> SelectCustomerPopup()
     {
+		logger.LogDebug(">>> Entering SelectCustomerPopup()");
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerSearchModelAsync(new CustomerSearchModel());
 
+		logger.LogDebug("SelectCustomerPopup(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting SelectCustomerPopup()");
         return View("~/Plugins/Misc.RFQ/Views/Admin/SelectCustomerPopup.cshtml", model);
     }
 
@@ -261,25 +281,32 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminRequests()
     {
+		logger.LogDebug(">>> Entering AdminRequests()");
         //prepare model
         var model = await _modelFactory.PrepareRequestQuoteSearchModelAsync();
 
+		logger.LogDebug("AdminRequests(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting AdminRequests()");
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminRequests.cshtml", model);
     }
 
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminRequest(int id)
     {
+		logger.LogDebug(">>> Entering AdminRequest(id={Id})", id);
         if (id <= 0)
             return RedirectToAction("AdminRequests");
 
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(id);
 
+		logger.LogDebug("AdminRequest(id={Id}): requestQuote → {RequestQuote}", id, requestQuote);
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
         var model = await _modelFactory.PreparedRequestQuoteModelAsync(requestQuote);
 
+		logger.LogDebug("AdminRequest(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting AdminRequest(id={Id})", id);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminRequest.cshtml", model);
     }
 
@@ -309,6 +336,7 @@ public class RfqAdminController : BasePluginController
         //if we got this far, something failed, redisplay form
         model = await _modelFactory.PreparedRequestQuoteModelAsync(requestQuote);
 
+		logger.LogDebug("<<< Exiting AdminRequest(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminRequest.cshtml", model);
     }
 
@@ -317,17 +345,20 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> EditRequestItem(int id, IFormCollection form)
     {
+		logger.LogDebug(">>> Entering EditRequestItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminRequests");
 
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(id);
 
+		logger.LogDebug("EditRequestItem(id={Id},form={Form}): requestQuote → {RequestQuote}", id, form, requestQuote);
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
         //get request a quote item identifier
         var requestQuoteItemId = 0;
 
+		logger.LogDebug("EditRequestItem(id={Id},form={Form}): requestQuoteItemId → {RequestQuoteItemId}", id, form, requestQuoteItemId);
         var saveButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnSave", StringComparison.InvariantCultureIgnoreCase)).Key;
 
@@ -345,11 +376,13 @@ public class RfqAdminController : BasePluginController
         if (requestQuote.AdminNotes != form["AdminNotes"])
         {
             requestQuote.AdminNotes = form["AdminNotes"];
+			logger.LogDebug("EditRequestItem(id={Id},form={Form}): requestQuote.AdminNotes → {Arg2}", id, form, requestQuote.AdminNotes);
             await _rfqService.UpdateRequestQuoteAsync(requestQuote);
         }
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Updated"));
 
+		logger.LogDebug("<<< Exiting EditRequestItem(id={Id},form={Form})", id, form);
         return await AdminRequest(id);
     }
 
@@ -358,17 +391,20 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteRequestItem(int id, IFormCollection form)
     {
+		logger.LogDebug(">>> Entering DeleteRequestItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminRequests");
 
         var requestQuote = await _rfqService.GetRequestQuoteByIdAsync(id);
 
+		logger.LogDebug("DeleteRequestItem(id={Id},form={Form}): requestQuote → {RequestQuote}", id, form, requestQuote);
         if (requestQuote == null)
             return RedirectToAction("AdminRequests");
 
         //get request a quote item identifier
         var requestQuoteItemId = 0;
 
+		logger.LogDebug("DeleteRequestItem(id={Id},form={Form}): requestQuoteItemId → {RequestQuoteItemId}", id, form, requestQuoteItemId);
         var deleteButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnDelete", StringComparison.InvariantCultureIgnoreCase)).Key;
 
@@ -382,6 +418,7 @@ public class RfqAdminController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Updated"));
 
+		logger.LogDebug("<<< Exiting DeleteRequestItem(id={Id},form={Form})", id, form);
         return await AdminRequest(id);
     }
 
@@ -419,10 +456,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteSelectedRequests(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelectedRequests(selectedIds={SelectedIds})", selectedIds);
         await _rfqService.DeleteRequestsQuoteByIdsAsync(selectedIds);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminRequest.Selected.Deleted"));
 
+		logger.LogDebug("<<< Exiting DeleteSelectedRequests(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
@@ -430,9 +469,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> RequestList(RequestQuoteSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering RequestList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _modelFactory.PrepareRequestQuoteListModelAsync(searchModel);
 
+		logger.LogDebug("RequestList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting RequestList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -452,16 +494,20 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> AdminQuote(int id)
     {
+		logger.LogDebug(">>> Entering AdminQuote(id={Id})", id);
         if (id <= 0)
             return RedirectToAction("AdminQuotes");
 
         var quote = await _rfqService.GetQuoteByIdAsync(id);
 
+		logger.LogDebug("AdminQuote(id={Id}): quote → {Quote}", id, quote);
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         var model = await _modelFactory.PreparedQuoteModelAsync(quote);
 
+		logger.LogDebug("AdminQuote(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting AdminQuote(id={Id})", id);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminQuote.cshtml", model);
     }
 
@@ -472,6 +518,7 @@ public class RfqAdminController : BasePluginController
     {
         var requestQuote = await _rfqService.CreateQuoteAsync(model.CustomerId);
 
+		logger.LogDebug("<<< Exiting AdminQuotes()");
         return RedirectToAction("AdminQuote", new { id = requestQuote.Id });
     }
 
@@ -488,10 +535,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteSelectedQuotes(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelectedQuotes(selectedIds={SelectedIds})", selectedIds);
         await _rfqService.DeleteQuotesByIdsAsync(selectedIds);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Selected.Deleted"));
 
+		logger.LogDebug("<<< Exiting DeleteSelectedQuotes(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
@@ -499,9 +548,12 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> QuoteList(QuoteSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering QuoteList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _modelFactory.PrepareQuoteListModelAsync(searchModel);
 
+		logger.LogDebug("QuoteList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting QuoteList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -588,6 +640,7 @@ public class RfqAdminController : BasePluginController
         //if we got this far, something failed, redisplay form
         model = await _modelFactory.PreparedQuoteModelAsync(quote);
 
+		logger.LogDebug("<<< Exiting AdminQuote(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View("~/Plugins/Misc.RFQ/Views/Admin/AdminQuote.cshtml", model);
     }
 
@@ -596,17 +649,20 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> EditQuoteItem(int id, IFormCollection form)
     {
+		logger.LogDebug(">>> Entering EditQuoteItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminQuotes");
 
         var quote = await _rfqService.GetQuoteByIdAsync(id);
 
+		logger.LogDebug("EditQuoteItem(id={Id},form={Form}): quote → {Quote}", id, form, quote);
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         //get the quote item identifier
         var quoteItemId = 0;
 
+		logger.LogDebug("EditQuoteItem(id={Id},form={Form}): quoteItemId → {QuoteItemId}", id, form, quoteItemId);
         var saveButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnSave", StringComparison.InvariantCultureIgnoreCase)).Key;
 
@@ -624,11 +680,13 @@ public class RfqAdminController : BasePluginController
         if (quote.AdminNotes != form["AdminNotes"])
         {
             quote.AdminNotes = form["AdminNotes"];
+			logger.LogDebug("EditQuoteItem(id={Id},form={Form}): quote.AdminNotes → {Arg2}", id, form, quote.AdminNotes);
             await _rfqService.UpdateQuoteAsync(quote);
         }
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Updated"));
 
+		logger.LogDebug("<<< Exiting EditQuoteItem(id={Id},form={Form})", id, form);
         return await AdminQuote(id);
     }
 
@@ -637,17 +695,20 @@ public class RfqAdminController : BasePluginController
     [CheckPermission(RfqPermissionConfigManager.ADMIN_ACCESS_RFQ)]
     public async Task<IActionResult> DeleteQuoteItem(int id, IFormCollection form)
     {
+		logger.LogDebug(">>> Entering DeleteQuoteItem(id={Id},form={Form})", id, form);
         if (id <= 0)
             return RedirectToAction("AdminQuotes");
 
         var quote = await _rfqService.GetQuoteByIdAsync(id);
 
+		logger.LogDebug("DeleteQuoteItem(id={Id},form={Form}): quote → {Quote}", id, form, quote);
         if (quote == null)
             return RedirectToAction("AdminQuotes");
 
         //get the quote item identifier
         var quoteItemId = 0;
 
+		logger.LogDebug("DeleteQuoteItem(id={Id},form={Form}): quoteItemId → {QuoteItemId}", id, form, quoteItemId);
         var deleteButtonId = form
             .FirstOrDefault(p => p.Key.StartsWith("btnDelete", StringComparison.InvariantCultureIgnoreCase)).Key;
 
@@ -661,6 +722,7 @@ public class RfqAdminController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.AdminQuote.Updated"));
 
+		logger.LogDebug("<<< Exiting DeleteQuoteItem(id={Id},form={Form})", id, form);
         return await AdminQuote(id);
     }
 

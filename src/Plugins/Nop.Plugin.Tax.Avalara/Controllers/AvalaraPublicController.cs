@@ -44,8 +44,10 @@ public class AvalaraPublicController : BasePublicController
 
     public async Task<IActionResult> ExemptionCertificates()
     {
+		logger.LogDebug(">>> Entering ExemptionCertificates()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("ExemptionCertificates(): customer → {Customer}", customer);
             return Challenge();
 
         //ensure that Avalara tax provider is active
@@ -60,13 +62,17 @@ public class AvalaraPublicController : BasePublicController
         {
             var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
             if (!customerRoleIds.Intersect(_avalaraTaxSettings.CustomerRoleIds).Any())
+				logger.LogDebug("ExemptionCertificates(): customerRoleIds → {CustomerRoleIds}", customerRoleIds);
                 return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
         }
 
         var token = await _avalaraTaxManager.CreateTokenAsync(customer);
         var link = await _avalaraTaxManager.GetInvitationAsync(customer) ?? AvalaraTaxDefaults.CertExpressUrl;
+		logger.LogWarning("ExemptionCertificates(): token → {Token}", token);
+		logger.LogDebug("ExemptionCertificates(): link → {Link}", link);
         var certificates = await _avalaraTaxManager.GetCustomerCertificatesAsync(customer);
         var model = new TaxExemptionModel
+		logger.LogDebug("ExemptionCertificates(): certificates → {Certificates}", certificates);
         {
             Token = token,
             Link = link,
@@ -84,14 +90,17 @@ public class AvalaraPublicController : BasePublicController
                 .ToList()
         };
 
+		logger.LogDebug("<<< Exiting ExemptionCertificates()");
         return View("~/Plugins/Tax.Avalara/Views/Customer/ExemptionCertificates.cshtml", model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public async Task<IActionResult> DownloadCertificate(int id)
     {
+		logger.LogDebug(">>> Entering DownloadCertificate(id={Id})", id);
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("DownloadCertificate(id={Id}): customer → {Customer}", id, customer);
             return Challenge();
 
         //ensure that Avalara tax provider is active
@@ -106,12 +115,14 @@ public class AvalaraPublicController : BasePublicController
         {
             var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
             if (!customerRoleIds.Intersect(_avalaraTaxSettings.CustomerRoleIds).Any())
+				logger.LogDebug("DownloadCertificate(id={Id}): customerRoleIds → {CustomerRoleIds}", id, customerRoleIds);
                 return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
         }
 
         //try to get a file by the identifier
         var file = await _avalaraTaxManager.DownloadCertificateAsync(id);
         if (file is null)
+			logger.LogDebug("DownloadCertificate(id={Id}): file → {File}", id, file);
             return InvokeHttp404();
 
         return File(file.Data, file.ContentType, file.Filename?.Split(';')?.FirstOrDefault() ?? "certificate");

@@ -17,6 +17,7 @@ public class StorePickupPointBuilder : NopEntityBuilder<StorePickupPoint>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(StorePickupPoint.Latitude))
                 .AsDecimal(18, 8)
@@ -24,6 +25,7 @@ public class StorePickupPointBuilder : NopEntityBuilder<StorePickupPoint>
             .WithColumn(nameof(StorePickupPoint.Longitude))
             .AsDecimal(18, 8)
                 .Nullable();
+				logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

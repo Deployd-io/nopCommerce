@@ -76,9 +76,11 @@ public class AddressValidationViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure that Avalara tax provider is active
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, customer))
+			logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customer → {Customer}", widgetZone, additionalData, customer);
             return Content(string.Empty);
 
         //ensure that it's a proper widget zone
@@ -98,11 +100,13 @@ public class AddressValidationViewComponent : NopViewComponent
 
         var address = await _addressService.GetAddressByIdAsync(addressId ?? 0);
         if (address == null)
+			logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): address → {Address}", widgetZone, additionalData, address);
             return Content(string.Empty);
 
         //validate address
         var validationResult = await _avalaraTaxManager.ValidateAddressAsync(address);
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validationResult → {ValidationResult}", widgetZone, additionalData, validationResult);
         //whether there are errors in validation result
         var errorDetails = validationResult?.messages?
             .Where(message => message.severity.Equals("Error", StringComparison.InvariantCultureIgnoreCase))
@@ -126,9 +130,15 @@ public class AddressValidationViewComponent : NopViewComponent
         //get validated address info
         var validatedAddressInfo = validationResult.validatedAddresses.First();
 
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddressInfo → {ValidatedAddressInfo}", widgetZone, additionalData, validatedAddressInfo);
         //create new address as a copy of address to validate and with details of the validated one
         var validatedAddress = _addressService.CloneAddress(address);
         validatedAddress.City = validatedAddressInfo.city;
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress → {ValidatedAddress}", widgetZone, additionalData, validatedAddress);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.City → {Arg2}", widgetZone, additionalData, validatedAddress.City);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.Address1 → {Arg2}", widgetZone, additionalData, validatedAddress.Address1);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.Address2 → {Arg2}", widgetZone, additionalData, validatedAddress.Address2);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.ZipPostalCode → {Arg2}", widgetZone, additionalData, validatedAddress.ZipPostalCode);
         validatedAddress.CountryId = (await _countryService.GetCountryByTwoLetterIsoCodeAsync(validatedAddressInfo.country))?.Id;
         validatedAddress.Address1 = validatedAddressInfo.line1;
         validatedAddress.Address2 = validatedAddressInfo.line2;
@@ -150,9 +160,12 @@ public class AddressValidationViewComponent : NopViewComponent
         //otherwise display to customer a confirmation dialog about address updating
         var model = new AddressValidationModel();
         if (existingAddress == null)
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
         {
             await _addressService.InsertAddressAsync(validatedAddress);
             model.AddressId = validatedAddress.Id;
+			logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model.AddressId → {Arg2}", widgetZone, additionalData, model.AddressId);
+			logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model.IsNewAddress → {Arg2}", widgetZone, additionalData, model.IsNewAddress);
             model.IsNewAddress = true;
         }
         else
@@ -170,6 +183,7 @@ public class AddressValidationViewComponent : NopViewComponent
         model.Message = string.Format(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.AddressValidation.Confirm"),
             await getAddressLineAsync(address), await getAddressLineAsync(existingAddress ?? validatedAddress));
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Tax.Avalara/Views/Checkout/AddressValidation.cshtml", model);
     }
 

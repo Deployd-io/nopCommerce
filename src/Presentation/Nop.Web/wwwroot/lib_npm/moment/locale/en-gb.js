@@ -48,6 +48,7 @@ export default moment.defineLocale('en-gb', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var b = number % 10,
             output =
                 ~~((number % 100) / 10) === 1

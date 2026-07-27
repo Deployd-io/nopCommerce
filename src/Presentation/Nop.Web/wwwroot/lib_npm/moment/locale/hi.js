@@ -122,19 +122,24 @@ export default moment.defineLocale('hi', {
         yy: '%d वर्ष',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[१२३४५६७८९०]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string.replace(/\d/g, function (match) {
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     // Hindi notation for meridiems are quite fuzzy in practice. While there exists
     // a rigid notion of a 'Pahar' it is not used as rigidly in modern Hindi.
     meridiemParse: /रात|सुबह|दोपहर|शाम/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -145,6 +150,9 @@ export default moment.defineLocale('hi', {
         } else if (meridiem === 'दोपहर') {
             return hour >= 10 ? hour : hour + 12;
         } else if (meridiem === 'शाम') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },
