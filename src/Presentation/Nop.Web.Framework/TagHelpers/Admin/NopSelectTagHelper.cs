@@ -34,8 +34,12 @@ public partial class NopSelectTagHelper : TagHelper
 
     public NopSelectTagHelper(AdminAreaSettings adminAreaSettings, IHtmlHelper htmlHelper)
     {
+		logger.LogDebug(">>> Entering NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper})", adminAreaSettings, htmlHelper);
         _adminAreaSettings = adminAreaSettings;
         _htmlHelper = htmlHelper;
+		logger.LogDebug("<<< Exiting NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper})", adminAreaSettings, htmlHelper);
+		logger.LogDebug("NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", adminAreaSettings, htmlHelper, _htmlHelper);
+		logger.LogDebug("NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper}): _adminAreaSettings → {_adminAreaSettings}", adminAreaSettings, htmlHelper, _adminAreaSettings);
     }
 
     #endregion
@@ -50,6 +54,7 @@ public partial class NopSelectTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -71,6 +76,7 @@ public partial class NopSelectTagHelper : TagHelper
         //get htmlAttributes object
         var htmlAttributes = new Dictionary<string, object>();
         var attributes = context.AllAttributes;
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributes → {HtmlAttributes}", context, output, htmlAttributes);
         foreach (var attribute in attributes)
         {
             if (!attribute.Name.Equals(FOR_ATTRIBUTE_NAME) &&
@@ -89,6 +95,7 @@ public partial class NopSelectTagHelper : TagHelper
         {
             var templateName = "Select";
 
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): templateName → {TemplateName}", context, output, templateName);
             if (bool.TryParse(IsMultiple, out var multiple) && multiple)
                 templateName = $"Multi{templateName}";
 
@@ -99,6 +106,7 @@ public partial class NopSelectTagHelper : TagHelper
             if(modelType is null || modelType == typeof(string) || typeof(IEnumerable<string>).IsAssignableFrom(modelType))
             {
                 selectList = _htmlHelper.Editor(tagName, $"{templateName}String", additionalData);
+				logger.LogDebug("ProcessAsync(context={Context},output={Output}): selectList → {SelectList}", context, output, selectList);
             }
             else if (modelType == typeof(int) || typeof(IEnumerable<int>).IsAssignableFrom(modelType))
             {
@@ -114,6 +122,7 @@ public partial class NopSelectTagHelper : TagHelper
 
             output.Content.SetHtmlContent(await selectList.RenderHtmlContentAsync());
         }
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

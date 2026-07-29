@@ -11,7 +11,10 @@ public abstract partial class BaseMenuItemCreatedEvent
 
     protected BaseMenuItemCreatedEvent(IAdminMenu adminMenu)
     {
+		logger.LogDebug(">>> Entering BaseMenuItemCreatedEvent(adminMenu={AdminMenu})", adminMenu);
         _adminMenu = adminMenu;
+		logger.LogDebug("<<< Exiting BaseMenuItemCreatedEvent(adminMenu={AdminMenu})", adminMenu);
+		logger.LogDebug("BaseMenuItemCreatedEvent(adminMenu={AdminMenu}): _adminMenu → {_adminMenu}", adminMenu, _adminMenu);
     }
 
     /// <summary>
@@ -21,6 +24,8 @@ public abstract partial class BaseMenuItemCreatedEvent
     /// <param name="actionName">The name of the action method</param>
     public virtual string GetMenuItemUrl(string controllerName, string actionName)
     {
+		logger.LogDebug(">>> Entering GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName})", controllerName, actionName);
+		logger.LogDebug("<<< Exiting GetMenuItemUrl(controllerName={ControllerName},actionName={ActionName})", controllerName, actionName);
         return _adminMenu.GetMenuItemUrl(controllerName, actionName);
     }
 }

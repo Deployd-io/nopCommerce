@@ -33,6 +33,7 @@ export default moment.defineLocale('cv', {
     },
     relativeTime: {
         future: function (output) {
+			logger.debug(`>>> Entering future(output=${output})`);
             var affix = /сехет$/i.exec(output)
                 ? 'рен'
                 : /ҫул$/i.exec(output)

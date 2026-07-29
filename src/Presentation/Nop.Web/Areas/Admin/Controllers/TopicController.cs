@@ -96,15 +96,20 @@ public partial class TopicController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _topicModelFactory.PrepareTopicSearchModelAsync(new TopicSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -115,6 +120,7 @@ public partial class TopicController : BaseAdminController
         //prepare model
         var model = await _topicModelFactory.PrepareTopicListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -125,9 +131,12 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _topicModelFactory.PrepareTopicModelAsync(new TopicModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -169,20 +178,25 @@ public partial class TopicController : BaseAdminController
         model = await _topicModelFactory.PrepareTopicModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a topic with the specified id
         var topic = await _topicService.GetTopicByIdAsync(id);
         if (topic == null)
+			logger.LogDebug("Edit(id={Id}): topic → {Topic}", id, topic);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _topicModelFactory.PrepareTopicModelAsync(null, topic);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -229,6 +243,7 @@ public partial class TopicController : BaseAdminController
         model = await _topicModelFactory.PrepareTopicModelAsync(model, topic, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -236,9 +251,11 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a topic with the specified id
         var topic = await _topicService.GetTopicByIdAsync(id);
         if (topic == null)
+			logger.LogDebug("Delete(id={Id}): topic → {Topic}", id, topic);
             return RedirectToAction("List");
 
         await _topicService.DeleteTopicAsync(topic);
@@ -249,6 +266,7 @@ public partial class TopicController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteTopic",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteTopic"), topic.Title ?? topic.SystemName), topic);
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 

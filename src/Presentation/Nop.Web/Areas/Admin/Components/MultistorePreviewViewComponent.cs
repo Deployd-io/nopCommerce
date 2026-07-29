@@ -17,7 +17,10 @@ public partial class MultistorePreviewViewComponent : NopViewComponent
 
     public MultistorePreviewViewComponent(ICommonModelFactory commonModelFactory)
     {
+		logger.LogDebug(">>> Entering MultistorePreviewViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
         _commonModelFactory = commonModelFactory;
+		logger.LogDebug("<<< Exiting MultistorePreviewViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
+		logger.LogDebug("MultistorePreviewViewComponent(commonModelFactory={CommonModelFactory}): _commonModelFactory → {_commonModelFactory}", commonModelFactory, _commonModelFactory);
     }
 
     #endregion
@@ -34,11 +37,14 @@ public partial class MultistorePreviewViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(object model)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(model={Model})", model);
         if (model is not BaseNopEntityModel entityModel)
             return Content(string.Empty);
 
         var multistorePreviewModels = await _commonModelFactory.PrepareMultistorePreviewModelsAsync(entityModel);
 
+		logger.LogDebug("InvokeAsync(model={Model}): multistorePreviewModels → {MultistorePreviewModels}", model, multistorePreviewModels);
+		logger.LogDebug("<<< Exiting InvokeAsync(model={Model})", model);
         return View(multistorePreviewModels);
     }
 

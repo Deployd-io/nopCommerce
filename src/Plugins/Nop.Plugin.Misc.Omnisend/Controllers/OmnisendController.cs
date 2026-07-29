@@ -41,16 +41,20 @@ public class OmnisendController : BasePluginController
 
     public async Task<IActionResult> AbandonedCheckout(string cartId)
     {
+		logger.LogDebug(">>> Entering AbandonedCheckout(cartId={CartId})", cartId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (await _customerService.IsGuestAsync(customer))
+			logger.LogDebug("AbandonedCheckout(cartId={CartId}): customer → {Customer}", cartId, customer);
             return RedirectToRoute(NopRouteNames.General.LOGIN, new { ReturnUrl = _webHelper.GetRawUrl(Request) });
 
         var customerEmail = await _genericAttributeService.GetAttributeAsync<string>(customer, OmnisendDefaults.CustomerEmailAttribute);
         if (!string.IsNullOrEmpty(customerEmail) && !customerEmail.Equals(customer.Email, StringComparison.InvariantCultureIgnoreCase))
+			logger.LogDebug("AbandonedCheckout(cartId={CartId}): customerEmail → {CustomerEmail}", cartId, customerEmail);
             return RedirectToRoute(NopRouteNames.General.LOGIN, new { ReturnUrl = _webHelper.GetRawUrl(Request) });
 
         await _omnisendService.RestoreShoppingCartAsync(cartId);
 
+		logger.LogDebug("<<< Exiting AbandonedCheckout(cartId={CartId})", cartId);
         return RedirectToRoute(NopRouteNames.General.CART);
     }
 

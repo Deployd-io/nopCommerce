@@ -106,6 +106,8 @@ public partial class CustomerValidator : BaseNopValidator<CustomerModel>
                 .WithMessageAwait(localizationService.GetResourceAsync("Admin.Customers.Customers.Fields.Phone.Required"))
                 //only for registered users
                 .WhenAwait(async x => await IsRegisteredCustomerRoleCheckedAsync(x, customerService));
+				logger.LogDebug(">>> Entering IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
+				logger.LogDebug("<<< Exiting IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
         }
         if (customerSettings.FaxRequired && customerSettings.FaxEnabled)
         {
@@ -121,13 +123,18 @@ public partial class CustomerValidator : BaseNopValidator<CustomerModel>
 
     protected virtual async Task<bool> IsRegisteredCustomerRoleCheckedAsync(CustomerModel model, ICustomerService customerService)
     {
+		logger.LogDebug(">>> Entering IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
         var allCustomerRoles = await customerService.GetAllCustomerRolesAsync(true);
         var newCustomerRoles = new List<CustomerRole>();
+		logger.LogDebug("IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService}): allCustomerRoles → {AllCustomerRoles}", model, customerService, allCustomerRoles);
+		logger.LogDebug("IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService}): newCustomerRoles → {NewCustomerRoles}", model, customerService, newCustomerRoles);
         foreach (var customerRole in allCustomerRoles)
             if (model.SelectedCustomerRoleIds.Contains(customerRole.Id))
                 newCustomerRoles.Add(customerRole);
 
         var isInRegisteredRole = newCustomerRoles.FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.RegisteredRoleName) != null;
+		logger.LogDebug("IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService}): isInRegisteredRole → {IsInRegisteredRole}", model, customerService, isInRegisteredRole);
+		logger.LogDebug("<<< Exiting IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
         return isInRegisteredRole;
     }
 }

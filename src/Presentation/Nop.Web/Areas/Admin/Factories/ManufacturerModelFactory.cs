@@ -105,6 +105,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<ManufacturerSearchModel> PrepareManufacturerSearchModelAsync(ManufacturerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -132,6 +133,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -145,6 +147,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<ManufacturerListModel> PrepareManufacturerListModelAsync(ManufacturerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get manufacturers
@@ -162,12 +165,14 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             {
                 var manufacturerModel = manufacturer.ToModel<ManufacturerModel>();
 
+				logger.LogDebug("PrepareManufacturerListModelAsync(searchModel={SearchModel}): manufacturerModel → {ManufacturerModel}", searchModel, manufacturerModel);
                 manufacturerModel.SeName = await _urlRecordService.GetSeNameAsync(manufacturer, 0, true, false);
 
                 return manufacturerModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -293,6 +298,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<AddProductToManufacturerSearchModel> PrepareAddProductToManufacturerSearchModelAsync(AddProductToManufacturerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddProductToManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available categories
@@ -313,6 +319,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareAddProductToManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -326,6 +333,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<AddProductToManufacturerListModel> PrepareAddProductToManufacturerListModelAsync(AddProductToManufacturerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddProductToManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get products
@@ -345,12 +353,14 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareAddProductToManufacturerListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareAddProductToManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

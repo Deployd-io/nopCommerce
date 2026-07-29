@@ -9,6 +9,7 @@ public class StorePickupPointValidator : BaseNopValidator<StorePickupPointModel>
 {
     public StorePickupPointValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering StorePickupPointValidator(localizationService={LocalizationService})", localizationService);
         // Latitude
         RuleFor(model => model.Latitude)
             .InclusiveBetween(-90, 90)
@@ -34,5 +35,6 @@ public class StorePickupPointValidator : BaseNopValidator<StorePickupPointModel>
         RuleFor(model => model.Longitude)
             .PrecisionScale(18, 8, false)
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Pickup.PickupInStore.Fields.Longitude.InvalidPrecision"));
+			logger.LogDebug("<<< Exiting StorePickupPointValidator(localizationService={LocalizationService})", localizationService);
     }
 }

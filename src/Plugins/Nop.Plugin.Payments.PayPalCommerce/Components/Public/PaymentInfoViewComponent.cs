@@ -21,6 +21,8 @@ public class PaymentInfoViewComponent : NopViewComponent
     /// </returns>
     public IViewComponentResult Invoke(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
+		logger.LogDebug("<<< Exiting Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/PaymentInfo.cshtml");
     }
 

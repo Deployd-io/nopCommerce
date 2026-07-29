@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
      public InputTagHelper(IHtmlGenerator generator) : base(generator)
      {
+	logger.LogDebug(">>> Entering InputTagHelper(generator={Generator})", generator);
+	logger.LogDebug("<<< Exiting InputTagHelper(generator={Generator})", generator);
      }
 
      #endregion
@@ -34,6 +36,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
      /// <returns>A task that represents the asynchronous operation</returns>
      public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
      {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
          ArgumentNullException.ThrowIfNull(context);
 
          ArgumentNullException.ThrowIfNull(output);
@@ -48,6 +51,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
          }
          catch
          {
+			logger.LogError("Exception in ProcessAsync(context={Context},output={Output}): {Arg2}", context, output, ex.Message);
              //If the passed values differ in data type according to the model, we should try to initialize the component with a default value. 
              //If this is not possible, then we suppress the generation of html for this imput.
              try
@@ -57,9 +61,11 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
              }
              catch
              {
+				logger.LogError("Exception in ProcessAsync(context={Context},output={Output}): {Arg2}", context, output, ex.Message);
                  output.SuppressOutput();
              }
          }
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
      }
 
      #endregion

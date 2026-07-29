@@ -16,7 +16,9 @@ public class FacebookPixelSchemaMigration : AutoReversingMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<FacebookPixelConfiguration>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     #endregion

@@ -43,11 +43,18 @@ public class ProductModelFactoryTests : WebTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _productModelFactory = GetService<IProductModelFactory>();
         _productReviewService = GetService<IProductReviewService>();
+		logger.LogDebug("SetUp(): _productModelFactory → {_productModelFactory}", _productModelFactory);
+		logger.LogDebug("SetUp(): _productReviewService → {_productReviewService}", _productReviewService);
         _productService = GetService<IProductService>();
         _urlRecordService = GetService<IUrlRecordService>();
+		logger.LogDebug("SetUp(): _productService → {_productService}", _productService);
+		logger.LogDebug("SetUp(): _urlRecordService → {_urlRecordService}", _urlRecordService);
         _productModelFactoryForTest = GetService<ProductModelFactoryForTest>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _productModelFactoryForTest → {_productModelFactoryForTest}", _productModelFactoryForTest);
     }
 
     [Test]
@@ -59,15 +66,20 @@ public class ProductModelFactoryTests : WebTest
             PropertiesShouldEqual(await _productModelFactoryForTest.NewPrepareProductPriceModelAsync(product, true, true), await _productModelFactoryForTest.PrepareProductOverviewPriceModelAsync(product, true), "CustomProperties");
             PropertiesShouldEqual(await _productModelFactoryForTest.NewPrepareProductPriceModelAsync(product), await _productModelFactoryForTest.PrepareProductPriceModelAsync(product), "CustomProperties");
         }
+		logger.LogDebug("<<< Exiting CanPreparePriceModel()");
     }
 
     [Test]
     public async Task CanPrepareProductTemplateViewPath()
     {
+		logger.LogDebug(">>> Entering CanPrepareProductTemplateViewPath()");
         var productTemplateRepository = GetService<IRepository<ProductTemplate>>();
         var productTemplateSimple = productTemplateRepository.Table.FirstOrDefault(pt => pt.Name == "Simple product") ?? throw new Exception("Simple product template could not be loaded");
+		logger.LogDebug("CanPrepareProductTemplateViewPath(): productTemplateRepository → {ProductTemplateRepository}", productTemplateRepository);
+		logger.LogDebug("CanPrepareProductTemplateViewPath(): productTemplateSimple → {ProductTemplateSimple}", productTemplateSimple);
         var productTemplateGrouped = productTemplateRepository.Table.FirstOrDefault(pt => pt.Name == "Grouped product (with variants)") ?? throw new Exception("Grouped product template could not be loaded");
 
+		logger.LogDebug("CanPrepareProductTemplateViewPath(): productTemplateGrouped → {ProductTemplateGrouped}", productTemplateGrouped);
         var modelSimple = await _productModelFactory.PrepareProductTemplateViewPathAsync(new Product
         {
             ProductTemplateId = productTemplateSimple.Id
@@ -82,73 +94,101 @@ public class ProductModelFactoryTests : WebTest
 
         modelSimple.Should().Be(productTemplateSimple.ViewPath);
         modelGrouped.Should().Be(productTemplateGrouped.ViewPath);
+		logger.LogDebug("<<< Exiting CanPrepareProductTemplateViewPath()");
     }
 
     [Test]
     public async Task CanPrepareProductOverviewModels()
     {
+		logger.LogDebug(">>> Entering CanPrepareProductOverviewModels()");
         var product = await _productService.GetProductByIdAsync(1);
         var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(new[] { product })).FirstOrDefault();
+		logger.LogDebug("CanPrepareProductOverviewModels(): product → {Product}", product);
+		logger.LogDebug("CanPrepareProductOverviewModels(): model → {Model}", model);
 
         PropertiesShouldEqual(product, model);
+		logger.LogDebug("<<< Exiting CanPrepareProductOverviewModels()");
     }
 
     [Test]
     public async Task CanPrepareProductDetailsModel()
     {
+		logger.LogDebug(">>> Entering CanPrepareProductDetailsModel()");
         var product = await _productService.GetProductByIdAsync(1);
         var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(new[] { product })).FirstOrDefault();
+		logger.LogDebug("CanPrepareProductDetailsModel(): product → {Product}", product);
+		logger.LogDebug("CanPrepareProductDetailsModel(): model → {Model}", model);
 
         PropertiesShouldEqual(product, model);
+		logger.LogDebug("<<< Exiting CanPrepareProductDetailsModel()");
     }
 
     [Test]
     public async Task CanPrepareProductReviewsModel()
     {
+		logger.LogDebug(">>> Entering CanPrepareProductReviewsModel()");
         var pId = (await _productReviewService.GetProductReviewByIdAsync(1)).ProductId;
         var product = await _productService.GetProductByIdAsync(pId);
+		logger.LogDebug("CanPrepareProductReviewsModel(): pId → {PId}", pId);
+		logger.LogDebug("CanPrepareProductReviewsModel(): product → {Product}", product);
         var model = await _productModelFactory.PrepareProductReviewsModelAsync(product);
 
+		logger.LogDebug("CanPrepareProductReviewsModel(): model → {Model}", model);
         model.ProductId.Should().Be(product.Id);
 
         model.Items.Any().Should().BeTrue();
+		logger.LogDebug("<<< Exiting CanPrepareProductReviewsModel()");
     }
 
     [Test]
     public async Task CanPrepareCustomerProductReviewsModel()
     {
+		logger.LogDebug(">>> Entering CanPrepareCustomerProductReviewsModel()");
         var model = await _productModelFactory.PrepareCustomerProductReviewsModelAsync(null);
         var review = model.ProductReviews.FirstOrDefault();
+		logger.LogDebug("CanPrepareCustomerProductReviewsModel(): model → {Model}", model);
+		logger.LogDebug("CanPrepareCustomerProductReviewsModel(): review → {Review}", review);
 
         review.Should().NotBeNull();
 
         var product = await _productService.GetProductByIdAsync(review.ProductId);
 
+		logger.LogDebug("CanPrepareCustomerProductReviewsModel(): product → {Product}", product);
         review.ProductName.Should().Be(product.Name);
         review.ProductSeName.Should().Be(await _urlRecordService.GetSeNameAsync(product));
+		logger.LogDebug("<<< Exiting CanPrepareCustomerProductReviewsModel()");
     }
 
     [Test]
     public async Task CanPrepareProductEmailAFriendModel()
     {
+		logger.LogDebug(">>> Entering CanPrepareProductEmailAFriendModel()");
         var product = await _productService.GetProductByIdAsync(1);
         var model = await _productModelFactory.PrepareProductEmailAFriendModelAsync(new ProductEmailAFriendModel(), product, false);
+		logger.LogDebug("CanPrepareProductEmailAFriendModel(): product → {Product}", product);
+		logger.LogDebug("CanPrepareProductEmailAFriendModel(): model → {Model}", model);
 
         model.ProductId.Should().Be(product.Id);
         model.ProductName.Should().Be(product.Name);
         model.ProductSeName.Should().Be(await GetService<IUrlRecordService>().GetSeNameAsync(product));
         model.YourEmailAddress.Should().Be(NopTestsDefaults.AdminEmail);
+		logger.LogDebug("<<< Exiting CanPrepareProductEmailAFriendModel()");
     }
 
     [Test]
     public async Task CanPrepareProductSpecificationModel()
     {
+		logger.LogDebug(">>> Entering CanPrepareProductSpecificationModel()");
         var product = await _productService.GetProductByIdAsync(1);
         var model = await _productModelFactory.PrepareProductSpecificationModelAsync(product);
+		logger.LogDebug("CanPrepareProductSpecificationModel(): product → {Product}", product);
+		logger.LogDebug("CanPrepareProductSpecificationModel(): model → {Model}", model);
 
         var group = model.Groups.FirstOrDefault();
 
+		logger.LogDebug("CanPrepareProductSpecificationModel(): group → {Group}", group);
         group.Should().NotBe(null);
+		logger.LogDebug("<<< Exiting CanPrepareProductSpecificationModel()");
     }
 
     #region Nested class
@@ -157,6 +197,8 @@ public class ProductModelFactoryTests : WebTest
     {
         public ProductModelFactoryForTest(CaptchaSettings captchaSettings, CatalogSettings catalogSettings, CustomerSettings customerSettings, ICategoryService categoryService, ICurrencyService currencyService, ICustomerService customerService, ICustomWishlistService customWishlistService, IDateRangeService dateRangeService, IDateTimeHelper dateTimeHelper, IDownloadService downloadService, IGenericAttributeService genericAttributeService, IJsonLdModelFactory jsonLdModelFactory, ILocalizationService localizationService, IManufacturerService manufacturerService, IPermissionService permissionService, IPictureService pictureService, IPriceCalculationService priceCalculationService, IPriceFormatter priceFormatter, IProductAttributeParser productAttributeParser, IProductAttributeService productAttributeService, IProductReviewService productReviewService, IProductService productService, IProductTagService productTagService, IProductTemplateService productTemplateService, IReviewTypeService reviewTypeService, IShoppingCartService shoppingCartService, ISpecificationAttributeService specificationAttributeService, IStaticCacheManager staticCacheManager, IStoreContext storeContext, IStoreService storeService, IShoppingCartModelFactory shoppingCartModelFactory, ITaxService taxService, IUrlRecordService urlRecordService, IVendorService vendorService, IVideoService videoService, IWebHelper webHelper, IWorkContext workContext, MediaSettings mediaSettings, OrderSettings orderSettings, SeoSettings seoSettings, ShippingSettings shippingSettings, VendorSettings vendorSettings) : base(captchaSettings, catalogSettings, customerSettings, categoryService, currencyService, customerService, customWishlistService, dateRangeService, dateTimeHelper, downloadService, genericAttributeService, jsonLdModelFactory, localizationService, manufacturerService, permissionService, pictureService, priceCalculationService, priceFormatter, productAttributeParser, productAttributeService, productReviewService, productService, productTagService, productTemplateService, reviewTypeService, shoppingCartService, specificationAttributeService, staticCacheManager, storeContext, storeService, shoppingCartModelFactory, taxService, urlRecordService, vendorService, videoService, webHelper, workContext, mediaSettings, orderSettings, seoSettings, shippingSettings, vendorSettings)
         {
+		logger.LogDebug(">>> Entering ProductModelFactoryForTest(captchaSettings={CaptchaSettings},catalogSettings={CatalogSettings},customerSettings={CustomerSettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},customWishlistService={CustomWishlistService},dateRangeService={DateRangeService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},genericAttributeService={GenericAttributeService},jsonLdModelFactory={JsonLdModelFactory},localizationService={LocalizationService},manufacturerService={ManufacturerService},permissionService={PermissionService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productReviewService={ProductReviewService},productService={ProductService},productTagService={ProductTagService},productTemplateService={ProductTemplateService},reviewTypeService={ReviewTypeService},shoppingCartService={ShoppingCartService},specificationAttributeService={SpecificationAttributeService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeService={StoreService},shoppingCartModelFactory={ShoppingCartModelFactory},taxService={TaxService},urlRecordService={UrlRecordService},vendorService={VendorService},videoService={VideoService},webHelper={WebHelper},workContext={WorkContext},mediaSettings={MediaSettings},orderSettings={OrderSettings},seoSettings={SeoSettings},shippingSettings={ShippingSettings},vendorSettings={VendorSettings})", captchaSettings, catalogSettings, customerSettings, categoryService, currencyService, customerService, customWishlistService, dateRangeService, dateTimeHelper, downloadService, genericAttributeService, jsonLdModelFactory, localizationService, manufacturerService, permissionService, pictureService, priceCalculationService, priceFormatter, productAttributeParser, productAttributeService, productReviewService, productService, productTagService, productTemplateService, reviewTypeService, shoppingCartService, specificationAttributeService, staticCacheManager, storeContext, storeService, shoppingCartModelFactory, taxService, urlRecordService, vendorService, videoService, webHelper, workContext, mediaSettings, orderSettings, seoSettings, shippingSettings, vendorSettings);
+		logger.LogDebug("<<< Exiting ProductModelFactoryForTest(captchaSettings={CaptchaSettings},catalogSettings={CatalogSettings},customerSettings={CustomerSettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},customWishlistService={CustomWishlistService},dateRangeService={DateRangeService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},genericAttributeService={GenericAttributeService},jsonLdModelFactory={JsonLdModelFactory},localizationService={LocalizationService},manufacturerService={ManufacturerService},permissionService={PermissionService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productReviewService={ProductReviewService},productService={ProductService},productTagService={ProductTagService},productTemplateService={ProductTemplateService},reviewTypeService={ReviewTypeService},shoppingCartService={ShoppingCartService},specificationAttributeService={SpecificationAttributeService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeService={StoreService},shoppingCartModelFactory={ShoppingCartModelFactory},taxService={TaxService},urlRecordService={UrlRecordService},vendorService={VendorService},videoService={VideoService},webHelper={WebHelper},workContext={WorkContext},mediaSettings={MediaSettings},orderSettings={OrderSettings},seoSettings={SeoSettings},shippingSettings={ShippingSettings},vendorSettings={VendorSettings})", captchaSettings, catalogSettings, customerSettings, categoryService, currencyService, customerService, customWishlistService, dateRangeService, dateTimeHelper, downloadService, genericAttributeService, jsonLdModelFactory, localizationService, manufacturerService, permissionService, pictureService, priceCalculationService, priceFormatter, productAttributeParser, productAttributeService, productReviewService, productService, productTagService, productTemplateService, reviewTypeService, shoppingCartService, specificationAttributeService, staticCacheManager, storeContext, storeService, shoppingCartModelFactory, taxService, urlRecordService, vendorService, videoService, webHelper, workContext, mediaSettings, orderSettings, seoSettings, shippingSettings, vendorSettings);
         }
 
         #region Methods
@@ -176,6 +218,7 @@ public class ProductModelFactoryTests : WebTest
 
             async Task prepareSimpleProductOverviewPriceModel(ProductPriceModel priceModel)
             {
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 //add to cart button
                 priceModel.DisableBuyButton = product.DisableBuyButton ||
                                               !await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART) ||
@@ -380,6 +423,7 @@ public class ProductModelFactoryTests : WebTest
                     priceModel.Price = null;
                     priceModel.PriceValue = null;
                 }
+				logger.LogDebug("<<< Exiting prepareSimpleProductOverviewPriceModel(priceModel={PriceModel})", priceModel);
             }
 
             async Task prepareGroupedProductOverviewPriceModel(ProductPriceModel priceModel)
@@ -464,6 +508,7 @@ public class ProductModelFactoryTests : WebTest
                     priceModel.Price = null;
                     priceModel.PriceValue = null;
                 }
+				logger.LogDebug("<<< Exiting prepareGroupedProductOverviewPriceModel(priceModel={PriceModel})", priceModel);
             }
 
             var currentCurrency = await _workContext.GetWorkingCurrencyAsync();

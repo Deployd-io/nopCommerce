@@ -5,14 +5,17 @@
 import moment from '../moment';
 
 function plural(n) {
+	logger.debug(`>>> Entering plural(n=${n})`);
     if (n % 100 === 11) {
         return true;
     } else if (n % 10 === 1) {
         return false;
     }
+	logger.debug(`<<< Exiting plural(n=${n})`);
     return true;
 }
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     switch (key) {
         case 's':
@@ -21,6 +24,7 @@ function translate(number, withoutSuffix, key, isFuture) {
                 : 'nokkrum sekúndum';
         case 'ss':
             if (plural(number)) {
+				logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture}): result → ${result}`);
                 return (
                     result +
                     (withoutSuffix || isFuture ? 'sekúndur' : 'sekúndum')
@@ -84,6 +88,7 @@ function translate(number, withoutSuffix, key, isFuture) {
             if (plural(number)) {
                 return result + (withoutSuffix || isFuture ? 'ár' : 'árum');
             }
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
             return result + (withoutSuffix || isFuture ? 'ár' : 'ári');
     }
 }

@@ -10,8 +10,10 @@ public partial class ReturnRequestReasonValidator : BaseNopValidator<ReturnReque
 {
     public ReturnRequestReasonValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ReturnRequestReasonValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Settings.Order.ReturnRequestReasons.Name.Required"));
 
         SetDatabaseValidationRules<ReturnRequestReason>();
+		logger.LogDebug("<<< Exiting ReturnRequestReasonValidator(localizationService={LocalizationService})", localizationService);
     }
 }

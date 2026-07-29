@@ -41,11 +41,13 @@ public partial class TaxModelFactory : ITaxModelFactory
     /// </returns>
     public virtual Task<TaxProviderSearchModel> PrepareTaxProviderSearchModelAsync(TaxProviderSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareTaxProviderSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareTaxProviderSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -59,11 +61,13 @@ public partial class TaxModelFactory : ITaxModelFactory
     /// </returns>
     public virtual async Task<TaxProviderListModel> PrepareTaxProviderListModelAsync(TaxProviderSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareTaxProviderListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get tax providers
         var taxProviders = (await _taxPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareTaxProviderListModelAsync(searchModel={SearchModel}): taxProviders → {TaxProviders}", searchModel, taxProviders);
         //prepare grid model
         var model = new TaxProviderListModel().PrepareToGrid(searchModel, taxProviders, () =>
         {
@@ -72,6 +76,7 @@ public partial class TaxModelFactory : ITaxModelFactory
                 //fill in model values from the entity
                 var taxProviderModel = provider.ToPluginModel<TaxProviderModel>();
 
+				logger.LogDebug("PrepareTaxProviderListModelAsync(searchModel={SearchModel}): taxProviderModel → {TaxProviderModel}", searchModel, taxProviderModel);
                 //fill in additional values (not existing in the entity)
                 taxProviderModel.ConfigurationUrl = provider.GetConfigurationPageUrl();
                 taxProviderModel.IsPrimaryTaxProvider = _taxPluginManager.IsPluginActive(provider);
@@ -80,6 +85,7 @@ public partial class TaxModelFactory : ITaxModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareTaxProviderListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -93,11 +99,13 @@ public partial class TaxModelFactory : ITaxModelFactory
     /// </returns>
     public virtual Task<TaxCategorySearchModel> PrepareTaxCategorySearchModelAsync(TaxCategorySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareTaxCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareTaxCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -111,11 +119,13 @@ public partial class TaxModelFactory : ITaxModelFactory
     /// </returns>
     public virtual async Task<TaxCategoryListModel> PrepareTaxCategoryListModelAsync(TaxCategorySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareTaxCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get tax categories
         var taxCategories = (await _taxCategoryService.GetAllTaxCategoriesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareTaxCategoryListModelAsync(searchModel={SearchModel}): taxCategories → {TaxCategories}", searchModel, taxCategories);
         //prepare grid model
         var model = new TaxCategoryListModel().PrepareToGrid(searchModel, taxCategories, () =>
         {
@@ -123,6 +133,7 @@ public partial class TaxModelFactory : ITaxModelFactory
             return taxCategories.Select(taxCategory => taxCategory.ToModel<TaxCategoryModel>());
         });
 
+		logger.LogDebug("<<< Exiting PrepareTaxCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

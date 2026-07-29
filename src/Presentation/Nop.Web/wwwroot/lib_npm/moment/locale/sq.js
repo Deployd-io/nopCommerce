@@ -19,9 +19,11 @@ export default moment.defineLocale('sq', {
     weekdaysParseExact: true,
     meridiemParse: /PD|MD/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return input.charAt(0) === 'M';
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         return hours < 12 ? 'PD' : 'MD';
     },
     longDateFormat: {

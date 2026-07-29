@@ -74,12 +74,15 @@ public partial class DiscountController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //whether discounts are ignored
         if (_catalogSettings.IgnoreDiscounts)
             _notificationService.WarningNotification(await _localizationService.GetResourceAsync("Admin.Promotions.Discounts.IgnoreDiscounts.Warning"));
@@ -87,6 +90,8 @@ public partial class DiscountController : BaseAdminController
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountSearchModelAsync(new DiscountSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -97,15 +102,19 @@ public partial class DiscountController : BaseAdminController
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountModelAsync(new DiscountModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -138,25 +147,31 @@ public partial class DiscountController : BaseAdminController
         model = await _discountModelFactory.PrepareDiscountModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(id);
         if (discount == null)
+			logger.LogDebug("Edit(id={Id}): discount → {Discount}", id, discount);
             return RedirectToAction("List");
 
         //a vendor should have access only to his discounts
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && discount.VendorId != currentVendor.Id)
+			logger.LogDebug("Edit(id={Id}): currentVendor → {CurrentVendor}", id, currentVendor);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountModelAsync(null, discount);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -215,6 +230,7 @@ public partial class DiscountController : BaseAdminController
         model = await _discountModelFactory.PrepareDiscountModelAsync(model, discount, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -222,19 +238,23 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(id);
         if (discount == null)
+			logger.LogDebug("Delete(id={Id}): discount → {Discount}", id, discount);
             return RedirectToAction("List");
 
         //a vendor should have access only to his discounts
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && discount.VendorId != currentVendor.Id)
+			logger.LogDebug("Delete(id={Id}): currentVendor → {CurrentVendor}", id, currentVendor);
             return RedirectToAction("List");
 
         //applied to products
         var products = await _productService.GetProductsWithAppliedDiscountAsync(discount.Id, true);
 
+		logger.LogDebug("Delete(id={Id}): products → {Products}", id, products);
         await _discountService.DeleteDiscountAsync(discount);
 
         //activity log
@@ -243,6 +263,7 @@ public partial class DiscountController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Promotions.Discounts.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -253,6 +274,7 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> GetDiscountRequirementConfigurationUrl(string systemName, int discountId, int? discountRequirementId)
     {
+		logger.LogDebug(">>> Entering GetDiscountRequirementConfigurationUrl(systemName={SystemName},discountId={DiscountId},discountRequirementId={DiscountRequirementId})", systemName, discountId, discountRequirementId);
         ArgumentException.ThrowIfNullOrEmpty(systemName);
 
         var discountRequirementRule = await _discountPluginManager.LoadPluginBySystemNameAsync(systemName)
@@ -263,6 +285,8 @@ public partial class DiscountController : BaseAdminController
 
         var url = discountRequirementRule.GetConfigurationUrl(discount.Id, discountRequirementId);
 
+		logger.LogDebug("GetDiscountRequirementConfigurationUrl(systemName={SystemName},discountId={DiscountId},discountRequirementId={DiscountRequirementId}): url → {Url}", systemName, discountId, discountRequirementId, url);
+		logger.LogDebug("<<< Exiting GetDiscountRequirementConfigurationUrl(systemName={SystemName},discountId={DiscountId},discountRequirementId={DiscountRequirementId})", systemName, discountId, discountRequirementId);
         return Json(new { url });
     }
 
@@ -356,10 +380,13 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> AddNewGroup(int discountId, string name)
     {
+		logger.LogDebug(">>> Entering AddNewGroup(discountId={DiscountId},name={Name})", discountId, name);
         var discount = await _discountService.GetDiscountByIdAsync(discountId) ?? throw new ArgumentException("Discount could not be loaded");
 
+		logger.LogDebug("AddNewGroup(discountId={DiscountId},name={Name}): discount → {Discount}", discountId, name, discount);
         var defaultGroup = (await _discountService.GetAllDiscountRequirementsAsync(discount.Id, true)).FirstOrDefault(requirement => requirement.IsGroup);
         if (defaultGroup == null)
+		logger.LogDebug("AddNewGroup(discountId={DiscountId},name={Name}): defaultGroup → {DefaultGroup}", discountId, name, defaultGroup);
         {
             //add default requirement group
             await _discountService.InsertDiscountRequirementAsync(new DiscountRequirement
@@ -388,16 +415,19 @@ public partial class DiscountController : BaseAdminController
 
         //set identifier as group name (if not specified)
         discountRequirementGroup.DiscountRequirementRuleSystemName = $"#{discountRequirementGroup.Id}";
+		logger.LogDebug("AddNewGroup(discountId={DiscountId},name={Name}): discountRequirementGroup.DiscountRequirementRuleSystemName → {Arg2}", discountId, name, discountRequirementGroup.DiscountRequirementRuleSystemName);
         await _discountService.UpdateDiscountRequirementAsync(discountRequirementGroup);
 
         await _discountService.UpdateDiscountAsync(discount);
 
+		logger.LogDebug("<<< Exiting AddNewGroup(discountId={DiscountId},name={Name})", discountId, name);
         return Json(new { Result = true, NewRequirementId = discountRequirementGroup.Id });
     }
 
     //action displaying notification (warning) to a store owner that entered coupon code already exists
     public virtual async Task<IActionResult> CouponCodeReservedWarning(int discountId, string couponCode)
     {
+		logger.LogDebug(">>> Entering CouponCodeReservedWarning(discountId={DiscountId},couponCode={CouponCode})", discountId, couponCode);
         if (string.IsNullOrEmpty(couponCode))
             return Json(new { Result = string.Empty });
 
@@ -408,6 +438,8 @@ public partial class DiscountController : BaseAdminController
             return Json(new { Result = string.Empty });
 
         var message = string.Format(await _localizationService.GetResourceAsync("Admin.Promotions.Discounts.Fields.CouponCode.Reserved"), discounts.FirstOrDefault().Name);
+		logger.LogDebug("CouponCodeReservedWarning(discountId={DiscountId},couponCode={CouponCode}): message → {Message}", discountId, couponCode, message);
+		logger.LogDebug("<<< Exiting CouponCodeReservedWarning(discountId={DiscountId},couponCode={CouponCode})", discountId, couponCode);
         return Json(new { Result = message });
     }
 
@@ -419,6 +451,7 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> ProductList(DiscountProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductList(searchModel={SearchModel})", searchModel);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(searchModel.DiscountId)
             ?? throw new ArgumentException("No discount found with the specified id");
@@ -426,12 +459,15 @@ public partial class DiscountController : BaseAdminController
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountProductListModelAsync(searchModel, discount);
 
+		logger.LogDebug("ProductList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductDelete(int discountId, int productId)
     {
+		logger.LogDebug(">>> Entering ProductDelete(discountId={DiscountId},productId={ProductId})", discountId, productId);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(discountId)
             ?? throw new ArgumentException("No discount found with the specified id", nameof(discountId));
@@ -446,15 +482,19 @@ public partial class DiscountController : BaseAdminController
 
         await _productService.UpdateProductAsync(product);
 
+		logger.LogDebug("<<< Exiting ProductDelete(discountId={DiscountId},productId={ProductId})", discountId, productId);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopup(int discountId)
     {
+		logger.LogDebug(">>> Entering ProductAddPopup(discountId={DiscountId})", discountId);
         //prepare model
         var model = await _discountModelFactory.PrepareAddProductToDiscountSearchModelAsync(new AddProductToDiscountSearchModel());
 
+		logger.LogDebug("ProductAddPopup(discountId={DiscountId}): model → {Model}", discountId, model);
+		logger.LogDebug("<<< Exiting ProductAddPopup(discountId={DiscountId})", discountId);
         return View(model);
     }
 
@@ -462,9 +502,12 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopupList(AddProductToDiscountSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _discountModelFactory.PrepareAddProductToDiscountListModelAsync(searchModel);
 
+		logger.LogDebug("ProductAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -502,6 +545,7 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> CategoryList(DiscountCategorySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering CategoryList(searchModel={SearchModel})", searchModel);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(searchModel.DiscountId)
             ?? throw new ArgumentException("No discount found with the specified id");
@@ -509,12 +553,15 @@ public partial class DiscountController : BaseAdminController
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountCategoryListModelAsync(searchModel, discount);
 
+		logger.LogDebug("CategoryList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting CategoryList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CategoryDelete(int discountId, int categoryId)
     {
+		logger.LogDebug(">>> Entering CategoryDelete(discountId={DiscountId},categoryId={CategoryId})", discountId, categoryId);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(discountId)
             ?? throw new ArgumentException("No discount found with the specified id", nameof(discountId));
@@ -529,15 +576,19 @@ public partial class DiscountController : BaseAdminController
 
         await _categoryService.UpdateCategoryAsync(category);
 
+		logger.LogDebug("<<< Exiting CategoryDelete(discountId={DiscountId},categoryId={CategoryId})", discountId, categoryId);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CategoryAddPopup(int discountId)
     {
+		logger.LogDebug(">>> Entering CategoryAddPopup(discountId={DiscountId})", discountId);
         //prepare model
         var model = await _discountModelFactory.PrepareAddCategoryToDiscountSearchModelAsync(new AddCategoryToDiscountSearchModel());
 
+		logger.LogDebug("CategoryAddPopup(discountId={DiscountId}): model → {Model}", discountId, model);
+		logger.LogDebug("<<< Exiting CategoryAddPopup(discountId={DiscountId})", discountId);
         return View(model);
     }
 
@@ -545,9 +596,12 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CategoryAddPopupList(AddCategoryToDiscountSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering CategoryAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _discountModelFactory.PrepareAddCategoryToDiscountListModelAsync(searchModel);
 
+		logger.LogDebug("CategoryAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting CategoryAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -585,6 +639,7 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> ManufacturerList(DiscountManufacturerSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ManufacturerList(searchModel={SearchModel})", searchModel);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(searchModel.DiscountId)
             ?? throw new ArgumentException("No discount found with the specified id");
@@ -592,12 +647,15 @@ public partial class DiscountController : BaseAdminController
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountManufacturerListModelAsync(searchModel, discount);
 
+		logger.LogDebug("ManufacturerList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ManufacturerList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ManufacturerDelete(int discountId, int manufacturerId)
     {
+		logger.LogDebug(">>> Entering ManufacturerDelete(discountId={DiscountId},manufacturerId={ManufacturerId})", discountId, manufacturerId);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(discountId)
             ?? throw new ArgumentException("No discount found with the specified id", nameof(discountId));
@@ -612,15 +670,19 @@ public partial class DiscountController : BaseAdminController
 
         await _manufacturerService.UpdateManufacturerAsync(manufacturer);
 
+		logger.LogDebug("<<< Exiting ManufacturerDelete(discountId={DiscountId},manufacturerId={ManufacturerId})", discountId, manufacturerId);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ManufacturerAddPopup(int discountId)
     {
+		logger.LogDebug(">>> Entering ManufacturerAddPopup(discountId={DiscountId})", discountId);
         //prepare model
         var model = await _discountModelFactory.PrepareAddManufacturerToDiscountSearchModelAsync(new AddManufacturerToDiscountSearchModel());
 
+		logger.LogDebug("ManufacturerAddPopup(discountId={DiscountId}): model → {Model}", discountId, model);
+		logger.LogDebug("<<< Exiting ManufacturerAddPopup(discountId={DiscountId})", discountId);
         return View(model);
     }
 
@@ -628,9 +690,12 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ManufacturerAddPopupList(AddManufacturerToDiscountSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ManufacturerAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _discountModelFactory.PrepareAddManufacturerToDiscountListModelAsync(searchModel);
 
+		logger.LogDebug("ManufacturerAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ManufacturerAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -668,6 +733,7 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public virtual async Task<IActionResult> UsageHistoryList(DiscountUsageHistorySearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering UsageHistoryList(searchModel={SearchModel})", searchModel);
         //try to get a discount with the specified id
         var discount = await _discountService.GetDiscountByIdAsync(searchModel.DiscountId)
             ?? throw new ArgumentException("No discount found with the specified id");
@@ -675,6 +741,8 @@ public partial class DiscountController : BaseAdminController
         //prepare model
         var model = await _discountModelFactory.PrepareDiscountUsageHistoryListModelAsync(searchModel, discount);
 
+		logger.LogDebug("UsageHistoryList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting UsageHistoryList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -682,6 +750,7 @@ public partial class DiscountController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> UsageHistoryDelete(int discountId, int id)
     {
+		logger.LogDebug(">>> Entering UsageHistoryDelete(discountId={DiscountId},id={Id})", discountId, id);
         //try to get a discount with the specified id
         _ = await _discountService.GetDiscountByIdAsync(discountId)
             ?? throw new ArgumentException("No discount found with the specified id", nameof(discountId));
@@ -692,6 +761,7 @@ public partial class DiscountController : BaseAdminController
 
         await _discountService.DeleteDiscountUsageHistoryAsync(discountUsageHistoryEntry);
 
+		logger.LogDebug("<<< Exiting UsageHistoryDelete(discountId={DiscountId},id={Id})", discountId, id);
         return new NullJsonResult();
     }
 

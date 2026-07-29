@@ -28,17 +28,20 @@ export default moment.defineLocale('it-ch', {
         nextWeek: 'dddd [alle] LT',
         lastDay: '[Ieri alle] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[la scorsa] dddd [alle] LT';
                 default:
                     return '[lo scorso] dddd [alle] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },
     relativeTime: {
         future: function (s) {
+			logger.debug(`>>> Entering future(s=${s})`);
             return (/^[0-9].+$/.test(s) ? 'tra' : 'in') + ' ' + s;
         },
         past: '%s fa',

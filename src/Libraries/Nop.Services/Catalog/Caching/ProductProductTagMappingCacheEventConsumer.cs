@@ -15,6 +15,8 @@ public partial class ProductProductTagMappingCacheEventConsumer : CacheEventCons
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductProductTagMapping entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.ProductTagsByProductCacheKey, entity.ProductId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

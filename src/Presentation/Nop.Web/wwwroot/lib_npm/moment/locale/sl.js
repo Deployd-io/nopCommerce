@@ -5,6 +5,7 @@
 import moment from '../moment';
 
 function processRelativeTime(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     switch (key) {
         case 's':
@@ -13,6 +14,7 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
                 : 'nekaj sekundami';
         case 'ss':
             if (number === 1) {
+				logger.debug(`processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture}): result → ${result}`);
                 result += withoutSuffix ? 'sekundo' : 'sekundi';
             } else if (number === 2) {
                 result += withoutSuffix || isFuture ? 'sekundi' : 'sekundah';
@@ -84,6 +86,7 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
             } else {
                 result += withoutSuffix || isFuture ? 'let' : 'leti';
             }
+			logger.debug(`<<< Exiting processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
             return result;
     }
 }
@@ -114,6 +117,7 @@ export default moment.defineLocale('sl', {
         nextDay: '[jutri ob] LT',
 
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[v] [nedeljo] [ob] LT';
@@ -127,9 +131,11 @@ export default moment.defineLocale('sl', {
                 case 5:
                     return '[v] dddd [ob] LT';
             }
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: '[včeraj ob] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[prejšnjo] [nedeljo] [ob] LT';
@@ -143,6 +149,7 @@ export default moment.defineLocale('sl', {
                 case 5:
                     return '[prejšnji] dddd [ob] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

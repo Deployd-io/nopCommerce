@@ -16,9 +16,11 @@ public partial class UrlRecordBuilder : NopEntityBuilder<UrlRecord>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(UrlRecord.EntityName)).AsString(400).NotNullable()
             .WithColumn(nameof(UrlRecord.Slug)).AsString(400).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

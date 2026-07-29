@@ -11,6 +11,7 @@ public class AutoMapperConfigurationTest
     [Test]
     public void ConfigurationIsValid()
     {
+		logger.LogDebug(">>> Entering ConfigurationIsValid()");
         var config = new MapperConfiguration(cfg =>
         {
             cfg.AddProfile(typeof(AdminMapperConfiguration));
@@ -18,5 +19,6 @@ public class AutoMapperConfigurationTest
 
         AutoMapperConfiguration.Init(config);
         AutoMapperConfiguration.MapperConfiguration.AssertConfigurationIsValid();
+		logger.LogDebug("<<< Exiting ConfigurationIsValid()");
     }
 }

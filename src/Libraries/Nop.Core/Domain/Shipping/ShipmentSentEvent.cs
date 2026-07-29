@@ -11,7 +11,10 @@ public partial class ShipmentSentEvent
     /// <param name="shipment">Shipment</param>
     public ShipmentSentEvent(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering ShipmentSentEvent(shipment={Shipment})", shipment);
         Shipment = shipment;
+		logger.LogDebug("<<< Exiting ShipmentSentEvent(shipment={Shipment})", shipment);
+		logger.LogDebug("ShipmentSentEvent(shipment={Shipment}): Shipment → {Shipment1}", shipment, Shipment);
     }
 
     /// <summary>

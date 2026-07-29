@@ -18,7 +18,10 @@ public partial class LocalizedModelFactory : ILocalizedModelFactory
 
     public LocalizedModelFactory(ILanguageService languageService)
     {
+		logger.LogDebug(">>> Entering LocalizedModelFactory(languageService={LanguageService})", languageService);
         _languageService = languageService;
+		logger.LogDebug("<<< Exiting LocalizedModelFactory(languageService={LanguageService})", languageService);
+		logger.LogDebug("LocalizedModelFactory(languageService={LanguageService}): _languageService → {_languageService}", languageService, _languageService);
     }
 
     #endregion
@@ -36,6 +39,7 @@ public partial class LocalizedModelFactory : ILocalizedModelFactory
     /// </returns>
     public virtual async Task<IList<T>> PrepareLocalizedModelsAsync<T>(Func<T, int, Task> configure = null) where T : ILocalizedLocaleModel
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get all available languages
         var availableLanguages = await _languageService.GetAllLanguagesAsync(true);
 

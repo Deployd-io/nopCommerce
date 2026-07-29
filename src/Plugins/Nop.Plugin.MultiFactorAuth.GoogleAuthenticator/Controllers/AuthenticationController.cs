@@ -53,10 +53,13 @@ public class AuthenticationController : BasePluginController
     [HttpPost]
     public async Task<IActionResult> RegisterGoogleAuthenticator(AuthModel model)
     {
+		logger.LogDebug(">>> Entering RegisterGoogleAuthenticator(model={Model})", model);
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("RegisterGoogleAuthenticator(model={Model}): currentCustomer → {CurrentCustomer}", model, currentCustomer);
         var isValidToken = _googleAuthenticatorService.ValidateTwoFactorToken(model.SecretKey, model.Code);
         if (isValidToken)
+		logger.LogDebug("RegisterGoogleAuthenticator(model={Model}): isValidToken → {IsValidToken}", model, isValidToken);
         {
             //try to find config with current customer and update
             if (_googleAuthenticatorService.IsRegisteredCustomer(currentCustomer.Email))
@@ -75,26 +78,33 @@ public class AuthenticationController : BasePluginController
             return RedirectToRoute(NopRouteNames.Standard.CUSTOMER_MULTI_FACTOR_AUTHENTICATION_PROVIDER_CONFIG, new { providerSysName = GoogleAuthenticatorDefaults.SystemName });
         }
 
+		logger.LogDebug("<<< Exiting RegisterGoogleAuthenticator(model={Model})", model);
         return RedirectToRoute(NopRouteNames.Standard.MULTI_FACTOR_AUTHENTICATION_SETTINGS);
     }
 
     [HttpPost]
     public async Task<IActionResult> VerifyGoogleAuthenticator(TokenModel model)
     {
+		logger.LogDebug(">>> Entering VerifyGoogleAuthenticator(model={Model})", model);
         var customerMultiFactorAuthenticationInfo = await HttpContext.Session.GetAsync<CustomerMultiFactorAuthenticationInfo>(NopCustomerDefaults.CustomerMultiFactorAuthenticationInfo);
         var username = customerMultiFactorAuthenticationInfo.UserName;
+		logger.LogDebug("VerifyGoogleAuthenticator(model={Model}): customerMultiFactorAuthenticationInfo → {CustomerMultiFactorAuthenticationInfo}", model, customerMultiFactorAuthenticationInfo);
+		logger.LogDebug("VerifyGoogleAuthenticator(model={Model}): username → {Username}", model, username);
         var returnUrl = customerMultiFactorAuthenticationInfo.ReturnUrl;
         var isPersist = customerMultiFactorAuthenticationInfo.RememberMe;
 
         var customer = _customerSettings.UsernamesEnabled ? await _customerService.GetCustomerByUsernameAsync(username) : await _customerService.GetCustomerByEmailAsync(username);
         if (customer == null)
+			logger.LogDebug("VerifyGoogleAuthenticator(model={Model}): customer → {Customer}", model, customer);
             return RedirectToRoute(NopRouteNames.General.LOGIN);
 
         var record = _googleAuthenticatorService.GetConfigurationByCustomerEmail(customer.Email);
         if (record != null)
+		logger.LogDebug("VerifyGoogleAuthenticator(model={Model}): record → {Record}", model, record);
         {
             var isValidToken = _googleAuthenticatorService.ValidateTwoFactorToken(record.SecretKey, model.Token);
             if (isValidToken)
+			logger.LogDebug("VerifyGoogleAuthenticator(model={Model}): isValidToken → {IsValidToken}", model, isValidToken);
             {
                 await HttpContext.Session.SetAsync<CustomerMultiFactorAuthenticationInfo>(NopCustomerDefaults.CustomerMultiFactorAuthenticationInfo, null);
 
@@ -110,6 +120,7 @@ public class AuthenticationController : BasePluginController
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Plugins.MultiFactorAuth.GoogleAuthenticator.Record.Notfound"));
         }
 
+		logger.LogDebug("<<< Exiting VerifyGoogleAuthenticator(model={Model})", model);
         return RedirectToRoute(NopRouteNames.Standard.MULTIFACTOR_VERIFICATION);
     }
 

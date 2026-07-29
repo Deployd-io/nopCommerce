@@ -10,6 +10,7 @@ public partial class ArtificialIntelligenceFullDescriptionValidator : BaseNopVal
 {
     public ArtificialIntelligenceFullDescriptionValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ArtificialIntelligenceFullDescriptionValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.ProductName)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Products.AiFullDescription.ProductName.Required"));
@@ -22,5 +23,6 @@ public partial class ArtificialIntelligenceFullDescriptionValidator : BaseNopVal
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Products.AiFullDescription.CustomToneOfVoice.Required"))
             .When(x => x.ToneOfVoiceId == (int)ToneOfVoiceType.Custom);
+			logger.LogDebug("<<< Exiting ArtificialIntelligenceFullDescriptionValidator(localizationService={LocalizationService})", localizationService);
     }
 }

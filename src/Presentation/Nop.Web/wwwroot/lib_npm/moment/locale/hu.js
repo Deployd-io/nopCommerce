@@ -8,6 +8,7 @@ import moment from '../moment';
 var weekEndings =
     'vasárnap hétfőn kedden szerdán csütörtökön pénteken szombaton'.split(' ');
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var num = number;
     switch (key) {
         case 's':
@@ -39,9 +40,12 @@ function translate(number, withoutSuffix, key, isFuture) {
         case 'yy':
             return num + (isFuture || withoutSuffix ? ' év' : ' éve');
     }
+	logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return '';
 }
 function week(isFuture) {
+	logger.debug(`>>> Entering week(isFuture=${isFuture})`);
+	logger.debug(`<<< Exiting week(isFuture=${isFuture})`);
     return (
         (isFuture ? '' : '[múlt] ') +
         '[' +
@@ -72,12 +76,14 @@ export default moment.defineLocale('hu', {
     },
     meridiemParse: /de|du/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return input.charAt(1).toLowerCase() === 'u';
     },
     meridiem: function (hours, minutes, isLower) {
         if (hours < 12) {
             return isLower === true ? 'de' : 'DE';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower === true ? 'du' : 'DU';
         }
     },
@@ -85,10 +91,12 @@ export default moment.defineLocale('hu', {
         sameDay: '[ma] LT[-kor]',
         nextDay: '[holnap] LT[-kor]',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return week.call(this, true);
         },
         lastDay: '[tegnap] LT[-kor]',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return week.call(this, false);
         },
         sameElse: 'L',

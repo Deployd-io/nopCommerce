@@ -201,11 +201,16 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// <returns>The <see cref="Task"/> containing the <see cref="ShipmentModel"/></returns>
     protected virtual async Task<ShipmentModel> PrepareShipmentModelAsync(Shipment shipment, ShipmentModel model = null)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentModelAsync(shipment={Shipment},model={Model})", shipment, model);
         //fill in model values from the entity
         var shipmentModel = model ?? shipment.ToModel<ShipmentModel>();
 
+		logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel → {ShipmentModel}", shipment, model, shipmentModel);
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId);
 
+		logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): order → {Order}", shipment, model, order);
+		logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.PickupInStore → {Arg2}", shipment, model, shipmentModel.PickupInStore);
+		logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.CustomOrderNumber → {Arg2}", shipment, model, shipmentModel.CustomOrderNumber);
         shipmentModel.PickupInStore = order.PickupInStore;
         shipmentModel.CustomOrderNumber = order.CustomOrderNumber;
 
@@ -214,6 +219,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         {
             shipmentModel.ShippedDate = await _localizationService.GetResourceAsync("Admin.Orders.Shipments.DateNotAvailable");
             shipmentModel.ReadyForPickupDate = shipment.ReadyForPickupDateUtc.HasValue
+				logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.ReadyForPickupDate → {Arg2}", shipment, model, shipmentModel.ReadyForPickupDate);
                 ? (await _dateTimeHelper.ConvertToUserTimeAsync(shipment.ReadyForPickupDateUtc.Value, DateTimeKind.Utc)).ToString()
                 : await _localizationService.GetResourceAsync("Admin.Orders.Shipments.ReadyForPickupDate.NotYet");
         }
@@ -221,16 +227,20 @@ public partial class OrderModelFactory : IOrderModelFactory
         {
             shipmentModel.ReadyForPickupDate = await _localizationService.GetResourceAsync("Admin.Orders.Shipments.DateNotAvailable");
             shipmentModel.ShippedDate = shipment.ShippedDateUtc.HasValue
+				logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.ShippedDate → {Arg2}", shipment, model, shipmentModel.ShippedDate);
                 ? (await _dateTimeHelper.ConvertToUserTimeAsync(shipment.ShippedDateUtc.Value, DateTimeKind.Utc)).ToString()
                 : await _localizationService.GetResourceAsync("Admin.Orders.Shipments.ShippedDate.NotYet");
         }
 
         shipmentModel.DeliveryDate = shipment.DeliveryDateUtc.HasValue
+			logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.DeliveryDate → {Arg2}", shipment, model, shipmentModel.DeliveryDate);
             ? (await _dateTimeHelper.ConvertToUserTimeAsync(shipment.DeliveryDateUtc.Value, DateTimeKind.Utc)).ToString()
             : await _localizationService.GetResourceAsync("Admin.Orders.Shipments.DeliveryDate.NotYet");
 
         //fill in additional values (not existing in the entity)
         shipmentModel.CanShip = !order.PickupInStore && !shipment.ShippedDateUtc.HasValue;
+		logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.CanShip → {Arg2}", shipment, model, shipmentModel.CanShip);
+		logger.LogDebug("PrepareShipmentModelAsync(shipment={Shipment},model={Model}): shipmentModel.CanMarkAsReadyForPickup → {Arg2}", shipment, model, shipmentModel.CanMarkAsReadyForPickup);
         shipmentModel.CanMarkAsReadyForPickup = order.PickupInStore && !shipment.ReadyForPickupDateUtc.HasValue;
         shipmentModel.CanDeliver = (shipment.ShippedDateUtc.HasValue || shipment.ReadyForPickupDateUtc.HasValue) && !shipment.DeliveryDateUtc.HasValue;
 
@@ -542,6 +552,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         model.Profit = await _priceFormatter
             .FormatOrderPriceAsync(profit, order.CurrencyRate, order.CustomerCurrencyCode,
                 _orderSettings.DisplayCustomerCurrencyOnOrders, primaryStoreCurrency, languageId, null, false);
+				logger.LogDebug("<<< Exiting PrepareOrderModelTotalsAsync(model={Model},order={Order})", model, order);
     }
 
     /// <summary>
@@ -668,6 +679,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             model.PickupAddressGoogleMapsUrl = $"https://maps.google.com/maps?f=q&hl=en&ie=UTF8&oe=UTF8&geocode=&q=" +
                                                $"{WebUtility.UrlEncode($"{pickupAddress.Address1} {pickupAddress.ZipPostalCode} {pickupAddress.City} {(pickupCountry?.Name ?? string.Empty)}")}";
         }
+		logger.LogDebug("<<< Exiting PrepareOrderModelShippingInfoAsync(model={Model},order={Order})", model, order);
     }
 
     /// <summary>
@@ -793,6 +805,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         var rentalEndDate = orderItem.RentalEndDateUtc.HasValue
             ? _productService.FormatRentalDate(product, orderItem.RentalEndDateUtc.Value) : string.Empty;
         model.RentalInfo = string.Format(await _localizationService.GetResourceAsync("Order.Rental.FormattedDate"), rentalStartDate, rentalEndDate);
+		logger.LogDebug("<<< Exiting PrepareShipmentItemModelAsync(model={Model},orderItem={OrderItem},product={Product})", model, orderItem, product);
     }
 
     /// <summary>
@@ -803,11 +816,14 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareShipmentStatusEventModelsAsync(IList<ShipmentStatusEventModel> models, Shipment shipment)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentStatusEventModelsAsync(models={Models},shipment={Shipment})", models, shipment);
         ArgumentNullException.ThrowIfNull(models);
 
         var shipmentTracker = await _shipmentService.GetShipmentTrackerAsync(shipment);
         var shipmentEvents = await shipmentTracker?.GetShipmentEventsAsync(shipment.TrackingNumber, shipment);
+		logger.LogDebug("PrepareShipmentStatusEventModelsAsync(models={Models},shipment={Shipment}): shipmentTracker → {ShipmentTracker}", models, shipment, shipmentTracker);
         if (shipmentEvents == null)
+			logger.LogDebug("PrepareShipmentStatusEventModelsAsync(models={Models},shipment={Shipment}): shipmentEvents → {ShipmentEvents}", models, shipment, shipmentEvents);
             return;
 
         foreach (var shipmentEvent in shipmentEvents)
@@ -821,9 +837,11 @@ public partial class OrderModelFactory : IOrderModelFactory
             };
             var shipmentEventCountry = await _countryService.GetCountryByTwoLetterIsoCodeAsync(shipmentEvent.CountryCode);
             shipmentStatusEventModel.Country = shipmentEventCountry != null
+				logger.LogDebug("PrepareShipmentStatusEventModelsAsync(models={Models},shipment={Shipment}): shipmentEventCountry → {ShipmentEventCountry}", models, shipment, shipmentEventCountry);
                 ? await _localizationService.GetLocalizedAsync(shipmentEventCountry, x => x.Name) : shipmentEvent.CountryCode;
             models.Add(shipmentStatusEventModel);
         }
+		logger.LogDebug("<<< Exiting PrepareShipmentStatusEventModelsAsync(models={Models},shipment={Shipment})", models, shipment);
     }
 
     /// <summary>
@@ -856,11 +874,13 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// <returns>Shipment item search model</returns>
     protected virtual ShipmentItemSearchModel PrepareShipmentItemSearchModel(ShipmentItemSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentItemSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareShipmentItemSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -898,16 +918,21 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<OrderSearchModel> PrepareOrderSearchModelAsync(OrderSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOrderSearchModelAsync(searchModel={SearchModel})", searchModel);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
         searchModel.BillingPhoneEnabled = _addressSettings.PhoneEnabled;
+		logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): searchModel.BillingPhoneEnabled → {Arg1}", searchModel, searchModel.BillingPhoneEnabled);
 
         var licenseCheckModel = new LicenseCheckModel();
         try
+		logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): licenseCheckModel → {LicenseCheckModel}", searchModel, licenseCheckModel);
         {
             var result = await _nopHttpClient.GetLicenseCheckDetailsAsync();
             if (!string.IsNullOrEmpty(result))
+			logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): result → {Result}", searchModel, result);
             {
                 licenseCheckModel = JsonConvert.DeserializeObject<LicenseCheckModel>(result);
                 if (licenseCheckModel.DisplayWarning == false && licenseCheckModel.BlockPages == false)
@@ -916,6 +941,8 @@ public partial class OrderModelFactory : IOrderModelFactory
         }
         catch { }
         searchModel.LicenseCheckModel = licenseCheckModel;
+		logger.LogError("Exception in PrepareOrderSearchModelAsync(searchModel={SearchModel}): {Arg1}", searchModel, ex.Message);
+		logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): searchModel.LicenseCheckModel → {Arg1}", searchModel, searchModel.LicenseCheckModel);
 
         //prepare available order, payment and shipping statuses
         await _baseAdminModelFactory.PrepareOrderStatusesAsync(searchModel.AvailableOrderStatuses);
@@ -925,9 +952,12 @@ public partial class OrderModelFactory : IOrderModelFactory
             {
                 var ids = searchModel.OrderStatusIds.Select(id => id.ToString());
                 var statusItems = searchModel.AvailableOrderStatuses.Where(statusItem => ids.Contains(statusItem.Value)).ToList();
+				logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): ids → {Ids}", searchModel, ids);
+				logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): statusItems → {StatusItems}", searchModel, statusItems);
                 foreach (var statusItem in statusItems)
                 {
                     statusItem.Selected = true;
+					logger.LogDebug("PrepareOrderSearchModelAsync(searchModel={SearchModel}): statusItem.Selected → {Arg1}", searchModel, statusItem.Selected);
                 }
             }
             else
@@ -990,6 +1020,8 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         searchModel.HideStoresList = _catalogSettings.IgnoreStoreLimitations || searchModel.AvailableStores.SelectionIsNotPossible();
 
+		logger.LogInformation("PrepareOrderSearchModelAsync(searchModel)={SearchModel}: external service call took {Arg1} ms", searchModel, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareOrderSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1003,13 +1035,19 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<OrderListModel> PrepareOrderListModelAsync(OrderSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOrderListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter orders
         var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
         var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
+		logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): orderStatusIds → {OrderStatusIds}", searchModel, orderStatusIds);
+		logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): paymentStatusIds → {PaymentStatusIds}", searchModel, paymentStatusIds);
+		logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): searchModel.VendorId → {Arg1}", searchModel, searchModel.VendorId);
         var shippingStatusIds = (searchModel.ShippingStatusIds?.Contains(0) ?? true) ? null : searchModel.ShippingStatusIds.ToList();
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): shippingStatusIds → {ShippingStatusIds}", searchModel, shippingStatusIds);
+		logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null)
             searchModel.VendorId = currentVendor.Id;
         var startDateValue = !searchModel.StartDate.HasValue ? null
@@ -1019,6 +1057,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         var product = await _productService.GetProductByIdAsync(searchModel.ProductId);
         var filterByProductId = product != null && (currentVendor == null || product.VendorId == currentVendor.Id)
             ? searchModel.ProductId : 0;
+			logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): product → {Product}", searchModel, product);
 
         //get orders
         var orders = await _orderService.SearchOrdersAsync(storeId: searchModel.StoreId,
@@ -1046,6 +1085,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             {
                 var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
+				logger.LogDebug("PrepareOrderListModelAsync(searchModel={SearchModel}): billingAddress → {BillingAddress}", searchModel, billingAddress);
                 //fill in model values from the entity
                 var orderModel = new OrderModel
                 {
@@ -1073,6 +1113,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareOrderListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1086,6 +1127,7 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<OrderAggreratorModel> PrepareOrderAggregatorModelAsync(OrderSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOrderAggregatorModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         if (!_orderSettings.DisplayOrderSummary)
@@ -1094,8 +1136,13 @@ public partial class OrderModelFactory : IOrderModelFactory
         //get parameters to filter orders
         var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
         var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): orderStatusIds → {OrderStatusIds}", searchModel, orderStatusIds);
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): paymentStatusIds → {PaymentStatusIds}", searchModel, paymentStatusIds);
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): searchModel.VendorId → {Arg1}", searchModel, searchModel.VendorId);
         var shippingStatusIds = (searchModel.ShippingStatusIds?.Contains(0) ?? true) ? null : searchModel.ShippingStatusIds.ToList();
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): shippingStatusIds → {ShippingStatusIds}", searchModel, shippingStatusIds);
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null)
             searchModel.VendorId = currentVendor.Id;
         var startDateValue = !searchModel.StartDate.HasValue ? null
@@ -1105,6 +1152,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         var product = await _productService.GetProductByIdAsync(searchModel.ProductId);
         var filterByProductId = product != null && (currentVendor == null || product.VendorId == currentVendor.Id)
             ? searchModel.ProductId : 0;
+			logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): product → {Product}", searchModel, product);
 
         //prepare additional model data
         var reportSummary = await _orderReportService.GetOrderAverageReportLineAsync(storeId: searchModel.StoreId,
@@ -1141,11 +1189,15 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
         var shippingSum = await _priceFormatter
+			logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): primaryStoreCurrency → {PrimaryStoreCurrency}", searchModel, primaryStoreCurrency);
             .FormatShippingPriceAsync(reportSummary.SumShippingExclTax, true, primaryStoreCurrency, (await _workContext.GetWorkingLanguageAsync()).Id, false);
         var taxSum = await _priceFormatter.FormatPriceAsync(reportSummary.SumTax, true, false);
         var totalSum = await _priceFormatter.FormatPriceAsync(reportSummary.SumOrders, true, false);
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): taxSum → {TaxSum}", searchModel, taxSum);
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): totalSum → {TotalSum}", searchModel, totalSum);
         var profitSum = await _priceFormatter.FormatPriceAsync(profit, true, false);
 
+		logger.LogDebug("PrepareOrderAggregatorModelAsync(searchModel={SearchModel}): profitSum → {ProfitSum}", searchModel, profitSum);
         var model = new OrderAggreratorModel
         {
             AggregatorProfit = profitSum,
@@ -1154,6 +1206,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             AggregatorTotal = totalSum
         };
 
+		logger.LogDebug("<<< Exiting PrepareOrderAggregatorModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1408,6 +1461,7 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<ShipmentSearchModel> PrepareShipmentSearchModelAsync(ShipmentSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available countries
@@ -1425,6 +1479,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareShipmentSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1438,11 +1493,13 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<ShipmentListModel> PrepareShipmentListModelAsync(ShipmentSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter shipments
         var vendor = await _workContext.GetCurrentVendorAsync();
         var vendorId = vendor?.Id ?? 0;
+		logger.LogDebug("PrepareShipmentListModelAsync(searchModel={SearchModel}): vendor → {Vendor}", searchModel, vendor);
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -1471,7 +1528,9 @@ public partial class OrderModelFactory : IOrderModelFactory
             //fill in model values from the entity
             return shipments.SelectAwait(async shipment => await PrepareShipmentModelAsync(shipment));
         });
+		logger.LogDebug("PrepareShipmentListModelAsync(searchModel={SearchModel}): shipment → {Shipment}", searchModel, shipment);
 
+		logger.LogDebug("<<< Exiting PrepareShipmentListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1590,6 +1649,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             model.Items.Add(shipmentItemModel);
         }
 
+		logger.LogDebug("<<< Exiting PrepareShipmentModelAsync(shipment={Shipment},model={Model})", shipment, model);
         return model;
     }
 
@@ -1640,6 +1700,7 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<ShipmentItemListModel> PrepareShipmentItemListModelAsync(ShipmentItemSearchModel searchModel, Shipment shipment)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment})", searchModel, shipment);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(shipment);
@@ -1647,6 +1708,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         //get shipments
         var shipmentItems = (await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id)).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): shipmentItems → {ShipmentItems}", searchModel, shipment, shipmentItems);
         //prepare list model
         var model = await new ShipmentItemListModel().PrepareToGridAsync(searchModel, shipmentItems, () =>
         {
@@ -1663,10 +1725,15 @@ public partial class OrderModelFactory : IOrderModelFactory
                 //fill in additional values (not existing in the entity)
                 var orderItem = await _orderService.GetOrderItemByIdAsync(item.OrderItemId);
                 if (orderItem == null)
+					logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): orderItem → {OrderItem}", searchModel, shipment, orderItem);
                     return shipmentItemModel;
 
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+				logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): product → {Product}", searchModel, shipment, product);
+				logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): shipmentItemModel.OrderItemId → {Arg2}", searchModel, shipment, shipmentItemModel.OrderItemId);
+				logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): shipmentItemModel.ProductId → {Arg2}", searchModel, shipment, shipmentItemModel.ProductId);
+				logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): shipmentItemModel.ProductName → {Arg2}", searchModel, shipment, shipmentItemModel.ProductName);
                 shipmentItemModel.OrderItemId = orderItem.Id;
                 shipmentItemModel.ProductId = orderItem.ProductId;
                 shipmentItemModel.ProductName = product.Name;
@@ -1675,9 +1742,12 @@ public partial class OrderModelFactory : IOrderModelFactory
 
                 var baseWeight = (await _measureService.GetMeasureWeightByIdAsync(_measureSettings.BaseWeightId))?.Name;
                 var baseDimension = (await _measureService.GetMeasureDimensionByIdAsync(_measureSettings.BaseDimensionId))?.Name;
+				logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): baseWeight → {BaseWeight}", searchModel, shipment, baseWeight);
+				logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): baseDimension → {BaseDimension}", searchModel, shipment, baseDimension);
 
                 if (orderItem.ItemWeight.HasValue)
                     shipmentItemModel.ItemWeight = $"{orderItem.ItemWeight:F2} [{baseWeight}]";
+					logger.LogDebug("PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment}): shipmentItemModel.ItemWeight → {Arg2}", searchModel, shipment, shipmentItemModel.ItemWeight);
 
                 shipmentItemModel.ItemDimensions =
                     $"{product.Length:F2} x {product.Width:F2} x {product.Height:F2} [{baseDimension}]";
@@ -1686,6 +1756,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareShipmentItemListModelAsync(searchModel={SearchModel},shipment={Shipment})", searchModel, shipment);
         return model;
     }
 
@@ -1741,11 +1812,13 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual Task<BestsellerBriefSearchModel> PrepareBestsellerBriefSearchModelAsync(BestsellerBriefSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareBestsellerBriefSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize(5);
 
+		logger.LogDebug("<<< Exiting PrepareBestsellerBriefSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -1759,10 +1832,12 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<BestsellerBriefListModel> PrepareBestsellerBriefListModelAsync(BestsellerBriefSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareBestsellerBriefListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var vendor = await _workContext.GetCurrentVendorAsync();
         //get bestsellers
+		logger.LogDebug("PrepareBestsellerBriefListModelAsync(searchModel={SearchModel}): vendor → {Vendor}", searchModel, vendor);
         var bestsellers = await _orderReportService.BestSellersReportAsync(showHidden: true,
             vendorId: vendor?.Id ?? 0,
             orderBy: searchModel.OrderBy,
@@ -1789,6 +1864,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareBestsellerBriefListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1802,6 +1878,7 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<OrderAverageReportListModel> PrepareOrderAverageReportListModelAsync(OrderAverageReportSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOrderAverageReportListModelAsync(searchModel={SearchModel})", searchModel);
         //get report
         var report = new List<OrderAverageReportLineSummary>
         {
@@ -1813,6 +1890,7 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         var pagedList = new PagedList<OrderAverageReportLineSummary>(report, 0, int.MaxValue);
 
+		logger.LogDebug("PrepareOrderAverageReportListModelAsync(searchModel={SearchModel}): pagedList → {PagedList}", searchModel, pagedList);
         //prepare list model
         var model = await new OrderAverageReportListModel().PrepareToGridAsync(searchModel, pagedList, () =>
         {
@@ -1828,6 +1906,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareOrderAverageReportListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1841,17 +1920,23 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<OrderIncompleteReportListModel> PrepareOrderIncompleteReportListModelAsync(OrderIncompleteReportSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel})", searchModel);
         var orderIncompleteReportModels = new List<OrderIncompleteReportModel>();
 
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): orderIncompleteReportModels → {OrderIncompleteReportModels}", searchModel, orderIncompleteReportModels);
         //get URL helper
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): urlHelper → {UrlHelper}", searchModel, urlHelper);
         //not paid
         var orderStatuses = Enum.GetValues(typeof(OrderStatus)).Cast<int>().Where(os => os != (int)OrderStatus.Cancelled).ToList();
         var paymentStatuses = new List<int> { (int)PaymentStatus.Pending };
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): orderStatuses → {OrderStatuses}", searchModel, orderStatuses);
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): paymentStatuses → {PaymentStatuses}", searchModel, paymentStatuses);
         var psPending = await _orderReportService.GetOrderAverageReportLineAsync(psIds: paymentStatuses, osIds: orderStatuses);
         orderIncompleteReportModels.Add(new OrderIncompleteReportModel
         {
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): psPending → {PsPending}", searchModel, psPending);
             Item = await _localizationService.GetResourceAsync("Admin.SalesReport.Incomplete.TotalUnpaidOrders"),
             Count = psPending.CountOrders,
             Total = await _priceFormatter.FormatPriceAsync(psPending.SumOrders, true, false),
@@ -1865,6 +1950,8 @@ public partial class OrderModelFactory : IOrderModelFactory
         //not shipped
         var shippingStatuses = new List<int> { (int)ShippingStatus.NotYetShipped };
         var ssPending = await _orderReportService.GetOrderAverageReportLineAsync(osIds: orderStatuses, ssIds: shippingStatuses);
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): shippingStatuses → {ShippingStatuses}", searchModel, shippingStatuses);
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): ssPending → {SsPending}", searchModel, ssPending);
         orderIncompleteReportModels.Add(new OrderIncompleteReportModel
         {
             Item = await _localizationService.GetResourceAsync("Admin.SalesReport.Incomplete.TotalNotShippedOrders"),
@@ -1880,6 +1967,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         //pending
         orderStatuses = [(int)OrderStatus.Pending];
         var osPending = await _orderReportService.GetOrderAverageReportLineAsync(osIds: orderStatuses);
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): osPending → {OsPending}", searchModel, osPending);
         orderIncompleteReportModels.Add(new OrderIncompleteReportModel
         {
             Item = await _localizationService.GetResourceAsync("Admin.SalesReport.Incomplete.TotalIncompleteOrders"),
@@ -1890,8 +1978,11 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         var pagedList = new PagedList<OrderIncompleteReportModel>(orderIncompleteReportModels, 0, int.MaxValue);
 
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): pagedList → {PagedList}", searchModel, pagedList);
         //prepare list model
         var model = new OrderIncompleteReportListModel().PrepareToGrid(searchModel, pagedList, () => pagedList);
+		logger.LogDebug("PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting PrepareOrderIncompleteReportListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

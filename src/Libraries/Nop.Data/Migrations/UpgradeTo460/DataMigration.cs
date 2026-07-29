@@ -21,7 +21,10 @@ public class DataMigration : Migration
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		logger.LogDebug("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -29,9 +32,11 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         //#6789 GenericAttribute was previously named CustomCustomerAttributes and not CustomCustomerAttributesXML
         var customCustomerAttributeName = "CustomCustomerAttributes";
 
+		logger.LogDebug("Up(): customCustomerAttributeName → {CustomCustomerAttributeName}", customCustomerAttributeName);
         //#4601 customer attribute values to customer table column values
         var attributeKeys = new[] { nameof(Customer.FirstName), nameof(Customer.LastName), nameof(Customer.Gender),
             nameof(Customer.Company), nameof(Customer.StreetAddress), nameof(Customer.StreetAddress2), nameof(Customer.ZipPostalCode),
@@ -42,8 +47,11 @@ public class DataMigration : Migration
 
         var languages = _dataProvider.GetTable<Language>().ToList();
         var currencies = _dataProvider.GetTable<Currency>().ToList();
+		logger.LogDebug("Up(): languages → {Languages}", languages);
+		logger.LogDebug("Up(): currencies → {Currencies}", currencies);
         var customerRole = _dataProvider.GetTable<CustomerRole>().FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.RegisteredRoleName);
         var customerRoleId = customerRole?.Id ?? 0;
+		logger.LogDebug("Up(): customerRole → {CustomerRole}", customerRole);
 
         var query =
             from c in _dataProvider.GetTable<Customer>()
@@ -76,6 +84,7 @@ public class DataMigration : Migration
         {
             var str = CommonHelper.EnsureMaximumLength(attributes.FirstOrDefault(ga => ga.Key == key)?.Value, maxLength);
 
+			logger.LogDebug("Up(): str → {Str}", str);
             return castTo(str);
         }
 
@@ -83,12 +92,14 @@ public class DataMigration : Migration
         {
             var customers = query.ToPagedListAsync(pageIndex++, pageSize).Result;
 
+			logger.LogDebug("Up(): customers → {Customers}", customers);
             if (!customers.Any())
                 break;
 
             var customerIds = customers.Select(c => c.Id).ToList();
             var genericAttributes = _dataProvider.GetTable<GenericAttribute>()
                 .Where(ga => ga.KeyGroup == nameof(Customer) && customerIds.Contains(ga.EntityId) && attributeKeys.Contains(ga.Key)).ToList();
+				logger.LogDebug("Up(): customerIds → {CustomerIds}", customerIds);
 
             if (!genericAttributes.Any())
                 continue;
@@ -97,6 +108,7 @@ public class DataMigration : Migration
             {
                 var customerAttributes = genericAttributes.Where(ga => ga.EntityId == customer.Id).ToList();
                 if (!customerAttributes.Any())
+					logger.LogDebug("Up(): customerAttributes → {CustomerAttributes}", customerAttributes);
                     continue;
 
                 customer.FirstName = getAttributeValue(customerAttributes, nameof(Customer.FirstName), castToString);
@@ -132,6 +144,7 @@ public class DataMigration : Migration
         //#3777 new activity log types
         var activityLogTypeTable = _dataProvider.GetTable<ActivityLogType>();
 
+		logger.LogDebug("Up(): activityLogTypeTable → {ActivityLogTypeTable}", activityLogTypeTable);
         if (!activityLogTypeTable.Any(alt => string.Compare(alt.SystemKeyword, "ImportNewsLetterSubscriptions", StringComparison.InvariantCultureIgnoreCase) == 0))
             _dataProvider.InsertEntity(
                 new ActivityLogType
@@ -248,6 +261,7 @@ public class DataMigration : Migration
 
             var customerRoles = _dataProvider.GetTable<CustomerRole>();
             if (!forceMultifactorAuthentication)
+				logger.LogDebug("Up(): customerRoles → {CustomerRoles}", customerRoles);
                 customerRoles = customerRoles.Where(cr => cr.SystemName == NopCustomerDefaults.AdministratorsRoleName || cr.SystemName == NopCustomerDefaults.RegisteredRoleName);
 
             foreach (var role in customerRoles.ToList())
@@ -294,14 +308,19 @@ public class DataMigration : Migration
         //#6395
         var paRange = _dataProvider.GetTable<ProductAvailabilityRange>().FirstOrDefault(par => string.Compare(par.Name, "2 week", StringComparison.InvariantCultureIgnoreCase) == 0);
         if (paRange is not null)
+		logger.LogDebug("Up(): paRange → {PaRange}", paRange);
         {
             paRange.Name = "2 weeks";
+			logger.LogDebug("Up(): paRange.Name → {Arg0}", paRange.Name);
             _dataProvider.UpdateEntity(paRange);
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

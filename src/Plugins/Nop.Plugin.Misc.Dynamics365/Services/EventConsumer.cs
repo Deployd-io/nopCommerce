@@ -9,6 +9,8 @@ namespace Nop.Plugin.Misc.Dynamics365.Services;
 public class EventConsumer : BaseAdminMenuCreatedEventConsumer
 {
     public EventConsumer(IPluginManager<IPlugin> pluginManager) :
+		logger.LogDebug(">>> Entering EventConsumer(pluginManager={PluginManager})", pluginManager);
+		logger.LogDebug("<<< Exiting EventConsumer(pluginManager={PluginManager})", pluginManager);
         base(pluginManager)
     {
     }

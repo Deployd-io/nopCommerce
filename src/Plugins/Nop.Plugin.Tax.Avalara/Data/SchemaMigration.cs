@@ -15,8 +15,10 @@ public class SchemaMigration : AutoReversingMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<TaxTransactionLog>();
         Create.TableFor<ItemClassification>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     #endregion

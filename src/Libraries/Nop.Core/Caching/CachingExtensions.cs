@@ -13,9 +13,12 @@ public static class CachingExtensions
     /// <returns>The cached value associated with the specified key</returns>
     public static T Get<T>(this IStaticCacheManager cacheManager, CacheKey key, Func<T> acquire)
     {
+		logger.LogDebug(">>> Entering Get(cacheManager={CacheManager},key={Key},acquire={Acquire})", cacheManager, key, acquire);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return cacheManager.GetAsync(key, acquire).GetAwaiter().GetResult();
     }
 
+	logger.LogInformation("Get(cacheManager,key,acquire)={CacheManager},{Key},{Acquire}: external service call took {Arg3} ms", cacheManager, key, acquire, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Remove items by cache key prefix
     /// </summary>
@@ -24,6 +27,8 @@ public static class CachingExtensions
     /// <param name="prefixParameters">Parameters to create cache key prefix</param>
     public static void RemoveByPrefix(this IStaticCacheManager cacheManager, string prefix, params object[] prefixParameters)
     {
+		logger.LogDebug(">>> Entering RemoveByPrefix(cacheManager={CacheManager},prefix={Prefix},prefixParameters={PrefixParameters})", cacheManager, prefix, prefixParameters);
         cacheManager.RemoveByPrefixAsync(prefix, prefixParameters).Wait();
+		logger.LogDebug("<<< Exiting RemoveByPrefix(cacheManager={CacheManager},prefix={Prefix},prefixParameters={PrefixParameters})", cacheManager, prefix, prefixParameters);
     }
 }

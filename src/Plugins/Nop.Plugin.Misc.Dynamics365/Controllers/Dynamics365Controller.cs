@@ -16,6 +16,8 @@ public class Dynamics365Controller : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.Dynamics365/Views/Configure.cshtml");
     }
 

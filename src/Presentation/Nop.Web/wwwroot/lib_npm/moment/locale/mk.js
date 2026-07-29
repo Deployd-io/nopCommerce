@@ -28,6 +28,7 @@ export default moment.defineLocale('mk', {
         nextWeek: '[Во] dddd [во] LT',
         lastDay: '[Вчера во] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                 case 3:
@@ -39,6 +40,7 @@ export default moment.defineLocale('mk', {
                 case 5:
                     return '[Изминатиот] dddd [во] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },
@@ -60,6 +62,7 @@ export default moment.defineLocale('mk', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(ев|ен|ти|ви|ри|ми)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var lastDigit = number % 10,
             last2Digits = number % 100;
         if (number === 0) {
@@ -75,6 +78,7 @@ export default moment.defineLocale('mk', {
         } else if (lastDigit === 7 || lastDigit === 8) {
             return number + '-ми';
         } else {
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
             return number + '-ти';
         }
     },

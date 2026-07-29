@@ -46,11 +46,13 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     /// </returns>
     public virtual Task<ReviewTypeSearchModel> PrepareReviewTypeSearchModelAsync(ReviewTypeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareReviewTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareReviewTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -64,11 +66,13 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     /// </returns>
     public virtual async Task<ReviewTypeListModel> PrepareReviewTypeListModelAsync(ReviewTypeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareReviewTypeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get review types
         var reviewTypes = (await _reviewTypeService.GetAllReviewTypesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareReviewTypeListModelAsync(searchModel={SearchModel}): reviewTypes → {ReviewTypes}", searchModel, reviewTypes);
         //prepare list model
         var model = new ReviewTypeListModel().PrepareToGrid(searchModel, reviewTypes, () =>
         {
@@ -76,6 +80,7 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
             return reviewTypes.Select(reviewType => reviewType.ToModel<ReviewTypeModel>());
         });
 
+		logger.LogDebug("<<< Exiting PrepareReviewTypeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

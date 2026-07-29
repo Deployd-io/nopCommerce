@@ -13,7 +13,10 @@ public partial class OrderVoidedEvent
     /// <param name="order">Order</param>
     public OrderVoidedEvent(Order order)
     {
+		logger.LogDebug(">>> Entering OrderVoidedEvent(order={Order})", order);
         Order = order;
+		logger.LogDebug("<<< Exiting OrderVoidedEvent(order={Order})", order);
+		logger.LogDebug("OrderVoidedEvent(order={Order}): Order → {Order1}", order, Order);
     }
 
     #endregion

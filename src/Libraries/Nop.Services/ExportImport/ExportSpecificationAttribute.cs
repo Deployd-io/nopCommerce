@@ -20,8 +20,10 @@ public partial class ExportSpecificationAttribute : ProductSpecificationAttribut
     /// <returns></returns>
     public static async Task<ExportSpecificationAttribute> CreateAsync(ProductSpecificationAttribute specificationAttribute, ISpecificationAttributeService specificationAttributeService)
     {
+		logger.LogDebug(">>> Entering CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService})", specificationAttribute, specificationAttributeService);
         var specificationAttributeOption = await specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(specificationAttribute.SpecificationAttributeOptionId);
 
+		logger.LogDebug("CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService}): specificationAttributeOption → {SpecificationAttributeOption}", specificationAttribute, specificationAttributeService, specificationAttributeOption);
         var attribute = new ExportSpecificationAttribute
         {
             Id = specificationAttribute.Id,
@@ -37,6 +39,7 @@ public partial class ExportSpecificationAttribute : ProductSpecificationAttribut
         {
             case SpecificationAttributeType.Option:
                 attribute.CustomValue = specificationAttributeOption.Name;
+				logger.LogDebug("CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService}): attribute.CustomValue → {Arg2}", specificationAttribute, specificationAttributeService, attribute.CustomValue);
                 break;
             case SpecificationAttributeType.CustomText:
             case SpecificationAttributeType.CustomHtmlText:
@@ -45,6 +48,7 @@ public partial class ExportSpecificationAttribute : ProductSpecificationAttribut
                 break;
         }
 
+		logger.LogDebug("<<< Exiting CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService})", specificationAttribute, specificationAttributeService);
         return attribute;
     }
 }

@@ -57,6 +57,7 @@ public partial class WebStoreContext : IStoreContext
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<Store> GetCurrentStoreAsync()
     {
+		logger.LogDebug(">>> Entering GetCurrentStoreAsync()");
         if (_cachedStore != null)
             return _cachedStore;
 
@@ -65,9 +66,13 @@ public partial class WebStoreContext : IStoreContext
 
         var allStores = await _storeService.GetAllStoresAsync();
         var store = allStores.FirstOrDefault(s => _storeService.ContainsHostValue(s, host)) ?? allStores.FirstOrDefault();
+		logger.LogDebug("GetCurrentStoreAsync(): allStores → {AllStores}", allStores);
+		logger.LogDebug("GetCurrentStoreAsync(): store → {Store}", store);
 
         _cachedStore = store ?? throw new Exception("No store could be loaded");
+		logger.LogDebug("GetCurrentStoreAsync(): _cachedStore → {_cachedStore}", _cachedStore);
 
+		logger.LogDebug("<<< Exiting GetCurrentStoreAsync()");
         return _cachedStore;
     }
 
@@ -76,8 +81,10 @@ public partial class WebStoreContext : IStoreContext
     /// </summary>
     public virtual Store GetCurrentStore()
     {
+		logger.LogDebug(">>> Entering GetCurrentStore()");
         if (_cachedStore != null)
             return _cachedStore;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         //try to determine the current store by HOST header
         string host = _httpContextAccessor.HttpContext?.Request.Headers[HeaderNames.Host];
@@ -90,8 +97,11 @@ public partial class WebStoreContext : IStoreContext
 
         var store = allStores.FirstOrDefault(s => _storeService.ContainsHostValue(s, host)) ?? allStores.FirstOrDefault();
 
+		logger.LogDebug("GetCurrentStore(): store → {Store}", store);
         _cachedStore = store ?? throw new Exception("No store could be loaded");
+		logger.LogDebug("GetCurrentStore(): _cachedStore → {_cachedStore}", _cachedStore);
 
+		logger.LogDebug("<<< Exiting GetCurrentStore()");
         return _cachedStore;
     }
 
@@ -101,6 +111,7 @@ public partial class WebStoreContext : IStoreContext
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<int> GetActiveStoreScopeConfigurationAsync()
     {
+		logger.LogDebug(">>> Entering GetActiveStoreScopeConfigurationAsync()");
         if (_cachedActiveStoreScopeConfiguration.HasValue)
             return _cachedActiveStoreScopeConfiguration.Value;
 
@@ -110,15 +121,18 @@ public partial class WebStoreContext : IStoreContext
             //do not inject IWorkContext via constructor because it'll cause circular references
             var currentCustomer = await EngineContext.Current.Resolve<IWorkContext>().GetCurrentCustomerAsync();
 
+			logger.LogDebug("GetActiveStoreScopeConfigurationAsync(): currentCustomer → {CurrentCustomer}", currentCustomer);
             //try to get store identifier from attributes
             var storeId = await _genericAttributeService
                 .GetAttributeAsync<int>(currentCustomer, NopCustomerDefaults.AdminAreaStoreScopeConfigurationAttribute);
 
             _cachedActiveStoreScopeConfiguration = (await _storeService.GetStoreByIdAsync(storeId))?.Id ?? 0;
+			logger.LogDebug("GetActiveStoreScopeConfigurationAsync(): _cachedActiveStoreScopeConfiguration → {_cachedActiveStoreScopeConfiguration}", _cachedActiveStoreScopeConfiguration);
         }
         else
             _cachedActiveStoreScopeConfiguration = 0;
 
+		logger.LogDebug("<<< Exiting GetActiveStoreScopeConfigurationAsync()");
         return _cachedActiveStoreScopeConfiguration ?? 0;
     }
 

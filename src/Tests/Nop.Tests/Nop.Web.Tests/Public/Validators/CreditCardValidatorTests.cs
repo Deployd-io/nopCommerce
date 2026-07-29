@@ -13,17 +13,22 @@ public class CreditCardValidatorTests
     [OneTimeSetUp]
     public void Setup()
     {
+		logger.LogDebug(">>> Entering Setup()");
         Thread.CurrentThread.CurrentUICulture = new CultureInfo("en-US");
 
         _validator = new TestValidator { v => v.RuleFor(x => x.CreditCard).IsCreditCard() };
+		logger.LogDebug("<<< Exiting Setup()");
+		logger.LogDebug("Setup(): _validator → {_validator}", _validator);
     }
 
     [Test]
     public async Task IsValidTests()
     {
+		logger.LogDebug(">>> Entering IsValidTests()");
         // Optional value is not valid
         var result = await _validator.ValidateAsync(new Person { CreditCard = null });
         result.IsValid.Should().BeFalse();
+		logger.LogDebug("IsValidTests(): result → {Result}", result);
 
         // Simplest valid value
         result = await _validator.ValidateAsync(new Person { CreditCard = "0000000000000000" });
@@ -47,5 +52,6 @@ public class CreditCardValidatorTests
 
         result = await _validator.ValidateAsync(new Person { CreditCard = "0000000000000000" });
         result.IsValid.Should().BeTrue();
+		logger.LogDebug("<<< Exiting IsValidTests()");
     }
 }

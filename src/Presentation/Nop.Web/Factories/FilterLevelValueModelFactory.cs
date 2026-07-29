@@ -40,6 +40,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareFilterLevelValuesAsync(IList<SelectListItem> items, FilterLevelEnum filterLevelValueEnum, string filterLevelValue = null)
     {
+		logger.LogDebug(">>> Entering PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue})", items, filterLevelValueEnum, filterLevelValue);
         ArgumentNullException.ThrowIfNull(items);
 
         var param1 = filterLevelValueEnum == FilterLevelEnum.FilterLevel1 ? filterLevelValue : null;
@@ -58,6 +59,9 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
                     FilterLevelEnum.FilterLevel3 => filterLevelValue.FilterLevel3Value,
                     _ => string.Empty,
                 };
+					logger.LogDebug("PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue}): FilterLevelEnum.FilterLevel1 → {Arg3}", items, filterLevelValueEnum, filterLevelValue, FilterLevelEnum.FilterLevel1);
+					logger.LogDebug("PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue}): FilterLevelEnum.FilterLevel2 → {Arg3}", items, filterLevelValueEnum, filterLevelValue, FilterLevelEnum.FilterLevel2);
+					logger.LogDebug("PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue}): FilterLevelEnum.FilterLevel3 → {Arg3}", items, filterLevelValueEnum, filterLevelValue, FilterLevelEnum.FilterLevel3);
             })
             .Distinct()
             .OrderBy(levelValue => levelValue)
@@ -69,6 +73,8 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
         //insert special item for the default value
         var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.Select");
         items.Insert(0, new SelectListItem { Text = defaultItemText, Value = "" });
+		logger.LogDebug("PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue}): defaultItemText → {DefaultItemText}", items, filterLevelValueEnum, filterLevelValue, defaultItemText);
+		logger.LogDebug("<<< Exiting PrepareFilterLevelValuesAsync(items={Items},filterLevelValueEnum={FilterLevelValueEnum},filterLevelValue={FilterLevelValue})", items, filterLevelValueEnum, filterLevelValue);
     }
 
     #endregion
@@ -84,6 +90,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual FilterLevelValueOverviewModel PrepareFilterLevelValueOverviewModel(IList<FilterLevelValue> filterLevelValues)
     {
+		logger.LogDebug(">>> Entering PrepareFilterLevelValueOverviewModel(filterLevelValues={FilterLevelValues})", filterLevelValues);
         ArgumentNullException.ThrowIfNull(filterLevelValues);
 
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
@@ -107,6 +114,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             model.FilterLevelValues.Add(itemModel);
         }
 
+		logger.LogDebug("<<< Exiting PrepareFilterLevelValueOverviewModel(filterLevelValues={FilterLevelValues})", filterLevelValues);
         return model;
     }    
 
@@ -120,18 +128,23 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<FilterLevelValueSearchModel> PrepareFilterLevelValueSearchModelAsync(FilterLevelValueSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
 
         //prepare filter (0 - all;)
         searchModel.HideSearchFilterValue1 = filterLevel1Disabled;
+		logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue1 → {Arg1}", searchModel, searchModel.HideSearchFilterValue1);
         if (!filterLevel1Disabled)
             await PrepareFilterLevelValuesAsync(searchModel.AvailableFilterLevel1Values, FilterLevelEnum.FilterLevel1);
 
         searchModel.HideSearchFilterValue2 = filterLevel2Disabled;
+		logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue2 → {Arg1}", searchModel, searchModel.HideSearchFilterValue2);
+		logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue3 → {Arg1}", searchModel, searchModel.HideSearchFilterValue3);
         searchModel.HideSearchFilterValue3 = filterLevel3Disabled;
 
+		logger.LogDebug("<<< Exiting PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 

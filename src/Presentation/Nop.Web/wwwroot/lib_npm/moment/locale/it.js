@@ -26,6 +26,7 @@ export default moment.defineLocale('it', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
             return (
                 '[Oggi a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
@@ -33,6 +34,7 @@ export default moment.defineLocale('it', {
             );
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
             return (
                 '[Domani a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
@@ -40,6 +42,7 @@ export default moment.defineLocale('it', {
             );
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return (
                 'dddd [a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
@@ -47,6 +50,7 @@ export default moment.defineLocale('it', {
             );
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
             return (
                 '[Ieri a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
@@ -54,6 +58,7 @@ export default moment.defineLocale('it', {
             );
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return (
@@ -76,6 +81,7 @@ export default moment.defineLocale('it', {
                         ']LT'
                     );
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

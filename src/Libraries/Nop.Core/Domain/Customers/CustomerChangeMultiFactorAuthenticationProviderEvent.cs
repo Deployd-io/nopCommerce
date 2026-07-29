@@ -11,7 +11,10 @@ public partial class CustomerChangeMultiFactorAuthenticationProviderEvent
     /// <param name="customer">Customer</param>
     public CustomerChangeMultiFactorAuthenticationProviderEvent(Customer customer)
     {
+		logger.LogDebug(">>> Entering CustomerChangeMultiFactorAuthenticationProviderEvent(customer={Customer})", customer);
         Customer = customer;
+		logger.LogDebug("<<< Exiting CustomerChangeMultiFactorAuthenticationProviderEvent(customer={Customer})", customer);
+		logger.LogDebug("CustomerChangeMultiFactorAuthenticationProviderEvent(customer={Customer}): Customer → {Customer1}", customer, Customer);
     }
 
     // <summary>

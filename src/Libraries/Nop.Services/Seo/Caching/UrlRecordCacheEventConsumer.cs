@@ -15,9 +15,11 @@ public partial class UrlRecordCacheEventConsumer : CacheEventConsumer<UrlRecord>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(UrlRecord entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopSeoDefaults.UrlRecordCacheKey, entity.EntityId, entity.EntityName, entity.LanguageId);
         await RemoveAsync(NopSeoDefaults.UrlRecordBySlugCacheKey, entity.Slug);
         await RemoveAsync(NopSeoDefaults.UrlRecordEntityIdLookupCacheKey, entity.LanguageId);
         await RemoveAsync(NopSeoDefaults.UrlRecordSlugLookupCacheKey);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

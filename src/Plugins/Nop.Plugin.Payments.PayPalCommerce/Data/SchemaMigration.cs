@@ -15,7 +15,9 @@ public class SchemaMigration : AutoReversingMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<PayPalToken>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     #endregion

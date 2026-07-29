@@ -19,6 +19,7 @@ public class PayPalTokenBuilder : NopEntityBuilder<PayPalToken>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(PayPalToken.CustomerId)).AsInt32().NotNullable().ForeignKey<Customer>()
             .WithColumn(nameof(PayPalToken.VaultId)).AsString(100).Nullable()
@@ -28,6 +29,7 @@ public class PayPalTokenBuilder : NopEntityBuilder<PayPalToken>
             .WithColumn(nameof(PayPalToken.Expiration)).AsString(100).Nullable()
             .WithColumn(nameof(PayPalToken.Type)).AsString(100).Nullable()
             .WithColumn(nameof(PayPalToken.ClientId)).AsString(200).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

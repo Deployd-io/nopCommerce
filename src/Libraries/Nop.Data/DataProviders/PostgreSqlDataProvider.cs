@@ -28,11 +28,14 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// </summary>
     protected override DataConnection CreateDataConnection()
     {
+		logger.LogDebug(">>> Entering CreateDataConnection()");
         var dataContext = CreateDataConnection(LinqToDbDataProvider);
         dataContext.MappingSchema.SetDataType(
             typeof(string),
             new SqlDataType(new DbDataType(typeof(string), "citext")));
+			logger.LogDebug("CreateDataConnection(): dataContext → {DataContext}", dataContext);
 
+		logger.LogDebug("<<< Exiting CreateDataConnection()");
         return dataContext;
     }
 
@@ -42,6 +45,8 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>The connection string builder</returns>
     protected virtual NpgsqlConnectionStringBuilder GetConnectionStringBuilder()
     {
+		logger.LogDebug(">>> Entering GetConnectionStringBuilder()");
+		logger.LogDebug("<<< Exiting GetConnectionStringBuilder()");
         return new NpgsqlConnectionStringBuilder(DataSettings.ConnectionString);
     }
 
@@ -52,8 +57,10 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection to a database</returns>
     protected override DbConnection GetInternalDbConnection(string connectionString)
     {
+		logger.LogDebug(">>> Entering GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
+		logger.LogDebug("<<< Exiting GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         return new NpgsqlConnection(connectionString);
     }
 
@@ -65,6 +72,7 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Returns the name of the sequence, or NULL if no sequence is associated with the column</returns>
     protected virtual string GetSequenceName<TEntity>(DataConnection dataConnection) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering GetSequenceName(dataConnection={DataConnection})", dataConnection);
         ArgumentNullException.ThrowIfNull(dataConnection);
 
         var descriptor = NopMappingSchema.GetEntityDescriptor(typeof(TEntity)) 
@@ -73,11 +81,13 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
         var tableName = descriptor.EntityName;
         var columnName = descriptor.Fields.FirstOrDefault(x => x.IsIdentity && x.IsPrimaryKey)?.Name;
 
+		logger.LogDebug("GetSequenceName(dataConnection={DataConnection}): columnName → {ColumnName}", dataConnection, columnName);
         if (string.IsNullOrEmpty(columnName))
             throw new NopException("A table's primary key does not have an identity constraint");
 
         return dataConnection.Query<string>($"SELECT pg_get_serial_sequence('\"{tableName}\"', '{columnName}');")
             .FirstOrDefault();
+		logger.LogDebug("<<< Exiting GetSequenceName(dataConnection={DataConnection})", dataConnection);
     }
 
     #endregion
@@ -92,8 +102,11 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task BulkInsertEntitiesAsync<TEntity>(IEnumerable<TEntity> entities)
     {
+		logger.LogDebug(">>> Entering BulkInsertEntitiesAsync(entities={Entities})", entities);
         using var dataContext = CreateDataConnection(LinqToDbDataProvider);
         await dataContext.BulkCopyAsync(new BulkCopyOptions() { KeepIdentity = true }, entities.RetrieveIdentity(dataContext, useSequenceName: true));
+		logger.LogDebug("<<< Exiting BulkInsertEntitiesAsync(entities={Entities})", entities);
+		logger.LogDebug("BulkInsertEntitiesAsync(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
     }
 
     /// <summary>
@@ -103,8 +116,11 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override void BulkInsertEntities<TEntity>(IEnumerable<TEntity> entities)
     {
+		logger.LogDebug(">>> Entering BulkInsertEntities(entities={Entities})", entities);
         using var dataContext = CreateDataConnection(LinqToDbDataProvider);
         dataContext.BulkCopy(new BulkCopyOptions() { KeepIdentity = true }, entities.RetrieveIdentity(dataContext, useSequenceName: true));
+		logger.LogDebug("<<< Exiting BulkInsertEntities(entities={Entities})", entities);
+		logger.LogDebug("BulkInsertEntities(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
     }
 
     /// <summary>
@@ -113,21 +129,28 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <param name="triesToConnect"></param>
     public virtual void CreateDatabase(int triesToConnect = 10)
     {
+		logger.LogDebug(">>> Entering CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (DatabaseExists())
             return;
 
         var builder = GetConnectionStringBuilder();
 
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): builder → {Builder}", triesToConnect, builder);
         //gets database name
         var databaseName = builder.Database;
 
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): databaseName → {DatabaseName}", triesToConnect, databaseName);
         //now create connection string to 'postgres' - default administrative connection database.
         builder.Database = "postgres";
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): builder.Database → {Arg1}", triesToConnect, builder.Database);
 
         using (var connection = GetInternalDbConnection(builder.ConnectionString))
         {
+			logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): connection → {Connection}", triesToConnect, connection);
             var query = $"CREATE DATABASE \"{databaseName}\" WITH OWNER = '{builder.Username}'";
 
+			logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): query → {Query}", triesToConnect, query);
             if (!string.IsNullOrWhiteSpace(DataSettings.CharacterSet))
                 query = $"{query} ENCODING '{DataSettings.CharacterSet}'";
 
@@ -136,9 +159,12 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
 
             var command = connection.CreateCommand();
             command.CommandText = query;
+			logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): command → {Command}", triesToConnect, command);
+			logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): command.CommandText → {Arg1}", triesToConnect, command.CommandText);
             command.Connection.Open();
 
             command.ExecuteNonQuery();
+			logger.LogInformation("CreateDatabase(triesToConnect)={TriesToConnect}: database query executed in {Arg1} ms", triesToConnect, __logStart.ElapsedMilliseconds);
         }
 
         //try connect
@@ -171,6 +197,7 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
                 break;
             }
         }
+		logger.LogDebug("<<< Exiting CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
     }
 
     /// <summary>
@@ -179,10 +206,12 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Returns true if the database exists.</returns>
     public virtual bool DatabaseExists()
     {
+		logger.LogDebug(">>> Entering DatabaseExists()");
         try
         {
             using var connection = GetInternalDbConnection(DataSettings.ConnectionString);
 
+			logger.LogDebug("DatabaseExists(): connection → {Connection}", connection);
             //just try to connect
             connection.Open();
 
@@ -190,6 +219,8 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
         }
         catch
         {
+			logger.LogError("Exception in DatabaseExists(): {Arg0}", ex.Message);
+			logger.LogDebug("<<< Exiting DatabaseExists()");
             return false;
         }
     }
@@ -203,10 +234,12 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual async Task<bool> DatabaseExistsAsync()
     {
+		logger.LogDebug(">>> Entering DatabaseExistsAsync()");
         try
         {
             await using var connection = GetInternalDbConnection(DataSettings.ConnectionString);
 
+			logger.LogDebug("DatabaseExistsAsync(): connection → {Connection}", connection);
             //just try to connect
             await connection.OpenAsync();
 
@@ -214,6 +247,8 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
         }
         catch
         {
+			logger.LogError("Exception in DatabaseExistsAsync(): {Arg0}", ex.Message);
+			logger.LogDebug("<<< Exiting DatabaseExistsAsync()");
             return false;
         }
     }
@@ -228,12 +263,18 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual Task<int?> GetTableIdentAsync<TEntity>() where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering GetTableIdentAsync()");
         using var currentConnection = CreateDataConnection();
 
+		logger.LogDebug("GetTableIdentAsync(): currentConnection → {CurrentConnection}", currentConnection);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var seqName = GetSequenceName<TEntity>(currentConnection);
 
+		logger.LogDebug("GetTableIdentAsync(): seqName → {SeqName}", seqName);
         var result = currentConnection.Query<int>($"SELECT COALESCE(last_value + CASE WHEN is_called THEN 1 ELSE 0 END, 1) as Value FROM {seqName};")
             .FirstOrDefault();
+			logger.LogDebug("GetTableIdentAsync(): result → {Result}", result);
+			logger.LogInformation("GetTableIdentAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         return Task.FromResult<int?>(result);
     }
@@ -246,14 +287,18 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetTableIdentAsync<TEntity>(int ident) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering SetTableIdentAsync(ident={Ident})", ident);
         var currentIdent = await GetTableIdentAsync<TEntity>();
         if (!currentIdent.HasValue || ident <= currentIdent.Value)
+			logger.LogDebug("SetTableIdentAsync(ident={Ident}): currentIdent → {CurrentIdent}", ident, currentIdent);
             return;
 
         using var currentConnection = CreateDataConnection();
 
+		logger.LogDebug("SetTableIdentAsync(ident={Ident}): currentConnection → {CurrentConnection}", ident, currentConnection);
         var seqName = GetSequenceName<TEntity>(currentConnection);
 
+		logger.LogDebug("SetTableIdentAsync(ident={Ident}): seqName → {SeqName}", ident, seqName);
         await currentConnection.ExecuteAsync($"select setval('{seqName}', {ident}, false);");
     }
 
@@ -263,6 +308,7 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task BackupDatabaseAsync(string fileName)
     {
+		logger.LogDebug(">>> Entering BackupDatabaseAsync(fileName={FileName})", fileName);
         throw new DataException("This database provider does not support backup");
     }
 
@@ -274,14 +320,17 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Inserted entity</returns>
     public override TEntity InsertEntity<TEntity>(TEntity entity)
     {
+		logger.LogDebug(">>> Entering InsertEntity(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         try
+		logger.LogDebug("InsertEntity(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
         {
             entity.Id = dataContext.InsertWithInt32Identity(entity);
         }
         // Ignore when we try insert foreign entity via InsertWithInt32IdentityAsync method
         catch (SqlException ex) when (ex.Message.StartsWith("Identity field must be defined for"))
         {
+			logger.LogError("Exception in InsertEntity(entity={Entity}): {Arg1}", entity, ex.Message);
             dataContext.Insert(entity);
         }
 
@@ -299,14 +348,17 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public override async Task<TEntity> InsertEntityAsync<TEntity>(TEntity entity)
     {
+		logger.LogDebug(">>> Entering InsertEntityAsync(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         try
+		logger.LogDebug("InsertEntityAsync(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
         {
             entity.Id = await dataContext.InsertWithInt32IdentityAsync(entity);
         }
         // Ignore when we try insert foreign entity via InsertWithInt32IdentityAsync method
         catch (SqlException ex) when (ex.Message.StartsWith("Identity field must be defined for"))
         {
+			logger.LogError("Exception in InsertEntityAsync(entity={Entity}): {Arg1}", entity, ex.Message);
             await dataContext.InsertAsync(entity);
         }
 
@@ -320,6 +372,7 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task RestoreDatabaseAsync(string backupFileName)
     {
+		logger.LogDebug(">>> Entering RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
         throw new DataException("This database provider does not support backup");
     }
 
@@ -329,8 +382,11 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ReIndexTablesAsync()
     {
+		logger.LogDebug(">>> Entering ReIndexTablesAsync()");
         using var currentConnection = CreateDataConnection();
         await currentConnection.ExecuteAsync($"REINDEX DATABASE \"{GetConnectionStringBuilder().Database}\";");
+		logger.LogDebug("<<< Exiting ReIndexTablesAsync()");
+		logger.LogDebug("ReIndexTablesAsync(): currentConnection → {CurrentConnection}", currentConnection);
     }
 
     /// <summary>
@@ -339,11 +395,17 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ShrinkDatabaseAsync()
     {
+		logger.LogDebug(">>> Entering ShrinkDatabaseAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using var currentConnection = CreateDataConnection();
         var tables = currentConnection.Query<string>($"SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_schema = 'public'").ToList();
 
+		logger.LogDebug("ShrinkDatabaseAsync(): currentConnection → {CurrentConnection}", currentConnection);
+		logger.LogDebug("ShrinkDatabaseAsync(): tables → {Tables}", tables);
+		logger.LogInformation("ShrinkDatabaseAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         foreach (var table in tables)
             await currentConnection.ExecuteAsync($"VACUUM FULL \"{table}\";");
+			logger.LogDebug("<<< Exiting ShrinkDatabaseAsync()");
     }
 
     /// <summary>
@@ -354,6 +416,7 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     public virtual string BuildConnectionString(INopConnectionStringInfo nopConnectionString)
     {
         ArgumentNullException.ThrowIfNull(nopConnectionString);
+		logger.LogDebug(">>> Entering BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
 
         if (nopConnectionString.IntegratedSecurity)
             throw new NopException("Data provider supports connection only with login and password");
@@ -367,6 +430,7 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
             Password = nopConnectionString.Password,
         };
 
+		logger.LogDebug("<<< Exiting BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         return builder.ConnectionString;
     }
 
@@ -380,6 +444,8 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of a foreign key</returns>
     public virtual string CreateForeignKeyName(string foreignTable, string foreignColumn, string primaryTable, string primaryColumn)
     {
+		logger.LogDebug(">>> Entering CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
+		logger.LogDebug("<<< Exiting CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
         return $"FK_{foreignTable}_{foreignColumn}_{primaryTable}_{primaryColumn}";
     }
 
@@ -391,6 +457,8 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of an index</returns>
     public virtual string GetIndexName(string targetTable, string targetColumn)
     {
+		logger.LogDebug(">>> Entering GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
+		logger.LogDebug("<<< Exiting GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
         return $"IX_{targetTable}_{targetColumn}";
     }
     
@@ -403,7 +471,10 @@ public partial class PostgreSqlDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public virtual Task<string> GetDataBaseCollationAsync()
     {
+		logger.LogDebug(">>> Entering GetDataBaseCollationAsync()");
         var builder = GetConnectionStringBuilder();
+		logger.LogDebug("GetDataBaseCollationAsync(): builder → {Builder}", builder);
+		logger.LogDebug("<<< Exiting GetDataBaseCollationAsync()");
         return GetSqlStringValueAsync($"SELECT datcollate AS collation FROM pg_database WHERE datname = '{builder.Database}';");
     }
 

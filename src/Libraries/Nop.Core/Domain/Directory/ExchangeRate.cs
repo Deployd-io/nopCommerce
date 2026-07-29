@@ -10,8 +10,12 @@ public partial class ExchangeRate
     /// </summary>
     public ExchangeRate()
     {
+		logger.LogDebug(">>> Entering ExchangeRate()");
         CurrencyCode = string.Empty;
         Rate = 1.0m;
+		logger.LogDebug("<<< Exiting ExchangeRate()");
+		logger.LogDebug("ExchangeRate(): Rate → {Rate}", Rate);
+		logger.LogDebug("ExchangeRate(): CurrencyCode → {CurrencyCode}", CurrencyCode);
     }
 
     /// <summary>
@@ -35,6 +39,8 @@ public partial class ExchangeRate
     /// <returns></returns>
     public override string ToString()
     {
+		logger.LogDebug(">>> Entering ToString()");
+		logger.LogDebug("<<< Exiting ToString()");
         return $"{CurrencyCode} {Rate}";
     }
 }

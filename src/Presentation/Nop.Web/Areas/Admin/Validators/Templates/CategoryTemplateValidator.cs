@@ -10,9 +10,11 @@ public partial class CategoryTemplateValidator : BaseNopValidator<CategoryTempla
 {
     public CategoryTemplateValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CategoryTemplateValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Category.Name.Required"));
         RuleFor(x => x.ViewPath).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.Templates.Category.ViewPath.Required"));
 
         SetDatabaseValidationRules<CategoryTemplate>();
+		logger.LogDebug("<<< Exiting CategoryTemplateValidator(localizationService={LocalizationService})", localizationService);
     }
 }

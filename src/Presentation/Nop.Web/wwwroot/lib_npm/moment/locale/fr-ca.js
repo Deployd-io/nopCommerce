@@ -51,6 +51,7 @@ export default moment.defineLocale('fr-ca', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(er|e)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             // Words with masculine grammatical gender: mois, trimestre, jour
             default:
@@ -66,5 +67,6 @@ export default moment.defineLocale('fr-ca', {
             case 'W':
                 return number + (number === 1 ? 're' : 'e');
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
 });

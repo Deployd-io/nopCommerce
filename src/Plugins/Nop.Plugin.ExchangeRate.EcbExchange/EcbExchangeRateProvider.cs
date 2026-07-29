@@ -51,6 +51,7 @@ public class EcbExchangeRateProvider : BasePlugin, IExchangeRateProvider
     /// </returns>
     public async Task<IList<Core.Domain.Directory.ExchangeRate>> GetCurrencyLiveRatesAsync(string exchangeRateCurrencyCode)
     {
+		logger.LogDebug(">>> Entering GetCurrencyLiveRatesAsync(exchangeRateCurrencyCode={ExchangeRateCurrencyCode})", exchangeRateCurrencyCode);
         ArgumentNullException.ThrowIfNull(exchangeRateCurrencyCode);
 
         //add euro with rate 1
@@ -111,6 +112,7 @@ public class EcbExchangeRateProvider : BasePlugin, IExchangeRateProvider
                                    ?? throw new NopException(await _localizationService.GetResourceAsync("Plugins.ExchangeRate.EcbExchange.Error"));
 
         //return result for the selected (not euro) currency
+		logger.LogDebug("<<< Exiting GetCurrencyLiveRatesAsync(exchangeRateCurrencyCode={ExchangeRateCurrencyCode})", exchangeRateCurrencyCode);
         return ratesToEuro.Select(rate => new Core.Domain.Directory.ExchangeRate
         {
             CurrencyCode = rate.CurrencyCode,
@@ -125,6 +127,7 @@ public class EcbExchangeRateProvider : BasePlugin, IExchangeRateProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         var defaultSettings = new EcbExchangeRateSettings
         {
@@ -136,6 +139,7 @@ public class EcbExchangeRateProvider : BasePlugin, IExchangeRateProvider
         await _localizationService.AddOrUpdateLocaleResourceAsync("Plugins.ExchangeRate.EcbExchange.Error", "You can use ECB (European central bank) exchange rate provider only when the primary exchange rate currency is supported by ECB");
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -144,6 +148,7 @@ public class EcbExchangeRateProvider : BasePlugin, IExchangeRateProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<EcbExchangeRateSettings>();
 
@@ -151,6 +156,7 @@ public class EcbExchangeRateProvider : BasePlugin, IExchangeRateProvider
         await _localizationService.DeleteLocaleResourceAsync("Plugins.ExchangeRate.EcbExchange.Error");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

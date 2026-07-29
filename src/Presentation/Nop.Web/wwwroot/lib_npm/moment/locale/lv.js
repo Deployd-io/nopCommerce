@@ -22,22 +22,30 @@ var units = {
  * @param withoutSuffix boolean true = a length of time; false = before/after a period of time.
  */
 function format(forms, number, withoutSuffix) {
+	logger.debug(`>>> Entering format(forms=${forms},number=${number},withoutSuffix=${withoutSuffix})`);
     if (withoutSuffix) {
         // E.g. "21 minūte", "3 minūtes".
         return number % 10 === 1 && number % 100 !== 11 ? forms[2] : forms[3];
     } else {
         // E.g. "21 minūtes" as in "pēc 21 minūtes".
         // E.g. "3 minūtēm" as in "pēc 3 minūtēm".
+		logger.debug(`<<< Exiting format(forms=${forms},number=${number},withoutSuffix=${withoutSuffix})`);
         return number % 10 === 1 && number % 100 !== 11 ? forms[0] : forms[1];
     }
 }
 function relativeTimeWithPlural(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
+	logger.debug(`<<< Exiting relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     return number + ' ' + format(units[key], number, withoutSuffix);
 }
 function relativeTimeWithSingular(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithSingular(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
+	logger.debug(`<<< Exiting relativeTimeWithSingular(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     return format(units[key], number, withoutSuffix);
 }
 function relativeSeconds(number, withoutSuffix) {
+	logger.debug(`>>> Entering relativeSeconds(number=${number},withoutSuffix=${withoutSuffix})`);
+	logger.debug(`<<< Exiting relativeSeconds(number=${number},withoutSuffix=${withoutSuffix})`);
     return withoutSuffix ? 'dažas sekundes' : 'dažām sekundēm';
 }
 

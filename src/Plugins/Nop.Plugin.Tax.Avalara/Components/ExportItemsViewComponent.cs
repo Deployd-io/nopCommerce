@@ -42,6 +42,7 @@ public class ExportItemsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return Content(string.Empty);
@@ -51,6 +52,7 @@ public class ExportItemsViewComponent : NopViewComponent
 
         //ensure that it's a proper widget zone
         if (!widgetZone.Equals(AdminWidgetZones.ProductListButtons))
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return Content(string.Empty);
 
         return View("~/Plugins/Tax.Avalara/Views/Product/ExportItems.cshtml");

@@ -43,6 +43,8 @@ public partial class LicenseTermsConsumer : IConsumer<PageRenderingEvent>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(PageRenderingEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (_httpContextAccessor.HttpContext.GetRouteValue("area") is not string area || area != AreaNames.ADMIN)
             return;
 
@@ -61,18 +63,24 @@ public partial class LicenseTermsConsumer : IConsumer<PageRenderingEvent>
 
         var licenseCheckModel = new LicenseCheckModel();
         try
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): licenseCheckModel → {LicenseCheckModel}", eventMessage, licenseCheckModel);
         {
             currentVersion.LastCheckDate = DateTime.UtcNow;
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): currentVersion.LastCheckDate → {Arg1}", eventMessage, currentVersion.LastCheckDate);
             var result = await _nopHttpClient.CheckLicenseTermsAsync();
             if (!string.IsNullOrEmpty(result))
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): result → {Result}", eventMessage, result);
                 licenseCheckModel = JsonConvert.DeserializeObject<LicenseCheckModel>(result);
         }
         catch { }
 
+		logger.LogError("Exception in HandleEventAsync(eventMessage={EventMessage}): {Arg1}", eventMessage, ex.Message);
         await _settingService.TryGetLicenseAsync(licenseCheckModel.AcceptedLicenseTerms == true, currentVersion.LastCheckDate);
 
         if (licenseCheckModel.DisplayWarning == true && !string.IsNullOrEmpty(licenseCheckModel.WarningText))
             _httpContextAccessor.HttpContext.Items.TryAdd("licenseTerms", licenseCheckModel);
+			logger.LogInformation("HandleEventAsync(eventMessage)={EventMessage}: external service call took {Arg1} ms", eventMessage, __logStart.ElapsedMilliseconds);
+			logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

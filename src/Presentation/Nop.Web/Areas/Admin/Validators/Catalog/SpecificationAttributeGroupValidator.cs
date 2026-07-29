@@ -13,10 +13,12 @@ public partial class SpecificationAttributeGroupValidator : BaseNopValidator<Spe
 {
     public SpecificationAttributeGroupValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeGroupValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttributeGroup.Fields.Name.Required"));
 
         SetDatabaseValidationRules<SpecificationAttributeGroup>();
+		logger.LogDebug("<<< Exiting SpecificationAttributeGroupValidator(localizationService={LocalizationService})", localizationService);
     }
 }

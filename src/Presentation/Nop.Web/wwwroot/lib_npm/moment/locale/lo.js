@@ -29,9 +29,11 @@ export default moment.defineLocale('lo', {
         return input === 'ຕອນແລງ';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ຕອນເຊົ້າ';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'ຕອນແລງ';
         }
     },
@@ -61,6 +63,7 @@ export default moment.defineLocale('lo', {
     },
     dayOfMonthOrdinalParse: /(ທີ່)\d{1,2}/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return 'ທີ່' + number;
     },
 });

@@ -64,27 +64,34 @@ public partial class BoardsController : BasePublicController
 
     public virtual async Task<IActionResult> Index()
     {
+		logger.LogDebug(">>> Entering Index()");
         if (!_forumSettings.ForumsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _forumModelFactory.PrepareBoardsIndexModelAsync();
 
+		logger.LogDebug("Index(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Index()");
         return View(model);
     }
 
     public virtual async Task<IActionResult> ActiveDiscussions(int forumId = 0, int pageNumber = 1)
     {
+		logger.LogDebug(">>> Entering ActiveDiscussions(forumId={ForumId},pageNumber={PageNumber})", forumId, pageNumber);
         if (!_forumSettings.ForumsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _forumModelFactory.PrepareActiveDiscussionsModelAsync(forumId, pageNumber);
 
+		logger.LogDebug("ActiveDiscussions(forumId={ForumId},pageNumber={PageNumber}): model → {Model}", forumId, pageNumber, model);
+		logger.LogDebug("<<< Exiting ActiveDiscussions(forumId={ForumId},pageNumber={PageNumber})", forumId, pageNumber);
         return View(model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> ActiveDiscussionsRss(int forumId = 0)
     {
+		logger.LogDebug(">>> Entering ActiveDiscussionsRss(forumId={ForumId})", forumId);
         if (!_forumSettings.ForumsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -93,9 +100,13 @@ public partial class BoardsController : BasePublicController
 
         var topics = await _forumService.GetActiveTopicsAsync(forumId, 0, _forumSettings.ActiveDiscussionsFeedCount);
         var url = Url.RouteUrl(NopRouteNames.Standard.ACTIVE_DISCUSSIONS_RSS, null, _webHelper.GetCurrentRequestProtocol());
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): topics → {Topics}", forumId, topics);
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): url → {Url}", forumId, url);
 
         var feedTitle = await _localizationService.GetResourceAsync("Forum.ActiveDiscussionsFeedTitle");
         var feedDescription = await _localizationService.GetResourceAsync("Forum.ActiveDiscussionsFeedDescription");
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): feedTitle → {FeedTitle}", forumId, feedTitle);
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): feedDescription → {FeedDescription}", forumId, feedDescription);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var feed = new RssFeed(
@@ -103,22 +114,30 @@ public partial class BoardsController : BasePublicController
             feedDescription,
             new Uri(url),
             DateTime.UtcNow);
+			logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): store → {Store}", forumId, store);
 
         var items = new List<RssItem>();
 
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): items → {Items}", forumId, items);
         var viewsText = await _localizationService.GetResourceAsync("Forum.Views");
         var repliesText = await _localizationService.GetResourceAsync("Forum.Replies");
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): viewsText → {ViewsText}", forumId, viewsText);
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): repliesText → {RepliesText}", forumId, repliesText);
 
         foreach (var topic in topics)
         {
             var topicUrl = Url.RouteUrl(NopRouteNames.Standard.TOPIC_SLUG, new { id = topic.Id, slug = await _forumService.GetTopicSeNameAsync(topic) }, _webHelper.GetCurrentRequestProtocol());
             var content = $"{repliesText}: {(topic.NumPosts > 0 ? topic.NumPosts - 1 : 0)}, {viewsText}: {topic.Views}";
+			logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): topicUrl → {TopicUrl}", forumId, topicUrl);
+			logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): content → {Content}", forumId, content);
 
             items.Add(new RssItem(topic.Subject, content, new Uri(topicUrl),
                 $"urn:store:{store.Id}:activeDiscussions:topic:{topic.Id}", topic.LastPostTime ?? topic.UpdatedOnUtc));
         }
         feed.Items = items;
+		logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): feed.Items → {Arg1}", forumId, feed.Items);
 
+		logger.LogDebug("<<< Exiting ActiveDiscussionsRss(forumId={ForumId})", forumId);
         return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
     }
 
@@ -169,8 +188,11 @@ public partial class BoardsController : BasePublicController
 
             var url = Url.RouteUrl(NopRouteNames.Standard.FORUM_RSS, new { id = forum.Id }, _webHelper.GetCurrentRequestProtocol());
 
+			logger.LogDebug("ForumRss(id={Id}): url → {Url}", id, url);
             var feedTitle = await _localizationService.GetResourceAsync("Forum.ForumFeedTitle");
             var feedDescription = await _localizationService.GetResourceAsync("Forum.ForumFeedDescription");
+			logger.LogDebug("ForumRss(id={Id}): feedTitle → {FeedTitle}", id, feedTitle);
+			logger.LogDebug("ForumRss(id={Id}): feedDescription → {FeedDescription}", id, feedDescription);
 
             var store = await _storeContext.GetCurrentStoreAsync();
             var feed = new RssFeed(
@@ -178,25 +200,33 @@ public partial class BoardsController : BasePublicController
                 feedDescription,
                 new Uri(url),
                 DateTime.UtcNow);
+				logger.LogDebug("ForumRss(id={Id}): store → {Store}", id, store);
 
             var items = new List<RssItem>();
 
+			logger.LogDebug("ForumRss(id={Id}): items → {Items}", id, items);
             var viewsText = await _localizationService.GetResourceAsync("Forum.Views");
             var repliesText = await _localizationService.GetResourceAsync("Forum.Replies");
+			logger.LogDebug("ForumRss(id={Id}): viewsText → {ViewsText}", id, viewsText);
+			logger.LogDebug("ForumRss(id={Id}): repliesText → {RepliesText}", id, repliesText);
 
             foreach (var topic in topics)
             {
                 var topicUrl = Url.RouteUrl(NopRouteNames.Standard.TOPIC_SLUG, new { id = topic.Id, slug = await _forumService.GetTopicSeNameAsync(topic) }, _webHelper.GetCurrentRequestProtocol());
                 var content = $"{repliesText}: {(topic.NumPosts > 0 ? topic.NumPosts - 1 : 0)}, {viewsText}: {topic.Views}";
+				logger.LogDebug("ForumRss(id={Id}): topicUrl → {TopicUrl}", id, topicUrl);
+				logger.LogDebug("ForumRss(id={Id}): content → {Content}", id, content);
 
                 items.Add(new RssItem(topic.Subject, content, new Uri(topicUrl), $"urn:store:{store.Id}:forum:topic:{topic.Id}", topic.LastPostTime ?? topic.UpdatedOnUtc));
             }
 
             feed.Items = items;
+			logger.LogDebug("ForumRss(id={Id}): feed.Items → {Arg1}", id, feed.Items);
 
             return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
         }
 
+		logger.LogDebug("<<< Exiting ForumRss(id={Id})", id);
         return new RssActionResult(new RssFeed(new Uri(_webHelper.GetStoreLocation())), _webHelper.GetThisPageUrl(false));
     }
 
@@ -230,14 +260,17 @@ public partial class BoardsController : BasePublicController
             };
             await _forumService.InsertSubscriptionAsync(forumSubscription);
             subscribed = true;
+			logger.LogDebug("ForumWatch(id={Id}): subscribed → {Subscribed}", id, subscribed);
             returnText = unwatchTopic;
         }
+		logger.LogDebug("ForumWatch(id={Id}): returnText → {ReturnText}", id, returnText);
         else
         {
             await _forumService.DeleteSubscriptionAsync(forumSubscription);
             subscribed = false;
         }
 
+		logger.LogDebug("<<< Exiting ForumWatch(id={Id})", id);
         return Json(new { Subscribed = subscribed, Text = returnText, Error = false });
     }
 
@@ -258,11 +291,13 @@ public partial class BoardsController : BasePublicController
         //update view count
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!customer.IsSearchEngineAccount())
+		logger.LogDebug("Topic(id={Id},pageNumber={PageNumber}): customer → {Customer}", id, pageNumber, customer);
         {
             forumTopic.Views += 1;
             await _forumService.UpdateTopicAsync(forumTopic);
         }
 
+		logger.LogDebug("<<< Exiting Topic(id={Id},pageNumber={PageNumber})", id, pageNumber);
         return View(model);
     }
 
@@ -296,14 +331,17 @@ public partial class BoardsController : BasePublicController
             };
             await _forumService.InsertSubscriptionAsync(forumSubscription);
             subscribed = true;
+			logger.LogDebug("TopicWatch(id={Id}): subscribed → {Subscribed}", id, subscribed);
             returnText = unwatchTopic;
         }
+		logger.LogDebug("TopicWatch(id={Id}): returnText → {ReturnText}", id, returnText);
         else
         {
             await _forumService.DeleteSubscriptionAsync(forumSubscription);
             subscribed = false;
         }
 
+		logger.LogDebug("<<< Exiting TopicWatch(id={Id})", id);
         return Json(new { Subscribed = subscribed, Text = returnText, Error = false });
     }
 
@@ -368,8 +406,10 @@ public partial class BoardsController : BasePublicController
                 {
                     redirect = Url.RouteUrl(NopRouteNames.Standard.FORUM_SLUG, new { id = forum.Id, slug = await _forumService.GetForumSeNameAsync(forum) }),
                 });
+					logger.LogDebug("TopicDelete(id={Id}): redirect → {Redirect}", id, redirect);
         }
 
+		logger.LogDebug("<<< Exiting TopicDelete(id={Id})", id);
         return Json(new
         {
             redirect = Url.RouteUrl(NopRouteNames.General.BOARDS),
@@ -671,7 +711,9 @@ public partial class BoardsController : BasePublicController
             {
                 redirect = Url.RouteUrl(NopRouteNames.Standard.FORUM_SLUG, new { id = forumId, slug = forumSlug }),
             });
+				logger.LogDebug("PostDelete(id={Id}): redirect → {Redirect}", id, redirect);
 
+		logger.LogDebug("<<< Exiting PostDelete(id={Id})", id);
         return Json(new
         {
             redirect = Url.RouteUrl(NopRouteNames.Standard.TOPIC_SLUG, new { id = forumTopic.Id, slug = await _forumService.GetTopicSeNameAsync(forumTopic) }),
@@ -787,6 +829,7 @@ public partial class BoardsController : BasePublicController
         //redisplay form
         model = await _forumModelFactory.PreparePostCreateModelAsync(forumTopic, 0, true);
 
+		logger.LogDebug("<<< Exiting PostCreate(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
@@ -903,6 +946,7 @@ public partial class BoardsController : BasePublicController
         //redisplay form
         model = await _forumModelFactory.PreparePostEditModelAsync(forumPost, true);
 
+		logger.LogDebug("<<< Exiting PostEdit(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
@@ -919,17 +963,21 @@ public partial class BoardsController : BasePublicController
 
     public virtual async Task<IActionResult> CustomerForumSubscriptions(int? pageNumber)
     {
+		logger.LogDebug(">>> Entering CustomerForumSubscriptions(pageNumber={PageNumber})", pageNumber);
         if (!_forumSettings.AllowCustomersToManageSubscriptions)
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
 
         var model = await _forumModelFactory.PrepareCustomerForumSubscriptionsModelAsync(pageNumber);
 
+		logger.LogDebug("CustomerForumSubscriptions(pageNumber={PageNumber}): model → {Model}", pageNumber, model);
+		logger.LogDebug("<<< Exiting CustomerForumSubscriptions(pageNumber={PageNumber})", pageNumber);
         return View(model);
     }
 
     [HttpPost, ActionName("CustomerForumSubscriptions")]
     public virtual async Task<IActionResult> CustomerForumSubscriptionsPOST(IFormCollection formCollection)
     {
+		logger.LogDebug(">>> Entering CustomerForumSubscriptionsPOST(formCollection={FormCollection})", formCollection);
         foreach (var key in formCollection.Keys)
         {
             var value = formCollection[key];
@@ -938,9 +986,12 @@ public partial class BoardsController : BasePublicController
             {
                 var id = key.Replace("fs", "").Trim();
                 if (int.TryParse(id, out var forumSubscriptionId))
+				logger.LogDebug("CustomerForumSubscriptionsPOST(formCollection={FormCollection}): id → {Id}", formCollection, id);
                 {
                     var forumSubscription = await _forumService.GetSubscriptionByIdAsync(forumSubscriptionId);
                     var customer = await _workContext.GetCurrentCustomerAsync();
+					logger.LogDebug("CustomerForumSubscriptionsPOST(formCollection={FormCollection}): forumSubscription → {ForumSubscription}", formCollection, forumSubscription);
+					logger.LogDebug("CustomerForumSubscriptionsPOST(formCollection={FormCollection}): customer → {Customer}", formCollection, customer);
 
                     if (forumSubscription != null && forumSubscription.CustomerId == customer.Id)
                     {
@@ -950,25 +1001,31 @@ public partial class BoardsController : BasePublicController
             }
         }
 
+		logger.LogDebug("<<< Exiting CustomerForumSubscriptionsPOST(formCollection={FormCollection})", formCollection);
         return RedirectToRoute(NopRouteNames.Standard.CUSTOMER_FORUM_SUBSCRIPTIONS);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> PostVote(int postId, bool isUp)
     {
+		logger.LogDebug(">>> Entering PostVote(postId={PostId},isUp={IsUp})", postId, isUp);
         if (!_forumSettings.AllowPostVoting)
             return new NullJsonResult();
 
         var forumPost = await _forumService.GetPostByIdAsync(postId);
         if (forumPost == null)
+			logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): forumPost → {ForumPost}", postId, isUp, forumPost);
             return new NullJsonResult();
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): customer → {Customer}", postId, isUp, customer);
             return Json(new
             {
                 Error = await _localizationService.GetResourceAsync("Forum.Votes.Login"),
                 VoteCount = forumPost.VoteCount
+				logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): Error → {Error}", postId, isUp, Error);
+				logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): VoteCount → {VoteCount}", postId, isUp, VoteCount);
             });
 
         if (customer.Id == forumPost.CustomerId)
@@ -980,6 +1037,7 @@ public partial class BoardsController : BasePublicController
 
         var forumPostVote = await _forumService.GetPostVoteAsync(postId, customer);
         if (forumPostVote != null)
+		logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): forumPostVote → {ForumPostVote}", postId, isUp, forumPostVote);
         {
             if ((forumPostVote.IsUp && isUp) || (!forumPostVote.IsUp && !isUp))
                 return Json(new
@@ -1007,6 +1065,7 @@ public partial class BoardsController : BasePublicController
             CreatedOnUtc = DateTime.UtcNow
         });
 
+		logger.LogDebug("<<< Exiting PostVote(postId={PostId},isUp={IsUp})", postId, isUp);
         return Json(new { VoteCount = forumPost.VoteCount, IsUp = isUp });
     }
 

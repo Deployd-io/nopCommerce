@@ -15,8 +15,10 @@ public partial class TierPriceCacheEventConsumer : CacheEventConsumer<TierPrice>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(TierPrice entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.TierPricesByProductCacheKey, entity.ProductId);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductPricePrefix, entity.ProductId);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductMultiplePricePrefix, entity.ProductId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }
