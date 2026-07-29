@@ -11,8 +11,10 @@ public partial class ProductReviewValidator : BaseNopValidator<ProductReviewMode
 {
     public ProductReviewValidator(ILocalizationService localizationService, IWorkContext workContext)
     {
+		logger.LogDebug(">>> Entering ProductReviewValidator(localizationService={LocalizationService},workContext={WorkContext})", localizationService, workContext);
         var isLoggedInAsVendor = workContext.GetCurrentVendorAsync().Result != null;
         //vendor can edit "Reply text" only
+		logger.LogDebug("ProductReviewValidator(localizationService={LocalizationService},workContext={WorkContext}): isLoggedInAsVendor → {IsLoggedInAsVendor}", localizationService, workContext, isLoggedInAsVendor);
         if (!isLoggedInAsVendor)
         {
             RuleFor(x => x.Title).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.ProductReviews.Fields.Title.Required"));
@@ -20,5 +22,6 @@ public partial class ProductReviewValidator : BaseNopValidator<ProductReviewMode
         }
 
         SetDatabaseValidationRules<ProductReview>();
+		logger.LogDebug("<<< Exiting ProductReviewValidator(localizationService={LocalizationService},workContext={WorkContext})", localizationService, workContext);
     }
 }

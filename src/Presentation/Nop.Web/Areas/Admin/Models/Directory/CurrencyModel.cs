@@ -13,10 +13,15 @@ public partial record CurrencyModel : BaseNopEntityModel, ILocalizedModel<Curren
 
     public CurrencyModel()
     {
+		logger.LogDebug(">>> Entering CurrencyModel()");
         Locales = new List<CurrencyLocalizedModel>();
 
+		logger.LogDebug("CurrencyModel(): Locales → {Locales}", Locales);
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("CurrencyModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CurrencyModel()");
+		logger.LogDebug("CurrencyModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

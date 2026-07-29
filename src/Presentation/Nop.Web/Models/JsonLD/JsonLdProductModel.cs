@@ -8,9 +8,14 @@ public partial record JsonLdProductModel : JsonLdModel
 
     public JsonLdProductModel()
     {
+		logger.LogDebug(">>> Entering JsonLdProductModel()");
         Brand = new List<JsonLdBrandModel>();
         Review = new List<JsonLdReviewModel>();
+		logger.LogDebug("JsonLdProductModel(): Brand → {Brand}", Brand);
+		logger.LogDebug("JsonLdProductModel(): Review → {Review}", Review);
         HasVariant = new List<JsonLdProductModel>();
+		logger.LogDebug("<<< Exiting JsonLdProductModel()");
+		logger.LogDebug("JsonLdProductModel(): HasVariant → {HasVariant}", HasVariant);
     }
 
     #endregion

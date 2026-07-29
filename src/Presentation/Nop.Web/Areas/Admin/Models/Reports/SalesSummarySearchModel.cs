@@ -11,16 +11,28 @@ public partial record SalesSummarySearchModel : BaseSearchModel
 
     public SalesSummarySearchModel()
     {
+		logger.LogDebug(">>> Entering SalesSummarySearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableOrderStatuses = new List<SelectListItem>();
+		logger.LogDebug("SalesSummarySearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("SalesSummarySearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailablePaymentStatuses = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		logger.LogDebug("SalesSummarySearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
+		logger.LogDebug("SalesSummarySearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("SalesSummarySearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		logger.LogDebug("SalesSummarySearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         OrderStatusIds = new List<int>();
         PaymentStatusIds = new List<int>();
+		logger.LogDebug("SalesSummarySearchModel(): OrderStatusIds → {OrderStatusIds}", OrderStatusIds);
+		logger.LogDebug("SalesSummarySearchModel(): PaymentStatusIds → {PaymentStatusIds}", PaymentStatusIds);
         GroupByOptions = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting SalesSummarySearchModel()");
+		logger.LogDebug("SalesSummarySearchModel(): GroupByOptions → {GroupByOptions}", GroupByOptions);
+		logger.LogDebug("SalesSummarySearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

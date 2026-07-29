@@ -14,7 +14,10 @@ public partial record LogSearchModel : BaseSearchModel
 
     public LogSearchModel()
     {
+		logger.LogDebug(">>> Entering LogSearchModel()");
         AvailableLogLevels = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting LogSearchModel()");
+		logger.LogDebug("LogSearchModel(): AvailableLogLevels → {AvailableLogLevels}", AvailableLogLevels);
     }
 
     #endregion

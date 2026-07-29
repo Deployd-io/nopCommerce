@@ -11,7 +11,10 @@ public partial record AddProductToManufacturerModel : BaseNopModel
 
     public AddProductToManufacturerModel()
     {
+		logger.LogDebug(">>> Entering AddProductToManufacturerModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddProductToManufacturerModel()");
+		logger.LogDebug("AddProductToManufacturerModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
     #endregion
 

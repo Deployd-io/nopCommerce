@@ -12,9 +12,14 @@ public partial record BlogContentModel : BaseNopModel
 
     public BlogContentModel()
     {
+		logger.LogDebug(">>> Entering BlogContentModel()");
         BlogPosts = new BlogPostSearchModel();
         BlogComments = new BlogCommentSearchModel();
+		logger.LogDebug("BlogContentModel(): BlogPosts → {BlogPosts}", BlogPosts);
+		logger.LogDebug("BlogContentModel(): BlogComments → {BlogComments}", BlogComments);
         SearchTitle = new BlogPostSearchModel().SearchTitle;
+		logger.LogDebug("<<< Exiting BlogContentModel()");
+		logger.LogDebug("BlogContentModel(): SearchTitle → {SearchTitle}", SearchTitle);
     }
 
     #endregion

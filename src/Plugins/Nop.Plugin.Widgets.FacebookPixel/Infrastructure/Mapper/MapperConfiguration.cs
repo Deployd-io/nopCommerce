@@ -14,6 +14,7 @@ public class MapperConfiguration : Profile, IOrderedMapperProfile
 
     public MapperConfiguration()
     {
+		logger.LogDebug(">>> Entering MapperConfiguration()");
         CreateMap<FacebookPixelConfiguration, FacebookPixelModel>()
             .ForMember(model => model.AvailableStores, options => options.Ignore())
             .ForMember(model => model.CustomEventSearchModel, options => options.Ignore())
@@ -23,6 +24,7 @@ public class MapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.StoreName, options => options.Ignore());
         CreateMap<FacebookPixelModel, FacebookPixelConfiguration>()
             .ForMember(entity => entity.CustomEvents, options => options.Ignore());
+			logger.LogDebug("<<< Exiting MapperConfiguration()");
     }
 
     #endregion

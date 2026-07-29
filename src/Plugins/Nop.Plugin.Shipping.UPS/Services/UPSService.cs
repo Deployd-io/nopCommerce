@@ -108,6 +108,7 @@ public class UPSService
     /// <returns>The asynchronous task whose result contains access token</returns>
     private async Task<string> GetAccessTokenAsync()
     {
+		logger.LogDebug(">>> Entering GetAccessTokenAsync()");
         if (!string.IsNullOrEmpty(_accessToken))
             return _accessToken;
 
@@ -119,9 +120,13 @@ public class UPSService
 
         var client = new OAuthClient(_httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient), _upsSettings);
 
+		logger.LogDebug("GetAccessTokenAsync(): client → {Client}", client);
         var response = await client.GenerateTokenAsync();
         _accessToken = response.Access_token;
+		logger.LogDebug("GetAccessTokenAsync(): response → {Response}", response);
+		logger.LogDebug("GetAccessTokenAsync(): _accessToken → {_accessToken}", _accessToken);
 
+		logger.LogDebug("<<< Exiting GetAccessTokenAsync()");
         return _accessToken;
     }
 
@@ -134,6 +139,8 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetWeightLimitAsync()
     {
+		logger.LogDebug(">>> Entering GetWeightLimitAsync()");
+		logger.LogDebug("<<< Exiting GetWeightLimitAsync()");
         return await _measureService.ConvertWeightAsync(WEIGHT_LIMIT, _lbWeight, _measureWeight);
     }
 
@@ -146,6 +153,8 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetSizeLimitAsync()
     {
+		logger.LogDebug(">>> Entering GetSizeLimitAsync()");
+		logger.LogDebug("<<< Exiting GetSizeLimitAsync()");
         return await _measureService.ConvertDimensionAsync(SIZE_LIMIT, _inchesDimension, _measureDimension);
     }
 
@@ -158,6 +167,8 @@ public class UPSService
     /// </returns>
     private async Task<decimal> GetLengthLimitAsync()
     {
+		logger.LogDebug(">>> Entering GetLengthLimitAsync()");
+		logger.LogDebug("<<< Exiting GetLengthLimitAsync()");
         return await _measureService.ConvertDimensionAsync(LENGTH_LIMIT, _inchesDimension, _measureDimension);
     }
 
@@ -169,8 +180,11 @@ public class UPSService
     /// <returns>The attribute value</returns>
     private TAttribute GetAttributeValue<TAttribute>(Enum enumValue) where TAttribute : Attribute
     {
+		logger.LogDebug(">>> Entering GetAttributeValue(enumValue={EnumValue})", enumValue);
         var enumType = enumValue.GetType();
         var enumValueInfo = enumType.GetMember(enumValue.ToString()).FirstOrDefault();
+		logger.LogDebug("GetAttributeValue(enumValue={EnumValue}): enumType → {EnumType}", enumValue, enumType);
+		logger.LogDebug("GetAttributeValue(enumValue={EnumValue}): enumValueInfo → {EnumValueInfo}", enumValue, enumValueInfo);
         var attribute = enumValueInfo?.GetCustomAttributes(typeof(TAttribute), false).FirstOrDefault();
         return attribute as TAttribute;
     }
@@ -185,10 +199,14 @@ public class UPSService
     /// </returns>
     private async Task<TrackResponse> TrackAsync(string trackingNumber)
     {
+		logger.LogDebug(">>> Entering TrackAsync(trackingNumber={TrackingNumber})", trackingNumber);
         var client = new TrackClient(_httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient), _upsSettings, await GetAccessTokenAsync());
 
+		logger.LogDebug("TrackAsync(trackingNumber={TrackingNumber}): client → {Client}", trackingNumber, client);
         var trackResponse = await client.TrackAsync(trackingNumber);
 
+		logger.LogDebug("TrackAsync(trackingNumber={TrackingNumber}): trackResponse → {TrackResponse}", trackingNumber, trackResponse);
+		logger.LogDebug("<<< Exiting TrackAsync(trackingNumber={TrackingNumber})", trackingNumber);
         return trackResponse;
     }
 
@@ -202,17 +220,21 @@ public class UPSService
     /// </returns>
     private async Task<ShipmentStatusEvent> PrepareShipmentStatusEventAsync(Activity activity)
     {
+		logger.LogDebug(">>> Entering PrepareShipmentStatusEventAsync(activity={Activity})", activity);
         var shipmentStatusEvent = new ShipmentStatusEvent();
 
+		logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): shipmentStatusEvent → {ShipmentStatusEvent}", activity, shipmentStatusEvent);
         try
         {
             //prepare date
             shipmentStatusEvent.Date = DateTime
+				logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): shipmentStatusEvent.Date → {Arg1}", activity, shipmentStatusEvent.Date);
                 .ParseExact($"{activity.Date} {activity.Time}", "yyyyMMdd HHmmss", CultureInfo.InvariantCulture);
 
             //prepare address
             var addressDetails = new List<string>();
 
+			logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): addressDetails → {AddressDetails}", activity, addressDetails);
             var address = activity.Location?.Address;
 
             if (address != null)
@@ -234,6 +256,7 @@ public class UPSService
             }
 
             shipmentStatusEvent.CountryCode = activity.Location?.Address?.CountryCode;
+			logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): shipmentStatusEvent.CountryCode → {Arg1}", activity, shipmentStatusEvent.CountryCode);
             shipmentStatusEvent.Location = string.Join(", ", addressDetails);
 
             if (activity.Status == null)
@@ -242,6 +265,7 @@ public class UPSService
             //prepare description
             var eventName = string.Empty;
             switch (activity.Status.Type)
+			logger.LogDebug("PrepareShipmentStatusEventAsync(activity={Activity}): eventName → {EventName}", activity, eventName);
             {
                 case "I":
                     eventName = activity.Status.Code switch
@@ -273,9 +297,11 @@ public class UPSService
         }
         catch
         {
+			logger.LogError("Exception in PrepareShipmentStatusEventAsync(activity={Activity}): {Arg1}", activity, ex.Message);
             // ignored
         }
 
+		logger.LogDebug("<<< Exiting PrepareShipmentStatusEventAsync(activity={Activity})", activity);
         return shipmentStatusEvent;
     }
 
@@ -513,6 +539,7 @@ public class UPSService
     /// </returns>
     private async Task<IEnumerable<Shipment_Package>> GetPackagesForOneItemPerPackageAsync(GetShippingOptionRequest shippingOptionRequest)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await shippingOptionRequest.Items.SelectManyAwait(async packageItem =>
         {
             //get dimensions and weight of the single item
@@ -529,6 +556,7 @@ public class UPSService
 
             return Enumerable.Repeat(package, packageItem.GetQuantity());
         }).ToListAsync();
+		logger.LogDebug("<<< Exiting GetPackagesForOneItemPerPackageAsync(shippingOptionRequest={ShippingOptionRequest})", shippingOptionRequest);
     }
 
     /// <summary>
@@ -721,6 +749,8 @@ public class UPSService
         {
             dimension = await _measureService.ConvertFromPrimaryMeasureDimensionAsync(dimension, _measureDimension);
             dimension = Convert.ToInt32(Math.Ceiling(dimension));
+			logger.LogDebug("convertAndRoundDimensionAsync(dimension={Dimension}): dimension → {Dimension1}", dimension, dimension);
+			logger.LogDebug("<<< Exiting convertAndRoundDimensionAsync(dimension={Dimension})", dimension);
             return Math.Max(dimension, 1);
         }
 
@@ -778,7 +808,9 @@ public class UPSService
     /// <returns>Package size</returns>
     private decimal GetPackageSize(decimal width, decimal length, decimal height)
     {
+		logger.LogDebug(">>> Entering GetPackageSize(width={Width},length={Length},height={Height})", width, length, height);
         //To measure ground packages use the following formula: Length + 2x Width +2x Height. Details: https://www.ups.com/us/en/help-center/packaging-and-supplies/prepare-overize.page
+		logger.LogDebug("<<< Exiting GetPackageSize(width={Width},length={Length},height={Height})", width, length, height);
         return length + width * 2 + height * 2;
     }
 
@@ -816,6 +848,7 @@ public class UPSService
 
                 return shippingOption;
             }).ToList(), null);
+			logger.LogDebug("<<< Exiting PrepareShippingOptionsAsync(rateResponse={RateResponse})", rateResponse);
         }
         catch (API.Rates.ApiException<ErrorResponse> exception)
         {
@@ -917,6 +950,8 @@ public class UPSService
     /// <returns>UPS code</returns>
     public string GetUpsCode(Enum enumValue)
     {
+		logger.LogDebug(">>> Entering GetUpsCode(enumValue={EnumValue})", enumValue);
+		logger.LogDebug("<<< Exiting GetUpsCode(enumValue={EnumValue})", enumValue);
         return GetAttributeValue<UPSCodeAttribute>(enumValue)?.Code;
     }
 
@@ -930,11 +965,14 @@ public class UPSService
     /// </returns>
     public virtual async Task<IEnumerable<ShipmentStatusEvent>> GetShipmentEventsAsync(string trackingNumber)
     {
+		logger.LogDebug(">>> Entering GetShipmentEventsAsync(trackingNumber={TrackingNumber})", trackingNumber);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             //get tracking info
             var response = await TrackAsync(trackingNumber);
 
+			logger.LogDebug("GetShipmentEventsAsync(trackingNumber={TrackingNumber}): response → {Response}", trackingNumber, response);
             if (response.Shipment == null)
                 return null;
 
@@ -943,12 +981,16 @@ public class UPSService
                     .SelectMany(package => package?.Activity)).Where(activity => activity != null)
                 .SelectAwait(async activity => await PrepareShipmentStatusEventAsync(activity)).ToListAsync();
         }
+		logger.LogDebug("GetShipmentEventsAsync(trackingNumber={TrackingNumber}): activity → {Activity}", trackingNumber, activity);
+		logger.LogInformation("GetShipmentEventsAsync(trackingNumber)={TrackingNumber}: database query executed in {Arg1} ms", trackingNumber, __logStart.ElapsedMilliseconds);
         catch (Exception exception)
         {
             //log errors
             var message = $"Error while getting UPS shipment tracking info - {trackingNumber}{Environment.NewLine}{exception.Message}";
             await _logger.ErrorAsync(message, exception, await _workContext.GetCurrentCustomerAsync());
+			logger.LogDebug("GetShipmentEventsAsync(trackingNumber={TrackingNumber}): message → {Message}", trackingNumber, message);
 
+			logger.LogDebug("<<< Exiting GetShipmentEventsAsync(trackingNumber={TrackingNumber})", trackingNumber);
             return new List<ShipmentStatusEvent>();
         }
     }

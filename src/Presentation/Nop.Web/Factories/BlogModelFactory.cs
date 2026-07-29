@@ -135,18 +135,26 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogPostListModel> PrepareBlogPostListModelAsync(BlogPagingFilteringModel command)
     {
+		logger.LogDebug(">>> Entering PrepareBlogPostListModelAsync(command={Command})", command);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(command);
 
         if (command.PageSize <= 0)
             command.PageSize = _blogSettings.PostsPageSize;
+			logger.LogDebug("PrepareBlogPostListModelAsync(command={Command}): command.PageSize → {Arg1}", command, command.PageSize);
         if (command.PageNumber <= 0)
             command.PageNumber = 1;
+			logger.LogDebug("PrepareBlogPostListModelAsync(command={Command}): command.PageNumber → {Arg1}", command, command.PageNumber);
 
         var dateFrom = command.GetFromMonth();
         var dateTo = command.GetToMonth();
+		logger.LogDebug("PrepareBlogPostListModelAsync(command={Command}): dateFrom → {DateFrom}", command, dateFrom);
+		logger.LogDebug("PrepareBlogPostListModelAsync(command={Command}): dateTo → {DateTo}", command, dateTo);
 
         var language = await _workContext.GetWorkingLanguageAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareBlogPostListModelAsync(command={Command}): language → {Language}", command, language);
+		logger.LogDebug("PrepareBlogPostListModelAsync(command={Command}): store → {Store}", command, store);
         var blogPosts = string.IsNullOrEmpty(command.Tag)
             ? await _blogService.GetAllBlogPostsAsync(store.Id, language.Id, dateFrom, dateTo, command.PageNumber - 1, command.PageSize)
             : await _blogService.GetAllBlogPostsByTagAsync(store.Id, language.Id, command.Tag, command.PageNumber - 1, command.PageSize);
@@ -162,8 +170,10 @@ public partial class BlogModelFactory : IBlogModelFactory
                 return blogPostModel;
             }).ToListAsync()
         };
+		logger.LogInformation("PrepareBlogPostListModelAsync(command)={Command}: database query executed in {Arg1} ms", command, __logStart.ElapsedMilliseconds);
         model.PagingFilteringContext.LoadPagedList(blogPosts);
 
+		logger.LogDebug("<<< Exiting PrepareBlogPostListModelAsync(command={Command})", command);
         return model;
     }
 
@@ -176,8 +186,11 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogPostTagListModel> PrepareBlogPostTagListModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareBlogPostTagListModelAsync()");
         var model = new BlogPostTagListModel();
         var store = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareBlogPostTagListModelAsync(): model → {Model}", model);
+		logger.LogDebug("PrepareBlogPostTagListModelAsync(): store → {Store}", store);
 
         //get tags
         var tags = (await _blogService
@@ -192,6 +205,7 @@ public partial class BlogModelFactory : IBlogModelFactory
             BlogPostCount = tag.BlogPostCount
         }));
 
+		logger.LogDebug("<<< Exiting PrepareBlogPostTagListModelAsync()");
         return model;
     }
 
@@ -204,22 +218,30 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<List<BlogPostYearModel>> PrepareBlogPostYearModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareBlogPostYearModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		logger.LogDebug("PrepareBlogPostYearModelAsync(): store → {Store}", store);
+		logger.LogDebug("PrepareBlogPostYearModelAsync(): currentLanguage → {CurrentLanguage}", currentLanguage);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.BlogMonthsModelKey, currentLanguage, store);
         var cachedModel = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
+		logger.LogDebug("PrepareBlogPostYearModelAsync(): cacheKey → {CacheKey}", cacheKey);
             var model = new List<BlogPostYearModel>();
 
+			logger.LogDebug("PrepareBlogPostYearModelAsync(): model → {Model}", model);
             var blogPosts = await _blogService.GetAllBlogPostsAsync(store.Id,
                 currentLanguage.Id);
             if (blogPosts.Any())
             {
                 var months = new SortedDictionary<DateTime, int>();
 
+				logger.LogDebug("PrepareBlogPostYearModelAsync(): months → {Months}", months);
                 var blogPost = blogPosts[blogPosts.Count - 1];
                 var first = blogPost.StartDateUtc ?? blogPost.CreatedOnUtc;
                 while (DateTime.SpecifyKind(first, DateTimeKind.Utc) <= DateTime.UtcNow.AddMonths(1))
+				logger.LogDebug("PrepareBlogPostYearModelAsync(): first → {First}", first);
                 {
                     var list = await _blogService.GetPostsByDateAsync(blogPosts, new DateTime(first.Year, first.Month, 1),
                         new DateTime(first.Year, first.Month, 1).AddMonths(1).AddSeconds(-1));
@@ -235,6 +257,7 @@ public partial class BlogModelFactory : IBlogModelFactory
                 var current = 0;
                 foreach (var kvp in months)
                 {
+				logger.LogDebug("PrepareBlogPostYearModelAsync(): current → {Current}", current);
                     var date = kvp.Key;
                     var blogPostCount = kvp.Value;
                     if (current == 0)
@@ -262,6 +285,8 @@ public partial class BlogModelFactory : IBlogModelFactory
             return model;
         });
 
+		logger.LogInformation("PrepareBlogPostYearModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareBlogPostYearModelAsync()");
         return cachedModel;
     }
 
@@ -275,10 +300,12 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogCommentModel> PrepareBlogPostCommentModelAsync(BlogComment blogComment)
     {
+		logger.LogDebug(">>> Entering PrepareBlogPostCommentModelAsync(blogComment={BlogComment})", blogComment);
         ArgumentNullException.ThrowIfNull(blogComment);
 
         var customer = await _customerService.GetCustomerByIdAsync(blogComment.CustomerId);
 
+		logger.LogDebug("PrepareBlogPostCommentModelAsync(blogComment={BlogComment}): customer → {Customer}", blogComment, customer);
         var model = new BlogCommentModel
         {
             Id = blogComment.Id,
@@ -296,6 +323,7 @@ public partial class BlogModelFactory : IBlogModelFactory
                 _mediaSettings.AvatarPictureSize, _customerSettings.DefaultAvatarEnabled, defaultPictureType: PictureType.Avatar);
         }
 
+		logger.LogDebug("<<< Exiting PrepareBlogPostCommentModelAsync(blogComment={BlogComment})", blogComment);
         return model;
     }
 

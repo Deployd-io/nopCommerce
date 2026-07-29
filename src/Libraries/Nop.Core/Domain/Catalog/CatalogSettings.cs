@@ -9,8 +9,12 @@ public partial class CatalogSettings : ISettings
 {
     public CatalogSettings()
     {
+		logger.LogDebug(">>> Entering CatalogSettings()");
         ProductSortingEnumDisabled = new List<int>();
         ProductSortingEnumDisplayOrder = new Dictionary<int, int>();
+		logger.LogDebug("<<< Exiting CatalogSettings()");
+		logger.LogDebug("CatalogSettings(): ProductSortingEnumDisabled → {ProductSortingEnumDisabled}", ProductSortingEnumDisabled);
+		logger.LogDebug("CatalogSettings(): ProductSortingEnumDisplayOrder → {ProductSortingEnumDisplayOrder}", ProductSortingEnumDisplayOrder);
     }
 
     /// <summary>

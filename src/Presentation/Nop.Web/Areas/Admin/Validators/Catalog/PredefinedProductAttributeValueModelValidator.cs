@@ -9,8 +9,10 @@ public partial class PredefinedProductAttributeValueModelValidator : BaseNopVali
 {
     public PredefinedProductAttributeValueModelValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering PredefinedProductAttributeValueModelValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Attributes.ProductAttributes.PredefinedValues.Fields.Name.Required"));
+			logger.LogDebug("<<< Exiting PredefinedProductAttributeValueModelValidator(localizationService={LocalizationService})", localizationService);
     }
 }

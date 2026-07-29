@@ -33,11 +33,14 @@ public partial class DeleteGuestsTask : IScheduleTask
     /// </summary>
     public virtual async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         var olderThanMinutes = _customerSettings.DeleteGuestTaskOlderThanMinutes;
         // Default value in case 0 is returned.  0 would effectively disable this service and harm performance.
+		logger.LogDebug("ExecuteAsync(): olderThanMinutes → {OlderThanMinutes}", olderThanMinutes);
         olderThanMinutes = olderThanMinutes == 0 ? 1440 : olderThanMinutes;
 
         await _customerService.DeleteGuestCustomersAsync(null, DateTime.UtcNow.AddMinutes(-olderThanMinutes), true);
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

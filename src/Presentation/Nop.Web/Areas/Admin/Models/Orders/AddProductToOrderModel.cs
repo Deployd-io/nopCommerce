@@ -14,9 +14,14 @@ public partial record AddProductToOrderModel : BaseNopModel
 
     public AddProductToOrderModel()
     {
+		logger.LogDebug(">>> Entering AddProductToOrderModel()");
         ProductAttributes = new List<ProductAttributeModel>();
         GiftCard = new GiftCardModel();
+		logger.LogDebug("AddProductToOrderModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
+		logger.LogDebug("AddProductToOrderModel(): GiftCard → {GiftCard}", GiftCard);
         Warnings = new List<string>();
+		logger.LogDebug("<<< Exiting AddProductToOrderModel()");
+		logger.LogDebug("AddProductToOrderModel(): Warnings → {Warnings}", Warnings);
     }
 
     #endregion
@@ -68,8 +73,12 @@ public partial record AddProductToOrderModel : BaseNopModel
     {
         public ProductAttributeModel()
         {
+			logger.LogDebug(">>> Entering ProductAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<ProductAttributeValueModel>();
+			logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			logger.LogDebug("ProductAttributeModel(): AllowedFileExtensions → {AllowedFileExtensions}", AllowedFileExtensions);
+			logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductAttributeId { get; set; }

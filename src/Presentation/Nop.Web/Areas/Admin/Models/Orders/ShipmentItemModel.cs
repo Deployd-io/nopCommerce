@@ -12,7 +12,10 @@ public partial record ShipmentItemModel : BaseNopEntityModel
 
     public ShipmentItemModel()
     {
+		logger.LogDebug(">>> Entering ShipmentItemModel()");
         AvailableWarehouses = new List<WarehouseInfo>();
+		logger.LogDebug("<<< Exiting ShipmentItemModel()");
+		logger.LogDebug("ShipmentItemModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     #endregion

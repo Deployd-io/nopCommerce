@@ -12,7 +12,10 @@ public partial record LocaleResourceSearchModel : BaseSearchModel
 
     public LocaleResourceSearchModel()
     {
+		logger.LogDebug(">>> Entering LocaleResourceSearchModel()");
         AddResourceString = new LocaleResourceModel();
+		logger.LogDebug("<<< Exiting LocaleResourceSearchModel()");
+		logger.LogDebug("LocaleResourceSearchModel(): AddResourceString → {AddResourceString}", AddResourceString);
     }
 
     #endregion

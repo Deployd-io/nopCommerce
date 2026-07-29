@@ -11,8 +11,12 @@ public partial record DatesRangesSearchModel : BaseSearchModel
 
     public DatesRangesSearchModel()
     {
+		logger.LogDebug(">>> Entering DatesRangesSearchModel()");
         DeliveryDateSearchModel = new DeliveryDateSearchModel();
         ProductAvailabilityRangeSearchModel = new ProductAvailabilityRangeSearchModel();
+		logger.LogDebug("<<< Exiting DatesRangesSearchModel()");
+		logger.LogDebug("DatesRangesSearchModel(): DeliveryDateSearchModel → {DeliveryDateSearchModel}", DeliveryDateSearchModel);
+		logger.LogDebug("DatesRangesSearchModel(): ProductAvailabilityRangeSearchModel → {ProductAvailabilityRangeSearchModel}", ProductAvailabilityRangeSearchModel);
     }
 
     #endregion

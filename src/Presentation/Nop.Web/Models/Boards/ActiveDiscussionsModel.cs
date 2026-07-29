@@ -6,7 +6,10 @@ public partial record ActiveDiscussionsModel : BaseNopModel
 {
     public ActiveDiscussionsModel()
     {
+		logger.LogDebug(">>> Entering ActiveDiscussionsModel()");
         ForumTopics = new List<ForumTopicRowModel>();
+		logger.LogDebug("<<< Exiting ActiveDiscussionsModel()");
+		logger.LogDebug("ActiveDiscussionsModel(): ForumTopics → {ForumTopics}", ForumTopics);
     }
 
     public IList<ForumTopicRowModel> ForumTopics { get; protected set; }

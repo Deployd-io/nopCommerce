@@ -7,7 +7,10 @@ public partial record TestMessageTemplateModel : BaseNopEntityModel
 {
     public TestMessageTemplateModel()
     {
+		logger.LogDebug(">>> Entering TestMessageTemplateModel()");
         Tokens = new List<string>();
+		logger.LogDebug("<<< Exiting TestMessageTemplateModel()");
+		logger.LogDebug("TestMessageTemplateModel(): Tokens → {Tokens}", Tokens);
     }
 
     public int LanguageId { get; set; }

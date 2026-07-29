@@ -19,17 +19,27 @@ public abstract record BasePageableModel : BaseNopModel, IPageableModel
     /// <param name="pagedList">Entities (models)</param>
     public virtual void LoadPagedList<T>(IPagedList<T> pagedList)
     {
+		logger.LogDebug(">>> Entering LoadPagedList(pagedList={PagedList})", pagedList);
         FirstItem = (pagedList.PageIndex * pagedList.PageSize) + 1;
         HasNextPage = pagedList.HasNextPage;
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): FirstItem → {FirstItem}", pagedList, FirstItem);
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): HasNextPage → {HasNextPage}", pagedList, HasNextPage);
         HasPreviousPage = pagedList.HasPreviousPage;
         LastItem = Math.Min(pagedList.TotalCount, ((pagedList.PageIndex * pagedList.PageSize) + pagedList.PageSize));
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): HasPreviousPage → {HasPreviousPage}", pagedList, HasPreviousPage);
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): LastItem → {LastItem}", pagedList, LastItem);
         PageNumber = pagedList.PageIndex + 1;
         PageSize = pagedList.PageSize;
         TotalItems = pagedList.TotalCount;
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): PageNumber → {PageNumber}", pagedList, PageNumber);
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): PageSize → {PageSize}", pagedList, PageSize);
+		logger.LogDebug("LoadPagedList(pagedList={PagedList}): TotalItems → {TotalItems}", pagedList, TotalItems);
         TotalPages = pagedList.TotalPages;
+		logger.LogDebug("<<< Exiting LoadPagedList(pagedList={PagedList})", pagedList);
     }
 
     #endregion
+	logger.LogDebug("LoadPagedList(pagedList={PagedList}): TotalPages → {TotalPages}", pagedList, TotalPages);
 
     #region Properties
 

@@ -13,11 +13,14 @@ internal class RedisSynchronizedMemoryCacheTests : ServiceTest
 {
     protected IStaticCacheManager CreateCacheInstance()
     {
+		logger.LogDebug(">>> Entering CreateCacheInstance()");
         var appSettings = Singleton<AppSettings>.Instance;
         var cacheKeyManager = new CacheKeyManager(new ConcurrentTrie<byte>());
         var redisSynchronizedMemoryCache = new RedisSynchronizedMemoryCache(new MemoryCache(new MemoryCacheOptions()),
             new TestRedisConnectionWrapper(), cacheKeyManager, appSettings);
+			logger.LogDebug("CreateCacheInstance(): cacheKeyManager → {CacheKeyManager}", cacheKeyManager);
 
+		logger.LogDebug("<<< Exiting CreateCacheInstance()");
         return new MemoryCacheManager(appSettings, redisSynchronizedMemoryCache, cacheKeyManager);
     }
 
@@ -26,27 +29,35 @@ internal class RedisSynchronizedMemoryCacheTests : ServiceTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _values = new List<KeyValuePair<CacheKey, string>>();
 
+		logger.LogDebug("SetUp(): _values → {_values}", _values);
         for (var i = 1; i <= 5; i++)
             _values.Add(new(new CacheKey($"key_{i}"), i.ToString()));
+			logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [Test]
     public async Task CanClearCacheAsync()
     {
+		logger.LogDebug(">>> Entering CanClearCacheAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var c1 = CreateCacheInstance();
         await c1.SetAsync(_values[0].Key, _values[0].Value);
+		logger.LogDebug("CanClearCacheAsync(): c1 → {C1}", c1);
         await c1.SetAsync(_values[2].Key, _values[2].Value);
         await c1.SetAsync(_values[4].Key, _values[4].Value);
 
         var c2 = CreateCacheInstance();
         await c2.SetAsync(_values[0].Key, _values[0].Value);
+		logger.LogDebug("CanClearCacheAsync(): c2 → {C2}", c2);
         await c2.SetAsync(_values[1].Key, _values[1].Value);
         await c2.SetAsync(_values[2].Key, _values[2].Value);
 
         var c3 = CreateCacheInstance();
         await c3.SetAsync(_values[4].Key, _values[0].Value);
+		logger.LogDebug("CanClearCacheAsync(): c3 → {C3}", c3);
         await c3.SetAsync(_values[3].Key, _values[1].Value);
 
         await c2.ClearAsync();
@@ -54,13 +65,18 @@ internal class RedisSynchronizedMemoryCacheTests : ServiceTest
         (await c1.GetAsync(_values[4].Key)).Should().BeNull();
         (await c3.GetAsync(_values[4].Key)).Should().BeNull();
         (await c1.GetAsync(_values[3].Key)).Should().BeNull();
+		logger.LogDebug("<<< Exiting CanClearCacheAsync()");
+		logger.LogInformation("CanClearCacheAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     [Test]
     public async Task CanRemoveByPrefixAsync()
     {
+		logger.LogDebug(">>> Entering CanRemoveByPrefixAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var c1 = CreateCacheInstance();
         await c1.SetAsync(new("key_1"), "1");
+		logger.LogDebug("CanRemoveByPrefixAsync(): c1 → {C1}", c1);
         await c1.SetAsync(new("key_12"), "12");
         await c1.SetAsync(new("key_11"), "11");
         await c1.SetAsync(new("key_111"), "111");
@@ -69,6 +85,7 @@ internal class RedisSynchronizedMemoryCacheTests : ServiceTest
 
         var c2 = CreateCacheInstance();
         await c2.SetAsync(new("key_12"), "12");
+		logger.LogDebug("CanRemoveByPrefixAsync(): c2 → {C2}", c2);
         await c2.SetAsync(new("key_112"), "112");
         await c2.SetAsync(new("key_113"), "113");
 
@@ -87,5 +104,7 @@ internal class RedisSynchronizedMemoryCacheTests : ServiceTest
         (await c2.GetAsync(new("key_12"))).Should().BeNull();
         (await c1.GetAsync(new("key_12"))).Should().BeNull();
         (await c1.GetAsync(new("key_1"))).Should().BeNull();
+		logger.LogDebug("<<< Exiting CanRemoveByPrefixAsync()");
+		logger.LogInformation("CanRemoveByPrefixAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 }

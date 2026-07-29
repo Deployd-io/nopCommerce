@@ -8,9 +8,14 @@ public partial record WishlistModel : BaseNopModel
 {
     public WishlistModel()
     {
+		logger.LogDebug(">>> Entering WishlistModel()");
         Items = new List<ShoppingCartItemModel>();
         CustomWishlistItems = new List<CustomWishlistModel>();
+		logger.LogDebug("WishlistModel(): Items → {Items}", Items);
+		logger.LogDebug("WishlistModel(): CustomWishlistItems → {CustomWishlistItems}", CustomWishlistItems);
         Warnings = new List<string>();
+		logger.LogDebug("<<< Exiting WishlistModel()");
+		logger.LogDebug("WishlistModel(): Warnings → {Warnings}", Warnings);
     }
 
     public int? ListId { get; set; }
@@ -46,9 +51,14 @@ public partial record WishlistModel : BaseNopModel
     {
         public ShoppingCartItemModel()
         {
+			logger.LogDebug(">>> Entering ShoppingCartItemModel()");
             Picture = new PictureModel();
             AllowedQuantities = new List<SelectListItem>();
+			logger.LogDebug("ShoppingCartItemModel(): Picture → {Picture}", Picture);
+			logger.LogDebug("ShoppingCartItemModel(): AllowedQuantities → {AllowedQuantities}", AllowedQuantities);
             Warnings = new List<string>();
+			logger.LogDebug("<<< Exiting ShoppingCartItemModel()");
+			logger.LogDebug("ShoppingCartItemModel(): Warnings → {Warnings}", Warnings);
         }
 
         public string Sku { get; set; }

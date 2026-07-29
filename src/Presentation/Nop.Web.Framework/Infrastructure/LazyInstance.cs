@@ -11,6 +11,8 @@ public partial class LazyInstance<T> : Lazy<T> where T : class
     public LazyInstance()
         : base(() => EngineContext.Current.Resolve<T>())
     {
+	logger.LogDebug(">>> Entering LazyInstance()");
 
+	logger.LogDebug("<<< Exiting LazyInstance()");
     }
 }

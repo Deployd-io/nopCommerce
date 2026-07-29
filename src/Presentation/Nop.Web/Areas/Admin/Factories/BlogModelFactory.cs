@@ -82,13 +82,16 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogContentModel> PrepareBlogContentModelAsync(BlogContentModel blogContentModel, int? filterByBlogPostId)
     {
+		logger.LogDebug(">>> Entering PrepareBlogContentModelAsync(blogContentModel={BlogContentModel},filterByBlogPostId={FilterByBlogPostId})", blogContentModel, filterByBlogPostId);
         ArgumentNullException.ThrowIfNull(blogContentModel);
 
         //prepare nested search models
         await PrepareBlogPostSearchModelAsync(blogContentModel.BlogPosts);
         var blogPost = await _blogService.GetBlogPostByIdAsync(filterByBlogPostId ?? 0);
         await PrepareBlogCommentSearchModelAsync(blogContentModel.BlogComments, blogPost);
+		logger.LogDebug("PrepareBlogContentModelAsync(blogContentModel={BlogContentModel},filterByBlogPostId={FilterByBlogPostId}): blogPost → {BlogPost}", blogContentModel, filterByBlogPostId, blogPost);
 
+		logger.LogDebug("<<< Exiting PrepareBlogContentModelAsync(blogContentModel={BlogContentModel},filterByBlogPostId={FilterByBlogPostId})", blogContentModel, filterByBlogPostId);
         return blogContentModel;
     }
 
@@ -102,6 +105,7 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogPostListModel> PrepareBlogPostListModelAsync(BlogPostSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareBlogPostListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get blog posts
@@ -116,8 +120,10 @@ public partial class BlogModelFactory : IBlogModelFactory
                 //fill in model values from the entity
                 var blogPostModel = blogPost.ToModel<BlogPostModel>();
 
+				logger.LogDebug("PrepareBlogPostListModelAsync(searchModel={SearchModel}): blogPostModel → {BlogPostModel}", searchModel, blogPostModel);
                 //little performance optimization: ensure that "Body" is not returned
                 blogPostModel.Body = string.Empty;
+				logger.LogDebug("PrepareBlogPostListModelAsync(searchModel={SearchModel}): blogPostModel.Body → {Arg1}", searchModel, blogPostModel.Body);
 
                 //convert dates to the user time
                 if (blogPost.StartDateUtc.HasValue)
@@ -136,6 +142,7 @@ public partial class BlogModelFactory : IBlogModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareBlogPostListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -167,13 +174,18 @@ public partial class BlogModelFactory : IBlogModelFactory
         if (blogPost == null)
         {
             model.AllowComments = true;
+			logger.LogDebug("PrepareBlogPostModelAsync(model={Model},blogPost={BlogPost},excludeProperties={ExcludeProperties}): model.AllowComments → {Arg3}", model, blogPost, excludeProperties, model.AllowComments);
+			logger.LogDebug("PrepareBlogPostModelAsync(model={Model},blogPost={BlogPost},excludeProperties={ExcludeProperties}): model.IncludeInSitemap → {Arg3}", model, blogPost, excludeProperties, model.IncludeInSitemap);
             model.IncludeInSitemap = true;
         }
 
         var blogTags = await _blogService.GetAllBlogPostTagsAsync(0, 0, true);
         var blogTagsSb = new StringBuilder();
+		logger.LogDebug("PrepareBlogPostModelAsync(model={Model},blogPost={BlogPost},excludeProperties={ExcludeProperties}): blogTags → {BlogTags}", model, blogPost, excludeProperties, blogTags);
+		logger.LogDebug("PrepareBlogPostModelAsync(model={Model},blogPost={BlogPost},excludeProperties={ExcludeProperties}): blogTagsSb → {BlogTagsSb}", model, blogPost, excludeProperties, blogTagsSb);
         blogTagsSb.Append("var initialBlogTags = [");
         for (var i = 0; i < blogTags.Count; i++)
+		logger.LogDebug("PrepareBlogPostModelAsync(model={Model},blogPost={BlogPost},excludeProperties={ExcludeProperties}): initialBlogTags → {InitialBlogTags}", model, blogPost, excludeProperties, initialBlogTags);
         {
             var tag = blogTags[i];
             blogTagsSb.Append('\'');
@@ -192,6 +204,7 @@ public partial class BlogModelFactory : IBlogModelFactory
         //prepare available stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, blogPost, excludeProperties);
 
+		logger.LogDebug("<<< Exiting PrepareBlogPostModelAsync(model={Model},blogPost={BlogPost},excludeProperties={ExcludeProperties})", model, blogPost, excludeProperties);
         return model;
     }
 
@@ -244,6 +257,7 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogCommentListModel> PrepareBlogCommentListModelAsync(BlogCommentSearchModel searchModel, int? blogPostId)
     {
+		logger.LogDebug(">>> Entering PrepareBlogCommentListModelAsync(searchModel={SearchModel},blogPostId={BlogPostId})", searchModel, blogPostId);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter comments
@@ -253,6 +267,7 @@ public partial class BlogModelFactory : IBlogModelFactory
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnTo.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var isApprovedOnly = searchModel.SearchApprovedId == 0 ? null : searchModel.SearchApprovedId == 1 ? true : (bool?)false;
 
+		logger.LogDebug("PrepareBlogCommentListModelAsync(searchModel={SearchModel},blogPostId={BlogPostId}): isApprovedOnly → {IsApprovedOnly}", searchModel, blogPostId, isApprovedOnly);
         //get comments
         var comments = (await _blogService.GetAllCommentsAsync(blogPostId: blogPostId,
             approved: isApprovedOnly,
@@ -272,6 +287,7 @@ public partial class BlogModelFactory : IBlogModelFactory
                 //fill in model values from the entity
                 var commentModel = blogComment.ToModel<BlogCommentModel>();
 
+				logger.LogDebug("PrepareBlogCommentListModelAsync(searchModel={SearchModel},blogPostId={BlogPostId}): commentModel → {CommentModel}", searchModel, blogPostId, commentModel);
                 //set title from linked blog post
                 commentModel.BlogPostTitle = (await _blogService.GetBlogPostByIdAsync(blogComment.BlogPostId))?.Title;
 
@@ -290,6 +306,7 @@ public partial class BlogModelFactory : IBlogModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareBlogCommentListModelAsync(searchModel={SearchModel},blogPostId={BlogPostId})", searchModel, blogPostId);
         return model;
     }
 
@@ -303,6 +320,7 @@ public partial class BlogModelFactory : IBlogModelFactory
     /// </returns>
     public virtual async Task<BlogPostSearchModel> PrepareBlogPostSearchModelAsync(BlogPostSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareBlogPostSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -313,6 +331,7 @@ public partial class BlogModelFactory : IBlogModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareBlogPostSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 

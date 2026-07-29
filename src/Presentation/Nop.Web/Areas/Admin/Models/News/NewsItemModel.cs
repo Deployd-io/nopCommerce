@@ -15,10 +15,15 @@ public partial record NewsItemModel : BaseNopEntityModel, IStoreMappingSupported
 
     public NewsItemModel()
     {
+		logger.LogDebug(">>> Entering NewsItemModel()");
         AvailableLanguages = new List<SelectListItem>();
 
+		logger.LogDebug("NewsItemModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("NewsItemModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NewsItemModel()");
+		logger.LogDebug("NewsItemModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

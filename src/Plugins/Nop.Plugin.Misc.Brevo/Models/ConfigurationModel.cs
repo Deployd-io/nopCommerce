@@ -14,13 +14,22 @@ public record ConfigurationModel : BaseNopModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         AvailableLists = new List<SelectListItem>();
         NewsLetterSubscriptionTypes = new List<NewsLetterSubscriptionMapModel>();
+		logger.LogDebug("ConfigurationModel(): AvailableLists → {AvailableLists}", AvailableLists);
+		logger.LogDebug("ConfigurationModel(): NewsLetterSubscriptionTypes → {NewsLetterSubscriptionTypes}", NewsLetterSubscriptionTypes);
         AvailableSenders = new List<SelectListItem>();
         AvailableMessageTemplates = new List<SelectListItem>();
+		logger.LogDebug("ConfigurationModel(): AvailableSenders → {AvailableSenders}", AvailableSenders);
+		logger.LogDebug("ConfigurationModel(): AvailableMessageTemplates → {AvailableMessageTemplates}", AvailableMessageTemplates);
         MessageTemplateSearchModel = new BrevoMessageTemplateSearchModel();
         SmsSearchModel = new SmsSearchModel();
+		logger.LogDebug("ConfigurationModel(): MessageTemplateSearchModel → {MessageTemplateSearchModel}", MessageTemplateSearchModel);
+		logger.LogDebug("ConfigurationModel(): SmsSearchModel → {SmsSearchModel}", SmsSearchModel);
         AddSms = new SmsModel();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): AddSms → {AddSms}", AddSms);
     }
 
     #endregion

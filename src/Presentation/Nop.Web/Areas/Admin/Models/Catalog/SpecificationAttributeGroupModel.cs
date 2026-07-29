@@ -12,7 +12,10 @@ public partial record SpecificationAttributeGroupModel : BaseNopEntityModel, ILo
 
     public SpecificationAttributeGroupModel()
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeGroupModel()");
         Locales = new List<SpecificationAttributeGroupLocalizedModel>();
+		logger.LogDebug("<<< Exiting SpecificationAttributeGroupModel()");
+		logger.LogDebug("SpecificationAttributeGroupModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

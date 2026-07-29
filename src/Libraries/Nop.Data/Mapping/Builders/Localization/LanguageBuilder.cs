@@ -16,11 +16,13 @@ public partial class LanguageBuilder : NopEntityBuilder<Language>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Language.Name)).AsString(100).NotNullable()
             .WithColumn(nameof(Language.LanguageCulture)).AsString(20).NotNullable()
             .WithColumn(nameof(Language.UniqueSeoCode)).AsString(2).Nullable()
             .WithColumn(nameof(Language.FlagImageFileName)).AsString(50).Nullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

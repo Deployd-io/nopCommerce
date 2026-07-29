@@ -16,12 +16,20 @@ public partial record CheckoutAttributeModel : BaseNopEntityModel,
 
     public CheckoutAttributeModel()
     {
+		logger.LogDebug(">>> Entering CheckoutAttributeModel()");
         Locales = new List<CheckoutAttributeLocalizedModel>();
         AvailableTaxCategories = new List<SelectListItem>();
+		logger.LogDebug("CheckoutAttributeModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("CheckoutAttributeModel(): AvailableTaxCategories → {AvailableTaxCategories}", AvailableTaxCategories);
         ConditionModel = new ConditionModel();
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("CheckoutAttributeModel(): ConditionModel → {ConditionModel}", ConditionModel);
+		logger.LogDebug("CheckoutAttributeModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
         CheckoutAttributeValueSearchModel = new CheckoutAttributeValueSearchModel();
+		logger.LogDebug("<<< Exiting CheckoutAttributeModel()");
+		logger.LogDebug("CheckoutAttributeModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("CheckoutAttributeModel(): CheckoutAttributeValueSearchModel → {CheckoutAttributeValueSearchModel}", CheckoutAttributeValueSearchModel);
     }
 
     #endregion
@@ -93,7 +101,10 @@ public partial record ConditionModel : BaseNopEntityModel
 {
     public ConditionModel()
     {
+		logger.LogDebug(">>> Entering ConditionModel()");
         ConditionAttributes = new List<AttributeConditionModel>();
+		logger.LogDebug("<<< Exiting ConditionModel()");
+		logger.LogDebug("ConditionModel(): ConditionAttributes → {ConditionAttributes}", ConditionAttributes);
     }
 
     [NopResourceDisplayName("Admin.Catalog.Attributes.CheckoutAttributes.Condition.EnableCondition")]

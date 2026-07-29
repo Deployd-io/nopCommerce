@@ -18,9 +18,12 @@ public class SchemaMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         //#6167
         var messageTemplateTableName = nameof(MessageTemplate);
         var allowDirectReplyColumnName = nameof(MessageTemplate.AllowDirectReply);
+		logger.LogDebug("Up(): messageTemplateTableName → {MessageTemplateTableName}", messageTemplateTableName);
+		logger.LogDebug("Up(): allowDirectReplyColumnName → {AllowDirectReplyColumnName}", allowDirectReplyColumnName);
 
         //add column
         if (!Schema.Table(messageTemplateTableName).Column(allowDirectReplyColumnName).Exists())
@@ -36,6 +39,8 @@ public class SchemaMigration : ForwardOnlyMigration
 
         var productTableName = nameof(Product);
         var displayAttributeCombinationImagesOnlyColumnName = nameof(Product.DisplayAttributeCombinationImagesOnly);
+		logger.LogDebug("Up(): productTableName → {ProductTableName}", productTableName);
+		logger.LogDebug("Up(): displayAttributeCombinationImagesOnlyColumnName → {DisplayAttributeCombinationImagesOnlyColumnName}", displayAttributeCombinationImagesOnlyColumnName);
 
         if (!Schema.Table(productTableName).Column(displayAttributeCombinationImagesOnlyColumnName).Exists())
             Alter.Table(productTableName)
@@ -44,8 +49,12 @@ public class SchemaMigration : ForwardOnlyMigration
         //#6710
         var productAttributeCombinationTableName = nameof(ProductAttributeCombination);
         var pac = Schema.Table(productAttributeCombinationTableName);
+		logger.LogDebug("Up(): productAttributeCombinationTableName → {ProductAttributeCombinationTableName}", productAttributeCombinationTableName);
+		logger.LogDebug("Up(): pac → {Pac}", pac);
         var columnName = "PictureId";
         var description = "The field is not used since 4.70 and is left only for the update process use the ProductAttributeCombinationPicture instead";
+		logger.LogDebug("Up(): columnName → {ColumnName}", columnName);
+		logger.LogDebug("Up(): description → {Description}", description);
 
         if (pac.Column(columnName).Exists())
             Alter.Table(productAttributeCombinationTableName)
@@ -56,6 +65,8 @@ public class SchemaMigration : ForwardOnlyMigration
 
         var productAttributeValueTableName = nameof(ProductAttributeValue);
         var pav = Schema.Table(productAttributeValueTableName);
+		logger.LogDebug("Up(): productAttributeValueTableName → {ProductAttributeValueTableName}", productAttributeValueTableName);
+		logger.LogDebug("Up(): pav → {Pav}", pav);
 
         if (pav.Column(columnName).Exists())
             Alter.Table(productAttributeValueTableName)
@@ -75,6 +86,8 @@ public class SchemaMigration : ForwardOnlyMigration
         //add column
         var emailAccountTableName = nameof(EmailAccount);
         var maxNumberOfEmailsColumnName = nameof(EmailAccount.MaxNumberOfEmails);
+		logger.LogDebug("Up(): emailAccountTableName → {EmailAccountTableName}", emailAccountTableName);
+		logger.LogDebug("Up(): maxNumberOfEmailsColumnName → {MaxNumberOfEmailsColumnName}", maxNumberOfEmailsColumnName);
 
         if (!Schema.Table(emailAccountTableName).Column(maxNumberOfEmailsColumnName).Exists())
             Alter.Table(emailAccountTableName)
@@ -100,7 +113,9 @@ public class SchemaMigration : ForwardOnlyMigration
         //#6978
         var newsLetterSubscriptionTableName = nameof(NewsLetterSubscription);
         if (!Schema.Table(newsLetterSubscriptionTableName).Column(nameof(NewsLetterSubscription.LanguageId)).Exists())
+			logger.LogDebug("Up(): newsLetterSubscriptionTableName → {NewsLetterSubscriptionTableName}", newsLetterSubscriptionTableName);
             Alter.Table(newsLetterSubscriptionTableName)
                 .AddColumn(nameof(NewsLetterSubscription.LanguageId)).AsInt32().NotNullable().SetExistingRowsTo(1);
+				logger.LogDebug("<<< Exiting Up()");
     }
 }

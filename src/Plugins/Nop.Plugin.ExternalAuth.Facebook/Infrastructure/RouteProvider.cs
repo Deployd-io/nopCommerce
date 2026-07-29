@@ -15,11 +15,13 @@ public class RouteProvider : IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(FacebookAuthenticationDefaults.DataDeletionCallbackRoute, $"facebook/data-deletion-callback/",
             new { controller = "FacebookDataDeletion", action = "DataDeletionCallback" });
 
         endpointRouteBuilder.MapControllerRoute(FacebookAuthenticationDefaults.DataDeletionStatusCheckRoute, $"facebook/data-deletion-status-check/{{earId:min(0)}}",
             new { controller = "FacebookAuthentication", action = "DataDeletionStatusCheck" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

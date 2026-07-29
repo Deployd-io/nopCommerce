@@ -12,7 +12,10 @@ public partial record ShippingMethodModel : BaseNopEntityModel, ILocalizedModel<
 
     public ShippingMethodModel()
     {
+		logger.LogDebug(">>> Entering ShippingMethodModel()");
         Locales = new List<ShippingMethodLocalizedModel>();
+		logger.LogDebug("<<< Exiting ShippingMethodModel()");
+		logger.LogDebug("ShippingMethodModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

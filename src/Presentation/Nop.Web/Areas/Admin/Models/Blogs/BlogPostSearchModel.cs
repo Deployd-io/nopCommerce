@@ -13,7 +13,10 @@ public partial record BlogPostSearchModel : BaseSearchModel
 
     public BlogPostSearchModel()
     {
+		logger.LogDebug(">>> Entering BlogPostSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting BlogPostSearchModel()");
+		logger.LogDebug("BlogPostSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

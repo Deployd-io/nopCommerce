@@ -8,7 +8,10 @@ public partial record CustomerRewardPointsModel : BaseNopModel
 {
     public CustomerRewardPointsModel()
     {
+		logger.LogDebug(">>> Entering CustomerRewardPointsModel()");
         RewardPoints = new List<RewardPointsHistoryModel>();
+		logger.LogDebug("<<< Exiting CustomerRewardPointsModel()");
+		logger.LogDebug("CustomerRewardPointsModel(): RewardPoints → {RewardPoints}", RewardPoints);
     }
 
     public IList<RewardPointsHistoryModel> RewardPoints { get; set; }

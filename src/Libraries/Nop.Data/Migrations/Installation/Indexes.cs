@@ -24,6 +24,7 @@ public class Indexes : ForwardOnlyMigration
 
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.Index("IX_UrlRecord_Slug")
             .OnTable(nameof(UrlRecord))
             .OnColumn(nameof(UrlRecord.Slug))
@@ -361,6 +362,7 @@ public class Indexes : ForwardOnlyMigration
             .OnColumn(nameof(ProductManufacturer.ManufacturerId)).Ascending()
             .WithOptions().NonClustered()
             .Include(nameof(ProductManufacturer.ProductId));
+			logger.LogDebug("<<< Exiting Up()");
     }
 
     #endregion

@@ -17,7 +17,10 @@ public class DownloadTaxRatesTask : IScheduleTask
 
     public DownloadTaxRatesTask(AvalaraTaxManager avalaraTaxManager)
     {
+		logger.LogDebug(">>> Entering DownloadTaxRatesTask(avalaraTaxManager={AvalaraTaxManager})", avalaraTaxManager);
         _avalaraTaxManager = avalaraTaxManager;
+		logger.LogDebug("<<< Exiting DownloadTaxRatesTask(avalaraTaxManager={AvalaraTaxManager})", avalaraTaxManager);
+		logger.LogDebug("DownloadTaxRatesTask(avalaraTaxManager={AvalaraTaxManager}): _avalaraTaxManager → {_avalaraTaxManager}", avalaraTaxManager, _avalaraTaxManager);
     }
 
     #endregion
@@ -30,7 +33,9 @@ public class DownloadTaxRatesTask : IScheduleTask
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ExecuteAsync()
     {
+		logger.LogDebug(">>> Entering ExecuteAsync()");
         await _avalaraTaxManager.DownloadTaxRatesAsync();
+		logger.LogDebug("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

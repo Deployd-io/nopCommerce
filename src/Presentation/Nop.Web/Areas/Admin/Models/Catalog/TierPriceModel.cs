@@ -14,8 +14,12 @@ public partial record TierPriceModel : BaseNopEntityModel
 
     public TierPriceModel()
     {
+		logger.LogDebug(">>> Entering TierPriceModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TierPriceModel()");
+		logger.LogDebug("TierPriceModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("TierPriceModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
     }
 
     #endregion

@@ -19,7 +19,10 @@ public class LuceneSearchProvider : BasePlugin, IMiscPlugin
 
     public LuceneSearchProvider(IWebHelper webHelper)
     {
+		logger.LogDebug(">>> Entering LuceneSearchProvider(webHelper={WebHelper})", webHelper);
         _webHelper = webHelper;
+		logger.LogDebug("<<< Exiting LuceneSearchProvider(webHelper={WebHelper})", webHelper);
+		logger.LogDebug("LuceneSearchProvider(webHelper={WebHelper}): _webHelper → {_webHelper}", webHelper, _webHelper);
     }
 
     #endregion
@@ -31,6 +34,8 @@ public class LuceneSearchProvider : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/Lucene/Configure";
     }
 
@@ -40,7 +45,9 @@ public class LuceneSearchProvider : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -49,7 +56,9 @@ public class LuceneSearchProvider : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

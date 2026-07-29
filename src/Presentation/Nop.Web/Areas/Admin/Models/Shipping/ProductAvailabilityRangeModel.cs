@@ -12,7 +12,10 @@ public partial record ProductAvailabilityRangeModel : BaseNopEntityModel, ILocal
 
     public ProductAvailabilityRangeModel()
     {
+		logger.LogDebug(">>> Entering ProductAvailabilityRangeModel()");
         Locales = new List<ProductAvailabilityRangeLocalizedModel>();
+		logger.LogDebug("<<< Exiting ProductAvailabilityRangeModel()");
+		logger.LogDebug("ProductAvailabilityRangeModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

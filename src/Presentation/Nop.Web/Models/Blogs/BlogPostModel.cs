@@ -7,9 +7,14 @@ public partial record BlogPostModel : BaseNopEntityModel, IMetaTagsSupportedMode
 {
     public BlogPostModel()
     {
+		logger.LogDebug(">>> Entering BlogPostModel()");
         Tags = new List<string>();
         Comments = new List<BlogCommentModel>();
+		logger.LogDebug("BlogPostModel(): Tags → {Tags}", Tags);
+		logger.LogDebug("BlogPostModel(): Comments → {Comments}", Comments);
         AddNewComment = new AddBlogCommentModel();
+		logger.LogDebug("<<< Exiting BlogPostModel()");
+		logger.LogDebug("BlogPostModel(): AddNewComment → {AddNewComment}", AddNewComment);
     }
 
     public string MetaKeywords { get; set; }

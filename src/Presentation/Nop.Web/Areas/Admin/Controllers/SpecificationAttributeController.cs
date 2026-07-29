@@ -94,14 +94,19 @@ public partial class SpecificationAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeSearchModelAsync(new SpecificationAttributeSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -109,8 +114,11 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> SpecificationAttributeGroupList(SpecificationAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeGroupList(searchModel={SearchModel})", searchModel);
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeGroupListModelAsync(searchModel);
 
+		logger.LogDebug("SpecificationAttributeGroupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting SpecificationAttributeGroupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -118,6 +126,7 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> SpecificationAttributeList(SpecificationAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeList(searchModel={SearchModel})", searchModel);
         SpecificationAttributeGroup group = null;
 
         if (searchModel.SpecificationAttributeGroupId > 0)
@@ -128,14 +137,19 @@ public partial class SpecificationAttributeController : BaseAdminController
 
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeListModelAsync(searchModel, group);
 
+		logger.LogDebug("SpecificationAttributeList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting SpecificationAttributeList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CreateSpecificationAttributeGroup()
     {
+		logger.LogDebug(">>> Entering CreateSpecificationAttributeGroup()");
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeGroupModelAsync(new SpecificationAttributeGroupModel(), null);
 
+		logger.LogDebug("CreateSpecificationAttributeGroup(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CreateSpecificationAttributeGroup()");
         return View(model);
     }
 
@@ -163,14 +177,18 @@ public partial class SpecificationAttributeController : BaseAdminController
         model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeGroupModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting CreateSpecificationAttributeGroup(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CreateSpecificationAttribute()
     {
+		logger.LogDebug(">>> Entering CreateSpecificationAttribute()");
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeModelAsync(new SpecificationAttributeModel(), null);
 
+		logger.LogDebug("CreateSpecificationAttribute(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CreateSpecificationAttribute()");
         return View(model);
     }
 
@@ -198,18 +216,23 @@ public partial class SpecificationAttributeController : BaseAdminController
         model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting CreateSpecificationAttribute(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> EditSpecificationAttributeGroup(int id)
     {
+		logger.LogDebug(">>> Entering EditSpecificationAttributeGroup(id={Id})", id);
         var specificationAttributeGroup = await _specificationAttributeService.GetSpecificationAttributeGroupByIdAsync(id);
         if (specificationAttributeGroup == null)
+			logger.LogDebug("EditSpecificationAttributeGroup(id={Id}): specificationAttributeGroup → {SpecificationAttributeGroup}", id, specificationAttributeGroup);
             return RedirectToAction("List");
 
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeGroupModelAsync(null, specificationAttributeGroup);
 
+		logger.LogDebug("EditSpecificationAttributeGroup(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting EditSpecificationAttributeGroup(id={Id})", id);
         return View(model);
     }
 
@@ -241,20 +264,25 @@ public partial class SpecificationAttributeController : BaseAdminController
         model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeGroupModelAsync(model, specificationAttributeGroup, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting EditSpecificationAttributeGroup(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> EditSpecificationAttribute(int id)
     {
+		logger.LogDebug(">>> Entering EditSpecificationAttribute(id={Id})", id);
         //try to get a specification attribute with the specified id
         var specificationAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(id);
         if (specificationAttribute == null)
+			logger.LogDebug("EditSpecificationAttribute(id={Id}): specificationAttribute → {SpecificationAttribute}", id, specificationAttribute);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeModelAsync(null, specificationAttribute);
 
+		logger.LogDebug("EditSpecificationAttribute(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting EditSpecificationAttribute(id={Id})", id);
         return View(model);
     }
 
@@ -290,6 +318,7 @@ public partial class SpecificationAttributeController : BaseAdminController
         model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeModelAsync(model, specificationAttribute, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting EditSpecificationAttribute(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -297,18 +326,23 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PreTranslate(int itemId)
     {
+		logger.LogDebug(">>> Entering PreTranslate(itemId={ItemId})", itemId);
         var translationModel = new TranslationModel();
 
+		logger.LogDebug("PreTranslate(itemId={ItemId}): translationModel → {TranslationModel}", itemId, translationModel);
         //try to get a specification attribute with the specified id
         var specificationAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(itemId);
         if (specificationAttribute == null)
+			logger.LogDebug("PreTranslate(itemId={ItemId}): specificationAttribute → {SpecificationAttribute}", itemId, specificationAttribute);
             return Json(translationModel);
 
         //prepare model
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeModelAsync(null, specificationAttribute);
 
+		logger.LogDebug("PreTranslate(itemId={ItemId}): model → {Model}", itemId, model);
         translationModel = await _translationModelFactory.PrepareTranslationModelAsync(model, nameof(SpecificationAttributeLocalizedModel.Name));
 
+		logger.LogDebug("<<< Exiting PreTranslate(itemId={ItemId})", itemId);
         return Json(translationModel);
     }
 
@@ -316,8 +350,10 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSpecificationAttributeGroup(int id)
     {
+		logger.LogDebug(">>> Entering DeleteSpecificationAttributeGroup(id={Id})", id);
         var specificationAttributeGroup = await _specificationAttributeService.GetSpecificationAttributeGroupByIdAsync(id);
         if (specificationAttributeGroup == null)
+			logger.LogDebug("DeleteSpecificationAttributeGroup(id={Id}): specificationAttributeGroup → {SpecificationAttributeGroup}", id, specificationAttributeGroup);
             return RedirectToAction("List");
 
         await _specificationAttributeService.DeleteSpecificationAttributeGroupAsync(specificationAttributeGroup);
@@ -327,6 +363,7 @@ public partial class SpecificationAttributeController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttributeGroup.Deleted"));
 
+		logger.LogDebug("<<< Exiting DeleteSpecificationAttributeGroup(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -334,8 +371,10 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSpecificationAttribute(int id)
     {
+		logger.LogDebug(">>> Entering DeleteSpecificationAttribute(id={Id})", id);
         var specificationAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(id);
 
+		logger.LogDebug("DeleteSpecificationAttribute(id={Id}): specificationAttribute → {SpecificationAttribute}", id, specificationAttribute);
         if (specificationAttribute == null)
             return RedirectToAction("List");
 
@@ -346,6 +385,7 @@ public partial class SpecificationAttributeController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttribute.Deleted"));
 
+		logger.LogDebug("<<< Exiting DeleteSpecificationAttribute(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -353,16 +393,20 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelectedSpecificationAttributes(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelectedSpecificationAttributes(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var specificationAttributes = await _specificationAttributeService.GetSpecificationAttributeByIdsAsync(selectedIds.ToArray());
         await _specificationAttributeService.DeleteSpecificationAttributesAsync(specificationAttributes);
+		logger.LogDebug("DeleteSelectedSpecificationAttributes(selectedIds={SelectedIds}): specificationAttributes → {SpecificationAttributes}", selectedIds, specificationAttributes);
         
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteSpecAttribute");
         await _customerActivityService.InsertActivitiesAsync("DeleteSpecAttribute", specificationAttributes, specificationAttribute => string.Format(activityLogFormat, specificationAttribute.Name));
+		logger.LogDebug("DeleteSelectedSpecificationAttributes(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DeleteSelectedSpecificationAttributes(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -374,6 +418,7 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> OptionList(SpecificationAttributeOptionSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering OptionList(searchModel={SearchModel})", searchModel);
         //try to get a specification attribute with the specified id
         var specificationAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(searchModel.SpecificationAttributeId)
             ?? throw new ArgumentException("No specification attribute found with the specified id");
@@ -381,21 +426,26 @@ public partial class SpecificationAttributeController : BaseAdminController
         //prepare model
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeOptionListModelAsync(searchModel, specificationAttribute);
 
+		logger.LogDebug("OptionList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting OptionList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> OptionCreatePopup(int specificationAttributeId)
     {
+		logger.LogDebug(">>> Entering OptionCreatePopup(specificationAttributeId={SpecificationAttributeId})", specificationAttributeId);
         //try to get a specification attribute with the specified id
         var specificationAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(specificationAttributeId);
         if (specificationAttribute == null)
+			logger.LogDebug("OptionCreatePopup(specificationAttributeId={SpecificationAttributeId}): specificationAttribute → {SpecificationAttribute}", specificationAttributeId, specificationAttribute);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _specificationAttributeModelFactory
             .PrepareSpecificationAttributeOptionModelAsync(new SpecificationAttributeOptionModel(), specificationAttribute, null);
 
+		logger.LogDebug("<<< Exiting OptionCreatePopup(specificationAttributeId={SpecificationAttributeId})", specificationAttributeId);
         return View(model);
     }
 
@@ -429,15 +479,18 @@ public partial class SpecificationAttributeController : BaseAdminController
         model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeOptionModelAsync(model, specificationAttribute, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting OptionCreatePopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> OptionEditPopup(int id)
     {
+		logger.LogDebug(">>> Entering OptionEditPopup(id={Id})", id);
         //try to get a specification attribute option with the specified id
         var specificationAttributeOption = await _specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(id);
         if (specificationAttributeOption == null)
+			logger.LogDebug("OptionEditPopup(id={Id}): specificationAttributeOption → {SpecificationAttributeOption}", id, specificationAttributeOption);
             return RedirectToAction("List");
 
         //try to get a specification attribute with the specified id
@@ -450,6 +503,7 @@ public partial class SpecificationAttributeController : BaseAdminController
         var model = await _specificationAttributeModelFactory
             .PrepareSpecificationAttributeOptionModelAsync(null, specificationAttribute, specificationAttributeOption);
 
+		logger.LogDebug("<<< Exiting OptionEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -490,6 +544,7 @@ public partial class SpecificationAttributeController : BaseAdminController
             .PrepareSpecificationAttributeOptionModelAsync(model, specificationAttribute, specificationAttributeOption, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting OptionEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -497,18 +552,21 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> OptionDelete(int id, int specificationAttributeId)
     {
+		logger.LogDebug(">>> Entering OptionDelete(id={Id},specificationAttributeId={SpecificationAttributeId})", id, specificationAttributeId);
         //try to get a specification attribute option with the specified id
         var specificationAttributeOption = await _specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(id)
             ?? throw new ArgumentException("No specification attribute option found with the specified id", nameof(id));
 
         await _specificationAttributeService.DeleteSpecificationAttributeOptionAsync(specificationAttributeOption);
 
+		logger.LogDebug("<<< Exiting OptionDelete(id={Id},specificationAttributeId={SpecificationAttributeId})", id, specificationAttributeId);
         return new NullJsonResult();
     }
 
     [HttpGet]
     public virtual async Task<IActionResult> GetOptionsByAttributeId(string attributeId)
     {
+		logger.LogDebug(">>> Entering GetOptionsByAttributeId(attributeId={AttributeId})", attributeId);
         //do not make any permission validation here 
         //because this method could be used on some other pages (such as product editing)
         //if (!await _permissionService.AuthorizeAsync(StandardPermission.ManageAttributes))
@@ -520,6 +578,8 @@ public partial class SpecificationAttributeController : BaseAdminController
         var options = await _specificationAttributeService.GetSpecificationAttributeOptionsBySpecificationAttributeAsync(Convert.ToInt32(attributeId));
         var result = (from o in options
             select new { id = o.Id, name = o.Name }).ToList();
+			logger.LogDebug("GetOptionsByAttributeId(attributeId={AttributeId}): options → {Options}", attributeId, options);
+		logger.LogDebug("<<< Exiting GetOptionsByAttributeId(attributeId={AttributeId})", attributeId);
         return Json(result);
     }
 
@@ -531,6 +591,7 @@ public partial class SpecificationAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.SPECIFICATION_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> UsedByProducts(SpecificationAttributeProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering UsedByProducts(searchModel={SearchModel})", searchModel);
         //try to get a specification attribute with the specified id
         var specificationAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(searchModel.SpecificationAttributeId)
             ?? throw new ArgumentException("No specification attribute found with the specified id");
@@ -538,6 +599,8 @@ public partial class SpecificationAttributeController : BaseAdminController
         //prepare model
         var model = await _specificationAttributeModelFactory.PrepareSpecificationAttributeProductListModelAsync(searchModel, specificationAttribute);
 
+		logger.LogDebug("UsedByProducts(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting UsedByProducts(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

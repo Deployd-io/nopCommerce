@@ -8,7 +8,10 @@ public partial record JsonLdBreadcrumbListModel : JsonLdModel
 
     public JsonLdBreadcrumbListModel()
     {
+		logger.LogDebug(">>> Entering JsonLdBreadcrumbListModel()");
         ItemListElement = new List<JsonLdBreadcrumbListItemModel>();
+		logger.LogDebug("<<< Exiting JsonLdBreadcrumbListModel()");
+		logger.LogDebug("JsonLdBreadcrumbListModel(): ItemListElement → {ItemListElement}", ItemListElement);
     }
 
     #endregion

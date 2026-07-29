@@ -125,17 +125,21 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> List(bool showWarnings = true)
     {
+		logger.LogDebug(">>> Entering List(showWarnings={ShowWarnings})", showWarnings);
         var model = await _pluginModelFactory.PreparePluginSearchModelAsync(new PluginSearchModel());
 
+		logger.LogDebug("List(showWarnings={ShowWarnings}): model → {Model}", showWarnings, model);
         if (!showWarnings)
             return View(model);
 
         var warnings = new List<SystemWarningModel>();
         await _commonModelFactory.PreparePluginsWarningModelAsync(warnings);
+		logger.LogDebug("List(showWarnings={ShowWarnings}): warnings → {Warnings}", showWarnings, warnings);
 
         if (warnings.Any())
             _notificationService.WarningNotification(string.Join("<br />", warnings), false);
 
+		logger.LogDebug("<<< Exiting List(showWarnings={ShowWarnings})", showWarnings);
         return View(model);
     }
 
@@ -143,15 +147,20 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> ListSelect(PluginSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ListSelect(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _pluginModelFactory.PreparePluginListModelAsync(searchModel);
 
+		logger.LogDebug("ListSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ListSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> AdminNavigationPlugins()
     {
+		logger.LogDebug(">>> Entering AdminNavigationPlugins()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare models
         var models = await (await _pluginModelFactory.PrepareAdminNavigationPluginModelsAsync()).SelectAwait(async model => new
         {
@@ -160,8 +169,15 @@ public partial class PluginController : BaseAdminController
             parent = await _localizationService.GetResourceAsync("Admin.Configuration.Plugins.Local"),
             grandParent = string.Empty,
             rate = -50 //negative rate is set to move plugins to the end of list
+			logger.LogDebug("AdminNavigationPlugins(): title → {Title}", title);
+			logger.LogDebug("AdminNavigationPlugins(): link → {Link}", link);
+			logger.LogDebug("AdminNavigationPlugins(): parent → {Parent}", parent);
+			logger.LogDebug("AdminNavigationPlugins(): grandParent → {GrandParent}", grandParent);
+			logger.LogDebug("AdminNavigationPlugins(): rate → {Rate}", rate);
+			logger.LogInformation("AdminNavigationPlugins(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }).ToListAsync();
 
+		logger.LogDebug("<<< Exiting AdminNavigationPlugins()");
         return Json(models);
     }
 
@@ -169,6 +185,7 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> UploadPluginsAndThemes(IFormFile archivefile)
     {
+		logger.LogDebug(">>> Entering UploadPluginsAndThemes(archivefile={Archivefile})", archivefile);
         try
         {
             if (archivefile == null || archivefile.Length == 0)
@@ -176,8 +193,11 @@ public partial class PluginController : BaseAdminController
 
             var descriptors = await _uploadService.UploadPluginsAndThemesAsync(archivefile);
             var pluginDescriptors = descriptors.OfType<PluginDescriptor>().ToList();
+			logger.LogDebug("UploadPluginsAndThemes(archivefile={Archivefile}): descriptors → {Descriptors}", archivefile, descriptors);
+			logger.LogDebug("UploadPluginsAndThemes(archivefile={Archivefile}): pluginDescriptors → {PluginDescriptors}", archivefile, pluginDescriptors);
             var themeDescriptors = descriptors.OfType<ThemeDescriptor>().ToList();
             
+			logger.LogDebug("UploadPluginsAndThemes(archivefile={Archivefile}): themeDescriptors → {ThemeDescriptors}", archivefile, themeDescriptors);
             if (pluginDescriptors.Any())
             {
                 //events
@@ -186,6 +206,7 @@ public partial class PluginController : BaseAdminController
                 //activity log
                 var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.UploadNewPlugin");
                 await _customerActivityService.InsertActivitiesAsync("UploadNewPlugin", pluginDescriptors, descriptor => string.Format(activityLogFormat, descriptor.FriendlyName));
+				logger.LogDebug("UploadPluginsAndThemes(archivefile={Archivefile}): activityLogFormat → {ActivityLogFormat}", archivefile, activityLogFormat);
             }
 
             if (themeDescriptors.Any())
@@ -200,15 +221,18 @@ public partial class PluginController : BaseAdminController
 
             var message = string.Format(await _localizationService.GetResourceAsync("Admin.Configuration.Plugins.Uploaded"), pluginDescriptors.Count, themeDescriptors.Count);
             _notificationService.SuccessNotification(message);
+			logger.LogDebug("UploadPluginsAndThemes(archivefile={Archivefile}): message → {Message}", archivefile, message);
 
             if (themeDescriptors.Any())
                 return View("RestartApplication", Url.Action("List", "Plugin"));
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in UploadPluginsAndThemes(archivefile={Archivefile}): {Arg1}", archivefile, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		logger.LogDebug("<<< Exiting UploadPluginsAndThemes(archivefile={Archivefile})", archivefile);
         return RedirectToAction("List", new { showWarnings = false });
     }
 
@@ -217,16 +241,19 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> Install(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering Install(form={Form})", form);
         try
         {
             //get plugin system name
             string systemName = null;
             foreach (var formValue in form.Keys)
                 if (formValue.StartsWith("install-plugin-link-", StringComparison.InvariantCultureIgnoreCase))
+				logger.LogDebug("Install(form={Form}): systemName → {SystemName}", form, systemName);
                     systemName = formValue["install-plugin-link-".Length..];
 
             var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.All);
             if (pluginDescriptor == null)
+				logger.LogDebug("Install(form={Form}): pluginDescriptor → {PluginDescriptor}", form, pluginDescriptor);
                 //No plugin found with the specified id
                 return RedirectToAction("List", new { showWarnings = false });
 
@@ -236,13 +263,16 @@ public partial class PluginController : BaseAdminController
 
             await _pluginService.PreparePluginToInstallAsync(pluginDescriptor.SystemName, await _workContext.GetCurrentCustomerAsync());
             pluginDescriptor.ShowInPluginsList = false;
+			logger.LogDebug("Install(form={Form}): pluginDescriptor.ShowInPluginsList → {Arg1}", form, pluginDescriptor.ShowInPluginsList);
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Plugins.ChangesApplyAfterReboot"));
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Install(form={Form}): {Arg1}", form, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		logger.LogDebug("<<< Exiting Install(form={Form})", form);
         return RedirectToAction("List", new { showWarnings = false });
     }
 
@@ -251,16 +281,19 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> Uninstall(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering Uninstall(form={Form})", form);
         try
         {
             //get plugin system name
             string systemName = null;
             foreach (var formValue in form.Keys)
                 if (formValue.StartsWith("uninstall-plugin-link-", StringComparison.InvariantCultureIgnoreCase))
+				logger.LogDebug("Uninstall(form={Form}): systemName → {SystemName}", form, systemName);
                     systemName = formValue["uninstall-plugin-link-".Length..];
 
             var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.All);
             if (pluginDescriptor == null)
+				logger.LogDebug("Uninstall(form={Form}): pluginDescriptor → {PluginDescriptor}", form, pluginDescriptor);
                 //No plugin found with the specified id
                 return RedirectToAction("List", new { showWarnings = false });
 
@@ -270,13 +303,16 @@ public partial class PluginController : BaseAdminController
 
             await _pluginService.PreparePluginToUninstallAsync(pluginDescriptor.SystemName);
             pluginDescriptor.ShowInPluginsList = false;
+			logger.LogDebug("Uninstall(form={Form}): pluginDescriptor.ShowInPluginsList → {Arg1}", form, pluginDescriptor.ShowInPluginsList);
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Plugins.ChangesApplyAfterReboot"));
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Uninstall(form={Form}): {Arg1}", form, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		logger.LogDebug("<<< Exiting Uninstall(form={Form})", form);
         return RedirectToAction("List", new { showWarnings = false });
     }
 
@@ -285,29 +321,35 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> Delete(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering Delete(form={Form})", form);
         try
         {
             //get plugin system name
             string systemName = null;
             foreach (var formValue in form.Keys)
                 if (formValue.StartsWith("delete-plugin-link-", StringComparison.InvariantCultureIgnoreCase))
+				logger.LogDebug("Delete(form={Form}): systemName → {SystemName}", form, systemName);
                     systemName = formValue["delete-plugin-link-".Length..];
 
             var pluginDescriptor = await _pluginService.GetPluginDescriptorBySystemNameAsync<IPlugin>(systemName, LoadPluginsMode.All);
 
+			logger.LogDebug("Delete(form={Form}): pluginDescriptor → {PluginDescriptor}", form, pluginDescriptor);
             //check whether plugin is not installed
             if (pluginDescriptor.Installed)
                 return RedirectToAction("List", new { showWarnings = false });
 
             await _pluginService.PreparePluginToDeleteAsync(pluginDescriptor.SystemName);
             pluginDescriptor.ShowInPluginsList = false;
+			logger.LogDebug("Delete(form={Form}): pluginDescriptor.ShowInPluginsList → {Arg1}", form, pluginDescriptor.ShowInPluginsList);
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Plugins.ChangesApplyAfterReboot"));
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(form={Form}): {Arg1}", form, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		logger.LogDebug("<<< Exiting Delete(form={Form})", form);
         return RedirectToAction("List", new { showWarnings = false });
     }
 
@@ -316,15 +358,18 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> ReloadList()
     {
+		logger.LogDebug(">>> Entering ReloadList()");
         await _pluginService.UninstallPluginsAsync();
         await _pluginService.DeletePluginsAsync();
 
+		logger.LogDebug("<<< Exiting ReloadList()");
         return View("RestartApplication", Url.Action("List", "Plugin"));
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> UninstallAndDeleteUnusedPlugins(string[] names)
     {
+		logger.LogDebug(">>> Entering UninstallAndDeleteUnusedPlugins(names={Names})", names);
         foreach (var name in names)
             await _pluginService.PreparePluginToUninstallAsync(name);
 
@@ -335,6 +380,7 @@ public partial class PluginController : BaseAdminController
 
         await _pluginService.DeletePluginsAsync();
 
+		logger.LogDebug("<<< Exiting UninstallAndDeleteUnusedPlugins(names={Names})", names);
         return View("RestartApplication", Url.Action("Warnings", "Common"));
     }
 
@@ -342,6 +388,8 @@ public partial class PluginController : BaseAdminController
     [FormValueRequired("plugin-apply-changes")]
     public virtual async Task<IActionResult> ApplyChanges()
     {
+		logger.LogDebug(">>> Entering ApplyChanges()");
+		logger.LogDebug("<<< Exiting ApplyChanges()");
         return await ReloadList();
     }
 
@@ -350,8 +398,10 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual IActionResult DiscardChanges()
     {
+		logger.LogDebug(">>> Entering DiscardChanges()");
         _pluginService.ResetChanges();
 
+		logger.LogDebug("<<< Exiting DiscardChanges()");
         return RedirectToAction("List", new { showWarnings = false });
     }
 
@@ -561,15 +611,19 @@ public partial class PluginController : BaseAdminController
         model = await _pluginModelFactory.PreparePluginModelAsync(model, pluginDescriptor, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting EditPopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> OfficialFeed()
     {
+		logger.LogDebug(">>> Entering OfficialFeed()");
         //prepare model
         var model = await _pluginModelFactory.PrepareOfficialFeedPluginSearchModelAsync(new OfficialFeedPluginSearchModel());
 
+		logger.LogDebug("OfficialFeed(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting OfficialFeed()");
         return View(model);
     }
 
@@ -577,9 +631,12 @@ public partial class PluginController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual async Task<IActionResult> OfficialFeedSelect(OfficialFeedPluginSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering OfficialFeedSelect(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _pluginModelFactory.PrepareOfficialFeedPluginListModelAsync(searchModel);
 
+		logger.LogDebug("OfficialFeedSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting OfficialFeedSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

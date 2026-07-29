@@ -7,7 +7,10 @@ public partial record CustomerAttributeModel : BaseNopEntityModel
 {
     public CustomerAttributeModel()
     {
+		logger.LogDebug(">>> Entering CustomerAttributeModel()");
         Values = new List<CustomerAttributeValueModel>();
+		logger.LogDebug("<<< Exiting CustomerAttributeModel()");
+		logger.LogDebug("CustomerAttributeModel(): Values → {Values}", Values);
     }
 
     public string Name { get; set; }

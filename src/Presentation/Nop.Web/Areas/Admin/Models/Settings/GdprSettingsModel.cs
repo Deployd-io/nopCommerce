@@ -12,7 +12,10 @@ public partial record GdprSettingsModel : BaseNopModel, ISettingsModel
 
     public GdprSettingsModel()
     {
+		logger.LogDebug(">>> Entering GdprSettingsModel()");
         GdprConsentSearchModel = new GdprConsentSearchModel();
+		logger.LogDebug("<<< Exiting GdprSettingsModel()");
+		logger.LogDebug("GdprSettingsModel(): GdprConsentSearchModel → {GdprConsentSearchModel}", GdprConsentSearchModel);
     }
 
     #endregion

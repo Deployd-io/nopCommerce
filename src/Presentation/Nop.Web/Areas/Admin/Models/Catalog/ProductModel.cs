@@ -18,57 +18,101 @@ public partial record ProductModel : BaseNopEntityModel,
 
     public ProductModel()
     {
+		logger.LogDebug(">>> Entering ProductModel()");
         ProductPictureModels = new List<ProductPictureModel>();
         ProductVideoModels = new List<ProductVideoModel>();
+		logger.LogDebug("ProductModel(): ProductPictureModels → {ProductPictureModels}", ProductPictureModels);
+		logger.LogDebug("ProductModel(): ProductVideoModels → {ProductVideoModels}", ProductVideoModels);
         Locales = new List<ProductLocalizedModel>();
         CopyProductModel = new CopyProductModel();
+		logger.LogDebug("ProductModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("ProductModel(): CopyProductModel → {CopyProductModel}", CopyProductModel);
         AddPictureModel = new ProductPictureModel();
         AddVideoModel = new ProductVideoModel();
+		logger.LogDebug("ProductModel(): AddPictureModel → {AddPictureModel}", AddPictureModel);
+		logger.LogDebug("ProductModel(): AddVideoModel → {AddVideoModel}", AddVideoModel);
         ProductWarehouseInventoryModels = new List<ProductWarehouseInventoryModel>();
         ProductEditorSettingsModel = new ProductEditorSettingsModel();
+		logger.LogDebug("ProductModel(): ProductWarehouseInventoryModels → {ProductWarehouseInventoryModels}", ProductWarehouseInventoryModels);
+		logger.LogDebug("ProductModel(): ProductEditorSettingsModel → {ProductEditorSettingsModel}", ProductEditorSettingsModel);
         StockQuantityHistory = new StockQuantityHistoryModel();
 
+		logger.LogDebug("ProductModel(): StockQuantityHistory → {StockQuantityHistory}", StockQuantityHistory);
         AvailableBasepriceUnits = new List<SelectListItem>();
         AvailableBasepriceBaseUnits = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): AvailableBasepriceUnits → {AvailableBasepriceUnits}", AvailableBasepriceUnits);
+		logger.LogDebug("ProductModel(): AvailableBasepriceBaseUnits → {AvailableBasepriceBaseUnits}", AvailableBasepriceBaseUnits);
         AvailableProductTemplates = new List<SelectListItem>();
         AvailableTaxCategories = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): AvailableProductTemplates → {AvailableProductTemplates}", AvailableProductTemplates);
+		logger.LogDebug("ProductModel(): AvailableTaxCategories → {AvailableTaxCategories}", AvailableTaxCategories);
         AvailableDeliveryDates = new List<SelectListItem>();
         AvailableProductAvailabilityRanges = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): AvailableDeliveryDates → {AvailableDeliveryDates}", AvailableDeliveryDates);
+		logger.LogDebug("ProductModel(): AvailableProductAvailabilityRanges → {AvailableProductAvailabilityRanges}", AvailableProductAvailabilityRanges);
         AvailableWarehouses = new List<SelectListItem>();
         ProductsTypesSupportedByProductTemplates = new Dictionary<int, IList<SelectListItem>>();
+		logger.LogDebug("ProductModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
+		logger.LogDebug("ProductModel(): ProductsTypesSupportedByProductTemplates → {ProductsTypesSupportedByProductTemplates}", ProductsTypesSupportedByProductTemplates);
 
         AvailableVendors = new List<SelectListItem>();
 
+		logger.LogDebug("ProductModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("ProductModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         SelectedManufacturerIds = new List<int>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): SelectedManufacturerIds → {SelectedManufacturerIds}", SelectedManufacturerIds);
+		logger.LogDebug("ProductModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
 
         SelectedCategoryIds = new List<int>();
         AvailableCategories = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): SelectedCategoryIds → {SelectedCategoryIds}", SelectedCategoryIds);
+		logger.LogDebug("ProductModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
 
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("ProductModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedDiscountIds = new List<int>();
         AvailableDiscounts = new List<SelectListItem>();
+		logger.LogDebug("ProductModel(): SelectedDiscountIds → {SelectedDiscountIds}", SelectedDiscountIds);
+		logger.LogDebug("ProductModel(): AvailableDiscounts → {AvailableDiscounts}", AvailableDiscounts);
 
         AvailableProductTags = new List<SelectListItem>();
         SelectedProductTags = new List<string>();
+		logger.LogDebug("ProductModel(): AvailableProductTags → {AvailableProductTags}", AvailableProductTags);
+		logger.LogDebug("ProductModel(): SelectedProductTags → {SelectedProductTags}", SelectedProductTags);
 
         RelatedProductSearchModel = new RelatedProductSearchModel();
         CrossSellProductSearchModel = new CrossSellProductSearchModel();
+		logger.LogDebug("ProductModel(): RelatedProductSearchModel → {RelatedProductSearchModel}", RelatedProductSearchModel);
+		logger.LogDebug("ProductModel(): CrossSellProductSearchModel → {CrossSellProductSearchModel}", CrossSellProductSearchModel);
         FilterLevelValueSearchModel = new FilterLevelValueSearchModel();
         AssociatedProductSearchModel = new AssociatedProductSearchModel();
+		logger.LogDebug("ProductModel(): FilterLevelValueSearchModel → {FilterLevelValueSearchModel}", FilterLevelValueSearchModel);
+		logger.LogDebug("ProductModel(): AssociatedProductSearchModel → {AssociatedProductSearchModel}", AssociatedProductSearchModel);
         ProductPictureSearchModel = new ProductPictureSearchModel();
         ProductVideoSearchModel = new ProductVideoSearchModel();
+		logger.LogDebug("ProductModel(): ProductPictureSearchModel → {ProductPictureSearchModel}", ProductPictureSearchModel);
+		logger.LogDebug("ProductModel(): ProductVideoSearchModel → {ProductVideoSearchModel}", ProductVideoSearchModel);
         ProductSpecificationAttributeSearchModel = new ProductSpecificationAttributeSearchModel();
         ProductOrderSearchModel = new ProductOrderSearchModel();
+		logger.LogDebug("ProductModel(): ProductSpecificationAttributeSearchModel → {ProductSpecificationAttributeSearchModel}", ProductSpecificationAttributeSearchModel);
+		logger.LogDebug("ProductModel(): ProductOrderSearchModel → {ProductOrderSearchModel}", ProductOrderSearchModel);
         TierPriceSearchModel = new TierPriceSearchModel();
         StockQuantityHistorySearchModel = new StockQuantityHistorySearchModel();
+		logger.LogDebug("ProductModel(): TierPriceSearchModel → {TierPriceSearchModel}", TierPriceSearchModel);
+		logger.LogDebug("ProductModel(): StockQuantityHistorySearchModel → {StockQuantityHistorySearchModel}", StockQuantityHistorySearchModel);
         ProductAttributeMappingSearchModel = new ProductAttributeMappingSearchModel();
         ProductAttributeCombinationSearchModel = new ProductAttributeCombinationSearchModel();
+		logger.LogDebug("<<< Exiting ProductModel()");
+		logger.LogDebug("ProductModel(): ProductAttributeMappingSearchModel → {ProductAttributeMappingSearchModel}", ProductAttributeMappingSearchModel);
+		logger.LogDebug("ProductModel(): ProductAttributeCombinationSearchModel → {ProductAttributeCombinationSearchModel}", ProductAttributeCombinationSearchModel);
     }
 
     #endregion

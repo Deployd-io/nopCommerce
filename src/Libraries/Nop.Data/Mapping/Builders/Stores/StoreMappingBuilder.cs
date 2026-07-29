@@ -17,9 +17,11 @@ public partial class StoreMappingBuilder : NopEntityBuilder<StoreMapping>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(StoreMapping.EntityName)).AsString(400).NotNullable()
             .WithColumn(nameof(StoreMapping.StoreId)).AsInt32().ForeignKey<Store>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

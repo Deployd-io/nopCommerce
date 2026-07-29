@@ -13,9 +13,14 @@ public partial record OfficialFeedPluginSearchModel : BaseSearchModel
 
     public OfficialFeedPluginSearchModel()
     {
+		logger.LogDebug(">>> Entering OfficialFeedPluginSearchModel()");
         AvailableVersions = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		logger.LogDebug("OfficialFeedPluginSearchModel(): AvailableVersions → {AvailableVersions}", AvailableVersions);
+		logger.LogDebug("OfficialFeedPluginSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailablePrices = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting OfficialFeedPluginSearchModel()");
+		logger.LogDebug("OfficialFeedPluginSearchModel(): AvailablePrices → {AvailablePrices}", AvailablePrices);
     }
 
     #endregion

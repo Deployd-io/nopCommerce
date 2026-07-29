@@ -15,9 +15,14 @@ public partial record BestCustomersReportSearchModel : BaseSearchModel
 
     public BestCustomersReportSearchModel()
     {
+		logger.LogDebug(">>> Entering BestCustomersReportSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		logger.LogDebug("BestCustomersReportSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
+		logger.LogDebug("BestCustomersReportSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableShippingStatuses = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting BestCustomersReportSearchModel()");
+		logger.LogDebug("BestCustomersReportSearchModel(): AvailableShippingStatuses → {AvailableShippingStatuses}", AvailableShippingStatuses);
     }
 
     #endregion

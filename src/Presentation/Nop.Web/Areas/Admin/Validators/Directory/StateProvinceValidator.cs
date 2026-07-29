@@ -10,8 +10,10 @@ public partial class StateProvinceValidator : BaseNopValidator<StateProvinceMode
 {
     public StateProvinceValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering StateProvinceValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Countries.States.Fields.Name.Required"));
 
         SetDatabaseValidationRules<StateProvince>();
+		logger.LogDebug("<<< Exiting StateProvinceValidator(localizationService={LocalizationService})", localizationService);
     }
 }

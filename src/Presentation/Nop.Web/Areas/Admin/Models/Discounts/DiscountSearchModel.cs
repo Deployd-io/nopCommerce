@@ -14,9 +14,14 @@ public partial record DiscountSearchModel : BaseSearchModel
 
     public DiscountSearchModel()
     {
+		logger.LogDebug(">>> Entering DiscountSearchModel()");
         AvailableActiveOptions = new List<SelectListItem>();
         AvailableDiscountTypes = new List<SelectListItem>();
+		logger.LogDebug("DiscountSearchModel(): AvailableActiveOptions → {AvailableActiveOptions}", AvailableActiveOptions);
+		logger.LogDebug("DiscountSearchModel(): AvailableDiscountTypes → {AvailableDiscountTypes}", AvailableDiscountTypes);
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting DiscountSearchModel()");
+		logger.LogDebug("DiscountSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

@@ -13,12 +13,20 @@ public partial record AssociateProductToAttributeValueSearchModel : BaseSearchMo
 
     public AssociateProductToAttributeValueSearchModel()
     {
+		logger.LogDebug(">>> Entering AssociateProductToAttributeValueSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
         AssociateProductToAttributeValueModel = new AssociateProductToAttributeValueModel();
+		logger.LogDebug("<<< Exiting AssociateProductToAttributeValueSearchModel()");
+		logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
+		logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AssociateProductToAttributeValueModel → {AssociateProductToAttributeValueModel}", AssociateProductToAttributeValueModel);
     }
 
     #endregion

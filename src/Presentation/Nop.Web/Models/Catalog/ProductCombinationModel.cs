@@ -25,7 +25,10 @@ public partial record ProductCombinationModel : BaseNopModel
 
     public ProductCombinationModel()
     {
+		logger.LogDebug(">>> Entering ProductCombinationModel()");
         Attributes = new List<ProductAttributeModel>();
+		logger.LogDebug("<<< Exiting ProductCombinationModel()");
+		logger.LogDebug("ProductCombinationModel(): Attributes → {Attributes}", Attributes);
     }
 
     #endregion

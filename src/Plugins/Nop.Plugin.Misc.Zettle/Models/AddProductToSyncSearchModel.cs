@@ -13,11 +13,18 @@ public record AddProductToSyncSearchModel : BaseSearchModel
 
     public AddProductToSyncSearchModel()
     {
+		logger.LogDebug(">>> Entering AddProductToSyncSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AddProductToSyncSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AddProductToSyncSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("AddProductToSyncSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("AddProductToSyncSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddProductToSyncSearchModel()");
+		logger.LogDebug("AddProductToSyncSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

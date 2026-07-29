@@ -12,8 +12,12 @@ public partial record PluginsConfigurationModel : BaseNopModel
 
     public PluginsConfigurationModel()
     {
+		logger.LogDebug(">>> Entering PluginsConfigurationModel()");
         PluginsLocal = new PluginSearchModel();
         AllPluginsAndThemes = new OfficialFeedPluginSearchModel();
+		logger.LogDebug("<<< Exiting PluginsConfigurationModel()");
+		logger.LogDebug("PluginsConfigurationModel(): PluginsLocal → {PluginsLocal}", PluginsLocal);
+		logger.LogDebug("PluginsConfigurationModel(): AllPluginsAndThemes → {AllPluginsAndThemes}", AllPluginsAndThemes);
     }
 
     #endregion

@@ -11,14 +11,23 @@ public partial record ShoppingCartModel : BaseNopModel
 {
     public ShoppingCartModel()
     {
+		logger.LogDebug(">>> Entering ShoppingCartModel()");
         Items = new List<ShoppingCartItemModel>();
         Warnings = new List<string>();
+		logger.LogDebug("ShoppingCartModel(): Items → {Items}", Items);
+		logger.LogDebug("ShoppingCartModel(): Warnings → {Warnings}", Warnings);
         DiscountBox = new DiscountBoxModel();
         GiftCardBox = new GiftCardBoxModel();
+		logger.LogDebug("ShoppingCartModel(): DiscountBox → {DiscountBox}", DiscountBox);
+		logger.LogDebug("ShoppingCartModel(): GiftCardBox → {GiftCardBox}", GiftCardBox);
         CheckoutAttributes = new List<CheckoutAttributeModel>();
         OrderReviewData = new OrderReviewDataModel();
+		logger.LogDebug("ShoppingCartModel(): CheckoutAttributes → {CheckoutAttributes}", CheckoutAttributes);
+		logger.LogDebug("ShoppingCartModel(): OrderReviewData → {OrderReviewData}", OrderReviewData);
 
         ButtonPaymentMethodViewComponents = new List<Type>();
+		logger.LogDebug("<<< Exiting ShoppingCartModel()");
+		logger.LogDebug("ShoppingCartModel(): ButtonPaymentMethodViewComponents → {ButtonPaymentMethodViewComponents}", ButtonPaymentMethodViewComponents);
     }
 
     public bool OnePageCheckoutEnabled { get; set; }
@@ -52,9 +61,14 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public ShoppingCartItemModel()
         {
+			logger.LogDebug(">>> Entering ShoppingCartItemModel()");
             Picture = new PictureModel();
             AllowedQuantities = new List<SelectListItem>();
+			logger.LogDebug("ShoppingCartItemModel(): Picture → {Picture}", Picture);
+			logger.LogDebug("ShoppingCartItemModel(): AllowedQuantities → {AllowedQuantities}", AllowedQuantities);
             Warnings = new List<string>();
+			logger.LogDebug("<<< Exiting ShoppingCartItemModel()");
+			logger.LogDebug("ShoppingCartItemModel(): Warnings → {Warnings}", Warnings);
         }
 
         public string Sku { get; set; }
@@ -99,8 +113,12 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public CheckoutAttributeModel()
         {
+			logger.LogDebug(">>> Entering CheckoutAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<CheckoutAttributeValueModel>();
+			logger.LogDebug("<<< Exiting CheckoutAttributeModel()");
+			logger.LogDebug("CheckoutAttributeModel(): AllowedFileExtensions → {AllowedFileExtensions}", AllowedFileExtensions);
+			logger.LogDebug("CheckoutAttributeModel(): Values → {Values}", Values);
         }
 
         public string Name { get; set; }
@@ -149,8 +167,12 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public DiscountBoxModel()
         {
+			logger.LogDebug(">>> Entering DiscountBoxModel()");
             AppliedDiscountsWithCodes = new List<DiscountInfoModel>();
             Messages = new List<string>();
+			logger.LogDebug("<<< Exiting DiscountBoxModel()");
+			logger.LogDebug("DiscountBoxModel(): AppliedDiscountsWithCodes → {AppliedDiscountsWithCodes}", AppliedDiscountsWithCodes);
+			logger.LogDebug("DiscountBoxModel(): Messages → {Messages}", Messages);
         }
 
         public List<DiscountInfoModel> AppliedDiscountsWithCodes { get; set; }
@@ -175,10 +197,16 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public OrderReviewDataModel()
         {
+			logger.LogDebug(">>> Entering OrderReviewDataModel()");
             BillingAddress = new AddressModel();
             ShippingAddress = new AddressModel();
+			logger.LogDebug("OrderReviewDataModel(): BillingAddress → {BillingAddress}", BillingAddress);
+			logger.LogDebug("OrderReviewDataModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
             PickupAddress = new AddressModel();
             CustomValues = new CustomValues();
+			logger.LogDebug("<<< Exiting OrderReviewDataModel()");
+			logger.LogDebug("OrderReviewDataModel(): PickupAddress → {PickupAddress}", PickupAddress);
+			logger.LogDebug("OrderReviewDataModel(): CustomValues → {CustomValues}", CustomValues);
         }
         public bool Display { get; set; }
 

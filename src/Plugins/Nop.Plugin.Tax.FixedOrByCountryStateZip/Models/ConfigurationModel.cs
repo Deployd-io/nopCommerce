@@ -8,10 +8,16 @@ public record ConfigurationModel : BaseSearchModel
 {
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("ConfigurationModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("ConfigurationModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
         AvailableTaxCategories = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): AvailableStates → {AvailableStates}", AvailableStates);
+		logger.LogDebug("ConfigurationModel(): AvailableTaxCategories → {AvailableTaxCategories}", AvailableTaxCategories);
     }
 
     [NopResourceDisplayName("Plugins.Tax.FixedOrByCountryStateZip.Fields.Store")]

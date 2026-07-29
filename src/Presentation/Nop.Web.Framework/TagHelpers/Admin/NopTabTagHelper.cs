@@ -29,7 +29,10 @@ public partial class NopTabTagHelper : TagHelper
 
     public NopTabTagHelper(IHtmlHelper htmlHelper)
     {
+		logger.LogDebug(">>> Entering NopTabTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
         _htmlHelper = htmlHelper;
+		logger.LogDebug("<<< Exiting NopTabTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
+		logger.LogDebug("NopTabTagHelper(htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", htmlHelper, _htmlHelper);
     }
 
     #endregion
@@ -44,6 +47,7 @@ public partial class NopTabTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -54,10 +58,12 @@ public partial class NopTabTagHelper : TagHelper
 
         _ = bool.TryParse(IsDefault, out var isDefaultTab);
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): _ → {_}", context, output, _);
         //get name of the tab should be selected
         var tabNameToSelect = context.Items.ContainsKey("tabNameToSelect")
             ? context.Items["tabNameToSelect"].ToString()
             : string.Empty;
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabNameToSelect → {TabNameToSelect}", context, output, tabNameToSelect);
 
         if (string.IsNullOrEmpty(tabNameToSelect))
             tabNameToSelect = _htmlHelper.GetSelectedTabName();
@@ -68,6 +74,7 @@ public partial class NopTabTagHelper : TagHelper
         //tab title
         var tabTitle = new TagBuilder("li");
         tabTitle.AddCssClass("nav-item");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabTitle → {TabTitle}", context, output, tabTitle);
         var linkTag = new TagBuilder("a")
         {
             Attributes =
@@ -96,14 +103,17 @@ public partial class NopTabTagHelper : TagHelper
         //tab content
         var tabContenttop = new TagBuilder("div");
         tabContenttop.AddCssClass("card-body");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabContenttop → {TabContenttop}", context, output, tabContenttop);
 
         var tabContent = new TagBuilder("div");
         tabContent.AddCssClass("tab-pane fade{0}");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabContent → {TabContent}", context, output, tabContent);
         tabContent.Attributes.Add("id", Name);
         tabContent.Attributes.Add("role", "tabpanel");
 
         var childContent = await output.GetChildContentAsync();
         tabContent.InnerHtml.AppendHtml(childContent.GetContent());
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): childContent → {ChildContent}", context, output, childContent);
 
         tabContenttop.InnerHtml.AppendHtml(await tabContent.RenderHtmlContentAsync());
 
@@ -115,6 +125,7 @@ public partial class NopTabTagHelper : TagHelper
         var tabContext = (List<NopTabContextItem>)context.Items[typeof(NopTabsTagHelper)];
         tabContext.Add(new NopTabContextItem
         {
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): tabContext → {TabContext}", context, output, tabContext);
             Title = await tabTitle.RenderHtmlContentAsync(),
             Content = await tabContent.RenderHtmlContentAsync(),
             IsDefault = isDefaultTab
@@ -122,6 +133,7 @@ public partial class NopTabTagHelper : TagHelper
 
         //generate nothing
         output.SuppressOutput();
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

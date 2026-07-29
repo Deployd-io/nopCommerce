@@ -7,10 +7,16 @@ public partial record SearchModel : BaseNopModel
 {
     public SearchModel()
     {
+		logger.LogDebug(">>> Entering SearchModel()");
         LimitList = new List<SelectListItem>();
         ForumList = new List<SelectListItem>();
+		logger.LogDebug("SearchModel(): LimitList → {LimitList}", LimitList);
+		logger.LogDebug("SearchModel(): ForumList → {ForumList}", ForumList);
         WithinList = new List<SelectListItem>();
         ForumTopics = new List<ForumTopicRowModel>();
+		logger.LogDebug("<<< Exiting SearchModel()");
+		logger.LogDebug("SearchModel(): WithinList → {WithinList}", WithinList);
+		logger.LogDebug("SearchModel(): ForumTopics → {ForumTopics}", ForumTopics);
     }
 
     public bool ShowAdvancedSearch { get; set; }

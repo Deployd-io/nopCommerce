@@ -11,7 +11,10 @@ public partial record AddManufacturerToDiscountModel : BaseNopModel
 
     public AddManufacturerToDiscountModel()
     {
+		logger.LogDebug(">>> Entering AddManufacturerToDiscountModel()");
         SelectedManufacturerIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddManufacturerToDiscountModel()");
+		logger.LogDebug("AddManufacturerToDiscountModel(): SelectedManufacturerIds → {SelectedManufacturerIds}", SelectedManufacturerIds);
     }
     #endregion
 

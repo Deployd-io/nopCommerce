@@ -18,17 +18,28 @@ public partial record DataTablesModel : BaseNopModel
     /// </summary>
     public DataTablesModel()
     {
+		logger.LogDebug(">>> Entering DataTablesModel()");
         //set default values
         Info = true;
+		logger.LogDebug("DataTablesModel(): Info → {Info}", Info);
         RefreshButton = true;
+		logger.LogDebug("DataTablesModel(): RefreshButton → {RefreshButton}", RefreshButton);
         ServerSide = true;
+		logger.LogDebug("DataTablesModel(): ServerSide → {ServerSide}", ServerSide);
         Processing = true;
+		logger.LogDebug("DataTablesModel(): Processing → {Processing}", Processing);
         Paging = true;
+		logger.LogDebug("DataTablesModel(): Paging → {Paging}", Paging);
         PagingType = DEFAULT_PAGING_TYPE;
+		logger.LogDebug("DataTablesModel(): PagingType → {PagingType}", PagingType);
 
         Filters = new List<FilterParameter>();
+		logger.LogDebug("DataTablesModel(): Filters → {Filters}", Filters);
         ColumnCollection = new List<ColumnProperty>();
         LayoutCollection = new List<LayoutOption>();
+		logger.LogDebug("<<< Exiting DataTablesModel()");
+		logger.LogDebug("DataTablesModel(): ColumnCollection → {ColumnCollection}", ColumnCollection);
+		logger.LogDebug("DataTablesModel(): LayoutCollection → {LayoutCollection}", LayoutCollection);
     }
 
     #endregion

@@ -14,7 +14,10 @@ public record RequestQuoteSearchModel : BaseSearchModel
 
     public RequestQuoteSearchModel()
     {
+		logger.LogDebug(">>> Entering RequestQuoteSearchModel()");
         AvailableRequestQuoteStatuses = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting RequestQuoteSearchModel()");
+		logger.LogDebug("RequestQuoteSearchModel(): AvailableRequestQuoteStatuses → {AvailableRequestQuoteStatuses}", AvailableRequestQuoteStatuses);
     }
 
     #endregion

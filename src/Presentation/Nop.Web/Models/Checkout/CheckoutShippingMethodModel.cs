@@ -7,8 +7,12 @@ public partial record CheckoutShippingMethodModel : BaseNopModel
 {
     public CheckoutShippingMethodModel()
     {
+		logger.LogDebug(">>> Entering CheckoutShippingMethodModel()");
         ShippingMethods = new List<ShippingMethodModel>();
         Warnings = new List<string>();
+		logger.LogDebug("<<< Exiting CheckoutShippingMethodModel()");
+		logger.LogDebug("CheckoutShippingMethodModel(): ShippingMethods → {ShippingMethods}", ShippingMethods);
+		logger.LogDebug("CheckoutShippingMethodModel(): Warnings → {Warnings}", Warnings);
     }
 
     public IList<ShippingMethodModel> ShippingMethods { get; set; }

@@ -13,14 +13,24 @@ public partial record AddSpecificationAttributeModel : BaseNopEntityModel, ILoca
 
     public AddSpecificationAttributeModel()
     {
+		logger.LogDebug(">>> Entering AddSpecificationAttributeModel()");
         AvailableOptions = new List<SelectListItem>();
         AvailableAttributes = new List<SelectListItem>();
+		logger.LogDebug("AddSpecificationAttributeModel(): AvailableOptions → {AvailableOptions}", AvailableOptions);
+		logger.LogDebug("AddSpecificationAttributeModel(): AvailableAttributes → {AvailableAttributes}", AvailableAttributes);
         ShowOnProductPage = true;
         AttributeName = string.Empty;
         AttributeTypeName = string.Empty;
+		logger.LogDebug("AddSpecificationAttributeModel(): ShowOnProductPage → {ShowOnProductPage}", ShowOnProductPage);
+		logger.LogDebug("AddSpecificationAttributeModel(): AttributeName → {AttributeName}", AttributeName);
+		logger.LogDebug("AddSpecificationAttributeModel(): AttributeTypeName → {AttributeTypeName}", AttributeTypeName);
         Value = string.Empty;
         ValueRaw = string.Empty;
         Locales = new List<AddSpecificationAttributeLocalizedModel>();
+		logger.LogDebug("<<< Exiting AddSpecificationAttributeModel()");
+		logger.LogDebug("AddSpecificationAttributeModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("AddSpecificationAttributeModel(): Value → {Value}", Value);
+		logger.LogDebug("AddSpecificationAttributeModel(): ValueRaw → {ValueRaw}", ValueRaw);
     }
 
     #endregion

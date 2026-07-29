@@ -68,14 +68,18 @@ public partial class LocalizationService : ILocalizationService
     /// </returns>
     protected virtual async Task<IList<LocaleStringResource>> GetAllResourcesAsync(int languageId)
     {
+		logger.LogDebug(">>> Entering GetAllResourcesAsync(languageId={LanguageId})", languageId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var locales = await _lsrRepository.GetAllAsync(query =>
         {
             return from l in query
                 orderby l.ResourceName
                 where l.LanguageId == languageId
                 select l;
+				logger.LogInformation("GetAllResourcesAsync(languageId)={LanguageId}: find query executed in {Arg1} ms", languageId, __logStart.ElapsedMilliseconds);
         });
 
+		logger.LogDebug("<<< Exiting GetAllResourcesAsync(languageId={LanguageId})", languageId);
         return locales;
     }
 
@@ -199,15 +203,21 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLocaleStringResourceAsync(LocaleStringResource localeStringResource)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _lsrRepository.DeleteAsync(localeStringResource);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Deletes a locale string resource
     /// </summary>
     /// <param name="localeStringResource">Locale string resource</param>
     public virtual void DeleteLocaleStringResource(LocaleStringResource localeStringResource)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _lsrRepository.Delete(localeStringResource);
     }
 
@@ -221,6 +231,8 @@ public partial class LocalizationService : ILocalizationService
     /// </returns>
     public virtual async Task<LocaleStringResource> GetLocaleStringResourceByIdAsync(int localeStringResourceId)
     {
+		logger.LogDebug(">>> Entering GetLocaleStringResourceByIdAsync(localeStringResourceId={LocaleStringResourceId})", localeStringResourceId);
+		logger.LogDebug("<<< Exiting GetLocaleStringResourceByIdAsync(localeStringResourceId={LocaleStringResourceId})", localeStringResourceId);
         return await _lsrRepository.GetByIdAsync(localeStringResourceId, cache => default);
     }
 
@@ -282,6 +294,7 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertLocaleStringResourceAsync(LocaleStringResource localeStringResource)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!string.IsNullOrEmpty(localeStringResource?.ResourceName))
             localeStringResource.ResourceName = localeStringResource.ResourceName.Trim().ToLowerInvariant();
 
@@ -295,6 +308,8 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateLocaleStringResourceAsync(LocaleStringResource localeStringResource)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _lsrRepository.UpdateAsync(localeStringResource);
     }
 
@@ -304,6 +319,8 @@ public partial class LocalizationService : ILocalizationService
     /// <param name="localeStringResource">Locale string resource</param>
     public virtual void UpdateLocaleStringResource(LocaleStringResource localeStringResource)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _lsrRepository.Update(localeStringResource);
     }
 
@@ -375,9 +392,12 @@ public partial class LocalizationService : ILocalizationService
     /// </returns>
     public virtual async Task<string> GetResourceAsync(string resourceKey)
     {
+		logger.LogDebug(">>> Entering GetResourceAsync(resourceKey={ResourceKey})", resourceKey);
         var workingLanguage = await _workContext.GetWorkingLanguageAsync();
 
+		logger.LogDebug("GetResourceAsync(resourceKey={ResourceKey}): workingLanguage → {WorkingLanguage}", resourceKey, workingLanguage);
         if (workingLanguage != null)
+		logger.LogDebug("<<< Exiting GetResourceAsync(resourceKey={ResourceKey})", resourceKey);
             return await GetResourceAsync(resourceKey, workingLanguage.Id);
 
         return string.Empty;
@@ -456,6 +476,7 @@ public partial class LocalizationService : ILocalizationService
     /// </returns>
     public virtual async Task<string> ExportResourcesToXmlAsync(Language language)
     {
+		logger.LogDebug(">>> Entering ExportResourcesToXmlAsync(language={Language})", language);
         ArgumentNullException.ThrowIfNull(language);
 
         var settings = new XmlWriterSettings
@@ -467,6 +488,8 @@ public partial class LocalizationService : ILocalizationService
 
         await using var stream = new MemoryStream();
         await using var xmlWriter = XmlWriter.Create(stream, settings);
+		logger.LogDebug("ExportResourcesToXmlAsync(language={Language}): stream → {Stream}", language, stream);
+		logger.LogDebug("ExportResourcesToXmlAsync(language={Language}): xmlWriter → {XmlWriter}", language, xmlWriter);
 
         await xmlWriter.WriteStartDocumentAsync();
         await xmlWriter.WriteStartElementAsync("Language");
@@ -476,6 +499,7 @@ public partial class LocalizationService : ILocalizationService
         var resources = await GetAllResourcesAsync(language.Id);
         foreach (var resource in resources)
         {
+		logger.LogDebug("ExportResourcesToXmlAsync(language={Language}): resources → {Resources}", language, resources);
             await xmlWriter.WriteStartElementAsync("LocaleResource");
             await xmlWriter.WriteAttributeStringAsync("Name", resource.ResourceName);
             await xmlWriter.WriteElementStringAsync("Value", null, resource.ResourceValue);
@@ -486,6 +510,7 @@ public partial class LocalizationService : ILocalizationService
         await xmlWriter.WriteEndDocumentAsync();
         await xmlWriter.FlushAsync();
 
+		logger.LogDebug("<<< Exiting ExportResourcesToXmlAsync(language={Language})", language);
         return Encoding.UTF8.GetString(stream.ToArray());
     }
 
@@ -498,6 +523,8 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportResourcesFromXmlAsync(Language language, StreamReader xmlStreamReader, bool updateExistingResources = true)
     {
+		logger.LogDebug(">>> Entering ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources})", language, xmlStreamReader, updateExistingResources);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(language);
 
         if (xmlStreamReader.EndOfStream)
@@ -505,9 +532,11 @@ public partial class LocalizationService : ILocalizationService
 
         var lsNamesList = new Dictionary<string, LocaleStringResource>();
         var locales = await _lsrRepository.Table
+			logger.LogDebug("ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources}): lsNamesList → {LsNamesList}", language, xmlStreamReader, updateExistingResources, lsNamesList);
             .Where(lsr => lsr.LanguageId == language.Id)
             .OrderBy(lsr => lsr.Id)
             .ToListAsync();
+			logger.LogInformation("ImportResourcesFromXmlAsync(language,xmlStreamReader,updateExistingResources)={Language},{XmlStreamReader},{UpdateExistingResources}: database query executed in {Arg3} ms", language, xmlStreamReader, updateExistingResources, __logStart.ElapsedMilliseconds);
 
         foreach (var localeStringResource in locales)
         {
@@ -516,6 +545,8 @@ public partial class LocalizationService : ILocalizationService
 
         var lrsToUpdateList = new Dictionary<string, LocaleStringResource>();
         var lrsToInsertList = new Dictionary<string, LocaleStringResource>();
+		logger.LogDebug("ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources}): lrsToUpdateList → {LrsToUpdateList}", language, xmlStreamReader, updateExistingResources, lrsToUpdateList);
+		logger.LogDebug("ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources}): lrsToInsertList → {LrsToInsertList}", language, xmlStreamReader, updateExistingResources, lrsToInsertList);
 
         foreach (var (name, value) in LoadLocaleResourcesFromStream(xmlStreamReader))
         {
@@ -525,6 +556,7 @@ public partial class LocalizationService : ILocalizationService
                     continue;
 
                 localString.ResourceValue = value;
+				logger.LogDebug("ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources}): localString.ResourceValue → {Arg3}", language, xmlStreamReader, updateExistingResources, localString.ResourceValue);
                 lrsToUpdateList[name] = localString;
             }
             else
@@ -535,10 +567,13 @@ public partial class LocalizationService : ILocalizationService
         }
 
         await _lsrRepository.UpdateAsync(lrsToUpdateList.Values.ToList(), false);
+		logger.LogInformation("ImportResourcesFromXmlAsync(language,xmlStreamReader,updateExistingResources)={Language},{XmlStreamReader},{UpdateExistingResources}: update query executed in {Arg3} ms", language, xmlStreamReader, updateExistingResources, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("ImportResourcesFromXmlAsync(language,xmlStreamReader,updateExistingResources)={Language},{XmlStreamReader},{UpdateExistingResources}: save query executed in {Arg3} ms", language, xmlStreamReader, updateExistingResources, __logStart.ElapsedMilliseconds);
         await _lsrRepository.InsertAsync(lrsToInsertList.Values.ToList(), false);
 
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(NopEntityCacheDefaults<LocaleStringResource>.Prefix);
+		logger.LogDebug("<<< Exiting ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources})", language, xmlStreamReader, updateExistingResources);
     }
 
     /// <summary>
@@ -672,14 +707,18 @@ public partial class LocalizationService : ILocalizationService
     /// </returns>
     public virtual async Task<string> GetLocalizedEnumAsync<TEnum>(TEnum enumValue, int? languageId = null) where TEnum : struct
     {
+		logger.LogDebug(">>> Entering GetLocalizedEnumAsync(enumValue={EnumValue},languageId={LanguageId})", enumValue, languageId);
         if (!typeof(TEnum).IsEnum)
             throw new ArgumentException("T must be an enumerated type");
 
         //localized value
         var workingLanguage = await _workContext.GetWorkingLanguageAsync();
         var resourceName = $"{NopLocalizationDefaults.EnumLocaleStringResourcesPrefix}{typeof(TEnum)}.{enumValue}";
+		logger.LogDebug("GetLocalizedEnumAsync(enumValue={EnumValue},languageId={LanguageId}): workingLanguage → {WorkingLanguage}", enumValue, languageId, workingLanguage);
+		logger.LogDebug("GetLocalizedEnumAsync(enumValue={EnumValue},languageId={LanguageId}): resourceName → {ResourceName}", enumValue, languageId, resourceName);
         var result = await GetResourceAsync(resourceName, languageId ?? workingLanguage.Id, false, string.Empty, true);
 
+		logger.LogDebug("GetLocalizedEnumAsync(enumValue={EnumValue},languageId={LanguageId}): result → {Result}", enumValue, languageId, result);
         //set default value if required
         if (string.IsNullOrEmpty(result))
             result = CommonHelper.SplitCamelCaseWord(enumValue.ToString());
@@ -699,17 +738,22 @@ public partial class LocalizationService : ILocalizationService
     /// </returns>
     public virtual async Task<string> GetLocalizedPermissionNameAsync(PermissionRecord permissionRecord, int? languageId = null)
     {
+		logger.LogDebug(">>> Entering GetLocalizedPermissionNameAsync(permissionRecord={PermissionRecord},languageId={LanguageId})", permissionRecord, languageId);
         ArgumentNullException.ThrowIfNull(permissionRecord);
 
         //localized value
         var workingLanguage = await _workContext.GetWorkingLanguageAsync();
         var resourceName = $"{NopLocalizationDefaults.PermissionLocaleStringResourcesPrefix}{permissionRecord.SystemName}";
+		logger.LogDebug("GetLocalizedPermissionNameAsync(permissionRecord={PermissionRecord},languageId={LanguageId}): workingLanguage → {WorkingLanguage}", permissionRecord, languageId, workingLanguage);
+		logger.LogDebug("GetLocalizedPermissionNameAsync(permissionRecord={PermissionRecord},languageId={LanguageId}): resourceName → {ResourceName}", permissionRecord, languageId, resourceName);
         var result = await GetResourceAsync(resourceName, languageId ?? workingLanguage.Id, false, string.Empty, true);
 
+		logger.LogDebug("GetLocalizedPermissionNameAsync(permissionRecord={PermissionRecord},languageId={LanguageId}): result → {Result}", permissionRecord, languageId, result);
         //set default value if required
         if (string.IsNullOrEmpty(result))
             result = permissionRecord.Name;
 
+		logger.LogDebug("<<< Exiting GetLocalizedPermissionNameAsync(permissionRecord={PermissionRecord},languageId={LanguageId})", permissionRecord, languageId);
         return result;
     }
 
@@ -720,15 +764,18 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveLocalizedPermissionNameAsync(PermissionRecord permissionRecord)
     {
+		logger.LogDebug(">>> Entering SaveLocalizedPermissionNameAsync(permissionRecord={PermissionRecord})", permissionRecord);
         ArgumentNullException.ThrowIfNull(permissionRecord);
 
         var resourceName = $"{NopLocalizationDefaults.PermissionLocaleStringResourcesPrefix}{permissionRecord.SystemName}";
         var resourceValue = permissionRecord.Name;
+		logger.LogDebug("SaveLocalizedPermissionNameAsync(permissionRecord={PermissionRecord}): resourceName → {ResourceName}", permissionRecord, resourceName);
 
         foreach (var lang in await _languageService.GetAllLanguagesAsync(true))
         {
             var lsr = await GetLocaleStringResourceByNameAsync(resourceName, lang.Id, false);
             if (lsr == null)
+			logger.LogDebug("SaveLocalizedPermissionNameAsync(permissionRecord={PermissionRecord}): lsr → {Lsr}", permissionRecord, lsr);
             {
                 lsr = new LocaleStringResource
                 {
@@ -741,9 +788,11 @@ public partial class LocalizationService : ILocalizationService
             else
             {
                 lsr.ResourceValue = resourceValue;
+				logger.LogDebug("SaveLocalizedPermissionNameAsync(permissionRecord={PermissionRecord}): lsr.ResourceValue → {Arg1}", permissionRecord, lsr.ResourceValue);
                 await UpdateLocaleStringResourceAsync(lsr);
             }
         }
+		logger.LogDebug("<<< Exiting SaveLocalizedPermissionNameAsync(permissionRecord={PermissionRecord})", permissionRecord);
     }
 
     /// <summary>
@@ -753,15 +802,19 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLocalizedPermissionNameAsync(PermissionRecord permissionRecord)
     {
+		logger.LogDebug(">>> Entering DeleteLocalizedPermissionNameAsync(permissionRecord={PermissionRecord})", permissionRecord);
         ArgumentNullException.ThrowIfNull(permissionRecord);
 
         var resourceName = $"{NopLocalizationDefaults.PermissionLocaleStringResourcesPrefix}{permissionRecord.SystemName}";
         foreach (var lang in await _languageService.GetAllLanguagesAsync(true))
         {
+		logger.LogDebug("DeleteLocalizedPermissionNameAsync(permissionRecord={PermissionRecord}): resourceName → {ResourceName}", permissionRecord, resourceName);
             var lsr = await GetLocaleStringResourceByNameAsync(resourceName, lang.Id, false);
             if (lsr != null)
+				logger.LogDebug("DeleteLocalizedPermissionNameAsync(permissionRecord={PermissionRecord}): lsr → {Lsr}", permissionRecord, lsr);
                 await DeleteLocaleStringResourceAsync(lsr);
         }
+		logger.LogDebug("<<< Exiting DeleteLocalizedPermissionNameAsync(permissionRecord={PermissionRecord})", permissionRecord);
     }
 
     /// <summary>
@@ -773,6 +826,7 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddOrUpdateLocaleResourceAsync(string resourceName, string resourceValue, string languageCulture = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         foreach (var lang in await _languageService.GetAllLanguagesAsync(true))
         {
             if (!string.IsNullOrEmpty(languageCulture) && !languageCulture.Equals(lang.LanguageCulture))
@@ -805,6 +859,7 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddOrUpdateLocaleResourceAsync(IDictionary<string, string> resources, int? languageId = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //first update all previous locales with the passed names if they exist
         var resourcesToInsert = await UpdateLocaleResourceAsync(resources, languageId, false);
 
@@ -835,6 +890,7 @@ public partial class LocalizationService : ILocalizationService
     /// <param name="languageId">Language identifier; pass null to add the passed resources for all languages</param>
     public virtual void AddOrUpdateLocaleResource(IDictionary<string, string> resources, int? languageId = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //first update all previous locales with the passed names if they exist
         var resourcesToInsert = UpdateLocaleResource(resources, languageId, false);
 
@@ -881,11 +937,19 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLocaleResourcesAsync(IList<string> resourceNames, int? languageId = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering DeleteLocaleResourcesAsync(resourceNames={ResourceNames},languageId={LanguageId})", resourceNames, languageId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _lsrRepository.DeleteAsync(locale => (!languageId.HasValue || locale.LanguageId == languageId.Value) &&
                                                    resourceNames.Contains(locale.ResourceName, StringComparer.InvariantCultureIgnoreCase));
+												var __logStart = System.Diagnostics.Stopwatch.StartNew();
+												logger.LogInformation("DeleteLocaleResourcesAsync(resourceNames,languageId)={ResourceNames},{LanguageId}: delete query executed in {Arg2} ms", resourceNames, languageId, __logStart.ElapsedMilliseconds);
 
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(NopEntityCacheDefaults<LocaleStringResource>.Prefix);
+		logger.LogDebug("<<< Exiting DeleteLocaleResourcesAsync(resourceNames={ResourceNames},languageId={LanguageId})", resourceNames, languageId);
+		logger.LogInformation("DeleteLocaleResourcesAsync(resourceNames,languageId)={ResourceNames},{LanguageId}: external service call took {Arg2} ms", resourceNames, languageId, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -895,12 +959,16 @@ public partial class LocalizationService : ILocalizationService
     /// <param name="languageId">Language identifier; pass null to delete the passed resources from all languages</param>
     public virtual void DeleteLocaleResources(IList<string> resourceNames, int? languageId = null)
     {
+		logger.LogDebug(">>> Entering DeleteLocaleResources(resourceNames={ResourceNames},languageId={LanguageId})", resourceNames, languageId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _lsrRepository.Delete(locale =>
             (!languageId.HasValue || locale.LanguageId == languageId.Value) &&
             resourceNames.Contains(locale.ResourceName, StringComparer.InvariantCultureIgnoreCase));
+			logger.LogInformation("DeleteLocaleResources(resourceNames,languageId)={ResourceNames},{LanguageId}: delete query executed in {Arg2} ms", resourceNames, languageId, __logStart.ElapsedMilliseconds);
 
         //clear cache
         _staticCacheManager.RemoveByPrefix(NopEntityCacheDefaults<LocaleStringResource>.Prefix);
+		logger.LogDebug("<<< Exiting DeleteLocaleResources(resourceNames={ResourceNames},languageId={LanguageId})", resourceNames, languageId);
     }
 
     /// <summary>
@@ -911,12 +979,18 @@ public partial class LocalizationService : ILocalizationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLocaleResourcesAsync(string resourceNamePrefix, int? languageId = null)
     {
+		logger.LogDebug(">>> Entering DeleteLocaleResourcesAsync(resourceNamePrefix={ResourceNamePrefix},languageId={LanguageId})", resourceNamePrefix, languageId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteLocaleResourcesAsync(resourceNamePrefix,languageId)={ResourceNamePrefix},{LanguageId}: delete query executed in {Arg2} ms", resourceNamePrefix, languageId, __logStart.ElapsedMilliseconds);
         await _lsrRepository.DeleteAsync(locale => (!languageId.HasValue || locale.LanguageId == languageId.Value) &&
                                                    !string.IsNullOrEmpty(locale.ResourceName) &&
                                                    locale.ResourceName.StartsWith(resourceNamePrefix, StringComparison.InvariantCultureIgnoreCase));
 
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(NopEntityCacheDefaults<LocaleStringResource>.Prefix);
+		logger.LogDebug("<<< Exiting DeleteLocaleResourcesAsync(resourceNamePrefix={ResourceNamePrefix},languageId={LanguageId})", resourceNamePrefix, languageId);
+		logger.LogInformation("DeleteLocaleResourcesAsync(resourceNamePrefix,languageId)={ResourceNamePrefix},{LanguageId}: external service call took {Arg2} ms", resourceNamePrefix, languageId, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -933,6 +1007,7 @@ public partial class LocalizationService : ILocalizationService
     public virtual async Task<string> GetLocalizedFriendlyNameAsync<TPlugin>(TPlugin plugin, int languageId, bool returnDefaultValue = true)
         where TPlugin : IPlugin
     {
+		logger.LogDebug(">>> Entering GetLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue})", plugin, languageId, returnDefaultValue);
         ArgumentNullException.ThrowIfNull(plugin);
 
         if (plugin.PluginDescriptor == null)
@@ -942,6 +1017,8 @@ public partial class LocalizationService : ILocalizationService
         //localized value
         var resourceName = $"{NopLocalizationDefaults.PluginNameLocaleStringResourcesPrefix}{systemName}";
         var result = await GetResourceAsync(resourceName, languageId, false, string.Empty, true);
+		logger.LogDebug("GetLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue}): resourceName → {ResourceName}", plugin, languageId, returnDefaultValue, resourceName);
+		logger.LogDebug("GetLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue}): result → {Result}", plugin, languageId, returnDefaultValue, result);
 
         //set default value if required
         if (string.IsNullOrEmpty(result) && returnDefaultValue)
@@ -961,18 +1038,22 @@ public partial class LocalizationService : ILocalizationService
     public virtual async Task SaveLocalizedFriendlyNameAsync<TPlugin>(TPlugin plugin, int languageId, string localizedFriendlyName)
         where TPlugin : IPlugin
     {
+		logger.LogDebug(">>> Entering SaveLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},localizedFriendlyName={LocalizedFriendlyName})", plugin, languageId, localizedFriendlyName);
         if (languageId == 0)
             throw new ArgumentOutOfRangeException(nameof(languageId), "Language ID should not be 0");
 
         ArgumentNullException.ThrowIfNull(plugin);
 
         if (plugin.PluginDescriptor == null)
+			logger.LogDebug("<<< Exiting SaveLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},localizedFriendlyName={LocalizedFriendlyName})", plugin, languageId, localizedFriendlyName);
             throw new ArgumentException("Plugin descriptor cannot be loaded");
 
         var systemName = plugin.PluginDescriptor.SystemName;
         //localized value
         var resourceName = $"{NopLocalizationDefaults.PluginNameLocaleStringResourcesPrefix}{systemName}";
         var resource = await GetLocaleStringResourceByNameAsync(resourceName, languageId, false);
+		logger.LogDebug("SaveLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},localizedFriendlyName={LocalizedFriendlyName}): resourceName → {ResourceName}", plugin, languageId, localizedFriendlyName, resourceName);
+		logger.LogDebug("SaveLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},localizedFriendlyName={LocalizedFriendlyName}): resource → {Resource}", plugin, languageId, localizedFriendlyName, resource);
 
         if (resource != null)
         {
@@ -985,6 +1066,7 @@ public partial class LocalizationService : ILocalizationService
             {
                 //update
                 resource.ResourceValue = localizedFriendlyName;
+				logger.LogDebug("SaveLocalizedFriendlyNameAsync(plugin={Plugin},languageId={LanguageId},localizedFriendlyName={LocalizedFriendlyName}): resource.ResourceValue → {Arg3}", plugin, languageId, localizedFriendlyName, resource.ResourceValue);
                 await UpdateLocaleStringResourceAsync(resource);
             }
         }

@@ -8,9 +8,14 @@ public partial record ManufacturerModel : BaseNopEntityModel, IMetaTagsSupported
 {
     public ManufacturerModel()
     {
+		logger.LogDebug(">>> Entering ManufacturerModel()");
         PictureModel = new PictureModel();
         FeaturedProducts = new List<ProductOverviewModel>();
+		logger.LogDebug("ManufacturerModel(): PictureModel → {PictureModel}", PictureModel);
+		logger.LogDebug("ManufacturerModel(): FeaturedProducts → {FeaturedProducts}", FeaturedProducts);
         CatalogProductsModel = new CatalogProductsModel();
+		logger.LogDebug("<<< Exiting ManufacturerModel()");
+		logger.LogDebug("ManufacturerModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
     }
 
     public string Name { get; set; }

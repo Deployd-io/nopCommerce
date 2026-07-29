@@ -14,10 +14,16 @@ public partial record PollModel : BaseNopEntityModel, IStoreMappingSupportedMode
 
     public PollModel()
     {
+		logger.LogDebug(">>> Entering PollModel()");
         AvailableLanguages = new List<SelectListItem>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("PollModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+		logger.LogDebug("PollModel(): AvailableStores → {AvailableStores}", AvailableStores);
         SelectedStoreIds = new List<int>();
         PollAnswerSearchModel = new PollAnswerSearchModel();
+		logger.LogDebug("<<< Exiting PollModel()");
+		logger.LogDebug("PollModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("PollModel(): PollAnswerSearchModel → {PollAnswerSearchModel}", PollAnswerSearchModel);
     }
 
     #endregion

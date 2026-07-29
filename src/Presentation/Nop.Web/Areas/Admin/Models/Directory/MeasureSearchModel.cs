@@ -11,10 +11,16 @@ public partial record MeasureSearchModel : BaseSearchModel
 
     public MeasureSearchModel()
     {
+		logger.LogDebug(">>> Entering MeasureSearchModel()");
         MeasureDimensionSearchModel = new MeasureDimensionSearchModel();
         MeasureWeightSearchModel = new MeasureWeightSearchModel();
+		logger.LogDebug("MeasureSearchModel(): MeasureDimensionSearchModel → {MeasureDimensionSearchModel}", MeasureDimensionSearchModel);
+		logger.LogDebug("MeasureSearchModel(): MeasureWeightSearchModel → {MeasureWeightSearchModel}", MeasureWeightSearchModel);
         AddMeasureDimension = new MeasureDimensionModel();
         AddMeasureWeight = new MeasureWeightModel();
+		logger.LogDebug("<<< Exiting MeasureSearchModel()");
+		logger.LogDebug("MeasureSearchModel(): AddMeasureDimension → {AddMeasureDimension}", AddMeasureDimension);
+		logger.LogDebug("MeasureSearchModel(): AddMeasureWeight → {AddMeasureWeight}", AddMeasureWeight);
     }
 
     #endregion

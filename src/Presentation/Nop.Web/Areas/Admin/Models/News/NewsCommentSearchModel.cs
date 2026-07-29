@@ -14,7 +14,10 @@ public partial record NewsCommentSearchModel : BaseSearchModel
 
     public NewsCommentSearchModel()
     {
+		logger.LogDebug(">>> Entering NewsCommentSearchModel()");
         AvailableApprovedOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NewsCommentSearchModel()");
+		logger.LogDebug("NewsCommentSearchModel(): AvailableApprovedOptions → {AvailableApprovedOptions}", AvailableApprovedOptions);
     }
 
     #endregion

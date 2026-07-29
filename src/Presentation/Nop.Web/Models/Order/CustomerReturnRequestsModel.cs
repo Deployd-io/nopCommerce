@@ -6,7 +6,10 @@ public partial record CustomerReturnRequestsModel : BaseNopModel
 {
     public CustomerReturnRequestsModel()
     {
+		logger.LogDebug(">>> Entering CustomerReturnRequestsModel()");
         Items = new List<ReturnRequestModel>();
+		logger.LogDebug("<<< Exiting CustomerReturnRequestsModel()");
+		logger.LogDebug("CustomerReturnRequestsModel(): Items → {Items}", Items);
     }
 
     public IList<ReturnRequestModel> Items { get; set; }

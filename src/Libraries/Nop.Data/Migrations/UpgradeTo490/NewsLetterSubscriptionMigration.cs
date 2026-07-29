@@ -13,6 +13,7 @@ public class NewsLetterSubscriptionMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!Schema.Table(nameof(NewsLetterSubscriptionType)).Exists())
             Create.TableFor<NewsLetterSubscriptionType>();
 
@@ -33,5 +34,6 @@ public class NewsLetterSubscriptionMigration : ForwardOnlyMigration
             Alter.Table(nameof(Campaign))
                 .AddColumn(nameof(Campaign.NewsLetterSubscriptionTypeId)).AsInt32().NotNullable().SetExistingRowsTo(0);
         }
+		logger.LogDebug("<<< Exiting Up()");
     }
 }

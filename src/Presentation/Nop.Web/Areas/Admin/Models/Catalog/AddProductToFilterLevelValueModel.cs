@@ -11,7 +11,10 @@ public partial record AddProductToFilterLevelValueModel : BaseNopModel
 
     public AddProductToFilterLevelValueModel()
     {
+		logger.LogDebug(">>> Entering AddProductToFilterLevelValueModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddProductToFilterLevelValueModel()");
+		logger.LogDebug("AddProductToFilterLevelValueModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
     #endregion
 

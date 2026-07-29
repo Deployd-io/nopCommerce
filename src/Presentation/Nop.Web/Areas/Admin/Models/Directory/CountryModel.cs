@@ -13,10 +13,16 @@ public partial record CountryModel : BaseNopEntityModel, ILocalizedModel<Country
 
     public CountryModel()
     {
+		logger.LogDebug(">>> Entering CountryModel()");
         Locales = new List<CountryLocalizedModel>();
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("CountryModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("CountryModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
         StateProvinceSearchModel = new StateProvinceSearchModel();
+		logger.LogDebug("<<< Exiting CountryModel()");
+		logger.LogDebug("CountryModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("CountryModel(): StateProvinceSearchModel → {StateProvinceSearchModel}", StateProvinceSearchModel);
     }
 
     #endregion

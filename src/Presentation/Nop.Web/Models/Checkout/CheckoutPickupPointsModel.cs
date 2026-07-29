@@ -6,8 +6,12 @@ public partial record CheckoutPickupPointsModel : BaseNopModel
 {
     public CheckoutPickupPointsModel()
     {
+		logger.LogDebug(">>> Entering CheckoutPickupPointsModel()");
         Warnings = new List<string>();
         PickupPoints = new List<CheckoutPickupPointModel>();
+		logger.LogDebug("<<< Exiting CheckoutPickupPointsModel()");
+		logger.LogDebug("CheckoutPickupPointsModel(): Warnings → {Warnings}", Warnings);
+		logger.LogDebug("CheckoutPickupPointsModel(): PickupPoints → {PickupPoints}", PickupPoints);
     }
 
     public IList<string> Warnings { get; set; }

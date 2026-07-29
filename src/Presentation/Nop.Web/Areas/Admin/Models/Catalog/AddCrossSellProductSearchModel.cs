@@ -13,11 +13,18 @@ public partial record AddCrossSellProductSearchModel : BaseSearchModel
 
     public AddCrossSellProductSearchModel()
     {
+		logger.LogDebug(">>> Entering AddCrossSellProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AddCrossSellProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AddCrossSellProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("AddCrossSellProductSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("AddCrossSellProductSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddCrossSellProductSearchModel()");
+		logger.LogDebug("AddCrossSellProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

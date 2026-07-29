@@ -9,7 +9,10 @@ public partial class SitemapXmlSettings : ISettings
 {
     public SitemapXmlSettings()
     {
+		logger.LogDebug(">>> Entering SitemapXmlSettings()");
         SitemapCustomUrls = new List<string>();
+		logger.LogDebug("<<< Exiting SitemapXmlSettings()");
+		logger.LogDebug("SitemapXmlSettings(): SitemapCustomUrls → {SitemapCustomUrls}", SitemapCustomUrls);
     }
 
     /// <summary>

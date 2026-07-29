@@ -12,7 +12,10 @@ public partial record CheckoutAttributeValueModel : BaseNopEntityModel, ILocaliz
 
     public CheckoutAttributeValueModel()
     {
+		logger.LogDebug(">>> Entering CheckoutAttributeValueModel()");
         Locales = new List<CheckoutAttributeValueLocalizedModel>();
+		logger.LogDebug("<<< Exiting CheckoutAttributeValueModel()");
+		logger.LogDebug("CheckoutAttributeValueModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

@@ -11,7 +11,10 @@ public partial record AddCrossSellProductModel : BaseNopModel
 
     public AddCrossSellProductModel()
     {
+		logger.LogDebug(">>> Entering AddCrossSellProductModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddCrossSellProductModel()");
+		logger.LogDebug("AddCrossSellProductModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
     #endregion
 

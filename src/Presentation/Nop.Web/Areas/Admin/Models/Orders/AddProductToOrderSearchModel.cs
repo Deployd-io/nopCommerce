@@ -13,9 +13,14 @@ public partial record AddProductToOrderSearchModel : BaseSearchModel
 
     public AddProductToOrderSearchModel()
     {
+		logger.LogDebug(">>> Entering AddProductToOrderSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AddProductToOrderSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AddProductToOrderSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddProductToOrderSearchModel()");
+		logger.LogDebug("AddProductToOrderSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

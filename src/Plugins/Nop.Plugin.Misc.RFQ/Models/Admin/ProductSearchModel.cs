@@ -13,9 +13,14 @@ public record ProductSearchModel : BaseSearchModel
 
     public ProductSearchModel()
     {
+		logger.LogDebug(">>> Entering ProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("ProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("ProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ProductSearchModel()");
+		logger.LogDebug("ProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

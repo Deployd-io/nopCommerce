@@ -14,10 +14,16 @@ public partial record CatalogSettingsModel : BaseNopModel, ISettingsModel
 
     public CatalogSettingsModel()
     {
+		logger.LogDebug(">>> Entering CatalogSettingsModel()");
         AvailableViewModes = new List<SelectListItem>();
         SortOptionSearchModel = new SortOptionSearchModel();
+		logger.LogDebug("CatalogSettingsModel(): AvailableViewModes → {AvailableViewModes}", AvailableViewModes);
+		logger.LogDebug("CatalogSettingsModel(): SortOptionSearchModel → {SortOptionSearchModel}", SortOptionSearchModel);
         ReviewTypeSearchModel = new ReviewTypeSearchModel();
         ArtificialIntelligenceSettingsModel = new ArtificialIntelligenceSettingsModel();
+		logger.LogDebug("<<< Exiting CatalogSettingsModel()");
+		logger.LogDebug("CatalogSettingsModel(): ReviewTypeSearchModel → {ReviewTypeSearchModel}", ReviewTypeSearchModel);
+		logger.LogDebug("CatalogSettingsModel(): ArtificialIntelligenceSettingsModel → {ArtificialIntelligenceSettingsModel}", ArtificialIntelligenceSettingsModel);
     }
 
     #endregion

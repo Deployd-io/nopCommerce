@@ -17,8 +17,10 @@ public class NopColumnsConvention : IColumnsConvention
     /// <returns>The same or a new expression. The underlying type must stay the same</returns>
     public IColumnsExpression Apply(IColumnsExpression expression)
     {
+		logger.LogDebug(">>> Entering Apply(expression={Expression})", expression);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		logger.LogDebug("Apply(expression={Expression}): dataSettings → {DataSettings}", expression, dataSettings);
         if (dataSettings.DataProvider != DataProviderType.PostgreSQL)
             return expression;
 
@@ -28,9 +30,12 @@ public class NopColumnsConvention : IColumnsConvention
                 continue;
 
             columnDefinition.Type = null;
+			logger.LogDebug("Apply(expression={Expression}): columnDefinition.Type → {Arg1}", expression, columnDefinition.Type);
+			logger.LogDebug("Apply(expression={Expression}): columnDefinition.CustomType → {Arg1}", expression, columnDefinition.CustomType);
             columnDefinition.CustomType = "citext";
         }
 
+		logger.LogDebug("<<< Exiting Apply(expression={Expression})", expression);
         return expression;
     }
 

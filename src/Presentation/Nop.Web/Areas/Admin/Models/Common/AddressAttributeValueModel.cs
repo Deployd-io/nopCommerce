@@ -12,7 +12,10 @@ public partial record AddressAttributeValueModel : BaseNopEntityModel, ILocalize
 
     public AddressAttributeValueModel()
     {
+		logger.LogDebug(">>> Entering AddressAttributeValueModel()");
         Locales = new List<AddressAttributeValueLocalizedModel>();
+		logger.LogDebug("<<< Exiting AddressAttributeValueModel()");
+		logger.LogDebug("AddressAttributeValueModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

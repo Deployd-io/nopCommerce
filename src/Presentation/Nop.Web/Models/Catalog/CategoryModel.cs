@@ -8,11 +8,18 @@ public partial record CategoryModel : BaseNopEntityModel, IMetaTagsSupportedMode
 {
     public CategoryModel()
     {
+		logger.LogDebug(">>> Entering CategoryModel()");
         PictureModel = new PictureModel();
         FeaturedProducts = new List<ProductOverviewModel>();
+		logger.LogDebug("CategoryModel(): PictureModel → {PictureModel}", PictureModel);
+		logger.LogDebug("CategoryModel(): FeaturedProducts → {FeaturedProducts}", FeaturedProducts);
         SubCategories = new List<SubCategoryModel>();
         CategoryBreadcrumb = new List<CategoryModel>();
+		logger.LogDebug("CategoryModel(): SubCategories → {SubCategories}", SubCategories);
+		logger.LogDebug("CategoryModel(): CategoryBreadcrumb → {CategoryBreadcrumb}", CategoryBreadcrumb);
         CatalogProductsModel = new CatalogProductsModel();
+		logger.LogDebug("<<< Exiting CategoryModel()");
+		logger.LogDebug("CategoryModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
     }
 
     public string Name { get; set; }
@@ -41,7 +48,10 @@ public partial record CategoryModel : BaseNopEntityModel, IMetaTagsSupportedMode
     {
         public SubCategoryModel()
         {
+			logger.LogDebug(">>> Entering SubCategoryModel()");
             PictureModel = new PictureModel();
+			logger.LogDebug("<<< Exiting SubCategoryModel()");
+			logger.LogDebug("SubCategoryModel(): PictureModel → {PictureModel}", PictureModel);
         }
 
         public string Name { get; set; }

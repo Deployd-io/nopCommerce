@@ -14,7 +14,10 @@ public partial record ActivityLogSearchModel : BaseSearchModel
 
     public ActivityLogSearchModel()
     {
+		logger.LogDebug(">>> Entering ActivityLogSearchModel()");
         ActivityLogType = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ActivityLogSearchModel()");
+		logger.LogDebug("ActivityLogSearchModel(): ActivityLogType → {ActivityLogType}", ActivityLogType);
     }
 
     #endregion

@@ -13,7 +13,10 @@ public partial record PollSearchModel : BaseSearchModel
 
     public PollSearchModel()
     {
+		logger.LogDebug(">>> Entering PollSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting PollSearchModel()");
+		logger.LogDebug("PollSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

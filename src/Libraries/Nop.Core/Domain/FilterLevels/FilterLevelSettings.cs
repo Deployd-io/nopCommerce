@@ -9,7 +9,10 @@ public partial class FilterLevelSettings : ISettings
 {
     public FilterLevelSettings()
     {
+		logger.LogDebug(">>> Entering FilterLevelSettings()");
         FilterLevelEnumDisabled = new List<int>();
+		logger.LogDebug("<<< Exiting FilterLevelSettings()");
+		logger.LogDebug("FilterLevelSettings(): FilterLevelEnumDisabled → {FilterLevelEnumDisabled}", FilterLevelEnumDisabled);
     }
 
     /// <summary>

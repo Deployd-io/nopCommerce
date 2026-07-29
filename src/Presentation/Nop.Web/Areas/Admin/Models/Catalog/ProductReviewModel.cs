@@ -12,7 +12,10 @@ public partial record ProductReviewModel : BaseNopEntityModel
 
     public ProductReviewModel()
     {
+		logger.LogDebug(">>> Entering ProductReviewModel()");
         ProductReviewReviewTypeMappingSearchModel = new ProductReviewReviewTypeMappingSearchModel();
+		logger.LogDebug("<<< Exiting ProductReviewModel()");
+		logger.LogDebug("ProductReviewModel(): ProductReviewReviewTypeMappingSearchModel → {ProductReviewReviewTypeMappingSearchModel}", ProductReviewReviewTypeMappingSearchModel);
     }
 
     #endregion

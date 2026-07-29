@@ -15,25 +15,43 @@ public partial record CustomerModel : BaseNopEntityModel, IAclSupportedModel
 
     public CustomerModel()
     {
+		logger.LogDebug(">>> Entering CustomerModel()");
         AvailableTimeZones = new List<SelectListItem>();
         SendEmail = new SendEmailModel() { SendImmediately = true };
+		logger.LogDebug("CustomerModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
         SendPm = new SendPmModel();
 
+		logger.LogDebug("CustomerModel(): SendPm → {SendPm}", SendPm);
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("CustomerModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("CustomerModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("CustomerModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("CustomerModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableVendors = new List<SelectListItem>();
         CustomerAttributes = new List<CustomerAttributeModel>();
+		logger.LogDebug("CustomerModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		logger.LogDebug("CustomerModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
         AddRewardPoints = new AddRewardPointsToCustomerModel();
         CustomerRewardPointsSearchModel = new CustomerRewardPointsSearchModel();
+		logger.LogDebug("CustomerModel(): AddRewardPoints → {AddRewardPoints}", AddRewardPoints);
+		logger.LogDebug("CustomerModel(): CustomerRewardPointsSearchModel → {CustomerRewardPointsSearchModel}", CustomerRewardPointsSearchModel);
         CustomerAddressSearchModel = new CustomerAddressSearchModel();
         CustomerOrderSearchModel = new CustomerOrderSearchModel();
+		logger.LogDebug("CustomerModel(): CustomerAddressSearchModel → {CustomerAddressSearchModel}", CustomerAddressSearchModel);
+		logger.LogDebug("CustomerModel(): CustomerOrderSearchModel → {CustomerOrderSearchModel}", CustomerOrderSearchModel);
         CustomerShoppingCartSearchModel = new CustomerShoppingCartSearchModel();
         CustomerActivityLogSearchModel = new CustomerActivityLogSearchModel();
+		logger.LogDebug("CustomerModel(): CustomerShoppingCartSearchModel → {CustomerShoppingCartSearchModel}", CustomerShoppingCartSearchModel);
+		logger.LogDebug("CustomerModel(): CustomerActivityLogSearchModel → {CustomerActivityLogSearchModel}", CustomerActivityLogSearchModel);
         CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
         CustomerAssociatedExternalAuthRecordsSearchModel = new CustomerAssociatedExternalAuthRecordsSearchModel();
+		logger.LogDebug("<<< Exiting CustomerModel()");
+		logger.LogDebug("CustomerModel(): CustomerBackInStockSubscriptionSearchModel → {CustomerBackInStockSubscriptionSearchModel}", CustomerBackInStockSubscriptionSearchModel);
+		logger.LogDebug("CustomerModel(): CustomerAssociatedExternalAuthRecordsSearchModel → {CustomerAssociatedExternalAuthRecordsSearchModel}", CustomerAssociatedExternalAuthRecordsSearchModel);
     }
 
     #endregion
@@ -279,7 +297,10 @@ public partial record CustomerModel : BaseNopEntityModel, IAclSupportedModel
     {
         public CustomerAttributeModel()
         {
+			logger.LogDebug(">>> Entering CustomerAttributeModel()");
             Values = new List<CustomerAttributeValueModel>();
+			logger.LogDebug("<<< Exiting CustomerAttributeModel()");
+			logger.LogDebug("CustomerAttributeModel(): Values → {Values}", Values);
         }
 
         public string Name { get; set; }

@@ -13,7 +13,10 @@ public partial record TopicSearchModel : BaseSearchModel
 
     public TopicSearchModel()
     {
+		logger.LogDebug(">>> Entering TopicSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TopicSearchModel()");
+		logger.LogDebug("TopicSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

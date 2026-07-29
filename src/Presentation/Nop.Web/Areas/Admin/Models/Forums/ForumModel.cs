@@ -12,7 +12,10 @@ public partial record ForumModel : BaseNopEntityModel
 
     public ForumModel()
     {
+		logger.LogDebug(">>> Entering ForumModel()");
         ForumGroups = new List<ForumGroupModel>();
+		logger.LogDebug("<<< Exiting ForumModel()");
+		logger.LogDebug("ForumModel(): ForumGroups → {ForumGroups}", ForumGroups);
     }
 
     #endregion

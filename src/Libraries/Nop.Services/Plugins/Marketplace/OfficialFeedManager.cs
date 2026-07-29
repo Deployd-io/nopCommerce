@@ -38,6 +38,8 @@ public partial class OfficialFeedManager
     /// <returns>Value (text)</returns>
     protected virtual string GetElementValue(XmlNode node, string elementName)
     {
+		logger.LogDebug(">>> Entering GetElementValue(node={Node},elementName={ElementName})", node, elementName);
+		logger.LogDebug("<<< Exiting GetElementValue(node={Node},elementName={ElementName})", node, elementName);
         return node?.SelectSingleNode(elementName)?.InnerText;
     }
 
@@ -54,9 +56,12 @@ public partial class OfficialFeedManager
     /// </returns>
     public virtual async Task<IList<OfficialFeedCategory>> GetCategoriesAsync()
     {
+		logger.LogDebug(">>> Entering GetCategoriesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load XML
         var xml = new XmlDocument();
         try
+		logger.LogDebug("GetCategoriesAsync(): xml → {Xml}", xml);
         {
             xml.LoadXml(await _nopHttpClient.GetExtensionsCategoriesAsync());
         }
@@ -66,6 +71,8 @@ public partial class OfficialFeedManager
         }
 
         //get list of categories from the XML
+		logger.LogInformation("GetCategoriesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetCategoriesAsync()");
         return xml.SelectNodes(@"//categories/category").Cast<XmlNode>().Select(node => new OfficialFeedCategory
         {
             Id = int.Parse(GetElementValue(node, @"id")),
@@ -83,9 +90,12 @@ public partial class OfficialFeedManager
     /// </returns>
     public virtual async Task<IList<OfficialFeedVersion>> GetVersionsAsync()
     {
+		logger.LogDebug(">>> Entering GetVersionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load XML
         var xml = new XmlDocument();
         try
+		logger.LogDebug("GetVersionsAsync(): xml → {Xml}", xml);
         {
             xml.LoadXml(await _nopHttpClient.GetExtensionsVersionsAsync());
         }
@@ -95,6 +105,8 @@ public partial class OfficialFeedManager
         }
 
         //get list of versions from the XML
+		logger.LogInformation("GetVersionsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetVersionsAsync()");
         return xml.SelectNodes(@"//versions/version").Cast<XmlNode>().Select(node => new OfficialFeedVersion
         {
             Id = int.Parse(GetElementValue(node, @"id")),

@@ -13,7 +13,10 @@ public record EntityUseCodeModel : BaseNopEntityModel
 
     public EntityUseCodeModel()
     {
+		logger.LogDebug(">>> Entering EntityUseCodeModel()");
         EntityUseCodes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting EntityUseCodeModel()");
+		logger.LogDebug("EntityUseCodeModel(): EntityUseCodes → {EntityUseCodes}", EntityUseCodes);
     }
 
     #endregion

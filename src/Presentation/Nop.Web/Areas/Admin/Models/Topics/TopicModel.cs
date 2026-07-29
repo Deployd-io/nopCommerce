@@ -15,14 +15,22 @@ public partial record TopicModel : BaseNopEntityModel, IAclSupportedModel, ILoca
 
     public TopicModel()
     {
+		logger.LogDebug(">>> Entering TopicModel()");
         AvailableTopicTemplates = new List<SelectListItem>();
         Locales = new List<TopicLocalizedModel>();
+		logger.LogDebug("TopicModel(): AvailableTopicTemplates → {AvailableTopicTemplates}", AvailableTopicTemplates);
+		logger.LogDebug("TopicModel(): Locales → {Locales}", Locales);
 
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("TopicModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("TopicModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TopicModel()");
+		logger.LogDebug("TopicModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("TopicModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

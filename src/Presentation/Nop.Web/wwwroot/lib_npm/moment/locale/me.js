@@ -24,10 +24,12 @@ var translator = {
               : wordKey[2];
     },
     translate: function (number, withoutSuffix, key) {
+		logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
         var wordKey = translator.words[key];
         if (key.length === 1) {
             return withoutSuffix ? wordKey[0] : wordKey[1];
         } else {
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
             return (
                 number +
                 ' ' +
@@ -63,6 +65,7 @@ export default moment.defineLocale('me', {
         nextDay: '[sjutra u] LT',
 
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[u] [nedjelju] [u] LT';
@@ -76,9 +79,11 @@ export default moment.defineLocale('me', {
                 case 5:
                     return '[u] dddd [u] LT';
             }
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: '[juče u] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             var lastWeekDays = [
                 '[prošle] [nedjelje] [u] LT',
                 '[prošlog] [ponedjeljka] [u] LT',

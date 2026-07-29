@@ -14,8 +14,12 @@ public partial record ProductReviewSearchModel : BaseSearchModel
 
     public ProductReviewSearchModel()
     {
+		logger.LogDebug(">>> Entering ProductReviewSearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableApprovedOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ProductReviewSearchModel()");
+		logger.LogDebug("ProductReviewSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("ProductReviewSearchModel(): AvailableApprovedOptions → {AvailableApprovedOptions}", AvailableApprovedOptions);
     }
 
     #endregion

@@ -13,7 +13,10 @@ public partial record CampaignSearchModel : BaseSearchModel
 
     public CampaignSearchModel()
     {
+		logger.LogDebug(">>> Entering CampaignSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CampaignSearchModel()");
+		logger.LogDebug("CampaignSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

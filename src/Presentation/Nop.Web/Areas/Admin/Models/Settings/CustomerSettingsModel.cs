@@ -14,7 +14,10 @@ public partial record CustomerSettingsModel : BaseNopModel, ISettingsModel
 
     public CustomerSettingsModel()
     {
+		logger.LogDebug(">>> Entering CustomerSettingsModel()");
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CustomerSettingsModel()");
+		logger.LogDebug("CustomerSettingsModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

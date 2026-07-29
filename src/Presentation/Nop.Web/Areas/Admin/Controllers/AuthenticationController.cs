@@ -60,10 +60,12 @@ public partial class AuthenticationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EXTERNAL_AUTHENTICATION_METHODS)]
     public virtual IActionResult ExternalMethods()
     {
+		logger.LogDebug(">>> Entering ExternalMethods()");
         //prepare model
         var model = _externalAuthenticationMethodModelFactory
             .PrepareExternalAuthenticationMethodSearchModel(new ExternalAuthenticationMethodSearchModel());
 
+		logger.LogDebug("<<< Exiting ExternalMethods()");
         return View(model);
     }
 
@@ -74,6 +76,7 @@ public partial class AuthenticationController : BaseAdminController
         //prepare model
         var model = await _externalAuthenticationMethodModelFactory.PrepareExternalAuthenticationMethodListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting ExternalMethods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -120,10 +123,12 @@ public partial class AuthenticationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public virtual IActionResult MultiFactorMethods()
     {
+		logger.LogDebug(">>> Entering MultiFactorMethods()");
         //prepare model
         var model = _multiFactorAuthenticationMethodModelFactory
             .PrepareMultiFactorAuthenticationMethodSearchModel(new MultiFactorAuthenticationMethodSearchModel());
 
+		logger.LogDebug("<<< Exiting MultiFactorMethods()");
         return View(model);
     }
 
@@ -134,6 +139,7 @@ public partial class AuthenticationController : BaseAdminController
         //prepare model
         var model = await _multiFactorAuthenticationMethodModelFactory.PrepareMultiFactorAuthenticationMethodListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting MultiFactorMethods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

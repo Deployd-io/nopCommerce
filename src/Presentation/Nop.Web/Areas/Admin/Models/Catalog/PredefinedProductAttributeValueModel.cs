@@ -12,7 +12,10 @@ public partial record PredefinedProductAttributeValueModel : BaseNopEntityModel,
 
     public PredefinedProductAttributeValueModel()
     {
+		logger.LogDebug(">>> Entering PredefinedProductAttributeValueModel()");
         Locales = new List<PredefinedProductAttributeValueLocalizedModel>();
+		logger.LogDebug("<<< Exiting PredefinedProductAttributeValueModel()");
+		logger.LogDebug("PredefinedProductAttributeValueModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

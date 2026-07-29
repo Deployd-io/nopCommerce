@@ -14,9 +14,14 @@ public partial record CountryReportSearchModel : BaseSearchModel
 
     public CountryReportSearchModel()
     {
+		logger.LogDebug(">>> Entering CountryReportSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		logger.LogDebug("CountryReportSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
+		logger.LogDebug("CountryReportSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CountryReportSearchModel()");
+		logger.LogDebug("CountryReportSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

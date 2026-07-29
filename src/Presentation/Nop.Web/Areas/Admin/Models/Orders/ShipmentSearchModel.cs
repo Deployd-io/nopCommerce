@@ -14,10 +14,16 @@ public partial record ShipmentSearchModel : BaseSearchModel
 
     public ShipmentSearchModel()
     {
+		logger.LogDebug(">>> Entering ShipmentSearchModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("ShipmentSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("ShipmentSearchModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableWarehouses = new List<SelectListItem>();
         ShipmentItemSearchModel = new ShipmentItemSearchModel();
+		logger.LogDebug("<<< Exiting ShipmentSearchModel()");
+		logger.LogDebug("ShipmentSearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
+		logger.LogDebug("ShipmentSearchModel(): ShipmentItemSearchModel → {ShipmentItemSearchModel}", ShipmentItemSearchModel);
     }
 
     #endregion

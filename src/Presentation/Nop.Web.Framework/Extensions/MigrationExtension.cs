@@ -15,12 +15,15 @@ public static partial class MigrationExtension
     /// <returns>Default language identifier and all languages</returns>
     public static (int? defaultLanguageId, IList<Language> allLanguages) GetLanguageData(this IMigration _, ILanguageService languageService = null)
     {
+		logger.LogDebug(">>> Entering GetLanguageData(defaultLanguageId={DefaultLanguageId},allLanguages={AllLanguages})", defaultLanguageId, allLanguages);
         languageService ??= EngineContext.Current.Resolve<ILanguageService>();
 
         var languages = languageService.GetAllLanguages(true);
         var languageId = languages
+			logger.LogDebug("GetLanguageData(defaultLanguageId={DefaultLanguageId},allLanguages={AllLanguages}): languages → {Languages}", defaultLanguageId, allLanguages, languages);
             .FirstOrDefault(lang => lang.UniqueSeoCode == new CultureInfo(NopCommonDefaults.DefaultLanguageCulture).TwoLetterISOLanguageName)?.Id;
 
+		logger.LogDebug("<<< Exiting GetLanguageData(defaultLanguageId={DefaultLanguageId},allLanguages={AllLanguages})", defaultLanguageId, allLanguages);
         return (languageId, languages);
     }
 

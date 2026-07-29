@@ -7,7 +7,10 @@ public partial record TopicMoveModel : BaseNopEntityModel
 {
     public TopicMoveModel()
     {
+		logger.LogDebug(">>> Entering TopicMoveModel()");
         ForumList = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TopicMoveModel()");
+		logger.LogDebug("TopicMoveModel(): ForumList → {ForumList}", ForumList);
     }
 
     public int ForumSelected { get; set; }

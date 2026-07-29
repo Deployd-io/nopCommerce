@@ -24,7 +24,10 @@ public class ModelCacheEventConsumer :
 
     public ModelCacheEventConsumer(IStaticCacheManager staticCacheManager)
     {
+		logger.LogDebug(">>> Entering ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
         _staticCacheManager = staticCacheManager;
+		logger.LogDebug("<<< Exiting ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
+		logger.LogDebug("ModelCacheEventConsumer(staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -38,7 +41,9 @@ public class ModelCacheEventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(EntityInsertedEvent<Setting> eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await _staticCacheManager.RemoveByPrefixAsync(PictureUrlPrefix);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

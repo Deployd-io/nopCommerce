@@ -11,7 +11,10 @@ public partial class MultiFactorAuthenticationSettings : ISettings
 
     public MultiFactorAuthenticationSettings()
     {
+		logger.LogDebug(">>> Entering MultiFactorAuthenticationSettings()");
         ActiveAuthenticationMethodSystemNames = new List<string>();
+		logger.LogDebug("<<< Exiting MultiFactorAuthenticationSettings()");
+		logger.LogDebug("MultiFactorAuthenticationSettings(): ActiveAuthenticationMethodSystemNames → {ActiveAuthenticationMethodSystemNames}", ActiveAuthenticationMethodSystemNames);
     }
 
     #endregion

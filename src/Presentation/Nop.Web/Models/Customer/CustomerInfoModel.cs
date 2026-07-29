@@ -10,13 +10,22 @@ public partial record CustomerInfoModel : BaseNopModel
 {
     public CustomerInfoModel()
     {
+		logger.LogDebug(">>> Entering CustomerInfoModel()");
         AvailableTimeZones = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("CustomerInfoModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
+		logger.LogDebug("CustomerInfoModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
         AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
+		logger.LogDebug("CustomerInfoModel(): AvailableStates → {AvailableStates}", AvailableStates);
+		logger.LogDebug("CustomerInfoModel(): AssociatedExternalAuthRecords → {AssociatedExternalAuthRecords}", AssociatedExternalAuthRecords);
         CustomerAttributes = new List<CustomerAttributeModel>();
         GdprConsents = new List<GdprConsentModel>();
+		logger.LogDebug("CustomerInfoModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
+		logger.LogDebug("CustomerInfoModel(): GdprConsents → {GdprConsents}", GdprConsents);
         NewsLetterSubscriptions = new List<NewsLetterSubscriptionModel>();
+		logger.LogDebug("<<< Exiting CustomerInfoModel()");
+		logger.LogDebug("CustomerInfoModel(): NewsLetterSubscriptions → {NewsLetterSubscriptions}", NewsLetterSubscriptions);
     }
 
     [DataType(DataType.EmailAddress)]
@@ -58,6 +67,8 @@ public partial record CustomerInfoModel : BaseNopModel
     public bool DateOfBirthRequired { get; set; }
     public DateTime? ParseDateOfBirth()
     {
+		logger.LogDebug(">>> Entering ParseDateOfBirth()");
+		logger.LogDebug("<<< Exiting ParseDateOfBirth()");
         return CommonHelper.ParseDate(DateOfBirthYear, DateOfBirthMonth, DateOfBirthDay);
     }
 

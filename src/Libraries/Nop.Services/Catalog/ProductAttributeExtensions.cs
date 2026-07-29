@@ -14,6 +14,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool ShouldHaveValues(this ProductAttributeMapping productAttributeMapping)
     {
+		logger.LogDebug(">>> Entering ShouldHaveValues(productAttributeMapping={ProductAttributeMapping})", productAttributeMapping);
         if (productAttributeMapping == null)
             return false;
 
@@ -34,6 +35,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool CanBeUsedAsCondition(this ProductAttributeMapping productAttributeMapping)
     {
+		logger.LogDebug(">>> Entering CanBeUsedAsCondition(productAttributeMapping={ProductAttributeMapping})", productAttributeMapping);
         if (productAttributeMapping == null)
             return false;
 
@@ -55,6 +57,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool ValidationRulesAllowed(this ProductAttributeMapping productAttributeMapping)
     {
+		logger.LogDebug(">>> Entering ValidationRulesAllowed(productAttributeMapping={ProductAttributeMapping})", productAttributeMapping);
         if (productAttributeMapping == null)
             return false;
 
@@ -74,6 +77,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool IsNonCombinable(this ProductAttributeMapping productAttributeMapping)
     {
+		logger.LogDebug(">>> Entering IsNonCombinable(productAttributeMapping={ProductAttributeMapping})", productAttributeMapping);
         //When you have a product with several attributes it may well be that some are combinable,
         //whose combination may form a new SKU with its own inventory,
         //and some non-combinable are more used to add accessories
@@ -86,6 +90,8 @@ public static class ProductAttributeExtensions
         //which cannot have values (any value can be entered by a customer)
         //are non-combinable
         var result = !ShouldHaveValues(productAttributeMapping);
+		logger.LogDebug("IsNonCombinable(productAttributeMapping={ProductAttributeMapping}): result → {Result}", productAttributeMapping, result);
+		logger.LogDebug("<<< Exiting IsNonCombinable(productAttributeMapping={ProductAttributeMapping})", productAttributeMapping);
         return result;
     }
 }

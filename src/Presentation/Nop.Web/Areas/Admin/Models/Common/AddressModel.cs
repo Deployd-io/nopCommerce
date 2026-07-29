@@ -10,9 +10,14 @@ public partial record AddressModel : BaseNopEntityModel
 {
     public AddressModel()
     {
+		logger.LogDebug(">>> Entering AddressModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("AddressModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("AddressModel(): AvailableStates → {AvailableStates}", AvailableStates);
         CustomAddressAttributes = new List<AddressAttributeModel>();
+		logger.LogDebug("<<< Exiting AddressModel()");
+		logger.LogDebug("AddressModel(): CustomAddressAttributes → {CustomAddressAttributes}", CustomAddressAttributes);
     }
 
     [NopResourceDisplayName("Admin.Address.Fields.FirstName")]
@@ -93,7 +98,10 @@ public partial record AddressModel : BaseNopEntityModel
     {
         public AddressAttributeModel()
         {
+			logger.LogDebug(">>> Entering AddressAttributeModel()");
             Values = new List<AddressAttributeValueModel>();
+			logger.LogDebug("<<< Exiting AddressAttributeModel()");
+			logger.LogDebug("AddressAttributeModel(): Values → {Values}", Values);
         }
 
         public string Name { get; set; }

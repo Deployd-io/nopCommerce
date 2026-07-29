@@ -15,9 +15,14 @@ public partial record TaxSettingsModel : BaseNopModel, ISettingsModel
 
     public TaxSettingsModel()
     {
+		logger.LogDebug(">>> Entering TaxSettingsModel()");
         TaxCategories = new List<SelectListItem>();
         EuVatShopCountries = new List<SelectListItem>();
+		logger.LogDebug("TaxSettingsModel(): TaxCategories → {TaxCategories}", TaxCategories);
+		logger.LogDebug("TaxSettingsModel(): EuVatShopCountries → {EuVatShopCountries}", EuVatShopCountries);
         DefaultTaxAddress = new AddressModel();
+		logger.LogDebug("<<< Exiting TaxSettingsModel()");
+		logger.LogDebug("TaxSettingsModel(): DefaultTaxAddress → {DefaultTaxAddress}", DefaultTaxAddress);
     }
 
     #endregion

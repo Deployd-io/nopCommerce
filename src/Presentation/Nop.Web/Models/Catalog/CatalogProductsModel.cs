@@ -91,13 +91,22 @@ public partial record CatalogProductsModel : BasePageableModel
 
     public CatalogProductsModel()
     {
+		logger.LogDebug(">>> Entering CatalogProductsModel()");
         PriceRangeFilter = new PriceRangeFilterModel();
         SpecificationFilter = new SpecificationFilterModel();
+		logger.LogDebug("CatalogProductsModel(): PriceRangeFilter → {PriceRangeFilter}", PriceRangeFilter);
+		logger.LogDebug("CatalogProductsModel(): SpecificationFilter → {SpecificationFilter}", SpecificationFilter);
         ManufacturerFilter = new ManufacturerFilterModel();
         AvailableSortOptions = new List<SelectListItem>();
+		logger.LogDebug("CatalogProductsModel(): ManufacturerFilter → {ManufacturerFilter}", ManufacturerFilter);
+		logger.LogDebug("CatalogProductsModel(): AvailableSortOptions → {AvailableSortOptions}", AvailableSortOptions);
         AvailableViewModes = new List<SelectListItem>();
         PageSizeOptions = new List<SelectListItem>();
+		logger.LogDebug("CatalogProductsModel(): AvailableViewModes → {AvailableViewModes}", AvailableViewModes);
+		logger.LogDebug("CatalogProductsModel(): PageSizeOptions → {PageSizeOptions}", PageSizeOptions);
         Products = new List<ProductOverviewModel>();
+		logger.LogDebug("<<< Exiting CatalogProductsModel()");
+		logger.LogDebug("CatalogProductsModel(): Products → {Products}", Products);
     }
 
     #endregion

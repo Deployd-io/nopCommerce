@@ -7,7 +7,10 @@ public partial record MiniShoppingCartModel : BaseNopModel
 {
     public MiniShoppingCartModel()
     {
+		logger.LogDebug(">>> Entering MiniShoppingCartModel()");
         Items = new List<ShoppingCartItemModel>();
+		logger.LogDebug("<<< Exiting MiniShoppingCartModel()");
+		logger.LogDebug("MiniShoppingCartModel(): Items → {Items}", Items);
     }
 
     public IList<ShoppingCartItemModel> Items { get; set; }
@@ -26,7 +29,10 @@ public partial record MiniShoppingCartModel : BaseNopModel
     {
         public ShoppingCartItemModel()
         {
+			logger.LogDebug(">>> Entering ShoppingCartItemModel()");
             Picture = new PictureModel();
+			logger.LogDebug("<<< Exiting ShoppingCartItemModel()");
+			logger.LogDebug("ShoppingCartItemModel(): Picture → {Picture}", Picture);
         }
 
         public int ProductId { get; set; }

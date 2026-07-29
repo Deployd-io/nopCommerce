@@ -8,10 +8,16 @@ public partial record SearchModel : BaseNopModel
 {
     public SearchModel()
     {
+		logger.LogDebug(">>> Entering SearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("SearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("SearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableVendors = new List<SelectListItem>();
         CatalogProductsModel = new CatalogProductsModel();
+		logger.LogDebug("<<< Exiting SearchModel()");
+		logger.LogDebug("SearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		logger.LogDebug("SearchModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
     }
 
     /// <summary>

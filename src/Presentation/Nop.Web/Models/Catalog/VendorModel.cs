@@ -8,9 +8,14 @@ public partial record VendorModel : BaseNopEntityModel, IMetaTagsSupportedModel
 {
     public VendorModel()
     {
+		logger.LogDebug(">>> Entering VendorModel()");
         PictureModel = new PictureModel();
         CatalogProductsModel = new CatalogProductsModel();
+		logger.LogDebug("VendorModel(): PictureModel → {PictureModel}", PictureModel);
+		logger.LogDebug("VendorModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
         ProductReviews = new VendorProductReviewsListModel();
+		logger.LogDebug("<<< Exiting VendorModel()");
+		logger.LogDebug("VendorModel(): ProductReviews → {ProductReviews}", ProductReviews);
     }
 
     public string Name { get; set; }

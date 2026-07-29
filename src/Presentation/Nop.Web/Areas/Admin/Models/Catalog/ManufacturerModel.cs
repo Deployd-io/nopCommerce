@@ -18,24 +18,36 @@ public partial record ManufacturerModel : BaseNopEntityModel, IAclSupportedModel
 
     public ManufacturerModel()
     {
+		logger.LogDebug(">>> Entering ManufacturerModel()");
         if (PageSize < 1)
         {
             PageSize = 5;
+			logger.LogDebug("ManufacturerModel(): PageSize → {PageSize}", PageSize);
         }
 
         Locales = new List<ManufacturerLocalizedModel>();
+		logger.LogDebug("ManufacturerModel(): Locales → {Locales}", Locales);
         AvailableManufacturerTemplates = new List<SelectListItem>();
 
+		logger.LogDebug("ManufacturerModel(): AvailableManufacturerTemplates → {AvailableManufacturerTemplates}", AvailableManufacturerTemplates);
         AvailableDiscounts = new List<SelectListItem>();
         SelectedDiscountIds = new List<int>();
+		logger.LogDebug("ManufacturerModel(): AvailableDiscounts → {AvailableDiscounts}", AvailableDiscounts);
+		logger.LogDebug("ManufacturerModel(): SelectedDiscountIds → {SelectedDiscountIds}", SelectedDiscountIds);
 
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("ManufacturerModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("ManufacturerModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("ManufacturerModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("ManufacturerModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         ManufacturerProductSearchModel = new ManufacturerProductSearchModel();
+		logger.LogDebug("<<< Exiting ManufacturerModel()");
+		logger.LogDebug("ManufacturerModel(): ManufacturerProductSearchModel → {ManufacturerProductSearchModel}", ManufacturerProductSearchModel);
     }
 
     #endregion

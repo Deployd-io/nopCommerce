@@ -14,11 +14,18 @@ public partial record CampaignModel : BaseNopEntityModel
 
     public CampaignModel()
     {
+		logger.LogDebug(">>> Entering CampaignModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("CampaignModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("CampaignModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         AvailableNewsLetterSubscriptionTypes = new List<SelectListItem>();
         AvailableEmailAccounts = new List<SelectListItem>();
+		logger.LogDebug("CampaignModel(): AvailableNewsLetterSubscriptionTypes → {AvailableNewsLetterSubscriptionTypes}", AvailableNewsLetterSubscriptionTypes);
+		logger.LogDebug("CampaignModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
         CopyCampaignModel = new CopyCampaignModel();
+		logger.LogDebug("<<< Exiting CampaignModel()");
+		logger.LogDebug("CampaignModel(): CopyCampaignModel → {CopyCampaignModel}", CopyCampaignModel);
     }
 
     #endregion

@@ -11,7 +11,10 @@ public partial class EmailUnsubscribedEvent
     /// <param name="subscription">Subscription</param>
     public EmailUnsubscribedEvent(NewsLetterSubscription subscription)
     {
+		logger.LogDebug(">>> Entering EmailUnsubscribedEvent(subscription={Subscription})", subscription);
         Subscription = subscription;
+		logger.LogDebug("<<< Exiting EmailUnsubscribedEvent(subscription={Subscription})", subscription);
+		logger.LogDebug("EmailUnsubscribedEvent(subscription={Subscription}): Subscription → {Subscription1}", subscription, Subscription);
     }
 
     /// <summary>
@@ -26,10 +29,12 @@ public partial class EmailUnsubscribedEvent
     /// <returns>Result</returns>
     public bool Equals(EmailUnsubscribedEvent other)
     {
+		logger.LogDebug(">>> Entering Equals(other={Other})", other);
         if (other is null)
             return false;
 
         if (ReferenceEquals(this, other))
+		logger.LogDebug("<<< Exiting Equals(other={Other})", other);
             return true;
 
         return Equals(other.Subscription, Subscription);
@@ -49,6 +54,7 @@ public partial class EmailUnsubscribedEvent
             return true;
 
         if (obj.GetType() != typeof(EmailUnsubscribedEvent))
+		logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
             return false;
 
         return Equals((EmailUnsubscribedEvent)obj);
@@ -60,6 +66,8 @@ public partial class EmailUnsubscribedEvent
     /// <returns>Hash code</returns>
     public override int GetHashCode()
     {
+		logger.LogDebug(">>> Entering GetHashCode()");
+		logger.LogDebug("<<< Exiting GetHashCode()");
         return Subscription != null ? Subscription.GetHashCode() : 0;
     }
 }

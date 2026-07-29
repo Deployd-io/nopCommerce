@@ -6,8 +6,12 @@ public partial record OrderTotalsModel : BaseNopModel
 {
     public OrderTotalsModel()
     {
+		logger.LogDebug(">>> Entering OrderTotalsModel()");
         TaxRates = new List<TaxRate>();
         GiftCards = new List<GiftCard>();
+		logger.LogDebug("<<< Exiting OrderTotalsModel()");
+		logger.LogDebug("OrderTotalsModel(): TaxRates → {TaxRates}", TaxRates);
+		logger.LogDebug("OrderTotalsModel(): GiftCards → {GiftCards}", GiftCards);
     }
     public bool IsEditable { get; set; }
 

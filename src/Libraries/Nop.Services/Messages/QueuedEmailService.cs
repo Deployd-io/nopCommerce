@@ -19,7 +19,10 @@ public partial class QueuedEmailService : IQueuedEmailService
 
     public QueuedEmailService(IRepository<QueuedEmail> queuedEmailRepository)
     {
+		logger.LogDebug(">>> Entering QueuedEmailService(queuedEmailRepository={QueuedEmailRepository})", queuedEmailRepository);
         _queuedEmailRepository = queuedEmailRepository;
+		logger.LogDebug("<<< Exiting QueuedEmailService(queuedEmailRepository={QueuedEmailRepository})", queuedEmailRepository);
+		logger.LogDebug("QueuedEmailService(queuedEmailRepository={QueuedEmailRepository}): _queuedEmailRepository → {_queuedEmailRepository}", queuedEmailRepository, _queuedEmailRepository);
     }
 
     #endregion
@@ -33,9 +36,15 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertQueuedEmailAsync(QueuedEmail queuedEmail)
     {
+		logger.LogDebug(">>> Entering InsertQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _queuedEmailRepository.InsertAsync(queuedEmail);
+		logger.LogDebug("<<< Exiting InsertQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertQueuedEmailAsync(queuedEmail)={QueuedEmail}: save query executed in {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertQueuedEmailAsync(queuedEmail)={QueuedEmail}: save query executed in {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a queued email
     /// </summary>
@@ -43,9 +52,15 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateQueuedEmailAsync(QueuedEmail queuedEmail)
     {
+		logger.LogDebug(">>> Entering UpdateQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _queuedEmailRepository.UpdateAsync(queuedEmail);
+		logger.LogDebug("<<< Exiting UpdateQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateQueuedEmailAsync(queuedEmail)={QueuedEmail}: update query executed in {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateQueuedEmailAsync(queuedEmail)={QueuedEmail}: update query executed in {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deleted a queued email
     /// </summary>
@@ -53,9 +68,19 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteQueuedEmailAsync(QueuedEmail queuedEmail)
     {
+		logger.LogDebug(">>> Entering DeleteQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _queuedEmailRepository.DeleteAsync(queuedEmail);
+		logger.LogDebug("<<< Exiting DeleteQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteQueuedEmailAsync(queuedEmail)={QueuedEmail}: external service call took {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteQueuedEmailAsync(queuedEmail)={QueuedEmail}: delete query executed in {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteQueuedEmailAsync(queuedEmail)={QueuedEmail}: external service call took {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteQueuedEmailAsync(queuedEmail)={QueuedEmail}: delete query executed in {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deleted a queued emails
     /// </summary>
@@ -63,9 +88,13 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteQueuedEmailsAsync(IList<QueuedEmail> queuedEmails)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _queuedEmailRepository.DeleteAsync(queuedEmails);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Gets a queued email by identifier
     /// </summary>
@@ -76,6 +105,8 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// </returns>
     public virtual async Task<QueuedEmail> GetQueuedEmailByIdAsync(int queuedEmailId)
     {
+		logger.LogDebug(">>> Entering GetQueuedEmailByIdAsync(queuedEmailId={QueuedEmailId})", queuedEmailId);
+		logger.LogDebug("<<< Exiting GetQueuedEmailByIdAsync(queuedEmailId={QueuedEmailId})", queuedEmailId);
         return await _queuedEmailRepository.GetByIdAsync(queuedEmailId, cache => default, useShortTermCache: true);
     }
 
@@ -89,6 +120,8 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// </returns>
     public virtual async Task<IList<QueuedEmail>> GetQueuedEmailsByIdsAsync(int[] queuedEmailIds)
     {
+		logger.LogDebug(">>> Entering GetQueuedEmailsByIdsAsync(queuedEmailIds={QueuedEmailIds})", queuedEmailIds);
+		logger.LogDebug("<<< Exiting GetQueuedEmailsByIdsAsync(queuedEmailIds={QueuedEmailIds})", queuedEmailIds);
         return await _queuedEmailRepository.GetByIdsAsync(queuedEmailIds);
     }
 
@@ -99,6 +132,7 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RequeueQueuedEmailsAsync(IList<QueuedEmail> queuedEmails)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(queuedEmails);
 
         var newEmails = queuedEmails.Select(queuedEmail => new QueuedEmail
@@ -190,8 +224,11 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// </returns>
     public virtual async Task<int> DeleteAlreadySentEmailsAsync(DateTime? createdFromUtc, DateTime? createdToUtc)
     {
+		logger.LogDebug(">>> Entering DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc})", createdFromUtc, createdToUtc);
         var query = _queuedEmailRepository.Table;
 
+		logger.LogDebug("DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc}): query → {Query}", createdFromUtc, createdToUtc, query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         // only sent emails
         query = query.Where(qe => qe.SentOnUtc.HasValue);
 
@@ -202,8 +239,11 @@ public partial class QueuedEmailService : IQueuedEmailService
 
         var emails = await query.ToArrayAsync();
 
+		logger.LogDebug("DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc}): emails → {Emails}", createdFromUtc, createdToUtc, emails);
+		logger.LogInformation("DeleteAlreadySentEmailsAsync(createdFromUtc,createdToUtc)={CreatedFromUtc},{CreatedToUtc}: database query executed in {Arg2} ms", createdFromUtc, createdToUtc, __logStart.ElapsedMilliseconds);
         await DeleteQueuedEmailsAsync(emails);
 
+		logger.LogDebug("<<< Exiting DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc})", createdFromUtc, createdToUtc);
         return emails.Length;
     }
 
@@ -213,8 +253,14 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAllEmailsAsync()
     {
+		logger.LogDebug(">>> Entering DeleteAllEmailsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _queuedEmailRepository.TruncateAsync();
+		logger.LogDebug("<<< Exiting DeleteAllEmailsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteAllEmailsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteAllEmailsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     #endregion
 }

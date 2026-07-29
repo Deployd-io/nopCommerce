@@ -13,11 +13,18 @@ public partial record AddProductToDiscountSearchModel : BaseSearchModel
 
     public AddProductToDiscountSearchModel()
     {
+		logger.LogDebug(">>> Entering AddProductToDiscountSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AddProductToDiscountSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AddProductToDiscountSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("AddProductToDiscountSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("AddProductToDiscountSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddProductToDiscountSearchModel()");
+		logger.LogDebug("AddProductToDiscountSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

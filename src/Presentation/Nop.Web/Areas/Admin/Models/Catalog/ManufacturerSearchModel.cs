@@ -13,8 +13,12 @@ public partial record ManufacturerSearchModel : BaseSearchModel
 
     public ManufacturerSearchModel()
     {
+		logger.LogDebug(">>> Entering ManufacturerSearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailablePublishedOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ManufacturerSearchModel()");
+		logger.LogDebug("ManufacturerSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("ManufacturerSearchModel(): AvailablePublishedOptions → {AvailablePublishedOptions}", AvailablePublishedOptions);
     }
 
     #endregion

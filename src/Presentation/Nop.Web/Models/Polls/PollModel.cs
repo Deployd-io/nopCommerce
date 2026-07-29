@@ -6,7 +6,10 @@ public partial record PollModel : BaseNopEntityModel
 {
     public PollModel()
     {
+		logger.LogDebug(">>> Entering PollModel()");
         Answers = new List<PollAnswerModel>();
+		logger.LogDebug("<<< Exiting PollModel()");
+		logger.LogDebug("PollModel(): Answers → {Answers}", Answers);
     }
 
     public string Name { get; set; }

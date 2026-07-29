@@ -11,7 +11,10 @@ public record AddProductToClassificationModel : BaseNopModel
 
     public AddProductToClassificationModel()
     {
+		logger.LogDebug(">>> Entering AddProductToClassificationModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddProductToClassificationModel()");
+		logger.LogDebug("AddProductToClassificationModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
 
     #endregion

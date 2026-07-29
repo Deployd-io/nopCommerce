@@ -13,8 +13,12 @@ public record TaxExemptionModel : BaseNopModel
 
     public TaxExemptionModel()
     {
+		logger.LogDebug(">>> Entering TaxExemptionModel()");
         Certificates = new List<ExemptionCertificateModel>();
         AvailableExposureZones = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TaxExemptionModel()");
+		logger.LogDebug("TaxExemptionModel(): Certificates → {Certificates}", Certificates);
+		logger.LogDebug("TaxExemptionModel(): AvailableExposureZones → {AvailableExposureZones}", AvailableExposureZones);
     }
 
     #endregion

@@ -15,8 +15,12 @@ public record FacebookPixelModel : BaseNopEntityModel
 
     public FacebookPixelModel()
     {
+		logger.LogDebug(">>> Entering FacebookPixelModel()");
         AvailableStores = new List<SelectListItem>();
         CustomEventSearchModel = new CustomEventSearchModel();
+		logger.LogDebug("<<< Exiting FacebookPixelModel()");
+		logger.LogDebug("FacebookPixelModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("FacebookPixelModel(): CustomEventSearchModel → {CustomEventSearchModel}", CustomEventSearchModel);
     }
 
     #endregion

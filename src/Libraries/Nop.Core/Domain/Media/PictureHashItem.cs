@@ -22,6 +22,8 @@ public partial class PictureHashItem : IComparable, IComparable<PictureHashItem>
     /// <returns></returns>
     public int CompareTo(object obj)
     {
+		logger.LogDebug(">>> Entering CompareTo(obj={Obj})", obj);
+		logger.LogDebug("<<< Exiting CompareTo(obj={Obj})", obj);
         return CompareTo(obj as PictureHashItem);
     }
 

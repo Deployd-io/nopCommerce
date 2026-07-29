@@ -17,9 +17,11 @@ public partial class ProductManufacturerBuilder : NopEntityBuilder<ProductManufa
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ProductManufacturer.ManufacturerId)).AsInt32().ForeignKey<Manufacturer>()
             .WithColumn(nameof(ProductManufacturer.ProductId)).AsInt32().ForeignKey<Product>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

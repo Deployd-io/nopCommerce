@@ -8,7 +8,10 @@ public partial record PermissionCategorySearchModel : BaseSearchModel
 
     public PermissionCategorySearchModel()
     {
+		logger.LogDebug(">>> Entering PermissionCategorySearchModel()");
         PermissionItemSearchModel = new PermissionItemSearchModel();
+		logger.LogDebug("<<< Exiting PermissionCategorySearchModel()");
+		logger.LogDebug("PermissionCategorySearchModel(): PermissionItemSearchModel → {PermissionItemSearchModel}", PermissionItemSearchModel);
     }
 
     #endregion

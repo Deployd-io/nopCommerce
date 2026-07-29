@@ -14,23 +14,42 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
 {
     public ProductDetailsModel()
     {
+		logger.LogDebug(">>> Entering ProductDetailsModel()");
         DefaultPictureModel = new PictureModel();
         PictureModels = new List<PictureModel>();
+		logger.LogDebug("ProductDetailsModel(): DefaultPictureModel → {DefaultPictureModel}", DefaultPictureModel);
+		logger.LogDebug("ProductDetailsModel(): PictureModels → {PictureModels}", PictureModels);
         VideoModels = new List<VideoModel>();
         GiftCard = new GiftCardModel();
+		logger.LogDebug("ProductDetailsModel(): VideoModels → {VideoModels}", VideoModels);
+		logger.LogDebug("ProductDetailsModel(): GiftCard → {GiftCard}", GiftCard);
         ProductPrice = new ProductPriceModel();
         AddToCart = new AddToCartModel();
+		logger.LogDebug("ProductDetailsModel(): ProductPrice → {ProductPrice}", ProductPrice);
+		logger.LogDebug("ProductDetailsModel(): AddToCart → {AddToCart}", AddToCart);
         ProductAttributes = new List<ProductAttributeModel>();
         AssociatedProducts = new List<ProductDetailsModel>();
+		logger.LogDebug("ProductDetailsModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
+		logger.LogDebug("ProductDetailsModel(): AssociatedProducts → {AssociatedProducts}", AssociatedProducts);
         VendorModel = new VendorBriefInfoModel();
         Breadcrumb = new ProductBreadcrumbModel();
+		logger.LogDebug("ProductDetailsModel(): VendorModel → {VendorModel}", VendorModel);
+		logger.LogDebug("ProductDetailsModel(): Breadcrumb → {Breadcrumb}", Breadcrumb);
         ProductTags = new List<ProductTagModel>();
         ProductSpecificationModel = new ProductSpecificationModel();
+		logger.LogDebug("ProductDetailsModel(): ProductTags → {ProductTags}", ProductTags);
+		logger.LogDebug("ProductDetailsModel(): ProductSpecificationModel → {ProductSpecificationModel}", ProductSpecificationModel);
         ProductManufacturers = new List<ManufacturerBriefInfoModel>();
         ProductReviewOverview = new ProductReviewOverviewModel();
+		logger.LogDebug("ProductDetailsModel(): ProductManufacturers → {ProductManufacturers}", ProductManufacturers);
+		logger.LogDebug("ProductDetailsModel(): ProductReviewOverview → {ProductReviewOverview}", ProductReviewOverview);
         ProductReviews = new ProductReviewsModel();
         TierPrices = new List<TierPriceModel>();
+		logger.LogDebug("ProductDetailsModel(): ProductReviews → {ProductReviews}", ProductReviews);
+		logger.LogDebug("ProductDetailsModel(): TierPrices → {TierPrices}", TierPrices);
         ProductEstimateShipping = new ProductEstimateShippingModel();
+		logger.LogDebug("<<< Exiting ProductDetailsModel()");
+		logger.LogDebug("ProductDetailsModel(): ProductEstimateShipping → {ProductEstimateShipping}", ProductEstimateShipping);
     }
 
     //picture(s)
@@ -132,7 +151,10 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductBreadcrumbModel()
         {
+			logger.LogDebug(">>> Entering ProductBreadcrumbModel()");
             CategoryBreadcrumb = new List<CategorySimpleModel>();
+			logger.LogDebug("<<< Exiting ProductBreadcrumbModel()");
+			logger.LogDebug("ProductBreadcrumbModel(): CategoryBreadcrumb → {CategoryBreadcrumb}", CategoryBreadcrumb);
         }
 
         public bool Enabled { get; set; }
@@ -147,8 +169,12 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public AddToCartModel()
         {
+			logger.LogDebug(">>> Entering AddToCartModel()");
             AllowedQuantities = new List<SelectListItem>();
             ProductToWishlist = new ProductToWishlistModel();
+			logger.LogDebug("<<< Exiting AddToCartModel()");
+			logger.LogDebug("AddToCartModel(): AllowedQuantities → {AllowedQuantities}", AllowedQuantities);
+			logger.LogDebug("AddToCartModel(): ProductToWishlist → {ProductToWishlist}", ProductToWishlist);
         }
         public int ProductId { get; set; }
 
@@ -218,8 +244,12 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductAttributeModel()
         {
+			logger.LogDebug(">>> Entering ProductAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<ProductAttributeValueModel>();
+			logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			logger.LogDebug("ProductAttributeModel(): AllowedFileExtensions → {AllowedFileExtensions}", AllowedFileExtensions);
+			logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductId { get; set; }
@@ -270,7 +300,10 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductAttributeValueModel()
         {
+			logger.LogDebug(">>> Entering ProductAttributeValueModel()");
             ImageSquaresPictureModel = new PictureModel();
+			logger.LogDebug("<<< Exiting ProductAttributeValueModel()");
+			logger.LogDebug("ProductAttributeValueModel(): ImageSquaresPictureModel → {ImageSquaresPictureModel}", ImageSquaresPictureModel);
         }
 
         public string Name { get; set; }

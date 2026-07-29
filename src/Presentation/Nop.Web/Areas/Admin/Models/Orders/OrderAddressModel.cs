@@ -9,7 +9,10 @@ public partial record OrderAddressModel : BaseNopModel
 
     public OrderAddressModel()
     {
+		logger.LogDebug(">>> Entering OrderAddressModel()");
         Address = new AddressModel();
+		logger.LogDebug("<<< Exiting OrderAddressModel()");
+		logger.LogDebug("OrderAddressModel(): Address → {Address}", Address);
     }
 
     #endregion

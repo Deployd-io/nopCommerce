@@ -12,7 +12,10 @@ public partial record CustomerAttributeValueModel : BaseNopEntityModel, ILocaliz
 
     public CustomerAttributeValueModel()
     {
+		logger.LogDebug(">>> Entering CustomerAttributeValueModel()");
         Locales = new List<CustomerAttributeValueLocalizedModel>();
+		logger.LogDebug("<<< Exiting CustomerAttributeValueModel()");
+		logger.LogDebug("CustomerAttributeValueModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

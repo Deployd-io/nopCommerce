@@ -49,11 +49,13 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual Task<StoreSearchModel> PrepareStoreSearchModelAsync(StoreSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareStoreSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareStoreSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -67,11 +69,13 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual async Task<StoreListModel> PrepareStoreListModelAsync(StoreSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareStoreListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get stores
         var stores = (await _storeService.GetAllStoresAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareStoreListModelAsync(searchModel={SearchModel}): stores → {Stores}", searchModel, stores);
         //prepare list model
         var model = new StoreListModel().PrepareToGrid(searchModel, stores, () =>
         {
@@ -79,6 +83,7 @@ public partial class StoreModelFactory : IStoreModelFactory
             return stores.Select(store => store.ToModel<StoreModel>());
         });
 
+		logger.LogDebug("<<< Exiting PrepareStoreListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

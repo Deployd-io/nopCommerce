@@ -17,11 +17,13 @@ public partial class StoreMappingCacheEventConsumer : CacheEventConsumer<StoreMa
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(StoreMapping entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopStoreDefaults.StoreMappingsCacheKey, entity.EntityId, entity.EntityName);
         await RemoveAsync(NopStoreDefaults.StoreMappingIdsCacheKey, entity.EntityId, entity.EntityName);
         await RemoveAsync(NopStoreDefaults.StoreMappingExistsCacheKey, entity.EntityName);
 
         if (entity.EntityName.Equals(nameof(Category)))
             await RemoveByPrefixAsync(NopCatalogDefaults.ChildCategoryIdLookupByStorePrefix, entity.StoreId);
+			logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

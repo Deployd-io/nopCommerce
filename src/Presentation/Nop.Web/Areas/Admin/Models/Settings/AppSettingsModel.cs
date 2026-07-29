@@ -11,15 +11,26 @@ public partial record AppSettingsModel : BaseNopModel
 
     public AppSettingsModel()
     {
+		logger.LogDebug(">>> Entering AppSettingsModel()");
         DataConfigModel = new DataConfigModel();
         CacheConfigModel = new CacheConfigModel();
+		logger.LogDebug("AppSettingsModel(): DataConfigModel → {DataConfigModel}", DataConfigModel);
         DistributedCacheConfigModel = new DistributedCacheConfigModel();
+		logger.LogDebug("AppSettingsModel(): CacheConfigModel → {CacheConfigModel}", CacheConfigModel);
+		logger.LogDebug("AppSettingsModel(): DistributedCacheConfigModel → {DistributedCacheConfigModel}", DistributedCacheConfigModel);
         HostingConfigModel = new HostingConfigModel();
         InstallationConfigModel = new InstallationConfigModel();
+		logger.LogDebug("AppSettingsModel(): HostingConfigModel → {HostingConfigModel}", HostingConfigModel);
+		logger.LogDebug("AppSettingsModel(): InstallationConfigModel → {InstallationConfigModel}", InstallationConfigModel);
         PluginConfigModel = new PluginConfigModel();
         CommonConfigModel = new CommonConfigModel();
+		logger.LogDebug("AppSettingsModel(): PluginConfigModel → {PluginConfigModel}", PluginConfigModel);
+		logger.LogDebug("AppSettingsModel(): CommonConfigModel → {CommonConfigModel}", CommonConfigModel);
         WebOptimizerConfigModel = new WebOptimizerConfigModel();
         EnvironmentVariables = new List<string>();
+		logger.LogDebug("<<< Exiting AppSettingsModel()");
+		logger.LogDebug("AppSettingsModel(): WebOptimizerConfigModel → {WebOptimizerConfigModel}", WebOptimizerConfigModel);
+		logger.LogDebug("AppSettingsModel(): EnvironmentVariables → {EnvironmentVariables}", EnvironmentVariables);
     }
 
     #endregion

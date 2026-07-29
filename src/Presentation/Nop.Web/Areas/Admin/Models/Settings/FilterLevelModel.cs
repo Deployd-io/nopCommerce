@@ -12,7 +12,10 @@ public partial record FilterLevelModel : BaseNopEntityModel, ILocalizedModel<Fil
 
     public FilterLevelModel()
     {
+		logger.LogDebug(">>> Entering FilterLevelModel()");
         Locales = new List<FilterLevelLocalizedModel>();
+		logger.LogDebug("<<< Exiting FilterLevelModel()");
+		logger.LogDebug("FilterLevelModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

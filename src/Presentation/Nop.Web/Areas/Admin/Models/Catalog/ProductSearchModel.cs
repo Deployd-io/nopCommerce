@@ -14,14 +14,24 @@ public partial record ProductSearchModel : BaseSearchModel
 
     public ProductSearchModel()
     {
+		logger.LogDebug(">>> Entering ProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("ProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("ProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableWarehouses = new List<SelectListItem>();
+		logger.LogDebug("ProductSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("ProductSearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
         AvailableVendors = new List<SelectListItem>();
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("ProductSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		logger.LogDebug("ProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
         AvailablePublishedOptions = new List<SelectListItem>();
         LicenseCheckModel = new();
+		logger.LogDebug("<<< Exiting ProductSearchModel()");
+		logger.LogDebug("ProductSearchModel(): AvailablePublishedOptions → {AvailablePublishedOptions}", AvailablePublishedOptions);
+		logger.LogDebug("ProductSearchModel(): LicenseCheckModel → {LicenseCheckModel}", LicenseCheckModel);
     }
 
     #endregion

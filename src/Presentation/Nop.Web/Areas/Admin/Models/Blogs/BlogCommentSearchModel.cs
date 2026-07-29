@@ -14,7 +14,10 @@ public partial record BlogCommentSearchModel : BaseSearchModel
 
     public BlogCommentSearchModel()
     {
+		logger.LogDebug(">>> Entering BlogCommentSearchModel()");
         AvailableApprovedOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting BlogCommentSearchModel()");
+		logger.LogDebug("BlogCommentSearchModel(): AvailableApprovedOptions → {AvailableApprovedOptions}", AvailableApprovedOptions);
     }
 
     #endregion

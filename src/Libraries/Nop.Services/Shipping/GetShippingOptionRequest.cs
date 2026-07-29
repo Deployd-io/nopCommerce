@@ -16,7 +16,10 @@ public partial class GetShippingOptionRequest
 
     public GetShippingOptionRequest()
     {
+		logger.LogDebug(">>> Entering GetShippingOptionRequest()");
         Items = new List<PackageItem>();
+		logger.LogDebug("<<< Exiting GetShippingOptionRequest()");
+		logger.LogDebug("GetShippingOptionRequest(): Items → {Items}", Items);
     }
 
     #endregion
@@ -95,9 +98,14 @@ public partial class GetShippingOptionRequest
         /// <param name="qty">Override "Quantity" property of shopping cart item</param>
         public PackageItem(ShoppingCartItem sci, Product product, int? qty = null)
         {
+			logger.LogDebug(">>> Entering PackageItem(sci={Sci},product={Product},qty={Qty})", sci, product, qty);
             ShoppingCartItem = sci;
             Product = product;
+			logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): Product → {Product1}", sci, product, qty, Product);
+			logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): ShoppingCartItem → {ShoppingCartItem}", sci, product, qty, ShoppingCartItem);
             OverriddenQuantity = qty;
+			logger.LogDebug("<<< Exiting PackageItem(sci={Sci},product={Product},qty={Qty})", sci, product, qty);
+			logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): OverriddenQuantity → {OverriddenQuantity}", sci, product, qty, OverriddenQuantity);
         }
 
         /// <summary>
@@ -121,7 +129,9 @@ public partial class GetShippingOptionRequest
         /// <returns></returns>
         public int GetQuantity()
         {
+			logger.LogDebug(">>> Entering GetQuantity()");
             if (OverriddenQuantity.HasValue)
+			logger.LogDebug("<<< Exiting GetQuantity()");
                 return OverriddenQuantity.Value;
 
             return ShoppingCartItem.Quantity;

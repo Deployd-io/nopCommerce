@@ -17,7 +17,10 @@ public partial class FooterMenuViewComponent : NopViewComponent
 
     public FooterMenuViewComponent(IMenuModelFactory menuModelFactory)
     {
+		logger.LogDebug(">>> Entering FooterMenuViewComponent(menuModelFactory={MenuModelFactory})", menuModelFactory);
         _menuModelFactory = menuModelFactory;
+		logger.LogDebug("<<< Exiting FooterMenuViewComponent(menuModelFactory={MenuModelFactory})", menuModelFactory);
+		logger.LogDebug("FooterMenuViewComponent(menuModelFactory={MenuModelFactory}): _menuModelFactory → {_menuModelFactory}", menuModelFactory, _menuModelFactory);
     }
 
     #endregion
@@ -26,6 +29,8 @@ public partial class FooterMenuViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(await _menuModelFactory.PrepareMenuModelsAsync(MenuType.Footer));
     }
 

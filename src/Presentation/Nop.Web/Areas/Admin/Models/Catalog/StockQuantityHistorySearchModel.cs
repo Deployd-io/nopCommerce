@@ -13,7 +13,10 @@ public partial record StockQuantityHistorySearchModel : BaseSearchModel
 
     public StockQuantityHistorySearchModel()
     {
+		logger.LogDebug(">>> Entering StockQuantityHistorySearchModel()");
         AvailableWarehouses = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting StockQuantityHistorySearchModel()");
+		logger.LogDebug("StockQuantityHistorySearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     #endregion

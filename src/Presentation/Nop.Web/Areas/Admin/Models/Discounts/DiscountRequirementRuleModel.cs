@@ -12,7 +12,10 @@ public partial record DiscountRequirementRuleModel : BaseNopModel
 
     public DiscountRequirementRuleModel()
     {
+		logger.LogDebug(">>> Entering DiscountRequirementRuleModel()");
         ChildRequirements = new List<DiscountRequirementRuleModel>();
+		logger.LogDebug("<<< Exiting DiscountRequirementRuleModel()");
+		logger.LogDebug("DiscountRequirementRuleModel(): ChildRequirements → {ChildRequirements}", ChildRequirements);
     }
 
     #endregion

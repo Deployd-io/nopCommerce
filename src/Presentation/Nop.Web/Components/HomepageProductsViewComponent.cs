@@ -27,6 +27,8 @@ public partial class HomepageProductsViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(int? productThumbPictureSize)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var products = await (await _productService.GetAllProductsDisplayedOnHomepageAsync())
             //ACL and store mapping
             .WhereAwait(async p => await _aclService.AuthorizeAsync(p) && await _storeMappingService.AuthorizeAsync(p))
@@ -34,12 +36,15 @@ public partial class HomepageProductsViewComponent : NopViewComponent
             .Where(p => _productService.ProductIsAvailable(p))
             //visible individually
             .Where(p => p.VisibleIndividually).ToListAsync();
+			logger.LogInformation("InvokeAsync(productThumbPictureSize)={ProductThumbPictureSize}: database query executed in {Arg1} ms", productThumbPictureSize, __logStart.ElapsedMilliseconds);
 
         if (!products.Any())
             return Content("");
 
         var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize)).ToList();
 
+		logger.LogDebug("InvokeAsync(productThumbPictureSize={ProductThumbPictureSize}): model → {Model}", productThumbPictureSize, model);
+		logger.LogDebug("<<< Exiting InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
         return View(model);
     }
 }

@@ -37,9 +37,11 @@ export default moment.defineLocale('ur', {
     },
     meridiemParse: /صبح|شام/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return 'شام' === input;
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'صبح';
         }
@@ -70,9 +72,11 @@ export default moment.defineLocale('ur', {
         yy: '%d سال',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string.replace(/,/g, '،');
     },
     week: {

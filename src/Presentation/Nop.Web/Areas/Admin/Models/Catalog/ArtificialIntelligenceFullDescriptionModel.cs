@@ -11,7 +11,10 @@ public partial record ArtificialIntelligenceFullDescriptionModel : BaseNopModel
 {
     public ArtificialIntelligenceFullDescriptionModel()
     {
+		logger.LogDebug(">>> Entering ArtificialIntelligenceFullDescriptionModel()");
         AvailableLanguages = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ArtificialIntelligenceFullDescriptionModel()");
+		logger.LogDebug("ArtificialIntelligenceFullDescriptionModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
     }
 
     [NopResourceDisplayName("Admin.Catalog.Products.AiFullDescription.ProductName")]

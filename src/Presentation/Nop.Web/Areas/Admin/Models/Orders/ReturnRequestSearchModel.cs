@@ -14,7 +14,10 @@ public partial record ReturnRequestSearchModel : BaseSearchModel
 
     public ReturnRequestSearchModel()
     {
+		logger.LogDebug(">>> Entering ReturnRequestSearchModel()");
         ReturnRequestStatusList = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ReturnRequestSearchModel()");
+		logger.LogDebug("ReturnRequestSearchModel(): ReturnRequestStatusList → {ReturnRequestStatusList}", ReturnRequestStatusList);
     }
 
     #endregion

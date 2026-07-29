@@ -12,7 +12,10 @@ public partial record StoreScopeConfigurationModel : BaseNopModel
 
     public StoreScopeConfigurationModel()
     {
+		logger.LogDebug(">>> Entering StoreScopeConfigurationModel()");
         Stores = new List<StoreModel>();
+		logger.LogDebug("<<< Exiting StoreScopeConfigurationModel()");
+		logger.LogDebug("StoreScopeConfigurationModel(): Stores → {Stores}", Stores);
     }
 
     #endregion

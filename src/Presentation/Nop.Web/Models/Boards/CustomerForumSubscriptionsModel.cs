@@ -7,7 +7,10 @@ public partial record CustomerForumSubscriptionsModel : BaseNopModel
 {
     public CustomerForumSubscriptionsModel()
     {
+		logger.LogDebug(">>> Entering CustomerForumSubscriptionsModel()");
         ForumSubscriptions = new List<ForumSubscriptionModel>();
+		logger.LogDebug("<<< Exiting CustomerForumSubscriptionsModel()");
+		logger.LogDebug("CustomerForumSubscriptionsModel(): ForumSubscriptions → {ForumSubscriptions}", ForumSubscriptions);
     }
 
     public IList<ForumSubscriptionModel> ForumSubscriptions { get; set; }

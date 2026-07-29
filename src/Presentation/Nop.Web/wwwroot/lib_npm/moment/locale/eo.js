@@ -26,12 +26,15 @@ export default moment.defineLocale('eo', {
     },
     meridiemParse: /[ap]\.t\.m/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return input.charAt(0).toLowerCase() === 'p';
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours > 11) {
             return isLower ? 'p.t.m.' : 'P.T.M.';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'a.t.m.' : 'A.T.M.';
         }
     },

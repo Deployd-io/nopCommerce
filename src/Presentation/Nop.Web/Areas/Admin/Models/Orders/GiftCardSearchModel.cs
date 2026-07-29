@@ -13,7 +13,10 @@ public partial record GiftCardSearchModel : BaseSearchModel
 
     public GiftCardSearchModel()
     {
+		logger.LogDebug(">>> Entering GiftCardSearchModel()");
         ActivatedList = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting GiftCardSearchModel()");
+		logger.LogDebug("GiftCardSearchModel(): ActivatedList → {ActivatedList}", ActivatedList);
     }
 
     #endregion

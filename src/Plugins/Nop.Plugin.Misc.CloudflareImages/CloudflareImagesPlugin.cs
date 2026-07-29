@@ -39,6 +39,8 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/CloudflareImages/Configure";
     }
 
@@ -48,6 +50,7 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new CloudflareImagesSettings
         {
@@ -74,6 +77,7 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -82,11 +86,13 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<CloudflareImagesSettings>();
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Nop.Plugin.Misc.CloudflareImages");
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

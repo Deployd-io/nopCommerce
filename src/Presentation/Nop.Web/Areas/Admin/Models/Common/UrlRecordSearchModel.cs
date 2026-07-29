@@ -13,8 +13,12 @@ public partial record UrlRecordSearchModel : BaseSearchModel
 
     public UrlRecordSearchModel()
     {
+		logger.LogDebug(">>> Entering UrlRecordSearchModel()");
         AvailableLanguages = new List<SelectListItem>();
         AvailableActiveOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting UrlRecordSearchModel()");
+		logger.LogDebug("UrlRecordSearchModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+		logger.LogDebug("UrlRecordSearchModel(): AvailableActiveOptions → {AvailableActiveOptions}", AvailableActiveOptions);
     }
 
     #endregion

@@ -19,10 +19,13 @@ public class ProductServiceTests : ServiceTest
     [OneTimeSetUp]
     public async Task SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _productService = GetService<IProductService>();
 
+		logger.LogDebug("SetUp(): _productService → {_productService}", _productService);
         var product = await _productService.GetProductByIdAsync(1);
         product.ManageInventoryMethod = ManageInventoryMethod.ManageStock;
+		logger.LogDebug("SetUp(): product → {Product}", product);
         product.UseMultipleWarehouses = true;
 
         await _productService.UpdateProductAsync(product);
@@ -41,19 +44,25 @@ public class ProductServiceTests : ServiceTest
             WarehouseId = 2,
             StockQuantity = 5
         });
+		logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
     public async Task TearDown()
     {
+		logger.LogDebug(">>> Entering TearDown()");
         var product = await _productService.GetProductByIdAsync(1);
         foreach (var productWarehouseInventory in await _productService.GetAllProductWarehouseInventoryRecordsAsync(1))
             await _productService.DeleteProductWarehouseInventoryAsync(productWarehouseInventory);
+			logger.LogDebug("TearDown(): product → {Product}", product);
 
         product.ManageInventoryMethod = ManageInventoryMethod.DontManageStock;
+		logger.LogDebug("TearDown(): product.ManageInventoryMethod → {Arg0}", product.ManageInventoryMethod);
+		logger.LogDebug("TearDown(): product.UseMultipleWarehouses → {Arg0}", product.UseMultipleWarehouses);
         product.UseMultipleWarehouses = false;
 
         await _productService.UpdateProductAsync(product);
+		logger.LogDebug("<<< Exiting TearDown()");
     }
 
     #endregion
@@ -63,6 +72,7 @@ public class ProductServiceTests : ServiceTest
     [Test]
     public void CanParseRequiredProductIds()
     {
+		logger.LogDebug(">>> Entering CanParseRequiredProductIds()");
         var product = new Product
         {
             RequiredProductIds = "1, 4,7 ,a,"
@@ -70,80 +80,95 @@ public class ProductServiceTests : ServiceTest
 
         var ids = _productService.ParseRequiredProductIds(product);
         ids.Length.Should().Be(3);
+		logger.LogDebug("CanParseRequiredProductIds(): ids → {Ids}", ids);
         ids[0].Should().Be(1);
         ids[1].Should().Be(4);
         ids[2].Should().Be(7);
+		logger.LogDebug("<<< Exiting CanParseRequiredProductIds()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenStartDateIsNotSet()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenStartDateIsNotSet()");
         var product = new Product
         {
             AvailableStartDateTimeUtc = null
         };
 
         _productService.ProductIsAvailable(product, new DateTime(2010, 01, 03)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenStartDateIsNotSet()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenStartDateIsLessThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenStartDateIsLessThanSomeDate()");
         var product = new Product
         {
             AvailableStartDateTimeUtc = new DateTime(2010, 01, 02)
         };
 
         _productService.ProductIsAvailable(product, new DateTime(2010, 01, 03)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenStartDateIsLessThanSomeDate()");
     }
 
     [Test]
     public void ShouldNotBeAvailableWhenStartDateIsGreaterThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldNotBeAvailableWhenStartDateIsGreaterThanSomeDate()");
         var product = new Product
         {
             AvailableStartDateTimeUtc = new DateTime(2010, 01, 02)
         };
 
         _productService.ProductIsAvailable(product, new DateTime(2010, 01, 01)).Should().BeFalse();
+		logger.LogDebug("<<< Exiting ShouldNotBeAvailableWhenStartDateIsGreaterThanSomeDate()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenEndDateIsNotSet()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenEndDateIsNotSet()");
         var product = new Product
         {
             AvailableEndDateTimeUtc = null
         };
 
         _productService.ProductIsAvailable(product, new DateTime(2010, 01, 03)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenEndDateIsNotSet()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenEndDateIsGreaterThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenEndDateIsGreaterThanSomeDate()");
         var product = new Product
         {
             AvailableEndDateTimeUtc = new DateTime(2010, 01, 02)
         };
 
         _productService.ProductIsAvailable(product, new DateTime(2010, 01, 01)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenEndDateIsGreaterThanSomeDate()");
     }
 
     [Test]
     public void ShouldNotBeAvailableWhenEndDateIsLessThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldNotBeAvailableWhenEndDateIsLessThanSomeDate()");
         var product = new Product
         {
             AvailableEndDateTimeUtc = new DateTime(2010, 01, 02)
         };
 
         _productService.ProductIsAvailable(product, new DateTime(2010, 01, 03)).Should().BeFalse();
+		logger.LogDebug("<<< Exiting ShouldNotBeAvailableWhenEndDateIsLessThanSomeDate()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenCurrentDateIsInRange()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenCurrentDateIsInRange()");
         var product = new Product
         {
             AvailableStartDateTimeUtc = DateTime.UtcNow.AddDays(-1),
@@ -151,11 +176,13 @@ public class ProductServiceTests : ServiceTest
         };
 
         _productService.ProductIsAvailable(product).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenCurrentDateIsInRange()");
     }
 
     [Test]
     public void ShouldNotBeAvailableWhenCurrentDateIsNotInRange()
     {
+		logger.LogDebug(">>> Entering ShouldNotBeAvailableWhenCurrentDateIsNotInRange()");
         var product = new Product
         {
             AvailableStartDateTimeUtc = DateTime.UtcNow.AddDays(-2),
@@ -163,11 +190,13 @@ public class ProductServiceTests : ServiceTest
         };
 
         _productService.ProductIsAvailable(product).Should().BeFalse();
+		logger.LogDebug("<<< Exiting ShouldNotBeAvailableWhenCurrentDateIsNotInRange()");
     }
 
     [Test]
     public void CanParseAllowedQuantities()
     {
+		logger.LogDebug(">>> Entering CanParseAllowedQuantities()");
         var product = new Product
         {
             AllowedQuantities = "1, 5,4,10,sdf"
@@ -175,43 +204,58 @@ public class ProductServiceTests : ServiceTest
 
         var result = _productService.ParseAllowedQuantities(product);
         result.Length.Should().Be(4);
+		logger.LogDebug("CanParseAllowedQuantities(): result → {Result}", result);
         result[0].Should().Be(1);
         result[1].Should().Be(5);
         result[2].Should().Be(4);
         result[3].Should().Be(10);
+		logger.LogDebug("<<< Exiting CanParseAllowedQuantities()");
     }
 
     [Test]
     public async Task CanCalculateTotalQuantityWhenWeDoNotUseMultipleWarehouses()
     {
+		logger.LogDebug(">>> Entering CanCalculateTotalQuantityWhenWeDoNotUseMultipleWarehouses()");
         var result = await _productService.GetTotalStockQuantityAsync(new Product { StockQuantity = 6, ManageInventoryMethod = ManageInventoryMethod.ManageStock });
         result.Should().Be(6);
+		logger.LogDebug("<<< Exiting CanCalculateTotalQuantityWhenWeDoNotUseMultipleWarehouses()");
+		logger.LogDebug("CanCalculateTotalQuantityWhenWeDoNotUseMultipleWarehouses(): result → {Result}", result);
     }
 
     [Test]
     public async Task PublicVoidCanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithReserved()
     {
+		logger.LogDebug(">>> Entering PublicVoidCanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithReserved()");
         var result = await _productService.GetTotalStockQuantityAsync(await _productService.GetProductByIdAsync(1));
         result.Should().Be(8);
+		logger.LogDebug("<<< Exiting PublicVoidCanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithReserved()");
+		logger.LogDebug("PublicVoidCanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithReserved(): result → {Result}", result);
     }
 
     [Test]
     public async Task CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithoutReserved()
     {
+		logger.LogDebug(">>> Entering CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithoutReserved()");
         var result = await _productService.GetTotalStockQuantityAsync(await _productService.GetProductByIdAsync(1), false);
         result.Should().Be(13);
+		logger.LogDebug("<<< Exiting CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithoutReserved()");
+		logger.LogDebug("CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithoutReserved(): result → {Result}", result);
     }
 
     [Test]
     public async Task CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithWarehouseSpecified()
     {
+		logger.LogDebug(">>> Entering CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithWarehouseSpecified()");
         var result = await _productService.GetTotalStockQuantityAsync(await _productService.GetProductByIdAsync(1), true, 1);
         result.Should().Be(3);
+		logger.LogDebug("<<< Exiting CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithWarehouseSpecified()");
+		logger.LogDebug("CanCalculateTotalQuantityWhenWeDoUseMultipleWarehousesWithWarehouseSpecified(): result → {Result}", result);
     }
 
     [Test]
     public void CanCalculateRentalPeriodsForDays()
     {
+		logger.LogDebug(">>> Entering CanCalculateRentalPeriodsForDays()");
         var product = new Product
         {
             IsRental = true,
@@ -231,6 +275,7 @@ public class ProductServiceTests : ServiceTest
 
         //rental period length = 2 days
         product.RentalPriceLength = 2;
+		logger.LogDebug("CanCalculateRentalPeriodsForDays(): product.RentalPriceLength → {Arg0}", product.RentalPriceLength);
         //the same date
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 5)).Should().Be(1);
         //1 day
@@ -239,11 +284,13 @@ public class ProductServiceTests : ServiceTest
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 7)).Should().Be(1);
         //3 days
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 8)).Should().Be(2);
+		logger.LogDebug("<<< Exiting CanCalculateRentalPeriodsForDays()");
     }
 
     [Test]
     public void CanCalculateRentalPeriodsForWeeks()
     {
+		logger.LogDebug(">>> Entering CanCalculateRentalPeriodsForWeeks()");
         var product = new Product
         {
             IsRental = true,
@@ -267,6 +314,7 @@ public class ProductServiceTests : ServiceTest
 
         //rental period length = 2 weeks
         product.RentalPriceLength = 2;
+		logger.LogDebug("CanCalculateRentalPeriodsForWeeks(): product.RentalPriceLength → {Arg0}", product.RentalPriceLength);
         //the same date
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 5)).Should().Be(1);
         //several days but less than a week
@@ -279,11 +327,13 @@ public class ProductServiceTests : ServiceTest
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 19)).Should().Be(1);
         //3 weeks
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 26)).Should().Be(2);
+		logger.LogDebug("<<< Exiting CanCalculateRentalPeriodsForWeeks()");
     }
 
     [Test]
     public void CanCalculateRentalPeriodsForMonths()
     {
+		logger.LogDebug(">>> Entering CanCalculateRentalPeriodsForMonths()");
         var product = new Product
         {
             IsRental = true,
@@ -321,6 +371,7 @@ public class ProductServiceTests : ServiceTest
 
         //rental period length = 2 months
         product.RentalPriceLength = 2;
+		logger.LogDebug("CanCalculateRentalPeriodsForMonths(): product.RentalPriceLength → {Arg0}", product.RentalPriceLength);
         //the same date
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 5)).Should().Be(1);
         //several days but less than a month
@@ -333,11 +384,13 @@ public class ProductServiceTests : ServiceTest
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 5, 5)).Should().Be(1);
         //3 months
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 5, 8)).Should().Be(2);
+		logger.LogDebug("<<< Exiting CanCalculateRentalPeriodsForMonths()");
     }
 
     [Test]
     public void CanCalculateRentalPeriodsForYears()
     {
+		logger.LogDebug(">>> Entering CanCalculateRentalPeriodsForYears()");
         var product = new Product
         {
             IsRental = true,
@@ -355,6 +408,7 @@ public class ProductServiceTests : ServiceTest
 
         //rental period length = 2 years
         product.RentalPriceLength = 2;
+		logger.LogDebug("CanCalculateRentalPeriodsForYears(): product.RentalPriceLength → {Arg0}", product.RentalPriceLength);
         //the same date
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2014, 3, 5)).Should().Be(1);
         //several days but less than a year
@@ -363,6 +417,7 @@ public class ProductServiceTests : ServiceTest
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2015, 3, 7)).Should().Be(1);
         //more than two year
         _productService.GetRentalPeriods(product, new DateTime(2014, 3, 5), new DateTime(2016, 3, 7)).Should().Be(2);
+		logger.LogDebug("<<< Exiting CanCalculateRentalPeriodsForYears()");
     }
 
     #endregion

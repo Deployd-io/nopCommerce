@@ -11,7 +11,10 @@ public partial record ForumGroupSearchModel : BaseSearchModel
 
     public ForumGroupSearchModel()
     {
+		logger.LogDebug(">>> Entering ForumGroupSearchModel()");
         ForumSearch = new ForumSearchModel();
+		logger.LogDebug("<<< Exiting ForumGroupSearchModel()");
+		logger.LogDebug("ForumGroupSearchModel(): ForumSearch → {ForumSearch}", ForumSearch);
     }
 
     #endregion

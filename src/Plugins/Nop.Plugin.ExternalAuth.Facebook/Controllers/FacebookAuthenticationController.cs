@@ -69,12 +69,14 @@ public class FacebookAuthenticationController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EXTERNAL_AUTHENTICATION_METHODS)]
     public IActionResult Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             ClientId = _facebookExternalAuthSettings.ClientKeyIdentifier,
             ClientSecret = _facebookExternalAuthSettings.ClientSecret
         };
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/ExternalAuth.Facebook/Views/Configure.cshtml", model);
     }
 
@@ -102,8 +104,10 @@ public class FacebookAuthenticationController : BasePluginController
 
     public async Task<IActionResult> Login(string returnUrl)
     {
+		logger.LogDebug(">>> Entering Login(returnUrl={ReturnUrl})", returnUrl);
         var store = await _storeContext.GetCurrentStoreAsync();
         var methodIsAvailable = await _authenticationPluginManager
+			logger.LogDebug("Login(returnUrl={ReturnUrl}): store → {Store}", returnUrl, store);
             .IsPluginActiveAsync(FacebookAuthenticationDefaults.SystemName, await _workContext.GetCurrentCustomerAsync(), store.Id);
         if (!methodIsAvailable)
             throw new NopException("Facebook authentication module cannot be loaded");
@@ -121,14 +125,17 @@ public class FacebookAuthenticationController : BasePluginController
         };
         authenticationProperties.SetString(FacebookAuthenticationDefaults.ErrorCallback, Url.RouteUrl(NopRouteNames.General.LOGIN, new { returnUrl }));
 
+		logger.LogDebug("<<< Exiting Login(returnUrl={ReturnUrl})", returnUrl);
         return Challenge(authenticationProperties, FacebookDefaults.AuthenticationScheme);
     }
 
     public async Task<IActionResult> LoginCallback(string returnUrl)
     {
+		logger.LogDebug(">>> Entering LoginCallback(returnUrl={ReturnUrl})", returnUrl);
         //authenticate Facebook user
         var authenticateResult = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
         if (!authenticateResult.Succeeded || !authenticateResult.Principal.Claims.Any())
+			logger.LogDebug("LoginCallback(returnUrl={ReturnUrl}): authenticateResult → {AuthenticateResult}", returnUrl, authenticateResult);
             return RedirectToRoute(NopRouteNames.General.LOGIN);
 
         //create external authentication parameters
@@ -143,17 +150,21 @@ public class FacebookAuthenticationController : BasePluginController
         };
 
         //authenticate Nop user
+		logger.LogDebug("<<< Exiting LoginCallback(returnUrl={ReturnUrl})", returnUrl);
         return await _externalAuthenticationService.AuthenticateAsync(authenticationParameters, returnUrl);
     }
 
     public async Task<IActionResult> DataDeletionStatusCheck(int earId)
     {
+		logger.LogDebug(">>> Entering DataDeletionStatusCheck(earId={EarId})", earId);
         var externalAuthenticationRecord = await _externalAuthenticationService.GetExternalAuthenticationRecordByIdAsync(earId);
         if (externalAuthenticationRecord is not null)
+			logger.LogDebug("DataDeletionStatusCheck(earId={EarId}): externalAuthenticationRecord → {ExternalAuthenticationRecord}", earId, externalAuthenticationRecord);
             _notificationService.WarningNotification(await _localizationService.GetResourceAsync("Plugins.ExternalAuth.Facebook.AuthenticationDataExist"));
         else
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.ExternalAuth.Facebook.AuthenticationDataDeletedSuccessfully"));
 
+		logger.LogDebug("<<< Exiting DataDeletionStatusCheck(earId={EarId})", earId);
         return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
     }
 

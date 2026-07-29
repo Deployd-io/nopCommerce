@@ -16,9 +16,11 @@ public class RouteProvider : IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(name: DiscountRequirementDefaults.ConfigurationRouteName,
             pattern: "Admin/DiscountRulesCustomerRoles/Configure",
             defaults: new { controller = "DiscountRulesCustomerRoles", action = "Configure", area = AreaNames.ADMIN });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

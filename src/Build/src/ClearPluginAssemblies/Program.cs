@@ -51,20 +51,26 @@ public class Program
 
     private static void Main(string[] args)
     {
+		logger.LogDebug(">>> Entering Main(args={Args})", args);
         var outputPath = string.Empty;
         var pluginPaths = string.Empty;
+		logger.LogDebug("Main(args={Args}): outputPath → {OutputPath}", args, outputPath);
+		logger.LogDebug("Main(args={Args}): pluginPaths → {PluginPaths}", args, pluginPaths);
         var saveLocalesFolders = true;
 
         var settings = args.FirstOrDefault(a => a.Contains('|')) ?? string.Empty;
         if(string.IsNullOrEmpty(settings))
+			logger.LogDebug("Main(args={Args}): settings → {Settings}", args, settings);
             return;
 
         foreach (var arg in settings.Split('|'))
         {
             var data = arg.Split("=").Select(p => p.Trim()).ToList();
 
+			logger.LogDebug("Main(args={Args}): data → {Data}", args, data);
             var name = data[0];
             var value = data.Count > 1 ? data[1] : string.Empty;
+			logger.LogDebug("Main(args={Args}): name → {Name}", args, name);
 
             switch (name)
             {
@@ -85,10 +91,12 @@ public class Program
 
         var di = new DirectoryInfo(outputPath);
         var separator = Path.DirectorySeparatorChar;
+		logger.LogDebug("Main(args={Args}): di → {Di}", args, di);
         var folderToIgnore = string.Concat(separator, "Plugins", separator);
         var fileNames = di.GetFiles("*.dll", SearchOption.AllDirectories)
             .Where(fi => !fi.FullName.Contains(folderToIgnore))
             .Select(fi => fi.Name.Replace(fi.Extension, "")).ToList();
+			logger.LogDebug("Main(args={Args}): folderToIgnore → {FolderToIgnore}", args, folderToIgnore);
        
         if (string.IsNullOrEmpty(pluginPaths) || fileNames.Count == 0)
         {
@@ -96,5 +104,6 @@ public class Program
         }
 
         Clear(pluginPaths, fileNames, saveLocalesFolders);
+		logger.LogDebug("<<< Exiting Main(args={Args})", args);
     }
 }

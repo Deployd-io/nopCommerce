@@ -11,8 +11,12 @@ public partial record PaymentMethodsModel : BaseNopModel
 
     public PaymentMethodsModel()
     {
+		logger.LogDebug(">>> Entering PaymentMethodsModel()");
         PaymentsMethod = new PaymentMethodSearchModel();
         PaymentMethodRestriction = new PaymentMethodRestrictionModel();
+		logger.LogDebug("<<< Exiting PaymentMethodsModel()");
+		logger.LogDebug("PaymentMethodsModel(): PaymentsMethod → {PaymentsMethod}", PaymentsMethod);
+		logger.LogDebug("PaymentMethodsModel(): PaymentMethodRestriction → {PaymentMethodRestriction}", PaymentMethodRestriction);
     }
 
     #endregion

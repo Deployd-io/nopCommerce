@@ -14,13 +14,22 @@ public partial record DiscountModel : BaseNopEntityModel
 
     public DiscountModel()
     {
+		logger.LogDebug(">>> Entering DiscountModel()");
         AvailableDiscountRequirementRules = new List<SelectListItem>();
         AvailableRequirementGroups = new List<SelectListItem>();
+		logger.LogDebug("DiscountModel(): AvailableDiscountRequirementRules → {AvailableDiscountRequirementRules}", AvailableDiscountRequirementRules);
+		logger.LogDebug("DiscountModel(): AvailableRequirementGroups → {AvailableRequirementGroups}", AvailableRequirementGroups);
         DiscountUsageHistorySearchModel = new DiscountUsageHistorySearchModel();
         DiscountProductSearchModel = new DiscountProductSearchModel();
+		logger.LogDebug("DiscountModel(): DiscountUsageHistorySearchModel → {DiscountUsageHistorySearchModel}", DiscountUsageHistorySearchModel);
+		logger.LogDebug("DiscountModel(): DiscountProductSearchModel → {DiscountProductSearchModel}", DiscountProductSearchModel);
         DiscountCategorySearchModel = new DiscountCategorySearchModel();
         DiscountManufacturerSearchModel = new DiscountManufacturerSearchModel();
+		logger.LogDebug("DiscountModel(): DiscountCategorySearchModel → {DiscountCategorySearchModel}", DiscountCategorySearchModel);
+		logger.LogDebug("DiscountModel(): DiscountManufacturerSearchModel → {DiscountManufacturerSearchModel}", DiscountManufacturerSearchModel);
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting DiscountModel()");
+		logger.LogDebug("DiscountModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

@@ -8,7 +8,10 @@ public partial record CustomerProductReviewModel : BaseNopModel
 {
     public CustomerProductReviewModel()
     {
+		logger.LogDebug(">>> Entering CustomerProductReviewModel()");
         AdditionalProductReviewList = new List<ProductReviewReviewTypeMappingModel>();
+		logger.LogDebug("<<< Exiting CustomerProductReviewModel()");
+		logger.LogDebug("CustomerProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
     }
     public int ProductId { get; set; }
     public string ProductName { get; set; }
@@ -26,7 +29,10 @@ public partial record CustomerProductReviewsModel : BaseNopModel
 {
     public CustomerProductReviewsModel()
     {
+		logger.LogDebug(">>> Entering CustomerProductReviewsModel()");
         ProductReviews = new List<CustomerProductReviewModel>();
+		logger.LogDebug("<<< Exiting CustomerProductReviewsModel()");
+		logger.LogDebug("CustomerProductReviewsModel(): ProductReviews → {ProductReviews}", ProductReviews);
     }
 
     public IList<CustomerProductReviewModel> ProductReviews { get; set; }

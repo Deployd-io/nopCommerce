@@ -10,8 +10,10 @@ public partial class WarehouseValidator : BaseNopValidator<WarehouseModel>
 {
     public WarehouseValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering WarehouseValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Shipping.Warehouses.Fields.Name.Required"));
 
         SetDatabaseValidationRules<Warehouse>();
+		logger.LogDebug("<<< Exiting WarehouseValidator(localizationService={LocalizationService})", localizationService);
     }
 }

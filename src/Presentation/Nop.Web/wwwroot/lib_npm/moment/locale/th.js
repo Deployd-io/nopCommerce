@@ -30,9 +30,11 @@ export default moment.defineLocale('th', {
         return input === 'หลังเที่ยง';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ก่อนเที่ยง';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'หลังเที่ยง';
         }
     },

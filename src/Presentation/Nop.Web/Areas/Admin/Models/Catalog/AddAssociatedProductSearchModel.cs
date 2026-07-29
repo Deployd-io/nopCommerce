@@ -13,11 +13,18 @@ public partial record AddAssociatedProductSearchModel : BaseSearchModel
 
     public AddAssociatedProductSearchModel()
     {
+		logger.LogDebug(">>> Entering AddAssociatedProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AddAssociatedProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AddAssociatedProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("AddAssociatedProductSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("AddAssociatedProductSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddAssociatedProductSearchModel()");
+		logger.LogDebug("AddAssociatedProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

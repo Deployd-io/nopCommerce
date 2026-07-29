@@ -12,6 +12,7 @@ public static class CustomerExtensions
     /// <returns>Result</returns>
     public static bool IsSearchEngineAccount(this Customer customer)
     {
+		logger.LogDebug(">>> Entering IsSearchEngineAccount(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         if (!customer.IsSystemAccount || string.IsNullOrEmpty(customer.SystemName))
@@ -19,6 +20,8 @@ public static class CustomerExtensions
 
         var result = customer.SystemName.Equals(NopCustomerDefaults.SearchEngineCustomerName, StringComparison.InvariantCultureIgnoreCase);
 
+		logger.LogDebug("IsSearchEngineAccount(customer={Customer}): result → {Result}", customer, result);
+		logger.LogDebug("<<< Exiting IsSearchEngineAccount(customer={Customer})", customer);
         return result;
     }
 
@@ -29,6 +32,7 @@ public static class CustomerExtensions
     /// <returns>Result</returns>
     public static bool IsBackgroundTaskAccount(this Customer customer)
     {
+		logger.LogDebug(">>> Entering IsBackgroundTaskAccount(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         if (!customer.IsSystemAccount || string.IsNullOrEmpty(customer.SystemName))
@@ -36,6 +40,8 @@ public static class CustomerExtensions
 
         var result = customer.SystemName.Equals(NopCustomerDefaults.BackgroundTaskCustomerName, StringComparison.InvariantCultureIgnoreCase);
 
+		logger.LogDebug("IsBackgroundTaskAccount(customer={Customer}): result → {Result}", customer, result);
+		logger.LogDebug("<<< Exiting IsBackgroundTaskAccount(customer={Customer})", customer);
         return result;
     }
 }

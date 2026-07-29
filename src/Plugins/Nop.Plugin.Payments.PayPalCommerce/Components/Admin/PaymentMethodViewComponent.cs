@@ -41,11 +41,13 @@ public class PaymentMethodViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         if (!widgetZone.Equals(AdminWidgetZones.PaymentMethodListTop))
             return Content(string.Empty);
 
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Admin/_PaymentMethod.cshtml", active);
     }
 

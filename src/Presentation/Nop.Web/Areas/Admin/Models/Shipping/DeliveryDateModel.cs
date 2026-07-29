@@ -12,7 +12,10 @@ public partial record DeliveryDateModel : BaseNopEntityModel, ILocalizedModel<De
 
     public DeliveryDateModel()
     {
+		logger.LogDebug(">>> Entering DeliveryDateModel()");
         Locales = new List<DeliveryDateLocalizedModel>();
+		logger.LogDebug("<<< Exiting DeliveryDateModel()");
+		logger.LogDebug("DeliveryDateModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

@@ -11,7 +11,10 @@ public partial record TaxCategorySearchModel : BaseSearchModel
 
     public TaxCategorySearchModel()
     {
+		logger.LogDebug(">>> Entering TaxCategorySearchModel()");
         AddTaxCategory = new TaxCategoryModel();
+		logger.LogDebug("<<< Exiting TaxCategorySearchModel()");
+		logger.LogDebug("TaxCategorySearchModel(): AddTaxCategory → {AddTaxCategory}", AddTaxCategory);
     }
 
     #endregion

@@ -25,7 +25,10 @@ public partial record ProductSpecificationAttributeModel : BaseNopEntityModel
 
     public ProductSpecificationAttributeModel()
     {
+		logger.LogDebug(">>> Entering ProductSpecificationAttributeModel()");
         Values = new List<ProductSpecificationAttributeValueModel>();
+		logger.LogDebug("<<< Exiting ProductSpecificationAttributeModel()");
+		logger.LogDebug("ProductSpecificationAttributeModel(): Values → {Values}", Values);
     }
 
     #endregion

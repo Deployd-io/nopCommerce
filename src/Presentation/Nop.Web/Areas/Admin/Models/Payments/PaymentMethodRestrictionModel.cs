@@ -12,9 +12,14 @@ public partial record PaymentMethodRestrictionModel : BaseNopModel
 
     public PaymentMethodRestrictionModel()
     {
+		logger.LogDebug(">>> Entering PaymentMethodRestrictionModel()");
         AvailablePaymentMethods = new List<PaymentMethodModel>();
         AvailableCountries = new List<CountryModel>();
+		logger.LogDebug("PaymentMethodRestrictionModel(): AvailablePaymentMethods → {AvailablePaymentMethods}", AvailablePaymentMethods);
+		logger.LogDebug("PaymentMethodRestrictionModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         Restricted = new Dictionary<string, IDictionary<int, bool>>();
+		logger.LogDebug("<<< Exiting PaymentMethodRestrictionModel()");
+		logger.LogDebug("PaymentMethodRestrictionModel(): Restricted → {Restricted}", Restricted);
     }
 
     #endregion

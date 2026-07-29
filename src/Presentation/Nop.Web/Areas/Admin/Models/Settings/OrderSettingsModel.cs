@@ -13,8 +13,12 @@ public partial record OrderSettingsModel : BaseNopModel, ISettingsModel
 
     public OrderSettingsModel()
     {
+		logger.LogDebug(">>> Entering OrderSettingsModel()");
         ReturnRequestReasonSearchModel = new ReturnRequestReasonSearchModel();
         ReturnRequestActionSearchModel = new ReturnRequestActionSearchModel();
+		logger.LogDebug("<<< Exiting OrderSettingsModel()");
+		logger.LogDebug("OrderSettingsModel(): ReturnRequestReasonSearchModel → {ReturnRequestReasonSearchModel}", ReturnRequestReasonSearchModel);
+		logger.LogDebug("OrderSettingsModel(): ReturnRequestActionSearchModel → {ReturnRequestActionSearchModel}", ReturnRequestActionSearchModel);
     }
 
     #endregion

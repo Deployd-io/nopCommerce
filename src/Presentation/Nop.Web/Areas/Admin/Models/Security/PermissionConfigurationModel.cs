@@ -11,10 +11,13 @@ public partial record PermissionConfigurationModel : BaseNopModel
 
     public PermissionConfigurationModel()
     {
+		logger.LogDebug(">>> Entering PermissionConfigurationModel()");
         PermissionCategorySearchModel = new PermissionCategorySearchModel
         {
+			logger.LogDebug("PermissionConfigurationModel(): PermissionCategorySearchModel → {PermissionCategorySearchModel}", PermissionCategorySearchModel);
             Length = int.MaxValue
         };
+		logger.LogDebug("<<< Exiting PermissionConfigurationModel()");
     }
 
     #endregion

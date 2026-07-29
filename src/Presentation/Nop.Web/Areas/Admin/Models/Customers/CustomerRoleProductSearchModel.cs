@@ -13,12 +13,20 @@ public partial record CustomerRoleProductSearchModel : BaseSearchModel
 
     public CustomerRoleProductSearchModel()
     {
+		logger.LogDebug(">>> Entering CustomerRoleProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("CustomerRoleProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("CustomerRoleProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("CustomerRoleProductSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("CustomerRoleProductSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
         AddProductToCustomerRoleModel = new AddProductToCustomerRoleModel();
+		logger.LogDebug("<<< Exiting CustomerRoleProductSearchModel()");
+		logger.LogDebug("CustomerRoleProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
+		logger.LogDebug("CustomerRoleProductSearchModel(): AddProductToCustomerRoleModel → {AddProductToCustomerRoleModel}", AddProductToCustomerRoleModel);
     }
 
     #endregion

@@ -46,6 +46,7 @@ public class BrevoMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -130,6 +131,7 @@ public class BrevoMigration : MigrationBase
 
         var sendinblueSettings = _dataProvider.GetTable<Setting>().Where(x => x.Name.StartsWith("sendinbluesettings.")).ToList();
         if (sendinblueSettings.Any())
+		logger.LogDebug("Up(): sendinblueSettings → {SendinblueSettings}", sendinblueSettings);
         { 
             foreach (var setting in sendinblueSettings)
             {
@@ -150,14 +152,18 @@ public class BrevoMigration : MigrationBase
 
         var sendinblueTask = _dataProvider.GetTable<ScheduleTask>().FirstOrDefault(x => x.Type == "Nop.Plugin.Misc.Sendinblue.Services.SynchronizationTask");
         if (sendinblueTask != null)
+		logger.LogDebug("Up(): sendinblueTask → {SendinblueTask}", sendinblueTask);
         {
             sendinblueTask.Type = BrevoDefaults.SynchronizationTask;
+			logger.LogDebug("Up(): sendinblueTask.Type → {Arg0}", sendinblueTask.Type);
+			logger.LogDebug("Up(): sendinblueTask.Name → {Arg0}", sendinblueTask.Name);
             sendinblueTask.Name = BrevoDefaults.SynchronizationTaskName;
 
             _dataProvider.UpdateEntity(sendinblueTask);
         }
 
         #endregion
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -165,7 +171,9 @@ public class BrevoMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

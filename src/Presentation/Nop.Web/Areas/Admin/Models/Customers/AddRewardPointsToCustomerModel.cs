@@ -14,7 +14,10 @@ public partial record AddRewardPointsToCustomerModel : BaseNopModel
 
     public AddRewardPointsToCustomerModel()
     {
+		logger.LogDebug(">>> Entering AddRewardPointsToCustomerModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddRewardPointsToCustomerModel()");
+		logger.LogDebug("AddRewardPointsToCustomerModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

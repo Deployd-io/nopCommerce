@@ -8,7 +8,10 @@ public partial record ProductAttributeConditionModel : BaseNopModel
 {
     public ProductAttributeConditionModel()
     {
+		logger.LogDebug(">>> Entering ProductAttributeConditionModel()");
         ProductAttributes = new List<ProductAttributeModel>();
+		logger.LogDebug("<<< Exiting ProductAttributeConditionModel()");
+		logger.LogDebug("ProductAttributeConditionModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
     }
 
     [NopResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Condition.EnableCondition")]
@@ -26,7 +29,10 @@ public partial record ProductAttributeConditionModel : BaseNopModel
     {
         public ProductAttributeModel()
         {
+			logger.LogDebug(">>> Entering ProductAttributeModel()");
             Values = new List<ProductAttributeValueModel>();
+			logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductAttributeId { get; set; }

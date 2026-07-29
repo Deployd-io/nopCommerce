@@ -15,9 +15,14 @@ public partial record BlogPostModel : BaseNopEntityModel, IStoreMappingSupported
 
     public BlogPostModel()
     {
+		logger.LogDebug(">>> Entering BlogPostModel()");
         AvailableLanguages = new List<SelectListItem>();
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("BlogPostModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+		logger.LogDebug("BlogPostModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting BlogPostModel()");
+		logger.LogDebug("BlogPostModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

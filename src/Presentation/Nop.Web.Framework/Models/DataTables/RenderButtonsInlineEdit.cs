@@ -12,7 +12,10 @@ public partial class RenderButtonsInlineEdit : IRender
     /// </summary>
     public RenderButtonsInlineEdit()
     {
+		logger.LogDebug(">>> Entering RenderButtonsInlineEdit()");
         ClassName = NopButtonClassDefaults.Default;
+		logger.LogDebug("<<< Exiting RenderButtonsInlineEdit()");
+		logger.LogDebug("RenderButtonsInlineEdit(): ClassName → {ClassName}", ClassName);
     }
 
     #endregion

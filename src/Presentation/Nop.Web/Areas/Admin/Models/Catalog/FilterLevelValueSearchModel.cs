@@ -13,9 +13,14 @@ public partial record FilterLevelValueSearchModel : BaseSearchModel
 
     public FilterLevelValueSearchModel()
     {
+		logger.LogDebug(">>> Entering FilterLevelValueSearchModel()");
         AvailableFilterLevel1Values = new List<SelectListItem>();
         AvailableFilterLevel2Values = new List<SelectListItem>();
+		logger.LogDebug("FilterLevelValueSearchModel(): AvailableFilterLevel1Values → {AvailableFilterLevel1Values}", AvailableFilterLevel1Values);
+		logger.LogDebug("FilterLevelValueSearchModel(): AvailableFilterLevel2Values → {AvailableFilterLevel2Values}", AvailableFilterLevel2Values);
         AvailableFilterLevel3Values = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting FilterLevelValueSearchModel()");
+		logger.LogDebug("FilterLevelValueSearchModel(): AvailableFilterLevel3Values → {AvailableFilterLevel3Values}", AvailableFilterLevel3Values);
     }
 
     #endregion

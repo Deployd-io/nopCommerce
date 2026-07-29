@@ -14,8 +14,11 @@ public partial class NopUpdateMigrationAttribute : NopMigrationAttribute
     /// <param name="nopVersion">nopCommerce full version</param>
     /// <param name="migrationType">The migration type</param>
     public NopUpdateMigrationAttribute(string dateTime, string nopVersion, UpdateMigrationType migrationType) :
+		logger.LogDebug(">>> Entering NopUpdateMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},migrationType={MigrationType})", dateTime, nopVersion, migrationType);
+		logger.LogDebug("<<< Exiting NopUpdateMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},migrationType={MigrationType})", dateTime, nopVersion, migrationType);
         base(dateTime, nopVersion, migrationType, MigrationProcessType.Update)
     {
         ApplyInDbOnDebugMode = !_config.NopVersion.Equals(NopVersion.CURRENT_VERSION, StringComparison.CurrentCultureIgnoreCase);
+		logger.LogDebug("NopUpdateMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},migrationType={MigrationType}): ApplyInDbOnDebugMode → {ApplyInDbOnDebugMode}", dateTime, nopVersion, migrationType, ApplyInDbOnDebugMode);
     }
 }

@@ -13,7 +13,10 @@ public partial record GiftCardModel : BaseNopEntityModel
 
     public GiftCardModel()
     {
+		logger.LogDebug(">>> Entering GiftCardModel()");
         GiftCardUsageHistorySearchModel = new GiftCardUsageHistorySearchModel();
+		logger.LogDebug("<<< Exiting GiftCardModel()");
+		logger.LogDebug("GiftCardModel(): GiftCardUsageHistorySearchModel → {GiftCardUsageHistorySearchModel}", GiftCardUsageHistorySearchModel);
     }
 
     #endregion
