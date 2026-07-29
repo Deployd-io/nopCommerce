@@ -18,10 +18,12 @@ public partial class AppSettings
 
     public AppSettings(IList<IConfig> configurations = null)
     {
+		logger.LogDebug(">>> Entering AppSettings(configurations={Configurations})", configurations);
         _configurations = configurations
                               ?.OrderBy(config => config.GetOrder())
                               ?.ToDictionary(config => config.GetType(), config => config)
                           ?? new Dictionary<Type, IConfig>();
+							logger.LogDebug("AppSettings(configurations={Configurations}): _configurations → {_configurations}", configurations, _configurations);
     }
 
     #endregion
@@ -35,6 +37,7 @@ public partial class AppSettings
     /// <returns>Configuration parameters</returns>
     public virtual TConfig Get<TConfig>() where TConfig : class, IConfig
     {
+		logger.LogDebug(">>> Entering Get()");
         if (_configurations[typeof(TConfig)] is not TConfig config)
             throw new NopException($"No configuration with type '{typeof(TConfig)}' found");
 
@@ -47,10 +50,12 @@ public partial class AppSettings
     /// <param name="configurations">Configurations to update</param>
     public virtual void Update(IList<IConfig> configurations)
     {
+		logger.LogDebug(">>> Entering Update(configurations={Configurations})", configurations);
         foreach (var config in configurations)
         {
             _configurations[config.GetType()] = config;
         }
+		logger.LogDebug("<<< Exiting Update(configurations={Configurations})", configurations);
     }
 
     #endregion

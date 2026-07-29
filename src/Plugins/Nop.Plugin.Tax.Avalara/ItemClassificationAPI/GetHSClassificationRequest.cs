@@ -7,8 +7,12 @@ public class GetHSClassificationRequestc : Request
 {
     public GetHSClassificationRequestc(string hsClassificationId, string companyId)
     {
+		logger.LogDebug(">>> Entering GetHSClassificationRequestc(hsClassificationId={HsClassificationId},companyId={CompanyId})", hsClassificationId, companyId);
         HSClassificationId = hsClassificationId;
         CompanyId = companyId;
+		logger.LogDebug("<<< Exiting GetHSClassificationRequestc(hsClassificationId={HsClassificationId},companyId={CompanyId})", hsClassificationId, companyId);
+		logger.LogDebug("GetHSClassificationRequestc(hsClassificationId={HsClassificationId},companyId={CompanyId}): CompanyId → {CompanyId1}", hsClassificationId, companyId, CompanyId);
+		logger.LogDebug("GetHSClassificationRequestc(hsClassificationId={HsClassificationId},companyId={CompanyId}): HSClassificationId → {HSClassificationId}", hsClassificationId, companyId, HSClassificationId);
     }
 
     /// <summary>

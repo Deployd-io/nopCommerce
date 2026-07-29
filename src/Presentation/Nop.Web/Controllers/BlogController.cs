@@ -89,62 +89,80 @@ public partial class BlogController : BasePublicController
 
     public virtual async Task<IActionResult> List(BlogPagingFilteringModel command)
     {
+		logger.LogDebug(">>> Entering List(command={Command})", command);
         if (!_blogSettings.Enabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _blogModelFactory.PrepareBlogPostListModelAsync(command);
+		logger.LogDebug("List(command={Command}): model → {Model}", command, model);
+		logger.LogDebug("<<< Exiting List(command={Command})", command);
         return View("List", model);
     }
 
     public virtual async Task<IActionResult> BlogByTag(BlogPagingFilteringModel command)
     {
+		logger.LogDebug(">>> Entering BlogByTag(command={Command})", command);
         if (!_blogSettings.Enabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _blogModelFactory.PrepareBlogPostListModelAsync(command);
+		logger.LogDebug("BlogByTag(command={Command}): model → {Model}", command, model);
+		logger.LogDebug("<<< Exiting BlogByTag(command={Command})", command);
         return View("List", model);
     }
 
     public virtual async Task<IActionResult> BlogByMonth(BlogPagingFilteringModel command)
     {
+		logger.LogDebug(">>> Entering BlogByMonth(command={Command})", command);
         if (!_blogSettings.Enabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _blogModelFactory.PrepareBlogPostListModelAsync(command);
+		logger.LogDebug("BlogByMonth(command={Command}): model → {Model}", command, model);
+		logger.LogDebug("<<< Exiting BlogByMonth(command={Command})", command);
         return View("List", model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> ListRss(int languageId)
     {
+		logger.LogDebug(">>> Entering ListRss(languageId={LanguageId})", languageId);
         var store = await _storeContext.GetCurrentStoreAsync();
         var feed = new RssFeed(
             $"{await _localizationService.GetLocalizedAsync(store, x => x.Name)}: Blog",
             "Blog",
             new Uri(_webHelper.GetStoreLocation()),
             DateTime.UtcNow);
+			logger.LogDebug("ListRss(languageId={LanguageId}): store → {Store}", languageId, store);
 
         if (!_blogSettings.Enabled)
             return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
 
         var items = new List<RssItem>();
         var blogPosts = await _blogService.GetAllBlogPostsAsync(store.Id, languageId);
+		logger.LogDebug("ListRss(languageId={LanguageId}): items → {Items}", languageId, items);
+		logger.LogDebug("ListRss(languageId={LanguageId}): blogPosts → {BlogPosts}", languageId, blogPosts);
         foreach (var blogPost in blogPosts)
         {
             var blogPostUrl = await _nopUrlHelper.RouteGenericUrlAsync(blogPost, _webHelper.GetCurrentRequestProtocol(), languageId: blogPost.LanguageId, ensureTwoPublishedLanguages: false);
             items.Add(new RssItem(blogPost.Title, blogPost.Body, new Uri(blogPostUrl), $"urn:store:{store.Id}:blog:post:{blogPost.Id}", blogPost.CreatedOnUtc));
+			logger.LogDebug("ListRss(languageId={LanguageId}): blogPostUrl → {BlogPostUrl}", languageId, blogPostUrl);
         }
         feed.Items = items;
+		logger.LogDebug("ListRss(languageId={LanguageId}): feed.Items → {Arg1}", languageId, feed.Items);
+		logger.LogDebug("<<< Exiting ListRss(languageId={LanguageId})", languageId);
         return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
     }
 
     public virtual async Task<IActionResult> BlogPost(int blogPostId)
     {
+		logger.LogDebug(">>> Entering BlogPost(blogPostId={BlogPostId})", blogPostId);
         if (!_blogSettings.Enabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var blogPost = await _blogService.GetBlogPostByIdAsync(blogPostId);
         if (blogPost == null)
+			logger.LogDebug("BlogPost(blogPostId={BlogPostId}): blogPost → {BlogPost}", blogPostId, blogPost);
             return InvokeHttp404();
 
         var notAvailable =
@@ -156,6 +174,7 @@ public partial class BlogController : BasePublicController
         //We should allows him (her) to use "Preview" functionality
         var hasAdminAccess = await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL) && await _permissionService.AuthorizeAsync(StandardPermission.ContentManagement.BLOG_VIEW);
         if (notAvailable && !hasAdminAccess)
+			logger.LogDebug("BlogPost(blogPostId={BlogPostId}): hasAdminAccess → {HasAdminAccess}", blogPostId, hasAdminAccess);
             return InvokeHttp404();
 
         //display "edit" (manage) link
@@ -164,7 +183,9 @@ public partial class BlogController : BasePublicController
 
         var model = new BlogPostModel();
         await _blogModelFactory.PrepareBlogPostModelAsync(model, blogPost, true);
+		logger.LogDebug("BlogPost(blogPostId={BlogPostId}): model → {Model}", blogPostId, model);
 
+		logger.LogDebug("<<< Exiting BlogPost(blogPostId={BlogPostId})", blogPostId);
         return View(model);
     }
 

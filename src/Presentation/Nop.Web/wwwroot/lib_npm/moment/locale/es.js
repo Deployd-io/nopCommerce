@@ -31,11 +31,13 @@ export default moment.defineLocale('es', {
         '_'
     ),
     monthsShort: function (m, format) {
+		logger.debug(`>>> Entering monthsShort(m=${m},format=${format})`);
         if (!m) {
             return monthsShortDot;
         } else if (/-MMM-/.test(format)) {
             return monthsShort[m.month()];
         } else {
+			logger.debug(`<<< Exiting monthsShort(m=${m},format=${format})`);
             return monthsShortDot[m.month()];
         }
     },
@@ -62,18 +64,23 @@ export default moment.defineLocale('es', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
             return '[hoy a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
             return '[mañana a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return 'dddd [a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
             return '[ayer a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return (
                 '[el] dddd [pasado a la' +
                 (this.hours() !== 1 ? 's' : '') +

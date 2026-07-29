@@ -60,6 +60,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignSearchModel> PrepareCampaignSearchModelAsync(CampaignSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCampaignSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -70,6 +71,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCampaignSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -83,11 +85,13 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignListModel> PrepareCampaignListModelAsync(CampaignSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCampaignListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get campaigns
         var campaigns = (await _campaignService.GetAllCampaignsAsync(searchModel.StoreId)).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaigns → {Campaigns}", searchModel, campaigns);
         //prepare grid model
         var model = await new CampaignListModel().PrepareToGridAsync(searchModel, campaigns, () =>
         {
@@ -96,11 +100,13 @@ public partial class CampaignModelFactory : ICampaignModelFactory
                 //fill in model values from the entity
                 var campaignModel = campaign.ToModel<CampaignModel>();
 
+				logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaignModel → {CampaignModel}", searchModel, campaignModel);
                 //convert dates to the user time
                 campaignModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(campaign.CreatedOnUtc, DateTimeKind.Utc);
                 if (campaign.DontSendBeforeDateUtc.HasValue)
                 {
                     campaignModel.DontSendBeforeDate = await _dateTimeHelper
+						logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaignModel.DontSendBeforeDate → {Arg1}", searchModel, campaignModel.DontSendBeforeDate);
                         .ConvertToUserTimeAsync(campaign.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
                 }
 
@@ -108,6 +114,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCampaignListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

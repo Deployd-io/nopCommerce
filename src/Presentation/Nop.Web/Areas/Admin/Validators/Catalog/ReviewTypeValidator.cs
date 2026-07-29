@@ -13,9 +13,11 @@ public partial class ReviewTypeValidator : BaseNopValidator<ReviewTypeModel>
 {
     public ReviewTypeValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ReviewTypeValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Settings.ReviewType.Fields.Name.Required"));
         RuleFor(x => x.Description).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Settings.ReviewType.Fields.Description.Required"));
 
         SetDatabaseValidationRules<ReviewType>();
+		logger.LogDebug("<<< Exiting ReviewTypeValidator(localizationService={LocalizationService})", localizationService);
     }
 }

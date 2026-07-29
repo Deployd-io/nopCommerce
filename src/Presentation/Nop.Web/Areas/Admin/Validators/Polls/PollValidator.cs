@@ -10,8 +10,10 @@ public partial class PollValidator : BaseNopValidator<PollModel>
 {
     public PollValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering PollValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Polls.Fields.Name.Required"));
 
         SetDatabaseValidationRules<Poll>();
+		logger.LogDebug("<<< Exiting PollValidator(localizationService={LocalizationService})", localizationService);
     }
 }

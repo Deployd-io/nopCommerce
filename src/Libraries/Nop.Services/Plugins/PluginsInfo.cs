@@ -25,7 +25,10 @@ public partial class PluginsInfo : IPluginsInfo
 
     public PluginsInfo(INopFileProvider fileProvider)
     {
+		logger.LogDebug(">>> Entering PluginsInfo(fileProvider={FileProvider})", fileProvider);
         _fileProvider = fileProvider ?? CommonHelper.DefaultFileProvider;
+		logger.LogDebug("<<< Exiting PluginsInfo(fileProvider={FileProvider})", fileProvider);
+		logger.LogDebug("PluginsInfo(fileProvider={FileProvider}): _fileProvider → {_fileProvider}", fileProvider, _fileProvider);
     }
 
     #endregion
@@ -41,9 +44,11 @@ public partial class PluginsInfo : IPluginsInfo
     /// </returns>
     protected virtual IList<string> GetObsoleteInstalledPluginNames()
     {
+		logger.LogDebug(">>> Entering GetObsoleteInstalledPluginNames()");
         //check whether file exists
         var filePath = _fileProvider.MapPath(NopPluginDefaults.InstalledPluginsFilePath);
         if (!_fileProvider.FileExists(filePath))
+		logger.LogDebug("GetObsoleteInstalledPluginNames(): filePath → {FilePath}", filePath);
         {
             //if not, try to parse the file that was used in previous nopCommerce versions
             filePath = _fileProvider.MapPath(NopPluginDefaults.ObsoleteInstalledPluginsFilePath);
@@ -54,6 +59,7 @@ public partial class PluginsInfo : IPluginsInfo
             var pluginSystemNames = new List<string>();
             using (var reader = new StringReader(_fileProvider.ReadAllText(filePath, Encoding.UTF8)))
             {
+			logger.LogDebug("GetObsoleteInstalledPluginNames(): pluginSystemNames → {PluginSystemNames}", pluginSystemNames);
                 string pluginName;
                 while ((pluginName = reader.ReadLine()) != null)
                     if (!string.IsNullOrWhiteSpace(pluginName))
@@ -68,12 +74,14 @@ public partial class PluginsInfo : IPluginsInfo
 
         var text = _fileProvider.ReadAllText(filePath, Encoding.UTF8);
         if (string.IsNullOrEmpty(text))
+			logger.LogDebug("GetObsoleteInstalledPluginNames(): text → {Text}", text);
             return new List<string>();
 
         //delete the old file
         _fileProvider.DeleteFile(filePath);
 
         //get plugin system names from the JSON file
+		logger.LogDebug("<<< Exiting GetObsoleteInstalledPluginNames()");
         return JsonConvert.DeserializeObject<IList<string>>(text);
     }
 
@@ -85,18 +93,26 @@ public partial class PluginsInfo : IPluginsInfo
     protected virtual void DeserializePluginInfo(string json)
     {
         if (string.IsNullOrEmpty(json))
+			logger.LogDebug(">>> Entering DeserializePluginInfo(json={Json})", json);
             return;
 
         var pluginsInfo = JsonConvert.DeserializeObject<PluginsInfo>(json);
 
+		logger.LogDebug("DeserializePluginInfo(json={Json}): pluginsInfo → {PluginsInfo}", json, pluginsInfo);
         if (pluginsInfo == null)
             return;
 
         InstalledPluginNames = pluginsInfo.InstalledPluginNames;
+		logger.LogDebug("DeserializePluginInfo(json={Json}): InstalledPluginNames → {InstalledPluginNames}", json, InstalledPluginNames);
         InstalledPlugins = pluginsInfo.InstalledPlugins;
+		logger.LogDebug("DeserializePluginInfo(json={Json}): InstalledPlugins → {InstalledPlugins}", json, InstalledPlugins);
         PluginNamesToUninstall = pluginsInfo.PluginNamesToUninstall;
+		logger.LogDebug("DeserializePluginInfo(json={Json}): PluginNamesToUninstall → {PluginNamesToUninstall}", json, PluginNamesToUninstall);
         PluginNamesToDelete = pluginsInfo.PluginNamesToDelete;
+		logger.LogDebug("DeserializePluginInfo(json={Json}): PluginNamesToDelete → {PluginNamesToDelete}", json, PluginNamesToDelete);
         PluginNamesToInstall = pluginsInfo.PluginNamesToInstall;
+		logger.LogDebug("DeserializePluginInfo(json={Json}): PluginNamesToInstall → {PluginNamesToInstall}", json, PluginNamesToInstall);
+		logger.LogDebug("<<< Exiting DeserializePluginInfo(json={Json})", json);
     }
 
     /// <summary>
@@ -106,16 +122,19 @@ public partial class PluginsInfo : IPluginsInfo
     /// <returns>Result of check</returns>
     protected bool IsPluginDirectory(string directoryName)
     {
+		logger.LogDebug(">>> Entering IsPluginDirectory(directoryName={DirectoryName})", directoryName);
         if (string.IsNullOrEmpty(directoryName))
             return false;
 
         //get parent directory
         var parent = _fileProvider.GetParentDirectory(directoryName);
         if (string.IsNullOrEmpty(parent))
+			logger.LogDebug("IsPluginDirectory(directoryName={DirectoryName}): parent → {Parent}", directoryName, parent);
             return false;
 
         //directory is directly in plugins directory
         if (!_fileProvider.GetDirectoryNameOnly(parent).Equals(NopPluginDefaults.PathName, StringComparison.InvariantCultureIgnoreCase))
+		logger.LogDebug("<<< Exiting IsPluginDirectory(directoryName={DirectoryName})", directoryName);
             return false;
 
         return true;
@@ -168,9 +187,11 @@ public partial class PluginsInfo : IPluginsInfo
     /// </returns>
     public virtual void LoadPluginInfo()
     {
+		logger.LogDebug(">>> Entering LoadPluginInfo()");
         //check whether plugins info file exists
         var filePath = _fileProvider.MapPath(NopPluginDefaults.PluginsInfoFilePath);
         if (!_fileProvider.FileExists(filePath))
+		logger.LogDebug("LoadPluginInfo(): filePath → {FilePath}", filePath);
         {
             //file doesn't exist, so try to get only installed plugin names from the obsolete file
             _installedPluginNames.AddRange(GetObsoleteInstalledPluginNames());
@@ -189,10 +210,13 @@ public partial class PluginsInfo : IPluginsInfo
 
         var pluginDescriptors = new List<(PluginDescriptor pluginDescriptor, bool needToDeploy)>();
         var incompatiblePlugins = new Dictionary<string, PluginIncompatibleType>();
+		logger.LogDebug("LoadPluginInfo(): pluginDescriptors → {PluginDescriptors}", pluginDescriptors);
+		logger.LogDebug("LoadPluginInfo(): incompatiblePlugins → {IncompatiblePlugins}", incompatiblePlugins);
 
         //ensure plugins directory is created
         var pluginsDirectory = _fileProvider.MapPath(NopPluginDefaults.Path);
         _fileProvider.CreateDirectory(pluginsDirectory);
+		logger.LogDebug("LoadPluginInfo(): pluginsDirectory → {PluginsDirectory}", pluginsDirectory);
 
         //load plugin descriptors from the plugin directory
         foreach (var item in GetDescriptionFilesAndDescriptors(pluginsDirectory))
@@ -227,6 +251,7 @@ public partial class PluginsInfo : IPluginsInfo
                 //try to get plugin directory
                 var pluginDirectory = _fileProvider.GetDirectoryName(descriptionFile);
                 if (string.IsNullOrEmpty(pluginDirectory))
+					logger.LogDebug("LoadPluginInfo(): pluginDirectory → {PluginDirectory}", pluginDirectory);
                     throw new Exception($"Directory cannot be resolved for '{_fileProvider.GetFileName(descriptionFile)}' description file");
 
                 //get list of all library files in the plugin directory (not in the bin one)
@@ -253,10 +278,12 @@ public partial class PluginsInfo : IPluginsInfo
 
                 //if it's found, set it as original assembly file
                 pluginDescriptor.OriginalAssemblyFile = mainPluginFile;
+				logger.LogDebug("LoadPluginInfo(): pluginDescriptor.OriginalAssemblyFile → {Arg0}", pluginDescriptor.OriginalAssemblyFile);
 
                 //need to deploy if plugin is already installed
                 var needToDeploy = InstalledPlugins.Select(pd => pd.SystemName).Contains(pluginName);
 
+				logger.LogDebug("LoadPluginInfo(): needToDeploy → {NeedToDeploy}", needToDeploy);
                 //also, deploy if the plugin is only going to be installed now
                 needToDeploy = needToDeploy || PluginNamesToInstall.Any(pluginInfo => pluginInfo.SystemName.Equals(pluginName));
 
@@ -268,6 +295,7 @@ public partial class PluginsInfo : IPluginsInfo
             }
             catch (ReflectionTypeLoadException exception)
             {
+				logger.LogError("Exception in LoadPluginInfo(): {Arg0}", ex.Message);
                 //get all loader exceptions
                 var error = exception.LoaderExceptions.Aggregate($"Plugin '{pluginDescriptor.FriendlyName}'. ",
                     (message, nextMessage) => $"{message}{nextMessage?.Message ?? string.Empty}{Environment.NewLine}");
@@ -282,7 +310,10 @@ public partial class PluginsInfo : IPluginsInfo
         }
 
         IncompatiblePlugins = incompatiblePlugins;
+		logger.LogDebug("LoadPluginInfo(): IncompatiblePlugins → {IncompatiblePlugins}", IncompatiblePlugins);
         PluginDescriptors = pluginDescriptors;
+		logger.LogDebug("LoadPluginInfo(): PluginDescriptors → {PluginDescriptors}", PluginDescriptors);
+		logger.LogDebug("<<< Exiting LoadPluginInfo()");
     }
 
 
@@ -292,10 +323,14 @@ public partial class PluginsInfo : IPluginsInfo
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveAsync()
     {
+		logger.LogDebug(">>> Entering SaveAsync()");
         //save the file
         var filePath = _fileProvider.MapPath(NopPluginDefaults.PluginsInfoFilePath);
         var text = JsonConvert.SerializeObject(this, Formatting.Indented);
+		logger.LogDebug("SaveAsync(): filePath → {FilePath}", filePath);
+		logger.LogDebug("SaveAsync(): text → {Text}", text);
         await _fileProvider.WriteAllTextAsync(filePath, text, Encoding.UTF8);
+		logger.LogDebug("<<< Exiting SaveAsync()");
     }
 
     /// <summary>
@@ -303,10 +338,14 @@ public partial class PluginsInfo : IPluginsInfo
     /// </summary>
     public virtual void Save()
     {
+		logger.LogDebug(">>> Entering Save()");
         //save the file
         var filePath = _fileProvider.MapPath(NopPluginDefaults.PluginsInfoFilePath);
         var text = JsonConvert.SerializeObject(this, Formatting.Indented);
+		logger.LogDebug("Save(): filePath → {FilePath}", filePath);
+		logger.LogDebug("Save(): text → {Text}", text);
         _fileProvider.WriteAllText(filePath, text, Encoding.UTF8);
+		logger.LogDebug("<<< Exiting Save()");
     }
 
     /// <summary>

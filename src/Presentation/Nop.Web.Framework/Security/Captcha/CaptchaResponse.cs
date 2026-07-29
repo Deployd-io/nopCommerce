@@ -11,7 +11,10 @@ public partial class CaptchaResponse
 
     public CaptchaResponse()
     {
+		logger.LogDebug(">>> Entering CaptchaResponse()");
         Errors = new List<string>();
+		logger.LogDebug("<<< Exiting CaptchaResponse()");
+		logger.LogDebug("CaptchaResponse(): Errors → {Errors}", Errors);
     }
 
     #endregion

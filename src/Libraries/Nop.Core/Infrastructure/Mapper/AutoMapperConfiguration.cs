@@ -23,7 +23,10 @@ public static class AutoMapperConfiguration
     /// <param name="config">Mapper configuration</param>
     public static void Init(MapperConfiguration config)
     {
+		logger.LogDebug(">>> Entering Init(config={Config})", config);
         MapperConfiguration = config;
         Mapper = config.CreateMapper();
+		logger.LogDebug("<<< Exiting Init(config={Config})", config);
+		logger.LogDebug("Init(config={Config}): Mapper → {Mapper}", config, Mapper);
     }
 }

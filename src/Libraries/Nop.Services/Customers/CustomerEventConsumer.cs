@@ -39,6 +39,7 @@ public partial class CustomerEventConsumer : IConsumer<CustomerChangeWorkingLang
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(CustomerChangeWorkingLanguageEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (eventMessage.Customer is not Customer customer)
             return;
 
@@ -48,14 +49,18 @@ public partial class CustomerEventConsumer : IConsumer<CustomerChangeWorkingLang
         //change language for all customer subscriptions
         var store = await _storeContext.GetCurrentStoreAsync();
         var subscriptions = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(customer.Email, storeId: store.Id);
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): store → {Store}", eventMessage, store);
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): subscriptions → {Subscriptions}", eventMessage, subscriptions);
         foreach (var subscription in subscriptions)
         {
             if (subscription.LanguageId == customer.LanguageId)
                 continue;
 
             subscription.LanguageId = customer.LanguageId ?? 0;
+			logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): subscription.LanguageId → {Arg1}", eventMessage, subscription.LanguageId);
             await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(subscription);
         }
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

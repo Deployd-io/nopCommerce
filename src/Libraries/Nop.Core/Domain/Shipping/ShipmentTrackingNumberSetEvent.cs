@@ -11,7 +11,10 @@ public partial class ShipmentTrackingNumberSetEvent
     /// <param name="shipment">Shipment</param>
     public ShipmentTrackingNumberSetEvent(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering ShipmentTrackingNumberSetEvent(shipment={Shipment})", shipment);
         Shipment = shipment;
+		logger.LogDebug("<<< Exiting ShipmentTrackingNumberSetEvent(shipment={Shipment})", shipment);
+		logger.LogDebug("ShipmentTrackingNumberSetEvent(shipment={Shipment}): Shipment → {Shipment1}", shipment, Shipment);
     }
 
     /// <summary>

@@ -207,19 +207,23 @@ public class AdminModelFactory
     /// </returns>
     public async Task<RequestQuoteSearchModel> PrepareRequestQuoteSearchModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareRequestQuoteSearchModelAsync()");
         var searchModel = new RequestQuoteSearchModel();
 
+		logger.LogDebug("PrepareRequestQuoteSearchModelAsync(): searchModel → {SearchModel}", searchModel);
         //prepare available statuses
         searchModel.AvailableRequestQuoteStatuses.AddRange(await RequestQuoteStatus.Submitted.ToSelectListAsync(false));
 
         //prepare default item text
         var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.All");
         //insert this default item at first
+		logger.LogDebug("PrepareRequestQuoteSearchModelAsync(): defaultItemText → {DefaultItemText}", defaultItemText);
         searchModel.AvailableRequestQuoteStatuses.Insert(0, new SelectListItem { Text = defaultItemText, Value = "-1" });
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareRequestQuoteSearchModelAsync()");
         return searchModel;
     }
 
@@ -232,19 +236,23 @@ public class AdminModelFactory
     /// </returns>
     public async Task<QuoteSearchModel> PrepareQuoteSearchModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareQuoteSearchModelAsync()");
         var searchModel = new QuoteSearchModel();
 
+		logger.LogDebug("PrepareQuoteSearchModelAsync(): searchModel → {SearchModel}", searchModel);
         //prepare available statuses
         searchModel.AvailableQuoteStatuses.AddRange(await QuoteStatus.CreatedFromRequestQuote.ToSelectListAsync(false));
 
         //prepare default item text
         var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.All");
         //insert this default item at first
+		logger.LogDebug("PrepareQuoteSearchModelAsync(): defaultItemText → {DefaultItemText}", defaultItemText);
         searchModel.AvailableQuoteStatuses.Insert(0, new SelectListItem { Text = defaultItemText, Value = "-1" });
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareQuoteSearchModelAsync()");
         return searchModel;
     }
 
@@ -258,6 +266,7 @@ public class AdminModelFactory
     /// </returns>
     public async Task<RequestListModel> PrepareRequestQuoteListModelAsync(RequestQuoteSearchModel searchModel)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var createdOnFromValue = !searchModel.CreatedOnFrom.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var createdOnToValue = !searchModel.CreatedOnTo.HasValue ? null
@@ -323,9 +332,14 @@ public class AdminModelFactory
     /// </returns>
     public async Task<List<RequestQuoteItemModel>> PrepareRequestItemListModelAsync(int requestQuoteId)
     {
+		logger.LogDebug(">>> Entering PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         var items = await _rfqService.GetRequestQuoteItemsAsync(requestQuoteId);
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		logger.LogDebug("PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId}): items → {Items}", requestQuoteId, items);
+		logger.LogDebug("PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId}): primaryStoreCurrency → {PrimaryStoreCurrency}", requestQuoteId, primaryStoreCurrency);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
+		logger.LogDebug("<<< Exiting PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         return await items.SelectAwait(async p => await PreparedRequestQuoteItemModelAsync(p, primaryStoreCurrency)).ToListAsync();
     }
 
@@ -339,9 +353,14 @@ public class AdminModelFactory
     /// </returns>
     public async Task<List<QuoteItemModel>> PrepareQuoteItemListModelAsync(int quoteId)
     {
+		logger.LogDebug(">>> Entering PrepareQuoteItemListModelAsync(quoteId={QuoteId})", quoteId);
         var items = await _rfqService.GetQuoteItemsAsync(quoteId);
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		logger.LogDebug("PrepareQuoteItemListModelAsync(quoteId={QuoteId}): items → {Items}", quoteId, items);
+		logger.LogDebug("PrepareQuoteItemListModelAsync(quoteId={QuoteId}): primaryStoreCurrency → {PrimaryStoreCurrency}", quoteId, primaryStoreCurrency);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
+		logger.LogDebug("<<< Exiting PrepareQuoteItemListModelAsync(quoteId={QuoteId})", quoteId);
         return await items.SelectAwait(async p => await PreparedQuoteItemModelAsync(p, primaryStoreCurrency)).ToListAsync();
     }
 
@@ -511,6 +530,7 @@ public class AdminModelFactory
     /// </returns>
     public async Task<QuoteListModel> PrepareQuoteListModelAsync(QuoteSearchModel searchModel)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var createdOnFromValue = !searchModel.CreatedOnFrom.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var createdOnToValue = !searchModel.CreatedOnTo.HasValue ? null

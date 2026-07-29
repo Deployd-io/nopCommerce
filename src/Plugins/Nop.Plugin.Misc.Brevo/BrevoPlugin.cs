@@ -69,6 +69,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string> { PublicWidgetZones.HeadHtmlTag });
     }
 
@@ -79,6 +81,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+		logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(WidgetsBrevoViewComponent);
     }
 
@@ -87,6 +91,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/Brevo/Configure";
     }
 
@@ -96,6 +102,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new BrevoSettings
         {
@@ -189,6 +196,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -197,13 +205,17 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //smtp accounts
         foreach (var store in await _storeService.GetAllStoresAsync())
         {
             var key = $"{nameof(BrevoSettings)}.{nameof(BrevoSettings.EmailAccountId)}";
             var emailAccountId = await _settingService.GetSettingByKeyAsync<int>(key, storeId: store.Id, loadSharedValueIfNotFound: true);
+			logger.LogWarning("UninstallAsync(): key → {Key}", key);
+			logger.LogDebug("UninstallAsync(): emailAccountId → {EmailAccountId}", emailAccountId);
             var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(emailAccountId);
             if (emailAccount != null)
+				logger.LogDebug("UninstallAsync(): emailAccount → {EmailAccount}", emailAccount);
                 await _emailAccountService.DeleteEmailAccountAsync(emailAccount);
         }
 
@@ -221,6 +233,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
             var messageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(store.Id);
             foreach (var messageTemplate in messageTemplates)
             {
+			logger.LogDebug("UninstallAsync(): messageTemplates → {MessageTemplates}", messageTemplates);
                 await _genericAttributeService.SaveAttributeAsync<int?>(messageTemplate, BrevoDefaults.TemplateIdAttribute, null);
             }
         }
@@ -228,12 +241,14 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         //schedule task
         var task = await _scheduleTaskService.GetTaskByTypeAsync(BrevoDefaults.SynchronizationTask);
         if (task != null)
+			logger.LogDebug("UninstallAsync(): task → {Task}", task);
             await _scheduleTaskService.DeleteTaskAsync(task);
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Misc.Brevo");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

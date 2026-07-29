@@ -13,7 +13,10 @@ public partial class PluginUpdatedEvent
     /// <param name="plugin">Updated plugin</param>
     public PluginUpdatedEvent(PluginDescriptor plugin)
     {
+		logger.LogDebug(">>> Entering PluginUpdatedEvent(plugin={Plugin})", plugin);
         Plugin = plugin;
+		logger.LogDebug("<<< Exiting PluginUpdatedEvent(plugin={Plugin})", plugin);
+		logger.LogDebug("PluginUpdatedEvent(plugin={Plugin}): Plugin → {Plugin1}", plugin, Plugin);
     }
 
     #endregion

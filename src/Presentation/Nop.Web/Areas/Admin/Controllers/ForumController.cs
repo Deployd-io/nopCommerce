@@ -46,15 +46,20 @@ public partial class ForumController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupSearchModelAsync(new ForumGroupSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -62,9 +67,12 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> ForumGroupList(ForumGroupSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ForumGroupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupListModelAsync(searchModel);
 
+		logger.LogDebug("ForumGroupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ForumGroupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -72,6 +80,7 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> ForumList(ForumSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ForumList(searchModel={SearchModel})", searchModel);
         //try to get a forum group with the specified id
         var forumGroup = await _forumService.GetForumGroupByIdAsync(searchModel.ForumGroupId)
                          ?? throw new ArgumentException("No forum group found with the specified id");
@@ -79,6 +88,8 @@ public partial class ForumController : BaseAdminController
         //prepare model
         var model = await _forumModelFactory.PrepareForumListModelAsync(searchModel, forumGroup);
 
+		logger.LogDebug("ForumList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ForumList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -89,9 +100,12 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CreateForumGroup()
     {
+		logger.LogDebug(">>> Entering CreateForumGroup()");
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupModelAsync(new ForumGroupModel(), null);
 
+		logger.LogDebug("CreateForumGroup(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CreateForumGroup()");
         return View(model);
     }
 
@@ -115,15 +129,19 @@ public partial class ForumController : BaseAdminController
         model = await _forumModelFactory.PrepareForumGroupModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting CreateForumGroup(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CreateForum()
     {
+		logger.LogDebug(">>> Entering CreateForum()");
         //prepare model
         var model = await _forumModelFactory.PrepareForumModelAsync(new ForumModel(), null);
 
+		logger.LogDebug("CreateForum(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting CreateForum()");
         return View(model);
     }
 
@@ -147,6 +165,7 @@ public partial class ForumController : BaseAdminController
         model = await _forumModelFactory.PrepareForumModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting CreateForum(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -157,14 +176,18 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> EditForumGroup(int id)
     {
+		logger.LogDebug(">>> Entering EditForumGroup(id={Id})", id);
         //try to get a forum group with the specified id
         var forumGroup = await _forumService.GetForumGroupByIdAsync(id);
         if (forumGroup == null)
+			logger.LogDebug("EditForumGroup(id={Id}): forumGroup → {ForumGroup}", id, forumGroup);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupModelAsync(null, forumGroup);
 
+		logger.LogDebug("EditForumGroup(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting EditForumGroup(id={Id})", id);
         return View(model);
     }
 
@@ -192,20 +215,25 @@ public partial class ForumController : BaseAdminController
         model = await _forumModelFactory.PrepareForumGroupModelAsync(model, forumGroup, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting EditForumGroup(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> EditForum(int id)
     {
+		logger.LogDebug(">>> Entering EditForum(id={Id})", id);
         //try to get a forum with the specified id
         var forum = await _forumService.GetForumByIdAsync(id);
         if (forum == null)
+			logger.LogDebug("EditForum(id={Id}): forum → {Forum}", id, forum);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _forumModelFactory.PrepareForumModelAsync(null, forum);
 
+		logger.LogDebug("EditForum(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting EditForum(id={Id})", id);
         return View(model);
     }
 
@@ -233,6 +261,7 @@ public partial class ForumController : BaseAdminController
         model = await _forumModelFactory.PrepareForumModelAsync(model, forum, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting EditForum(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -244,15 +273,18 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteForumGroup(int id)
     {
+		logger.LogDebug(">>> Entering DeleteForumGroup(id={Id})", id);
         //try to get a forum group with the specified id
         var forumGroup = await _forumService.GetForumGroupByIdAsync(id);
         if (forumGroup == null)
+			logger.LogDebug("DeleteForumGroup(id={Id}): forumGroup → {ForumGroup}", id, forumGroup);
             return RedirectToAction("List");
 
         await _forumService.DeleteForumGroupAsync(forumGroup);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Forums.ForumGroup.Deleted"));
 
+		logger.LogDebug("<<< Exiting DeleteForumGroup(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -260,15 +292,18 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteForum(int id)
     {
+		logger.LogDebug(">>> Entering DeleteForum(id={Id})", id);
         //try to get a forum with the specified id
         var forum = await _forumService.GetForumByIdAsync(id);
         if (forum == null)
+			logger.LogDebug("DeleteForum(id={Id}): forum → {Forum}", id, forum);
             return RedirectToAction("List");
 
         await _forumService.DeleteForumAsync(forum);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Forums.Forum.Deleted"));
 
+		logger.LogDebug("<<< Exiting DeleteForum(id={Id})", id);
         return RedirectToAction("List");
     }
 

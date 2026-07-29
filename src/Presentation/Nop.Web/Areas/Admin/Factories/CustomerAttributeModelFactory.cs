@@ -71,11 +71,13 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     /// </returns>
     public virtual Task<CustomerAttributeSearchModel> PrepareCustomerAttributeSearchModelAsync(CustomerAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCustomerAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -89,11 +91,13 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     /// </returns>
     public virtual async Task<CustomerAttributeListModel> PrepareCustomerAttributeListModelAsync(CustomerAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customer attributes
         var customerAttributes = (await _customerAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareCustomerAttributeListModelAsync(searchModel={SearchModel}): customerAttributes → {CustomerAttributes}", searchModel, customerAttributes);
         //prepare list model
         var model = await new CustomerAttributeListModel().PrepareToGridAsync(searchModel, customerAttributes, () =>
         {
@@ -102,6 +106,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<CustomerAttributeModel>();
 
+				logger.LogDebug("PrepareCustomerAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
 
@@ -109,6 +114,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCustomerAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -54,9 +54,12 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _measureModelFactory.PrepareMeasureSearchModelAsync(new MeasureSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -66,9 +69,12 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Weights(MeasureWeightSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering Weights(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _measureModelFactory.PrepareMeasureWeightListModelAsync(searchModel);
 
+		logger.LogDebug("Weights(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting Weights(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -112,6 +118,7 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> WeightDelete(int id)
     {
+		logger.LogDebug(">>> Entering WeightDelete(id={Id})", id);
         //try to get a weight with the specified id
         var weight = await _measureService.GetMeasureWeightByIdAsync(id)
             ?? throw new ArgumentException("No weight found with the specified id", nameof(id));
@@ -127,6 +134,7 @@ public partial class MeasureController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteMeasureWeight",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteMeasureWeight"), weight.Id), weight);
 
+		logger.LogDebug("<<< Exiting WeightDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -134,13 +142,16 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> MarkAsPrimaryWeight(int id)
     {
+		logger.LogDebug(">>> Entering MarkAsPrimaryWeight(id={Id})", id);
         //try to get a weight with the specified id
         var weight = await _measureService.GetMeasureWeightByIdAsync(id)
             ?? throw new ArgumentException("No weight found with the specified id", nameof(id));
 
         _measureSettings.BaseWeightId = weight.Id;
+		logger.LogDebug("MarkAsPrimaryWeight(id={Id}): _measureSettings.BaseWeightId → {Arg1}", id, _measureSettings.BaseWeightId);
         await _settingService.SaveSettingAsync(_measureSettings);
 
+		logger.LogDebug("<<< Exiting MarkAsPrimaryWeight(id={Id})", id);
         return Json(new { result = true });
     }
 
@@ -152,9 +163,12 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Dimensions(MeasureDimensionSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering Dimensions(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _measureModelFactory.PrepareMeasureDimensionListModelAsync(searchModel);
 
+		logger.LogDebug("Dimensions(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting Dimensions(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -198,6 +212,7 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DimensionDelete(int id)
     {
+		logger.LogDebug(">>> Entering DimensionDelete(id={Id})", id);
         //try to get a dimension with the specified id
         var dimension = await _measureService.GetMeasureDimensionByIdAsync(id)
             ?? throw new ArgumentException("No dimension found with the specified id", nameof(id));
@@ -213,6 +228,7 @@ public partial class MeasureController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteMeasureDimension",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteMeasureDimension"), dimension.Id), dimension);
 
+		logger.LogDebug("<<< Exiting DimensionDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -220,13 +236,16 @@ public partial class MeasureController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> MarkAsPrimaryDimension(int id)
     {
+		logger.LogDebug(">>> Entering MarkAsPrimaryDimension(id={Id})", id);
         //try to get a dimension with the specified id
         var dimension = await _measureService.GetMeasureDimensionByIdAsync(id)
             ?? throw new ArgumentException("No dimension found with the specified id", nameof(id));
 
         _measureSettings.BaseDimensionId = dimension.Id;
+		logger.LogDebug("MarkAsPrimaryDimension(id={Id}): _measureSettings.BaseDimensionId → {Arg1}", id, _measureSettings.BaseDimensionId);
         await _settingService.SaveSettingAsync(_measureSettings);
 
+		logger.LogDebug("<<< Exiting MarkAsPrimaryDimension(id={Id})", id);
         return Json(new { result = true });
     }
 

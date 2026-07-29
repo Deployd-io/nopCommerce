@@ -10,9 +10,11 @@ public partial class ScheduleTaskValidator : BaseNopValidator<ScheduleTaskModel>
 {
     public ScheduleTaskValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ScheduleTaskValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.System.ScheduleTasks.Name.Required"));
         RuleFor(x => x.Seconds).GreaterThan(0).WithMessageAwait(localizationService.GetResourceAsync("Admin.System.ScheduleTasks.Seconds.Positive"));
 
         SetDatabaseValidationRules<ScheduleTask>();
+		logger.LogDebug("<<< Exiting ScheduleTaskValidator(localizationService={LocalizationService})", localizationService);
     }
 }

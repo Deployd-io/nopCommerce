@@ -19,9 +19,15 @@ public partial class DeepSeekHttpClientHelper : IArtificialIntelligenceHttpClien
     /// <param name="httpClient">HTTP client for configuration</param>
     public virtual void ConfigureClient(HttpClient httpClient)
     {
+		logger.LogDebug(">>> Entering ConfigureClient(httpClient={HttpClient})", httpClient);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         httpClient.BaseAddress = new Uri(ArtificialIntelligenceDefaults.DeepSeekBaseApiUrl);
+		logger.LogDebug("<<< Exiting ConfigureClient(httpClient={HttpClient})", httpClient);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("ConfigureClient(httpClient)={HttpClient}: external service call took {Arg1} ms", httpClient, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("ConfigureClient(httpClient)={HttpClient}: external service call took {Arg1} ms", httpClient, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Create HTTP request
     /// </summary>
@@ -30,6 +36,7 @@ public partial class DeepSeekHttpClientHelper : IArtificialIntelligenceHttpClien
     /// <returns>Created HttpRequestMessage</returns>
     public virtual HttpRequestMessage CreateRequest(ArtificialIntelligenceSettings settings, string query)
     {
+		logger.LogDebug(">>> Entering CreateRequest(settings={Settings},query={Query})", settings);
         var request = new HttpRequestMessage { Method = HttpMethod.Post };
         request.Headers.TryAddWithoutValidation(HeaderNames.Authorization, $"Bearer {settings.DeepSeekApiKey}");
 
@@ -37,10 +44,12 @@ public partial class DeepSeekHttpClientHelper : IArtificialIntelligenceHttpClien
         {
             messages = new List<Dictionary<string, string>> { new() { ["content"] = query, ["role"] = "system" } },
             model = ArtificialIntelligenceDefaults.DeepSeekApiModel
+			logger.LogDebug("CreateRequest(settings={Settings},query={Query}): model → {Model}", settings, model);
         });
 
         request.Content = new StringContent(data, Encoding.UTF8, MimeTypes.ApplicationJson);
 
+		logger.LogDebug("<<< Exiting CreateRequest(settings={Settings},query={Query})", settings);
         return request;
     }
 
@@ -51,10 +60,12 @@ public partial class DeepSeekHttpClientHelper : IArtificialIntelligenceHttpClien
     /// <returns>Generated text from artificial intelligence host</returns>
     public virtual string ParseResponse(string responseText)
     {
+		logger.LogDebug(">>> Entering ParseResponse(responseText={ResponseText})", responseText);
         var response = JsonConvert.DeserializeAnonymousType(responseText,
             new
             {
                 choices = new[]
+				logger.LogDebug("ParseResponse(responseText={ResponseText}): choices → {Choices}", responseText, choices);
                 {
                     new { message =  new { content = string.Empty  } }
                 }
@@ -62,6 +73,8 @@ public partial class DeepSeekHttpClientHelper : IArtificialIntelligenceHttpClien
 
         var result = response.choices.FirstOrDefault()?.message?.content;
 
+		logger.LogDebug("ParseResponse(responseText={ResponseText}): result → {Result}", responseText, result);
+		logger.LogDebug("<<< Exiting ParseResponse(responseText={ResponseText})", responseText);
         return result ?? string.Empty;
     }
 

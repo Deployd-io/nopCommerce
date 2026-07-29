@@ -51,9 +51,12 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var checkMoneyOrderPaymentSettings = await _settingService.LoadSettingAsync<CheckMoneyOrderPaymentSettings>(storeScope);
+		logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
+		logger.LogDebug("Configure(): checkMoneyOrderPaymentSettings → {CheckMoneyOrderPaymentSettings}", checkMoneyOrderPaymentSettings);
 
         var model = new ConfigurationModel
         {
@@ -64,13 +67,18 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
         await AddLocalesAsync(_languageService, model.Locales, async (locale, languageId) =>
         {
             locale.DescriptionText = await _localizationService
+				logger.LogDebug("Configure(): locale.DescriptionText → {Arg0}", locale.DescriptionText);
                 .GetLocalizedSettingAsync(checkMoneyOrderPaymentSettings, x => x.DescriptionText, languageId, 0, false, false);
         });
         model.AdditionalFee = checkMoneyOrderPaymentSettings.AdditionalFee;
+		logger.LogDebug("Configure(): model.AdditionalFee → {Arg0}", model.AdditionalFee);
+		logger.LogDebug("Configure(): model.AdditionalFeePercentage → {Arg0}", model.AdditionalFeePercentage);
+		logger.LogDebug("Configure(): model.ShippableProductRequired → {Arg0}", model.ShippableProductRequired);
         model.AdditionalFeePercentage = checkMoneyOrderPaymentSettings.AdditionalFeePercentage;
         model.ShippableProductRequired = checkMoneyOrderPaymentSettings.ShippableProductRequired;
 
         model.ActiveStoreScopeConfiguration = storeScope;
+		logger.LogDebug("Configure(): model.ActiveStoreScopeConfiguration → {Arg0}", model.ActiveStoreScopeConfiguration);
         if (storeScope > 0)
         {
             model.DescriptionText_OverrideForStore = await _settingService.SettingExistsAsync(checkMoneyOrderPaymentSettings, x => x.DescriptionText, storeScope);
@@ -79,6 +87,7 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
             model.ShippableProductRequired_OverrideForStore = await _settingService.SettingExistsAsync(checkMoneyOrderPaymentSettings, x => x.ShippableProductRequired, storeScope);
         }
 
+		logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Payments.CheckMoneyOrder/Views/Configure.cshtml", model);
     }
 

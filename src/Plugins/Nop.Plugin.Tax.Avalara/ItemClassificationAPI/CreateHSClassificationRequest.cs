@@ -10,7 +10,10 @@ public class CreateHSClassificationRequest : Request
 {
     public CreateHSClassificationRequest(string companyId)
     {
+		logger.LogDebug(">>> Entering CreateHSClassificationRequest(companyId={CompanyId})", companyId);
         CompanyId = companyId;
+		logger.LogDebug("<<< Exiting CreateHSClassificationRequest(companyId={CompanyId})", companyId);
+		logger.LogDebug("CreateHSClassificationRequest(companyId={CompanyId}): CompanyId → {CompanyId1}", companyId, CompanyId);
     }
 
     /// <summary>

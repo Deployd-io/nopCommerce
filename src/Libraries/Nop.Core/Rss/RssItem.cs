@@ -30,20 +30,33 @@ public partial class RssItem
     /// <param name="item">XML view of rss item</param>
     public RssItem(XContainer item)
     {
+		logger.LogDebug(">>> Entering RssItem(item={Item})", item);
+		logger.LogDebug("RssItem(item={Item}): Title → {Title}", item, Title);
+		logger.LogDebug("RssItem(item={Item}): Content → {Content}", item, Content);
+		logger.LogDebug("RssItem(item={Item}): Link → {Link}", item, Link);
         var title = item.Element(NopRssDefaults.Title)?.Value ?? string.Empty;
+		logger.LogDebug("RssItem(item={Item}): title → {Title}", item, title);
         var content = item.Element(NopRssDefaults.Content)?.Value ?? string.Empty;
         if (string.IsNullOrEmpty(content))
             content = item.Element(NopRssDefaults.Description)?.Value ?? string.Empty;
+			logger.LogDebug("RssItem(item={Item}): content → {Content}", item, content);
         var link = new Uri(item.Element(NopRssDefaults.Link)?.Value ?? string.Empty);
         var pubDateValue = item.Element(NopRssDefaults.PubDate)?.Value;
         var pubDate = pubDateValue == null ? DateTimeOffset.Now : DateTimeOffset.ParseExact(pubDateValue, "r", null);
+		logger.LogDebug("RssItem(item={Item}): link → {Link}", item, link);
+		logger.LogDebug("RssItem(item={Item}): pubDateValue → {PubDateValue}", item, pubDateValue);
+		logger.LogDebug("RssItem(item={Item}): pubDate → {PubDate}", item, pubDate);
+		logger.LogDebug("RssItem(item={Item}): PubDate → {PubDate}", item, PubDate);
         var id = item.Element(NopRssDefaults.Guid)?.Value ?? string.Empty;
 
         Title = new XElement(NopRssDefaults.Title, title);
         Content = new XElement(NopRssDefaults.Description, content);
         Link = new XElement(NopRssDefaults.Link, link);
         Id = new XElement(NopRssDefaults.Guid, new XAttribute("isPermaLink", false), id);
+		logger.LogDebug("RssItem(item={Item}): id → {Id}", item, id);
+		logger.LogDebug("RssItem(item={Item}): Id → {Id}", item, Id);
         PubDate = new XElement(NopRssDefaults.PubDate, pubDate.ToString("r"));
+		logger.LogDebug("<<< Exiting RssItem(item={Item})", item);
     }
 
     #region Methods
@@ -54,13 +67,16 @@ public partial class RssItem
     /// <returns></returns>
     public XElement ToXElement()
     {
+		logger.LogDebug(">>> Entering ToXElement()");
         var element = new XElement(NopRssDefaults.Item, Id, Link, Title, Content);
 
+		logger.LogDebug("ToXElement(): element → {Element}", element);
         foreach (var elementExtensions in ElementExtensions)
         {
             element.Add(elementExtensions);
         }
 
+		logger.LogDebug("<<< Exiting ToXElement()");
         return element;
     }
 

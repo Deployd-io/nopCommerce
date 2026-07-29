@@ -57,6 +57,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		logger.LogDebug(">>> Entering ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         var result = new ProcessPaymentResult
         {
             AllowStoringCreditCardNumber = true
@@ -65,6 +66,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
         {
             case TransactMode.Pending:
                 result.NewPaymentStatus = PaymentStatus.Pending;
+				logger.LogDebug("ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest}): result.NewPaymentStatus → {Arg1}", processPaymentRequest, result.NewPaymentStatus);
                 break;
             case TransactMode.Authorize:
                 result.NewPaymentStatus = PaymentStatus.Authorized;
@@ -77,6 +79,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
                 break;
         }
 
+		logger.LogDebug("<<< Exiting ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -87,7 +90,9 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public Task PostProcessPaymentAsync(PostProcessPaymentRequest postProcessPaymentRequest)
     {
+		logger.LogDebug(">>> Entering PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         //nothing
+		logger.LogDebug("<<< Exiting PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         return Task.CompletedTask;
     }
 
@@ -101,9 +106,11 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering HidePaymentMethodAsync(cart={Cart})", cart);
         //you can put any logic here
         //for example, hide this payment method if all products in the cart are downloadable
         //or hide this payment method if current customer is from certain country
+		logger.LogDebug("<<< Exiting HidePaymentMethodAsync(cart={Cart})", cart);
         return Task.FromResult(false);
     }
 
@@ -116,6 +123,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
     {
+		logger.LogDebug(">>> Entering GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
+		logger.LogDebug("<<< Exiting GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
         return await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
             _manualPaymentSettings.AdditionalFee, _manualPaymentSettings.AdditionalFeePercentage);
     }
@@ -130,6 +139,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
     {
+		logger.LogDebug(">>> Entering CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
+		logger.LogDebug("<<< Exiting CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
         return Task.FromResult(new CapturePaymentResult { Errors = new[] { "Capture method not supported" } });
     }
 
@@ -143,6 +154,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
     {
+		logger.LogDebug(">>> Entering RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
+		logger.LogDebug("<<< Exiting RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
         return Task.FromResult(new RefundPaymentResult { Errors = new[] { "Refund method not supported" } });
     }
 
@@ -156,6 +169,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
     {
+		logger.LogDebug(">>> Entering VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
+		logger.LogDebug("<<< Exiting VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
         return Task.FromResult(new VoidPaymentResult { Errors = new[] { "Void method not supported" } });
     }
 
@@ -169,6 +184,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		logger.LogDebug(">>> Entering ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         var result = new ProcessPaymentResult
         {
             AllowStoringCreditCardNumber = true
@@ -177,6 +193,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
         {
             case TransactMode.Pending:
                 result.NewPaymentStatus = PaymentStatus.Pending;
+				logger.LogDebug("ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest}): result.NewPaymentStatus → {Arg1}", processPaymentRequest, result.NewPaymentStatus);
                 break;
             case TransactMode.Authorize:
                 result.NewPaymentStatus = PaymentStatus.Authorized;
@@ -189,6 +206,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
                 break;
         }
 
+		logger.LogDebug("<<< Exiting ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.FromResult(result);
     }
 
@@ -202,7 +220,9 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
     {
+		logger.LogDebug(">>> Entering CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         //always success
+		logger.LogDebug("<<< Exiting CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         return Task.FromResult(new CancelRecurringPaymentResult());
     }
 
@@ -216,9 +236,11 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<bool> CanRePostProcessPaymentAsync(Order order)
     {
+		logger.LogDebug(">>> Entering CanRePostProcessPaymentAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         //it's not a redirection payment method. So we always return false
+		logger.LogDebug("<<< Exiting CanRePostProcessPaymentAsync(order={Order})", order);
         return Task.FromResult(false);
     }
 
@@ -232,11 +254,14 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering ValidatePaymentFormAsync(form={Form})", form);
         var warnings = new List<string>();
 
+		logger.LogDebug("ValidatePaymentFormAsync(form={Form}): warnings → {Warnings}", form, warnings);
         //validate
         var validator = new PaymentInfoValidator(_localizationService);
         var model = new PaymentInfoModel
+		logger.LogDebug("ValidatePaymentFormAsync(form={Form}): validator → {Validator}", form, validator);
         {
             CardholderName = form["CardholderName"],
             CardNumber = form["CardNumber"],
@@ -246,8 +271,10 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
         };
         var validationResult = validator.Validate(model);
         if (!validationResult.IsValid)
+			logger.LogDebug("ValidatePaymentFormAsync(form={Form}): validationResult → {ValidationResult}", form, validationResult);
             warnings.AddRange(validationResult.Errors.Select(error => error.ErrorMessage));
 
+		logger.LogDebug("<<< Exiting ValidatePaymentFormAsync(form={Form})", form);
         return Task.FromResult<IList<string>>(warnings);
     }
 
@@ -261,6 +288,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
     {
+		logger.LogDebug(">>> Entering GetPaymentInfoAsync(form={Form})", form);
+		logger.LogDebug("<<< Exiting GetPaymentInfoAsync(form={Form})", form);
         return Task.FromResult(new ProcessPaymentRequest
         {
             CreditCardType = form["CreditCardType"],
@@ -277,6 +306,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/PaymentManual/Configure";
     }
 
@@ -286,6 +317,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>View component type</returns>
     public Type GetPublicViewComponent()
     {
+		logger.LogDebug(">>> Entering GetPublicViewComponent()");
+		logger.LogDebug("<<< Exiting GetPublicViewComponent()");
         return typeof(PaymentManualViewComponent);
     }
 
@@ -295,6 +328,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         var settings = new ManualPaymentSettings
         {
@@ -316,6 +350,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -324,6 +359,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<ManualPaymentSettings>();
 
@@ -331,6 +367,7 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Payments.Manual");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     /// <summary>
@@ -343,6 +380,8 @@ public class ManualPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetPaymentMethodDescriptionAsync()
     {
+		logger.LogDebug(">>> Entering GetPaymentMethodDescriptionAsync()");
+		logger.LogDebug("<<< Exiting GetPaymentMethodDescriptionAsync()");
         return await _localizationService.GetResourceAsync("Plugins.Payments.Manual.PaymentMethodDescription");
     }
 

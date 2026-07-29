@@ -28,6 +28,7 @@ public partial class EuCookieLawViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (!_storeInformationSettings.DisplayEuCookieLawWarning)
             //disabled
             return Content("");
@@ -46,6 +47,7 @@ public partial class EuCookieLawViewComponent : NopViewComponent
         //ignore notification?
         //right now it's used during logout so popup window is not displayed twice
         if (TempData[$"{NopCookieDefaults.Prefix}{NopCookieDefaults.IgnoreEuCookieLawWarning}"] != null && Convert.ToBoolean(TempData[$"{NopCookieDefaults.Prefix}{NopCookieDefaults.IgnoreEuCookieLawWarning}"]))
+		logger.LogDebug("<<< Exiting InvokeAsync()");
             return Content("");
 
         return View();

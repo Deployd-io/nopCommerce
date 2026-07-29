@@ -180,15 +180,19 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<string> GetSpecificationAttributeNameAsync(SpecificationAttribute specificationAttribute)
     {
+		logger.LogDebug(">>> Entering GetSpecificationAttributeNameAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
         var name = specificationAttribute.Name;
 
+		logger.LogDebug("GetSpecificationAttributeNameAsync(specificationAttribute={SpecificationAttribute}): name → {Name}", specificationAttribute, name);
         if (specificationAttribute.SpecificationAttributeGroupId.HasValue)
         {
             var group = await _specificationAttributeService.GetSpecificationAttributeGroupByIdAsync(specificationAttribute.SpecificationAttributeGroupId.Value);
             if (group != null)
+				logger.LogDebug("GetSpecificationAttributeNameAsync(specificationAttribute={SpecificationAttribute}): group → {Group}", specificationAttribute, group);
                 name = string.Format(await _localizationService.GetResourceAsync("Admin.Catalog.Products.SpecificationAttributes.NameFormat"), group.Name, name);
         }
 
+		logger.LogDebug("<<< Exiting GetSpecificationAttributeNameAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
         return name;
     }
 
@@ -221,6 +225,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareProductWarehouseInventoryModelsAsync(IList<ProductWarehouseInventoryModel> models, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductWarehouseInventoryModelsAsync(models={Models},product={Product})", models, product);
         ArgumentNullException.ThrowIfNull(models);
 
         foreach (var warehouse in await _warehouseService.GetAllWarehousesAsync())
@@ -235,8 +240,12 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var productWarehouseInventory = (await _productService.GetAllProductWarehouseInventoryRecordsAsync(product.Id))?.FirstOrDefault(inventory => inventory.WarehouseId == warehouse.Id);
                 if (productWarehouseInventory != null)
+				logger.LogDebug("PrepareProductWarehouseInventoryModelsAsync(models={Models},product={Product}): productWarehouseInventory → {ProductWarehouseInventory}", models, product, productWarehouseInventory);
                 {
                     model.WarehouseUsed = true;
+					logger.LogDebug("PrepareProductWarehouseInventoryModelsAsync(models={Models},product={Product}): model.WarehouseUsed → {Arg2}", models, product, model.WarehouseUsed);
+					logger.LogDebug("PrepareProductWarehouseInventoryModelsAsync(models={Models},product={Product}): model.StockQuantity → {Arg2}", models, product, model.StockQuantity);
+					logger.LogDebug("PrepareProductWarehouseInventoryModelsAsync(models={Models},product={Product}): model.ReservedQuantity → {Arg2}", models, product, model.ReservedQuantity);
                     model.StockQuantity = productWarehouseInventory.StockQuantity;
                     model.ReservedQuantity = productWarehouseInventory.ReservedQuantity;
                     model.PlannedQuantity = await _shipmentService.GetQuantityInShipmentsAsync(product, productWarehouseInventory.WarehouseId, true, true);
@@ -245,6 +254,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
             models.Add(model);
         }
+		logger.LogDebug("<<< Exiting PrepareProductWarehouseInventoryModelsAsync(models={Models},product={Product})", models, product);
     }
 
     /// <summary>
@@ -257,11 +267,13 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<string> PrepareProductAttributeMappingValidationRulesStringAsync(ProductAttributeMapping attributeMapping)
     {
+		logger.LogDebug(">>> Entering PrepareProductAttributeMappingValidationRulesStringAsync(attributeMapping={AttributeMapping})", attributeMapping);
         if (!attributeMapping.ValidationRulesAllowed())
             return string.Empty;
 
         var validationRules = new StringBuilder(string.Empty);
         if (attributeMapping.ValidationMinLength.HasValue)
+		logger.LogDebug("PrepareProductAttributeMappingValidationRulesStringAsync(attributeMapping={AttributeMapping}): validationRules → {ValidationRules}", attributeMapping, validationRules);
         {
             validationRules.AppendFormat("{0}: {1}<br />",
                 await _localizationService.GetResourceAsync("Admin.Catalog.Products.ProductAttributes.Attributes.ValidationRules.MinLength"),
@@ -296,6 +308,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 WebUtility.HtmlEncode(attributeMapping.DefaultValue));
         }
 
+		logger.LogDebug("<<< Exiting PrepareProductAttributeMappingValidationRulesStringAsync(attributeMapping={AttributeMapping})", attributeMapping);
         return validationRules.ToString();
     }
 
@@ -407,14 +420,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Related product search model</returns>
     protected virtual RelatedProductSearchModel PrepareRelatedProductSearchModel(RelatedProductSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareRelatedProductSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareRelatedProductSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareRelatedProductSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -426,14 +442,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Cross-sell product search model</returns>
     protected virtual CrossSellProductSearchModel PrepareCrossSellProductSearchModel(CrossSellProductSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareCrossSellProductSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareCrossSellProductSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCrossSellProductSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -445,14 +464,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Filter level value search model</returns>
     protected virtual FilterLevelValueSearchModel PrepareFilterLevelValuesSearchModel(FilterLevelValueSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareFilterLevelValuesSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareFilterLevelValuesSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareFilterLevelValuesSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -464,14 +486,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Associated product search model</returns>
     protected virtual AssociatedProductSearchModel PrepareAssociatedProductSearchModel(AssociatedProductSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareAssociatedProductSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareAssociatedProductSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareAssociatedProductSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -483,14 +508,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Product picture search model</returns>
     protected virtual ProductPictureSearchModel PrepareProductPictureSearchModel(ProductPictureSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductPictureSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareProductPictureSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareProductPictureSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -502,14 +530,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Product video search model</returns>
     protected virtual ProductVideoSearchModel PrepareProductVideoSearchModel(ProductVideoSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductVideoSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareProductVideoSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareProductVideoSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -521,14 +552,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Product order search model</returns>
     protected virtual ProductOrderSearchModel PrepareProductOrderSearchModel(ProductOrderSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductOrderSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareProductOrderSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareProductOrderSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -540,14 +574,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Tier price search model</returns>
     protected virtual TierPriceSearchModel PrepareTierPriceSearchModel(TierPriceSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareTierPriceSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareTierPriceSearchModel(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareTierPriceSearchModel(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -562,10 +599,12 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<StockQuantityHistorySearchModel> PrepareStockQuantityHistorySearchModelAsync(StockQuantityHistorySearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareStockQuantityHistorySearchModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         searchModel.ProductId = product.Id;
+		logger.LogDebug("PrepareStockQuantityHistorySearchModelAsync(searchModel={SearchModel},product={Product}): searchModel.ProductId → {Arg2}", searchModel, product, searchModel.ProductId);
 
         //prepare available warehouses
         await _baseAdminModelFactory.PrepareWarehousesAsync(searchModel.AvailableWarehouses);
@@ -573,6 +612,7 @@ public partial class ProductModelFactory : IProductModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareStockQuantityHistorySearchModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return searchModel;
     }
 
@@ -664,14 +704,17 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>Related product search model</returns>
     protected virtual ProductTagProductSearchModel PrepareTaggedProductsSearchModel(ProductTagProductSearchModel searchModel, ProductTag productTag)
     {
+		logger.LogDebug(">>> Entering PrepareTaggedProductsSearchModel(searchModel={SearchModel},productTag={ProductTag})", searchModel, productTag);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(productTag);
 
         searchModel.ProductTagId = productTag.Id;
+		logger.LogDebug("PrepareTaggedProductsSearchModel(searchModel={SearchModel},productTag={ProductTag}): searchModel.ProductTagId → {Arg2}", searchModel, productTag, searchModel.ProductTagId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareTaggedProductsSearchModel(searchModel={SearchModel},productTag={ProductTag})", searchModel, productTag);
         return searchModel;
     }
 
@@ -689,17 +732,22 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductSearchModel> PrepareProductSearchModelAsync(ProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductSearchModelAsync(searchModel={SearchModel})", searchModel);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
         searchModel.AllowVendorsToImportProducts = _vendorSettings.AllowVendorsToImportProducts;
+		logger.LogDebug("PrepareProductSearchModelAsync(searchModel={SearchModel}): searchModel.AllowVendorsToImportProducts → {Arg1}", searchModel, searchModel.AllowVendorsToImportProducts);
 
         var licenseCheckModel = new LicenseCheckModel();
         try
+		logger.LogDebug("PrepareProductSearchModelAsync(searchModel={SearchModel}): licenseCheckModel → {LicenseCheckModel}", searchModel, licenseCheckModel);
         {
             var result = await _nopHttpClient.GetLicenseCheckDetailsAsync();
             if (!string.IsNullOrEmpty(result))
+			logger.LogDebug("PrepareProductSearchModelAsync(searchModel={SearchModel}): result → {Result}", searchModel, result);
             {
                 licenseCheckModel = JsonConvert.DeserializeObject<LicenseCheckModel>(result);
                 if (licenseCheckModel.DisplayWarning == false && licenseCheckModel.BlockPages == false)
@@ -708,6 +756,8 @@ public partial class ProductModelFactory : IProductModelFactory
         }
         catch { }
         searchModel.LicenseCheckModel = licenseCheckModel;
+		logger.LogError("Exception in PrepareProductSearchModelAsync(searchModel={SearchModel}): {Arg1}", searchModel, ex.Message);
+		logger.LogDebug("PrepareProductSearchModelAsync(searchModel={SearchModel}): searchModel.LicenseCheckModel → {Arg1}", searchModel, searchModel.LicenseCheckModel);
 
         //prepare available categories
         await _baseAdminModelFactory.PrepareCategoriesAsync(searchModel.AvailableCategories);
@@ -749,6 +799,8 @@ public partial class ProductModelFactory : IProductModelFactory
         //prepare grid
         searchModel.SetGridPageSize();
 
+		logger.LogInformation("PrepareProductSearchModelAsync(searchModel)={SearchModel}: external service call took {Arg1} ms", searchModel, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting PrepareProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -762,11 +814,15 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductListModel> PrepareProductListModelAsync(ProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter comments
         var overridePublished = searchModel.SearchPublishedId == 0 ? null : (bool?)(searchModel.SearchPublishedId == 1);
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): overridePublished → {OverridePublished}", searchModel, overridePublished);
+		logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+		logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
         if (currentVendor != null)
             searchModel.SearchVendorId = currentVendor.Id;
         var categoryIds = new List<int> { searchModel.SearchCategoryId };
@@ -774,6 +830,7 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             var childCategoryIds = await _categoryService.GetChildCategoryIdsAsync(parentCategoryId: searchModel.SearchCategoryId, showHidden: true);
             categoryIds.AddRange(childCategoryIds);
+			logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): childCategoryIds → {ChildCategoryIds}", searchModel, childCategoryIds);
         }
 
         //get products
@@ -790,6 +847,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
 
+		logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): primaryStoreCurrency → {PrimaryStoreCurrency}", searchModel, primaryStoreCurrency);
         //prepare list model
         var model = await new ProductListModel().PrepareToGridAsync(searchModel, products, () =>
         {
@@ -798,18 +856,22 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 //little performance optimization: ensure that "FullDescription" is not returned
                 productModel.FullDescription = string.Empty;
+				logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): productModel.FullDescription → {Arg1}", searchModel, productModel.FullDescription);
 
                 //fill formatted price
                 productModel.FormattedPrice = product.ProductType == ProductType.GroupedProduct ? null : await _priceFormatter.FormatPriceAsync(product.Price);
 
                 productModel.PrimaryStoreCurrencyCode = primaryStoreCurrency.CurrencyCode;
+				logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): productModel.PrimaryStoreCurrencyCode → {Arg1}", searchModel, productModel.PrimaryStoreCurrencyCode);
 
                 //fill in additional values (not existing in the entity)
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
                 var defaultProductPicture = (await _pictureService.GetPicturesByProductIdAsync(product.Id, 1)).FirstOrDefault();
                 (productModel.PictureThumbnailUrl, _) = await _pictureService.GetPictureUrlAsync(defaultProductPicture, 75);
+				logger.LogDebug("PrepareProductListModelAsync(searchModel={SearchModel}): defaultProductPicture → {DefaultProductPicture}", searchModel, defaultProductPicture);
                 productModel.ProductTypeName = await _localizationService.GetLocalizedEnumAsync(product.ProductType);
                 if (product.ProductType == ProductType.SimpleProduct && product.ManageInventoryMethod == ManageInventoryMethod.ManageStock)
                     productModel.StockQuantityStr = (await _productService.GetTotalStockQuantityAsync(product)).ToString();
@@ -818,6 +880,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -842,16 +905,21 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 model = product.ToModel<ProductModel>();
                 model.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
+				logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model → {Model1}", model, product, excludeProperties, model);
             }
 
             var parentGroupedProduct = await _productService.GetProductByIdAsync(product.ParentGroupedProductId);
             if (parentGroupedProduct != null)
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): parentGroupedProduct → {ParentGroupedProduct}", model, product, excludeProperties, parentGroupedProduct);
             {
                 model.AssociatedToProductId = product.ParentGroupedProductId;
+				logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.AssociatedToProductId → {Arg3}", model, product, excludeProperties, model.AssociatedToProductId);
+				logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.AssociatedToProductName → {Arg3}", model, product, excludeProperties, model.AssociatedToProductName);
                 model.AssociatedToProductName = parentGroupedProduct.Name;
             }
 
             model.LastStockQuantity = product.StockQuantity;
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.LastStockQuantity → {Arg3}", model, product, excludeProperties, model.LastStockQuantity);
 
             model.SelectedProductTags = (await _productTagService.GetAllProductTagsByProductIdAsync(product.Id)).Select(tag => tag.Name).ToList();
             model.AvailableProductTags = (await _productTagService.GetAllProductTagsAsync())
@@ -904,6 +972,21 @@ public partial class ProductModelFactory : IProductModelFactory
         if (product == null)
         {
             model.MaximumCustomerEnteredPrice = 1000;
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.MaximumCustomerEnteredPrice → {Arg3}", model, product, excludeProperties, model.MaximumCustomerEnteredPrice);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.MaxNumberOfDownloads → {Arg3}", model, product, excludeProperties, model.MaxNumberOfDownloads);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.RecurringCycleLength → {Arg3}", model, product, excludeProperties, model.RecurringCycleLength);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.RecurringTotalCycles → {Arg3}", model, product, excludeProperties, model.RecurringTotalCycles);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.RentalPriceLength → {Arg3}", model, product, excludeProperties, model.RentalPriceLength);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.StockQuantity → {Arg3}", model, product, excludeProperties, model.StockQuantity);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.NotifyAdminForQuantityBelow → {Arg3}", model, product, excludeProperties, model.NotifyAdminForQuantityBelow);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.OrderMinimumQuantity → {Arg3}", model, product, excludeProperties, model.OrderMinimumQuantity);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.OrderMaximumQuantity → {Arg3}", model, product, excludeProperties, model.OrderMaximumQuantity);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.TaxCategoryId → {Arg3}", model, product, excludeProperties, model.TaxCategoryId);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.UnlimitedDownloads → {Arg3}", model, product, excludeProperties, model.UnlimitedDownloads);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.IsShipEnabled → {Arg3}", model, product, excludeProperties, model.IsShipEnabled);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.AllowCustomerReviews → {Arg3}", model, product, excludeProperties, model.AllowCustomerReviews);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, product, excludeProperties, model.Published);
+			logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.VisibleIndividually → {Arg3}", model, product, excludeProperties, model.VisibleIndividually);
             model.MaxNumberOfDownloads = 10;
             model.RecurringCycleLength = 100;
             model.RecurringTotalCycles = 10;
@@ -928,6 +1011,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         model.IsLoggedInAsVendor = currentVendor != null;
+		logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): currentVendor → {CurrentVendor}", model, product, excludeProperties, currentVendor);
 
         //prepare localized models
         if (!excludeProperties)
@@ -943,11 +1027,13 @@ public partial class ProductModelFactory : IProductModelFactory
         var productTemplates = await _productTemplateService.GetAllProductTemplatesAsync();
         foreach (var productType in Enum.GetValues(typeof(ProductType)).OfType<ProductType>())
         {
+		logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): productTemplates → {ProductTemplates}", model, product, excludeProperties, productTemplates);
             model.ProductsTypesSupportedByProductTemplates.Add((int)productType, new List<SelectListItem>());
             foreach (var template in productTemplates)
             {
                 var list = (IList<int>)TypeDescriptor.GetConverter(typeof(List<int>)).ConvertFrom(template.IgnoredProductTypes) ?? new List<int>();
                 if (string.IsNullOrEmpty(template.IgnoredProductTypes) || !list.Contains((int)productType))
+				logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): list → {List}", model, product, excludeProperties, list);
                 {
                     model.ProductsTypesSupportedByProductTemplates[(int)productType].Add(new SelectListItem
                     {
@@ -982,6 +1068,8 @@ public partial class ProductModelFactory : IProductModelFactory
         var availableMeasureWeights = (await _measureService.GetAllMeasureWeightsAsync())
             .Select(weight => new SelectListItem { Text = weight.Name, Value = weight.Id.ToString() }).ToList();
         model.AvailableBasepriceUnits = availableMeasureWeights;
+		logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.AvailableBasepriceUnits → {Arg3}", model, product, excludeProperties, model.AvailableBasepriceUnits);
+		logger.LogDebug("PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.AvailableBasepriceBaseUnits → {Arg3}", model, product, excludeProperties, model.AvailableBasepriceBaseUnits);
         model.AvailableBasepriceBaseUnits = availableMeasureWeights;
 
         //prepare model categories
@@ -1013,6 +1101,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
         await _baseAdminModelFactory.PreparePreTranslationSupportModelAsync(model);
 
+		logger.LogDebug("<<< Exiting PrepareProductModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties})", model, product, excludeProperties);
         return model;
     }
 
@@ -1026,6 +1115,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddRequiredProductSearchModel> PrepareAddRequiredProductSearchModelAsync(AddRequiredProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddRequiredProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -1048,6 +1138,7 @@ public partial class ProductModelFactory : IProductModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareAddRequiredProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1061,11 +1152,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddRequiredProductListModel> PrepareAddRequiredProductListModelAsync(AddRequiredProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddRequiredProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+			logger.LogDebug("PrepareAddRequiredProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+			logger.LogDebug("PrepareAddRequiredProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             searchModel.SearchVendorId = currentVendor.Id;
 
         //get products
@@ -1085,12 +1179,14 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareAddRequiredProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareAddRequiredProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1105,6 +1201,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<RelatedProductListModel> PrepareRelatedProductListModelAsync(RelatedProductSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareRelatedProductListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
@@ -1120,12 +1217,14 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var relatedProductModel = relatedProduct.ToModel<RelatedProductModel>();
 
+				logger.LogDebug("PrepareRelatedProductListModelAsync(searchModel={SearchModel},product={Product}): relatedProductModel → {RelatedProductModel}", searchModel, product, relatedProductModel);
                 //fill in additional values (not existing in the entity)
                 relatedProductModel.Product2Name = (await _productService.GetProductByIdAsync(relatedProduct.ProductId2))?.Name;
 
                 return relatedProductModel;
             });
         });
+		logger.LogDebug("<<< Exiting PrepareRelatedProductListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1139,6 +1238,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddRelatedProductSearchModel> PrepareAddRelatedProductSearchModelAsync(AddRelatedProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddRelatedProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -1161,6 +1261,7 @@ public partial class ProductModelFactory : IProductModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareAddRelatedProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1174,11 +1275,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddRelatedProductListModel> PrepareAddRelatedProductListModelAsync(AddRelatedProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddRelatedProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+			logger.LogDebug("PrepareAddRelatedProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+			logger.LogDebug("PrepareAddRelatedProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             searchModel.SearchVendorId = currentVendor.Id;
 
         //get products
@@ -1198,12 +1302,14 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareAddRelatedProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareAddRelatedProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1218,6 +1324,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<CrossSellProductListModel> PrepareCrossSellProductListModelAsync(CrossSellProductSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareCrossSellProductListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
@@ -1244,6 +1351,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCrossSellProductListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1258,6 +1366,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<FilterLevelValueListModel> PrepareFilterLevelValueListModelAsync(FilterLevelValueSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareFilterLevelValueListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
@@ -1288,6 +1397,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareFilterLevelValueListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1301,6 +1411,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddCrossSellProductSearchModel> PrepareAddCrossSellProductSearchModelAsync(AddCrossSellProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddCrossSellProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -1323,6 +1434,7 @@ public partial class ProductModelFactory : IProductModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareAddCrossSellProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1336,11 +1448,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddCrossSellProductListModel> PrepareAddCrossSellProductListModelAsync(AddCrossSellProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddCrossSellProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+			logger.LogDebug("PrepareAddCrossSellProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+			logger.LogDebug("PrepareAddCrossSellProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             searchModel.SearchVendorId = currentVendor.Id;
 
         //get products
@@ -1360,12 +1475,14 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareAddCrossSellProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareAddCrossSellProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1380,11 +1497,13 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AssociatedProductListModel> PrepareAssociatedProductListModelAsync(AssociatedProductSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareAssociatedProductListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         var vendor = await _workContext.GetCurrentVendorAsync();
         //get associated products
+		logger.LogDebug("PrepareAssociatedProductListModelAsync(searchModel={SearchModel},product={Product}): vendor → {Vendor}", searchModel, product, vendor);
         var associatedProducts = (await _productService.GetAssociatedProductsAsync(showHidden: true,
             parentGroupedProductId: product.Id,
             vendorId: vendor?.Id ?? 0)).ToPagedList(searchModel);
@@ -1396,11 +1515,14 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var associatedProductModel = associatedProduct.ToModel<AssociatedProductModel>();
                 associatedProductModel.ProductName = associatedProduct.Name;
+				logger.LogDebug("PrepareAssociatedProductListModelAsync(searchModel={SearchModel},product={Product}): associatedProductModel → {AssociatedProductModel}", searchModel, product, associatedProductModel);
+				logger.LogDebug("PrepareAssociatedProductListModelAsync(searchModel={SearchModel},product={Product}): associatedProductModel.ProductName → {Arg2}", searchModel, product, associatedProductModel.ProductName);
 
                 return associatedProductModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareAssociatedProductListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1414,6 +1536,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddAssociatedProductSearchModel> PrepareAddAssociatedProductSearchModelAsync(AddAssociatedProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddAssociatedProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -1436,6 +1559,7 @@ public partial class ProductModelFactory : IProductModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareAddAssociatedProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1449,11 +1573,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddAssociatedProductListModel> PrepareAddAssociatedProductListModelAsync(AddAssociatedProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+			logger.LogDebug("PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+			logger.LogDebug("PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             searchModel.SearchVendorId = currentVendor.Id;
 
         //get products
@@ -1474,20 +1601,25 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var productModel = product.ToModel<ProductModel>();
 
+				logger.LogDebug("PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 //fill in additional values (not existing in the entity)
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
                 var parentGroupedProduct = await _productService.GetProductByIdAsync(product.ParentGroupedProductId);
 
+				logger.LogDebug("PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel}): parentGroupedProduct → {ParentGroupedProduct}", searchModel, parentGroupedProduct);
                 if (parentGroupedProduct == null)
                     return productModel;
 
                 productModel.AssociatedToProductId = product.ParentGroupedProductId;
+				logger.LogDebug("PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel}): productModel.AssociatedToProductId → {Arg1}", searchModel, productModel.AssociatedToProductId);
+				logger.LogDebug("PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel}): productModel.AssociatedToProductName → {Arg1}", searchModel, productModel.AssociatedToProductName);
                 productModel.AssociatedToProductName = parentGroupedProduct.Name;
 
                 return productModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareAddAssociatedProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1502,12 +1634,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductPictureListModel> PrepareProductPictureListModelAsync(ProductPictureSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductPictureListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         //get product pictures
         var productPictures = (await _productService.GetProductPicturesByProductIdAsync(product.Id)).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareProductPictureListModelAsync(searchModel={SearchModel},product={Product}): productPictures → {ProductPictures}", searchModel, product, productPictures);
         //prepare grid model
         var model = await new ProductPictureListModel().PrepareToGridAsync(searchModel, productPictures, () =>
         {
@@ -1516,6 +1650,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var productPictureModel = productPicture.ToModel<ProductPictureModel>();
 
+				logger.LogDebug("PrepareProductPictureListModelAsync(searchModel={SearchModel},product={Product}): productPictureModel → {ProductPictureModel}", searchModel, product, productPictureModel);
                 //fill in additional values (not existing in the entity)
                 var picture = (await _pictureService.GetPictureByIdAsync(productPicture.PictureId))
                               ?? throw new Exception("Picture cannot be loaded");
@@ -1523,12 +1658,15 @@ public partial class ProductModelFactory : IProductModelFactory
                 productPictureModel.PictureUrl = (await _pictureService.GetPictureUrlAsync(picture)).Url;
 
                 productPictureModel.OverrideAltAttribute = picture.AltAttribute;
+				logger.LogDebug("PrepareProductPictureListModelAsync(searchModel={SearchModel},product={Product}): productPictureModel.OverrideAltAttribute → {Arg2}", searchModel, product, productPictureModel.OverrideAltAttribute);
+				logger.LogDebug("PrepareProductPictureListModelAsync(searchModel={SearchModel},product={Product}): productPictureModel.OverrideTitleAttribute → {Arg2}", searchModel, product, productPictureModel.OverrideTitleAttribute);
                 productPictureModel.OverrideTitleAttribute = picture.TitleAttribute;
 
                 return productPictureModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductPictureListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1543,12 +1681,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductVideoListModel> PrepareProductVideoListModelAsync(ProductVideoSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductVideoListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
         //get product videos
         var productVideos = (await _productService.GetProductVideosByProductIdAsync(product.Id)).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareProductVideoListModelAsync(searchModel={SearchModel},product={Product}): productVideos → {ProductVideos}", searchModel, product, productVideos);
         //prepare grid model
         var model = await new ProductVideoListModel().PrepareToGridAsync(searchModel, productVideos, () =>
         {
@@ -1557,16 +1697,19 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var productVideoModel = productVideo.ToModel<ProductVideoModel>();
 
+				logger.LogDebug("PrepareProductVideoListModelAsync(searchModel={SearchModel},product={Product}): productVideoModel → {ProductVideoModel}", searchModel, product, productVideoModel);
                 //fill in additional values (not existing in the entity)
                 var video = (await _videoService.GetVideoByIdAsync(productVideo.VideoId))
                             ?? throw new Exception("Video cannot be loaded");
 
                 productVideoModel.VideoUrl = video.VideoUrl;
+				logger.LogDebug("PrepareProductVideoListModelAsync(searchModel={SearchModel},product={Product}): productVideoModel.VideoUrl → {Arg2}", searchModel, product, productVideoModel.VideoUrl);
 
                 return productVideoModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductVideoListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1645,6 +1788,8 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<AddSpecificationAttributeModel> PrepareAddSpecificationAttributeModelAsync(int productId, int? specificationId)
     {
+		logger.LogDebug(">>> Entering PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId})", productId, specificationId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!specificationId.HasValue)
         {
             return new AddSpecificationAttributeModel
@@ -1654,11 +1799,13 @@ public partial class ProductModelFactory : IProductModelFactory
                     {
                         var attributeName = await GetSpecificationAttributeNameAsync(attributeWithOption);
 
+						logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): attributeName → {AttributeName}", productId, specificationId, attributeName);
                         return new SelectListItem(attributeName, attributeWithOption.Id.ToString());
                     }).ToListAsync(),
                 ProductId = productId,
                 Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync<AddSpecificationAttributeLocalizedModel>()
             };
+			logger.LogInformation("PrepareAddSpecificationAttributeModelAsync(productId,specificationId)={ProductId},{SpecificationId}: database query executed in {Arg2} ms", productId, specificationId, __logStart.ElapsedMilliseconds);
         }
 
         var attribute = await _specificationAttributeService.GetProductSpecificationAttributeByIdAsync(specificationId.Value) 
@@ -1668,12 +1815,19 @@ public partial class ProductModelFactory : IProductModelFactory
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null && (await _productService.GetProductByIdAsync(attribute.ProductId)).VendorId != currentVendor.Id)
             throw new UnauthorizedAccessException("This is not your product");
+			logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): currentVendor → {CurrentVendor}", productId, specificationId, currentVendor);
 
         var specAttributeOption = await _specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(attribute.SpecificationAttributeOptionId);
         var specAttribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(specAttributeOption.SpecificationAttributeId);
+		logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): specAttributeOption → {SpecAttributeOption}", productId, specificationId, specAttributeOption);
+		logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): specAttribute → {SpecAttribute}", productId, specificationId, specAttribute);
 
         var model = attribute.ToModel<AddSpecificationAttributeModel>();
         model.SpecificationId = attribute.Id;
+		logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model → {Model}", productId, specificationId, model);
+		logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model.SpecificationId → {Arg2}", productId, specificationId, model.SpecificationId);
+		logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model.AttributeId → {Arg2}", productId, specificationId, model.AttributeId);
+		logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model.AttributeName → {Arg2}", productId, specificationId, model.AttributeName);
         model.AttributeId = specAttribute.Id;
         model.AttributeTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeType);
         model.AttributeName = specAttribute.Name;
@@ -1697,15 +1851,18 @@ public partial class ProductModelFactory : IProductModelFactory
             case SpecificationAttributeType.Option:
                 model.ValueRaw = WebUtility.HtmlEncode(specAttributeOption.Name);
                 model.SpecificationAttributeOptionId = specAttributeOption.Id;
+				logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model.SpecificationAttributeOptionId → {Arg2}", productId, specificationId, model.SpecificationAttributeOptionId);
                 break;
             case SpecificationAttributeType.CustomText:
                 model.Value = WebUtility.HtmlDecode(attribute.CustomValue);
                 break;
             case SpecificationAttributeType.CustomHtmlText:
                 model.ValueRaw = attribute.CustomValue;
+				logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model.ValueRaw → {Arg2}", productId, specificationId, model.ValueRaw);
                 break;
             case SpecificationAttributeType.Hyperlink:
                 model.Value = attribute.CustomValue;
+				logger.LogDebug("PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId}): model.Value → {Arg2}", productId, specificationId, model.Value);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(attribute.AttributeType));
@@ -1714,6 +1871,7 @@ public partial class ProductModelFactory : IProductModelFactory
         model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(
             async (AddSpecificationAttributeLocalizedModel locale, int languageId) =>
             {
+				logger.LogDebug(">>> Entering async(locale={Locale},languageId={LanguageId})", locale, languageId);
                 switch (attribute.AttributeType)
                 {
                     case SpecificationAttributeType.CustomHtmlText:
@@ -1729,8 +1887,10 @@ public partial class ProductModelFactory : IProductModelFactory
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+				logger.LogDebug("<<< Exiting async(locale={Locale},languageId={LanguageId})", locale, languageId);
             });
 
+		logger.LogDebug("<<< Exiting PrepareAddSpecificationAttributeModelAsync(productId={ProductId},specificationId={SpecificationId})", productId, specificationId);
         return model;
     }
 
@@ -1744,11 +1904,13 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual Task<ProductTagSearchModel> PrepareProductTagSearchModelAsync(ProductTagSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductTagSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareProductTagSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -1762,12 +1924,15 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductTagListModel> PrepareProductTagListModelAsync(ProductTagSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductTagListModelAsync(searchModel={SearchModel})", searchModel);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get product tags
         var productTags = (await (await _productTagService.GetAllProductTagsAsync(tagName: searchModel.SearchTagName))
                 .OrderByDescendingAwait(async tag => await _productTagService.GetProductCountByProductTagIdAsync(tag.Id, storeId: 0, showHidden: true)).ToListAsync())
             .ToPagedList(searchModel);
+			logger.LogInformation("PrepareProductTagListModelAsync(searchModel)={SearchModel}: find query executed in {Arg1} ms", searchModel, __logStart.ElapsedMilliseconds);
 
         //prepare list model
         var model = await new ProductTagListModel().PrepareToGridAsync(searchModel, productTags, () =>
@@ -1777,6 +1942,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var productTagModel = tag.ToModel<ProductTagModel>();
 
+				logger.LogDebug("PrepareProductTagListModelAsync(searchModel={SearchModel}): productTagModel → {ProductTagModel}", searchModel, productTagModel);
                 //fill in additional values (not existing in the entity)
                 productTagModel.ProductCount = await _productTagService.GetProductCountByProductTagIdAsync(tag.Id, storeId: 0, showHidden: true);
 
@@ -1784,6 +1950,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductTagListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1808,6 +1975,7 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 model = productTag.ToModel<ProductTagModel>();
             }
+			logger.LogDebug("PrepareProductTagModelAsync(model={Model},productTag={ProductTag},excludeProperties={ExcludeProperties}): model → {Model1}", model, productTag, excludeProperties, model);
 
             model.ProductCount = await _productTagService.GetProductCountByProductTagIdAsync(productTag.Id, storeId: 0, showHidden: true);
 
@@ -1827,6 +1995,7 @@ public partial class ProductModelFactory : IProductModelFactory
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		logger.LogDebug("<<< Exiting PrepareProductTagModelAsync(model={Model},productTag={ProductTag},excludeProperties={ExcludeProperties})", model, productTag, excludeProperties);
         return model;
     }
 
@@ -1840,6 +2009,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductTagProductListModel> PrepareTaggedProductListModelAsync(ProductTagProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareTaggedProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get products by tag
@@ -1849,6 +2019,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
         //prepare list model
+		logger.LogDebug("<<< Exiting PrepareTaggedProductListModelAsync(searchModel={SearchModel})", searchModel);
         return new ProductTagProductListModel().PrepareToGrid(searchModel, products, () => products.Select(product => product.ToModel<ProductModel>()));
     }
 
@@ -1863,6 +2034,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductOrderListModel> PrepareProductOrderListModelAsync(ProductOrderSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareProductOrderListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
@@ -1877,6 +2049,7 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
 
+				logger.LogDebug("PrepareProductOrderListModelAsync(searchModel={SearchModel},product={Product}): billingAddress → {BillingAddress}", searchModel, product, billingAddress);
                 //fill in model values from the entity
                 var orderModel = new OrderModel
                 {
@@ -1898,6 +2071,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductOrderListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1912,6 +2086,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<TierPriceListModel> PrepareTierPriceListModelAsync(TierPriceSearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareTierPriceListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
@@ -1928,11 +2103,15 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var tierPriceModel = price.ToModel<TierPriceModel>();
 
+				logger.LogDebug("PrepareTierPriceListModelAsync(searchModel={SearchModel},product={Product}): tierPriceModel → {TierPriceModel}", searchModel, product, tierPriceModel);
                 //fill in additional values (not existing in the entity)   
                 tierPriceModel.Store = price.StoreId > 0
+					logger.LogDebug("PrepareTierPriceListModelAsync(searchModel={SearchModel},product={Product}): tierPriceModel.Store → {Arg2}", searchModel, product, tierPriceModel.Store);
                     ? ((await _storeService.GetStoreByIdAsync(price.StoreId))?.Name ?? "Deleted")
                     : await _localizationService.GetResourceAsync("Admin.Catalog.Products.TierPrices.Fields.Store.All");
                 tierPriceModel.CustomerRoleId = price.CustomerRoleId ?? 0;
+				logger.LogDebug("PrepareTierPriceListModelAsync(searchModel={SearchModel},product={Product}): tierPriceModel.CustomerRoleId → {Arg2}", searchModel, product, tierPriceModel.CustomerRoleId);
+				logger.LogDebug("PrepareTierPriceListModelAsync(searchModel={SearchModel},product={Product}): tierPriceModel.CustomerRole → {Arg2}", searchModel, product, tierPriceModel.CustomerRole);
                 tierPriceModel.CustomerRole = price.CustomerRoleId.HasValue
                     ? (await _customerService.GetCustomerRoleByIdAsync(price.CustomerRoleId.Value))?.Name
                     : await _localizationService.GetResourceAsync("Admin.Catalog.Products.TierPrices.Fields.CustomerRole.All");
@@ -1943,6 +2122,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareTierPriceListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 
@@ -1991,6 +2171,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<StockQuantityHistoryListModel> PrepareStockQuantityHistoryListModelAsync(StockQuantityHistorySearchModel searchModel, Product product)
     {
+		logger.LogDebug(">>> Entering PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(product);
 
@@ -2001,6 +2182,8 @@ public partial class ProductModelFactory : IProductModelFactory
 
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		logger.LogDebug("PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product}): currentCustomer → {CurrentCustomer}", searchModel, product, currentCustomer);
+		logger.LogDebug("PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product}): currentStore → {CurrentStore}", searchModel, product, currentStore);
 
         //prepare grid model
         var model = await new StockQuantityHistoryListModel().PrepareToGridAsync(searchModel, stockQuantityHistory, () =>
@@ -2010,6 +2193,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in model values from the entity
                 var stockQuantityHistoryModel = historyEntry.ToModel<StockQuantityHistoryModel>();
 
+				logger.LogDebug("PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product}): stockQuantityHistoryModel → {StockQuantityHistoryModel}", searchModel, product, stockQuantityHistoryModel);
                 //convert dates to the user time
                 stockQuantityHistoryModel.CreatedOn =
                     await _dateTimeHelper.ConvertToUserTimeAsync(historyEntry.CreatedOnUtc, DateTimeKind.Utc);
@@ -2017,12 +2201,15 @@ public partial class ProductModelFactory : IProductModelFactory
                 //fill in additional values (not existing in the entity)
                 var combination = await _productAttributeService.GetProductAttributeCombinationByIdAsync(historyEntry.CombinationId ?? 0);
                 if (combination != null)
+				logger.LogDebug("PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product}): combination → {Combination}", searchModel, product, combination);
                 {
                     stockQuantityHistoryModel.AttributeCombination = await _productAttributeFormatter
+						logger.LogDebug("PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product}): stockQuantityHistoryModel.AttributeCombination → {Arg2}", searchModel, product, stockQuantityHistoryModel.AttributeCombination);
                         .FormatAttributesAsync(product, combination.AttributesXml, currentCustomer, currentStore, renderGiftCardAttributes: false);
                 }
 
                 stockQuantityHistoryModel.WarehouseName = historyEntry.WarehouseId.HasValue
+					logger.LogDebug("PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product}): stockQuantityHistoryModel.WarehouseName → {Arg2}", searchModel, product, stockQuantityHistoryModel.WarehouseName);
                     ? (await _warehouseService.GetWarehouseByIdAsync(historyEntry.WarehouseId.Value))?.Name ?? "Deleted"
                     : await _localizationService.GetResourceAsync("Admin.Catalog.Products.Fields.Warehouse.None");
 
@@ -2030,6 +2217,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareStockQuantityHistoryListModelAsync(searchModel={SearchModel},product={Product})", searchModel, product);
         return model;
     }
 

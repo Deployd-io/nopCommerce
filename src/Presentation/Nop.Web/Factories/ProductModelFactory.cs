@@ -245,6 +245,7 @@ public partial class ProductModelFactory : IProductModelFactory
             priceModel.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, finalPriceBase);
             priceModel.BasePricePAngVValue = finalPriceBase;
         }
+		logger.LogDebug("<<< Exiting PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel})", product, priceModel);
     }
 
     /// <summary>
@@ -593,6 +594,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductReviewOverviewModel> PrepareProductReviewOverviewModelAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ProductReviewOverviewModel productReview;
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
@@ -642,8 +644,10 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<PictureModel>> PrepareProductOverviewPicturesModelAsync(Product product, int? productThumbPictureSize = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productName = await _localizationService.GetLocalizedAsync(product, x => x.Name);
         //If a size has been set in the view, we use it in priority
         var pictureSize = productThumbPictureSize ?? _mediaSettings.ProductThumbPictureSize;
@@ -749,6 +753,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductTagModel>> PrepareProductTagModelsAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var store = await _storeContext.GetCurrentStoreAsync();
@@ -900,6 +905,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductDetailsModel.ProductAttributeModel>> PrepareProductAttributeModelsAsync(Product product, ShoppingCartItem updatecartitem)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new List<ProductDetailsModel.ProductAttributeModel>();
@@ -1122,6 +1128,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductDetailsModel.TierPriceModel>> PrepareProductTierPriceModelsAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
@@ -1156,6 +1163,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ManufacturerBriefInfoModel>> PrepareProductManufacturerModelsAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var model = await (await _manufacturerService.GetProductManufacturersByProductIdAsync(product.Id))
@@ -1817,9 +1825,11 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<CustomerProductReviewsModel> PrepareCustomerProductReviewsModelAsync(int? page)
     {
+		logger.LogDebug(">>> Entering PrepareCustomerProductReviewsModelAsync(page={Page})", page);
         var pageSize = _catalogSettings.ProductReviewsPageSizeOnAccountPage;
         var pageIndex = 0;
 
+		logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): pageIndex → {PageIndex}", page, pageIndex);
         if (page > 0)
         {
             pageIndex = page.Value - 1;
@@ -1827,6 +1837,8 @@ public partial class ProductModelFactory : IProductModelFactory
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): store → {Store}", page, store);
+		logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): customer → {Customer}", page, customer);
 
         var list = await _productReviewService.GetAllProductReviewsAsync(
             customerId: customer.Id,
@@ -1837,10 +1849,12 @@ public partial class ProductModelFactory : IProductModelFactory
 
         var productReviews = new List<CustomerProductReviewModel>();
 
+		logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): productReviews → {ProductReviews}", page, productReviews);
         foreach (var review in list)
         {
             var product = await _productService.GetProductByIdAsync(review.ProductId);
 
+			logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): product → {Product}", page, product);
             var productReviewModel = new CustomerProductReviewModel
             {
                 Title = review.Title,
@@ -1856,6 +1870,7 @@ public partial class ProductModelFactory : IProductModelFactory
             if (_catalogSettings.ProductReviewsMustBeApproved)
             {
                 productReviewModel.ApprovalStatus = review.IsApproved
+					logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): productReviewModel.ApprovalStatus → {Arg1}", page, productReviewModel.ApprovalStatus);
                     ? await _localizationService.GetResourceAsync("Account.CustomerProductReviews.ApprovalStatus.Approved")
                     : await _localizationService.GetResourceAsync("Account.CustomerProductReviews.ApprovalStatus.Pending");
             }
@@ -1864,6 +1879,7 @@ public partial class ProductModelFactory : IProductModelFactory
             {
                 var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(q.ReviewTypeId);
 
+				logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): reviewType → {ReviewType}", page, reviewType);
                 productReviewModel.AdditionalProductReviewList.Add(new ProductReviewReviewTypeMappingModel
                 {
                     ReviewTypeId = q.ReviewTypeId,
@@ -1893,6 +1909,7 @@ public partial class ProductModelFactory : IProductModelFactory
             PagerModel = pagerModel
         };
 
+		logger.LogDebug("<<< Exiting PrepareCustomerProductReviewsModelAsync(page={Page})", page);
         return model;
     }
 

@@ -71,34 +71,43 @@ public partial class NopUrlHelper : INopUrlHelper
     /// </returns>
     protected virtual async Task<string> RouteProductUrlAsync(object values = null, string protocol = null, string host = null, string fragment = null)
     {
+		logger.LogDebug(">>> Entering RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment})", values, protocol, host, fragment);
         if (_catalogSettings.ProductUrlStructureTypeId == (int)ProductUrlStructureType.Product)
             return RouteUrl(NopRoutingDefaults.RouteName.Generic.Product, values, protocol, host, fragment);
 
         var routeValues = new RouteValueDictionary(values);
         if (!routeValues.TryGetValue(NopRoutingDefaults.RouteValue.SeName, out var slug))
+			logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): routeValues → {RouteValues}", values, protocol, host, fragment, routeValues);
             return RouteUrl(NopRoutingDefaults.RouteName.Generic.Product, values, protocol, host, fragment);
 
         var urlRecord = await _urlRecordService.GetBySlugAsync(slug.ToString());
         if (urlRecord is null || !urlRecord.EntityName.Equals(nameof(Product), StringComparison.InvariantCultureIgnoreCase))
+			logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): urlRecord → {UrlRecord}", values, protocol, host, fragment, urlRecord);
             return RouteUrl(NopRoutingDefaults.RouteName.Generic.Product, values, protocol, host, fragment);
 
         var catalogSeName = string.Empty;
         if (_catalogSettings.ProductUrlStructureTypeId == (int)ProductUrlStructureType.CategoryProduct)
+		logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): catalogSeName → {CatalogSeName}", values, protocol, host, fragment, catalogSeName);
         {
             var productCategory = (await _categoryService.GetProductCategoriesByProductIdAsync(urlRecord.EntityId)).FirstOrDefault();
             var category = await _categoryService.GetCategoryByIdAsync(productCategory?.CategoryId ?? 0);
+			logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): productCategory → {ProductCategory}", values, protocol, host, fragment, productCategory);
+			logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): category → {Category}", values, protocol, host, fragment, category);
             catalogSeName = category is not null ? await _urlRecordService.GetSeNameAsync(category) : string.Empty;
         }
         if (_catalogSettings.ProductUrlStructureTypeId == (int)ProductUrlStructureType.ManufacturerProduct)
         {
             var productManufacturer = (await _manufacturerService.GetProductManufacturersByProductIdAsync(urlRecord.EntityId)).FirstOrDefault();
             var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(productManufacturer?.ManufacturerId ?? 0);
+			logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): productManufacturer → {ProductManufacturer}", values, protocol, host, fragment, productManufacturer);
+			logger.LogDebug("RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment}): manufacturer → {Manufacturer}", values, protocol, host, fragment, manufacturer);
             catalogSeName = manufacturer is not null ? await _urlRecordService.GetSeNameAsync(manufacturer) : string.Empty;
         }
         if (string.IsNullOrEmpty(catalogSeName))
             return RouteUrl(NopRoutingDefaults.RouteName.Generic.Product, values, protocol, host, fragment);
 
         routeValues[NopRoutingDefaults.RouteValue.CatalogSeName] = catalogSeName;
+		logger.LogDebug("<<< Exiting RouteProductUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment})", values, protocol, host, fragment);
         return RouteUrl(NopRoutingDefaults.RouteName.Generic.ProductCatalog, routeValues, protocol, host, fragment);
     }
 
@@ -146,6 +155,8 @@ public partial class NopUrlHelper : INopUrlHelper
     public virtual async Task<string> RouteGenericUrlAsync<TEntity>(object values = null, string protocol = null, string host = null, string fragment = null)
         where TEntity : BaseEntity, ISlugSupported
     {
+		logger.LogDebug(">>> Entering RouteGenericUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment})", values, protocol, host, fragment);
+		logger.LogDebug("<<< Exiting RouteGenericUrlAsync(values={Values},protocol={Protocol},host={Host},fragment={Fragment})", values, protocol, host, fragment);
         return typeof(TEntity) switch
         {
             var entityType when entityType == typeof(Product)
@@ -181,9 +192,13 @@ public partial class NopUrlHelper : INopUrlHelper
     /// </returns>
     public virtual async Task<string> RouteTopicUrlAsync(string systemName, string protocol = null, string host = null, string fragment = null)
     {
+		logger.LogDebug(">>> Entering RouteTopicUrlAsync(systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment})", systemName, protocol, host, fragment);
         var store = await _storeContext.GetCurrentStoreAsync();
         var topic = await _topicService.GetTopicBySystemNameAsync(systemName, store.Id);
+		logger.LogDebug("RouteTopicUrlAsync(systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment}): store → {Store}", systemName, protocol, host, fragment, store);
+		logger.LogDebug("RouteTopicUrlAsync(systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment}): topic → {Topic}", systemName, protocol, host, fragment, topic);
 
+		logger.LogDebug("<<< Exiting RouteTopicUrlAsync(systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment})", systemName, protocol, host, fragment);
         return await RouteGenericUrlAsync(topic, protocol, host, fragment);
     }
 
@@ -200,11 +215,14 @@ public partial class NopUrlHelper : INopUrlHelper
     /// </returns>
     public virtual string RouteUrl(string routeName, object values = null, string protocol = null, string host = null, string fragment = null)
     {
+		logger.LogDebug(">>> Entering RouteUrl(routeName={RouteName},values={Values},protocol={Protocol},host={Host},fragment={Fragment})", routeName, values, protocol, host, fragment);
         if (_actionContextAccessor.ActionContext is null)
             return string.Empty;
 
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
+		logger.LogDebug("RouteUrl(routeName={RouteName},values={Values},protocol={Protocol},host={Host},fragment={Fragment}): urlHelper → {UrlHelper}", routeName, values, protocol, host, fragment, urlHelper);
+		logger.LogDebug("<<< Exiting RouteUrl(routeName={RouteName},values={Values},protocol={Protocol},host={Host},fragment={Fragment})", routeName, values, protocol, host, fragment);
         return urlHelper.RouteUrl(routeName, values, protocol, host, fragment);
     }
 

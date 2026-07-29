@@ -52,6 +52,8 @@ public partial class AclService : IAclService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertAclRecordAsync(AclRecord aclRecord)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _aclRecordRepository.InsertAsync(aclRecord);
     }
 
@@ -65,9 +67,14 @@ public partial class AclService : IAclService
     /// </returns>
     protected virtual async Task<bool> IsEntityAclMappingExistAsync<TEntity>() where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering IsEntityAclMappingExistAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var entityName = typeof(TEntity).Name;
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopSecurityDefaults.EntityAclRecordExistsCacheKey, entityName);
 
+		logger.LogDebug("IsEntityAclMappingExistAsync(): entityName → {EntityName}", entityName);
+		logger.LogWarning("IsEntityAclMappingExistAsync(): key → {Key}", key);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from acl in _aclRecordRepository.Table
             where acl.EntityName == entityName
             select acl;
@@ -92,6 +99,7 @@ public partial class AclService : IAclService
     public virtual async Task<IQueryable<TEntity>> ApplyAcl<TEntity>(IQueryable<TEntity> query, Customer customer)
         where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering ApplyAcl(query={Query},customer={Customer})", query, customer);
         ArgumentNullException.ThrowIfNull(query);
 
         ArgumentNullException.ThrowIfNull(customer);
@@ -133,9 +141,13 @@ public partial class AclService : IAclService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAclRecordAsync(AclRecord aclRecord)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _aclRecordRepository.DeleteAsync(aclRecord);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Gets ACL records
     /// </summary>
@@ -147,17 +159,22 @@ public partial class AclService : IAclService
     /// </returns>
     public virtual async Task<IList<AclRecord>> GetAclRecordsAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering GetAclRecordsAsync(entity={Entity})", entity);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("GetAclRecordsAsync(entity={Entity}): entityName → {EntityName}", entity, entityName);
         var query = from ur in _aclRecordRepository.Table
             where ur.EntityId == entityId &&
                   ur.EntityName == entityName
             select ur;
         var aclRecords = await query.ToListAsync();
 
+		logger.LogDebug("GetAclRecordsAsync(entity={Entity}): aclRecords → {AclRecords}", entity, aclRecords);
+		logger.LogInformation("GetAclRecordsAsync(entity)={Entity}: database query executed in {Arg1} ms", entity, __logStart.ElapsedMilliseconds);
         return aclRecords;
     }
 
@@ -170,14 +187,17 @@ public partial class AclService : IAclService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAclRecordAsync<TEntity>(TEntity entity, int customerRoleId) where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering InsertAclRecordAsync(entity={Entity},customerRoleId={CustomerRoleId})", entity, customerRoleId);
         ArgumentNullException.ThrowIfNull(entity);
 
         if (customerRoleId == 0)
+			logger.LogDebug("<<< Exiting InsertAclRecordAsync(entity={Entity},customerRoleId={CustomerRoleId})", entity, customerRoleId);
             throw new ArgumentOutOfRangeException(nameof(customerRoleId));
 
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("InsertAclRecordAsync(entity={Entity},customerRoleId={CustomerRoleId}): entityName → {EntityName}", entity, customerRoleId, entityName);
         var aclRecord = new AclRecord
         {
             EntityId = entityId,
@@ -199,9 +219,11 @@ public partial class AclService : IAclService
     /// </returns>
     public virtual async Task<int[]> GetCustomerRoleIdsWithAccessAsync(int entityId, string entityName)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (entityId == 0)
             return [];
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopSecurityDefaults.AclRecordCacheKey, entityId, entityName);
 
         var query = from ur in _aclRecordRepository.Table
@@ -223,6 +245,7 @@ public partial class AclService : IAclService
     /// </returns>
     public virtual async Task<bool> AuthorizeAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering AuthorizeAsync(entity={Entity})", entity);
         return await AuthorizeAsync(entity, await _workContext.Value.GetCurrentCustomerAsync());
     }
 
@@ -238,6 +261,7 @@ public partial class AclService : IAclService
     /// </returns>
     public virtual async Task<bool> AuthorizeAsync<TEntity>(TEntity entity, Customer customer) where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering AuthorizeAsync(entity={Entity},customer={Customer})", entity, customer);
         if (entity == null)
             return false;
 
@@ -292,6 +316,7 @@ public partial class AclService : IAclService
     /// </returns>
     public virtual async Task<bool> AuthorizeAsync(Customer customer, IList<int> allowedCustomerRoleIds)
     {
+		logger.LogDebug("<<< Exiting AuthorizeAsync(customer={Customer},allowedCustomerRoleIds={AllowedCustomerRoleIds})", customer, allowedCustomerRoleIds);
         return _catalogSettings.IgnoreAcl || allowedCustomerRoleIds.Intersect(await _customerService.GetCustomerRoleIdsAsync(customer)).Any();
     }
 
@@ -304,7 +329,9 @@ public partial class AclService : IAclService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveAclAsync<TEntity>(TEntity entity, IList<int> selectedCustomerRoleIds) where TEntity : BaseEntity, IAclSupported
     {
+		logger.LogDebug(">>> Entering SaveAclAsync(entity={Entity},selectedCustomerRoleIds={SelectedCustomerRoleIds})", entity, selectedCustomerRoleIds);
         if (entity == null)
+			logger.LogDebug("<<< Exiting SaveAclAsync(entity={Entity},selectedCustomerRoleIds={SelectedCustomerRoleIds})", entity, selectedCustomerRoleIds);
             return;
 
         if (entity.SubjectToAcl != selectedCustomerRoleIds.Any())
@@ -315,6 +342,8 @@ public partial class AclService : IAclService
 
         var existingAclRecords = await GetAclRecordsAsync(entity);
         var allCustomerRoles = await _customerService.GetAllCustomerRolesAsync(true);
+		logger.LogDebug("SaveAclAsync(entity={Entity},selectedCustomerRoleIds={SelectedCustomerRoleIds}): existingAclRecords → {ExistingAclRecords}", entity, selectedCustomerRoleIds, existingAclRecords);
+		logger.LogDebug("SaveAclAsync(entity={Entity},selectedCustomerRoleIds={SelectedCustomerRoleIds}): allCustomerRoles → {AllCustomerRoles}", entity, selectedCustomerRoleIds, allCustomerRoles);
         foreach (var customerRole in allCustomerRoles)
             if (selectedCustomerRoleIds.Contains(customerRole.Id))
             {
@@ -327,6 +356,7 @@ public partial class AclService : IAclService
                 //remove role
                 var aclRecordToDelete = existingAclRecords.FirstOrDefault(acl => acl.CustomerRoleId == customerRole.Id);
                 if (aclRecordToDelete != null)
+					logger.LogDebug("SaveAclAsync(entity={Entity},selectedCustomerRoleIds={SelectedCustomerRoleIds}): aclRecordToDelete → {AclRecordToDelete}", entity, selectedCustomerRoleIds, aclRecordToDelete);
                     await DeleteAclRecordAsync(aclRecordToDelete);
             }
     }

@@ -8,6 +8,8 @@ public partial class KeepAliveController : Controller
 {
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return Content("I am alive!");
     }
 }

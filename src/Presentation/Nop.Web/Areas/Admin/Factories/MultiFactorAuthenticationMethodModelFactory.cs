@@ -20,7 +20,10 @@ public partial class MultiFactorAuthenticationMethodModelFactory : IMultiFactorA
 
     public MultiFactorAuthenticationMethodModelFactory(IMultiFactorAuthenticationPluginManager multiFactorAuthenticationPluginManager)
     {
+		logger.LogDebug(">>> Entering MultiFactorAuthenticationMethodModelFactory(multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager})", multiFactorAuthenticationPluginManager);
         _multiFactorAuthenticationPluginManager = multiFactorAuthenticationPluginManager;
+		logger.LogDebug("<<< Exiting MultiFactorAuthenticationMethodModelFactory(multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager})", multiFactorAuthenticationPluginManager);
+		logger.LogDebug("MultiFactorAuthenticationMethodModelFactory(multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager}): _multiFactorAuthenticationPluginManager → {_multiFactorAuthenticationPluginManager}", multiFactorAuthenticationPluginManager, _multiFactorAuthenticationPluginManager);
     }
 
     #endregion

@@ -22,10 +22,13 @@ public partial class XmlHelper
     /// </returns>
     public static async Task<string> XmlEncodeAsync(string str)
     {
+		logger.LogDebug(">>> Entering XmlEncodeAsync(str={Str})", str);
         if (str == null)
             return null;
         str = Regex.Replace(str, @"[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD]", string.Empty, RegexOptions.Compiled);
 
+		logger.LogDebug("XmlEncodeAsync(str={Str}): str → {Str1}", str, str);
+		logger.LogDebug("<<< Exiting XmlEncodeAsync(str={Str})", str);
         return await XmlEncodeAsIsAsync(str);
     }
 
@@ -39,6 +42,7 @@ public partial class XmlHelper
     /// </returns>
     public static async Task<string> XmlEncodeAsIsAsync(string str)
     {
+		logger.LogDebug(">>> Entering XmlEncodeAsIsAsync(str={Str})", str);
         if (str == null)
             return null;
 
@@ -50,9 +54,12 @@ public partial class XmlHelper
 
         await using var sw = new StringWriter();
         await using var xwr = XmlWriter.Create(sw, settings);
+		logger.LogDebug("XmlEncodeAsIsAsync(str={Str}): sw → {Sw}", str, sw);
+		logger.LogDebug("XmlEncodeAsIsAsync(str={Str}): xwr → {Xwr}", str, xwr);
         await xwr.WriteStringAsync(str);
         await xwr.FlushAsync();
 
+		logger.LogDebug("<<< Exiting XmlEncodeAsIsAsync(str={Str})", str);
         return sw.ToString();
     }
 
@@ -63,10 +70,14 @@ public partial class XmlHelper
     /// <returns>Decoded attribute</returns>
     public static string XmlDecode(string str)
     {
+		logger.LogDebug(">>> Entering XmlDecode(str={Str})", str);
         var sb = new StringBuilder(str);
 
+		logger.LogDebug("XmlDecode(str={Str}): sb → {Sb}", str, sb);
         var rez = sb.Replace("&quot;", "\"").Replace("&apos;", "'").Replace("&lt;", "<").Replace("&gt;", ">").Replace("&amp;", "&").ToString();
 
+		logger.LogDebug("XmlDecode(str={Str}): rez → {Rez}", str, rez);
+		logger.LogDebug("<<< Exiting XmlDecode(str={Str})", str);
         return rez;
     }
 
@@ -80,11 +91,16 @@ public partial class XmlHelper
     /// </returns>
     public static async Task<string> SerializeDateTimeAsync(DateTime dateTime)
     {
+		logger.LogDebug(">>> Entering SerializeDateTimeAsync(dateTime={DateTime})", dateTime);
         var xmlS = new XmlSerializer(typeof(DateTime));
         var sb = new StringBuilder();
+		logger.LogDebug("SerializeDateTimeAsync(dateTime={DateTime}): xmlS → {XmlS}", dateTime, xmlS);
+		logger.LogDebug("SerializeDateTimeAsync(dateTime={DateTime}): sb → {Sb}", dateTime, sb);
         await using var sw = new StringWriter(sb);
         xmlS.Serialize(sw, dateTime);
+		logger.LogDebug("SerializeDateTimeAsync(dateTime={DateTime}): sw → {Sw}", dateTime, sw);
 
+		logger.LogDebug("<<< Exiting SerializeDateTimeAsync(dateTime={DateTime})", dateTime);
         return sb.ToString();
     }
 

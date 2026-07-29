@@ -50,15 +50,20 @@ public partial class TaxController : BaseAdminController
 
     public virtual IActionResult List()
     {
+		logger.LogDebug(">>> Entering List()");
+		logger.LogDebug("<<< Exiting List()");
         return RedirectToAction("Providers");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> Providers()
     {
+		logger.LogDebug(">>> Entering Providers()");
         //prepare model
         var model = await _taxModelFactory.PrepareTaxProviderSearchModelAsync(new TaxProviderSearchModel());
 
+		logger.LogDebug("Providers(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Providers()");
         return View(model);
     }
 
@@ -69,22 +74,27 @@ public partial class TaxController : BaseAdminController
         //prepare model
         var model = await _taxModelFactory.PrepareTaxProviderListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting Providers(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> MarkAsPrimaryProvider(string systemName)
     {
+		logger.LogDebug(">>> Entering MarkAsPrimaryProvider(systemName={SystemName})", systemName);
         if (string.IsNullOrEmpty(systemName))
             return RedirectToAction("Providers");
 
         var taxProvider = await _taxPluginManager.LoadPluginBySystemNameAsync(systemName);
         if (taxProvider == null)
+			logger.LogDebug("MarkAsPrimaryProvider(systemName={SystemName}): taxProvider → {TaxProvider}", systemName, taxProvider);
             return RedirectToAction("Providers");
 
         _taxSettings.ActiveTaxProviderSystemName = systemName;
+		logger.LogDebug("MarkAsPrimaryProvider(systemName={SystemName}): _taxSettings.ActiveTaxProviderSystemName → {Arg1}", systemName, _taxSettings.ActiveTaxProviderSystemName);
         await _settingService.SaveSettingAsync(_taxSettings);
 
+		logger.LogDebug("<<< Exiting MarkAsPrimaryProvider(systemName={SystemName})", systemName);
         return RedirectToAction("Providers");
     }
 
@@ -95,9 +105,12 @@ public partial class TaxController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> Categories()
     {
+		logger.LogDebug(">>> Entering Categories()");
         //prepare model
         var model = await _taxModelFactory.PrepareTaxCategorySearchModelAsync(new TaxCategorySearchModel());
 
+		logger.LogDebug("Categories(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Categories()");
         return View(model);
     }
 
@@ -108,6 +121,7 @@ public partial class TaxController : BaseAdminController
         //prepare model
         var model = await _taxModelFactory.PrepareTaxCategoryListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting Categories(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -143,12 +157,14 @@ public partial class TaxController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> CategoryDelete(int id)
     {
+		logger.LogDebug(">>> Entering CategoryDelete(id={Id})", id);
         //try to get a tax category with the specified id
         var taxCategory = await _taxCategoryService.GetTaxCategoryByIdAsync(id)
             ?? throw new ArgumentException("No tax category found with the specified id", nameof(id));
 
         await _taxCategoryService.DeleteTaxCategoryAsync(taxCategory);
 
+		logger.LogDebug("<<< Exiting CategoryDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

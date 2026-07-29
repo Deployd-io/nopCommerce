@@ -25,7 +25,10 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
 
     public RedisConnectionWrapper(IOptions<RedisCacheOptions> optionsAccessor)
     {
+		logger.LogDebug(">>> Entering RedisConnectionWrapper(optionsAccessor={OptionsAccessor})", optionsAccessor);
         _options = optionsAccessor.Value;
+		logger.LogDebug("<<< Exiting RedisConnectionWrapper(optionsAccessor={OptionsAccessor})", optionsAccessor);
+		logger.LogDebug("RedisConnectionWrapper(optionsAccessor={OptionsAccessor}): _options → {_options}", optionsAccessor, _options);
     }
 
     #endregion
@@ -38,12 +41,14 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns></returns>
     protected virtual async Task<IConnectionMultiplexer> ConnectAsync()
     {
+		logger.LogDebug(">>> Entering ConnectAsync()");
         IConnectionMultiplexer connection;
 
         if (_options.ConnectionMultiplexerFactory is null)
         {
             if (_options.ConfigurationOptions is not null)
                 connection = await ConnectionMultiplexer.ConnectAsync(_options.ConfigurationOptions);
+				logger.LogDebug("ConnectAsync(): connection → {Connection}", connection);
             else
                 connection = await ConnectionMultiplexer.ConnectAsync(_options.Configuration);
         }
@@ -55,6 +60,7 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
         if (_options.ProfilingSession != null)
             connection.RegisterProfiler(_options.ProfilingSession);
 
+		logger.LogDebug("<<< Exiting ConnectAsync()");
         return connection;
     }
 
@@ -64,16 +70,19 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns></returns>
     protected virtual IConnectionMultiplexer Connect()
     {
+		logger.LogDebug(">>> Entering Connect()");
         IConnectionMultiplexer connection;
 
         if (_options.ConnectionMultiplexerFactory is null)
             connection = _options.ConfigurationOptions is not null ? ConnectionMultiplexer.Connect(_options.ConfigurationOptions) : ConnectionMultiplexer.Connect(_options.Configuration);
+			logger.LogDebug("Connect(): connection → {Connection}", connection);
         else
             connection = _options.ConnectionMultiplexerFactory().GetAwaiter().GetResult();
 
         if (_options.ProfilingSession != null)
             connection.RegisterProfiler(_options.ProfilingSession);
 
+		logger.LogDebug("<<< Exiting Connect()");
         return connection;
     }
 
@@ -83,6 +92,7 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns></returns>
     protected virtual async Task<IConnectionMultiplexer> GetConnectionAsync()
     {
+		logger.LogDebug(">>> Entering GetConnectionAsync()");
         if (_connection?.IsConnected == true)
             return _connection;
 
@@ -97,12 +107,14 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
 
             //Creating new instance of Redis Connection
             _connection = await ConnectAsync();
+			logger.LogDebug("GetConnectionAsync(): _connection → {_connection}", _connection);
         }
         finally
         {
             _connectionLock.Release();
         }
 
+		logger.LogDebug("<<< Exiting GetConnectionAsync()");
         return _connection;
     }
 
@@ -112,6 +124,7 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns></returns>
     protected virtual IConnectionMultiplexer GetConnection()
     {
+		logger.LogDebug(">>> Entering GetConnection()");
         if (_connection?.IsConnected == true)
             return _connection;
 
@@ -126,12 +139,14 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
 
             //Creating new instance of Redis Connection
             _connection = Connect();
+			logger.LogDebug("GetConnection(): _connection → {_connection}", _connection);
         }
         finally
         {
             _connectionLock.Release();
         }
 
+		logger.LogDebug("<<< Exiting GetConnection()");
         return _connection;
     }
 
@@ -145,6 +160,8 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Redis cache database</returns>
     public virtual async Task<IDatabase> GetDatabaseAsync()
     {
+		logger.LogDebug(">>> Entering GetDatabaseAsync()");
+		logger.LogDebug("<<< Exiting GetDatabaseAsync()");
         return (await GetConnectionAsync()).GetDatabase();
     }
 
@@ -154,6 +171,8 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Redis cache database</returns>
     public virtual IDatabase GetDatabase()
     {
+		logger.LogDebug(">>> Entering GetDatabase()");
+		logger.LogDebug("<<< Exiting GetDatabase()");
         return GetConnection().GetDatabase();
     }
 
@@ -164,6 +183,8 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Redis server</returns>
     public virtual async Task<IServer> GetServerAsync(EndPoint endPoint)
     {
+		logger.LogDebug(">>> Entering GetServerAsync(endPoint={EndPoint})", endPoint);
+		logger.LogDebug("<<< Exiting GetServerAsync(endPoint={EndPoint})", endPoint);
         return (await GetConnectionAsync()).GetServer(endPoint);
     }
 
@@ -173,6 +194,8 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Array of endpoints</returns>
     public virtual async Task<EndPoint[]> GetEndPointsAsync()
     {
+		logger.LogDebug(">>> Entering GetEndPointsAsync()");
+		logger.LogDebug("<<< Exiting GetEndPointsAsync()");
         return (await GetConnectionAsync()).GetEndPoints();
     }
 
@@ -182,6 +205,8 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Array of endpoints</returns>
     public virtual async Task<ISubscriber> GetSubscriberAsync()
     {
+		logger.LogDebug(">>> Entering GetSubscriberAsync()");
+		logger.LogDebug("<<< Exiting GetSubscriberAsync()");
         return (await GetConnectionAsync()).GetSubscriber();
     }
 
@@ -191,6 +216,8 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Array of endpoints</returns>
     public virtual ISubscriber GetSubscriber()
     {
+		logger.LogDebug(">>> Entering GetSubscriber()");
+		logger.LogDebug("<<< Exiting GetSubscriber()");
         return GetConnection().GetSubscriber();
     }
 
@@ -199,15 +226,19 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// </summary>
     public virtual async Task FlushDatabaseAsync()
     {
+		logger.LogDebug(">>> Entering FlushDatabaseAsync()");
         var endPoints = await GetEndPointsAsync();
         await Task.WhenAll(endPoints.Select(async endPoint =>
         {
+		logger.LogDebug("FlushDatabaseAsync(): endPoints → {EndPoints}", endPoints);
             var server = await GetServerAsync(endPoint);
             if (!server.IsReplica)
+			logger.LogDebug("FlushDatabaseAsync(): server → {Server}", server);
             {
                 await server.FlushDatabaseAsync();
             }
         }));
+		logger.LogDebug("<<< Exiting FlushDatabaseAsync()");
     }
 
     /// <summary>
@@ -215,8 +246,10 @@ public partial class RedisConnectionWrapper : IRedisConnectionWrapper
     /// </summary>
     public virtual void Dispose()
     {
+		logger.LogDebug(">>> Entering Dispose()");
         //dispose ConnectionMultiplexer
         _connection?.Dispose();
+		logger.LogDebug("<<< Exiting Dispose()");
     }
 
     #endregion

@@ -9,6 +9,7 @@ public partial class Setting : BaseEntity, ILocalizedEntity
 {
     public Setting()
     {
+	logger.LogDebug(">>> Entering Setting()");
     }
 
     /// <summary>
@@ -19,11 +20,17 @@ public partial class Setting : BaseEntity, ILocalizedEntity
     /// <param name="storeId">Store identifier</param>
     public Setting(string name, string value, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering Setting(name={Name},value={Value},storeId={StoreId})", name, value, storeId);
         Name = name;
         Value = value;
+		logger.LogDebug("Setting(name={Name},value={Value},storeId={StoreId}): Name → {Name1}", name, value, storeId, Name);
+		logger.LogDebug("Setting(name={Name},value={Value},storeId={StoreId}): Value → {Value1}", name, value, storeId, Value);
         StoreId = storeId;
+		logger.LogDebug("<<< Exiting Setting(name={Name},value={Value},storeId={StoreId})", name, value, storeId);
+		logger.LogDebug("<<< Exiting Setting()");
     }
 
+	logger.LogDebug("Setting(name={Name},value={Value},storeId={StoreId}): StoreId → {StoreId1}", name, value, storeId, StoreId);
     /// <summary>
     /// Gets or sets the name
     /// </summary>
@@ -45,6 +52,8 @@ public partial class Setting : BaseEntity, ILocalizedEntity
     /// <returns>Result</returns>
     public override string ToString()
     {
+		logger.LogDebug(">>> Entering ToString()");
+		logger.LogDebug("<<< Exiting ToString()");
         return Name;
     }
 }

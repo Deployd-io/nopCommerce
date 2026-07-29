@@ -18,6 +18,8 @@ public partial class NopRoutingStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+	logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
+	logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -26,12 +28,15 @@ public partial class NopRoutingStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+		logger.LogDebug(">>> Entering Configure(application={Application})", application);
         //add the RoutingMiddleware
         application.UseRouting();
 
         var commonConfig = Singleton<AppSettings>.Instance.Get<CommonConfig>();
         if (commonConfig.PermitLimit > 0)
+			logger.LogDebug("Configure(application={Application}): commonConfig → {CommonConfig}", application, commonConfig);
             application.UseRateLimiter();
+			logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

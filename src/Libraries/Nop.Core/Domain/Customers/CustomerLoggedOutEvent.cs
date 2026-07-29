@@ -11,7 +11,10 @@ public partial class CustomerLoggedOutEvent
     /// <param name="customer">Customer</param>
     public CustomerLoggedOutEvent(Customer customer)
     {
+		logger.LogDebug(">>> Entering CustomerLoggedOutEvent(customer={Customer})", customer);
         Customer = customer;
+		logger.LogDebug("<<< Exiting CustomerLoggedOutEvent(customer={Customer})", customer);
+		logger.LogDebug("CustomerLoggedOutEvent(customer={Customer}): Customer → {Customer1}", customer, Customer);
     }
 
     /// <summary>

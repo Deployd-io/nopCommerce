@@ -94,9 +94,12 @@ var symbolMap = {
         ],
     },
     pluralize = function (u) {
+		logger.debug(`>>> Entering pluralize(u=${u})`);
         return function (number, withoutSuffix, string, isFuture) {
+		logger.debug(`>>> Entering function(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             var f = pluralForm(number),
                 str = plurals[u][pluralForm(number)];
+				logger.debug(`<<< Exiting function(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             if (f === 2) {
                 str = str[withoutSuffix ? 0 : 1];
             }
@@ -135,12 +138,15 @@ export default moment.defineLocale('ar', {
     },
     meridiemParse: /ص|م/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return 'م' === input;
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ص';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'م';
         }
     },
@@ -169,18 +175,22 @@ export default moment.defineLocale('ar', {
         yy: pluralize('y'),
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string
             .replace(/[١٢٣٤٥٦٧٨٩٠]/g, function (match) {
                 return numberMap[match];
             })
             .replace(/،/g, ',');
+			logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string
             .replace(/\d/g, function (match) {
                 return symbolMap[match];
             })
             .replace(/,/g, '،');
+			logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     week: {
         dow: 6, // Saturday is the first day of the week.

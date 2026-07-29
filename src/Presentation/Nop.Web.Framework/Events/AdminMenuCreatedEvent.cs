@@ -16,7 +16,10 @@ public partial class AdminMenuCreatedEvent : BaseMenuItemCreatedEvent
     /// <param name="rootMenuItem">Root menu item</param>
     public AdminMenuCreatedEvent(IAdminMenu adminMenu, AdminMenuItem rootMenuItem) : base(adminMenu)
     {
+		logger.LogDebug(">>> Entering AdminMenuCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem})", adminMenu, rootMenuItem);
         RootMenuItem = rootMenuItem;
+		logger.LogDebug("<<< Exiting AdminMenuCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem})", adminMenu, rootMenuItem);
+		logger.LogDebug("AdminMenuCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem}): RootMenuItem → {RootMenuItem1}", adminMenu, rootMenuItem, RootMenuItem);
     }
 
     #endregion

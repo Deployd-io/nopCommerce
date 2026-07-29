@@ -98,11 +98,13 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     /// </returns>
     public virtual Task<ProductAttributeSearchModel> PrepareProductAttributeSearchModelAsync(ProductAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareProductAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -116,6 +118,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     /// </returns>
     public virtual async Task<ProductAttributeListModel> PrepareProductAttributeListModelAsync(ProductAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareProductAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get product attributes
@@ -132,6 +135,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
 
         });
 
+		logger.LogDebug("<<< Exiting PrepareProductAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

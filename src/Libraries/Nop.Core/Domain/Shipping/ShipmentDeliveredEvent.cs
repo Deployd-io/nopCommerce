@@ -11,7 +11,10 @@ public partial class ShipmentDeliveredEvent
     /// <param name="shipment">Shipment</param>
     public ShipmentDeliveredEvent(Shipment shipment)
     {
+		logger.LogDebug(">>> Entering ShipmentDeliveredEvent(shipment={Shipment})", shipment);
         Shipment = shipment;
+		logger.LogDebug("<<< Exiting ShipmentDeliveredEvent(shipment={Shipment})", shipment);
+		logger.LogDebug("ShipmentDeliveredEvent(shipment={Shipment}): Shipment → {Shipment1}", shipment, Shipment);
     }
 
     /// <summary>

@@ -15,7 +15,9 @@ public class SchemaMigration : AutoReversingMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<ZettleRecord>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     #endregion

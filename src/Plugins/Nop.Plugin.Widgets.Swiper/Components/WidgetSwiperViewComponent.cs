@@ -45,6 +45,8 @@ public class WidgetSwiperViewComponent : NopViewComponent
     /// <returns>A task that represents the asynchronous operation</returns>
     private async Task<string> GetPictureUrlAsync(int pictureId)
     {
+		logger.LogDebug(">>> Entering GetPictureUrlAsync(pictureId={PictureId})", pictureId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (pictureId == 0)
             return string.Empty;
 
@@ -57,6 +59,8 @@ public class WidgetSwiperViewComponent : NopViewComponent
             var url = await _pictureService.GetPictureUrlAsync(pictureId, showDefaultPicture: false) ?? "";
             return url;
         });
+		logger.LogInformation("GetPictureUrlAsync(pictureId)={PictureId}: external service call {Url} took {Arg2} ms", pictureId, url, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetPictureUrlAsync(pictureId={PictureId})", pictureId);
     }
 
     #endregion
@@ -66,8 +70,11 @@ public class WidgetSwiperViewComponent : NopViewComponent
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var store = await _storeContext.GetCurrentStoreAsync();
         var sliderSettings = await _settingService.LoadSettingAsync<SwiperSettings>(store.Id);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): store → {Store}", widgetZone, additionalData, store);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): sliderSettings → {SliderSettings}", widgetZone, additionalData, sliderSettings);
 
         if (string.IsNullOrEmpty(sliderSettings.Slides))
             return Content("");
@@ -83,8 +90,10 @@ public class WidgetSwiperViewComponent : NopViewComponent
         var slides = JsonConvert.DeserializeObject<List<Slide>>(sliderSettings.Slides);
         foreach (var slide in slides)
         {
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): slides → {Slides}", widgetZone, additionalData, slides);
             var picUrl = await GetPictureUrlAsync(slide.PictureId);
             if (string.IsNullOrEmpty(picUrl))
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): picUrl → {PicUrl}", widgetZone, additionalData, picUrl);
                 continue;
 
             model.Slides.Add(new()
@@ -94,10 +103,16 @@ public class WidgetSwiperViewComponent : NopViewComponent
                 LinkUrl = slide.LinkUrl,
                 AltText = slide.AltText,
                 LazyLoading = sliderSettings.LazyLoading
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): PictureUrl → {PictureUrl}", widgetZone, additionalData, PictureUrl);
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): TitleText → {TitleText}", widgetZone, additionalData, TitleText);
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): LinkUrl → {LinkUrl}", widgetZone, additionalData, LinkUrl);
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): AltText → {AltText}", widgetZone, additionalData, AltText);
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): LazyLoading → {LazyLoading}", widgetZone, additionalData, LazyLoading);
             });
         }
 
         if (!model.Slides.Any())
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return Content("");
 
         return View("~/Plugins/Widgets.Swiper/Views/PublicInfo.cshtml", model);

@@ -32,7 +32,10 @@ public partial class NopEditorTagHelper : TagHelper
 
     public NopEditorTagHelper(IHtmlHelper htmlHelper)
     {
+		logger.LogDebug(">>> Entering NopEditorTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
         _htmlHelper = htmlHelper;
+		logger.LogDebug("<<< Exiting NopEditorTagHelper(htmlHelper={HtmlHelper})", htmlHelper);
+		logger.LogDebug("NopEditorTagHelper(htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", htmlHelper, _htmlHelper);
     }
 
     #endregion
@@ -47,6 +50,7 @@ public partial class NopEditorTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -57,9 +61,11 @@ public partial class NopEditorTagHelper : TagHelper
         //container for additional attributes
         var htmlAttributes = new Dictionary<string, object>();
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributes → {HtmlAttributes}", context, output, htmlAttributes);
         //set custom html attributes
         var htmlAttributesDictionary = HtmlHelper.AnonymousObjectToHtmlAttributes(CustomHtmlAttributes);
         if (htmlAttributesDictionary?.Count > 0)
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributesDictionary → {HtmlAttributesDictionary}", context, output, htmlAttributesDictionary);
         {
             foreach (var (key, value) in htmlAttributesDictionary)
             {
@@ -81,20 +87,25 @@ public partial class NopEditorTagHelper : TagHelper
         //add form-control class
         _ = bool.TryParse(RenderFormControlClass, out var renderFormControlClass);
         if (string.IsNullOrEmpty(RenderFormControlClass) && For.Metadata.ModelType.Name.Equals("String") || renderFormControlClass)
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): _ → {_}", context, output, _);
             htmlAttributes.Add("class", "form-control");
 
         //generate editor
         var pattern = @"(?=\[\w+\]\.)";
         if (!_htmlHelper.ViewData.ContainsKey(For.Name) && Regex.IsMatch(For.Name, pattern))
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): pattern → {Pattern}", context, output, pattern);
         {
             var prefix = _htmlHelper.ViewData.TemplateInfo.HtmlFieldPrefix;
             var key = string.IsNullOrEmpty(prefix) ? For.Name : $"{prefix}.{For.Name}";
             _htmlHelper.ViewData.Add(key, For.Model);
+			logger.LogWarning("ProcessAsync(context={Context},output={Output}): key → {Key}", context, output, key);
         }
 
         var htmlOutput = _htmlHelper.Editor(For.Name, Template, new { htmlAttributes, postfix = Postfix });
         output.Content.SetHtmlContent(htmlOutput);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlOutput → {HtmlOutput}", context, output, htmlOutput);
 
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

@@ -19,10 +19,13 @@ public partial class StoreThemeSelectorViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (!_storeInformationSettings.AllowCustomerToSelectTheme)
             return Content("");
 
         var model = await _commonModelFactory.PrepareStoreThemeSelectorModelAsync();
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 }

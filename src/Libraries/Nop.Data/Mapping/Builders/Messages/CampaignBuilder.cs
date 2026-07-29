@@ -16,10 +16,12 @@ public partial class CampaignBuilder : NopEntityBuilder<Campaign>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Campaign.Name)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(Campaign.Subject)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(Campaign.Body)).AsString(int.MaxValue).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

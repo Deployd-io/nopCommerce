@@ -19,8 +19,12 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public ValidateVendorAttribute(bool ignore = false) : base(typeof(ValidateVendorFilter))
     {
+		logger.LogDebug(">>> Entering ValidateVendorAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		logger.LogDebug("<<< Exiting ValidateVendorAttribute(ignore={Ignore})", ignore);
+		logger.LogDebug("ValidateVendorAttribute(ignore={Ignore}): Arguments → {Arguments}", ignore, Arguments);
+		logger.LogDebug("ValidateVendorAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
     }
 
     #endregion
@@ -53,9 +57,14 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
 
         public ValidateVendorFilter(bool ignoreFilter, IWorkContext workContext, ICustomerService customerService)
         {
+			logger.LogDebug(">>> Entering ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService})", ignoreFilter, workContext, customerService);
             _ignoreFilter = ignoreFilter;
             _customerService = customerService;
+			logger.LogDebug("ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService}): _customerService → {_customerService}", ignoreFilter, workContext, customerService, _customerService);
+			logger.LogDebug("ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, workContext, customerService, _ignoreFilter);
             _workContext = workContext;
+			logger.LogDebug("<<< Exiting ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService})", ignoreFilter, workContext, customerService);
+			logger.LogDebug("ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService}): _workContext → {_workContext}", ignoreFilter, workContext, customerService, _workContext);
         }
 
         #endregion
@@ -69,6 +78,7 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidateVendorAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering ValidateVendorAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -88,12 +98,15 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
             //whether current customer is vendor
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (!await _customerService.IsVendorAsync(customer))
+				logger.LogDebug("ValidateVendorAsync(context={Context}): customer → {Customer}", context, customer);
                 return;
 
             //ensure that this user has active vendor record associated
             var vendor = await _workContext.GetCurrentVendorAsync();
             if (vendor == null)
+				logger.LogDebug("ValidateVendorAsync(context={Context}): vendor → {Vendor}", context, vendor);
                 context.Result = new ChallengeResult();
+				logger.LogDebug("<<< Exiting ValidateVendorAsync(context={Context})", context);
         }
 
         #endregion
@@ -107,7 +120,9 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await ValidateVendorAsync(context);
+			logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

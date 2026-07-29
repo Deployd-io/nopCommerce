@@ -10,6 +10,7 @@ public class PollModelTests
     [Test]
     public void CanClone()
     {
+		logger.LogDebug(">>> Entering CanClone()");
         //create
         var model1 = new PollModel
         {
@@ -38,5 +39,6 @@ public class PollModelTests
         model2.Answers[0].Name.Should().Be("answer 1");
         model2.Answers[0].NumberOfVotes.Should().Be(4);
         model2.Answers[0].PercentOfTotalVotes.Should().Be(5);
+		logger.LogDebug("<<< Exiting CanClone()");
     }
 }

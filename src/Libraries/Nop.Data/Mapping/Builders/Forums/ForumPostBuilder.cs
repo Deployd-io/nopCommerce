@@ -19,11 +19,13 @@ public partial class ForumPostBuilder : NopEntityBuilder<ForumPost>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ForumPost.Text)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(ForumPost.IPAddress)).AsString(100).Nullable()
             .WithColumn(nameof(ForumPost.CustomerId)).AsInt32().ForeignKey<Customer>().OnDelete(Rule.None)
             .WithColumn(nameof(ForumPost.TopicId)).AsInt32().ForeignKey<ForumTopic>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

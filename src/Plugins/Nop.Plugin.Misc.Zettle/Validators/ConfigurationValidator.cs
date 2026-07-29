@@ -14,6 +14,7 @@ public class ConfigurationValidator : BaseNopValidator<ConfigurationModel>
 
     public ConfigurationValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ConfigurationValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(model => model.ApiKey)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Misc.Zettle.Configuration.Fields.ApiKey.Required"))
@@ -24,6 +25,7 @@ public class ConfigurationValidator : BaseNopValidator<ConfigurationModel>
             .GreaterThan(0)
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Misc.Zettle.Configuration.Fields.AutoSyncPeriod.Invalid"))
             .When(model => model.AutoSyncEnabled);
+			logger.LogDebug("<<< Exiting ConfigurationValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

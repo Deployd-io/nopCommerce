@@ -40,6 +40,7 @@ public partial class AddressModelFactory : IAddressModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareAddressModelAsync(AddressModel model, Address address = null)
     {
+		logger.LogDebug(">>> Entering PrepareAddressModelAsync(model={Model},address={Address})", model, address);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available countries
@@ -55,6 +56,7 @@ public partial class AddressModelFactory : IAddressModelFactory
             return;
 
         model.FormattedCustomAddressAttributes = await _addressAttributeFormatter.FormatAttributesAsync(address.CustomAttributes);
+		logger.LogDebug("<<< Exiting PrepareAddressModelAsync(model={Model},address={Address})", model, address);
     }
 
     #endregion

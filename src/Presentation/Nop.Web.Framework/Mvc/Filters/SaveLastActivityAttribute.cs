@@ -19,6 +19,8 @@ public sealed class SaveLastActivityAttribute : TypeFilterAttribute
     /// </summary>
     public SaveLastActivityAttribute() : base(typeof(SaveLastActivityFilter))
     {
+	logger.LogDebug(">>> Entering SaveLastActivityAttribute()");
+	logger.LogDebug("<<< Exiting SaveLastActivityAttribute()");
     }
 
     #endregion
@@ -60,6 +62,8 @@ public sealed class SaveLastActivityAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SaveLastActivityAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering SaveLastActivityAsync(context={Context})", context);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ArgumentNullException.ThrowIfNull(context);
 
             //only in GET requests
@@ -72,12 +76,16 @@ public sealed class SaveLastActivityAttribute : TypeFilterAttribute
             //update last activity date
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (customer.LastActivityDateUtc.AddMinutes(_customerSettings.LastActivityMinutes) < DateTime.UtcNow)
+			logger.LogDebug("SaveLastActivityAsync(context={Context}): customer → {Customer}", context, customer);
             {
                 customer.LastActivityDateUtc = DateTime.UtcNow;
+				logger.LogDebug("SaveLastActivityAsync(context={Context}): customer.LastActivityDateUtc → {Arg1}", context, customer.LastActivityDateUtc);
 
                 //update customer without event notification
                 await _customerRepository.UpdateAsync(customer, false);
+				logger.LogInformation("SaveLastActivityAsync(context)={Context}: update query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
             }
+			logger.LogDebug("<<< Exiting SaveLastActivityAsync(context={Context})", context);
         }
 
         #endregion
@@ -92,9 +100,11 @@ public sealed class SaveLastActivityAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await SaveLastActivityAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

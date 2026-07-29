@@ -13,10 +13,14 @@ public partial class ColumnProperty
     /// <param name="data">The data source for the column from the rows data object</param>
     public ColumnProperty(string data)
     {
+		logger.LogDebug(">>> Entering ColumnProperty(data={Data})", data);
         Data = data;
         //set default values
         Visible = true;
+		logger.LogDebug("ColumnProperty(data={Data}): Visible → {Visible}", data, Visible);
         Encode = true;
+		logger.LogDebug("<<< Exiting ColumnProperty(data={Data})", data);
+		logger.LogDebug("ColumnProperty(data={Data}): Encode → {Encode}", data, Encode);
     }
 
     #endregion

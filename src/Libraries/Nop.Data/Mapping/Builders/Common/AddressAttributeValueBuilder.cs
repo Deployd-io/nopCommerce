@@ -17,9 +17,11 @@ public partial class AddressAttributeValueBuilder : NopEntityBuilder<AddressAttr
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(AddressAttributeValue.Name)).AsString(400).NotNullable()
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(AddressAttributeValue), nameof(AddressAttributeValue.AttributeId))).AsInt32().ForeignKey<AddressAttribute>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

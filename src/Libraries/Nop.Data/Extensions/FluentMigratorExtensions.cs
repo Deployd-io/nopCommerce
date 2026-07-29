@@ -83,8 +83,11 @@ public static class FluentMigratorExtensions
     /// </summary>
     public static ICreateTableColumnOptionOrWithColumnSyntax AsNopDateTime2(this ICreateTableColumnAsTypeSyntax syntax)
     {
+		logger.LogDebug(">>> Entering AsNopDateTime2(syntax={Syntax})", syntax);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		logger.LogDebug("AsNopDateTime2(syntax={Syntax}): dataSettings → {DataSettings}", syntax, dataSettings);
+		logger.LogDebug("<<< Exiting AsNopDateTime2(syntax={Syntax})", syntax);
         return dataSettings.DataProvider switch
         {
             DataProviderType.MySql => syntax.AsCustom($"datetime({DATE_TIME_PRECISION})"),
@@ -140,9 +143,13 @@ public static class FluentMigratorExtensions
     /// <typeparam name="TEntity">Entity type</typeparam>
     public static void TableFor<TEntity>(this ICreateExpressionRoot expressionRoot) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering TableFor(expressionRoot={ExpressionRoot})", expressionRoot);
         var type = typeof(TEntity);
         var builder = expressionRoot.Table(NameCompatibilityManager.GetTableName(type)) as CreateTableExpressionBuilder;
+		logger.LogDebug("TableFor(expressionRoot={ExpressionRoot}): type → {Type}", expressionRoot, type);
+		logger.LogDebug("TableFor(expressionRoot={ExpressionRoot}): builder → {Builder}", expressionRoot, builder);
         builder.RetrieveTableExpressions(type);
+		logger.LogDebug("<<< Exiting TableFor(expressionRoot={ExpressionRoot})", expressionRoot);
     }
 
     /// <summary>
@@ -193,7 +200,9 @@ public static class FluentMigratorExtensions
 
     public static (Type propType, bool canBeNullable) GetTypeToMap(this Type type)
     {
+		logger.LogDebug(">>> Entering GetTypeToMap(propType={PropType},canBeNullable={CanBeNullable})", propType, canBeNullable);
         if (Nullable.GetUnderlyingType(type) is Type uType)
+		logger.LogDebug("<<< Exiting GetTypeToMap(propType={PropType},canBeNullable={CanBeNullable})", propType, canBeNullable);
             return (uType, true);
 
         return (type, false);

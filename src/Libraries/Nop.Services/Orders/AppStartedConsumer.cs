@@ -21,7 +21,10 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
 
     public AppStartedConsumer(IGenericAttributeService genericAttributeService)
     {
+		logger.LogDebug(">>> Entering AppStartedConsumer(genericAttributeService={GenericAttributeService})", genericAttributeService);
         _genericAttributeService = genericAttributeService;
+		logger.LogDebug("<<< Exiting AppStartedConsumer(genericAttributeService={GenericAttributeService})", genericAttributeService);
+		logger.LogDebug("AppStartedConsumer(genericAttributeService={GenericAttributeService}): _genericAttributeService → {_genericAttributeService}", genericAttributeService, _genericAttributeService);
     }
 
     #endregion
@@ -35,11 +38,13 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(AppStartedEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //clear payment info requests
         await _genericAttributeService.DeleteAttributesAsync<Customer>(NopCustomerDefaults.ProcessPaymentRequestAttribute);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

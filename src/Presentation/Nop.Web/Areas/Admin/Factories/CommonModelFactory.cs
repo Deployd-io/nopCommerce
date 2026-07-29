@@ -244,6 +244,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             Text = string.Format(await _localizationService.GetResourceAsync("Admin.System.Warnings.URL.NoMatch"),
                 currentStoreUrl, _webHelper.GetStoreLocation(false))
         });
+		logger.LogDebug("<<< Exiting PrepareStoreUrlWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -253,6 +254,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareRecommendationsModelAsync(IList<SystemWarningModel> models)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(models);
 
         var recommendations = new List<string>();
@@ -310,6 +312,7 @@ public partial class CommonModelFactory : ICommonModelFactory
                 Text = await _localizationService.GetResourceAsync("Admin.System.Warnings.ExchangeCurrency.Rate1")
             });
         }
+		logger.LogDebug("<<< Exiting PrepareExchangeRateCurrencyWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -338,6 +341,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             Level = SystemWarningLevel.Pass,
             Text = await _localizationService.GetResourceAsync("Admin.System.Warnings.PrimaryCurrency.Set")
         });
+		logger.LogDebug("<<< Exiting PreparePrimaryStoreCurrencyWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -376,6 +380,7 @@ public partial class CommonModelFactory : ICommonModelFactory
                 Text = await _localizationService.GetResourceAsync("Admin.System.Warnings.DefaultWeight.Ratio1")
             });
         }
+		logger.LogDebug("<<< Exiting PrepareBaseWeightWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -414,6 +419,7 @@ public partial class CommonModelFactory : ICommonModelFactory
                 Text = await _localizationService.GetResourceAsync("Admin.System.Warnings.DefaultDimension.Ratio1")
             });
         }
+		logger.LogDebug("<<< Exiting PrepareBaseDimensionWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -441,6 +447,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             Level = SystemWarningLevel.Fail,
             Text = await _localizationService.GetResourceAsync("Admin.System.Warnings.PaymentMethods.NoActive")
         });
+		logger.LogDebug("<<< Exiting PreparePaymentMethodsWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -540,11 +547,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// <returns>Backup file search model</returns>
     protected virtual BackupFileSearchModel PrepareBackupFileSearchModel(BackupFileSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareBackupFileSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareBackupFileSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -566,6 +575,7 @@ public partial class CommonModelFactory : ICommonModelFactory
         model.IsDeleteThumbsSupported = true;
         model.FilesCountText = string.Format(await _localizationService.GetResourceAsync("Admin.System.Maintenance.DeleteThumbFiles.FilesCount"), filesCount);
         model.FilesSizeText = string.Format(await _localizationService.GetResourceAsync("Admin.System.Maintenance.DeleteThumbFiles.FilesSize"), Math.Round(filesSize / 1024M / 1024M, 2));
+		logger.LogDebug("<<< Exiting PrepareDeleteThumbFilesModelAsync(model={Model})", model);
     }
 
     /// <summary>
@@ -691,6 +701,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             DontEncode = true,
             Text = $"{await _localizationService.GetResourceAsync("Admin.System.Warnings.PluginNotInstalled")}: {string.Join(", ", notInstalled)}. {await _localizationService.GetResourceAsync("Admin.System.Warnings.PluginNotInstalled.HelpText")}"
         });
+		logger.LogDebug("<<< Exiting PreparePluginsInstalledWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -777,8 +788,11 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     protected virtual async Task<IList<MultistorePreviewModel>> PrepareMultistorePreviewModelsForEntityAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, ISlugSupported
     {
+		logger.LogDebug(">>> Entering PrepareMultistorePreviewModelsForEntityAsync(entity={Entity})", entity);
         var models = new List<MultistorePreviewModel>();
         var stores = await _storeService.GetAllStoresAsync();
+		logger.LogDebug("PrepareMultistorePreviewModelsForEntityAsync(entity={Entity}): models → {Models}", entity, models);
+		logger.LogDebug("PrepareMultistorePreviewModelsForEntityAsync(entity={Entity}): stores → {Stores}", entity, stores);
 
         foreach (var store in stores)
         {
@@ -888,6 +902,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareProxyConnectionWarningModelAsync(IList<SystemWarningModel> models)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(models);
 
         //whether proxy is enabled
@@ -914,6 +929,7 @@ public partial class CommonModelFactory : ICommonModelFactory
                 Text = await _localizationService.GetResourceAsync("Admin.System.Warnings.ProxyConnection.Failed")
             });
         }
+		logger.LogDebug("<<< Exiting PrepareProxyConnectionWarningModelAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -950,8 +966,10 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<IList<SystemWarningModel>> PrepareSystemWarningModelsAsync()
     {
+		logger.LogDebug(">>> Entering PrepareSystemWarningModelsAsync()");
         var models = new List<SystemWarningModel>();
 
+		logger.LogDebug("PrepareSystemWarningModelsAsync(): models → {Models}", models);
         //store URL
         await PrepareStoreUrlWarningModelAsync(models);
 
@@ -988,8 +1006,10 @@ public partial class CommonModelFactory : ICommonModelFactory
         //publish event and add another warnings (for example from plugins) 
         var warningEvent = new SystemWarningCreatedEvent();
         await _eventPublisher.PublishAsync(warningEvent);
+		logger.LogDebug("PrepareSystemWarningModelsAsync(): warningEvent → {WarningEvent}", warningEvent);
         models.AddRange(warningEvent.SystemWarnings);
 
+		logger.LogDebug("<<< Exiting PrepareSystemWarningModelsAsync()");
         return models;
     }
 
@@ -1032,11 +1052,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual Task<BackupFileListModel> PrepareBackupFileListModelAsync(BackupFileSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareBackupFileListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get backup files
         var backupFiles = _maintenanceService.GetAllBackupFiles().ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareBackupFileListModelAsync(searchModel={SearchModel}): backupFiles → {BackupFiles}", searchModel, backupFiles);
         //prepare list model
         var model = new BackupFileListModel().PrepareToGrid(searchModel, backupFiles, () =>
         {
@@ -1051,6 +1073,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareBackupFileListModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(model);
     }
 
@@ -1064,6 +1087,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<UrlRecordSearchModel> PrepareUrlRecordSearchModelAsync(UrlRecordSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareUrlRecordSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available languages
@@ -1074,6 +1098,7 @@ public partial class CommonModelFactory : ICommonModelFactory
         searchModel.AvailableLanguages.Insert(0,
             new SelectListItem { Text = await _localizationService.GetResourceAsync("Admin.Common.All"), Value = "-1" });
         searchModel.LanguageId = -1;
+		logger.LogDebug("PrepareUrlRecordSearchModelAsync(searchModel={SearchModel}): searchModel.LanguageId → {Arg1}", searchModel, searchModel.LanguageId);
 
         //prepare "is active" filter (0 - all; 1 - active only; 2 - inactive only)
         searchModel.AvailableActiveOptions.Add(new SelectListItem
@@ -1095,6 +1120,7 @@ public partial class CommonModelFactory : ICommonModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareUrlRecordSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1108,10 +1134,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<UrlRecordListModel> PrepareUrlRecordListModelAsync(UrlRecordSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareUrlRecordListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var isActive = searchModel.IsActiveId == 0 ? null : (bool?)(searchModel.IsActiveId == 1);
         var languageId = searchModel.LanguageId < 0 ? null : (int?)(searchModel.LanguageId);
+		logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): isActive → {IsActive}", searchModel, isActive);
+		logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): languageId → {LanguageId}", searchModel, languageId);
 
         //get URL records
         var urlRecords = await _urlRecordService.GetAllUrlRecordsAsync(slug: searchModel.SeName,
@@ -1121,6 +1150,7 @@ public partial class CommonModelFactory : ICommonModelFactory
         //get URL helper
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
+		logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): urlHelper → {UrlHelper}", searchModel, urlHelper);
         //prepare list model
         var model = await new UrlRecordListModel().PrepareToGridAsync(searchModel, urlRecords, () =>
         {
@@ -1129,8 +1159,10 @@ public partial class CommonModelFactory : ICommonModelFactory
                 //fill in model values from the entity
                 var urlRecordModel = urlRecord.ToModel<UrlRecordModel>();
 
+				logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): urlRecordModel → {UrlRecordModel}", searchModel, urlRecordModel);
                 //fill in additional values (not existing in the entity)
                 urlRecordModel.Name = urlRecord.Slug;
+				logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): urlRecordModel.Name → {Arg1}", searchModel, urlRecordModel.Name);
                 urlRecordModel.Language = urlRecord.LanguageId == 0
                     ? await _localizationService.GetResourceAsync("Admin.System.SeNames.Language.Standard")
                     : (await _languageService.GetLanguageByIdAsync(urlRecord.LanguageId))?.Name ?? "Unknown";
@@ -1138,6 +1170,8 @@ public partial class CommonModelFactory : ICommonModelFactory
                 //details URL
                 var detailsUrl = string.Empty;
                 var entityName = urlRecord.EntityName?.ToLowerInvariant() ?? string.Empty;
+				logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): detailsUrl → {DetailsUrl}", searchModel, detailsUrl);
+				logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): entityName → {EntityName}", searchModel, entityName);
                 switch (entityName)
                 {
                     case "blogpost":
@@ -1164,10 +1198,12 @@ public partial class CommonModelFactory : ICommonModelFactory
                 }
 
                 urlRecordModel.DetailsUrl = detailsUrl;
+				logger.LogDebug("PrepareUrlRecordListModelAsync(searchModel={SearchModel}): urlRecordModel.DetailsUrl → {Arg1}", searchModel, urlRecordModel.DetailsUrl);
 
                 return urlRecordModel;
             });
         });
+		logger.LogDebug("<<< Exiting PrepareUrlRecordListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1180,8 +1216,10 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<LanguageSelectorModel> PrepareLanguageSelectorModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareLanguageSelectorModelAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var model = new LanguageSelectorModel
+		logger.LogDebug("PrepareLanguageSelectorModelAsync(): store → {Store}", store);
         {
             CurrentLanguage = (await _workContext.GetWorkingLanguageAsync()).ToModel<LanguageModel>(),
             AvailableLanguages = (await _languageService
@@ -1189,6 +1227,7 @@ public partial class CommonModelFactory : ICommonModelFactory
                 .Select(language => language.ToModel<LanguageModel>()).ToList()
         };
 
+		logger.LogDebug("<<< Exiting PrepareLanguageSelectorModelAsync()");
         return model;
     }
 
@@ -1202,11 +1241,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual Task<PopularSearchTermSearchModel> PreparePopularSearchTermSearchModelAsync(PopularSearchTermSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePopularSearchTermSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize(5);
 
+		logger.LogDebug("<<< Exiting PreparePopularSearchTermSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -1220,11 +1261,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<PopularSearchTermListModel> PreparePopularSearchTermListModelAsync(PopularSearchTermSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PreparePopularSearchTermListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get popular search terms
         var searchTermRecordLines = await _searchTermService.GetStatsAsync(pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
+		logger.LogDebug("PreparePopularSearchTermListModelAsync(searchModel={SearchModel}): searchTermRecordLines → {SearchTermRecordLines}", searchModel, searchTermRecordLines);
         //prepare list model
         var model = new PopularSearchTermListModel().PrepareToGrid(searchModel, searchTermRecordLines, () =>
         {
@@ -1235,6 +1278,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PreparePopularSearchTermListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1247,6 +1291,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<CommonStatisticsModel> PrepareCommonStatisticsModelAsync()
     {
+		logger.LogDebug(">>> Entering PrepareCommonStatisticsModelAsync()");
         var model = new CommonStatisticsModel
         {
             NumberOfOrders = (await _orderService.SearchOrdersAsync(pageIndex: 0, pageSize: 1, getOnlyTotalCount: true)).TotalCount
@@ -1255,6 +1300,7 @@ public partial class CommonModelFactory : ICommonModelFactory
         var customerRoleIds = new[] { (await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName)).Id };
         model.NumberOfCustomers = (await _customerService.GetAllCustomersAsync(customerRoleIds: customerRoleIds,
             pageIndex: 0, pageSize: 1, getOnlyTotalCount: true)).TotalCount;
+			logger.LogDebug("PrepareCommonStatisticsModelAsync(): customerRoleIds → {CustomerRoleIds}", customerRoleIds);
 
         var returnRequestStatus = ReturnRequestStatus.Pending;
         model.NumberOfPendingReturnRequests = (await _returnRequestService.SearchReturnRequestsAsync(rs: returnRequestStatus,
@@ -1264,6 +1310,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             (await _productService.GetLowStockProductsAsync(getOnlyTotalCount: true)).TotalCount +
             (await _productService.GetLowStockProductCombinationsAsync(getOnlyTotalCount: true)).TotalCount;
 
+		logger.LogDebug("<<< Exiting PrepareCommonStatisticsModelAsync()");
         return model;
     }
 
@@ -1278,6 +1325,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<IList<MultistorePreviewModel>> PrepareMultistorePreviewModelsAsync<TModel>(TModel model) where TModel : BaseNopEntityModel
     {
+		logger.LogDebug(">>> Entering PrepareMultistorePreviewModelsAsync(model={Model})", model);
         switch (model)
         {
             case BlogPostModel blogPostModel:
@@ -1307,6 +1355,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             default:
                 throw new NotImplementedException("Unknown entity type");
         }
+		logger.LogDebug("<<< Exiting PrepareMultistorePreviewModelsAsync(model={Model})", model);
     }
 
     #endregion

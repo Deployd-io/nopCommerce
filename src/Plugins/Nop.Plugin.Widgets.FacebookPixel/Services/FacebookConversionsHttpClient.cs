@@ -20,7 +20,10 @@ public class FacebookConversionsHttpClient
 
     public FacebookConversionsHttpClient(HttpClient httpClient)
     {
+		logger.LogDebug(">>> Entering FacebookConversionsHttpClient(httpClient={HttpClient})", httpClient);
         _httpClient = httpClient;
+		logger.LogDebug("<<< Exiting FacebookConversionsHttpClient(httpClient={HttpClient})", httpClient);
+		logger.LogDebug("FacebookConversionsHttpClient(httpClient={HttpClient}): _httpClient → {_httpClient}", httpClient, _httpClient);
     }
 
     #endregion
@@ -38,6 +41,8 @@ public class FacebookConversionsHttpClient
     /// </returns>
     public async Task<string> SendEventAsync(FacebookPixelConfiguration facebookPixelConfiguration, ConversionsEvent conversionsEvent)
     {
+		logger.LogDebug(">>> Entering SendEventAsync(facebookPixelConfiguration={FacebookPixelConfiguration},conversionsEvent={ConversionsEvent})", facebookPixelConfiguration, conversionsEvent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var urlString = string.Join($"/",
         [
             FacebookPixelDefaults.FbConversionsApiBaseAddress,
@@ -48,8 +53,13 @@ public class FacebookConversionsHttpClient
 
         var jsonString = JsonConvert.SerializeObject(conversionsEvent, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
         var requestContent = new StringContent(jsonString, Encoding.UTF8, MimeTypes.ApplicationJson);
+		logger.LogDebug("SendEventAsync(facebookPixelConfiguration={FacebookPixelConfiguration},conversionsEvent={ConversionsEvent}): jsonString → {JsonString}", facebookPixelConfiguration, conversionsEvent, jsonString);
+		logger.LogDebug("SendEventAsync(facebookPixelConfiguration={FacebookPixelConfiguration},conversionsEvent={ConversionsEvent}): requestContent → {RequestContent}", facebookPixelConfiguration, conversionsEvent, requestContent);
+		logger.LogInformation("SendEventAsync(facebookPixelConfiguration,conversionsEvent)={FacebookPixelConfiguration},{ConversionsEvent}: external service call {UrlString} took {Arg3} ms", facebookPixelConfiguration, conversionsEvent, urlString, __logStart.ElapsedMilliseconds);
         var response = await _httpClient.PostAsync(urlString, requestContent);
 
+		logger.LogDebug("SendEventAsync(facebookPixelConfiguration={FacebookPixelConfiguration},conversionsEvent={ConversionsEvent}): response → {Response}", facebookPixelConfiguration, conversionsEvent, response);
+		logger.LogDebug("<<< Exiting SendEventAsync(facebookPixelConfiguration={FacebookPixelConfiguration},conversionsEvent={ConversionsEvent})", facebookPixelConfiguration, conversionsEvent);
         return await response.Content.ReadAsStringAsync();
     }
 

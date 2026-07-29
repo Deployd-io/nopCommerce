@@ -15,6 +15,8 @@ public partial class MessageTemplateCacheEventConsumer : CacheEventConsumer<Mess
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(MessageTemplate entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(NopMessageDefaults.MessageTemplatesByNamePrefix, entity.Name);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

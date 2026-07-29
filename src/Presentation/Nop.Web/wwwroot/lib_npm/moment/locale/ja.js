@@ -90,9 +90,11 @@ export default moment.defineLocale('ja', {
         return input === '午後';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return '午前';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return '午後';
         }
     },
@@ -100,17 +102,21 @@ export default moment.defineLocale('ja', {
         sameDay: '[今日] LT',
         nextDay: '[明日] LT',
         nextWeek: function (now) {
+			logger.debug(`>>> Entering nextWeek(now=${now})`);
             if (now.week() !== this.week()) {
                 return '[来週]dddd LT';
             } else {
+				logger.debug(`<<< Exiting nextWeek(now=${now})`);
                 return 'dddd LT';
             }
         },
         lastDay: '[昨日] LT',
         lastWeek: function (now) {
+			logger.debug(`>>> Entering lastWeek(now=${now})`);
             if (this.week() !== now.week()) {
                 return '[先週]dddd LT';
             } else {
+				logger.debug(`<<< Exiting lastWeek(now=${now})`);
                 return 'dddd LT';
             }
         },
@@ -128,6 +134,7 @@ export default moment.defineLocale('ja', {
             default:
                 return number;
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
     relativeTime: {
         future: '%s後',

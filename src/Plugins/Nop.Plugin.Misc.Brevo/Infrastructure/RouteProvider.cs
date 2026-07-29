@@ -15,6 +15,7 @@ public class RouteProvider : IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(BrevoDefaults.ImportContactsRoute, "Plugins/Brevo/ImportContacts",
             new { controller = "Brevo", action = "ImportContacts" });
 
@@ -23,6 +24,7 @@ public class RouteProvider : IRouteProvider
 
         endpointRouteBuilder.MapControllerRoute(BrevoDefaults.UnsubscribeContactRoute, "Plugins/Brevo/UnsubscribeWebHook",
             new { controller = "BrevoWebhook", action = "UnsubscribeWebHook" });
+			logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

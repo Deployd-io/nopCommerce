@@ -5,6 +5,8 @@
 import moment from '../moment';
 
 function isFunction(input) {
+	logger.debug(`>>> Entering isFunction(input=${input})`);
+	logger.debug(`<<< Exiting isFunction(input=${input})`);
     return (
         (typeof Function !== 'undefined' && input instanceof Function) ||
         Object.prototype.toString.call(input) === '[object Function]'
@@ -30,6 +32,7 @@ export default moment.defineLocale('el', {
             // if there is a day number before 'MMMM'
             return this._monthsGenitiveEl[momentToFormat.month()];
         } else {
+			logger.debug(`<<< Exiting months(momentToFormat=${momentToFormat},format=${format})`);
             return this._monthsNominativeEl[momentToFormat.month()];
         }
     },
@@ -40,13 +43,16 @@ export default moment.defineLocale('el', {
     weekdaysShort: 'Κυρ_Δευ_Τρι_Τετ_Πεμ_Παρ_Σαβ'.split('_'),
     weekdaysMin: 'Κυ_Δε_Τρ_Τε_Πε_Πα_Σα'.split('_'),
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours > 11) {
             return isLower ? 'μμ' : 'ΜΜ';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'πμ' : 'ΠΜ';
         }
     },
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return (input + '').toLowerCase()[0] === 'μ';
     },
     meridiemParse: /[ΠΜ]\.?Μ?\.?/i,
@@ -64,20 +70,25 @@ export default moment.defineLocale('el', {
         nextWeek: 'dddd [{}] LT',
         lastDay: '[Χθες {}] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 6:
                     return '[το προηγούμενο] dddd [{}] LT';
                 default:
                     return '[την προηγούμενη] dddd [{}] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },
     calendar: function (key, mom) {
+		logger.debug(`>>> Entering calendar(key=${key},mom=${mom})`);
         var output = this._calendarEl[key],
             hours = mom && mom.hours();
+			logger.debug(`calendar(key=${key},mom=${mom}): output → ${output}`);
         if (isFunction(output)) {
             output = output.apply(mom);
+			logger.debug(`<<< Exiting calendar(key=${key},mom=${mom})`);
         }
         return output.replace('{}', hours % 12 === 1 ? 'στη' : 'στις');
     },

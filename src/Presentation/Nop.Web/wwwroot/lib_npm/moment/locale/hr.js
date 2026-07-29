@@ -5,10 +5,12 @@
 import moment from '../moment';
 
 function translate(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var result = number + ' ';
     switch (key) {
         case 'ss':
             if (number === 1) {
+				logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key}): result → ${result}`);
                 result += 'sekunda';
             } else if (number === 2 || number === 3 || number === 4) {
                 result += 'sekunde';
@@ -62,6 +64,7 @@ function translate(number, withoutSuffix, key) {
             } else {
                 result += 'godina';
             }
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
             return result;
     }
 }
@@ -99,6 +102,7 @@ export default moment.defineLocale('hr', {
         sameDay: '[danas u] LT',
         nextDay: '[sutra u] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[u] [nedjelju] [u] LT';
@@ -112,9 +116,11 @@ export default moment.defineLocale('hr', {
                 case 5:
                     return '[u] dddd [u] LT';
             }
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: '[jučer u] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[prošlu] [nedjelju] [u] LT';
@@ -128,6 +134,7 @@ export default moment.defineLocale('hr', {
                 case 5:
                     return '[prošli] dddd [u] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

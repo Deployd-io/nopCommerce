@@ -43,11 +43,13 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
     /// </returns>
     public virtual Task<ScheduleTaskSearchModel> PrepareScheduleTaskSearchModelAsync(ScheduleTaskSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareScheduleTaskSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareScheduleTaskSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -61,6 +63,7 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
     /// </returns>
     public virtual async Task<ScheduleTaskListModel> PrepareScheduleTaskListModelAsync(ScheduleTaskSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareScheduleTaskListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get schedule tasks
@@ -77,6 +80,7 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
                 //fill in model values from the entity
                 var scheduleTaskModel = scheduleTask.ToModel<ScheduleTaskModel>();
 
+				logger.LogDebug("PrepareScheduleTaskListModelAsync(searchModel={SearchModel}): scheduleTaskModel → {ScheduleTaskModel}", searchModel, scheduleTaskModel);
                 //convert dates to the user time
                 if (scheduleTask.LastStartUtc.HasValue)
                 {
@@ -99,6 +103,7 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
                 return scheduleTaskModel;
             });
         });
+		logger.LogDebug("<<< Exiting PrepareScheduleTaskListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

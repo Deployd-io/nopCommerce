@@ -14,13 +14,18 @@ public class AppSettingsMigration : MigrationBase
 
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
 
+		logger.LogDebug("Up(): fileProvider → {FileProvider}", fileProvider);
         var dataConfig = DataSettingsManager.LoadSettings();
         dataConfig.WithNoLock = false;
+		logger.LogDebug("Up(): dataConfig → {DataConfig}", dataConfig);
+		logger.LogDebug("Up(): dataConfig.WithNoLock → {Arg0}", dataConfig.WithNoLock);
 
         var rootDir = fileProvider.MapPath("~/");
         var woConfig = new WebOptimizerConfig
+		logger.LogDebug("Up(): rootDir → {RootDir}", rootDir);
         {
             CdnUrl = string.Empty,
             HttpsCompression = HttpsCompressionMode.Compress,
@@ -33,6 +38,7 @@ public class AppSettingsMigration : MigrationBase
 
 
         AppSettingsHelper.SaveAppSettings(new List<IConfig> { dataConfig, woConfig }, fileProvider);
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down() { }

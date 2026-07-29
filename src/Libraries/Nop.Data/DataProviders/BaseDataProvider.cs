@@ -30,6 +30,8 @@ public abstract partial class BaseDataProvider
     /// </summary>
     protected virtual DataConnection CreateDataConnection()
     {
+		logger.LogDebug(">>> Entering CreateDataConnection()");
+		logger.LogDebug("<<< Exiting CreateDataConnection()");
         return CreateDataConnection(LinqToDbDataProvider);
     }
 
@@ -47,6 +49,7 @@ public abstract partial class BaseDataProvider
             CommandTimeout = DataSettingsManager.GetSqlCommandTimeout()
         };
 
+		logger.LogDebug("<<< Exiting CreateDataConnection(dataProvider={DataProvider})", dataProvider);
         return dataConnection;
     }
 
@@ -57,6 +60,7 @@ public abstract partial class BaseDataProvider
     /// <returns>Connection to a database</returns>
     protected virtual DbConnection CreateDbConnection(string connectionString = null)
     {
+		logger.LogDebug(">>> Entering CreateDbConnection(connectionString={ConnectionString})", connectionString);
         return GetInternalDbConnection(!string.IsNullOrEmpty(connectionString) ? connectionString : DataSettings.ConnectionString);
     }
 
@@ -71,10 +75,16 @@ public abstract partial class BaseDataProvider
     /// </returns>
     protected virtual async Task<string> GetSqlStringValueAsync(string sql, params DataParameter[] parameters)
     {
+		logger.LogDebug(">>> Entering GetSqlStringValueAsync(sql={Sql},parameters={Parameters})", sql, parameters);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentException.ThrowIfNullOrEmpty(sql);
 
         await using var dbConnection = CreateDbConnection();
         await using var command = dbConnection.CreateCommand();
+		logger.LogDebug("GetSqlStringValueAsync(sql={Sql},parameters={Parameters}): dbConnection → {DbConnection}", sql, parameters, dbConnection);
+		logger.LogDebug("GetSqlStringValueAsync(sql={Sql},parameters={Parameters}): command → {Command}", sql, parameters, command);
+		logger.LogDebug("GetSqlStringValueAsync(sql={Sql},parameters={Parameters}): command.Connection → {Arg2}", sql, parameters, command.Connection);
+		logger.LogDebug("GetSqlStringValueAsync(sql={Sql},parameters={Parameters}): command.CommandText → {Arg2}", sql, parameters, command.CommandText);
         command.Connection = dbConnection;
         command.CommandText = sql;
         command.Parameters.AddRange(parameters);
@@ -82,6 +92,8 @@ public abstract partial class BaseDataProvider
 
         var value = await command.ExecuteScalarAsync();
 
+		logger.LogDebug("GetSqlStringValueAsync(sql={Sql},parameters={Parameters}): value → {Value}", sql, parameters, value);
+		logger.LogDebug("<<< Exiting GetSqlStringValueAsync(sql={Sql},parameters={Parameters})", sql, parameters);
         return value?.ToString() ?? string.Empty;
     }
 
@@ -99,6 +111,7 @@ public abstract partial class BaseDataProvider
     [Sql.Expression("encode(digest({0}, 'sha512'), 'hex')", ServerSideOnly = true, Configuration = ProviderName.PostgreSQL)]
     protected static string SqlSha2(object binaryData)
     {
+		logger.LogDebug(">>> Entering SqlSha2(binaryData={BinaryData})", binaryData);
         throw new InvalidOperationException("This function should be used only in database code");
     }
 
@@ -111,10 +124,13 @@ public abstract partial class BaseDataProvider
     /// </summary>
     public virtual void InitializeDatabase()
     {
+		logger.LogDebug(">>> Entering InitializeDatabase()");
         var migrationManager = EngineContext.Current.Resolve<IMigrationManager>();
 
+		logger.LogDebug("InitializeDatabase(): migrationManager → {MigrationManager}", migrationManager);
         var targetAssembly = typeof(NopDbStartup).Assembly;
         migrationManager.ApplyUpMigrations(targetAssembly);
+		logger.LogDebug("InitializeDatabase(): targetAssembly → {TargetAssembly}", targetAssembly);
 
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var mAssemblies = typeFinder.FindClassesOfType<MigrationBase>()
@@ -126,6 +142,7 @@ public abstract partial class BaseDataProvider
         //mark update migrations as applied
         foreach (var assembly in mAssemblies)
             migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update, true);
+			logger.LogDebug("<<< Exiting InitializeDatabase()");
     }
 
     /// <summary>
@@ -141,6 +158,7 @@ public abstract partial class BaseDataProvider
     public virtual Task<ITempDataStorage<TItem>> CreateTempDataStorageAsync<TItem>(string storeKey, IQueryable<TItem> query)
         where TItem : class
     {
+		logger.LogDebug(">>> Entering CreateTempDataStorageAsync(storeKey={StoreKey},query={Query})", storeKey);
         return Task.FromResult<ITempDataStorage<TItem>>(new TempSqlDataStorage<TItem>(storeKey, query, CreateDataConnection()));
     }
 
@@ -189,12 +207,14 @@ public abstract partial class BaseDataProvider
     /// <returns>Queryable source</returns>
     public virtual IQueryable<TEntity> GetTable<TEntity>() where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering GetTable()");
         var options = new DataOptions()
             .UseConnectionString(LinqToDbDataProvider, DataSettings.ConnectionString)
             .UseMappingSchema(NopMappingSchema.GetMappingSchema(ConfigurationName, LinqToDbDataProvider));
 
         return new DataContext(options)
         {
+		logger.LogDebug("<<< Exiting GetTable()");
             CommandTimeout = DataSettingsManager.GetSqlCommandTimeout()
         }
         .GetTable<TEntity>();
@@ -211,8 +231,10 @@ public abstract partial class BaseDataProvider
     /// </returns>
     public virtual async Task<TEntity> InsertEntityAsync<TEntity>(TEntity entity) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering InsertEntityAsync(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         entity.Id = await dataContext.InsertWithInt32IdentityAsync(entity);
+		logger.LogDebug("InsertEntityAsync(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
         return entity;
     }
 
@@ -224,8 +246,10 @@ public abstract partial class BaseDataProvider
     /// <returns>Inserted entity</returns>
     public virtual TEntity InsertEntity<TEntity>(TEntity entity) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering InsertEntity(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         entity.Id = dataContext.InsertWithInt32Identity(entity);
+		logger.LogDebug("InsertEntity(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
         return entity;
     }
 
@@ -238,8 +262,11 @@ public abstract partial class BaseDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateEntityAsync<TEntity>(TEntity entity) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering UpdateEntityAsync(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         await dataContext.UpdateAsync(entity);
+		logger.LogDebug("<<< Exiting UpdateEntityAsync(entity={Entity})", entity);
+		logger.LogDebug("UpdateEntityAsync(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
     }
 
     /// <summary>
@@ -250,8 +277,11 @@ public abstract partial class BaseDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public virtual void UpdateEntity<TEntity>(TEntity entity) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering UpdateEntity(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         dataContext.Update(entity);
+		logger.LogDebug("<<< Exiting UpdateEntity(entity={Entity})", entity);
+		logger.LogDebug("UpdateEntity(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
     }
 
     /// <summary>
@@ -263,10 +293,12 @@ public abstract partial class BaseDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateEntitiesAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering UpdateEntitiesAsync(entities={Entities})", entities);
         //we don't use the Merge API on this level, because this API not support all databases.
         //you may see all supported databases by the following link: https://linq2db.github.io/articles/sql/merge/Merge-API.html#supported-databases
         foreach (var entity in entities)
             await UpdateEntityAsync(entity);
+			logger.LogDebug("<<< Exiting UpdateEntitiesAsync(entities={Entities})", entities);
     }
 
     /// <summary>
@@ -277,10 +309,12 @@ public abstract partial class BaseDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public virtual void UpdateEntities<TEntity>(IEnumerable<TEntity> entities) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering UpdateEntities(entities={Entities})", entities);
         //we don't use the Merge API on this level, because this API not support all databases.
         //you may see all supported databases by the following link: https://linq2db.github.io/articles/sql/merge/Merge-API.html#supported-databases
         foreach (var entity in entities)
             UpdateEntity(entity);
+			logger.LogDebug("<<< Exiting UpdateEntities(entities={Entities})", entities);
     }
 
     /// <summary>
@@ -292,8 +326,13 @@ public abstract partial class BaseDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteEntityAsync<TEntity>(TEntity entity) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering DeleteEntityAsync(entity={Entity})", entity);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using var dataContext = CreateDataConnection();
         await dataContext.DeleteAsync(entity);
+		logger.LogDebug("<<< Exiting DeleteEntityAsync(entity={Entity})", entity);
+		logger.LogInformation("DeleteEntityAsync(entity)={Entity}: external service call took {Arg1} ms", entity, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("DeleteEntityAsync(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
     }
 
     /// <summary>
@@ -304,8 +343,11 @@ public abstract partial class BaseDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public virtual void DeleteEntity<TEntity>(TEntity entity) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering DeleteEntity(entity={Entity})", entity);
         using var dataContext = CreateDataConnection();
         dataContext.Delete(entity);
+		logger.LogDebug("<<< Exiting DeleteEntity(entity={Entity})", entity);
+		logger.LogDebug("DeleteEntity(entity={Entity}): dataContext → {DataContext}", entity, dataContext);
     }
 
     /// <summary>
@@ -316,8 +358,11 @@ public abstract partial class BaseDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BulkDeleteEntitiesAsync<TEntity>(IList<TEntity> entities) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering BulkDeleteEntitiesAsync(entities={Entities})", entities);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using var dataContext = CreateDataConnection();
         if (entities.All(entity => entity.Id == 0))
+		logger.LogDebug("BulkDeleteEntitiesAsync(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
         {
             foreach (var entity in entities)
                 await dataContext.DeleteAsync(entity);
@@ -328,6 +373,8 @@ public abstract partial class BaseDataProvider
                 .Where(e => e.Id.In(entities.Select(x => x.Id)))
                 .DeleteAsync();
         }
+		logger.LogDebug("<<< Exiting BulkDeleteEntitiesAsync(entities={Entities})", entities);
+		logger.LogInformation("BulkDeleteEntitiesAsync(entities)={Entities}: external service call took {Arg1} ms", entities, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -337,14 +384,17 @@ public abstract partial class BaseDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public virtual void BulkDeleteEntities<TEntity>(IList<TEntity> entities) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering BulkDeleteEntities(entities={Entities})", entities);
         using var dataContext = CreateDataConnection();
         if (entities.All(entity => entity.Id == 0))
+			logger.LogDebug("BulkDeleteEntities(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
             foreach (var entity in entities)
                 dataContext.Delete(entity);
         else
             dataContext.GetTable<TEntity>()
                 .Where(e => e.Id.In(entities.Select(x => x.Id)))
                 .Delete();
+				logger.LogDebug("<<< Exiting BulkDeleteEntities(entities={Entities})", entities);
     }
 
     /// <summary>
@@ -358,6 +408,7 @@ public abstract partial class BaseDataProvider
     /// </returns>
     public virtual async Task<int> BulkDeleteEntitiesAsync<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : BaseEntity
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using var dataContext = CreateDataConnection();
         return await dataContext.GetTable<TEntity>()
             .Where(predicate)
@@ -388,8 +439,11 @@ public abstract partial class BaseDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task BulkInsertEntitiesAsync<TEntity>(IEnumerable<TEntity> entities) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering BulkInsertEntitiesAsync(entities={Entities})", entities);
         using var dataContext = CreateDataConnection(LinqToDbDataProvider);
         await dataContext.BulkCopyAsync(new BulkCopyOptions() { KeepIdentity = true }, entities.RetrieveIdentity(dataContext, useSequenceName: false));
+		logger.LogDebug("<<< Exiting BulkInsertEntitiesAsync(entities={Entities})", entities);
+		logger.LogDebug("BulkInsertEntitiesAsync(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
     }
 
     /// <summary>
@@ -399,8 +453,11 @@ public abstract partial class BaseDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public virtual void BulkInsertEntities<TEntity>(IEnumerable<TEntity> entities) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering BulkInsertEntities(entities={Entities})", entities);
         using var dataContext = CreateDataConnection(LinqToDbDataProvider);
         dataContext.BulkCopy(new BulkCopyOptions() { KeepIdentity = true }, entities.RetrieveIdentity(dataContext, useSequenceName: false));
+		logger.LogDebug("<<< Exiting BulkInsertEntities(entities={Entities})", entities);
+		logger.LogDebug("BulkInsertEntities(entities={Entities}): dataContext → {DataContext}", entities, dataContext);
     }
 
     /// <summary>
@@ -414,9 +471,15 @@ public abstract partial class BaseDataProvider
     /// </returns>
     public virtual async Task<int> ExecuteNonQueryAsync(string sql, params DataParameter[] dataParameters)
     {
+		logger.LogDebug(">>> Entering ExecuteNonQueryAsync(sql={Sql},dataParameters={DataParameters})", sql, dataParameters);
         using var dataConnection = CreateDataConnection(LinqToDbDataProvider);
         var command = new CommandInfo(dataConnection, sql, dataParameters);
+		logger.LogDebug("ExecuteNonQueryAsync(sql={Sql},dataParameters={DataParameters}): dataConnection → {DataConnection}", sql, dataParameters, dataConnection);
+		logger.LogDebug("ExecuteNonQueryAsync(sql={Sql},dataParameters={DataParameters}): command → {Command}", sql, dataParameters, command);
 
+		logger.LogDebug(">>> Entering QueryAsync(sql={Sql},parameters={Parameters})", sql, parameters);
+		logger.LogDebug("QueryAsync(sql={Sql},parameters={Parameters}): dataContext → {DataContext}", sql, parameters, dataContext);
+		logger.LogDebug("<<< Exiting QueryAsync(sql={Sql},parameters={Parameters})", sql, parameters);
         return await command.ExecuteAsync();
     }
 
@@ -433,8 +496,11 @@ public abstract partial class BaseDataProvider
     /// </returns>
     public virtual Task<IList<T>> QueryProcAsync<T>(string procedureName, params DataParameter[] parameters)
     {
+		logger.LogDebug(">>> Entering QueryProcAsync(procedureName={ProcedureName},parameters={Parameters})", procedureName, parameters);
         using var dataConnection = CreateDataConnection(LinqToDbDataProvider);
         var command = new CommandInfo(dataConnection, procedureName, parameters);
+		logger.LogDebug("QueryProcAsync(procedureName={ProcedureName},parameters={Parameters}): dataConnection → {DataConnection}", procedureName, parameters, dataConnection);
+		logger.LogDebug("QueryProcAsync(procedureName={ProcedureName},parameters={Parameters}): command → {Command}", procedureName, parameters, command);
 
         var rez = command.QueryProc<T>()?.ToList();
         return Task.FromResult<IList<T>>(rez ?? new List<T>());
@@ -463,10 +529,13 @@ public abstract partial class BaseDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public virtual async Task TruncateAsync<TEntity>(bool resetIdentity = false) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering TruncateAsync(resetIdentity={ResetIdentity})", resetIdentity);
         using var dataContext = CreateDataConnection(LinqToDbDataProvider);
         await dataContext.GetTable<TEntity>().TruncateAsync(resetIdentity);
+		logger.LogDebug("<<< Exiting TruncateAsync(resetIdentity={ResetIdentity})", resetIdentity);
     }
 
+	logger.LogDebug("TruncateAsync(resetIdentity={ResetIdentity}): dataContext → {DataContext}", resetIdentity, dataContext);
     #endregion
 
     #region Properties

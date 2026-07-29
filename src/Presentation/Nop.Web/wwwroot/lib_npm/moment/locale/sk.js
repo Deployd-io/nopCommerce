@@ -11,9 +11,12 @@ var months =
         ),
     monthsShort = 'jan_feb_mar_apr_máj_jún_júl_aug_sep_okt_nov_dec'.split('_');
 function plural(n) {
+	logger.debug(`>>> Entering plural(n=${n})`);
+	logger.debug(`<<< Exiting plural(n=${n})`);
     return n > 1 && n < 5;
 }
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     switch (key) {
         case 's': // a few seconds / in a few seconds / a few seconds ago
@@ -62,6 +65,7 @@ function translate(number, withoutSuffix, key, isFuture) {
             if (withoutSuffix || isFuture) {
                 return result + (plural(number) ? 'roky' : 'rokov');
             } else {
+				logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
                 return result + 'rokmi';
             }
     }
@@ -85,6 +89,7 @@ export default moment.defineLocale('sk', {
         sameDay: '[dnes o] LT',
         nextDay: '[zajtra o] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[v nedeľu o] LT';
@@ -100,9 +105,11 @@ export default moment.defineLocale('sk', {
                 case 6:
                     return '[v sobotu o] LT';
             }
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: '[včera o] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[minulú nedeľu o] LT';
@@ -117,6 +124,7 @@ export default moment.defineLocale('sk', {
                 case 6:
                     return '[minulú sobotu o] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

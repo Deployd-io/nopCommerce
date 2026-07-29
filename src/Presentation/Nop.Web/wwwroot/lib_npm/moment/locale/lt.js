@@ -18,13 +18,17 @@ var units = {
     yy: 'metai_metų_metus',
 };
 function translateSeconds(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translateSeconds(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     if (withoutSuffix) {
         return 'kelios sekundės';
     } else {
+		logger.debug(`<<< Exiting translateSeconds(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
         return isFuture ? 'kelių sekundžių' : 'kelias sekundes';
     }
 }
 function translateSingular(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translateSingular(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
+	logger.debug(`<<< Exiting translateSingular(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return withoutSuffix
         ? forms(key)[0]
         : isFuture
@@ -32,14 +36,20 @@ function translateSingular(number, withoutSuffix, key, isFuture) {
           : forms(key)[2];
 }
 function special(number) {
+	logger.debug(`>>> Entering special(number=${number})`);
+	logger.debug(`<<< Exiting special(number=${number})`);
     return number % 10 === 0 || (number > 10 && number < 20);
 }
 function forms(key) {
+	logger.debug(`>>> Entering forms(key=${key})`);
+	logger.debug(`<<< Exiting forms(key=${key})`);
     return units[key].split('_');
 }
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     if (number === 1) {
+		logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture}): result → ${result}`);
         return (
             result + translateSingular(number, withoutSuffix, key[0], isFuture)
         );
@@ -49,6 +59,7 @@ function translate(number, withoutSuffix, key, isFuture) {
         if (isFuture) {
             return result + forms(key)[1];
         } else {
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
             return result + (special(number) ? forms(key)[1] : forms(key)[2]);
         }
     }
@@ -116,6 +127,7 @@ export default moment.defineLocale('lt', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}-oji/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return number + '-oji';
     },
     week: {

@@ -5,14 +5,17 @@
 import moment from '../moment';
 
 function relativeTimeWithMutation(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithMutation(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var format = {
         mm: 'munutenn',
         MM: 'miz',
         dd: 'devezh',
     };
+	logger.debug(`<<< Exiting relativeTimeWithMutation(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     return number + ' ' + mutation(format[key], number);
 }
 function specialMutationForYears(number) {
+	logger.debug(`>>> Entering specialMutationForYears(number=${number})`);
     switch (lastNumber(number)) {
         case 1:
         case 3:
@@ -21,22 +24,28 @@ function specialMutationForYears(number) {
         case 9:
             return number + ' bloaz';
         default:
+			logger.debug(`<<< Exiting specialMutationForYears(number=${number})`);
             return number + ' vloaz';
     }
 }
 function lastNumber(number) {
+	logger.debug(`>>> Entering lastNumber(number=${number})`);
     if (number > 9) {
         return lastNumber(number % 10);
     }
+	logger.debug(`<<< Exiting lastNumber(number=${number})`);
     return number;
 }
 function mutation(text, number) {
+	logger.debug(`>>> Entering mutation(text=${text},number=${number})`);
     if (number === 2) {
         return softMutation(text);
     }
+	logger.debug(`<<< Exiting mutation(text=${text},number=${number})`);
     return text;
 }
 function softMutation(text) {
+	logger.debug(`>>> Entering softMutation(text=${text})`);
     var mutationTable = {
         m: 'v',
         b: 'v',
@@ -45,6 +54,7 @@ function softMutation(text) {
     if (mutationTable[text.charAt(0)] === undefined) {
         return text;
     }
+	logger.debug(`<<< Exiting softMutation(text=${text})`);
     return mutationTable[text.charAt(0)] + text.substring(1);
 }
 
@@ -151,6 +161,7 @@ export default moment.defineLocale('br', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(añ|vet)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var output = number === 1 ? 'añ' : 'vet';
         return number + output;
     },
@@ -163,6 +174,7 @@ export default moment.defineLocale('br', {
         return token === 'g.m.';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         return hour < 12 ? 'a.m.' : 'g.m.';
     },
 });

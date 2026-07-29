@@ -26,9 +26,14 @@ public class PriceCalculationServiceTests : ServiceTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _customerService = GetService<ICustomerService>();
         _productService = GetService<IProductService>();
+		logger.LogDebug("SetUp(): _customerService → {_customerService}", _customerService);
+		logger.LogDebug("SetUp(): _productService → {_productService}", _productService);
         _priceCalcService = GetService<IPriceCalculationService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _priceCalcService → {_priceCalcService}", _priceCalcService);
     }
 
     #endregion
@@ -38,10 +43,14 @@ public class PriceCalculationServiceTests : ServiceTest
     [Test]
     public async Task CanGetFinalProductPrice()
     {
+		logger.LogDebug(">>> Entering CanGetFinalProductPrice()");
         var product = await _productService.GetProductBySkuAsync("BP_20_WSP");
 
+		logger.LogDebug("CanGetFinalProductPrice(): product → {Product}", product);
         var customer = new Customer();
         var store = new Store();
+		logger.LogDebug("CanGetFinalProductPrice(): customer → {Customer}", customer);
+		logger.LogDebug("CanGetFinalProductPrice(): store → {Store}", store);
 
         var (finalPriceWithoutDiscounts, finalPrice, _, _) = await _priceCalcService.GetFinalPriceAsync(product, customer, store, 0, false);
         finalPrice.Should().Be(79.99M);
@@ -51,15 +60,20 @@ public class PriceCalculationServiceTests : ServiceTest
 
         finalPrice.Should().Be(19M);
         finalPriceWithoutDiscounts.Should().Be(finalPriceWithoutDiscounts);
+		logger.LogDebug("<<< Exiting CanGetFinalProductPrice()");
     }
 
     [Test]
     public async Task CanGetFinalProductPriceWithTierPrices()
     {
+		logger.LogDebug(">>> Entering CanGetFinalProductPriceWithTierPrices()");
         var product = await _productService.GetProductBySkuAsync("BP_20_WSP");
 
+		logger.LogDebug("CanGetFinalProductPriceWithTierPrices(): product → {Product}", product);
         var customer = new Customer();
         var store = new Store();
+		logger.LogDebug("CanGetFinalProductPriceWithTierPrices(): customer → {Customer}", customer);
+		logger.LogDebug("CanGetFinalProductPriceWithTierPrices(): store → {Store}", store);
 
         var (finalPriceWithoutDiscounts, finalPrice, _, _) = await _priceCalcService.GetFinalPriceAsync(product, customer, store, 0, false);
         finalPrice.Should().Be(79.99M);
@@ -77,23 +91,31 @@ public class PriceCalculationServiceTests : ServiceTest
 
         finalPrice.Should().Be(17);
         finalPrice.Should().Be(finalPriceWithoutDiscounts);
+		logger.LogDebug("<<< Exiting CanGetFinalProductPriceWithTierPrices()");
     }
 
     [Test]
     public async Task CanGetFinalProductPriceWithTierPricesByCustomerRole()
     {
+		logger.LogDebug(">>> Entering CanGetFinalProductPriceWithTierPricesByCustomerRole()");
         var product = await _productService.GetProductBySkuAsync("NK_ZSJ_MM");
 
+		logger.LogDebug("CanGetFinalProductPriceWithTierPricesByCustomerRole(): product → {Product}", product);
         //customer
         var customer = await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
         var store = new Store();
+		logger.LogDebug("CanGetFinalProductPriceWithTierPricesByCustomerRole(): customer → {Customer}", customer);
+		logger.LogDebug("CanGetFinalProductPriceWithTierPricesByCustomerRole(): store → {Store}", store);
 
         var roles = await _customerService.GetAllCustomerRolesAsync();
         var customerRole = roles.FirstOrDefault();
+		logger.LogDebug("CanGetFinalProductPriceWithTierPricesByCustomerRole(): roles → {Roles}", roles);
+		logger.LogDebug("CanGetFinalProductPriceWithTierPricesByCustomerRole(): customerRole → {CustomerRole}", customerRole);
 
         customerRole.Should().NotBeNull();
 
         var tierPrices = new List<TierPrice>
+		logger.LogDebug("<<< Exiting CanGetFinalProductPriceWithTierPricesByCustomerRole()");
         {
             new() { CustomerRoleId = customerRole.Id, ProductId = product.Id, Quantity = 2, Price = 25 },
             new() { CustomerRoleId = customerRole.Id, ProductId = product.Id, Quantity = 5, Price = 20 },
@@ -131,25 +153,34 @@ public class PriceCalculationServiceTests : ServiceTest
     [Test]
     public async Task CanGetFinalProductPriceWithAdditionalFee()
     {
+		logger.LogDebug(">>> Entering CanGetFinalProductPriceWithAdditionalFee()");
         var product = await _productService.GetProductBySkuAsync("BP_20_WSP");
 
+		logger.LogDebug("CanGetFinalProductPriceWithAdditionalFee(): product → {Product}", product);
         //customer
         var customer = new Customer();
         var store = new Store();
+		logger.LogDebug("CanGetFinalProductPriceWithAdditionalFee(): customer → {Customer}", customer);
+		logger.LogDebug("CanGetFinalProductPriceWithAdditionalFee(): store → {Store}", store);
 
         var (finalPriceWithoutDiscounts, finalPrice, _, _) = await _priceCalcService.GetFinalPriceAsync(product, customer, store, 5, false);
 
         finalPrice.Should().Be(84.99M);
         finalPrice.Should().Be(finalPriceWithoutDiscounts);
+		logger.LogDebug("<<< Exiting CanGetFinalProductPriceWithAdditionalFee()");
     }
 
     [Test]
     public async Task CanGetFinalProductPriceWithDiscount()
     {
+		logger.LogDebug(">>> Entering CanGetFinalProductPriceWithDiscount()");
         var product = await _productService.GetProductBySkuAsync("BP_20_WSP");
         var customer = await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
+		logger.LogDebug("CanGetFinalProductPriceWithDiscount(): product → {Product}", product);
+		logger.LogDebug("CanGetFinalProductPriceWithDiscount(): customer → {Customer}", customer);
         var store = new Store();
 
+		logger.LogDebug("CanGetFinalProductPriceWithDiscount(): store → {Store}", store);
         var mapping = new DiscountProductMapping
         {
             DiscountId = 1,
@@ -166,6 +197,7 @@ public class PriceCalculationServiceTests : ServiceTest
 
         finalPrice.Should().Be(69.99M);
         finalPriceWithoutDiscounts.Should().Be(79.99M);
+		logger.LogDebug("<<< Exiting CanGetFinalProductPriceWithDiscount()");
     }
 
     [TestCase(12.366, 12.37, RoundingType.Rounding001)]
@@ -206,7 +238,9 @@ public class PriceCalculationServiceTests : ServiceTest
     [TestCase(12.00, 12.00, RoundingType.Rounding1Up)]
     public void CanRound(decimal valueToRounding, decimal roundedValue, RoundingType roundingType)
     {
+		logger.LogDebug(">>> Entering CanRound(valueToRounding={ValueToRounding},roundedValue={RoundedValue},roundingType={RoundingType})", valueToRounding, roundedValue, roundingType);
         _priceCalcService.Round(valueToRounding, roundingType).Should().Be(roundedValue);
+		logger.LogDebug("<<< Exiting CanRound(valueToRounding={ValueToRounding},roundedValue={RoundedValue},roundingType={RoundingType})", valueToRounding, roundedValue, roundingType);
     }
 
     #endregion

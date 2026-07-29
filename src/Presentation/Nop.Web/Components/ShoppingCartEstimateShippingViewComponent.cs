@@ -34,14 +34,18 @@ public partial class ShoppingCartEstimateShippingViewComponent : NopViewComponen
 
     public async Task<IViewComponentResult> InvokeAsync(bool? prepareAndDisplayOrderReviewData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData})", prepareAndDisplayOrderReviewData);
         if (!_shippingSettings.EstimateShippingCartPageEnabled)
             return Content(string.Empty);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, store.Id);
+		logger.LogDebug("InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData}): store → {Store}", prepareAndDisplayOrderReviewData, store);
+		logger.LogDebug("InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData}): cart → {Cart}", prepareAndDisplayOrderReviewData, cart);
 
         var model = await _shoppingCartModelFactory.PrepareEstimateShippingModelAsync(cart);
         if (!model.Enabled)
+			logger.LogDebug("InvokeAsync(prepareAndDisplayOrderReviewData={PrepareAndDisplayOrderReviewData}): model → {Model}", prepareAndDisplayOrderReviewData, model);
             return Content(string.Empty);
 
         return View(model);

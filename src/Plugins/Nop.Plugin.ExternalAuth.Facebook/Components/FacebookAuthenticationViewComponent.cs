@@ -16,6 +16,8 @@ public class FacebookAuthenticationViewComponent : NopViewComponent
     /// <returns>View component result</returns>
     public IViewComponentResult Invoke(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
+		logger.LogDebug("<<< Exiting Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/ExternalAuth.Facebook/Views/PublicInfo.cshtml");
     }
 }

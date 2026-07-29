@@ -19,7 +19,10 @@ public partial class AdminLanguageSelectorViewComponent : NopViewComponent
 
     public AdminLanguageSelectorViewComponent(ICommonModelFactory commonModelFactory)
     {
+		logger.LogDebug(">>> Entering AdminLanguageSelectorViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
         _commonModelFactory = commonModelFactory;
+		logger.LogDebug("<<< Exiting AdminLanguageSelectorViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
+		logger.LogDebug("AdminLanguageSelectorViewComponent(commonModelFactory={CommonModelFactory}): _commonModelFactory → {_commonModelFactory}", commonModelFactory, _commonModelFactory);
     }
 
     #endregion
@@ -35,9 +38,12 @@ public partial class AdminLanguageSelectorViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         //prepare model
         var model = await _commonModelFactory.PrepareLanguageSelectorModelAsync();
 
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 

@@ -10,6 +10,7 @@ public partial class ContactVendorValidator : BaseNopValidator<ContactVendorMode
 {
     public ContactVendorValidator(ILocalizationService localizationService, CommonSettings commonSettings)
     {
+		logger.LogDebug(">>> Entering ContactVendorValidator(localizationService={LocalizationService},commonSettings={CommonSettings})", localizationService, commonSettings);
         RuleFor(x => x.Email).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("ContactVendor.Email.Required"));
         RuleFor(x => x.Email)
             .IsEmailAddress()
@@ -20,5 +21,6 @@ public partial class ContactVendorValidator : BaseNopValidator<ContactVendorMode
             RuleFor(x => x.Subject).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("ContactVendor.Subject.Required"));
         }
         RuleFor(x => x.Enquiry).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("ContactVendor.Enquiry.Required"));
+		logger.LogDebug("<<< Exiting ContactVendorValidator(localizationService={LocalizationService},commonSettings={CommonSettings})", localizationService, commonSettings);
     }
 }

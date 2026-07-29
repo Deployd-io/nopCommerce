@@ -22,10 +22,12 @@ public static partial class CheckoutAttributeServiceExtensions
     /// </returns>
     public static async Task<IList<CheckoutAttribute>> GetAllAttributesAsync(this IAttributeService<CheckoutAttribute, CheckoutAttributeValue> service, IStaticCacheManager staticCacheManager, IStoreMappingService storeMappingService, int storeId = 0, bool excludeShippableAttributes = false)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = staticCacheManager.PrepareKeyForDefaultCache(NopOrderDefaults.CheckoutAttributesAllCacheKey, storeId, excludeShippableAttributes);
 
         return await staticCacheManager.GetAsync(key, async () =>
         {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var checkoutAttributes = (await service.GetAllAttributesAsync()).ToAsyncEnumerable();
 
             if (storeId > 0)
@@ -38,5 +40,6 @@ public static partial class CheckoutAttributeServiceExtensions
 
             return await checkoutAttributes.ToListAsync();
         });
+		logger.LogDebug("<<< Exiting GetAllAttributesAsync(IAttributeService<CheckoutAttribute={Arg0},service={Service},staticCacheManager={StaticCacheManager},storeMappingService={StoreMappingService},storeId={StoreId},excludeShippableAttributes={ExcludeShippableAttributes})", IAttributeService<CheckoutAttribute, service, staticCacheManager, storeMappingService, storeId, excludeShippableAttributes);
     }
 }
