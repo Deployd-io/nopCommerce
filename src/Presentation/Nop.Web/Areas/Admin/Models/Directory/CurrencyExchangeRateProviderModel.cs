@@ -13,8 +13,12 @@ public partial record CurrencyExchangeRateProviderModel : BaseNopModel
 
     public CurrencyExchangeRateProviderModel()
     {
+		logger.LogDebug(">>> Entering CurrencyExchangeRateProviderModel()");
         ExchangeRates = new List<CurrencyExchangeRateModel>();
         ExchangeRateProviders = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CurrencyExchangeRateProviderModel()");
+		logger.LogDebug("CurrencyExchangeRateProviderModel(): ExchangeRates → {ExchangeRates}", ExchangeRates);
+		logger.LogDebug("CurrencyExchangeRateProviderModel(): ExchangeRateProviders → {ExchangeRateProviders}", ExchangeRateProviders);
     }
 
     #endregion

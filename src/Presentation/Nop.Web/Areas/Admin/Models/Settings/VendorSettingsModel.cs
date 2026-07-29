@@ -13,7 +13,10 @@ public partial record VendorSettingsModel : BaseNopModel, ISettingsModel
 
     public VendorSettingsModel()
     {
+		logger.LogDebug(">>> Entering VendorSettingsModel()");
         VendorAttributeSearchModel = new VendorAttributeSearchModel();
+		logger.LogDebug("<<< Exiting VendorSettingsModel()");
+		logger.LogDebug("VendorSettingsModel(): VendorAttributeSearchModel → {VendorAttributeSearchModel}", VendorAttributeSearchModel);
     }
 
     #endregion

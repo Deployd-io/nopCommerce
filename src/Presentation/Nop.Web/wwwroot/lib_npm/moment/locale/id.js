@@ -23,6 +23,7 @@ export default moment.defineLocale('id', {
     },
     meridiemParse: /pagi|siang|sore|malam/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -31,6 +32,9 @@ export default moment.defineLocale('id', {
         } else if (meridiem === 'siang') {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'sore' || meridiem === 'malam') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return hour + 12;
         }
     },

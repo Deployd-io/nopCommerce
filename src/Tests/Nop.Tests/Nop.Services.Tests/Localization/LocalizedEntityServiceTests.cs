@@ -15,14 +15,19 @@ public class LocalizedEntityServiceTests : BaseNopTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _localizedEntityService = GetService<ILocalizedEntityService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _localizedEntityService → {_localizedEntityService}", _localizedEntityService);
     }
 
     [Test]
     public async Task CanSaveLocalizedValueAsync()
     {
+		logger.LogDebug(">>> Entering CanSaveLocalizedValueAsync()");
         var product = await GetService<IProductService>().GetProductByIdAsync(1);
 
+		logger.LogDebug("CanSaveLocalizedValueAsync(): product → {Product}", product);
         await _localizedEntityService.SaveLocalizedValueAsync(product, p => p.Name, "test lang 1", 1);
         await _localizedEntityService.SaveLocalizedValueAsync(product, p => p.BasepriceAmount, 1.0M, 1);
 
@@ -40,5 +45,6 @@ public class LocalizedEntityServiceTests : BaseNopTest
             nameof(Product.BasepriceAmount));
 
         basePriceAmount.Should().BeNullOrEmpty();
+		logger.LogDebug("<<< Exiting CanSaveLocalizedValueAsync()");
     }
 }

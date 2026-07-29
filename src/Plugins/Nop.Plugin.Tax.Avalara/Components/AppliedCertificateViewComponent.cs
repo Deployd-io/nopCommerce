@@ -57,9 +57,11 @@ public class AppliedCertificateViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure that Avalara tax provider is active
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, customer))
+			logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customer → {Customer}", widgetZone, additionalData, customer);
             return Content(string.Empty);
 
         if (!_avalaraTaxSettings.EnableCertificates)
@@ -70,6 +72,7 @@ public class AppliedCertificateViewComponent : NopViewComponent
         {
             var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
             if (!customerRoleIds.Intersect(_avalaraTaxSettings.CustomerRoleIds).Any())
+				logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customerRoleIds → {CustomerRoleIds}", widgetZone, additionalData, customerRoleIds);
                 return Content(string.Empty);
         }
 
@@ -83,10 +86,13 @@ public class AppliedCertificateViewComponent : NopViewComponent
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var validCertificate = await _avalaraTaxManager.GetValidCertificatesAsync(customer, store.Id);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): store → {Store}", widgetZone, additionalData, store);
+		logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validCertificate → {ValidCertificate}", widgetZone, additionalData, validCertificate);
         var certificateValue = !string.IsNullOrEmpty(validCertificate?.exemptionNumber)
             ? validCertificate.exemptionNumber
             : validCertificate?.id?.ToString();
 
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Tax.Avalara/Views/Checkout/AppliedCertificate.cshtml", certificateValue);
     }
 

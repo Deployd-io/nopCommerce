@@ -18,24 +18,37 @@ public partial record CategoryModel : BaseNopEntityModel, IAclSupportedModel, ID
 
     public CategoryModel()
     {
+		logger.LogDebug(">>> Entering CategoryModel()");
         if (PageSize < 1)
         {
             PageSize = 5;
+			logger.LogDebug("CategoryModel(): PageSize → {PageSize}", PageSize);
         }
 
         Locales = new List<CategoryLocalizedModel>();
+		logger.LogDebug("CategoryModel(): Locales → {Locales}", Locales);
         AvailableCategoryTemplates = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		logger.LogDebug("CategoryModel(): AvailableCategoryTemplates → {AvailableCategoryTemplates}", AvailableCategoryTemplates);
+		logger.LogDebug("CategoryModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableDiscounts = new List<SelectListItem>();
         SelectedDiscountIds = new List<int>();
+		logger.LogDebug("CategoryModel(): AvailableDiscounts → {AvailableDiscounts}", AvailableDiscounts);
+		logger.LogDebug("CategoryModel(): SelectedDiscountIds → {SelectedDiscountIds}", SelectedDiscountIds);
 
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("CategoryModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("CategoryModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("CategoryModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("CategoryModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         CategoryProductSearchModel = new CategoryProductSearchModel();
+		logger.LogDebug("<<< Exiting CategoryModel()");
+		logger.LogDebug("CategoryModel(): CategoryProductSearchModel → {CategoryProductSearchModel}", CategoryProductSearchModel);
     }
 
     #endregion

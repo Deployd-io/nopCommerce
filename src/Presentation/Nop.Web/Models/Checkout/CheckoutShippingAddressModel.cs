@@ -7,9 +7,14 @@ public partial record CheckoutShippingAddressModel : BaseNopModel
 {
     public CheckoutShippingAddressModel()
     {
+		logger.LogDebug(">>> Entering CheckoutShippingAddressModel()");
         ExistingAddresses = new List<AddressModel>();
         InvalidExistingAddresses = new List<AddressModel>();
+		logger.LogDebug("CheckoutShippingAddressModel(): ExistingAddresses → {ExistingAddresses}", ExistingAddresses);
+		logger.LogDebug("CheckoutShippingAddressModel(): InvalidExistingAddresses → {InvalidExistingAddresses}", InvalidExistingAddresses);
         ShippingNewAddress = new AddressModel();
+		logger.LogDebug("<<< Exiting CheckoutShippingAddressModel()");
+		logger.LogDebug("CheckoutShippingAddressModel(): ShippingNewAddress → {ShippingNewAddress}", ShippingNewAddress);
     }
 
     public IList<AddressModel> ExistingAddresses { get; set; }

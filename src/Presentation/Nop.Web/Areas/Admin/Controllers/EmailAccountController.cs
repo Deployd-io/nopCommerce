@@ -111,9 +111,12 @@ public partial class EmailAccountController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountSearchModelAsync(new EmailAccountSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -124,28 +127,36 @@ public partial class EmailAccountController : BaseAdminController
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> MarkAsDefaultEmail(int id)
     {
+		logger.LogDebug(">>> Entering MarkAsDefaultEmail(id={Id})", id);
         var defaultEmailAccount = await _emailAccountService.GetEmailAccountByIdAsync(id);
         if (defaultEmailAccount == null)
+			logger.LogDebug("MarkAsDefaultEmail(id={Id}): defaultEmailAccount → {DefaultEmailAccount}", id, defaultEmailAccount);
             return RedirectToAction("List");
 
         _emailAccountSettings.DefaultEmailAccountId = defaultEmailAccount.Id;
+		logger.LogDebug("MarkAsDefaultEmail(id={Id}): _emailAccountSettings.DefaultEmailAccountId → {Arg1}", id, _emailAccountSettings.DefaultEmailAccountId);
         await _settingService.SaveSettingAsync(_emailAccountSettings);
 
+		logger.LogDebug("<<< Exiting MarkAsDefaultEmail(id={Id})", id);
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(new EmailAccountModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -174,23 +185,28 @@ public partial class EmailAccountController : BaseAdminController
         model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an email account with the specified id
         var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(id);
         if (emailAccount == null)
+			logger.LogDebug("Edit(id={Id}): emailAccount → {EmailAccount}", id, emailAccount);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(null, emailAccount);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
         if (emailAccount.EmailAuthenticationMethod == EmailAuthenticationMethod.GmailOAuth2)
             model.AuthUrl = await PrepareOAuthUrlAsync(emailAccount);
 
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -225,6 +241,7 @@ public partial class EmailAccountController : BaseAdminController
             model.AuthUrl = await PrepareOAuthUrlAsync(emailAccount);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -303,7 +320,9 @@ public partial class EmailAccountController : BaseAdminController
         //prepare model
         model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(model, emailAccount, true);
 
+		logger.LogDebug("SendTestEmail(model={Model}): model → {Model1}", model, model);
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting SendTestEmail(model={Model})", model);
         return View(model);
     }
 
@@ -311,9 +330,11 @@ public partial class EmailAccountController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an email account with the specified id
         var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(id);
         if (emailAccount == null)
+			logger.LogDebug("Delete(id={Id}): emailAccount → {EmailAccount}", id, emailAccount);
             return RedirectToAction("List");
 
         try
@@ -330,18 +351,22 @@ public partial class EmailAccountController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = emailAccount.Id });
         }
     }
 
     public virtual async Task<IActionResult> AuthReturn(AuthorizationCodeResponseUrl authorizationCode)
     {
+		logger.LogDebug(">>> Entering AuthReturn(authorizationCode={AuthorizationCode})", authorizationCode);
         if (string.IsNullOrEmpty(authorizationCode.State))
             return RedirectToAction(nameof(List));
 
         var strAccountId = authorizationCode.State.Split(SEPARATOR).FirstOrDefault();
 
+		logger.LogDebug("AuthReturn(authorizationCode={AuthorizationCode}): strAccountId → {StrAccountId}", authorizationCode, strAccountId);
         if (!int.TryParse(strAccountId, out var accountId) ||
             await _emailAccountService.GetEmailAccountByIdAsync(accountId) is not EmailAccount emailAccount)
         {
@@ -360,6 +385,8 @@ public partial class EmailAccountController : BaseAdminController
 
         var tokenFilePath = _fileProvider.MapPath(NopMessageDefaults.GmailAuthStorePath);
         var credentialRoot = _fileProvider.Combine(tokenFilePath, emailAccount.Email);
+		logger.LogDebug("AuthReturn(authorizationCode={AuthorizationCode}): tokenFilePath → {TokenFilePath}", authorizationCode, tokenFilePath);
+		logger.LogDebug("AuthReturn(authorizationCode={AuthorizationCode}): credentialRoot → {CredentialRoot}", authorizationCode, credentialRoot);
 
         var flow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
         {
@@ -374,12 +401,15 @@ public partial class EmailAccountController : BaseAdminController
 
         var redirectUri = Url.Action(nameof(AuthReturn), null, null, _webHelper.GetCurrentRequestProtocol());
         var tokenResponse = await flow.ExchangeCodeForTokenAsync(emailAccount.Email, authorizationCode.Code, redirectUri, CancellationToken.None);
+		logger.LogDebug("AuthReturn(authorizationCode={AuthorizationCode}): redirectUri → {RedirectUri}", authorizationCode, redirectUri);
+		logger.LogDebug("AuthReturn(authorizationCode={AuthorizationCode}): tokenResponse → {TokenResponse}", authorizationCode, tokenResponse);
 
         if (tokenResponse is null || tokenResponse.IsStale)
             return RedirectToAction(nameof(Edit), new { id = emailAccount.Id });
 
         _notificationService.SuccessNotification("The token was successfully retrieved from the server");
 
+		logger.LogDebug("<<< Exiting AuthReturn(authorizationCode={AuthorizationCode})", authorizationCode);
         return RedirectToAction(nameof(Edit), new { id = emailAccount.Id });
     }
 

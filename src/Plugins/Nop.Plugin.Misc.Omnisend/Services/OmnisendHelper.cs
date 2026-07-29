@@ -53,13 +53,17 @@ public class OmnisendHelper
     /// </summary>
     public async Task<string> GetPrimaryStoreCurrencyCodeAsync()
     {
+		logger.LogDebug(">>> Entering GetPrimaryStoreCurrencyCodeAsync()");
         if (!string.IsNullOrEmpty(_primaryStoreCurrencyCode))
             return _primaryStoreCurrencyCode;
 
         var currency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
 
+		logger.LogDebug("GetPrimaryStoreCurrencyCodeAsync(): currency → {Currency}", currency);
         _primaryStoreCurrencyCode = currency.CurrencyCode;
+		logger.LogDebug("GetPrimaryStoreCurrencyCodeAsync(): _primaryStoreCurrencyCode → {_primaryStoreCurrencyCode}", _primaryStoreCurrencyCode);
 
+		logger.LogDebug("<<< Exiting GetPrimaryStoreCurrencyCodeAsync()");
         return _primaryStoreCurrencyCode;
     }
 
@@ -91,6 +95,8 @@ public class OmnisendHelper
     /// <param name="product">Product</param>
     public async Task<string> GetProductUrlAsync(Product product)
     {
+		logger.LogDebug(">>> Entering GetProductUrlAsync(product={Product})", product);
+		logger.LogDebug("<<< Exiting GetProductUrlAsync(product={Product})", product);
         return await _nopUrlHelper.RouteGenericUrlAsync(product, _webHelper.GetCurrentRequestProtocol());
     }
 
@@ -100,6 +106,7 @@ public class OmnisendHelper
     /// <param name="product">Product</param>
     public async Task<ProductDto.Image> GetProductPictureUrlAsync(Product product)
     {
+		logger.LogDebug(">>> Entering GetProductPictureUrlAsync(product={Product})", product);
         var picture = (await _pictureService
             .GetPicturesByProductIdAsync(product.Id, 1)).DefaultIfEmpty(null).FirstOrDefault();
 
@@ -107,9 +114,12 @@ public class OmnisendHelper
 
         var storeLocation = _webHelper.GetStoreLocation();
 
+		logger.LogDebug("GetProductPictureUrlAsync(product={Product}): storeLocation → {StoreLocation}", product, storeLocation);
         if (!url.StartsWith(storeLocation))
             url = storeLocation + url;
+			logger.LogInformation("GetProductPictureUrlAsync(product={Product}): url → {Url}", product, url);
 
+		logger.LogDebug("<<< Exiting GetProductPictureUrlAsync(product={Product})", product);
         return new ProductDto.Image { ImageId = (picture?.Id ?? 0).ToString(), Url = url };
     }
 

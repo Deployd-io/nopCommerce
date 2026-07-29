@@ -12,7 +12,10 @@ public partial record RecurringPaymentModel : BaseNopEntityModel
 
     public RecurringPaymentModel()
     {
+		logger.LogDebug(">>> Entering RecurringPaymentModel()");
         RecurringPaymentHistorySearchModel = new RecurringPaymentHistorySearchModel();
+		logger.LogDebug("<<< Exiting RecurringPaymentModel()");
+		logger.LogDebug("RecurringPaymentModel(): RecurringPaymentHistorySearchModel → {RecurringPaymentHistorySearchModel}", RecurringPaymentHistorySearchModel);
     }
 
     #endregion

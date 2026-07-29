@@ -27,18 +27,23 @@ export default moment.defineLocale('gl', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
             return '[hoxe ' + (this.hours() !== 1 ? 'ás' : 'á') + '] LT';
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
             return '[mañá ' + (this.hours() !== 1 ? 'ás' : 'á') + '] LT';
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return 'dddd [' + (this.hours() !== 1 ? 'ás' : 'a') + '] LT';
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
             return '[onte ' + (this.hours() !== 1 ? 'á' : 'a') + '] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return (
                 '[o] dddd [pasado ' + (this.hours() !== 1 ? 'ás' : 'a') + '] LT'
             );
@@ -47,6 +52,7 @@ export default moment.defineLocale('gl', {
     },
     relativeTime: {
         future: function (str) {
+			logger.debug(`>>> Entering future(str=${str})`);
             if (str.indexOf('un') === 0) {
                 return 'n' + str;
             }

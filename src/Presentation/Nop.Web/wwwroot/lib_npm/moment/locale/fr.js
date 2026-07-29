@@ -80,6 +80,7 @@ export default moment.defineLocale('fr', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(er|)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             // TODO: Return 'e' when day of month > 1. Move this case inside
             // block for masculine words below.
@@ -100,6 +101,7 @@ export default moment.defineLocale('fr', {
             case 'W':
                 return number + (number === 1 ? 're' : 'e');
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
     week: {
         dow: 1, // Monday is the first day of the week.

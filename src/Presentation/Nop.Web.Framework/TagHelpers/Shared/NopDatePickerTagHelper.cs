@@ -37,9 +37,14 @@ public partial class NopDatePickerTagHelper : TagHelper
 
     public NopDatePickerTagHelper(IHtmlGenerator generator, IHtmlHelper htmlHelper, ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering NopDatePickerTagHelper(generator={Generator},htmlHelper={HtmlHelper},localizationService={LocalizationService})", generator, htmlHelper, localizationService);
         Generator = generator;
         _htmlHelper = htmlHelper;
+		logger.LogDebug("NopDatePickerTagHelper(generator={Generator},htmlHelper={HtmlHelper},localizationService={LocalizationService}): _htmlHelper → {_htmlHelper}", generator, htmlHelper, localizationService, _htmlHelper);
+		logger.LogDebug("NopDatePickerTagHelper(generator={Generator},htmlHelper={HtmlHelper},localizationService={LocalizationService}): Generator → {Generator1}", generator, htmlHelper, localizationService, Generator);
         _localizationService = localizationService;
+		logger.LogDebug("<<< Exiting NopDatePickerTagHelper(generator={Generator},htmlHelper={HtmlHelper},localizationService={LocalizationService})", generator, htmlHelper, localizationService);
+		logger.LogDebug("NopDatePickerTagHelper(generator={Generator},htmlHelper={HtmlHelper},localizationService={LocalizationService}): _localizationService → {_localizationService}", generator, htmlHelper, localizationService, _localizationService);
     }
 
     #endregion
@@ -54,6 +59,7 @@ public partial class NopDatePickerTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -64,14 +70,19 @@ public partial class NopDatePickerTagHelper : TagHelper
 
         //tag details
         output.TagName = "div";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.SetAttribute("class", "date-picker-wrapper");
 
         //build date selects
         var daysList = new TagBuilder("select");
         var monthsList = new TagBuilder("select");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): daysList → {DaysList}", context, output, daysList);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): monthsList → {MonthsList}", context, output, monthsList);
         var yearsList = new TagBuilder("select");
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): yearsList → {YearsList}", context, output, yearsList);
         daysList.Attributes.Add("name", DayName);
         monthsList.Attributes.Add("name", MonthName);
         yearsList.Attributes.Add("name", YearName);
@@ -89,11 +100,13 @@ public partial class NopDatePickerTagHelper : TagHelper
         var customerAttributes = new Dictionary<string, object>();
         foreach (var attribute in context.AllAttributes)
         {
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): customerAttributes → {CustomerAttributes}", context, output, customerAttributes);
             if (!tagHelperAttributes.Contains(attribute.Name))
                 customerAttributes.Add(attribute.Name, attribute.Value);
         }
         var htmlAttributesDictionary = HtmlHelper.AnonymousObjectToHtmlAttributes(customerAttributes);
         daysList.MergeAttributes(htmlAttributesDictionary, true);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributesDictionary → {HtmlAttributesDictionary}", context, output, htmlAttributesDictionary);
         monthsList.MergeAttributes(htmlAttributesDictionary, true);
         yearsList.MergeAttributes(htmlAttributesDictionary, true);
 
@@ -101,8 +114,11 @@ public partial class NopDatePickerTagHelper : TagHelper
 
         var days = new StringBuilder();
         var months = new StringBuilder();
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): days → {Days}", context, output, days);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): months → {Months}", context, output, months);
         var years = new StringBuilder();
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): years → {Years}", context, output, years);
         days.AppendFormat("<option value='{0}'>{1}</option>", "0", await _localizationService.GetResourceAsync("Common.Day"));
 
         for (var i = 1; i <= 31; i++)
@@ -157,6 +173,7 @@ public partial class NopDatePickerTagHelper : TagHelper
             output.Content.AppendHtml(monthsList);
             output.Content.AppendHtml(yearsList);
         }
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

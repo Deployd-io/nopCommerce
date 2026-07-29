@@ -14,9 +14,14 @@ public partial record CustomerSearchModel : BaseSearchModel, IAclSupportedModel
 
     public CustomerSearchModel()
     {
+		logger.LogDebug(">>> Entering CustomerSearchModel()");
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("CustomerSearchModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("CustomerSearchModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         AvailableActiveValues = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CustomerSearchModel()");
+		logger.LogDebug("CustomerSearchModel(): AvailableActiveValues → {AvailableActiveValues}", AvailableActiveValues);
     }
 
     #endregion

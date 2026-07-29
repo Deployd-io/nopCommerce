@@ -8,6 +8,8 @@ public partial class HomeController : BasePublicController
     [SaveLastContinueShoppingPage]
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return View();
     }
 }

@@ -11,7 +11,10 @@ public partial class CustomerRegisteredEvent
     /// <param name="customer">customer</param>
     public CustomerRegisteredEvent(Customer customer)
     {
+		logger.LogDebug(">>> Entering CustomerRegisteredEvent(customer={Customer})", customer);
         Customer = customer;
+		logger.LogDebug("<<< Exiting CustomerRegisteredEvent(customer={Customer})", customer);
+		logger.LogDebug("CustomerRegisteredEvent(customer={Customer}): Customer → {Customer1}", customer, Customer);
     }
 
     /// <summary>

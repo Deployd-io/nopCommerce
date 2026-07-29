@@ -18,15 +18,26 @@ public record ConfigurationModel : BaseNopModel, IAclSupportedModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         TestAddress = new AddressModel();
         Companies = new List<SelectListItem>();
+		logger.LogDebug("ConfigurationModel(): TestAddress → {TestAddress}", TestAddress);
+		logger.LogDebug("ConfigurationModel(): Companies → {Companies}", Companies);
         TaxOriginAddressTypes = new List<SelectListItem>();
         TaxTransactionLogSearchModel = new TaxTransactionLogSearchModel();
+		logger.LogDebug("ConfigurationModel(): TaxOriginAddressTypes → {TaxOriginAddressTypes}", TaxOriginAddressTypes);
+		logger.LogDebug("ConfigurationModel(): TaxTransactionLogSearchModel → {TaxTransactionLogSearchModel}", TaxTransactionLogSearchModel);
         ItemClassificationSearchModel = new ItemClassificationSearchModel();
         SelectedCustomerRoleIds = new List<int>();
+		logger.LogDebug("ConfigurationModel(): ItemClassificationSearchModel → {ItemClassificationSearchModel}", ItemClassificationSearchModel);
+		logger.LogDebug("ConfigurationModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
         SelectedCountryIds = new List<int>();
+		logger.LogDebug("ConfigurationModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
+		logger.LogDebug("ConfigurationModel(): SelectedCountryIds → {SelectedCountryIds}", SelectedCountryIds);
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

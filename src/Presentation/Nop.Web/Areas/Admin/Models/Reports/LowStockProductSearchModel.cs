@@ -13,7 +13,10 @@ public partial record LowStockProductSearchModel : BaseSearchModel
 
     public LowStockProductSearchModel()
     {
+		logger.LogDebug(">>> Entering LowStockProductSearchModel()");
         AvailablePublishedOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting LowStockProductSearchModel()");
+		logger.LogDebug("LowStockProductSearchModel(): AvailablePublishedOptions → {AvailablePublishedOptions}", AvailablePublishedOptions);
     }
 
     #endregion

@@ -7,6 +7,7 @@ import moment from '../moment';
 var numbersNouns = 'pagh_wa’_cha’_wej_loS_vagh_jav_Soch_chorgh_Hut'.split('_');
 
 function translateFuture(output) {
+	logger.debug(`>>> Entering translateFuture(output=${output})`);
     var time = output;
     time =
         output.indexOf('jaj') !== -1
@@ -16,10 +17,12 @@ function translateFuture(output) {
               : output.indexOf('DIS') !== -1
                 ? time.slice(0, -3) + 'nem'
                 : time + ' pIq';
+	logger.debug(`<<< Exiting translateFuture(output=${output})`);
     return time;
 }
 
 function translatePast(output) {
+	logger.debug(`>>> Entering translatePast(output=${output})`);
     var time = output;
     time =
         output.indexOf('jaj') !== -1
@@ -29,10 +32,12 @@ function translatePast(output) {
               : output.indexOf('DIS') !== -1
                 ? time.slice(0, -3) + 'ben'
                 : time + ' ret';
+	logger.debug(`<<< Exiting translatePast(output=${output})`);
     return time;
 }
 
 function translate(number, withoutSuffix, string, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
     var numberNoun = numberAsNoun(number);
     switch (string) {
         case 'ss':
@@ -46,15 +51,18 @@ function translate(number, withoutSuffix, string, isFuture) {
         case 'MM':
             return numberNoun + ' jar';
         case 'yy':
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             return numberNoun + ' DIS';
     }
 }
 
 function numberAsNoun(number) {
+	logger.debug(`>>> Entering numberAsNoun(number=${number})`);
     var hundred = Math.floor((number % 1000) / 100),
         ten = Math.floor((number % 100) / 10),
         one = number % 10,
         word = '';
+		logger.debug(`numberAsNoun(number=${number}): hundred → ${hundred}`);
     if (hundred > 0) {
         word += numbersNouns[hundred] + 'vatlh';
     }
@@ -64,6 +72,8 @@ function numberAsNoun(number) {
     if (one > 0) {
         word += (word !== '' ? ' ' : '') + numbersNouns[one];
     }
+	logger.debug(`numberAsNoun(number=${number}): word → ${word}`);
+	logger.debug(`<<< Exiting numberAsNoun(number=${number})`);
     return word === '' ? 'pagh' : word;
 }
 

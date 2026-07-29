@@ -46,7 +46,9 @@ public partial class CloudflareThumbService : IThumbService
     /// </returns>
     public async Task<string> GetThumbLocalPathAsync(string pictureUrl)
     {
+		logger.LogDebug(">>> Entering GetThumbLocalPathAsync(pictureUrl={PictureUrl})", pictureUrl);
         if (string.IsNullOrEmpty(pictureUrl))
+		logger.LogDebug("<<< Exiting GetThumbLocalPathAsync(pictureUrl={PictureUrl})", pictureUrl);
             return string.Empty;
 
         return await GetThumbLocalPathByFileNameAsync(_fileProvider.GetFileName(pictureUrl));
@@ -63,6 +65,8 @@ public partial class CloudflareThumbService : IThumbService
     /// </returns>
     public async Task<bool> GeneratedThumbExistsAsync(string thumbFilePath, string thumbFileName)
     {
+		logger.LogDebug(">>> Entering GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName})", thumbFilePath, thumbFileName);
+		logger.LogDebug("<<< Exiting GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName})", thumbFilePath, thumbFileName);
         return await _cloudflareImagesRepository.Table.AnyAsync(i => i.ThumbFileName.Equals(thumbFileName));
     }
 
@@ -76,13 +80,17 @@ public partial class CloudflareThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SaveThumbAsync(string thumbFilePath, string thumbFileName, string mimeType, byte[] binary)
     {
+		logger.LogDebug(">>> Entering SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary})", thumbFilePath, thumbFileName, mimeType, binary);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var dataContent = new MultipartFormDataContent
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             { new StreamContent(new MemoryStream(binary)), "file", thumbFileName }
         };
 
         var response = await _cloudflareImagesHttpClient.SaveThumbAsync(dataContent);
 
+		logger.LogDebug("SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary}): response → {Response}", thumbFilePath, thumbFileName, mimeType, binary, response);
         if (response is not { Success: true })
             return;
 
@@ -91,6 +99,9 @@ public partial class CloudflareThumbService : IThumbService
             ImageId = response.Result.Id,
             ThumbFileName = thumbFileName
         }, false);
+		logger.LogInformation("SaveThumbAsync(thumbFilePath,thumbFileName,mimeType,binary)={ThumbFilePath},{ThumbFileName},{MimeType},{Binary}: external service call took {Arg4} ms", thumbFilePath, thumbFileName, mimeType, binary, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("SaveThumbAsync(thumbFilePath,thumbFileName,mimeType,binary)={ThumbFilePath},{ThumbFileName},{MimeType},{Binary}: save query executed in {Arg4} ms", thumbFilePath, thumbFileName, mimeType, binary, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary})", thumbFilePath, thumbFileName, mimeType, binary);
     }
 
     /// <summary>
@@ -103,9 +114,13 @@ public partial class CloudflareThumbService : IThumbService
     /// </returns>
     public async Task<string> GetThumbLocalPathByFileNameAsync(string thumbFileName)
     {
+		logger.LogDebug(">>> Entering GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName})", thumbFileName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var image = await _cloudflareImagesRepository.Table.FirstOrDefaultAsync(i => i.ThumbFileName.Equals(thumbFileName));
 
         if (image == null)
+			logger.LogDebug("GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName}): image → {Image}", thumbFileName, image);
+			logger.LogInformation("GetThumbLocalPathByFileNameAsync(thumbFileName)={ThumbFileName}: database query executed in {Arg1} ms", thumbFileName, __logStart.ElapsedMilliseconds);
             return null;
 
         return _cloudflareImagesSettings.DeliveryUrl
@@ -124,6 +139,8 @@ public partial class CloudflareThumbService : IThumbService
     /// </returns>
     public async Task<string> GetThumbUrlAsync(string thumbFileName, string storeLocation = null)
     {
+		logger.LogDebug(">>> Entering GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation})", thumbFileName, storeLocation);
+		logger.LogDebug("<<< Exiting GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation})", thumbFileName, storeLocation);
         return await GetThumbLocalPathByFileNameAsync(thumbFileName);
     }
 
@@ -134,14 +151,21 @@ public partial class CloudflareThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeletePictureThumbsAsync(Picture picture)
     {
+		logger.LogDebug(">>> Entering DeletePictureThumbsAsync(picture={Picture})", picture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var items = await _cloudflareImagesRepository.Table
             .Where(i => i.ThumbFileName.Contains($"_{picture.SeoFilename}.") || i.ThumbFileName.Contains($"_{picture.SeoFilename}_"))
             .ToListAsync();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			logger.LogInformation("DeletePictureThumbsAsync(picture)={Picture}: database query executed in {Arg1} ms", picture, __logStart.ElapsedMilliseconds);
 
         foreach (var item in items)
             await _cloudflareImagesHttpClient.DeleteThumbAsync(item.ImageId);
 
         await _cloudflareImagesRepository.DeleteAsync(items, false);
+		logger.LogDebug("<<< Exiting DeletePictureThumbsAsync(picture={Picture})", picture);
+		logger.LogInformation("DeletePictureThumbsAsync(picture)={Picture}: external service call took {Arg1} ms", picture, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("DeletePictureThumbsAsync(picture)={Picture}: delete query executed in {Arg1} ms", picture, __logStart.ElapsedMilliseconds);
     }
 
     #endregion

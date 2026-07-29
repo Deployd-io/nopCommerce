@@ -46,6 +46,7 @@ public partial class NopRedirectResultExecutor : RedirectResultExecutor
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ExecuteAsync(ActionContext context, RedirectResult result)
     {
+		logger.LogDebug(">>> Entering ExecuteAsync(context={Context},result={Result})", context, result);
         ArgumentNullException.ThrowIfNull(result);
 
         if (_securitySettings.AllowNonAsciiCharactersInHeaders)
@@ -54,16 +55,21 @@ public partial class NopRedirectResultExecutor : RedirectResultExecutor
             //so we force to encode this URL before processing
             var url = WebUtility.UrlDecode(result.Url);
             var urlHelper = result.UrlHelper ?? _urlHelperFactory.GetUrlHelper(context);
+			logger.LogDebug("ExecuteAsync(context={Context},result={Result}): url → {Url}", context, result, url);
+			logger.LogDebug("ExecuteAsync(context={Context},result={Result}): urlHelper → {UrlHelper}", context, result, urlHelper);
             var isLocalUrl = urlHelper.IsLocalUrl(url);
 
+			logger.LogDebug("ExecuteAsync(context={Context},result={Result}): isLocalUrl → {IsLocalUrl}", context, result, isLocalUrl);
             var uriStr = url;
             if (isLocalUrl)
+			logger.LogDebug("ExecuteAsync(context={Context},result={Result}): uriStr → {UriStr}", context, result, uriStr);
             {
                 var pathBase = context.HttpContext.Request.PathBase;
                 uriStr = $"{_webHelper.GetStoreLocation().TrimEnd('/')}{(url.StartsWith(pathBase) && !string.IsNullOrEmpty(pathBase) ? url.Replace(pathBase, "") : url)}";
             }
             var uri = new Uri(uriStr, UriKind.Absolute);
 
+			logger.LogDebug("ExecuteAsync(context={Context},result={Result}): uri → {Uri}", context, result, uri);
             //Allowlist redirect URI schemes to http and https
             if ((uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) && urlHelper.IsLocalUrl(uri.AbsolutePath))
                 result.Url = isLocalUrl ? uri.PathAndQuery : $"{uri.GetLeftPart(UriPartial.Query)}{uri.Fragment}";
@@ -71,6 +77,7 @@ public partial class NopRedirectResultExecutor : RedirectResultExecutor
                 result.Url = urlHelper.RouteUrl(NopRouteNames.General.HOMEPAGE);
         }
 
+		logger.LogDebug("<<< Exiting ExecuteAsync(context={Context},result={Result})", context, result);
         return base.ExecuteAsync(context, result);
     }
 

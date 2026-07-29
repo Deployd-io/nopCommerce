@@ -7,8 +7,12 @@ public partial record SystemInfoModel : BaseNopModel
 {
     public SystemInfoModel()
     {
+		logger.LogDebug(">>> Entering SystemInfoModel()");
         Headers = new List<HeaderModel>();
         LoadedAssemblies = new List<LoadedAssembly>();
+		logger.LogDebug("<<< Exiting SystemInfoModel()");
+		logger.LogDebug("SystemInfoModel(): Headers → {Headers}", Headers);
+		logger.LogDebug("SystemInfoModel(): LoadedAssemblies → {LoadedAssemblies}", LoadedAssemblies);
     }
 
     [NopResourceDisplayName("Admin.System.SystemInfo.ASPNETInfo")]

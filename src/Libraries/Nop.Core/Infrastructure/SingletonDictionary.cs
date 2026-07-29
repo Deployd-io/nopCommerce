@@ -9,7 +9,9 @@ public partial class SingletonDictionary<TKey, TValue> : Singleton<IDictionary<T
 {
     static SingletonDictionary()
     {
+		logger.LogDebug(">>> Entering SingletonDictionary()");
         Singleton<Dictionary<TKey, TValue>>.Instance = new Dictionary<TKey, TValue>();
+		logger.LogDebug("<<< Exiting SingletonDictionary()");
     }
 
     /// <summary>

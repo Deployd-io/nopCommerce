@@ -16,16 +16,28 @@ public partial record OrderModel : BaseNopEntityModel
 
     public OrderModel()
     {
+		logger.LogDebug(">>> Entering OrderModel()");
         CustomValues = new CustomValues();
         TaxRates = new List<TaxRate>();
+		logger.LogDebug("OrderModel(): CustomValues → {CustomValues}", CustomValues);
+		logger.LogDebug("OrderModel(): TaxRates → {TaxRates}", TaxRates);
         GiftCards = new List<GiftCard>();
         Items = new List<OrderItemModel>();
+		logger.LogDebug("OrderModel(): GiftCards → {GiftCards}", GiftCards);
+		logger.LogDebug("OrderModel(): Items → {Items}", Items);
         UsedDiscounts = new List<UsedDiscountModel>();
         OrderShipmentSearchModel = new OrderShipmentSearchModel();
+		logger.LogDebug("OrderModel(): UsedDiscounts → {UsedDiscounts}", UsedDiscounts);
+		logger.LogDebug("OrderModel(): OrderShipmentSearchModel → {OrderShipmentSearchModel}", OrderShipmentSearchModel);
         OrderNoteSearchModel = new OrderNoteSearchModel();
         BillingAddress = new AddressModel();
+		logger.LogDebug("OrderModel(): OrderNoteSearchModel → {OrderNoteSearchModel}", OrderNoteSearchModel);
+		logger.LogDebug("OrderModel(): BillingAddress → {BillingAddress}", BillingAddress);
         ShippingAddress = new AddressModel();
         PickupAddress = new AddressModel();
+		logger.LogDebug("<<< Exiting OrderModel()");
+		logger.LogDebug("OrderModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
+		logger.LogDebug("OrderModel(): PickupAddress → {PickupAddress}", PickupAddress);
     }
 
     #endregion

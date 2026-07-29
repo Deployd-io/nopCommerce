@@ -42,6 +42,7 @@ public class SchemaMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         Create.TableFor<AddressAttribute>();
         Create.TableFor<AddressAttributeValue>();
         Create.TableFor<GenericAttribute>();
@@ -173,5 +174,6 @@ public class SchemaMigration : ForwardOnlyMigration
         Create.TableFor<VendorNote>();
         Create.TableFor<Menu>();
         Create.TableFor<MenuItem>();
+		logger.LogDebug("<<< Exiting Up()");
     }
 }

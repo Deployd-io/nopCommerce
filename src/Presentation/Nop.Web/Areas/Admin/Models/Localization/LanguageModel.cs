@@ -13,11 +13,18 @@ public partial record LanguageModel : BaseNopEntityModel, IStoreMappingSupported
 
     public LanguageModel()
     {
+		logger.LogDebug(">>> Entering LanguageModel()");
         AvailableCurrencies = new List<SelectListItem>();
         AvailableFlagImages = new List<SelectListItem>();
+		logger.LogDebug("LanguageModel(): AvailableCurrencies → {AvailableCurrencies}", AvailableCurrencies);
+		logger.LogDebug("LanguageModel(): AvailableFlagImages → {AvailableFlagImages}", AvailableFlagImages);
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("LanguageModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("LanguageModel(): AvailableStores → {AvailableStores}", AvailableStores);
         LocaleResourceSearchModel = new LocaleResourceSearchModel();
+		logger.LogDebug("<<< Exiting LanguageModel()");
+		logger.LogDebug("LanguageModel(): LocaleResourceSearchModel → {LocaleResourceSearchModel}", LocaleResourceSearchModel);
     }
 
     #endregion

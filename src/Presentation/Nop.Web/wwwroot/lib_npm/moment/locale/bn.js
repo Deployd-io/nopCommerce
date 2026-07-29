@@ -75,17 +75,22 @@ export default moment.defineLocale('bn', {
         yy: '%d বছর',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[১২৩৪৫৬৭৮৯০]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     meridiemParse: /রাত|সকাল|দুপুর|বিকাল|রাত/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -96,6 +101,9 @@ export default moment.defineLocale('bn', {
         ) {
             return hour + 12;
         } else {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour;
         }
     },

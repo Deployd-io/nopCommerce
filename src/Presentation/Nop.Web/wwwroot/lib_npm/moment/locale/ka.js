@@ -39,18 +39,23 @@ export default moment.defineLocale('ka', {
     },
     relativeTime: {
         future: function (s) {
+			logger.debug(`>>> Entering future(s=${s})`);
             return s.replace(
                 /(წამ|წუთ|საათ|წელ|დღ|თვ)(ი|ე)/,
                 function ($0, $1, $2) {
+					logger.debug(`>>> Entering function($0=${$0},$1=${$1},$2=${$2})`);
                     return $2 === 'ი' ? $1 + 'ში' : $1 + $2 + 'ში';
                 }
             );
+			logger.debug(`<<< Exiting future(s=${s})`);
         },
         past: function (s) {
+			logger.debug(`>>> Entering past(s=${s})`);
             if (/(წამი|წუთი|საათი|დღე|თვე)/.test(s)) {
                 return s.replace(/(ი|ე)$/, 'ის წინ');
             }
             if (/წელი/.test(s)) {
+				logger.debug(`<<< Exiting past(s=${s})`);
                 return s.replace(/წელი$/, 'წლის წინ');
             }
             return s;
@@ -70,6 +75,7 @@ export default moment.defineLocale('ka', {
     },
     dayOfMonthOrdinalParse: /0|1-ლი|მე-\d{1,2}|\d{1,2}-ე/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         if (number === 0) {
             return number;
         }
@@ -81,6 +87,7 @@ export default moment.defineLocale('ka', {
             (number <= 100 && number % 20 === 0) ||
             number % 100 === 0
         ) {
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
             return 'მე-' + number;
         }
         return number + '-ე';

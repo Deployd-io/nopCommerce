@@ -13,7 +13,10 @@ public partial record ProductTagModel : BaseNopEntityModel, ILocalizedModel<Prod
 
     public ProductTagModel()
     {
+		logger.LogDebug(">>> Entering ProductTagModel()");
         Locales = new List<ProductTagLocalizedModel>();
+		logger.LogDebug("<<< Exiting ProductTagModel()");
+		logger.LogDebug("ProductTagModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

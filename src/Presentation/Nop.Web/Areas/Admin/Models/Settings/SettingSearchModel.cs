@@ -12,7 +12,10 @@ public partial record SettingSearchModel : BaseSearchModel
 
     public SettingSearchModel()
     {
+		logger.LogDebug(">>> Entering SettingSearchModel()");
         AddSetting = new SettingModel();
+		logger.LogDebug("<<< Exiting SettingSearchModel()");
+		logger.LogDebug("SettingSearchModel(): AddSetting → {AddSetting}", AddSetting);
     }
 
     #endregion

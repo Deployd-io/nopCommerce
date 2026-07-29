@@ -18,7 +18,10 @@ public sealed class ParameterBasedOnFormNameAttribute : TypeFilterAttribute
     /// <param name="actionParameterName">The name of the action parameter to which the result will be passed</param>
     public ParameterBasedOnFormNameAttribute(string formKeyName, string actionParameterName) : base(typeof(ParameterBasedOnFormNameFilter))
     {
+		logger.LogDebug(">>> Entering ParameterBasedOnFormNameAttribute(formKeyName={FormKeyName},actionParameterName={ActionParameterName})", formKeyName, actionParameterName);
         Arguments = [formKeyName, actionParameterName];
+		logger.LogDebug("<<< Exiting ParameterBasedOnFormNameAttribute(formKeyName={FormKeyName},actionParameterName={ActionParameterName})", formKeyName, actionParameterName);
+		logger.LogDebug("ParameterBasedOnFormNameAttribute(formKeyName={FormKeyName},actionParameterName={ActionParameterName}): Arguments → {Arguments}", formKeyName, actionParameterName, Arguments);
     }
 
     #endregion
@@ -41,8 +44,12 @@ public sealed class ParameterBasedOnFormNameAttribute : TypeFilterAttribute
 
         public ParameterBasedOnFormNameFilter(string formKeyName, string actionParameterName)
         {
+			logger.LogDebug(">>> Entering ParameterBasedOnFormNameFilter(formKeyName={FormKeyName},actionParameterName={ActionParameterName})", formKeyName, actionParameterName);
             _formKeyName = formKeyName;
             _actionParameterName = actionParameterName;
+			logger.LogDebug("<<< Exiting ParameterBasedOnFormNameFilter(formKeyName={FormKeyName},actionParameterName={ActionParameterName})", formKeyName, actionParameterName);
+			logger.LogDebug("ParameterBasedOnFormNameFilter(formKeyName={FormKeyName},actionParameterName={ActionParameterName}): _actionParameterName → {_actionParameterName}", formKeyName, actionParameterName, _actionParameterName);
+			logger.LogDebug("ParameterBasedOnFormNameFilter(formKeyName={FormKeyName},actionParameterName={ActionParameterName}): _formKeyName → {_formKeyName}", formKeyName, actionParameterName, _formKeyName);
         }
 
         #endregion
@@ -56,6 +63,7 @@ public sealed class ParameterBasedOnFormNameAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckParameterBasedOnFormNameAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering CheckParameterBasedOnFormNameAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //if form key with '_formKeyName' exists, then set specified '_actionParameterName' to true
@@ -64,6 +72,7 @@ public sealed class ParameterBasedOnFormNameAttribute : TypeFilterAttribute
             //we check whether form key with '_formKeyName' exists only
             //uncomment the code below if you want to check whether form value is specified
             //context.ActionArguments[_actionParameterName] = !string.IsNullOrEmpty(await context.HttpContext.Request.GetFormValueAsync(_formKeyName));
+			logger.LogDebug("<<< Exiting CheckParameterBasedOnFormNameAsync(context={Context})", context);
         }
 
         #endregion
@@ -78,9 +87,11 @@ public sealed class ParameterBasedOnFormNameAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckParameterBasedOnFormNameAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

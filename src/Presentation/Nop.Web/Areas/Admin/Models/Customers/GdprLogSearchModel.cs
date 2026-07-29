@@ -14,7 +14,10 @@ public partial record GdprLogSearchModel : BaseSearchModel
 
     public GdprLogSearchModel()
     {
+		logger.LogDebug(">>> Entering GdprLogSearchModel()");
         AvailableRequestTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting GdprLogSearchModel()");
+		logger.LogDebug("GdprLogSearchModel(): AvailableRequestTypes → {AvailableRequestTypes}", AvailableRequestTypes);
     }
 
     #endregion

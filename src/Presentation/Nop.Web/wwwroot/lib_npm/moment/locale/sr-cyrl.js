@@ -31,6 +31,7 @@ var translator = {
         return wordKey[2];
     },
     translate: function (number, withoutSuffix, key, isFuture) {
+		logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
         var wordKey = translator.words[key],
             word;
 
@@ -46,6 +47,7 @@ var translator = {
             return number + ' година';
         }
 
+		logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
         return number + ' ' + word;
     },
 };
@@ -73,6 +75,7 @@ export default moment.defineLocale('sr-cyrl', {
         sameDay: '[данас у] LT',
         nextDay: '[сутра у] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[у] [недељу] [у] LT';
@@ -86,9 +89,11 @@ export default moment.defineLocale('sr-cyrl', {
                 case 5:
                     return '[у] dddd [у] LT';
             }
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: '[јуче у] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             var lastWeekDays = [
                 '[прошле] [недеље] [у] LT',
                 '[прошлог] [понедељка] [у] LT',

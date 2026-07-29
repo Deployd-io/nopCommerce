@@ -13,7 +13,10 @@ public record FacebookPixelSearchModel : BaseSearchModel
 
     public FacebookPixelSearchModel()
     {
+		logger.LogDebug(">>> Entering FacebookPixelSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting FacebookPixelSearchModel()");
+		logger.LogDebug("FacebookPixelSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

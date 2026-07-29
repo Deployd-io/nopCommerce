@@ -10,6 +10,8 @@ public abstract partial class BasePlugin : IPlugin
     /// </summary>
     public virtual string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return null;
     }
 
@@ -24,6 +26,8 @@ public abstract partial class BasePlugin : IPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
+		logger.LogDebug("<<< Exiting InstallAsync()");
         return Task.CompletedTask;
     }
 
@@ -33,6 +37,8 @@ public abstract partial class BasePlugin : IPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task InstallSampleDataAsync()
     {
+		logger.LogDebug(">>> Entering InstallSampleDataAsync()");
+		logger.LogDebug("<<< Exiting InstallSampleDataAsync()");
         return Task.CompletedTask;
     }
 
@@ -42,6 +48,8 @@ public abstract partial class BasePlugin : IPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
+		logger.LogDebug("<<< Exiting UninstallAsync()");
         return Task.CompletedTask;
     }
 
@@ -53,6 +61,8 @@ public abstract partial class BasePlugin : IPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task UpdateAsync(string currentVersion, string targetVersion)
     {
+		logger.LogDebug(">>> Entering UpdateAsync(currentVersion={CurrentVersion},targetVersion={TargetVersion})", currentVersion, targetVersion);
+		logger.LogDebug("<<< Exiting UpdateAsync(currentVersion={CurrentVersion},targetVersion={TargetVersion})", currentVersion, targetVersion);
         return Task.CompletedTask;
     }
 
@@ -62,9 +72,11 @@ public abstract partial class BasePlugin : IPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task PreparePluginToUninstallAsync()
     {
+		logger.LogDebug(">>> Entering PreparePluginToUninstallAsync()");
         //any can put any custom validation logic here
         //throw an exception if this plugin cannot be uninstalled
         //for example, requires some other certain plugins to be uninstalled first
+		logger.LogDebug("<<< Exiting PreparePluginToUninstallAsync()");
         return Task.CompletedTask;
     }
 }

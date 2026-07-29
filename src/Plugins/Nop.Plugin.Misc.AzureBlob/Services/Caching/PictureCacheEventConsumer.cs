@@ -15,6 +15,8 @@ public class PictureCacheEventConsumer : CacheEventConsumer<Picture>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Picture entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(AzureBlobDefaults.ThumbsExistsPrefix);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

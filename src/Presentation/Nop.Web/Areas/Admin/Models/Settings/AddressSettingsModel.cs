@@ -13,7 +13,10 @@ public partial record AddressSettingsModel : BaseNopModel, ISettingsModel
 
     public AddressSettingsModel()
     {
+		logger.LogDebug(">>> Entering AddressSettingsModel()");
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddressSettingsModel()");
+		logger.LogDebug("AddressSettingsModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

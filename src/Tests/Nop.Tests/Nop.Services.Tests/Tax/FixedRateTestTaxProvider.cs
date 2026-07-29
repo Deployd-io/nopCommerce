@@ -37,6 +37,8 @@ public class FixedRateTestTaxProvider : BasePlugin, ITaxProvider
     /// <returns>Tax</returns>
     public Task<TaxRateResult> GetTaxRateAsync(TaxRateRequest taxRateRequest)
     {
+		logger.LogDebug(">>> Entering GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
+		logger.LogDebug("<<< Exiting GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
         return Task.FromResult(new TaxRateResult { TaxRate = 10 });
     }
 
@@ -47,8 +49,10 @@ public class FixedRateTestTaxProvider : BasePlugin, ITaxProvider
     /// <returns>Tax total</returns>
     public async Task<TaxTotalResult> GetTaxTotalAsync(TaxTotalRequest taxTotalRequest)
     {
+		logger.LogDebug(">>> Entering GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         var taxRates = new SortedDictionary<decimal, decimal>();
         var cart = taxTotalRequest.ShoppingCart;
+		logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxRates → {TaxRates}", taxTotalRequest, taxRates);
         var customer = taxTotalRequest.Customer;
         var storeId = taxTotalRequest.StoreId;
         var usePaymentMethodAdditionalFee = taxTotalRequest.UsePaymentMethodAdditionalFee;
@@ -79,6 +83,7 @@ public class FixedRateTestTaxProvider : BasePlugin, ITaxProvider
         //shipping
         var shippingTax = decimal.Zero;
         if (_taxSettings.ShippingIsTaxable)
+		logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): shippingTax → {ShippingTax}", taxTotalRequest, shippingTax);
         {
             var (shippingExclTax, _, _) = await _orderTotalCalculationService.GetShoppingCartShippingTotalAsync(cart, false);
             var (shippingInclTax, taxRate, _) = await _orderTotalCalculationService.GetShoppingCartShippingTotalAsync(cart, true);
@@ -103,9 +108,11 @@ public class FixedRateTestTaxProvider : BasePlugin, ITaxProvider
         //payment method additional fee
         var paymentMethodAdditionalFeeTax = decimal.Zero;
         if (usePaymentMethodAdditionalFee && _taxSettings.PaymentMethodAdditionalFeeIsTaxable)
+		logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): paymentMethodAdditionalFeeTax → {PaymentMethodAdditionalFeeTax}", taxTotalRequest, paymentMethodAdditionalFeeTax);
         {
             var paymentMethodAdditionalFee = await _paymentService.GetAdditionalHandlingFeeAsync(cart, paymentMethodSystemName);
             var (paymentMethodAdditionalFeeExclTax, _) = await _taxService.GetPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFee, false, customer);
+			logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): paymentMethodAdditionalFee → {PaymentMethodAdditionalFee}", taxTotalRequest, paymentMethodAdditionalFee);
             var (paymentMethodAdditionalFeeInclTax, taxRate) = await _taxService.GetPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFee, true, customer);
 
             paymentMethodAdditionalFeeTax = paymentMethodAdditionalFeeInclTax - paymentMethodAdditionalFeeExclTax;
@@ -130,9 +137,11 @@ public class FixedRateTestTaxProvider : BasePlugin, ITaxProvider
         //summarize taxes
         var taxTotal = subTotalTaxTotal + shippingTax + paymentMethodAdditionalFeeTax;
         //ensure that tax is equal or greater than zero
+		logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotal → {TaxTotal}", taxTotalRequest, taxTotal);
         if (taxTotal < decimal.Zero)
             taxTotal = decimal.Zero;
 
+		logger.LogDebug("<<< Exiting GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         return new TaxTotalResult { TaxTotal = taxTotal, TaxRates = taxRates };
     }
 }

@@ -7,7 +7,10 @@ public partial record AddressAttributeModel : BaseNopEntityModel
 {
     public AddressAttributeModel()
     {
+		logger.LogDebug(">>> Entering AddressAttributeModel()");
         Values = new List<AddressAttributeValueModel>();
+		logger.LogDebug("<<< Exiting AddressAttributeModel()");
+		logger.LogDebug("AddressAttributeModel(): Values → {Values}", Values);
     }
 
     public string ControlId { get; set; }

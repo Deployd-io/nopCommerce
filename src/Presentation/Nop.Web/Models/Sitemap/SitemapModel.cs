@@ -8,8 +8,12 @@ public partial record SitemapModel : BaseNopModel
 
     public SitemapModel()
     {
+		logger.LogDebug(">>> Entering SitemapModel()");
         Items = new List<SitemapItemModel>();
         PageModel = new SitemapPageModel();
+		logger.LogDebug("<<< Exiting SitemapModel()");
+		logger.LogDebug("SitemapModel(): Items → {Items}", Items);
+		logger.LogDebug("SitemapModel(): PageModel → {PageModel}", PageModel);
     }
 
     #endregion

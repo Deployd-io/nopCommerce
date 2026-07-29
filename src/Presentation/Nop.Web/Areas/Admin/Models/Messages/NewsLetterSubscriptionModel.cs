@@ -14,9 +14,14 @@ public partial record NewsLetterSubscriptionModel : BaseNopEntityModel
 
     public NewsLetterSubscriptionModel()
     {
+		logger.LogDebug(">>> Entering NewsLetterSubscriptionModel()");
         AvailableNewsLetterSubscriptionTypes = new List<SelectListItem>();
         AvailableNewsLetterSubscriptionStores = new List<SelectListItem>();
+		logger.LogDebug("NewsLetterSubscriptionModel(): AvailableNewsLetterSubscriptionTypes → {AvailableNewsLetterSubscriptionTypes}", AvailableNewsLetterSubscriptionTypes);
+		logger.LogDebug("NewsLetterSubscriptionModel(): AvailableNewsLetterSubscriptionStores → {AvailableNewsLetterSubscriptionStores}", AvailableNewsLetterSubscriptionStores);
         AvailableNewsLetterSubscriptionLanguages = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NewsLetterSubscriptionModel()");
+		logger.LogDebug("NewsLetterSubscriptionModel(): AvailableNewsLetterSubscriptionLanguages → {AvailableNewsLetterSubscriptionLanguages}", AvailableNewsLetterSubscriptionLanguages);
     }
 
     #endregion

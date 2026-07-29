@@ -13,8 +13,12 @@ public partial record CategorySearchModel : BaseSearchModel
 
     public CategorySearchModel()
     {
+		logger.LogDebug(">>> Entering CategorySearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailablePublishedOptions = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CategorySearchModel()");
+		logger.LogDebug("CategorySearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("CategorySearchModel(): AvailablePublishedOptions → {AvailablePublishedOptions}", AvailablePublishedOptions);
     }
 
     #endregion

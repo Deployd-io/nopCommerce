@@ -12,7 +12,10 @@ public partial record SpecificationAttributeOptionModel : BaseNopEntityModel, IL
 
     public SpecificationAttributeOptionModel()
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeOptionModel()");
         Locales = new List<SpecificationAttributeOptionLocalizedModel>();
+		logger.LogDebug("<<< Exiting SpecificationAttributeOptionModel()");
+		logger.LogDebug("SpecificationAttributeOptionModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

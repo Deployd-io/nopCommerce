@@ -16,12 +16,15 @@ export default moment.defineLocale('af', {
     weekdaysMin: 'So_Ma_Di_Wo_Do_Vr_Sa'.split('_'),
     meridiemParse: /vm|nm/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /^nm$/i.test(input);
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 12) {
             return isLower ? 'vm' : 'VM';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'nm' : 'NM';
         }
     },
@@ -59,6 +62,7 @@ export default moment.defineLocale('af', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(ste|de)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return (
             number +
             (number === 1 || number === 8 || number >= 20 ? 'ste' : 'de')

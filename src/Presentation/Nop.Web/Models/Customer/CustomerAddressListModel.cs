@@ -7,7 +7,10 @@ public partial record CustomerAddressListModel : BaseNopModel
 {
     public CustomerAddressListModel()
     {
+		logger.LogDebug(">>> Entering CustomerAddressListModel()");
         Addresses = new List<AddressModel>();
+		logger.LogDebug("<<< Exiting CustomerAddressListModel()");
+		logger.LogDebug("CustomerAddressListModel(): Addresses → {Addresses}", Addresses);
     }
 
     public IList<AddressModel> Addresses { get; set; }

@@ -9,7 +9,10 @@ public partial class SitemapCreatedEvent
 
     public SitemapCreatedEvent(IList<SitemapUrlModel> sitemapUrls)
     {
+		logger.LogDebug(">>> Entering SitemapCreatedEvent(sitemapUrls={SitemapUrls})", sitemapUrls);
         SitemapUrls = sitemapUrls ?? new List<SitemapUrlModel>();
+		logger.LogDebug("<<< Exiting SitemapCreatedEvent(sitemapUrls={SitemapUrls})", sitemapUrls);
+		logger.LogDebug("SitemapCreatedEvent(sitemapUrls={SitemapUrls}): SitemapUrls → {SitemapUrls1}", sitemapUrls, SitemapUrls);
     }
 
     #endregion

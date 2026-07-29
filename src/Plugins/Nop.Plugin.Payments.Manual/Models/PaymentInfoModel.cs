@@ -8,9 +8,14 @@ public record PaymentInfoModel : BaseNopModel
 {
     public PaymentInfoModel()
     {
+		logger.LogDebug(">>> Entering PaymentInfoModel()");
         CreditCardTypes = new List<SelectListItem>();
         ExpireMonths = new List<SelectListItem>();
+		logger.LogDebug("PaymentInfoModel(): CreditCardTypes → {CreditCardTypes}", CreditCardTypes);
+		logger.LogDebug("PaymentInfoModel(): ExpireMonths → {ExpireMonths}", ExpireMonths);
         ExpireYears = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting PaymentInfoModel()");
+		logger.LogDebug("PaymentInfoModel(): ExpireYears → {ExpireYears}", ExpireYears);
     }
 
     [NopResourceDisplayName("Payment.SelectCreditCard")]

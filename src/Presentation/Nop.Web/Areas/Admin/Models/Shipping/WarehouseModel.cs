@@ -13,7 +13,10 @@ public partial record WarehouseModel : BaseNopEntityModel
 
     public WarehouseModel()
     {
+		logger.LogDebug(">>> Entering WarehouseModel()");
         Address = new AddressModel();
+		logger.LogDebug("<<< Exiting WarehouseModel()");
+		logger.LogDebug("WarehouseModel(): Address → {Address}", Address);
     }
 
     #endregion

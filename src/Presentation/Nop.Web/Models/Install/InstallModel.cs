@@ -9,9 +9,14 @@ public partial record InstallModel : INopConnectionStringInfo
 {
     public InstallModel()
     {
+		logger.LogDebug(">>> Entering InstallModel()");
         AvailableLanguages = new List<SelectListItem>();
         AvailableDataProviders = new List<SelectListItem>();
+		logger.LogDebug("InstallModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+		logger.LogDebug("InstallModel(): AvailableDataProviders → {AvailableDataProviders}", AvailableDataProviders);
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting InstallModel()");
+		logger.LogDebug("InstallModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     [DataType(DataType.EmailAddress)]

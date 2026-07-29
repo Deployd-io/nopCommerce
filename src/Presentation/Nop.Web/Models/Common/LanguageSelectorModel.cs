@@ -6,7 +6,10 @@ public partial record LanguageSelectorModel : BaseNopModel
 {
     public LanguageSelectorModel()
     {
+		logger.LogDebug(">>> Entering LanguageSelectorModel()");
         AvailableLanguages = new List<LanguageModel>();
+		logger.LogDebug("<<< Exiting LanguageSelectorModel()");
+		logger.LogDebug("LanguageSelectorModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
     }
 
     public IList<LanguageModel> AvailableLanguages { get; set; }

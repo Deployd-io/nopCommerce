@@ -13,11 +13,18 @@ public record ConfigurationModel : BaseSearchModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("ConfigurationModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("ConfigurationModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableShippingMethods = new List<SelectListItem>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("ConfigurationModel(): AvailableShippingMethods → {AvailableShippingMethods}", AvailableShippingMethods);
+		logger.LogDebug("ConfigurationModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableWarehouses = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     [NopResourceDisplayName("Plugins.Shipping.FixedByWeightByTotal.Fields.Store")]

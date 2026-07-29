@@ -14,8 +14,12 @@ public partial class RenderCheckBox : IRender
     /// <param name="propertyKeyName">Property key name ("Id" by default). This property must be defined in the row dataset.</param>
     public RenderCheckBox(string name, string propertyKeyName = "Id")
     {
+		logger.LogDebug(">>> Entering RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName})", name, propertyKeyName);
         Name = name;
         PropertyKeyName = propertyKeyName;
+		logger.LogDebug("<<< Exiting RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName})", name, propertyKeyName);
+		logger.LogDebug("RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName}): Name → {Name1}", name, propertyKeyName, Name);
+		logger.LogDebug("RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName}): PropertyKeyName → {PropertyKeyName1}", name, propertyKeyName, PropertyKeyName);
     }
 
     #endregion

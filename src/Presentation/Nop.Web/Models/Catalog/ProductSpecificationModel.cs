@@ -20,7 +20,10 @@ public partial record ProductSpecificationModel : BaseNopModel
 
     public ProductSpecificationModel()
     {
+		logger.LogDebug(">>> Entering ProductSpecificationModel()");
         Groups = new List<ProductSpecificationAttributeGroupModel>();
+		logger.LogDebug("<<< Exiting ProductSpecificationModel()");
+		logger.LogDebug("ProductSpecificationModel(): Groups → {Groups}", Groups);
     }
 
     #endregion

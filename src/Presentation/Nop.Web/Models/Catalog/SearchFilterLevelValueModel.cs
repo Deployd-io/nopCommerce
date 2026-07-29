@@ -8,9 +8,14 @@ public partial record SearchFilterLevelValueModel : BaseNopModel
 {
     public SearchFilterLevelValueModel()
     {
+		logger.LogDebug(">>> Entering SearchFilterLevelValueModel()");
         AvailableFilterLevel1Values = new List<SelectListItem>();
         AvailableFilterLevel2Values = new List<SelectListItem>();
+		logger.LogDebug("SearchFilterLevelValueModel(): AvailableFilterLevel1Values → {AvailableFilterLevel1Values}", AvailableFilterLevel1Values);
+		logger.LogDebug("SearchFilterLevelValueModel(): AvailableFilterLevel2Values → {AvailableFilterLevel2Values}", AvailableFilterLevel2Values);
         AvailableFilterLevel3Values = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting SearchFilterLevelValueModel()");
+		logger.LogDebug("SearchFilterLevelValueModel(): AvailableFilterLevel3Values → {AvailableFilterLevel3Values}", AvailableFilterLevel3Values);
     }
 
     /// <summary>

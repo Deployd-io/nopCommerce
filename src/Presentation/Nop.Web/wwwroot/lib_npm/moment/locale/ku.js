@@ -64,12 +64,15 @@ export default moment.defineLocale('ku', {
     },
     meridiemParse: /ئێواره‌|به‌یانی/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /ئێواره‌/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'به‌یانی';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'ئێواره‌';
         }
     },
@@ -98,18 +101,22 @@ export default moment.defineLocale('ku', {
         yy: '%d ساڵ',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string
             .replace(/[١٢٣٤٥٦٧٨٩٠]/g, function (match) {
                 return numberMap[match];
             })
             .replace(/،/g, ',');
+			logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string
             .replace(/\d/g, function (match) {
                 return symbolMap[match];
             })
             .replace(/,/g, '،');
+			logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     week: {
         dow: 6, // Saturday is the first day of the week.

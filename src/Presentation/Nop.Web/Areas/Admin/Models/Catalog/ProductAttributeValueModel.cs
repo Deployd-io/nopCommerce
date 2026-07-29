@@ -13,9 +13,14 @@ public partial record ProductAttributeValueModel : BaseNopEntityModel, ILocalize
 
     public ProductAttributeValueModel()
     {
+		logger.LogDebug(">>> Entering ProductAttributeValueModel()");
         ProductPictureModels = new List<ProductPictureModel>();
         Locales = new List<ProductAttributeValueLocalizedModel>();
+		logger.LogDebug("ProductAttributeValueModel(): ProductPictureModels → {ProductPictureModels}", ProductPictureModels);
+		logger.LogDebug("ProductAttributeValueModel(): Locales → {Locales}", Locales);
         PictureIds = new List<int>();
+		logger.LogDebug("<<< Exiting ProductAttributeValueModel()");
+		logger.LogDebug("ProductAttributeValueModel(): PictureIds → {PictureIds}", PictureIds);
     }
 
     #endregion

@@ -13,11 +13,18 @@ public partial record AddProductToFilterLevelValueSearchModel : BaseSearchModel
 
     public AddProductToFilterLevelValueSearchModel()
     {
+		logger.LogDebug(">>> Entering AddProductToFilterLevelValueSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AddProductToFilterLevelValueSearchModel()");
+		logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

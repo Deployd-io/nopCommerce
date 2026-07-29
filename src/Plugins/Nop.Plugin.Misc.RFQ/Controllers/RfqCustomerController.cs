@@ -87,6 +87,7 @@ public class RfqCustomerController : BasePublicController
             return null;
 
         if (request.CustomerId != customer.Id)
+		logger.LogDebug("<<< Exiting CheckCustomerPermissionAsync(request={Request})", request);
             return RedirectToAction("CustomerRequests");
 
         return null;
@@ -100,10 +101,13 @@ public class RfqCustomerController : BasePublicController
 
     public async Task<IActionResult> CustomerRequest(int? requestId = null)
     {
+		logger.LogDebug(">>> Entering CustomerRequest(requestId={RequestId})", requestId);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("CustomerRequest(requestId={RequestId}): customer → {Customer}", requestId, customer);
         var result = await CheckCustomerPermissionAsync(customer);
 
+		logger.LogDebug("CustomerRequest(requestId={RequestId}): result → {Result}", requestId, result);
         if (result != null)
             return result;
 
@@ -114,9 +118,11 @@ public class RfqCustomerController : BasePublicController
             try
             {
                 model = await _modelFactory.PrepareRequestQuoteModelAsync(requestId.Value);
+				logger.LogDebug("CustomerRequest(requestId={RequestId}): model → {Model}", requestId, model);
             }
             catch (ArgumentNullException)
             {
+				logger.LogError("Exception in CustomerRequest(requestId={RequestId}): {Arg1}", requestId, ex.Message);
                 return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
             }
 
@@ -127,9 +133,12 @@ public class RfqCustomerController : BasePublicController
         {
             var store = await _storeContext.GetCurrentStoreAsync();
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			logger.LogDebug("CustomerRequest(requestId={RequestId}): store → {Store}", requestId, store);
+			logger.LogDebug("CustomerRequest(requestId={RequestId}): cart → {Cart}", requestId, cart);
 
             var products = await _productService.GetProductsByIdsAsync(cart.Select(i => i.ProductId).ToArray());
 
+			logger.LogDebug("CustomerRequest(requestId={RequestId}): products → {Products}", requestId, products);
             //"enter your price" or rental products in the cart, so we should redirect customer to shopping cart page
             if (products.Any(product => product.CustomerEntersPrice || product.IsRental))
                 return RedirectToRoute(NopRouteNames.General.CART);
@@ -142,6 +151,7 @@ public class RfqCustomerController : BasePublicController
             model = await _modelFactory.PrepareRequestQuoteModelAsync(request, items);
         }
 
+		logger.LogDebug("<<< Exiting CustomerRequest(requestId={RequestId})", requestId);
         return View("~/Plugins/Misc.RFQ/Views/CustomerRequest.cshtml", model);
     }
 
@@ -168,6 +178,8 @@ public class RfqCustomerController : BasePublicController
 
         model = await _modelFactory.PrepareRequestQuoteModelAsync(model);
 
+		logger.LogDebug("SendRequest(model={Model}): model → {Model1}", model, model);
+		logger.LogDebug("<<< Exiting SendRequest(model={Model})", model);
         return View("~/Plugins/Misc.RFQ/Views/CustomerRequest.cshtml", model);
     }
 
@@ -207,6 +219,8 @@ public class RfqCustomerController : BasePublicController
 
         model = await _modelFactory.PrepareRequestQuoteModelAsync(model);
 
+		logger.LogDebug("CancelRequest(model={Model}): model → {Model1}", model, model);
+		logger.LogDebug("<<< Exiting CancelRequest(model={Model})", model);
         return View("~/Plugins/Misc.RFQ/Views/CustomerRequest.cshtml", model);
     }
 
@@ -235,22 +249,31 @@ public class RfqCustomerController : BasePublicController
 
         model = await _modelFactory.PrepareRequestQuoteModelAsync(model);
 
+		logger.LogDebug("DeleteRequest(model={Model}): model → {Model1}", model, model);
+		logger.LogDebug("<<< Exiting DeleteRequest(model={Model})", model);
         return View("~/Plugins/Misc.RFQ/Views/CustomerRequest.cshtml", model);
     }
 
     public async Task<IActionResult> CustomerRequests()
     {
+		logger.LogDebug(">>> Entering CustomerRequests()");
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("CustomerRequests(): customer → {Customer}", customer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var result = await CheckCustomerPermissionAsync(customer);
 
+		logger.LogDebug("CustomerRequests(): result → {Result}", result);
         if (result != null)
             return result;
 
         var items = await _rfqService.GetCustomerRequestsAsync(customer.Id);
         var model = await items.SelectAwait(async item =>
             await _modelFactory.PrepareRequestQuoteModelAsync(item, new List<RequestQuoteItem>())).ToListAsync();
+			logger.LogDebug("CustomerRequests(): items → {Items}", items);
+			logger.LogInformation("CustomerRequests(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting CustomerRequests()");
         return View("~/Plugins/Misc.RFQ/Views/CustomerRequests.cshtml", model);
     }
 
@@ -260,25 +283,34 @@ public class RfqCustomerController : BasePublicController
 
     public async Task<IActionResult> CustomerQuotes()
     {
+		logger.LogDebug(">>> Entering CustomerQuotes()");
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("CustomerQuotes(): customer → {Customer}", customer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var result = await CheckCustomerPermissionAsync(customer);
 
+		logger.LogDebug("CustomerQuotes(): result → {Result}", result);
         if (result != null)
             return result;
 
         var items = await _rfqService.GetCustomerQuotesAsync(customer.Id);
         var model = await items
+			logger.LogDebug("CustomerQuotes(): items → {Items}", items);
             .SelectAwait(async item => await _modelFactory.PrepareQuoteModelAsync(item, new List<QuoteItem>()))
             .ToListAsync();
+			logger.LogInformation("CustomerQuotes(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting CustomerQuotes()");
         return View("~/Plugins/Misc.RFQ/Views/CustomerQuotes.cshtml", model);
     }
 
     public async Task<IActionResult> CustomerQuote(int quoteId)
     {
+		logger.LogDebug(">>> Entering CustomerQuote(quoteId={QuoteId})", quoteId);
         var result = await CheckCustomerPermissionAsync(await _workContext.GetCurrentCustomerAsync());
 
+		logger.LogDebug("CustomerQuote(quoteId={QuoteId}): result → {Result}", quoteId, result);
         if (result != null)
             return result;
 
@@ -287,9 +319,11 @@ public class RfqCustomerController : BasePublicController
         try
         {
             model = await _modelFactory.PrepareQuoteModelAsync(quoteId);
+			logger.LogDebug("CustomerQuote(quoteId={QuoteId}): model → {Model}", quoteId, model);
         }
         catch (ArgumentNullException)
         {
+			logger.LogError("Exception in CustomerQuote(quoteId={QuoteId}): {Arg1}", quoteId, ex.Message);
             return RedirectToAction("CustomerQuotes");
         }
 
@@ -299,6 +333,7 @@ public class RfqCustomerController : BasePublicController
         var statuses = new[] { QuoteStatus.Submitted, QuoteStatus.OrderCreated };
 
         if (!statuses.Contains(model.StatusType))
+		logger.LogDebug("<<< Exiting CustomerQuote(quoteId={QuoteId})", quoteId);
             return RedirectToAction("CustomerQuotes");
 
         return View("~/Plugins/Misc.RFQ/Views/CustomerQuote.cshtml", model);
@@ -331,22 +366,28 @@ public class RfqCustomerController : BasePublicController
 
         model = await _modelFactory.PrepareQuoteModelAsync(model.Id, model);
 
+		logger.LogDebug("<<< Exiting CustomerQuote(model={Model})", model);
         return View("~/Plugins/Misc.RFQ/Views/CustomerQuote.cshtml", model);
     }
 
     public async Task<IActionResult> ExitQuoteMode()
     {
+		logger.LogDebug(">>> Entering ExitQuoteMode()");
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("ExitQuoteMode(): customer → {Customer}", customer);
         var result = await CheckCustomerPermissionAsync(customer);
 
+		logger.LogDebug("ExitQuoteMode(): result → {Result}", result);
         if (result != null)
             return result;
 
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("ExitQuoteMode(): store → {Store}", store);
         await _shoppingCartService.ClearShoppingCartAsync(customer, store.Id);
 
+		logger.LogDebug("<<< Exiting ExitQuoteMode()");
         return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
     }
 

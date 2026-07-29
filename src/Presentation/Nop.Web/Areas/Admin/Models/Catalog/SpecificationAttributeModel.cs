@@ -14,10 +14,16 @@ public partial record SpecificationAttributeModel : BaseNopEntityModel, ITransla
 
     public SpecificationAttributeModel()
     {
+		logger.LogDebug(">>> Entering SpecificationAttributeModel()");
         AvailableGroups = new List<SelectListItem>();
         Locales = new List<SpecificationAttributeLocalizedModel>();
+		logger.LogDebug("SpecificationAttributeModel(): AvailableGroups → {AvailableGroups}", AvailableGroups);
+		logger.LogDebug("SpecificationAttributeModel(): Locales → {Locales}", Locales);
         SpecificationAttributeOptionSearchModel = new SpecificationAttributeOptionSearchModel();
         SpecificationAttributeProductSearchModel = new SpecificationAttributeProductSearchModel();
+		logger.LogDebug("<<< Exiting SpecificationAttributeModel()");
+		logger.LogDebug("SpecificationAttributeModel(): SpecificationAttributeOptionSearchModel → {SpecificationAttributeOptionSearchModel}", SpecificationAttributeOptionSearchModel);
+		logger.LogDebug("SpecificationAttributeModel(): SpecificationAttributeProductSearchModel → {SpecificationAttributeProductSearchModel}", SpecificationAttributeProductSearchModel);
     }
 
     #endregion

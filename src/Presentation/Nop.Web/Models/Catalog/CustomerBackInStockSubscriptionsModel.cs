@@ -7,7 +7,10 @@ public partial record CustomerBackInStockSubscriptionsModel : BaseNopModel
 {
     public CustomerBackInStockSubscriptionsModel()
     {
+		logger.LogDebug(">>> Entering CustomerBackInStockSubscriptionsModel()");
         Subscriptions = new List<BackInStockSubscriptionModel>();
+		logger.LogDebug("<<< Exiting CustomerBackInStockSubscriptionsModel()");
+		logger.LogDebug("CustomerBackInStockSubscriptionsModel(): Subscriptions → {Subscriptions}", Subscriptions);
     }
 
     public IList<BackInStockSubscriptionModel> Subscriptions { get; set; }

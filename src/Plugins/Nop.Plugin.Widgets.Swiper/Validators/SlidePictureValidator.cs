@@ -14,9 +14,11 @@ public class SlidePictureValidator : BaseNopValidator<SlidePictureModel>
 
     public SlidePictureValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering SlidePictureValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(model => model.PictureId)
             .GreaterThan(0)
             .WithMessageAwait(localizationService.GetResourceAsync("Plugins.Widgets.Swiper.Picture.Required"));
+			logger.LogDebug("<<< Exiting SlidePictureValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

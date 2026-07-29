@@ -13,9 +13,14 @@ public partial record NewsLetterSubscriptionTypeModel : BaseNopEntityModel, ILoc
 
     public NewsLetterSubscriptionTypeModel()
     {
+		logger.LogDebug(">>> Entering NewsLetterSubscriptionTypeModel()");
         Locales = new List<NewsLetterSubscriptionTypeLocalizedModel>();
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("NewsLetterSubscriptionTypeModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("NewsLetterSubscriptionTypeModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NewsLetterSubscriptionTypeModel()");
+		logger.LogDebug("NewsLetterSubscriptionTypeModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

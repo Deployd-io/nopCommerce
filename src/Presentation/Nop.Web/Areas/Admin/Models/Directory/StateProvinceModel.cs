@@ -12,7 +12,10 @@ public partial record StateProvinceModel : BaseNopEntityModel, ILocalizedModel<S
 
     public StateProvinceModel()
     {
+		logger.LogDebug(">>> Entering StateProvinceModel()");
         Locales = new List<StateProvinceLocalizedModel>();
+		logger.LogDebug("<<< Exiting StateProvinceModel()");
+		logger.LogDebug("StateProvinceModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

@@ -11,17 +11,28 @@ public partial record OrderDetailsModel : BaseNopEntityModel
 {
     public OrderDetailsModel()
     {
+		logger.LogDebug(">>> Entering OrderDetailsModel()");
         TaxRates = new List<TaxRate>();
         GiftCards = new List<GiftCard>();
+		logger.LogDebug("OrderDetailsModel(): TaxRates → {TaxRates}", TaxRates);
+		logger.LogDebug("OrderDetailsModel(): GiftCards → {GiftCards}", GiftCards);
         Items = new List<OrderItemModel>();
         OrderNotes = new List<OrderNote>();
+		logger.LogDebug("OrderDetailsModel(): Items → {Items}", Items);
+		logger.LogDebug("OrderDetailsModel(): OrderNotes → {OrderNotes}", OrderNotes);
         Shipments = new List<ShipmentBriefModel>();
 
+		logger.LogDebug("OrderDetailsModel(): Shipments → {Shipments}", Shipments);
         BillingAddress = new AddressModel();
         ShippingAddress = new AddressModel();
+		logger.LogDebug("OrderDetailsModel(): BillingAddress → {BillingAddress}", BillingAddress);
+		logger.LogDebug("OrderDetailsModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
         PickupAddress = new AddressModel();
 
+		logger.LogDebug("OrderDetailsModel(): PickupAddress → {PickupAddress}", PickupAddress);
         CustomValues = new CustomValues();
+		logger.LogDebug("<<< Exiting OrderDetailsModel()");
+		logger.LogDebug("OrderDetailsModel(): CustomValues → {CustomValues}", CustomValues);
     }
 
     public bool PrintMode { get; set; }
@@ -97,7 +108,10 @@ public partial record OrderDetailsModel : BaseNopEntityModel
     {
         public OrderItemModel()
         {
+			logger.LogDebug(">>> Entering OrderItemModel()");
             Picture = new PictureModel();
+			logger.LogDebug("<<< Exiting OrderItemModel()");
+			logger.LogDebug("OrderItemModel(): Picture → {Picture}", Picture);
         }
 
         public Guid OrderItemGuid { get; set; }

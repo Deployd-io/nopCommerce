@@ -21,10 +21,16 @@ public partial record ProductReviewsModel : BaseNopModel
 {
     public ProductReviewsModel()
     {
+		logger.LogDebug(">>> Entering ProductReviewsModel()");
         Items = new List<ProductReviewModel>();
         AddProductReview = new AddProductReviewModel();
+		logger.LogDebug("ProductReviewsModel(): Items → {Items}", Items);
+		logger.LogDebug("ProductReviewsModel(): AddProductReview → {AddProductReview}", AddProductReview);
         ReviewTypeList = new List<ReviewTypeModel>();
         AddAdditionalProductReviewList = new List<AddProductReviewReviewTypeMappingModel>();
+		logger.LogDebug("<<< Exiting ProductReviewsModel()");
+		logger.LogDebug("ProductReviewsModel(): ReviewTypeList → {ReviewTypeList}", ReviewTypeList);
+		logger.LogDebug("ProductReviewsModel(): AddAdditionalProductReviewList → {AddAdditionalProductReviewList}", AddAdditionalProductReviewList);
     }
 
     public int ProductId { get; set; }
@@ -57,7 +63,10 @@ public partial record ProductReviewModel : BaseNopEntityModel
 {
     public ProductReviewModel()
     {
+		logger.LogDebug(">>> Entering ProductReviewModel()");
         AdditionalProductReviewList = new List<ProductReviewReviewTypeMappingModel>();
+		logger.LogDebug("<<< Exiting ProductReviewModel()");
+		logger.LogDebug("ProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
     }
 
     public int CustomerId { get; set; }

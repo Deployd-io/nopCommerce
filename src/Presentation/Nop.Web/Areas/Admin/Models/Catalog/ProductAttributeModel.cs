@@ -13,9 +13,14 @@ public partial record ProductAttributeModel : BaseNopEntityModel, ITranslationSu
 
     public ProductAttributeModel()
     {
+		logger.LogDebug(">>> Entering ProductAttributeModel()");
         Locales = new List<ProductAttributeLocalizedModel>();
         PredefinedProductAttributeValueSearchModel = new PredefinedProductAttributeValueSearchModel();
+		logger.LogDebug("ProductAttributeModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("ProductAttributeModel(): PredefinedProductAttributeValueSearchModel → {PredefinedProductAttributeValueSearchModel}", PredefinedProductAttributeValueSearchModel);
         ProductAttributeProductSearchModel = new ProductAttributeProductSearchModel();
+		logger.LogDebug("<<< Exiting ProductAttributeModel()");
+		logger.LogDebug("ProductAttributeModel(): ProductAttributeProductSearchModel → {ProductAttributeProductSearchModel}", ProductAttributeProductSearchModel);
     }
 
     #endregion

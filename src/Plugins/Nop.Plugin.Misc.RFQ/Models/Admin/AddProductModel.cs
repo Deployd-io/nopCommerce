@@ -14,9 +14,14 @@ public record AddProductModel : BaseNopModel
 
     public AddProductModel()
     {
+		logger.LogDebug(">>> Entering AddProductModel()");
         ProductAttributes = new List<ProductAttributeModel>();
         GiftCard = new GiftCardModel();
+		logger.LogDebug("AddProductModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
+		logger.LogDebug("AddProductModel(): GiftCard → {GiftCard}", GiftCard);
         Warnings = new List<string>();
+		logger.LogDebug("<<< Exiting AddProductModel()");
+		logger.LogDebug("AddProductModel(): Warnings → {Warnings}", Warnings);
     }
 
     #endregion
@@ -59,7 +64,10 @@ public record AddProductModel : BaseNopModel
     {
         public ProductAttributeModel()
         {
+			logger.LogDebug(">>> Entering ProductAttributeModel()");
             Values = new List<ProductAttributeValueModel>();
+			logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductAttributeId { get; set; }

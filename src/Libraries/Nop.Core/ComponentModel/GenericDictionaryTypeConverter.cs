@@ -22,11 +22,15 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
 
     public GenericDictionaryTypeConverter()
     {
+		logger.LogDebug(">>> Entering GenericDictionaryTypeConverter()");
         _typeConverterKey = TypeDescriptor.GetConverter(typeof(K));
         if (_typeConverterKey == null)
+			logger.LogDebug("GenericDictionaryTypeConverter(): _typeConverterKey → {_typeConverterKey}", _typeConverterKey);
             throw new InvalidOperationException("No type converter exists for type " + typeof(K).FullName);
         _typeConverterValue = TypeDescriptor.GetConverter(typeof(V));
+		logger.LogDebug("GenericDictionaryTypeConverter(): _typeConverterValue → {_typeConverterValue}", _typeConverterValue);
         if (_typeConverterValue == null)
+			logger.LogDebug("<<< Exiting GenericDictionaryTypeConverter()");
             throw new InvalidOperationException("No type converter exists for type " + typeof(V).FullName);
     }
 
@@ -40,9 +44,12 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
     /// <returns>Result</returns>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
+		logger.LogDebug(">>> Entering CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         if (sourceType == typeof(string))
             return true;
 
+		logger.LogDebug(">>> Entering ConvertFrom(context={Context},culture={Culture},value={Value})", context, culture, value);
+		logger.LogDebug("<<< Exiting ConvertFrom(context={Context},culture={Culture},value={Value})", context, culture, value);
         return base.CanConvertFrom(context, sourceType);
     }
 
@@ -90,11 +97,13 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
     /// <returns>Result</returns>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
+		logger.LogDebug(">>> Entering ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         if (destinationType != typeof(string))
             return base.ConvertTo(context, culture, value, destinationType);
 
         var result = string.Empty;
         if (value == null)
+			logger.LogDebug("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): result → {Result}", context, culture, value, destinationType, result);
             return result;
 
         //we don't use string.Join() because it doesn't support invariant culture
@@ -102,6 +111,7 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
         var dictionary = (IDictionary<K, V>)value;
         foreach (var keyValue in dictionary)
         {
+		logger.LogDebug("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): dictionary → {Dictionary}", context, culture, value, destinationType, dictionary);
             result += $"{Convert.ToString(keyValue.Key, CultureInfo.InvariantCulture)}, {Convert.ToString(keyValue.Value, CultureInfo.InvariantCulture)}";
             //don't add ; after the last element
             if (counter != dictionary.Count - 1)
@@ -109,6 +119,7 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
             counter++;
         }
 
+		logger.LogDebug("<<< Exiting ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         return result;
     }
 }

@@ -13,12 +13,19 @@ public partial record PluginModel : BaseNopModel, IAclSupportedModel, ILocalized
 
     public PluginModel()
     {
+		logger.LogDebug(">>> Entering PluginModel()");
         Locales = new List<PluginLocalizedModel>();
 
+		logger.LogDebug("PluginModel(): Locales → {Locales}", Locales);
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("PluginModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
         SelectedCustomerRoleIds = new List<int>();
+		logger.LogDebug("PluginModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("PluginModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting PluginModel()");
+		logger.LogDebug("PluginModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
     }
 
     #endregion

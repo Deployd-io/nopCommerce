@@ -13,7 +13,10 @@ public partial record CustomerRoleModel : BaseNopEntityModel
 
     public CustomerRoleModel()
     {
+		logger.LogDebug(">>> Entering CustomerRoleModel()");
         TaxDisplayTypeValues = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CustomerRoleModel()");
+		logger.LogDebug("CustomerRoleModel(): TaxDisplayTypeValues → {TaxDisplayTypeValues}", TaxDisplayTypeValues);
     }
 
     #endregion

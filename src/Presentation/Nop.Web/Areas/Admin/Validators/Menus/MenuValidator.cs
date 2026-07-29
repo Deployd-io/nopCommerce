@@ -12,9 +12,11 @@ public partial class MenuValidator : BaseNopValidator<MenuModel>
 
     public MenuValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering MenuValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ContentManagement.Menus.Fields.Name.Required"));
 
         SetDatabaseValidationRules<Menu>();
+		logger.LogDebug("<<< Exiting MenuValidator(localizationService={LocalizationService})", localizationService);
     }
 
     #endregion

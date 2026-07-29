@@ -6,7 +6,10 @@ public partial record ForumPageModel : BaseNopModel
 {
     public ForumPageModel()
     {
+		logger.LogDebug(">>> Entering ForumPageModel()");
         ForumTopics = new List<ForumTopicRowModel>();
+		logger.LogDebug("<<< Exiting ForumPageModel()");
+		logger.LogDebug("ForumPageModel(): ForumTopics → {ForumTopics}", ForumTopics);
     }
 
     public int Id { get; set; }

@@ -24,6 +24,8 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
     /// </summary>
     public ForceMultiFactorAuthenticationAttribute() : base(typeof(ForceMultiFactorAuthenticationFilter))
     {
+	logger.LogDebug(">>> Entering ForceMultiFactorAuthenticationAttribute()");
+	logger.LogDebug("<<< Exiting ForceMultiFactorAuthenticationAttribute()");
     }
 
     #endregion
@@ -68,6 +70,7 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidateAuthenticationForceAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering ValidateAuthenticationForceAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.HttpContext.Request == null)
@@ -103,12 +106,14 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
             //check selected provider of MFA
             var customer = await _workContext.GetCurrentCustomerAsync();
             var selectedProvider = await _genericAttributeService
+				logger.LogDebug("ValidateAuthenticationForceAsync(context={Context}): customer → {Customer}", context, customer);
                 .GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute);
             if (!string.IsNullOrEmpty(selectedProvider))
                 return;
 
             //redirect to MultiFactorAuthenticationSettings page if force is enabled
             context.Result = new RedirectToRouteResult(NopRouteNames.Standard.MULTI_FACTOR_AUTHENTICATION_SETTINGS, null);
+			logger.LogDebug("<<< Exiting ValidateAuthenticationForceAsync(context={Context})", context);
         }
 
         #endregion
@@ -123,9 +128,11 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await ValidateAuthenticationForceAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

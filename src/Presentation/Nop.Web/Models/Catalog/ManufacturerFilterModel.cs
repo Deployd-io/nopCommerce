@@ -26,7 +26,10 @@ public partial record ManufacturerFilterModel : BaseNopModel
 
     public ManufacturerFilterModel()
     {
+		logger.LogDebug(">>> Entering ManufacturerFilterModel()");
         Manufacturers = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ManufacturerFilterModel()");
+		logger.LogDebug("ManufacturerFilterModel(): Manufacturers → {Manufacturers}", Manufacturers);
     }
 
     #endregion

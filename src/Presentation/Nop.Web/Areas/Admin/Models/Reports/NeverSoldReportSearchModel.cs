@@ -14,10 +14,16 @@ public partial record NeverSoldReportSearchModel : BaseSearchModel
 
     public NeverSoldReportSearchModel()
     {
+		logger.LogDebug(">>> Entering NeverSoldReportSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		logger.LogDebug("NeverSoldReportSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		logger.LogDebug("NeverSoldReportSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NeverSoldReportSearchModel()");
+		logger.LogDebug("NeverSoldReportSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("NeverSoldReportSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

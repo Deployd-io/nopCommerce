@@ -11,8 +11,12 @@ public partial record TaxConfigurationModel : BaseNopModel
 
     public TaxConfigurationModel()
     {
+		logger.LogDebug(">>> Entering TaxConfigurationModel()");
         TaxProviders = new TaxProviderSearchModel();
         TaxCategories = new TaxCategorySearchModel();
+		logger.LogDebug("<<< Exiting TaxConfigurationModel()");
+		logger.LogDebug("TaxConfigurationModel(): TaxProviders → {TaxProviders}", TaxProviders);
+		logger.LogDebug("TaxConfigurationModel(): TaxCategories → {TaxCategories}", TaxCategories);
     }
 
     #endregion

@@ -12,7 +12,10 @@ public partial record ReviewTypeModel : BaseNopEntityModel, ILocalizedModel<Revi
 
     public ReviewTypeModel()
     {
+		logger.LogDebug(">>> Entering ReviewTypeModel()");
         Locales = new List<ReviewTypeLocalizedModel>();
+		logger.LogDebug("<<< Exiting ReviewTypeModel()");
+		logger.LogDebug("ReviewTypeModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

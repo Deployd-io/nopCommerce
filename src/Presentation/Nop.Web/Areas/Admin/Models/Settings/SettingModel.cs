@@ -13,7 +13,10 @@ public partial record SettingModel : BaseNopEntityModel
 
     public SettingModel()
     {
+		logger.LogDebug(">>> Entering SettingModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting SettingModel()");
+		logger.LogDebug("SettingModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

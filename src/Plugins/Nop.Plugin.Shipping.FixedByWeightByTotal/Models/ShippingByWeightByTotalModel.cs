@@ -9,11 +9,18 @@ public record ShippingByWeightByTotalModel : BaseNopEntityModel
 {
     public ShippingByWeightByTotalModel()
     {
+		logger.LogDebug(">>> Entering ShippingByWeightByTotalModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("ShippingByWeightByTotalModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("ShippingByWeightByTotalModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableShippingMethods = new List<SelectListItem>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("ShippingByWeightByTotalModel(): AvailableShippingMethods → {AvailableShippingMethods}", AvailableShippingMethods);
+		logger.LogDebug("ShippingByWeightByTotalModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableWarehouses = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ShippingByWeightByTotalModel()");
+		logger.LogDebug("ShippingByWeightByTotalModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     [NopResourceDisplayName("Plugins.Shipping.FixedByWeightByTotal.Fields.Store")]

@@ -6,7 +6,10 @@ public partial record CheckoutConfirmModel : BaseNopModel
 {
     public CheckoutConfirmModel()
     {
+		logger.LogDebug(">>> Entering CheckoutConfirmModel()");
         Warnings = new List<string>();
+		logger.LogDebug("<<< Exiting CheckoutConfirmModel()");
+		logger.LogDebug("CheckoutConfirmModel(): Warnings → {Warnings}", Warnings);
     }
 
     public bool TermsOfServiceOnOrderConfirmPage { get; set; }

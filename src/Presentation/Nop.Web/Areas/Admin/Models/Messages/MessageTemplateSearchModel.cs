@@ -13,9 +13,14 @@ public partial record MessageTemplateSearchModel : BaseSearchModel
 
     public MessageTemplateSearchModel()
     {
+		logger.LogDebug(">>> Entering MessageTemplateSearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableActiveOptions = new List<SelectListItem>();
+		logger.LogDebug("MessageTemplateSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("MessageTemplateSearchModel(): AvailableActiveOptions → {AvailableActiveOptions}", AvailableActiveOptions);
         AvailableEmailAccounts = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting MessageTemplateSearchModel()");
+		logger.LogDebug("MessageTemplateSearchModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
     }
 
     #endregion

@@ -12,7 +12,10 @@ public partial record ReturnRequestReasonModel : BaseNopEntityModel, ILocalizedM
 
     public ReturnRequestReasonModel()
     {
+		logger.LogDebug(">>> Entering ReturnRequestReasonModel()");
         Locales = new List<ReturnRequestReasonLocalizedModel>();
+		logger.LogDebug("<<< Exiting ReturnRequestReasonModel()");
+		logger.LogDebug("ReturnRequestReasonModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

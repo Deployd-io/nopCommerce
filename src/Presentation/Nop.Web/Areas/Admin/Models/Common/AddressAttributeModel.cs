@@ -12,8 +12,12 @@ public partial record AddressAttributeModel : BaseNopEntityModel, ILocalizedMode
 
     public AddressAttributeModel()
     {
+		logger.LogDebug(">>> Entering AddressAttributeModel()");
         Locales = new List<AddressAttributeLocalizedModel>();
         AddressAttributeValueSearchModel = new AddressAttributeValueSearchModel();
+		logger.LogDebug("<<< Exiting AddressAttributeModel()");
+		logger.LogDebug("AddressAttributeModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("AddressAttributeModel(): AddressAttributeValueSearchModel → {AddressAttributeValueSearchModel}", AddressAttributeValueSearchModel);
     }
 
     #endregion

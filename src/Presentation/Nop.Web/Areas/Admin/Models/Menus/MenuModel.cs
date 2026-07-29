@@ -13,16 +13,25 @@ public partial record MenuModel : BaseNopEntityModel, IAclSupportedModel, IStore
 
     public MenuModel()
     {
+		logger.LogDebug(">>> Entering MenuModel()");
         AvailableMenuTypes = new List<SelectListItem>();
 
+		logger.LogDebug("MenuModel(): AvailableMenuTypes → {AvailableMenuTypes}", AvailableMenuTypes);
         SelectedStoreIds = new List<int>();
+		logger.LogDebug("MenuModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
 
+		logger.LogDebug("MenuModel(): AvailableStores → {AvailableStores}", AvailableStores);
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("MenuModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("MenuModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         MenuItemSearchModel = new();
         Locales = new List<MenuLocalizedModel>();
+		logger.LogDebug("<<< Exiting MenuModel()");
+		logger.LogDebug("MenuModel(): MenuItemSearchModel → {MenuItemSearchModel}", MenuItemSearchModel);
+		logger.LogDebug("MenuModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

@@ -14,10 +14,16 @@ public partial record NewsLetterSubscriptionSearchModel : BaseSearchModel
 
     public NewsLetterSubscriptionSearchModel()
     {
+		logger.LogDebug(">>> Entering NewsLetterSubscriptionSearchModel()");
         AvailableStores = new List<SelectListItem>();
         ActiveList = new List<SelectListItem>();
+		logger.LogDebug("NewsLetterSubscriptionSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("NewsLetterSubscriptionSearchModel(): ActiveList → {ActiveList}", ActiveList);
         AvailableCustomerRoles = new List<SelectListItem>();
         AvailableSubscriptionTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NewsLetterSubscriptionSearchModel()");
+		logger.LogDebug("NewsLetterSubscriptionSearchModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
+		logger.LogDebug("NewsLetterSubscriptionSearchModel(): AvailableSubscriptionTypes → {AvailableSubscriptionTypes}", AvailableSubscriptionTypes);
     }
 
     #endregion

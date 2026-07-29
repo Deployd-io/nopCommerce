@@ -18,9 +18,11 @@ public static class CommonExtensions
     /// <returns>A value indicating whether real selection is not possible</returns>
     public static bool SelectionIsNotPossible(this IList<SelectListItem> items, bool ignoreZeroValue = true)
     {
+		logger.LogDebug(">>> Entering SelectionIsNotPossible(items={Items},ignoreZeroValue={IgnoreZeroValue})", items, ignoreZeroValue);
         ArgumentNullException.ThrowIfNull(items);
 
         //we ignore items with "0" value? Usually it's something like "Select All", "etc
+		logger.LogDebug("<<< Exiting SelectionIsNotPossible(items={Items},ignoreZeroValue={IgnoreZeroValue})", items, ignoreZeroValue);
         return items.Count(x => !ignoreZeroValue || !x.Value.ToString().Equals("0")) < 2;
     }
 
@@ -32,18 +34,23 @@ public static class CommonExtensions
     /// <returns>Formatted date and time string</returns>
     public static string RelativeFormat(this DateTime source, string languageCode = "en-US")
     {
+		logger.LogDebug(">>> Entering RelativeFormat(source={Source},languageCode={LanguageCode})", source, languageCode);
         var ts = new TimeSpan(DateTime.UtcNow.Ticks - source.Ticks);
         var delta = ts.TotalSeconds;
+		logger.LogDebug("RelativeFormat(source={Source},languageCode={LanguageCode}): ts → {Ts}", source, languageCode, ts);
 
         CultureInfo culture;
         try
         {
             culture = new CultureInfo(languageCode);
+			logger.LogDebug("RelativeFormat(source={Source},languageCode={LanguageCode}): culture → {Culture}", source, languageCode, culture);
         }
         catch (CultureNotFoundException)
         {
+			logger.LogError("Exception in RelativeFormat(source={Source},languageCode={LanguageCode}): {Arg2}", source, languageCode, ex.Message);
             culture = new CultureInfo("en-US");
         }
+		logger.LogDebug("<<< Exiting RelativeFormat(source={Source},languageCode={LanguageCode})", source, languageCode);
         return TimeSpan.FromSeconds(delta).Humanize(precision: 1, culture: culture, maxUnit: TimeUnit.Year);
     }
 }

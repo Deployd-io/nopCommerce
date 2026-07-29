@@ -12,9 +12,14 @@ public partial record NewsContentModel : BaseNopModel
 
     public NewsContentModel()
     {
+		logger.LogDebug(">>> Entering NewsContentModel()");
         NewsItems = new NewsItemSearchModel();
         NewsComments = new NewsCommentSearchModel();
+		logger.LogDebug("NewsContentModel(): NewsItems → {NewsItems}", NewsItems);
+		logger.LogDebug("NewsContentModel(): NewsComments → {NewsComments}", NewsComments);
         SearchTitle = new NewsItemSearchModel().SearchTitle;
+		logger.LogDebug("<<< Exiting NewsContentModel()");
+		logger.LogDebug("NewsContentModel(): SearchTitle → {SearchTitle}", SearchTitle);
     }
 
     #endregion

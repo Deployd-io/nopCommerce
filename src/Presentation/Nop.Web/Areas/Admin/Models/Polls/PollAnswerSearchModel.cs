@@ -11,7 +11,10 @@ public partial record PollAnswerSearchModel : BaseSearchModel
 
     public PollAnswerSearchModel()
     {
+		logger.LogDebug(">>> Entering PollAnswerSearchModel()");
         AddPollAnswer = new PollAnswerModel();
+		logger.LogDebug("<<< Exiting PollAnswerSearchModel()");
+		logger.LogDebug("PollAnswerSearchModel(): AddPollAnswer → {AddPollAnswer}", AddPollAnswer);
     }
 
     #endregion

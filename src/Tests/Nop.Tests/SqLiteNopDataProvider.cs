@@ -32,7 +32,10 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
 
     public void CreateDatabase(int triesToConnect = 10)
     {
+		logger.LogDebug(">>> Entering CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
         ExecuteNonQueryAsync("PRAGMA journal_mode=WAL;").Wait();
+		logger.LogDebug("<<< Exiting CreateDatabase(triesToConnect={TriesToConnect})", triesToConnect);
+		logger.LogDebug("CreateDatabase(triesToConnect={TriesToConnect}): journal_mode → {Journal_mode}", triesToConnect, journal_mode);
     }
 
     /// <summary>
@@ -42,8 +45,10 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection to a database</returns>
     protected override DbConnection GetInternalDbConnection(string connectionString)
     {
+		logger.LogDebug(">>> Entering GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
+		logger.LogDebug("<<< Exiting GetInternalDbConnection(connectionString={ConnectionString})", connectionString);
         return new SqliteConnection(string.IsNullOrEmpty(connectionString)
             ? DataSettingsManager.LoadSettings().ConnectionString
             : connectionString);
@@ -57,11 +62,13 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Inserted entity</returns>
     public override TEntity InsertEntity<TEntity>(TEntity entity)
     {
+		logger.LogDebug(">>> Entering InsertEntity(entity={Entity})", entity);
         using (new ReaderWriteLockDisposable(_locker))
         {
             entity.Id = DataContext.InsertWithInt32Identity(entity);
             return entity;
         }
+		logger.LogDebug("<<< Exiting InsertEntity(entity={Entity})", entity);
     }
 
     /// <summary>
@@ -72,6 +79,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Entity</returns>
     public override Task<TEntity> InsertEntityAsync<TEntity>(TEntity entity)
     {
+		logger.LogDebug(">>> Entering InsertEntityAsync(entity={Entity})", entity);
         InsertEntity(entity);
 
         return Task.FromResult(entity);
@@ -85,6 +93,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override Task UpdateEntityAsync<TEntity>(TEntity entity)
     {
+		logger.LogDebug(">>> Entering UpdateEntityAsync(entity={Entity})", entity);
         using (new ReaderWriteLockDisposable(_locker))
             DataContext.Update(entity);
 
@@ -100,8 +109,10 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UpdateEntitiesAsync<TEntity>(IEnumerable<TEntity> entities)
     {
+		logger.LogDebug(">>> Entering UpdateEntitiesAsync(entities={Entities})", entities);
         foreach (var entity in entities)
             await UpdateEntityAsync(entity);
+			logger.LogDebug("<<< Exiting UpdateEntitiesAsync(entities={Entities})", entities);
     }
 
     /// <summary>
@@ -112,8 +123,10 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override void UpdateEntities<TEntity>(IEnumerable<TEntity> entities)
     {
+		logger.LogDebug(">>> Entering UpdateEntities(entities={Entities})", entities);
         foreach (var entity in entities)
             UpdateEntity(entity);
+			logger.LogDebug("<<< Exiting UpdateEntities(entities={Entities})", entities);
     }
 
     /// <summary>
@@ -124,6 +137,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override Task DeleteEntityAsync<TEntity>(TEntity entity)
     {
+		logger.LogDebug(">>> Entering DeleteEntityAsync(entity={Entity})", entity);
         using (new ReaderWriteLockDisposable(_locker))
             DataContext.Delete(entity);
 
@@ -137,6 +151,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override Task BulkDeleteEntitiesAsync<TEntity>(IList<TEntity> entities)
     {
+		logger.LogDebug(">>> Entering BulkDeleteEntitiesAsync(entities={Entities})", entities);
         using (new ReaderWriteLockDisposable(_locker))
         {
             foreach (var entity in entities)
@@ -164,6 +179,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override Task BulkInsertEntitiesAsync<TEntity>(IEnumerable<TEntity> entities)
     {
+		logger.LogDebug(">>> Entering BulkInsertEntitiesAsync(entities={Entities})", entities);
         foreach (var entity in entities)
             InsertEntity(entity);
 
@@ -180,6 +196,8 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of a foreign key</returns>
     public string CreateForeignKeyName(string foreignTable, string foreignColumn, string primaryTable, string primaryColumn)
     {
+		logger.LogDebug(">>> Entering CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
+		logger.LogDebug("<<< Exiting CreateForeignKeyName(foreignTable={ForeignTable},foreignColumn={ForeignColumn},primaryTable={PrimaryTable},primaryColumn={PrimaryColumn})", foreignTable, foreignColumn, primaryTable, primaryColumn);
         return "FK_" + HashHelper.CreateHash(Encoding.UTF8.GetBytes($"{foreignTable}_{foreignColumn}_{primaryTable}_{primaryColumn}"), HASH_ALGORITHM);
     }
 
@@ -191,6 +209,8 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Name of an index</returns>
     public string GetIndexName(string targetTable, string targetColumn)
     {
+		logger.LogDebug(">>> Entering GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
+		logger.LogDebug("<<< Exiting GetIndexName(targetTable={TargetTable},targetColumn={TargetColumn})", targetTable, targetColumn);
         return "IX_" + HashHelper.CreateHash(Encoding.UTF8.GetBytes($"{targetTable}_{targetColumn}"), HASH_ALGORITHM);
     }
 
@@ -202,6 +222,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Queryable source</returns>
     public override IQueryable<TEntity> GetTable<TEntity>()
     {
+		logger.LogDebug(">>> Entering GetTable()");
         using (new ReaderWriteLockDisposable(_locker, ReaderWriteLockType.Read))
             return DataContext.GetTable<TEntity>();
     }
@@ -213,15 +234,19 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Integer identity; null if cannot get the result</returns>
     public Task<int?> GetTableIdentAsync<TEntity>() where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering GetTableIdentAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using (new ReaderWriteLockDisposable(_locker, ReaderWriteLockType.Read))
         {
             var tableName = DataContext.GetTable<TEntity>().TableName;
 
             var result = DataContext.Query<int?>($"select seq from sqlite_sequence where name = \"{tableName}\"")
                 .FirstOrDefault();
+				logger.LogInformation("GetTableIdentAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
             return Task.FromResult<int?>(result ?? 1);
         }
+		logger.LogDebug("<<< Exiting GetTableIdentAsync()");
     }
 
     /// <summary>
@@ -230,6 +255,8 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Returns true if the database exists.</returns>
     public bool DatabaseExists()
     {
+		logger.LogDebug(">>> Entering DatabaseExists()");
+		logger.LogDebug("<<< Exiting DatabaseExists()");
         return true;
     }
 
@@ -238,6 +265,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// </summary>
     public virtual Task BackupDatabaseAsync(string fileName)
     {
+		logger.LogDebug(">>> Entering BackupDatabaseAsync(fileName={FileName})", fileName);
         throw new DataException("This database provider does not support backup");
     }
 
@@ -247,6 +275,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <param name="backupFileName">The name of the backup file</param>
     public virtual Task RestoreDatabaseAsync(string backupFileName)
     {
+		logger.LogDebug(">>> Entering RestoreDatabaseAsync(backupFileName={BackupFileName})", backupFileName);
         throw new DataException("This database provider does not support backup");
     }
 
@@ -255,9 +284,11 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// </summary>
     public Task ReIndexTablesAsync()
     {
+		logger.LogDebug(">>> Entering ReIndexTablesAsync()");
         using (new ReaderWriteLockDisposable(_locker))
             DataContext.Execute("VACUUM;");
 
+		logger.LogDebug("<<< Exiting ReIndexTablesAsync()");
         return Task.CompletedTask;
     }
 
@@ -267,9 +298,11 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task ShrinkDatabaseAsync()
     {
+		logger.LogDebug(">>> Entering ShrinkDatabaseAsync()");
         using (new ReaderWriteLockDisposable(_locker))
             DataContext.Execute("VACUUM;");
 
+		logger.LogDebug("<<< Exiting ShrinkDatabaseAsync()");
         return Task.CompletedTask;
     }
 
@@ -280,6 +313,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Connection string</returns>
     public string BuildConnectionString(INopConnectionStringInfo nopConnectionString)
     {
+		logger.LogDebug(">>> Entering BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         ArgumentNullException.ThrowIfNull(nopConnectionString);
 
         if (nopConnectionString.IntegratedSecurity)
@@ -293,6 +327,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
             Cache = SqliteCacheMode.Shared
         };
 
+		logger.LogDebug("<<< Exiting BuildConnectionString(nopConnectionString={NopConnectionString})", nopConnectionString);
         return builder.ConnectionString;
     }
 
@@ -303,11 +338,14 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <param name="ident">Identity value</param>
     public Task SetTableIdentAsync<TEntity>(int ident) where TEntity : BaseEntity
     {
+		logger.LogDebug(">>> Entering SetTableIdentAsync(ident={Ident})", ident);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using (new ReaderWriteLockDisposable(_locker))
         {
             var tableName = DataContext.GetTable<TEntity>().TableName;
 
             DataContext.Execute($"update sqlite_sequence set seq = {ident} where name = \"{tableName}\"");
+			logger.LogInformation("SetTableIdentAsync(ident)={Ident}: update query executed in {Arg1} ms", ident, __logStart.ElapsedMilliseconds);
         }
 
         return Task.CompletedTask;
@@ -323,6 +361,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Returns collection of query result records</returns>
     public override Task<IList<T>> QueryProcAsync<T>(string procedureName, params DataParameter[] parameters)
     {
+		logger.LogDebug(">>> Entering QueryProcAsync(procedureName={ProcedureName},parameters={Parameters})", procedureName, parameters);
         //stored procedure is not support by SqLite
         return Task.FromResult<IList<T>>(new List<T>());
     }
@@ -336,9 +375,11 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Collection of values of specified type</returns>
     public override Task<IList<T>> QueryAsync<T>(string sql, params DataParameter[] parameters)
     {
+		logger.LogDebug(">>> Entering QueryAsync(sql={Sql},parameters={Parameters})", sql, parameters);
         using (new ReaderWriteLockDisposable(_locker, ReaderWriteLockType.Read))
             return Task.FromResult<IList<T>>(DataContext.Query<T>(sql, parameters).ToList());
     }
+	logger.LogDebug("<<< Exiting QueryAsync(sql={Sql},parameters={Parameters})", sql, parameters);
 
     /// <summary>
     /// Executes command asynchronously and returns number of affected records
@@ -348,11 +389,13 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <returns>Number of records, affected by command execution.</returns>
     public override Task<int> ExecuteNonQueryAsync(string sql, params DataParameter[] dataParameters)
     {
+		logger.LogDebug(">>> Entering ExecuteNonQueryAsync(sql={Sql},dataParameters={DataParameters})", sql, dataParameters);
         using (new ReaderWriteLockDisposable(_locker, ReaderWriteLockType.Read))
         {
             using var dataConnection = CreateDataConnection(LinqToDbDataProvider);
             var command = new CommandInfo(dataConnection, sql, dataParameters);
 
+			logger.LogDebug("<<< Exiting ExecuteNonQueryAsync(sql={Sql},dataParameters={DataParameters})", sql, dataParameters);
             return command.ExecuteAsync();
         }
     }
@@ -369,11 +412,14 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public override Task<ITempDataStorage<TItem>> CreateTempDataStorageAsync<TItem>(string storeKey, IQueryable<TItem> query)
     {
+		logger.LogDebug(">>> Entering CreateTempDataStorageAsync(storeKey={StoreKey},query={Query})", storeKey);
         return Task.FromResult<ITempDataStorage<TItem>>(new TempSqlDataStorage<TItem>(storeKey, query, DataContext));
     }
 
     public Task<bool> DatabaseExistsAsync()
     {
+		logger.LogDebug(">>> Entering DatabaseExistsAsync()");
+		logger.LogDebug("<<< Exiting DatabaseExistsAsync()");
         return Task.FromResult(DatabaseExists());
     }
 
@@ -384,6 +430,7 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// <typeparam name="TEntity">Entity type</typeparam>
     public override Task TruncateAsync<TEntity>(bool resetIdentity = false)
     {
+		logger.LogDebug(">>> Entering TruncateAsync(resetIdentity={ResetIdentity})", resetIdentity);
         using (new ReaderWriteLockDisposable(_locker))
             DataContext.GetTable<TEntity>().Truncate(resetIdentity);
 
@@ -399,6 +446,8 @@ public partial class SqLiteNopDataProvider : BaseDataProvider, INopDataProvider
     /// </returns>
     public Task<string> GetDataBaseCollationAsync()
     {
+		logger.LogDebug(">>> Entering GetDataBaseCollationAsync()");
+		logger.LogDebug("<<< Exiting GetDataBaseCollationAsync()");
         return Task.FromResult(string.Empty);
     }
 

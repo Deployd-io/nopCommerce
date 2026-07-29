@@ -43,6 +43,7 @@ public partial class GeoLookupService : IGeoLookupService
     /// <returns>Information</returns>
     protected virtual CountryResponse GetInformation(string ipAddress)
     {
+		logger.LogDebug(">>> Entering GetInformation(ipAddress={IpAddress})", ipAddress);
         if (string.IsNullOrEmpty(ipAddress))
             return null;
 
@@ -51,13 +52,17 @@ public partial class GeoLookupService : IGeoLookupService
             //This product includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com
             var databasePath = _fileProvider.MapPath("~/App_Data/GeoLite2-Country.mmdb");
             var reader = new DatabaseReader(databasePath);
+			logger.LogDebug("GetInformation(ipAddress={IpAddress}): databasePath → {DatabasePath}", ipAddress, databasePath);
+			logger.LogDebug("GetInformation(ipAddress={IpAddress}): reader → {Reader}", ipAddress, reader);
             var omni = reader.Country(ipAddress);
 
+			logger.LogDebug("GetInformation(ipAddress={IpAddress}): omni → {Omni}", ipAddress, omni);
             return omni;
                 
         }
         //catch (AddressNotFoundException exc)
         catch (GeoIP2Exception)
+		logger.LogError("Exception in GetInformation(ipAddress={IpAddress}): {Arg1}", ipAddress, ex.Message);
         {
             //address is not found
             //do not throw exceptions
@@ -67,6 +72,7 @@ public partial class GeoLookupService : IGeoLookupService
         {
             //do not throw exceptions
             _logger.Warning("Cannot load MaxMind record", exc);
+			logger.LogDebug("<<< Exiting GetInformation(ipAddress={IpAddress})", ipAddress);
             return null;
         }
     }
@@ -82,8 +88,10 @@ public partial class GeoLookupService : IGeoLookupService
     /// <returns>Country name</returns>
     public virtual string LookupCountryIsoCode(string ipAddress)
     {
+		logger.LogDebug(">>> Entering LookupCountryIsoCode(ipAddress={IpAddress})", ipAddress);
         var response = GetInformation(ipAddress);
         if (response?.Country != null)
+			logger.LogDebug("LookupCountryIsoCode(ipAddress={IpAddress}): response → {Response}", ipAddress, response);
             return response.Country.IsoCode;
 
         return string.Empty;
@@ -96,8 +104,10 @@ public partial class GeoLookupService : IGeoLookupService
     /// <returns>Country name</returns>
     public virtual string LookupCountryName(string ipAddress)
     {
+		logger.LogDebug(">>> Entering LookupCountryName(ipAddress={IpAddress})", ipAddress);
         var response = GetInformation(ipAddress);
         if (response?.Country != null)
+			logger.LogDebug("LookupCountryName(ipAddress={IpAddress}): response → {Response}", ipAddress, response);
             return response.Country.Name;
 
         return string.Empty;

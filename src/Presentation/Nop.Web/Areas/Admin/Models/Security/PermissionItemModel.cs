@@ -13,8 +13,12 @@ public partial record PermissionItemModel : BaseNopEntityModel
 
     public PermissionItemModel()
     {
+		logger.LogDebug(">>> Entering PermissionItemModel()");
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting PermissionItemModel()");
+		logger.LogDebug("PermissionItemModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("PermissionItemModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
     }
 
     #endregion

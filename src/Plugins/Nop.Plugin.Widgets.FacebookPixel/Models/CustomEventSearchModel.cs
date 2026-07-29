@@ -12,7 +12,10 @@ public record CustomEventSearchModel : BaseSearchModel
 
     public CustomEventSearchModel()
     {
+		logger.LogDebug(">>> Entering CustomEventSearchModel()");
         AddCustomEvent = new CustomEventModel();
+		logger.LogDebug("<<< Exiting CustomEventSearchModel()");
+		logger.LogDebug("CustomEventSearchModel(): AddCustomEvent → {AddCustomEvent}", AddCustomEvent);
     }
 
     #endregion

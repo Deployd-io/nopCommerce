@@ -43,6 +43,9 @@ public partial class ReviewTypeService : IReviewTypeService
     /// </returns>
     public virtual async Task<IList<ReviewType>> GetAllReviewTypesAsync()
     {
+		logger.LogDebug(">>> Entering GetAllReviewTypesAsync()");
+		logger.LogDebug("GetAllReviewTypesAsync(): query → {Query}");
+		logger.LogDebug("<<< Exiting GetAllReviewTypesAsync()");
         return await _reviewTypeRepository.GetAllAsync(
             query => query.OrderBy(reviewType => reviewType.DisplayOrder).ThenBy(reviewType => reviewType.Id),
             cache => default);
@@ -58,6 +61,8 @@ public partial class ReviewTypeService : IReviewTypeService
     /// </returns>
     public virtual async Task<ReviewType> GetReviewTypeByIdAsync(int reviewTypeId)
     {
+		logger.LogDebug(">>> Entering GetReviewTypeByIdAsync(reviewTypeId={ReviewTypeId})", reviewTypeId);
+		logger.LogDebug("<<< Exiting GetReviewTypeByIdAsync(reviewTypeId={ReviewTypeId})", reviewTypeId);
         return await _reviewTypeRepository.GetByIdAsync(reviewTypeId, cache => default);
     }
 
@@ -68,9 +73,15 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReviewTypeAsync(ReviewType reviewType)
     {
+		logger.LogDebug(">>> Entering InsertReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _reviewTypeRepository.InsertAsync(reviewType);
+		logger.LogDebug("<<< Exiting InsertReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertReviewTypeAsync(reviewType)={ReviewType}: save query executed in {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertReviewTypeAsync(reviewType)={ReviewType}: save query executed in {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a review type
     /// </summary>
@@ -78,9 +89,15 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReviewTypeAsync(ReviewType reviewType)
     {
+		logger.LogDebug(">>> Entering UpdateReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _reviewTypeRepository.UpdateAsync(reviewType);
+		logger.LogDebug("<<< Exiting UpdateReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateReviewTypeAsync(reviewType)={ReviewType}: update query executed in {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateReviewTypeAsync(reviewType)={ReviewType}: update query executed in {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete review type
     /// </summary>
@@ -88,9 +105,19 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReviewTypeAsync(ReviewType reviewType)
     {
+		logger.LogDebug(">>> Entering DeleteReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _reviewTypeRepository.DeleteAsync(reviewType);
+		logger.LogDebug("<<< Exiting DeleteReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReviewTypeAsync(reviewType)={ReviewType}: external service call took {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReviewTypeAsync(reviewType)={ReviewType}: delete query executed in {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteReviewTypeAsync(reviewType)={ReviewType}: external service call took {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteReviewTypeAsync(reviewType)={ReviewType}: delete query executed in {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Product review type mapping
@@ -125,9 +152,15 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductReviewReviewTypeMappingsAsync(ProductReviewReviewTypeMapping productReviewReviewType)
     {
+		logger.LogDebug(">>> Entering InsertProductReviewReviewTypeMappingsAsync(productReviewReviewType={ProductReviewReviewType})", productReviewReviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewReviewTypeMappingRepository.InsertAsync(productReviewReviewType);
+		logger.LogDebug("<<< Exiting InsertProductReviewReviewTypeMappingsAsync(productReviewReviewType={ProductReviewReviewType})", productReviewReviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertProductReviewReviewTypeMappingsAsync(productReviewReviewType)={ProductReviewReviewType}: save query executed in {Arg1} ms", productReviewReviewType, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertProductReviewReviewTypeMappingsAsync(productReviewReviewType)={ProductReviewReviewType}: save query executed in {Arg1} ms", productReviewReviewType, __logStart.ElapsedMilliseconds);
     #endregion
 
     #endregion

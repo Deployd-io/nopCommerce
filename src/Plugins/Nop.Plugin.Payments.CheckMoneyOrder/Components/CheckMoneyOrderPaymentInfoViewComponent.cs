@@ -27,14 +27,17 @@ public class CheckMoneyOrderViewComponent : NopViewComponent
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("InvokeAsync(): store → {Store}", store);
         var model = new PaymentInfoModel
         {
             DescriptionText = await _localizationService.GetLocalizedSettingAsync(_checkMoneyOrderPaymentSettings,
                 x => x.DescriptionText, (await _workContext.GetWorkingLanguageAsync()).Id, store.Id)
         };
 
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View("~/Plugins/Payments.CheckMoneyOrder/Views/PaymentInfo.cshtml", model);
     }
 }

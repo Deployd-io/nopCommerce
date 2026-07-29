@@ -13,8 +13,12 @@ public partial class RenderButtonRemove : IRender
     /// <param name="title">Button title</param>
     public RenderButtonRemove(string title)
     {
+		logger.LogDebug(">>> Entering RenderButtonRemove(title={Title})", title);
         Title = title;
         ClassName = NopButtonClassDefaults.Default;
+		logger.LogDebug("<<< Exiting RenderButtonRemove(title={Title})", title);
+		logger.LogDebug("RenderButtonRemove(title={Title}): ClassName → {ClassName}", title, ClassName);
+		logger.LogDebug("RenderButtonRemove(title={Title}): Title → {Title1}", title, Title);
     }
 
     #endregion

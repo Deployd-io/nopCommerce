@@ -16,10 +16,12 @@ public partial class PermissionRecordBuilder : NopEntityBuilder<PermissionRecord
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(PermissionRecord.Name)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(PermissionRecord.SystemName)).AsString(255).NotNullable()
             .WithColumn(nameof(PermissionRecord.Category)).AsString(255).NotNullable();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

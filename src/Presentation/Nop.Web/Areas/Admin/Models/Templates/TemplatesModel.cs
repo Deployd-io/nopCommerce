@@ -11,15 +11,25 @@ public partial record TemplatesModel : BaseNopModel
 
     public TemplatesModel()
     {
+		logger.LogDebug(">>> Entering TemplatesModel()");
         TemplatesCategory = new CategoryTemplateSearchModel();
         TemplatesManufacturer = new ManufacturerTemplateSearchModel();
+		logger.LogDebug("TemplatesModel(): TemplatesCategory → {TemplatesCategory}", TemplatesCategory);
+		logger.LogDebug("TemplatesModel(): TemplatesManufacturer → {TemplatesManufacturer}", TemplatesManufacturer);
         TemplatesProduct = new ProductTemplateSearchModel();
         TemplatesTopic = new TopicTemplateSearchModel();
+		logger.LogDebug("TemplatesModel(): TemplatesProduct → {TemplatesProduct}", TemplatesProduct);
+		logger.LogDebug("TemplatesModel(): TemplatesTopic → {TemplatesTopic}", TemplatesTopic);
 
         AddCategoryTemplate = new CategoryTemplateModel();
         AddManufacturerTemplate = new ManufacturerTemplateModel();
+		logger.LogDebug("TemplatesModel(): AddCategoryTemplate → {AddCategoryTemplate}", AddCategoryTemplate);
+		logger.LogDebug("TemplatesModel(): AddManufacturerTemplate → {AddManufacturerTemplate}", AddManufacturerTemplate);
         AddProductTemplate = new ProductTemplateModel();
         AddTopicTemplate = new TopicTemplateModel();
+		logger.LogDebug("<<< Exiting TemplatesModel()");
+		logger.LogDebug("TemplatesModel(): AddProductTemplate → {AddProductTemplate}", AddProductTemplate);
+		logger.LogDebug("TemplatesModel(): AddTopicTemplate → {AddTopicTemplate}", AddTopicTemplate);
     }
 
     #endregion

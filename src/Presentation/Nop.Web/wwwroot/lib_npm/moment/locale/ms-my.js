@@ -23,6 +23,7 @@ export default moment.defineLocale('ms-my', {
     },
     meridiemParse: /pagi|tengahari|petang|malam/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -31,6 +32,9 @@ export default moment.defineLocale('ms-my', {
         } else if (meridiem === 'tengahari') {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'petang' || meridiem === 'malam') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return hour + 12;
         }
     },

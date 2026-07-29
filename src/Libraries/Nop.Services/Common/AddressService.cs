@@ -55,9 +55,19 @@ public partial class AddressService : IAddressService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAddressAsync(Address address)
     {
+		logger.LogDebug(">>> Entering DeleteAddressAsync(address={Address})", address);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _addressRepository.DeleteAsync(address);
+		logger.LogDebug("<<< Exiting DeleteAddressAsync(address={Address})", address);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteAddressAsync(address)={Address}: external service call took {Arg1} ms", address, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteAddressAsync(address)={Address}: delete query executed in {Arg1} ms", address, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteAddressAsync(address)={Address}: external service call took {Arg1} ms", address, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteAddressAsync(address)={Address}: delete query executed in {Arg1} ms", address, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets total number of addresses by country identifier
     /// </summary>
@@ -68,13 +78,16 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<int> GetAddressTotalByCountryIdAsync(int countryId)
     {
+		logger.LogDebug(">>> Entering GetAddressTotalByCountryIdAsync(countryId={CountryId})", countryId);
         if (countryId == 0)
             return 0;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var query = from a in _addressRepository.Table
             where a.CountryId == countryId
             select a;
 
+		logger.LogDebug("<<< Exiting GetAddressTotalByCountryIdAsync(countryId={CountryId})", countryId);
         return await query.CountAsync();
     }
 
@@ -88,13 +101,16 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<int> GetAddressTotalByStateProvinceIdAsync(int stateProvinceId)
     {
+		logger.LogDebug(">>> Entering GetAddressTotalByStateProvinceIdAsync(stateProvinceId={StateProvinceId})", stateProvinceId);
         if (stateProvinceId == 0)
             return 0;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var query = from a in _addressRepository.Table
             where a.StateProvinceId == stateProvinceId
             select a;
 
+		logger.LogDebug("<<< Exiting GetAddressTotalByStateProvinceIdAsync(stateProvinceId={StateProvinceId})", stateProvinceId);
         return await query.CountAsync();
     }
 
@@ -108,6 +124,8 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<Address> GetAddressByIdAsync(int addressId)
     {
+		logger.LogDebug(">>> Entering GetAddressByIdAsync(addressId={AddressId})", addressId);
+		logger.LogDebug("<<< Exiting GetAddressByIdAsync(addressId={AddressId})", addressId);
         return await _addressRepository.GetByIdAsync(addressId, cache => default, useShortTermCache: true);
     }
 
@@ -118,17 +136,24 @@ public partial class AddressService : IAddressService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAddressAsync(Address address)
     {
+		logger.LogDebug(">>> Entering InsertAddressAsync(address={Address})", address);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(address);
 
         address.CreatedOnUtc = DateTime.UtcNow;
+		logger.LogDebug("InsertAddressAsync(address={Address}): address.CreatedOnUtc → {Arg1}", address, address.CreatedOnUtc);
 
         //some validation
         if (address.CountryId == 0)
             address.CountryId = null;
+			logger.LogDebug("InsertAddressAsync(address={Address}): address.CountryId → {Arg1}", address, address.CountryId);
         if (address.StateProvinceId == 0)
             address.StateProvinceId = null;
+			logger.LogDebug("InsertAddressAsync(address={Address}): address.StateProvinceId → {Arg1}", address, address.StateProvinceId);
 
         await _addressRepository.InsertAsync(address);
+		logger.LogDebug("<<< Exiting InsertAddressAsync(address={Address})", address);
+		logger.LogInformation("InsertAddressAsync(address)={Address}: save query executed in {Arg1} ms", address, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -138,15 +163,21 @@ public partial class AddressService : IAddressService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAddressAsync(Address address)
     {
+		logger.LogDebug(">>> Entering UpdateAddressAsync(address={Address})", address);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(address);
 
         //some validation
         if (address.CountryId == 0)
             address.CountryId = null;
+			logger.LogDebug("UpdateAddressAsync(address={Address}): address.CountryId → {Arg1}", address, address.CountryId);
         if (address.StateProvinceId == 0)
             address.StateProvinceId = null;
+			logger.LogDebug("UpdateAddressAsync(address={Address}): address.StateProvinceId → {Arg1}", address, address.StateProvinceId);
 
         await _addressRepository.UpdateAsync(address);
+		logger.LogDebug("<<< Exiting UpdateAddressAsync(address={Address})", address);
+		logger.LogInformation("UpdateAddressAsync(address)={Address}: update query executed in {Arg1} ms", address, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -159,6 +190,7 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<bool> IsAddressValidAsync(Address address)
     {
+		logger.LogDebug(">>> Entering IsAddressValidAsync(address={Address})", address);
         ArgumentNullException.ThrowIfNull(address);
 
         if (string.IsNullOrWhiteSpace(address.FirstName))
@@ -241,6 +273,7 @@ public partial class AddressService : IAddressService
                 return false;
         }
 
+		logger.LogDebug("<<< Exiting IsAddressValidAsync(address={Address})", address);
         return true;
     }
 
@@ -291,6 +324,7 @@ public partial class AddressService : IAddressService
     /// <returns>A deep copy of address</returns>
     public virtual Address CloneAddress(Address address)
     {
+		logger.LogDebug(">>> Entering CloneAddress(address={Address})", address);
         var addr = new Address
         {
             FirstName = address.FirstName,
@@ -310,6 +344,7 @@ public partial class AddressService : IAddressService
             CreatedOnUtc = address.CreatedOnUtc
         };
 
+		logger.LogDebug("<<< Exiting CloneAddress(address={Address})", address);
         return addr;
     }
 

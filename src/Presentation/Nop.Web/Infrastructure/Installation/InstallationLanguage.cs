@@ -7,7 +7,10 @@ public partial class InstallationLanguage
 {
     public InstallationLanguage()
     {
+		logger.LogDebug(">>> Entering InstallationLanguage()");
         Resources = new List<InstallationLocaleResource>();
+		logger.LogDebug("<<< Exiting InstallationLanguage()");
+		logger.LogDebug("InstallationLanguage(): Resources → {Resources}", Resources);
     }
     public string Name { get; set; }
     public string Code { get; set; }

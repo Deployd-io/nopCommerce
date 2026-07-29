@@ -6,8 +6,12 @@ public partial record ShipmentDetailsModel : BaseNopEntityModel
 {
     public ShipmentDetailsModel()
     {
+		logger.LogDebug(">>> Entering ShipmentDetailsModel()");
         ShipmentStatusEvents = new List<ShipmentStatusEventModel>();
         Items = new List<ShipmentItemModel>();
+		logger.LogDebug("<<< Exiting ShipmentDetailsModel()");
+		logger.LogDebug("ShipmentDetailsModel(): ShipmentStatusEvents → {ShipmentStatusEvents}", ShipmentStatusEvents);
+		logger.LogDebug("ShipmentDetailsModel(): Items → {Items}", Items);
     }
 
     public string TrackingNumber { get; set; }

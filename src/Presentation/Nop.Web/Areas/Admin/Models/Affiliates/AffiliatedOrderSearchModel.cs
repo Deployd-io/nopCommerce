@@ -14,9 +14,14 @@ public partial record AffiliatedOrderSearchModel : BaseSearchModel
 
     public AffiliatedOrderSearchModel()
     {
+		logger.LogDebug(">>> Entering AffiliatedOrderSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		logger.LogDebug("AffiliatedOrderSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
+		logger.LogDebug("AffiliatedOrderSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableShippingStatuses = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting AffiliatedOrderSearchModel()");
+		logger.LogDebug("AffiliatedOrderSearchModel(): AvailableShippingStatuses → {AvailableShippingStatuses}", AvailableShippingStatuses);
     }
 
     #endregion

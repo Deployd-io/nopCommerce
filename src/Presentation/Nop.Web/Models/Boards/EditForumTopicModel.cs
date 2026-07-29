@@ -10,7 +10,10 @@ public partial record EditForumTopicModel : BaseNopModel
 
     public EditForumTopicModel()
     {
+		logger.LogDebug(">>> Entering EditForumTopicModel()");
         TopicPriorities = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting EditForumTopicModel()");
+		logger.LogDebug("EditForumTopicModel(): TopicPriorities → {TopicPriorities}", TopicPriorities);
     }
 
     #endregion

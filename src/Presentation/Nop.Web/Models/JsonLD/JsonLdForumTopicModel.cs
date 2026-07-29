@@ -8,8 +8,12 @@ public partial record JsonLdForumTopicModel : JsonLdModel
 
     public JsonLdForumTopicModel()
     {
+		logger.LogDebug(">>> Entering JsonLdForumTopicModel()");
         Comments = new List<JsonLdForumTopicCommentModel>();
         InteractionStatistic = new List<JsonLdInteractionStatisticModel>();
+		logger.LogDebug("<<< Exiting JsonLdForumTopicModel()");
+		logger.LogDebug("JsonLdForumTopicModel(): Comments → {Comments}", Comments);
+		logger.LogDebug("JsonLdForumTopicModel(): InteractionStatistic → {InteractionStatistic}", InteractionStatistic);
     }
 
     #endregion

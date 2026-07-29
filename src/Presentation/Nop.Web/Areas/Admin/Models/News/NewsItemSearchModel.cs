@@ -13,7 +13,10 @@ public partial record NewsItemSearchModel : BaseSearchModel
 
     public NewsItemSearchModel()
     {
+		logger.LogDebug(">>> Entering NewsItemSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting NewsItemSearchModel()");
+		logger.LogDebug("NewsItemSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

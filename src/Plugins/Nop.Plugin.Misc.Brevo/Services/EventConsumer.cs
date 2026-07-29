@@ -57,6 +57,7 @@ public class EventConsumer :
 
         //unsubscribe contact
         await _brevoEmailManager.UnsubscribeAsync(eventMessage.Subscription);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -113,6 +114,7 @@ public class EventConsumer :
 
         //handle event
         await _marketingAutomationManager.HandleShoppingCartChangedEventAsync(eventMessage.Entity);
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

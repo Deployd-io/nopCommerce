@@ -43,6 +43,7 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
     /// </returns>
     public async Task<StorePickupPointListModel> PrepareStorePickupPointListModelAsync(StorePickupPointSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareStorePickupPointListModelAsync(searchModel={SearchModel})", searchModel);
         var pickupPoints = await _storePickupPointService.GetAllStorePickupPointsAsync(pageIndex: searchModel.Page - 1,
             pageSize: searchModel.PageSize);
         var model = await new StorePickupPointListModel().PrepareToGridAsync(searchModel, pickupPoints, () =>
@@ -51,6 +52,7 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
             {
                 var store = await _storeService.GetStoreByIdAsync(point.StoreId);
 
+				logger.LogDebug("PrepareStorePickupPointListModelAsync(searchModel={SearchModel}): store → {Store}", searchModel, store);
                 return new StorePickupPointModel
                 {
                     Id = point.Id,
@@ -65,6 +67,7 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareStorePickupPointListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -78,11 +81,13 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
     /// </returns>
     public Task<StorePickupPointSearchModel> PrepareStorePickupPointSearchModelAsync(StorePickupPointSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareStorePickupPointSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareStorePickupPointSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 

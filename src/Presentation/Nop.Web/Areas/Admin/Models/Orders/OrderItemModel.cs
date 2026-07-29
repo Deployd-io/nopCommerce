@@ -12,8 +12,12 @@ public partial record OrderItemModel : BaseNopEntityModel
 
     public OrderItemModel()
     {
+		logger.LogDebug(">>> Entering OrderItemModel()");
         PurchasedGiftCardIds = new List<int>();
         ReturnRequests = new List<ReturnRequestBriefModel>();
+		logger.LogDebug("<<< Exiting OrderItemModel()");
+		logger.LogDebug("OrderItemModel(): PurchasedGiftCardIds → {PurchasedGiftCardIds}", PurchasedGiftCardIds);
+		logger.LogDebug("OrderItemModel(): ReturnRequests → {ReturnRequests}", ReturnRequests);
     }
 
     #endregion

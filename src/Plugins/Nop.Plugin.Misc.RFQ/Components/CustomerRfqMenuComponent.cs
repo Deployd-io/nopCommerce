@@ -45,6 +45,7 @@ public class CustomerRfqMenuComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         if (additionalData is not CustomerNavigationModel model)
             return Content(string.Empty);
 
@@ -52,6 +53,7 @@ public class CustomerRfqMenuComponent : NopViewComponent
             return Content(string.Empty);
 
         if (!_rfqSettings.Enabled)
+		logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return Content(string.Empty);
 
         return View("~/Plugins/Misc.RFQ/Views/Components/CustomerRfqMenu.cshtml", model);

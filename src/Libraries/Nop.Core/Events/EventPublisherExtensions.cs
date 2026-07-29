@@ -14,7 +14,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task EntityInsertedAsync<T>(this IEventPublisher eventPublisher, T entity) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityInsertedAsync(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
         await eventPublisher.PublishAsync(new EntityInsertedEvent<T>(entity));
+		logger.LogDebug("<<< Exiting EntityInsertedAsync(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
     }
 
     /// <summary>
@@ -25,7 +27,9 @@ public static class EventPublisherExtensions
     /// <param name="entity">Entity</param>
     public static void EntityInserted<T>(this IEventPublisher eventPublisher, T entity) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityInserted(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
         eventPublisher.Publish(new EntityInsertedEvent<T>(entity));
+		logger.LogDebug("<<< Exiting EntityInserted(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
     }
 
     /// <summary>
@@ -37,7 +41,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task EntityUpdatedAsync<T>(this IEventPublisher eventPublisher, T entity) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityUpdatedAsync(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
         await eventPublisher.PublishAsync(new EntityUpdatedEvent<T>(entity));
+		logger.LogDebug("<<< Exiting EntityUpdatedAsync(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
     }
 
     /// <summary>
@@ -48,7 +54,9 @@ public static class EventPublisherExtensions
     /// <param name="entity">Entity</param>
     public static void EntityUpdated<T>(this IEventPublisher eventPublisher, T entity) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityUpdated(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
         eventPublisher.Publish(new EntityUpdatedEvent<T>(entity));
+		logger.LogDebug("<<< Exiting EntityUpdated(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
     }
 
     /// <summary>
@@ -60,7 +68,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task EntityDeletedAsync<T>(this IEventPublisher eventPublisher, T entity) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityDeletedAsync(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
         await eventPublisher.PublishAsync(new EntityDeletedEvent<T>(entity));
+		logger.LogDebug("<<< Exiting EntityDeletedAsync(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
     }
 
     /// <summary>
@@ -71,6 +81,8 @@ public static class EventPublisherExtensions
     /// <param name="entity">Entity</param>
     public static void EntityDeleted<T>(this IEventPublisher eventPublisher, T entity) where T : BaseEntity
     {
+		logger.LogDebug(">>> Entering EntityDeleted(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
         eventPublisher.Publish(new EntityDeletedEvent<T>(entity));
+		logger.LogDebug("<<< Exiting EntityDeleted(eventPublisher={EventPublisher},entity={Entity})", eventPublisher, entity);
     }
 }

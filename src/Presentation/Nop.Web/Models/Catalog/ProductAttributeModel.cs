@@ -25,7 +25,10 @@ public partial record ProductAttributeModel : BaseNopModel
 
     public ProductAttributeModel()
     {
+		logger.LogDebug(">>> Entering ProductAttributeModel()");
         ValueIds = new List<int>();
+		logger.LogDebug("<<< Exiting ProductAttributeModel()");
+		logger.LogDebug("ProductAttributeModel(): ValueIds → {ValueIds}", ValueIds);
     }
 
     #endregion

@@ -33,8 +33,11 @@ public partial class SummernoteHelper : ISummernoteHelper
     /// </returns>
     public virtual async Task<string> GetRichEditorLanguageAsync()
     {
+		logger.LogDebug(">>> Entering GetRichEditorLanguageAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var languageCulture = (await _workContext.GetWorkingLanguageAsync()).LanguageCulture;
 
+		logger.LogDebug("GetRichEditorLanguageAsync(): languageCulture → {LanguageCulture}", languageCulture);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.SummernoteLanguageKey,
             languageCulture);
 
@@ -46,5 +49,7 @@ public partial class SummernoteHelper : ISummernoteHelper
 
             return fileExists ? languageCulture : string.Empty;
         });
+		logger.LogInformation("GetRichEditorLanguageAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetRichEditorLanguageAsync()");
     }
 }

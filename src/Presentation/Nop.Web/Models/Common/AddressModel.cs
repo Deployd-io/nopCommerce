@@ -10,10 +10,16 @@ public partial record AddressModel : BaseNopEntityModel
 {
     public AddressModel()
     {
+		logger.LogDebug(">>> Entering AddressModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("AddressModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("AddressModel(): AvailableStates → {AvailableStates}", AvailableStates);
         CustomAddressAttributes = new List<AddressAttributeModel>();
         AddressFields = new KeyValuePair<AddressField, string>[7];
+		logger.LogDebug("<<< Exiting AddressModel()");
+		logger.LogDebug("AddressModel(): CustomAddressAttributes → {CustomAddressAttributes}", CustomAddressAttributes);
+		logger.LogDebug("AddressModel(): AddressFields → {AddressFields}", AddressFields);
     }
 
     [NopResourceDisplayName("Address.Fields.FirstName")]
@@ -91,9 +97,15 @@ public partial record AddressModel : BaseNopEntityModel
 
     public Address ToEntity(Address destination = null)
     {
+		logger.LogDebug(">>> Entering ToEntity(destination={Destination})", destination);
         destination ??= new Address();
         
         destination.Id = Id;
+		logger.LogDebug("ToEntity(destination={Destination}): destination.Id → {Arg1}", destination, destination.Id);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.FirstName → {Arg1}", destination, destination.FirstName);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.LastName → {Arg1}", destination, destination.LastName);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.Email → {Arg1}", destination, destination.Email);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.Company → {Arg1}", destination, destination.Company);
         destination.FirstName = FirstName;
         destination.LastName = LastName;
         destination.Email = Email;
@@ -101,6 +113,13 @@ public partial record AddressModel : BaseNopEntityModel
         destination.CountryId = CountryId == 0 ? null : CountryId;
         destination.StateProvinceId = StateProvinceId == 0 ? null : StateProvinceId;
         destination.County = County;
+		logger.LogDebug("ToEntity(destination={Destination}): destination.County → {Arg1}", destination, destination.County);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.City → {Arg1}", destination, destination.City);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.Address1 → {Arg1}", destination, destination.Address1);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.Address2 → {Arg1}", destination, destination.Address2);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.ZipPostalCode → {Arg1}", destination, destination.ZipPostalCode);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.PhoneNumber → {Arg1}", destination, destination.PhoneNumber);
+		logger.LogDebug("ToEntity(destination={Destination}): destination.FaxNumber → {Arg1}", destination, destination.FaxNumber);
         destination.City = City;
         destination.Address1 = Address1;
         destination.Address2 = Address2;
@@ -108,6 +127,7 @@ public partial record AddressModel : BaseNopEntityModel
         destination.PhoneNumber = PhoneNumber;
         destination.FaxNumber = FaxNumber;
 
+		logger.LogDebug("<<< Exiting ToEntity(destination={Destination})", destination);
         return destination;
     }
 }

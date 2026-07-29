@@ -8,13 +8,22 @@ public partial record MaintenanceModel : BaseNopModel
 {
     public MaintenanceModel()
     {
+		logger.LogDebug(">>> Entering MaintenanceModel()");
         DeleteGuests = new();
         DeleteAbandonedCarts = new();
+		logger.LogDebug("MaintenanceModel(): DeleteGuests → {DeleteGuests}", DeleteGuests);
+		logger.LogDebug("MaintenanceModel(): DeleteAbandonedCarts → {DeleteAbandonedCarts}", DeleteAbandonedCarts);
         DeleteExportedFiles = new();
         BackupFileSearchModel = new();
+		logger.LogDebug("MaintenanceModel(): DeleteExportedFiles → {DeleteExportedFiles}", DeleteExportedFiles);
+		logger.LogDebug("MaintenanceModel(): BackupFileSearchModel → {BackupFileSearchModel}", BackupFileSearchModel);
         DeleteAlreadySentQueuedEmails = new();
         DeleteMinificationFiles = new();
+		logger.LogDebug("MaintenanceModel(): DeleteAlreadySentQueuedEmails → {DeleteAlreadySentQueuedEmails}", DeleteAlreadySentQueuedEmails);
+		logger.LogDebug("MaintenanceModel(): DeleteMinificationFiles → {DeleteMinificationFiles}", DeleteMinificationFiles);
         DeleteThumbsFiles = new();
+		logger.LogDebug("<<< Exiting MaintenanceModel()");
+		logger.LogDebug("MaintenanceModel(): DeleteThumbsFiles → {DeleteThumbsFiles}", DeleteThumbsFiles);
     }
 
     public DeleteGuestsModel DeleteGuests { get; set; }

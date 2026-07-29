@@ -13,9 +13,14 @@ public partial record TranslationSettingsModel : BaseNopModel, ISettingsModel
 
     public TranslationSettingsModel()
     {
+		logger.LogDebug(">>> Entering TranslationSettingsModel()");
         AvailableLanguages = new List<SelectListItem>();
         NotTranslateLanguages = new List<int>();
+		logger.LogDebug("TranslationSettingsModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+		logger.LogDebug("TranslationSettingsModel(): NotTranslateLanguages → {NotTranslateLanguages}", NotTranslateLanguages);
         AvailableTranslationService = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TranslationSettingsModel()");
+		logger.LogDebug("TranslationSettingsModel(): AvailableTranslationService → {AvailableTranslationService}", AvailableTranslationService);
     }
 
     #endregion

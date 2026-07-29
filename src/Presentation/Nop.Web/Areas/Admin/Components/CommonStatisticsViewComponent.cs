@@ -43,6 +43,7 @@ public partial class CommonStatisticsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         if (!await _permissionService.AuthorizeAsync(StandardPermission.Customers.CUSTOMERS_VIEW) ||
             !await _permissionService.AuthorizeAsync(StandardPermission.Orders.ORDERS_VIEW) ||
             !await _permissionService.AuthorizeAsync(StandardPermission.Orders.RETURN_REQUESTS_VIEW) ||
@@ -58,6 +59,8 @@ public partial class CommonStatisticsViewComponent : NopViewComponent
         //prepare model
         var model = await _commonModelFactory.PrepareCommonStatisticsModelAsync();
 
+		logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 

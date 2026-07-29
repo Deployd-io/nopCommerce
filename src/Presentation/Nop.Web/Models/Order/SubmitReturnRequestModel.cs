@@ -7,9 +7,14 @@ public partial record SubmitReturnRequestModel : BaseNopModel
 {
     public SubmitReturnRequestModel()
     {
+		logger.LogDebug(">>> Entering SubmitReturnRequestModel()");
         Items = new List<OrderItemModel>();
         AvailableReturnReasons = new List<ReturnRequestReasonModel>();
+		logger.LogDebug("SubmitReturnRequestModel(): Items → {Items}", Items);
+		logger.LogDebug("SubmitReturnRequestModel(): AvailableReturnReasons → {AvailableReturnReasons}", AvailableReturnReasons);
         AvailableReturnActions = new List<ReturnRequestActionModel>();
+		logger.LogDebug("<<< Exiting SubmitReturnRequestModel()");
+		logger.LogDebug("SubmitReturnRequestModel(): AvailableReturnActions → {AvailableReturnActions}", AvailableReturnActions);
     }
 
     public int OrderId { get; set; }

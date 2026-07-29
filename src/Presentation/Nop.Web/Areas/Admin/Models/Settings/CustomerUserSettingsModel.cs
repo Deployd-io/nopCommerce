@@ -13,13 +13,22 @@ public partial record CustomerUserSettingsModel : BaseNopModel, ISettingsModel
 
     public CustomerUserSettingsModel()
     {
+		logger.LogDebug(">>> Entering CustomerUserSettingsModel()");
         CustomerSettings = new CustomerSettingsModel();
         AddressSettings = new AddressSettingsModel();
+		logger.LogDebug("CustomerUserSettingsModel(): CustomerSettings → {CustomerSettings}", CustomerSettings);
+		logger.LogDebug("CustomerUserSettingsModel(): AddressSettings → {AddressSettings}", AddressSettings);
         DateTimeSettings = new DateTimeSettingsModel();
         ExternalAuthenticationSettings = new ExternalAuthenticationSettingsModel();
+		logger.LogDebug("CustomerUserSettingsModel(): DateTimeSettings → {DateTimeSettings}", DateTimeSettings);
+		logger.LogDebug("CustomerUserSettingsModel(): ExternalAuthenticationSettings → {ExternalAuthenticationSettings}", ExternalAuthenticationSettings);
         MultiFactorAuthenticationSettings = new MultiFactorAuthenticationSettingsModel();
         CustomerAttributeSearchModel = new CustomerAttributeSearchModel();
+		logger.LogDebug("CustomerUserSettingsModel(): MultiFactorAuthenticationSettings → {MultiFactorAuthenticationSettings}", MultiFactorAuthenticationSettings);
+		logger.LogDebug("CustomerUserSettingsModel(): CustomerAttributeSearchModel → {CustomerAttributeSearchModel}", CustomerAttributeSearchModel);
         AddressAttributeSearchModel = new AddressAttributeSearchModel();
+		logger.LogDebug("<<< Exiting CustomerUserSettingsModel()");
+		logger.LogDebug("CustomerUserSettingsModel(): AddressAttributeSearchModel → {AddressAttributeSearchModel}", AddressAttributeSearchModel);
     }
 
     #endregion

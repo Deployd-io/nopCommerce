@@ -14,7 +14,9 @@ public abstract partial class BasePublicController : BaseController
 {
     protected virtual IActionResult InvokeHttp404()
     {
+		logger.LogDebug(">>> Entering InvokeHttp404()");
         Response.StatusCode = 404;
+		logger.LogDebug("<<< Exiting InvokeHttp404()");
         return new EmptyResult();
     }
 }

@@ -69,6 +69,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareConditionAttributesModelAsync(ConditionModel model, CheckoutAttribute checkoutAttribute)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(model);
 
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
@@ -136,11 +137,13 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// </returns>
     public virtual Task<CheckoutAttributeSearchModel> PrepareCheckoutAttributeSearchModelAsync(CheckoutAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCheckoutAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareCheckoutAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -154,11 +157,13 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// </returns>
     public virtual async Task<CheckoutAttributeListModel> PrepareCheckoutAttributeListModelAsync(CheckoutAttributeSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get checkout attributes
         var checkoutAttributes = (await _checkoutAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
 
+		logger.LogDebug("PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel}): checkoutAttributes → {CheckoutAttributes}", searchModel, checkoutAttributes);
         //prepare list model
         var model = await new CheckoutAttributeListModel().PrepareToGridAsync(searchModel, checkoutAttributes, () =>
         {
@@ -167,6 +172,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<CheckoutAttributeModel>();
 
+				logger.LogDebug("PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
 
@@ -174,6 +180,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

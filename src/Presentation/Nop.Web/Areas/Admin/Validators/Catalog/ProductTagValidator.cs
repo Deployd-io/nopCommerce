@@ -10,8 +10,10 @@ public partial class ProductTagValidator : BaseNopValidator<ProductTagModel>
 {
     public ProductTagValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ProductTagValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.ProductTags.Fields.Name.Required"));
 
         SetDatabaseValidationRules<ProductTag>();
+		logger.LogDebug("<<< Exiting ProductTagValidator(localizationService={LocalizationService})", localizationService);
     }
 }

@@ -12,7 +12,10 @@ public partial record FilterLevelSettingsModel : BaseNopModel, ISettingsModel
 
     public FilterLevelSettingsModel()
     {
+		logger.LogDebug(">>> Entering FilterLevelSettingsModel()");
         FilterLevelSearchModel = new FilterLevelSearchModel();
+		logger.LogDebug("<<< Exiting FilterLevelSettingsModel()");
+		logger.LogDebug("FilterLevelSettingsModel(): FilterLevelSearchModel → {FilterLevelSearchModel}", FilterLevelSearchModel);
     }
 
     #endregion

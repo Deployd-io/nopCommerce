@@ -11,7 +11,10 @@ public partial record AddAssociatedProductModel : BaseNopModel
 
     public AddAssociatedProductModel()
     {
+		logger.LogDebug(">>> Entering AddAssociatedProductModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddAssociatedProductModel()");
+		logger.LogDebug("AddAssociatedProductModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
     #endregion
 

@@ -14,11 +14,14 @@ public class SchemaMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         //#7387
         var productTableName = nameof(Product);
 
+		logger.LogDebug("Up(): productTableName → {ProductTableName}", productTableName);
         var ageVerificationColumnName = nameof(Product.AgeVerification);
         if (!Schema.Table(productTableName).Column(ageVerificationColumnName).Exists())
+		logger.LogDebug("Up(): ageVerificationColumnName → {AgeVerificationColumnName}", ageVerificationColumnName);
         {
             Alter.Table(productTableName)
                 .AddColumn(ageVerificationColumnName)
@@ -29,6 +32,7 @@ public class SchemaMigration : ForwardOnlyMigration
 
         var minimumAgeToPurchaseColumnName = nameof(Product.MinimumAgeToPurchase);
         if (!Schema.Table(productTableName).Column(minimumAgeToPurchaseColumnName).Exists())
+		logger.LogDebug("Up(): minimumAgeToPurchaseColumnName → {MinimumAgeToPurchaseColumnName}", minimumAgeToPurchaseColumnName);
         {
             Alter.Table(productTableName)
                 .AddColumn(minimumAgeToPurchaseColumnName)
@@ -40,8 +44,11 @@ public class SchemaMigration : ForwardOnlyMigration
         //#7294
         var topicTableName = nameof(Topic);
         var topicAvailableEndDateColumnName = nameof(Topic.AvailableEndDateTimeUtc);
+		logger.LogDebug("Up(): topicTableName → {TopicTableName}", topicTableName);
+		logger.LogDebug("Up(): topicAvailableEndDateColumnName → {TopicAvailableEndDateColumnName}", topicAvailableEndDateColumnName);
         var topicAvailableStartDateColumnName = nameof(Topic.AvailableStartDateTimeUtc);
 
+		logger.LogDebug("Up(): topicAvailableStartDateColumnName → {TopicAvailableStartDateColumnName}", topicAvailableStartDateColumnName);
         if (!Schema.Table(topicTableName).Column(topicAvailableEndDateColumnName).Exists())
         {
             Alter.Table(topicTableName)
@@ -61,6 +68,7 @@ public class SchemaMigration : ForwardOnlyMigration
         //#873
         var productTagTableName = nameof(ProductTag);
 
+		logger.LogDebug("Up(): productTagTableName → {ProductTagTableName}", productTagTableName);
         if (!Schema.Table(productTagTableName).Column(nameof(ProductTag.MetaDescription)).Exists())
             Alter.Table(productTagTableName).AddColumn(nameof(ProductTag.MetaDescription)).AsString().Nullable();
 
@@ -79,25 +87,32 @@ public class SchemaMigration : ForwardOnlyMigration
 
         var footerColumn1ColumnName = "IncludeInFooterColumn1";
         if (Schema.Table(topicTableName).Column(footerColumn1ColumnName).Exists())
+			logger.LogDebug("Up(): footerColumn1ColumnName → {FooterColumn1ColumnName}", footerColumn1ColumnName);
             Delete.Column(footerColumn1ColumnName).FromTable(topicTableName);
 
         var footerColumn2ColumnName = "IncludeInFooterColumn2";
         if (Schema.Table(topicTableName).Column(footerColumn2ColumnName).Exists())
+			logger.LogDebug("Up(): footerColumn2ColumnName → {FooterColumn2ColumnName}", footerColumn2ColumnName);
             Delete.Column(footerColumn2ColumnName).FromTable(topicTableName);
 
         var footerColumn3ColumnName = "IncludeInFooterColumn3";
         if (Schema.Table(topicTableName).Column(footerColumn3ColumnName).Exists())
+			logger.LogDebug("Up(): footerColumn3ColumnName → {FooterColumn3ColumnName}", footerColumn3ColumnName);
             Delete.Column(footerColumn3ColumnName).FromTable(topicTableName);
 
         var includeTopicInTopMenuColumnName = "IncludeInTopMenu";
         if (Schema.Table(topicTableName).Column(includeTopicInTopMenuColumnName).Exists())
+			logger.LogDebug("Up(): includeTopicInTopMenuColumnName → {IncludeTopicInTopMenuColumnName}", includeTopicInTopMenuColumnName);
             Delete.Column(includeTopicInTopMenuColumnName).FromTable(topicTableName);
 
         var categoryTableName = nameof(Category);
         var includeCategoryInTopMenuColumnName = "IncludeInTopMenu";
+		logger.LogDebug("Up(): categoryTableName → {CategoryTableName}", categoryTableName);
+		logger.LogDebug("Up(): includeCategoryInTopMenuColumnName → {IncludeCategoryInTopMenuColumnName}", includeCategoryInTopMenuColumnName);
         if (Schema.Table(categoryTableName).Column(includeCategoryInTopMenuColumnName).Exists())
             Delete.Column(includeCategoryInTopMenuColumnName).FromTable(categoryTableName);
 
 
+	logger.LogDebug("<<< Exiting Up()");
     }
 }

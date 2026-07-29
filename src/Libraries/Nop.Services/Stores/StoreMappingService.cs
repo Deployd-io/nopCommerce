@@ -50,6 +50,8 @@ public partial class StoreMappingService : IStoreMappingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertStoreMappingAsync(StoreMapping storeMapping)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _storeMappingRepository.InsertAsync(storeMapping);
     }
 
@@ -63,9 +65,14 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     protected virtual async Task<bool> IsEntityMappingExistsAsync<TEntity>() where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering IsEntityMappingExistsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var entityName = typeof(TEntity).Name;
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopStoreDefaults.StoreMappingExistsCacheKey, entityName);
 
+		logger.LogDebug("IsEntityMappingExistsAsync(): entityName → {EntityName}", entityName);
+		logger.LogWarning("IsEntityMappingExistsAsync(): key → {Key}", key);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from sm in _storeMappingRepository.Table
             where sm.EntityName == entityName
             select sm.StoreId;
@@ -90,11 +97,13 @@ public partial class StoreMappingService : IStoreMappingService
     public virtual async Task<IQueryable<TEntity>> ApplyStoreMapping<TEntity>(IQueryable<TEntity> query, int storeId)
         where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering ApplyStoreMapping(query={Query},storeId={StoreId})", query, storeId);
         ArgumentNullException.ThrowIfNull(query);
 
         if (storeId == 0 || _catalogSettings.IgnoreStoreLimitations || !await IsEntityMappingExistsAsync<TEntity>())
             return query;
 
+		logger.LogDebug("<<< Exiting ApplyStoreMapping(query={Query},storeId={StoreId})", query, storeId);
         return from entity in query
             where !entity.LimitedToStores || _storeMappingRepository.Table.Any(sm =>
                 sm.EntityName == typeof(TEntity).Name && sm.EntityId == entity.Id && sm.StoreId == storeId)
@@ -108,9 +117,13 @@ public partial class StoreMappingService : IStoreMappingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteStoreMappingAsync(StoreMapping storeMapping)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _storeMappingRepository.DeleteAsync(storeMapping);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Gets store mapping records
     /// </summary>
@@ -122,13 +135,18 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     public virtual async Task<IList<StoreMapping>> GetStoreMappingsAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering GetStoreMappingsAsync(entity={Entity})", entity);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(entity);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("GetStoreMappingsAsync(entity={Entity}): entityName → {EntityName}", entity, entityName);
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopStoreDefaults.StoreMappingsCacheKey, entityId, entityName);
 
+		logger.LogWarning("GetStoreMappingsAsync(entity={Entity}): key → {Key}", entity, key);
         var query = from sm in _storeMappingRepository.Table
             where sm.EntityId == entityId &&
                   sm.EntityName == entityName
@@ -136,6 +154,9 @@ public partial class StoreMappingService : IStoreMappingService
 
         var storeMappings = await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
 
+		logger.LogDebug("GetStoreMappingsAsync(entity={Entity}): storeMappings → {StoreMappings}", entity, storeMappings);
+		logger.LogInformation("GetStoreMappingsAsync(entity)={Entity}: external service call took {Arg1} ms", entity, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("GetStoreMappingsAsync(entity)={Entity}: find query executed in {Arg1} ms", entity, __logStart.ElapsedMilliseconds);
         return storeMappings;
     }
 
@@ -148,14 +169,17 @@ public partial class StoreMappingService : IStoreMappingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertStoreMappingAsync<TEntity>(TEntity entity, int storeId) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering InsertStoreMappingAsync(entity={Entity},storeId={StoreId})", entity, storeId);
         ArgumentNullException.ThrowIfNull(entity);
 
         if (storeId == 0)
+			logger.LogDebug("<<< Exiting InsertStoreMappingAsync(entity={Entity},storeId={StoreId})", entity, storeId);
             throw new ArgumentOutOfRangeException(nameof(storeId));
 
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("InsertStoreMappingAsync(entity={Entity},storeId={StoreId}): entityName → {EntityName}", entity, storeId, entityName);
         var storeMapping = new StoreMapping
         {
             EntityId = entityId,
@@ -177,13 +201,18 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     public virtual async Task<int[]> GetStoresIdsWithAccessAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering GetStoresIdsWithAccessAsync(entity={Entity})", entity);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(entity);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("GetStoresIdsWithAccessAsync(entity={Entity}): entityName → {EntityName}", entity, entityName);
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopStoreDefaults.StoreMappingIdsCacheKey, entityId, entityName);
 
+		logger.LogWarning("GetStoresIdsWithAccessAsync(entity={Entity}): key → {Key}", entity, key);
         var query = from sm in _storeMappingRepository.Table
             where sm.EntityId == entityId &&
                   sm.EntityName == entityName
@@ -202,13 +231,16 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     public virtual int[] GetStoresIdsWithAccess<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering GetStoresIdsWithAccess(entity={Entity})", entity);
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("GetStoresIdsWithAccess(entity={Entity}): entityName → {EntityName}", entity, entityName);
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopStoreDefaults.StoreMappingIdsCacheKey, entityId, entityName);
 
+		logger.LogWarning("GetStoresIdsWithAccess(entity={Entity}): key → {Key}", entity, key);
         var query = from sm in _storeMappingRepository.Table
             where sm.EntityId == entityId &&
                   sm.EntityName == entityName
@@ -228,8 +260,10 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     public virtual async Task<bool> AuthorizeAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering AuthorizeAsync(entity={Entity})", entity);
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		logger.LogDebug("AuthorizeAsync(entity={Entity}): store → {Store}", entity, store);
         return await AuthorizeAsync(entity, store.Id);
     }
 
@@ -278,6 +312,7 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     public virtual bool Authorize<TEntity>(TEntity entity, int storeId) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering Authorize(entity={Entity},storeId={StoreId})", entity, storeId);
         if (entity == null)
             return false;
 
@@ -311,6 +346,7 @@ public partial class StoreMappingService : IStoreMappingService
     /// </returns>
     public virtual async Task SaveStoreMappingsAsync<TEntity>(TEntity entity, IEnumerable<int> storeIds) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		logger.LogDebug(">>> Entering SaveStoreMappingsAsync(entity={Entity},storeIds={StoreIds})", entity, storeIds);
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(storeIds);
 
@@ -318,6 +354,8 @@ public partial class StoreMappingService : IStoreMappingService
 
         var allStores = await _storeService.GetAllStoresAsync();
         var existingStoreMappings = await GetStoreMappingsAsync(entity);
+		logger.LogDebug("SaveStoreMappingsAsync(entity={Entity},storeIds={StoreIds}): allStores → {AllStores}", entity, storeIds, allStores);
+		logger.LogDebug("SaveStoreMappingsAsync(entity={Entity},storeIds={StoreIds}): existingStoreMappings → {ExistingStoreMappings}", entity, storeIds, existingStoreMappings);
 
         if (entity.LimitedToStores != storeIds.Any())
         {
@@ -338,9 +376,11 @@ public partial class StoreMappingService : IStoreMappingService
                 //remove store
                 var storeMappingToDelete = existingStoreMappings.FirstOrDefault(sm => sm.StoreId == store.Id);
                 if (storeMappingToDelete != null)
+					logger.LogDebug("SaveStoreMappingsAsync(entity={Entity},storeIds={StoreIds}): storeMappingToDelete → {StoreMappingToDelete}", entity, storeIds, storeMappingToDelete);
                     await DeleteStoreMappingAsync(storeMappingToDelete);
             }
         }
+		logger.LogDebug("<<< Exiting SaveStoreMappingsAsync(entity={Entity},storeIds={StoreIds})", entity, storeIds);
     }
 
     #endregion

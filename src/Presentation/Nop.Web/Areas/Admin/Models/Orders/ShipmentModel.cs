@@ -12,8 +12,12 @@ public partial record ShipmentModel : BaseNopEntityModel
 
     public ShipmentModel()
     {
+		logger.LogDebug(">>> Entering ShipmentModel()");
         ShipmentStatusEvents = new List<ShipmentStatusEventModel>();
         Items = new List<ShipmentItemModel>();
+		logger.LogDebug("<<< Exiting ShipmentModel()");
+		logger.LogDebug("ShipmentModel(): ShipmentStatusEvents → {ShipmentStatusEvents}", ShipmentStatusEvents);
+		logger.LogDebug("ShipmentModel(): Items → {Items}", Items);
     }
 
     #endregion

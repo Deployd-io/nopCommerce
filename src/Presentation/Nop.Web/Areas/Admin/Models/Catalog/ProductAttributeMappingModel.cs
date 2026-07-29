@@ -15,10 +15,16 @@ public partial record ProductAttributeMappingModel : BaseNopEntityModel, ITransl
 
     public ProductAttributeMappingModel()
     {
+		logger.LogDebug(">>> Entering ProductAttributeMappingModel()");
         AvailableProductAttributes = new List<SelectListItem>();
         Locales = new List<ProductAttributeMappingLocalizedModel>();
+		logger.LogDebug("ProductAttributeMappingModel(): AvailableProductAttributes → {AvailableProductAttributes}", AvailableProductAttributes);
+		logger.LogDebug("ProductAttributeMappingModel(): Locales → {Locales}", Locales);
         ConditionModel = new ProductAttributeConditionModel();
         ProductAttributeValueSearchModel = new ProductAttributeValueSearchModel();
+		logger.LogDebug("<<< Exiting ProductAttributeMappingModel()");
+		logger.LogDebug("ProductAttributeMappingModel(): ConditionModel → {ConditionModel}", ConditionModel);
+		logger.LogDebug("ProductAttributeMappingModel(): ProductAttributeValueSearchModel → {ProductAttributeValueSearchModel}", ProductAttributeValueSearchModel);
     }
 
     #endregion

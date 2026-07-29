@@ -9,11 +9,18 @@ public partial record ProductOverviewModel : BaseNopEntityModel
 {
     public ProductOverviewModel()
     {
+		logger.LogDebug(">>> Entering ProductOverviewModel()");
         ProductPrice = new ProductPriceModel();
         PictureModels = new List<PictureModel>();
+		logger.LogDebug("ProductOverviewModel(): ProductPrice → {ProductPrice}", ProductPrice);
+		logger.LogDebug("ProductOverviewModel(): PictureModels → {PictureModels}", PictureModels);
         ProductSpecificationModel = new ProductSpecificationModel();
         ReviewOverviewModel = new ProductReviewOverviewModel();
+		logger.LogDebug("ProductOverviewModel(): ProductSpecificationModel → {ProductSpecificationModel}", ProductSpecificationModel);
+		logger.LogDebug("ProductOverviewModel(): ReviewOverviewModel → {ReviewOverviewModel}", ReviewOverviewModel);
         ProductToWishlist = new ProductToWishlistModel();
+		logger.LogDebug("<<< Exiting ProductOverviewModel()");
+		logger.LogDebug("ProductOverviewModel(): ProductToWishlist → {ProductToWishlist}", ProductToWishlist);
     }
 
     public string Name { get; set; }

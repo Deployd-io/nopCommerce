@@ -13,8 +13,12 @@ public partial record OnlineCustomerSearchModel : BaseSearchModel, IAclSupported
 
     public OnlineCustomerSearchModel()
     {
+		logger.LogDebug(">>> Entering OnlineCustomerSearchModel()");
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting OnlineCustomerSearchModel()");
+		logger.LogDebug("OnlineCustomerSearchModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		logger.LogDebug("OnlineCustomerSearchModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
     }
 
     #endregion

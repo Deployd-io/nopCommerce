@@ -11,9 +11,14 @@ public partial record CustomerReportsSearchModel : BaseSearchModel
 
     public CustomerReportsSearchModel()
     {
+		logger.LogDebug(">>> Entering CustomerReportsSearchModel()");
         BestCustomersByOrderTotal = new BestCustomersReportSearchModel();
         BestCustomersByNumberOfOrders = new BestCustomersReportSearchModel();
+		logger.LogDebug("CustomerReportsSearchModel(): BestCustomersByOrderTotal → {BestCustomersByOrderTotal}", BestCustomersByOrderTotal);
+		logger.LogDebug("CustomerReportsSearchModel(): BestCustomersByNumberOfOrders → {BestCustomersByNumberOfOrders}", BestCustomersByNumberOfOrders);
         RegisteredCustomers = new RegisteredCustomersReportSearchModel();
+		logger.LogDebug("<<< Exiting CustomerReportsSearchModel()");
+		logger.LogDebug("CustomerReportsSearchModel(): RegisteredCustomers → {RegisteredCustomers}", RegisteredCustomers);
     }
 
     #endregion

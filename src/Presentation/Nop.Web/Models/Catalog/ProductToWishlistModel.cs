@@ -10,6 +10,9 @@ public partial record ProductToWishlistModel : BaseNopModel
     
     public ProductToWishlistModel()
     {
+		logger.LogDebug(">>> Entering ProductToWishlistModel()");
         CustomWishlistItems = new List<CustomWishlistModel>();
+		logger.LogDebug("<<< Exiting ProductToWishlistModel()");
+		logger.LogDebug("ProductToWishlistModel(): CustomWishlistItems → {CustomWishlistItems}", CustomWishlistItems);
     }
 }

@@ -13,9 +13,14 @@ public partial record AffiliateModel : BaseNopEntityModel
 
     public AffiliateModel()
     {
+		logger.LogDebug(">>> Entering AffiliateModel()");
         Address = new AddressModel();
         AffiliatedOrderSearchModel = new AffiliatedOrderSearchModel();
+		logger.LogDebug("AffiliateModel(): Address → {Address}", Address);
+		logger.LogDebug("AffiliateModel(): AffiliatedOrderSearchModel → {AffiliatedOrderSearchModel}", AffiliatedOrderSearchModel);
         AffiliatedCustomerSearchModel = new AffiliatedCustomerSearchModel();
+		logger.LogDebug("<<< Exiting AffiliateModel()");
+		logger.LogDebug("AffiliateModel(): AffiliatedCustomerSearchModel → {AffiliatedCustomerSearchModel}", AffiliatedCustomerSearchModel);
     }
 
     #endregion

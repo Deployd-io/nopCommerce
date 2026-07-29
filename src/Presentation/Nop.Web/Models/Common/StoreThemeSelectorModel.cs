@@ -6,7 +6,10 @@ public partial record StoreThemeSelectorModel : BaseNopModel
 {
     public StoreThemeSelectorModel()
     {
+		logger.LogDebug(">>> Entering StoreThemeSelectorModel()");
         AvailableStoreThemes = new List<StoreThemeModel>();
+		logger.LogDebug("<<< Exiting StoreThemeSelectorModel()");
+		logger.LogDebug("StoreThemeSelectorModel(): AvailableStoreThemes → {AvailableStoreThemes}", AvailableStoreThemes);
     }
 
     public IList<StoreThemeModel> AvailableStoreThemes { get; set; }

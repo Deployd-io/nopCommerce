@@ -33,8 +33,12 @@ public partial record PriceRangeFilterModel : BaseNopModel
     /// </summary>
     public PriceRangeFilterModel()
     {
+		logger.LogDebug(">>> Entering PriceRangeFilterModel()");
         SelectedPriceRange = new PriceRangeModel();
         AvailablePriceRange = new PriceRangeModel();
+		logger.LogDebug("<<< Exiting PriceRangeFilterModel()");
+		logger.LogDebug("PriceRangeFilterModel(): SelectedPriceRange → {SelectedPriceRange}", SelectedPriceRange);
+		logger.LogDebug("PriceRangeFilterModel(): AvailablePriceRange → {AvailablePriceRange}", AvailablePriceRange);
     }
 
     #endregion

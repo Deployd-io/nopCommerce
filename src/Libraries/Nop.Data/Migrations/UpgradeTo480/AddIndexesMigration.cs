@@ -12,7 +12,10 @@ public class AddIndexesMigration : ForwardOnlyMigration
 
     public AddIndexesMigration(INopDataProvider dataProvider)
     {
+		logger.LogDebug(">>> Entering AddIndexesMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		logger.LogDebug("<<< Exiting AddIndexesMigration(dataProvider={DataProvider})", dataProvider);
+		logger.LogDebug("AddIndexesMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -20,6 +23,7 @@ public class AddIndexesMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!Schema.Table(nameof(Customer)).Index("IX_Customer_Deleted").Exists())
             Create.Index("IX_Customer_Deleted")
                 .OnTable(nameof(Customer))
@@ -54,5 +58,6 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .OnTable(nameof(Topic))
                 .OnColumn(nameof(Topic.SystemName)).Ascending()
                 .WithOptions().NonClustered();
+				logger.LogDebug("<<< Exiting Up()");
     }
 }

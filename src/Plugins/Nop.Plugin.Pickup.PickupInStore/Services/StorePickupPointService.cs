@@ -64,15 +64,21 @@ public class StorePickupPointService : IStorePickupPointService
     /// </returns>
     public virtual async Task<IPagedList<StorePickupPoint>> GetAllStorePickupPointsAsync(int storeId = 0, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		logger.LogDebug(">>> Entering GetAllStorePickupPointsAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize})", storeId, pageIndex, pageSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var rez = await _shortTermCacheManager.GetAsync(async () => await _storePickupPointRepository.GetAllAsync(query =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (storeId > 0)
                 query = query.Where(point => point.StoreId == storeId || point.StoreId == 0);
             query = query.OrderBy(point => point.DisplayOrder).ThenBy(point => point.Name);
+			logger.LogInformation("GetAllStorePickupPointsAsync(storeId,pageIndex,pageSize)={StoreId},{PageIndex},{PageSize}: find query executed in {Arg3} ms", storeId, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
             return query;
         }), _pickupPointAllKey, storeId);
 
+		logger.LogInformation("GetAllStorePickupPointsAsync(storeId,pageIndex,pageSize)={StoreId},{PageIndex},{PageSize}: external service call took {Arg3} ms", storeId, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetAllStorePickupPointsAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize})", storeId, pageIndex, pageSize);
         return new PagedList<StorePickupPoint>(rez, pageIndex, pageSize);
     }
 
@@ -86,6 +92,8 @@ public class StorePickupPointService : IStorePickupPointService
     /// </returns>
     public virtual async Task<StorePickupPoint> GetStorePickupPointByIdAsync(int pickupPointId)
     {
+		logger.LogDebug(">>> Entering GetStorePickupPointByIdAsync(pickupPointId={PickupPointId})", pickupPointId);
+		logger.LogDebug("<<< Exiting GetStorePickupPointByIdAsync(pickupPointId={PickupPointId})", pickupPointId);
         return await _storePickupPointRepository.GetByIdAsync(pickupPointId);
     }
 
@@ -96,8 +104,12 @@ public class StorePickupPointService : IStorePickupPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertStorePickupPointAsync(StorePickupPoint pickupPoint)
     {
+		logger.LogDebug(">>> Entering InsertStorePickupPointAsync(pickupPoint={PickupPoint})", pickupPoint);
         await _storePickupPointRepository.InsertAsync(pickupPoint, false);
         await _staticCacheManager.RemoveByPrefixAsync(PICKUP_POINT_PATTERN_KEY);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertStorePickupPointAsync(pickupPoint)={PickupPoint}: save query executed in {Arg1} ms", pickupPoint, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting InsertStorePickupPointAsync(pickupPoint={PickupPoint})", pickupPoint);
     }
 
     /// <summary>
@@ -107,8 +119,12 @@ public class StorePickupPointService : IStorePickupPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateStorePickupPointAsync(StorePickupPoint pickupPoint)
     {
+		logger.LogDebug(">>> Entering UpdateStorePickupPointAsync(pickupPoint={PickupPoint})", pickupPoint);
         await _storePickupPointRepository.UpdateAsync(pickupPoint, false);
         await _staticCacheManager.RemoveByPrefixAsync(PICKUP_POINT_PATTERN_KEY);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateStorePickupPointAsync(pickupPoint)={PickupPoint}: update query executed in {Arg1} ms", pickupPoint, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting UpdateStorePickupPointAsync(pickupPoint={PickupPoint})", pickupPoint);
     }
 
     /// <summary>
@@ -118,8 +134,15 @@ public class StorePickupPointService : IStorePickupPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteStorePickupPointAsync(StorePickupPoint pickupPoint)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogDebug(">>> Entering DeleteStorePickupPointAsync(pickupPoint={PickupPoint})", pickupPoint);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _storePickupPointRepository.DeleteAsync(pickupPoint, false);
         await _staticCacheManager.RemoveByPrefixAsync(PICKUP_POINT_PATTERN_KEY);
+		logger.LogDebug("<<< Exiting DeleteStorePickupPointAsync(pickupPoint={PickupPoint})", pickupPoint);
+		logger.LogInformation("DeleteStorePickupPointAsync(pickupPoint)={PickupPoint}: external service call took {Arg1} ms", pickupPoint, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteStorePickupPointAsync(pickupPoint)={PickupPoint}: delete query executed in {Arg1} ms", pickupPoint, __logStart.ElapsedMilliseconds);
     }
 
     #endregion

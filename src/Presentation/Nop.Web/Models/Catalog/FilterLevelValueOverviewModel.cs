@@ -9,7 +9,10 @@ public partial record FilterLevelValueOverviewModel : BaseNopModel
 {
     public FilterLevelValueOverviewModel()
     {
+		logger.LogDebug(">>> Entering FilterLevelValueOverviewModel()");
         FilterLevelValues = new List<FilterLevelValueInfoModel>();
+		logger.LogDebug("<<< Exiting FilterLevelValueOverviewModel()");
+		logger.LogDebug("FilterLevelValueOverviewModel(): FilterLevelValues → {FilterLevelValues}", FilterLevelValues);
     }
 
     public bool FilterLevel1ValueEnabled { get; set; }

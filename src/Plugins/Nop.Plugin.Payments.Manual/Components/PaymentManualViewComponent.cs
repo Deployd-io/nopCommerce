@@ -10,6 +10,7 @@ public class PaymentManualViewComponent : NopViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		logger.LogDebug(">>> Entering InvokeAsync()");
         var model = new PaymentInfoModel()
         {
             CreditCardTypes = new List<SelectListItem>
@@ -53,6 +54,7 @@ public class PaymentManualViewComponent : NopViewComponent
                 selectedYear.Selected = true;
         }
 
+		logger.LogDebug("<<< Exiting InvokeAsync()");
         return View("~/Plugins/Payments.Manual/Views/PaymentInfo.cshtml", model);
     }
 }

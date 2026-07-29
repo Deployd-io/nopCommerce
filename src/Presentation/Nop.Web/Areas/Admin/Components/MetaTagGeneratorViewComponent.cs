@@ -20,7 +20,10 @@ public partial class MetaTagsGeneratorViewComponent : NopViewComponent
 
     public MetaTagsGeneratorViewComponent(ArtificialIntelligenceSettings artificialIntelligenceSettings)
     {
+		logger.LogDebug(">>> Entering MetaTagsGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings})", artificialIntelligenceSettings);
         _artificialIntelligenceSettings = artificialIntelligenceSettings;
+		logger.LogDebug("<<< Exiting MetaTagsGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings})", artificialIntelligenceSettings);
+		logger.LogDebug("MetaTagsGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings}): _artificialIntelligenceSettings → {_artificialIntelligenceSettings}", artificialIntelligenceSettings, _artificialIntelligenceSettings);
     }
 
     #endregion
@@ -29,6 +32,7 @@ public partial class MetaTagsGeneratorViewComponent : NopViewComponent
 
     public IViewComponentResult Invoke(MetaTagsGeneratorModel model)
     {
+		logger.LogDebug(">>> Entering Invoke(model={Model})", model);
         if (!_artificialIntelligenceSettings.Enabled)
             return Content(string.Empty);
 
@@ -39,6 +43,7 @@ public partial class MetaTagsGeneratorViewComponent : NopViewComponent
             return Content(string.Empty);
         }
 
+		logger.LogDebug("<<< Exiting Invoke(model={Model})", model);
         return View(model);
     }
 

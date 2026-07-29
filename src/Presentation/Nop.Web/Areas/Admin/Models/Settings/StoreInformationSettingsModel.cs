@@ -13,7 +13,10 @@ public partial record StoreInformationSettingsModel : BaseNopModel, ISettingsMod
 
     public StoreInformationSettingsModel()
     {
+		logger.LogDebug(">>> Entering StoreInformationSettingsModel()");
         AvailableStoreThemes = new List<ThemeModel>();
+		logger.LogDebug("<<< Exiting StoreInformationSettingsModel()");
+		logger.LogDebug("StoreInformationSettingsModel(): AvailableStoreThemes → {AvailableStoreThemes}", AvailableStoreThemes);
     }
 
     #endregion

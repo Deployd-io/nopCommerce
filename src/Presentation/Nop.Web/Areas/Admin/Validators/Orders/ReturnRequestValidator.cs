@@ -10,6 +10,7 @@ public partial class ReturnRequestValidator : BaseNopValidator<ReturnRequestMode
 {
     public ReturnRequestValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering ReturnRequestValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.ReasonForReturn).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.ReasonForReturn.Required"));
         RuleFor(x => x.RequestedAction).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.RequestedAction.Required"));
         RuleFor(x => x.Quantity).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.Quantity.Required"));
@@ -18,5 +19,6 @@ public partial class ReturnRequestValidator : BaseNopValidator<ReturnRequestMode
         RuleFor(x => x.ReturnedQuantity).Must((model, value) => value <= model.Quantity).WithMessage(model => string.Format(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.ReturnedQuantity.MustBeLessOrEqualQuantityField").Result, model.Quantity));
 
         SetDatabaseValidationRules<ReturnRequest>();
+		logger.LogDebug("<<< Exiting ReturnRequestValidator(localizationService={LocalizationService})", localizationService);
     }
 }

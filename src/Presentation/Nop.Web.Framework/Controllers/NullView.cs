@@ -11,8 +11,10 @@ public partial class NullView : IView
 
     public virtual Task RenderAsync(ViewContext context)
     {
+		logger.LogDebug(">>> Entering RenderAsync(context={Context})", context);
         ArgumentNullException.ThrowIfNull(context);
 
+		logger.LogDebug("<<< Exiting RenderAsync(context={Context})", context);
         return Task.CompletedTask;
     }
 }

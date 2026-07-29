@@ -6,7 +6,10 @@ public partial record CustomerDownloadableProductsModel : BaseNopModel
 {
     public CustomerDownloadableProductsModel()
     {
+		logger.LogDebug(">>> Entering CustomerDownloadableProductsModel()");
         Items = new List<DownloadableProductsModel>();
+		logger.LogDebug("<<< Exiting CustomerDownloadableProductsModel()");
+		logger.LogDebug("CustomerDownloadableProductsModel(): Items → {Items}", Items);
     }
 
     public IList<DownloadableProductsModel> Items { get; set; }

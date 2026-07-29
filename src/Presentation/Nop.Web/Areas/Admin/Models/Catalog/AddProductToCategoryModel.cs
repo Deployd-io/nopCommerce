@@ -11,7 +11,10 @@ public partial record AddProductToCategoryModel : BaseNopModel
 
     public AddProductToCategoryModel()
     {
+		logger.LogDebug(">>> Entering AddProductToCategoryModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddProductToCategoryModel()");
+		logger.LogDebug("AddProductToCategoryModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
     #endregion
 

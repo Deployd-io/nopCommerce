@@ -51,6 +51,8 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(ZettleDefaults.ConfigurationRouteName);
     }
 
@@ -60,6 +62,8 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //ensure MediaSettings.UseAbsoluteImagePath is enabled (used for images uploading)
         await _settingService.SetSettingAsync($"{nameof(MediaSettings)}.{nameof(MediaSettings.UseAbsoluteImagePath)}", true, clearCache: false);
 
@@ -87,6 +91,12 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
                 Name = ZettleDefaults.SynchronizationTask.Name,
                 Type = ZettleDefaults.SynchronizationTask.Type,
                 Seconds = ZettleDefaults.SynchronizationTask.Period
+				logger.LogInformation("InstallAsync(): Enabled → {Enabled}", Enabled);
+				logger.LogDebug("InstallAsync(): StopOnError → {StopOnError}", StopOnError);
+				logger.LogDebug("InstallAsync(): LastEnabledUtc → {LastEnabledUtc}", LastEnabledUtc);
+				logger.LogDebug("InstallAsync(): Name → {Name}", Name);
+				logger.LogDebug("InstallAsync(): Type → {Type}", Type);
+				logger.LogDebug("InstallAsync(): Seconds → {Seconds}", Seconds);
             });
         }
 
@@ -129,6 +139,7 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
             ["Plugins.Misc.Zettle.Configuration.Fields.DiscountSyncEnabled.Hint"] = "Determine whether to import discounts from nopCommerce catalog (assigned to order subtotal only) to PayPal Zettle.",
             ["Plugins.Misc.Zettle.Configuration.Webhook.Warning"] = "Webhook was not created (see details in the <a href=\"{0}\" target=\"_blank\">log</a>), so some functions may not work correctly. Please ensure that your store is under SSL, PayPal Zettle doesn't send requests to unsecured sites.",
 
+			logger.LogInformation("InstallAsync(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             ["Plugins.Misc.Zettle.Account.Pending"] = "Before your account is activated, you will go through a process to verify your identity. This process may take some time. See details <a href=\"{1}\" target=\"_blank\">here</a>. The current customer status is {0}.",
             ["Plugins.Misc.Zettle.Account.Fields.Name"] = "Name",
             ["Plugins.Misc.Zettle.Account.Fields.Name.Hint"] = "Displays the name of the connected account.",
@@ -182,6 +193,7 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -190,8 +202,10 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         var zettleSettings = await _settingService.LoadSettingAsync<ZettleSettings>();
         if (zettleSettings.DisconnectOnUninstall)
+			logger.LogDebug("UninstallAsync(): zettleSettings → {ZettleSettings}", zettleSettings);
             await _zettleService.DisconnectAsync();
         else if (!string.IsNullOrEmpty(zettleSettings.WebhookUrl))
             await _zettleService.DeleteWebhookAsync();
@@ -201,9 +215,11 @@ public class ZettlePlugin : BasePlugin, IMiscPlugin
 
         var scheduleTask = await _scheduleTaskService.GetTaskByTypeAsync(ZettleDefaults.SynchronizationTask.Type);
         if (scheduleTask is not null)
+			logger.LogDebug("UninstallAsync(): scheduleTask → {ScheduleTask}", scheduleTask);
             await _scheduleTaskService.DeleteTaskAsync(scheduleTask);
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

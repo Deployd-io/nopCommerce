@@ -32,17 +32,25 @@ public class AuthenticationModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<AuthModel> PrepareAuthModel(AuthModel model)
     {
+		logger.LogDebug(">>> Entering PrepareAuthModel(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var secretkey = Guid.NewGuid().ToString().Replace("-", "")[0..10];
         var setupInfo = await _googleAuthenticatorService.GenerateSetupCode(secretkey);
+		logger.LogDebug("PrepareAuthModel(model={Model}): secretkey → {Secretkey}", model, secretkey);
+		logger.LogDebug("PrepareAuthModel(model={Model}): setupInfo → {SetupInfo}", model, setupInfo);
+		logger.LogDebug("PrepareAuthModel(model={Model}): model.SecretKey → {Arg1}", model, model.SecretKey);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		logger.LogDebug("PrepareAuthModel(model={Model}): customer → {Customer}", model, customer);
         model.SecretKey = secretkey;
         model.Account = $"{_googleAuthenticatorSettings.BusinessPrefix} ({customer.Email})";
         model.ManualEntryQrCode = setupInfo.ManualEntryKey;
+		logger.LogDebug("PrepareAuthModel(model={Model}): model.ManualEntryQrCode → {Arg1}", model, model.ManualEntryQrCode);
+		logger.LogDebug("PrepareAuthModel(model={Model}): model.QrCodeImageUrl → {Arg1}", model, model.QrCodeImageUrl);
         model.QrCodeImageUrl = setupInfo.QrCodeSetupImageUrl;
 
+		logger.LogDebug("<<< Exiting PrepareAuthModel(model={Model})", model);
         return model;
     }
 

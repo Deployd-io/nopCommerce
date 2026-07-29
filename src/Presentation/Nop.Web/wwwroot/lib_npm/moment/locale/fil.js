@@ -49,6 +49,7 @@ export default moment.defineLocale('fil', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return number;
     },
     week: {

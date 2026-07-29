@@ -17,11 +17,13 @@ public partial class ProductAttributeCombinationBuilder : NopEntityBuilder<Produ
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ProductAttributeCombination.Sku)).AsString(400).Nullable()
             .WithColumn(nameof(ProductAttributeCombination.ManufacturerPartNumber)).AsString(400).Nullable()
             .WithColumn(nameof(ProductAttributeCombination.Gtin)).AsString(400).Nullable()
             .WithColumn(nameof(ProductAttributeCombination.ProductId)).AsInt32().ForeignKey<Product>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

@@ -20,7 +20,10 @@ public partial record NewProductsModel : BaseNopModel
 
     public NewProductsModel()
     {
+		logger.LogDebug(">>> Entering NewProductsModel()");
         CatalogProductsModel = new CatalogProductsModel();
+		logger.LogDebug("<<< Exiting NewProductsModel()");
+		logger.LogDebug("NewProductsModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
     }
 
     #endregion

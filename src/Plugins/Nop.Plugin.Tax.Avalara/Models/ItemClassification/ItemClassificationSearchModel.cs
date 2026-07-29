@@ -13,7 +13,10 @@ public record ItemClassificationSearchModel : BaseSearchModel
 
     public ItemClassificationSearchModel()
     {
+		logger.LogDebug(">>> Entering ItemClassificationSearchModel()");
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ItemClassificationSearchModel()");
+		logger.LogDebug("ItemClassificationSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

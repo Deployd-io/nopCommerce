@@ -7,8 +7,12 @@ public partial record NewsItemModel : BaseNopEntityModel, IMetaTagsSupportedMode
 {
     public NewsItemModel()
     {
+		logger.LogDebug(">>> Entering NewsItemModel()");
         Comments = new List<NewsCommentModel>();
         AddNewComment = new AddNewsCommentModel();
+		logger.LogDebug("<<< Exiting NewsItemModel()");
+		logger.LogDebug("NewsItemModel(): Comments → {Comments}", Comments);
+		logger.LogDebug("NewsItemModel(): AddNewComment → {AddNewComment}", AddNewComment);
     }
 
     public string MetaKeywords { get; set; }

@@ -9,7 +9,10 @@ public partial class PaymentSettings : ISettings
 {
     public PaymentSettings()
     {
+		logger.LogDebug(">>> Entering PaymentSettings()");
         ActivePaymentMethodSystemNames = new List<string>();
+		logger.LogDebug("<<< Exiting PaymentSettings()");
+		logger.LogDebug("PaymentSettings(): ActivePaymentMethodSystemNames → {ActivePaymentMethodSystemNames}", ActivePaymentMethodSystemNames);
     }
 
     /// <summary>

@@ -87,6 +87,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     /// </returns>
     public virtual async Task<GiftCardSearchModel> PrepareGiftCardSearchModelAsync(GiftCardSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareGiftCardSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare "activated" filter (0 - all; 1 - activated only; 2 - deactivated only)
@@ -109,6 +110,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		logger.LogDebug("<<< Exiting PrepareGiftCardSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -122,11 +124,13 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     /// </returns>
     public virtual async Task<GiftCardListModel> PrepareGiftCardListModelAsync(GiftCardSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering PrepareGiftCardListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter gift cards
         var isActivatedOnly = searchModel.ActivatedId == 0 ? null : searchModel.ActivatedId == 1 ? true : (bool?)false;
 
+		logger.LogDebug("PrepareGiftCardListModelAsync(searchModel={SearchModel}): isActivatedOnly → {IsActivatedOnly}", searchModel, isActivatedOnly);
         //get gift cards
         var giftCards = await _giftCardService.GetAllGiftCardsAsync(isGiftCardActivated: isActivatedOnly,
             giftCardCouponCode: searchModel.CouponCode,
@@ -141,18 +145,21 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
                 //fill in model values from the entity
                 var giftCardModel = giftCard.ToModel<GiftCardModel>();
 
+				logger.LogDebug("PrepareGiftCardListModelAsync(searchModel={SearchModel}): giftCardModel → {GiftCardModel}", searchModel, giftCardModel);
                 //convert dates to the user time
                 giftCardModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(giftCard.CreatedOnUtc, DateTimeKind.Utc);
 
                 //fill in additional values (not existing in the entity)
                 var giftAmount = await _giftCardService.GetGiftCardRemainingAmountAsync(giftCard);
                 giftCardModel.RemainingAmountStr = await _priceFormatter.FormatPriceAsync(giftAmount, true, false);
+				logger.LogDebug("PrepareGiftCardListModelAsync(searchModel={SearchModel}): giftAmount → {GiftAmount}", searchModel, giftAmount);
                 giftCardModel.AmountStr = await _priceFormatter.FormatPriceAsync(giftCard.Amount, true, false);
 
                 return giftCardModel;
             });
         });
 
+		logger.LogDebug("<<< Exiting PrepareGiftCardListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

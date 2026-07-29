@@ -12,7 +12,10 @@ public record ConfigurationModel : BaseNopModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         GoogleAuthenticatorSearchModel = new GoogleAuthenticatorSearchModel();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): GoogleAuthenticatorSearchModel → {GoogleAuthenticatorSearchModel}", GoogleAuthenticatorSearchModel);
     }
 
     #endregion

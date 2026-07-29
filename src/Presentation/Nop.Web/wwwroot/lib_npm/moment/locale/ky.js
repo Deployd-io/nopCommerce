@@ -73,8 +73,10 @@ export default moment.defineLocale('ky', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(чи|чы|чү|чу)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var a = number % 10,
             b = number >= 100 ? 100 : null;
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + (suffixes[number] || suffixes[a] || suffixes[b]);
     },
     week: {

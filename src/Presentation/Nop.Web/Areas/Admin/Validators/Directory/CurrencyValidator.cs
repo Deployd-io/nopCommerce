@@ -11,6 +11,7 @@ public partial class CurrencyValidator : BaseNopValidator<CurrencyModel>
 {
     public CurrencyValidator(ILocalizationService localizationService)
     {
+		logger.LogDebug(">>> Entering CurrencyValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Currencies.Fields.Name.Required"))
             .Length(1, 50).WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Currencies.Fields.Name.Range"));
@@ -35,11 +36,13 @@ public partial class CurrencyValidator : BaseNopValidator<CurrencyModel>
                 }
                 catch
                 {
+					logger.LogError("Exception in CurrencyValidator(localizationService={LocalizationService}): {Arg1}", localizationService, ex.Message);
                     return false;
                 }
             })
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Currencies.Fields.DisplayLocale.Validation"));
 
         SetDatabaseValidationRules<Currency>();
+		logger.LogDebug("<<< Exiting CurrencyValidator(localizationService={LocalizationService})", localizationService);
     }
 }

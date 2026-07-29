@@ -134,10 +134,12 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="migrationInfo">Migration to rollback</param>
     public virtual void ApplyDownMigration(IMigrationInfo migrationInfo)
     {
+		logger.LogDebug(">>> Entering ApplyDownMigration(migrationInfo={MigrationInfo})", migrationInfo);
         ArgumentNullException.ThrowIfNull(migrationInfo);
 
         _migrationRunner.Down(migrationInfo.Migration);
         _versionLoader.Value.DeleteVersion(migrationInfo.Version);
+		logger.LogDebug("<<< Exiting ApplyDownMigration(migrationInfo={MigrationInfo})", migrationInfo);
     }
 
     /// <summary>
@@ -147,6 +149,7 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="commitVersionOnly">Commit only version information</param>
     public virtual void ApplyUpMigration(IMigrationInfo migrationInfo, bool commitVersionOnly = false)
     {
+		logger.LogDebug(">>> Entering ApplyUpMigration(migrationInfo={MigrationInfo},commitVersionOnly={CommitVersionOnly})", migrationInfo, commitVersionOnly);
         ArgumentNullException.ThrowIfNull(migrationInfo);
 
         if (!commitVersionOnly)
@@ -157,6 +160,7 @@ public partial class MigrationManager : IMigrationManager
 #endif
         _versionLoader.Value
             .UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+			logger.LogDebug("<<< Exiting ApplyUpMigration(migrationInfo={MigrationInfo},commitVersionOnly={CommitVersionOnly})", migrationInfo, commitVersionOnly);
     }
 
     #endregion

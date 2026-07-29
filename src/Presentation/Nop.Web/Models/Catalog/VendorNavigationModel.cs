@@ -6,7 +6,10 @@ public partial record VendorNavigationModel : BaseNopModel
 {
     public VendorNavigationModel()
     {
+		logger.LogDebug(">>> Entering VendorNavigationModel()");
         Vendors = new List<VendorBriefInfoModel>();
+		logger.LogDebug("<<< Exiting VendorNavigationModel()");
+		logger.LogDebug("VendorNavigationModel(): Vendors → {Vendors}", Vendors);
     }
 
     public IList<VendorBriefInfoModel> Vendors { get; set; }

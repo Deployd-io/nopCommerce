@@ -15,18 +15,32 @@ public partial record OrderSearchModel : BaseSearchModel
 
     public OrderSearchModel()
     {
+		logger.LogDebug(">>> Entering OrderSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		logger.LogDebug("OrderSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
+		logger.LogDebug("OrderSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableShippingStatuses = new List<SelectListItem>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("OrderSearchModel(): AvailableShippingStatuses → {AvailableShippingStatuses}", AvailableShippingStatuses);
+		logger.LogDebug("OrderSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
         AvailableWarehouses = new List<SelectListItem>();
+		logger.LogDebug("OrderSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		logger.LogDebug("OrderSearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
         AvailablePaymentMethods = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("OrderSearchModel(): AvailablePaymentMethods → {AvailablePaymentMethods}", AvailablePaymentMethods);
+		logger.LogDebug("OrderSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         OrderStatusIds = new List<int>();
         PaymentStatusIds = new List<int>();
+		logger.LogDebug("OrderSearchModel(): OrderStatusIds → {OrderStatusIds}", OrderStatusIds);
+		logger.LogDebug("OrderSearchModel(): PaymentStatusIds → {PaymentStatusIds}", PaymentStatusIds);
         ShippingStatusIds = new List<int>();
         LicenseCheckModel = new();
+		logger.LogDebug("<<< Exiting OrderSearchModel()");
+		logger.LogDebug("OrderSearchModel(): ShippingStatusIds → {ShippingStatusIds}", ShippingStatusIds);
+		logger.LogDebug("OrderSearchModel(): LicenseCheckModel → {LicenseCheckModel}", LicenseCheckModel);
     }
 
     #endregion

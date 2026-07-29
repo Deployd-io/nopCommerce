@@ -14,9 +14,14 @@ public record ConfigurationModel : BaseNopModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         Account = new AccountModel();
         Import = new ImportModel();
+		logger.LogDebug("ConfigurationModel(): Account → {Account}", Account);
+		logger.LogDebug("ConfigurationModel(): Import → {Import}", Import);
         SyncRecordSearchModel = new SyncRecordSearchModel();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): SyncRecordSearchModel → {SyncRecordSearchModel}", SyncRecordSearchModel);
     }
 
     #endregion

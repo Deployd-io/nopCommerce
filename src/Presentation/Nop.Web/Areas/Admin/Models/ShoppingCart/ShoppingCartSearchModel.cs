@@ -15,10 +15,16 @@ public partial record ShoppingCartSearchModel : BaseSearchModel
 
     public ShoppingCartSearchModel()
     {
+		logger.LogDebug(">>> Entering ShoppingCartSearchModel()");
         AvailableShoppingCartTypes = new List<SelectListItem>();
         ShoppingCartItemSearchModel = new ShoppingCartItemSearchModel();
+		logger.LogDebug("ShoppingCartSearchModel(): AvailableShoppingCartTypes → {AvailableShoppingCartTypes}", AvailableShoppingCartTypes);
+		logger.LogDebug("ShoppingCartSearchModel(): ShoppingCartItemSearchModel → {ShoppingCartItemSearchModel}", ShoppingCartItemSearchModel);
         AvailableStores = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ShoppingCartSearchModel()");
+		logger.LogDebug("ShoppingCartSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("ShoppingCartSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

@@ -6,7 +6,10 @@ public partial record CheckoutPaymentMethodModel : BaseNopModel
 {
     public CheckoutPaymentMethodModel()
     {
+		logger.LogDebug(">>> Entering CheckoutPaymentMethodModel()");
         PaymentMethods = new List<PaymentMethodModel>();
+		logger.LogDebug("<<< Exiting CheckoutPaymentMethodModel()");
+		logger.LogDebug("CheckoutPaymentMethodModel(): PaymentMethods → {PaymentMethods}", PaymentMethods);
     }
 
     public IList<PaymentMethodModel> PaymentMethods { get; set; }

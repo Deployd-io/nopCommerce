@@ -13,8 +13,12 @@ public partial record PluginSearchModel : BaseSearchModel
 
     public PluginSearchModel()
     {
+		logger.LogDebug(">>> Entering PluginSearchModel()");
         AvailableLoadModes = new List<SelectListItem>();
         AvailableGroups = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting PluginSearchModel()");
+		logger.LogDebug("PluginSearchModel(): AvailableLoadModes → {AvailableLoadModes}", AvailableLoadModes);
+		logger.LogDebug("PluginSearchModel(): AvailableGroups → {AvailableGroups}", AvailableGroups);
     }
 
     #endregion

@@ -25,7 +25,10 @@ public partial record SpecificationFilterModel : BaseNopModel
 
     public SpecificationFilterModel()
     {
+		logger.LogDebug(">>> Entering SpecificationFilterModel()");
         Attributes = new List<SpecificationAttributeFilterModel>();
+		logger.LogDebug("<<< Exiting SpecificationFilterModel()");
+		logger.LogDebug("SpecificationFilterModel(): Attributes → {Attributes}", Attributes);
     }
 
     #endregion

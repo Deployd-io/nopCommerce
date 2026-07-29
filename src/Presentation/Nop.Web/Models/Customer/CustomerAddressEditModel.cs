@@ -7,7 +7,10 @@ public partial record CustomerAddressEditModel : BaseNopModel
 {
     public CustomerAddressEditModel()
     {
+		logger.LogDebug(">>> Entering CustomerAddressEditModel()");
         Address = new AddressModel();
+		logger.LogDebug("<<< Exiting CustomerAddressEditModel()");
+		logger.LogDebug("CustomerAddressEditModel(): Address → {Address}", Address);
     }
 
     public AddressModel Address { get; set; }

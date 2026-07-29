@@ -12,8 +12,12 @@ public record TaxCategorySearchModel : BaseSearchModel
 
     public TaxCategorySearchModel()
     {
+		logger.LogDebug(">>> Entering TaxCategorySearchModel()");
         AddTaxCategory = new TaxCategoryModel();
         AvailableTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting TaxCategorySearchModel()");
+		logger.LogDebug("TaxCategorySearchModel(): AddTaxCategory → {AddTaxCategory}", AddTaxCategory);
+		logger.LogDebug("TaxCategorySearchModel(): AvailableTypes → {AvailableTypes}", AvailableTypes);
     }
 
     #endregion

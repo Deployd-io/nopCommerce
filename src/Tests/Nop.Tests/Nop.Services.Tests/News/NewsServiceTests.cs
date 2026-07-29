@@ -13,72 +13,87 @@ public class NewsServiceTests : ServiceTest
     [OneTimeSetUp]
     public void SetUp()
     {
+		logger.LogDebug(">>> Entering SetUp()");
         _newsService = GetService<INewsService>();
+		logger.LogDebug("<<< Exiting SetUp()");
+		logger.LogDebug("SetUp(): _newsService → {_newsService}", _newsService);
     }
 
     [Test]
     public void ShouldBeAvailableWhenStartDateIsNotSet()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenStartDateIsNotSet()");
         var newsItem = new NewsItem
         {
             StartDateUtc = null
         };
 
         _newsService.IsNewsAvailable(newsItem, new DateTime(2010, 01, 03)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenStartDateIsNotSet()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenStartDateIsLessThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenStartDateIsLessThanSomeDate()");
         var newsItem = new NewsItem
         {
             StartDateUtc = new DateTime(2010, 01, 02)
         };
 
         _newsService.IsNewsAvailable(newsItem, new DateTime(2010, 01, 03)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenStartDateIsLessThanSomeDate()");
     }
 
     [Test]
     public void ShouldNotBeAvailableWhenStartDateIsGreaterThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldNotBeAvailableWhenStartDateIsGreaterThanSomeDate()");
         var newsItem = new NewsItem
         {
             StartDateUtc = new DateTime(2010, 01, 02)
         };
 
         _newsService.IsNewsAvailable(newsItem, new DateTime(2010, 01, 01)).Should().BeFalse();
+		logger.LogDebug("<<< Exiting ShouldNotBeAvailableWhenStartDateIsGreaterThanSomeDate()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenEndDateIsNotSet()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenEndDateIsNotSet()");
         var newsItem = new NewsItem
         {
             EndDateUtc = null
         };
 
         _newsService.IsNewsAvailable(newsItem, new DateTime(2010, 01, 03)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenEndDateIsNotSet()");
     }
 
     [Test]
     public void ShouldBeAvailableWhenEndDateIsGreaterThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldBeAvailableWhenEndDateIsGreaterThanSomeDate()");
         var newsItem = new NewsItem
         {
             EndDateUtc = new DateTime(2010, 01, 02)
         };
 
         _newsService.IsNewsAvailable(newsItem, new DateTime(2010, 01, 01)).Should().BeTrue();
+		logger.LogDebug("<<< Exiting ShouldBeAvailableWhenEndDateIsGreaterThanSomeDate()");
     }
 
     [Test]
     public void ShouldNotBeAvailableWhenEndDateIsLessThanSomeDate()
     {
+		logger.LogDebug(">>> Entering ShouldNotBeAvailableWhenEndDateIsLessThanSomeDate()");
         var newsItem = new NewsItem
         {
             EndDateUtc = new DateTime(2010, 01, 02)
         };
 
         _newsService.IsNewsAvailable(newsItem, new DateTime(2010, 01, 03)).Should().BeFalse();
+		logger.LogDebug("<<< Exiting ShouldNotBeAvailableWhenEndDateIsLessThanSomeDate()");
     }
 }

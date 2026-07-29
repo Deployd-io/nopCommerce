@@ -14,10 +14,16 @@ public partial record ProductAttributeCombinationModel : BaseNopEntityModel
 
     public ProductAttributeCombinationModel()
     {
+		logger.LogDebug(">>> Entering ProductAttributeCombinationModel()");
         ProductAttributes = new List<ProductAttributeModel>();
         ProductPictureModels = new List<ProductPictureModel>();
+		logger.LogDebug("ProductAttributeCombinationModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
+		logger.LogDebug("ProductAttributeCombinationModel(): ProductPictureModels → {ProductPictureModels}", ProductPictureModels);
         Warnings = new List<string>();
         PictureIds = new List<int>();
+		logger.LogDebug("<<< Exiting ProductAttributeCombinationModel()");
+		logger.LogDebug("ProductAttributeCombinationModel(): Warnings → {Warnings}", Warnings);
+		logger.LogDebug("ProductAttributeCombinationModel(): PictureIds → {PictureIds}", PictureIds);
     }
 
     #endregion
@@ -73,7 +79,10 @@ public partial record ProductAttributeCombinationModel : BaseNopEntityModel
     {
         public ProductAttributeModel()
         {
+			logger.LogDebug(">>> Entering ProductAttributeModel()");
             Values = new List<ProductAttributeValueModel>();
+			logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductAttributeId { get; set; }

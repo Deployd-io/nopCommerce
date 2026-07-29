@@ -64,15 +64,20 @@ public partial class FilterLevelValueController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		logger.LogDebug(">>> Entering Index()");
+		logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueSearchModelAsync(new FilterLevelValueSearchModel());
 
+		logger.LogDebug("List(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -83,6 +88,7 @@ public partial class FilterLevelValueController : BaseAdminController
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueListModelAsync(searchModel);
 
+		logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -93,9 +99,12 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual IActionResult Create()
     {
+		logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(new FilterLevelValueModel(), null);
 
+		logger.LogDebug("Create(): model → {Model}", model);
+		logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -135,20 +144,25 @@ public partial class FilterLevelValueController : BaseAdminController
         model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(model, null);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a filter level value with the specified id
         var filterLevelValue = await _filterLevelValueService.GetFilterLevelValueByIdAsync(id);
         if (filterLevelValue == null)
+			logger.LogDebug("Edit(id={Id}): filterLevelValue → {FilterLevelValue}", id, filterLevelValue);
             return RedirectToAction("List");
 
         //prepare model
         var model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(null, filterLevelValue);
 
+		logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -197,6 +211,7 @@ public partial class FilterLevelValueController : BaseAdminController
         model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(model, filterLevelValue);
 
         //if we got this far, something failed, redisplay form
+		logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -204,9 +219,11 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a filter level value with the specified id
         var filterLevelValue = await _filterLevelValueService.GetFilterLevelValueByIdAsync(id);
         if (filterLevelValue == null)
+			logger.LogDebug("Delete(id={Id}): filterLevelValue → {FilterLevelValue}", id, filterLevelValue);
             return RedirectToAction("List");
 
         await _filterLevelValueService.DeleteFilterLevelValueAsync(filterLevelValue);
@@ -217,6 +234,7 @@ public partial class FilterLevelValueController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.FilterLevelValues.Deleted"));
 
+		logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -224,17 +242,21 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var filterLevelValues = await _filterLevelValueService.GetFilterLevelValuesByIdsAsync(selectedIds.ToArray());
 
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): filterLevelValues → {FilterLevelValues}", selectedIds, filterLevelValues);
         await _filterLevelValueService.DeleteFilterLevelValuesAsync(filterLevelValues);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteFilterLevelValue");
         await _customerActivityService.InsertActivitiesAsync("DeleteFilterLevelValue", filterLevelValues, filterLevelValue => string.Format(activityLogFormat, filterLevelValue.Id));
+		logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -245,16 +267,21 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXlsx()
     {
+		logger.LogDebug(">>> Entering ExportXlsx()");
         try
         {
             var filterLevelValues = (await _filterLevelValueService.GetAllFilterLevelValuesAsync()).ToList();
             var bytes = await _exportManager.ExportFilterLevelValuesToXlsxAsync(filterLevelValues);
+			logger.LogDebug("ExportXlsx(): filterLevelValues → {FilterLevelValues}", filterLevelValues);
+			logger.LogDebug("ExportXlsx(): bytes → {Bytes}", bytes);
 
             return File(bytes, MimeTypes.TextXlsx, "FilterLevelValues.xlsx");
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ExportXlsx(): {Arg0}", ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ExportXlsx()");
             return RedirectToAction("List");
         }
     }
@@ -263,6 +290,7 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile)
     {
+		logger.LogDebug(">>> Entering ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
         //a vendor cannot import filter level values
         if (await _workContext.GetCurrentVendorAsync() != null)
             return AccessDeniedView();
@@ -285,7 +313,9 @@ public partial class FilterLevelValueController : BaseAdminController
         }
         catch (Exception exc)
         {
+			logger.LogError("Exception in ImportFromXlsx(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			logger.LogDebug("<<< Exiting ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }
@@ -298,6 +328,7 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductList(FilterLevelValueProductSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductList(searchModel={SearchModel})", searchModel);
         //try to get a filter level value with the specified id
         var filterLevelValue = await _filterLevelValueService.GetFilterLevelValueByIdAsync(searchModel.FilterLevelValueId)
             ?? throw new ArgumentException("No filter level value found with the specified id");
@@ -305,27 +336,34 @@ public partial class FilterLevelValueController : BaseAdminController
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueProductListModelAsync(searchModel, filterLevelValue);
 
+		logger.LogDebug("ProductList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductDelete(int id)
     {
+		logger.LogDebug(">>> Entering ProductDelete(id={Id})", id);
         //try to get a filter level value product mapping with the specified id
         var filterLevelValueProduct = await _filterLevelValueService.GetFilterLevelValueProductByIdAsync(id)
             ?? throw new ArgumentException("No filter level value product mapping found with the specified id", nameof(id));
 
         await _filterLevelValueService.DeleteFilterLevelValueProductAsync(filterLevelValueProduct);
 
+		logger.LogDebug("<<< Exiting ProductDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopup(int filterLevelValueId)
     {
+		logger.LogDebug(">>> Entering ProductAddPopup(filterLevelValueId={FilterLevelValueId})", filterLevelValueId);
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareAddProductToFilterLevelValueSearchModelAsync(new AddProductToFilterLevelValueSearchModel());
 
+		logger.LogDebug("ProductAddPopup(filterLevelValueId={FilterLevelValueId}): model → {Model}", filterLevelValueId, model);
+		logger.LogDebug("<<< Exiting ProductAddPopup(filterLevelValueId={FilterLevelValueId})", filterLevelValueId);
         return View(model);
     }
 
@@ -333,9 +371,12 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopupList(AddProductToFilterLevelValueSearchModel searchModel)
     {
+		logger.LogDebug(">>> Entering ProductAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareAddProductToFilterLevelValueListModelAsync(searchModel);
 
+		logger.LogDebug("ProductAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		logger.LogDebug("<<< Exiting ProductAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

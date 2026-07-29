@@ -11,18 +11,32 @@ public partial record GeneralCommonSettingsModel : BaseNopModel, ISettingsModel
 
     public GeneralCommonSettingsModel()
     {
+		logger.LogDebug(">>> Entering GeneralCommonSettingsModel()");
         StoreInformationSettings = new StoreInformationSettingsModel();
         SitemapSettings = new SitemapSettingsModel();
+		logger.LogDebug("GeneralCommonSettingsModel(): StoreInformationSettings → {StoreInformationSettings}", StoreInformationSettings);
+		logger.LogDebug("GeneralCommonSettingsModel(): SitemapSettings → {SitemapSettings}", SitemapSettings);
         SeoSettings = new SeoSettingsModel();
         SecuritySettings = new SecuritySettingsModel();
+		logger.LogDebug("GeneralCommonSettingsModel(): SeoSettings → {SeoSettings}", SeoSettings);
+		logger.LogDebug("GeneralCommonSettingsModel(): SecuritySettings → {SecuritySettings}", SecuritySettings);
         CaptchaSettings = new CaptchaSettingsModel();
         PdfSettings = new PdfSettingsModel();
+		logger.LogDebug("GeneralCommonSettingsModel(): CaptchaSettings → {CaptchaSettings}", CaptchaSettings);
+		logger.LogDebug("GeneralCommonSettingsModel(): PdfSettings → {PdfSettings}", PdfSettings);
         LocalizationSettings = new LocalizationSettingsModel();
         TranslationSettings = new TranslationSettingsModel();
+		logger.LogDebug("GeneralCommonSettingsModel(): LocalizationSettings → {LocalizationSettings}", LocalizationSettings);
+		logger.LogDebug("GeneralCommonSettingsModel(): TranslationSettings → {TranslationSettings}", TranslationSettings);
         AdminAreaSettings = new AdminAreaSettingsModel();
         MinificationSettings = new MinificationSettingsModel();
+		logger.LogDebug("GeneralCommonSettingsModel(): AdminAreaSettings → {AdminAreaSettings}", AdminAreaSettings);
+		logger.LogDebug("GeneralCommonSettingsModel(): MinificationSettings → {MinificationSettings}", MinificationSettings);
         CustomHtmlSettings = new CustomHtmlSettingsModel();
         RobotsTxtSettings = new RobotsTxtSettingsModel();
+		logger.LogDebug("<<< Exiting GeneralCommonSettingsModel()");
+		logger.LogDebug("GeneralCommonSettingsModel(): CustomHtmlSettings → {CustomHtmlSettings}", CustomHtmlSettings);
+		logger.LogDebug("GeneralCommonSettingsModel(): RobotsTxtSettings → {RobotsTxtSettings}", RobotsTxtSettings);
     }
 
     #endregion

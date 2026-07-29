@@ -18,9 +18,11 @@ public partial class PollBuilder : NopEntityBuilder<Poll>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Poll.Name)).AsString(int.MaxValue).NotNullable()
             .WithColumn(nameof(Poll.LanguageId)).AsInt32().ForeignKey<Language>();
+			logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

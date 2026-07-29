@@ -10,6 +10,7 @@ public partial class ContactUsValidator : BaseNopValidator<ContactUsModel>
 {
     public ContactUsValidator(ILocalizationService localizationService, CommonSettings commonSettings)
     {
+		logger.LogDebug(">>> Entering ContactUsValidator(localizationService={LocalizationService},commonSettings={CommonSettings})", localizationService, commonSettings);
         RuleFor(x => x.Email).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("ContactUs.Email.Required"));
         RuleFor(x => x.Email)
             .IsEmailAddress()
@@ -20,5 +21,6 @@ public partial class ContactUsValidator : BaseNopValidator<ContactUsModel>
             RuleFor(x => x.Subject).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("ContactUs.Subject.Required"));
         }
         RuleFor(x => x.Enquiry).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("ContactUs.Enquiry.Required"));
+		logger.LogDebug("<<< Exiting ContactUsValidator(localizationService={LocalizationService},commonSettings={CommonSettings})", localizationService, commonSettings);
     }
 }

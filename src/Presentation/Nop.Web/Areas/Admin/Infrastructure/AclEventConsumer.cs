@@ -140,6 +140,8 @@ public partial class AclEventConsumer : IConsumer<ModelPreparedEvent<BaseNopMode
                 await _aclSupportedModelFactory.PrepareModelCustomerRolesAsync(onlineCustomerSearchModel);
                 break;
         }
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -154,41 +156,48 @@ public partial class AclEventConsumer : IConsumer<ModelPreparedEvent<BaseNopMode
 
         var key = string.Empty;
 
+		logger.LogWarning("HandleEventAsync(eventMessage={EventMessage}): key → {Key}", eventMessage, key);
         switch (eventMessage.Model)
         {
             case ManufacturerModel manufacturerModel:
                 var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(manufacturerModel.Id);
                 await _aclService.SaveAclAsync(manufacturer, manufacturerModel.SelectedCustomerRoleIds);
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): manufacturer → {Manufacturer}", eventMessage, manufacturer);
                 key = manufacturer == null ? manufacturerModel.Name : string.Empty;
                 break;
 
             case MenuModel menuModel:
                 var menu = await _menuService.GetMenuByIdAsync(menuModel.Id);
                 await _aclService.SaveAclAsync(menu, menuModel.SelectedCustomerRoleIds);
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): menu → {Menu}", eventMessage, menu);
                 key = menu == null ? menuModel.Name : string.Empty;
                 break;
 
             case MenuItemModel menuItemModel:
                 var menuItem = await _menuService.GetMenuItemByIdAsync(menuItemModel.Id);
                 await _aclService.SaveAclAsync(menuItem, menuItemModel.SelectedCustomerRoleIds);
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): menuItem → {MenuItem}", eventMessage, menuItem);
                 key = menuItem == null ? $"{nameof(MenuItem)}:{menuItemModel.Title}:{menuItemModel.MenuId}:{menuItemModel.MenuItemTypeId}" : string.Empty;
                 break;
 
             case ProductModel productModel:
                 var product = await _productService.GetProductByIdAsync(productModel.Id);
                 await _aclService.SaveAclAsync(product, productModel.SelectedCustomerRoleIds);
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): product → {Product}", eventMessage, product);
                 key = product == null ? productModel.Name : string.Empty;
                 break;
 
             case TopicModel topicModel:
                 var topic = await _topicService.GetTopicByIdAsync(topicModel.Id);
                 await _aclService.SaveAclAsync(topic, topicModel.SelectedCustomerRoleIds);
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): topic → {Topic}", eventMessage, topic);
                 key = topic == null ? topicModel.Title : string.Empty;
                 break;
 
             case CategoryModel categoryModel:
                 var category = await _categoryService.GetCategoryByIdAsync(categoryModel.Id);
                 await _aclService.SaveAclAsync(category, categoryModel.SelectedCustomerRoleIds);
+				logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): category → {Category}", eventMessage, category);
                 key = category == null ? categoryModel.Name : string.Empty;
                 break;
         }

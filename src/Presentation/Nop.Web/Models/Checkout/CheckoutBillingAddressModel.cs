@@ -8,9 +8,14 @@ public partial record CheckoutBillingAddressModel : BaseNopModel
 {
     public CheckoutBillingAddressModel()
     {
+		logger.LogDebug(">>> Entering CheckoutBillingAddressModel()");
         ExistingAddresses = new List<AddressModel>();
         InvalidExistingAddresses = new List<AddressModel>();
+		logger.LogDebug("CheckoutBillingAddressModel(): ExistingAddresses → {ExistingAddresses}", ExistingAddresses);
+		logger.LogDebug("CheckoutBillingAddressModel(): InvalidExistingAddresses → {InvalidExistingAddresses}", InvalidExistingAddresses);
         BillingNewAddress = new AddressModel();
+		logger.LogDebug("<<< Exiting CheckoutBillingAddressModel()");
+		logger.LogDebug("CheckoutBillingAddressModel(): BillingNewAddress → {BillingNewAddress}", BillingNewAddress);
     }
 
     public IList<AddressModel> ExistingAddresses { get; set; }

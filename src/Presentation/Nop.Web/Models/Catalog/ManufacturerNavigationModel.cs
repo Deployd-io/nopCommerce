@@ -6,7 +6,10 @@ public partial record ManufacturerNavigationModel : BaseNopModel
 {
     public ManufacturerNavigationModel()
     {
+		logger.LogDebug(">>> Entering ManufacturerNavigationModel()");
         Manufacturers = new List<ManufacturerBriefInfoModel>();
+		logger.LogDebug("<<< Exiting ManufacturerNavigationModel()");
+		logger.LogDebug("ManufacturerNavigationModel(): Manufacturers → {Manufacturers}", Manufacturers);
     }
 
     public IList<ManufacturerBriefInfoModel> Manufacturers { get; set; }

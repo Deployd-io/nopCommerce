@@ -10,8 +10,11 @@ public static partial class MigrationInfoExtension
     /// </summary>
     public static bool IsNeedToApplyInDbOnDebugMode(this IMigrationInfo info)
     {
+		logger.LogDebug(">>> Entering IsNeedToApplyInDbOnDebugMode(info={Info})", info);
         var applyInDbOnDebugMode = info.Migration.GetType().GetCustomAttribute<NopMigrationAttribute>()?.ApplyInDbOnDebugMode;
 
+		logger.LogDebug("IsNeedToApplyInDbOnDebugMode(info={Info}): applyInDbOnDebugMode → {ApplyInDbOnDebugMode}", info, applyInDbOnDebugMode);
+		logger.LogDebug("<<< Exiting IsNeedToApplyInDbOnDebugMode(info={Info})", info);
         return applyInDbOnDebugMode ?? true;
     }
 }

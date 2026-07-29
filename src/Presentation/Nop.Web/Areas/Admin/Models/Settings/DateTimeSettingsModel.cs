@@ -13,7 +13,10 @@ public partial record DateTimeSettingsModel : BaseNopModel, ISettingsModel
 
     public DateTimeSettingsModel()
     {
+		logger.LogDebug(">>> Entering DateTimeSettingsModel()");
         AvailableTimeZones = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting DateTimeSettingsModel()");
+		logger.LogDebug("DateTimeSettingsModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
     }
 
     #endregion

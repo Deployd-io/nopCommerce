@@ -13,8 +13,12 @@ public record SmsModel : BaseNopEntityModel
 
     public SmsModel()
     {
+		logger.LogDebug(">>> Entering SmsModel()");
         AvailableMessages = new List<SelectListItem>();
         AvailablePhoneTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting SmsModel()");
+		logger.LogDebug("SmsModel(): AvailableMessages → {AvailableMessages}", AvailableMessages);
+		logger.LogDebug("SmsModel(): AvailablePhoneTypes → {AvailablePhoneTypes}", AvailablePhoneTypes);
     }
 
     #endregion

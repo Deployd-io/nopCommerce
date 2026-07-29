@@ -13,9 +13,14 @@ public record CustomEventModel : BaseNopModel
 
     public CustomEventModel()
     {
+		logger.LogDebug(">>> Entering CustomEventModel()");
         WidgetZonesIds = new List<int>();
         WidgetZones = new List<string>();
+		logger.LogDebug("CustomEventModel(): WidgetZonesIds → {WidgetZonesIds}", WidgetZonesIds);
         AvailableWidgetZones = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CustomEventModel()");
+		logger.LogDebug("CustomEventModel(): WidgetZones → {WidgetZones}", WidgetZones);
+		logger.LogDebug("CustomEventModel(): AvailableWidgetZones → {AvailableWidgetZones}", AvailableWidgetZones);
     }
 
     #endregion

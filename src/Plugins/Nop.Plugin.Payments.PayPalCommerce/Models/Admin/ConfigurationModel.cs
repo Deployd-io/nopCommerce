@@ -15,7 +15,10 @@ public record ConfigurationModel : BaseNopModel
 
     public ConfigurationModel()
     {
+		logger.LogDebug(">>> Entering ConfigurationModel()");
         PaymentTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting ConfigurationModel()");
+		logger.LogDebug("ConfigurationModel(): PaymentTypes → {PaymentTypes}", PaymentTypes);
     }
 
     #endregion

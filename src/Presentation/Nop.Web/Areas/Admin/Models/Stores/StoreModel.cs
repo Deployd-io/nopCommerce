@@ -14,8 +14,12 @@ public partial record StoreModel : BaseNopEntityModel, ILocalizedModel<StoreLoca
 
     public StoreModel()
     {
+		logger.LogDebug(">>> Entering StoreModel()");
         Locales = new List<StoreLocalizedModel>();
         AvailableLanguages = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting StoreModel()");
+		logger.LogDebug("StoreModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("StoreModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
     }
 
     #endregion

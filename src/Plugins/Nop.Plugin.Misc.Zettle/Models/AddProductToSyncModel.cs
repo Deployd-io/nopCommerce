@@ -11,7 +11,10 @@ public record AddProductToSyncModel : BaseNopModel
 
     public AddProductToSyncModel()
     {
+		logger.LogDebug(">>> Entering AddProductToSyncModel()");
         SelectedProductIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddProductToSyncModel()");
+		logger.LogDebug("AddProductToSyncModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
 
     #endregion

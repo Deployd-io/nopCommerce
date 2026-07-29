@@ -11,7 +11,10 @@ public partial record OrderShipmentSearchModel : BaseSearchModel
 
     public OrderShipmentSearchModel()
     {
+		logger.LogDebug(">>> Entering OrderShipmentSearchModel()");
         ShipmentItemSearchModel = new ShipmentItemSearchModel();
+		logger.LogDebug("<<< Exiting OrderShipmentSearchModel()");
+		logger.LogDebug("OrderShipmentSearchModel(): ShipmentItemSearchModel → {ShipmentItemSearchModel}", ShipmentItemSearchModel);
     }
 
     #endregion

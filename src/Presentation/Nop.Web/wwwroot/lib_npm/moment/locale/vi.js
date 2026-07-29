@@ -22,12 +22,15 @@ export default moment.defineLocale('vi', {
     weekdaysParseExact: true,
     meridiemParse: /sa|ch/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /^ch$/i.test(input);
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 12) {
             return isLower ? 'sa' : 'SA';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'ch' : 'CH';
         }
     },
@@ -71,6 +74,7 @@ export default moment.defineLocale('vi', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return number;
     },
     week: {

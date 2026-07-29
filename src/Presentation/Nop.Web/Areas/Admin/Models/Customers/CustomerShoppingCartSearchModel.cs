@@ -13,7 +13,10 @@ public partial record CustomerShoppingCartSearchModel : BaseSearchModel
 
     public CustomerShoppingCartSearchModel()
     {
+		logger.LogDebug(">>> Entering CustomerShoppingCartSearchModel()");
         AvailableShoppingCartTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting CustomerShoppingCartSearchModel()");
+		logger.LogDebug("CustomerShoppingCartSearchModel(): AvailableShoppingCartTypes → {AvailableShoppingCartTypes}", AvailableShoppingCartTypes);
     }
 
     #endregion

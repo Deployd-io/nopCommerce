@@ -12,6 +12,8 @@ public partial record SystemWarningModel : BaseNopModel
 
     public override string ToString()
     {
+		logger.LogDebug(">>> Entering ToString()");
+		logger.LogDebug("<<< Exiting ToString()");
         return Text;
     }
 }

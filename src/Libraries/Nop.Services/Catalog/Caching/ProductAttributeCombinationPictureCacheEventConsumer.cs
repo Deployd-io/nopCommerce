@@ -15,6 +15,8 @@ public partial class ProductAttributeCombinationPictureCacheEventConsumer : Cach
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductAttributeCombinationPicture entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.ProductAttributeCombinationPicturesByCombinationCacheKey, entity.ProductAttributeCombinationId);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

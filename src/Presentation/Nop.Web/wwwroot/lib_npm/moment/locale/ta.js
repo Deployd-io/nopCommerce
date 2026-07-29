@@ -79,21 +79,27 @@ export default moment.defineLocale('ta', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}வது/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return number + 'வது';
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[௧௨௩௪௫௬௭௮௯௦]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     // refer http://ta.wikipedia.org/s/1er1
     meridiemParse: /யாமம்|வைகறை|காலை|நண்பகல்|எற்பாடு|மாலை/,
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 2) {
             return ' யாமம்';
         } else if (hour < 6) {
@@ -111,6 +117,7 @@ export default moment.defineLocale('ta', {
         }
     },
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -121,6 +128,8 @@ export default moment.defineLocale('ta', {
         } else if (meridiem === 'நண்பகல்') {
             return hour >= 10 ? hour : hour + 12;
         } else {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },

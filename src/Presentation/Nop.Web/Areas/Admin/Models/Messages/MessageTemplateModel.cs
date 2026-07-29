@@ -14,11 +14,17 @@ public partial record MessageTemplateModel : BaseNopEntityModel, ILocalizedModel
 
     public MessageTemplateModel()
     {
+		logger.LogDebug(">>> Entering MessageTemplateModel()");
         Locales = new List<MessageTemplateLocalizedModel>();
         AvailableEmailAccounts = new List<SelectListItem>();
+		logger.LogDebug("MessageTemplateModel(): Locales → {Locales}", Locales);
+		logger.LogDebug("MessageTemplateModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting MessageTemplateModel()");
+		logger.LogDebug("MessageTemplateModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		logger.LogDebug("MessageTemplateModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion
@@ -84,7 +90,10 @@ public partial record MessageTemplateLocalizedModel : ILocalizedLocaleModel
 {
     public MessageTemplateLocalizedModel()
     {
+		logger.LogDebug(">>> Entering MessageTemplateLocalizedModel()");
         AvailableEmailAccounts = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting MessageTemplateLocalizedModel()");
+		logger.LogDebug("MessageTemplateLocalizedModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
     }
 
     public int LanguageId { get; set; }

@@ -11,7 +11,10 @@ public partial record CurrencySearchModel : BaseSearchModel
 
     public CurrencySearchModel()
     {
+		logger.LogDebug(">>> Entering CurrencySearchModel()");
         ExchangeRateProviderModel = new CurrencyExchangeRateProviderModel();
+		logger.LogDebug("<<< Exiting CurrencySearchModel()");
+		logger.LogDebug("CurrencySearchModel(): ExchangeRateProviderModel → {ExchangeRateProviderModel}", ExchangeRateProviderModel);
     }
 
     #endregion

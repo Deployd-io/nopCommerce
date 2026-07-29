@@ -12,7 +12,10 @@ public partial record GdprConsentModel : BaseNopEntityModel, ILocalizedModel<Gdp
 
     public GdprConsentModel()
     {
+		logger.LogDebug(">>> Entering GdprConsentModel()");
         Locales = new List<GdprConsentLocalizedModel>();
+		logger.LogDebug("<<< Exiting GdprConsentModel()");
+		logger.LogDebug("GdprConsentModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

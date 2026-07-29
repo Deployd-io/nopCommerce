@@ -11,7 +11,10 @@ public partial record NopCommerceNewsModel : BaseNopModel
 
     public NopCommerceNewsModel()
     {
+		logger.LogDebug(">>> Entering NopCommerceNewsModel()");
         Items = new List<NopCommerceNewsDetailsModel>();
+		logger.LogDebug("<<< Exiting NopCommerceNewsModel()");
+		logger.LogDebug("NopCommerceNewsModel(): Items → {Items}", Items);
     }
 
     #endregion

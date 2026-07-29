@@ -11,12 +11,20 @@ public partial record RegisterModel : BaseNopModel
 {
     public RegisterModel()
     {
+		logger.LogDebug(">>> Entering RegisterModel()");
         AvailableTimeZones = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("RegisterModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
+		logger.LogDebug("RegisterModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
         CustomerAttributes = new List<CustomerAttributeModel>();
+		logger.LogDebug("RegisterModel(): AvailableStates → {AvailableStates}", AvailableStates);
+		logger.LogDebug("RegisterModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
         GdprConsents = new List<GdprConsentModel>();
         NewsLetterSubscriptions = new List<NewsLetterSubscriptionModel>();
+		logger.LogDebug("<<< Exiting RegisterModel()");
+		logger.LogDebug("RegisterModel(): GdprConsents → {GdprConsents}", GdprConsents);
+		logger.LogDebug("RegisterModel(): NewsLetterSubscriptions → {NewsLetterSubscriptions}", NewsLetterSubscriptions);
     }
 
     [DataType(DataType.EmailAddress)]
@@ -70,6 +78,8 @@ public partial record RegisterModel : BaseNopModel
     public bool DateOfBirthRequired { get; set; }
     public DateTime? ParseDateOfBirth()
     {
+		logger.LogDebug(">>> Entering ParseDateOfBirth()");
+		logger.LogDebug("<<< Exiting ParseDateOfBirth()");
         return CommonHelper.ParseDate(DateOfBirthYear, DateOfBirthMonth, DateOfBirthDay);
     }
 

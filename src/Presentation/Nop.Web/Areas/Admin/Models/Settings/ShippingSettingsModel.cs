@@ -14,7 +14,10 @@ public partial record ShippingSettingsModel : BaseNopModel, ISettingsModel
 
     public ShippingSettingsModel()
     {
+		logger.LogDebug(">>> Entering ShippingSettingsModel()");
         ShippingOriginAddress = new AddressModel();
+		logger.LogDebug("<<< Exiting ShippingSettingsModel()");
+		logger.LogDebug("ShippingSettingsModel(): ShippingOriginAddress → {ShippingOriginAddress}", ShippingOriginAddress);
     }
 
     #endregion

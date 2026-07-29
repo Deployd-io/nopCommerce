@@ -7,8 +7,12 @@ public partial record EstimateShippingModel : BaseNopModel
 {
     public EstimateShippingModel()
     {
+		logger.LogDebug(">>> Entering EstimateShippingModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting EstimateShippingModel()");
+		logger.LogDebug("EstimateShippingModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		logger.LogDebug("EstimateShippingModel(): AvailableStates → {AvailableStates}", AvailableStates);
     }
 
     public int RequestDelay { get; set; }
@@ -29,8 +33,12 @@ public partial record EstimateShippingResultModel : BaseNopModel
 {
     public EstimateShippingResultModel()
     {
+		logger.LogDebug(">>> Entering EstimateShippingResultModel()");
         ShippingOptions = new List<ShippingOptionModel>();
         Errors = new List<string>();
+		logger.LogDebug("<<< Exiting EstimateShippingResultModel()");
+		logger.LogDebug("EstimateShippingResultModel(): ShippingOptions → {ShippingOptions}", ShippingOptions);
+		logger.LogDebug("EstimateShippingResultModel(): Errors → {Errors}", Errors);
     }
 
     public IList<ShippingOptionModel> ShippingOptions { get; set; }

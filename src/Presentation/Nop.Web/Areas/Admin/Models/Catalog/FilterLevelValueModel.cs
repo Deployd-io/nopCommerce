@@ -12,7 +12,10 @@ public partial record FilterLevelValueModel : BaseNopEntityModel
 
     public FilterLevelValueModel()
     {
+		logger.LogDebug(">>> Entering FilterLevelValueModel()");
         FilterLevelValueProductSearchModel = new FilterLevelValueProductSearchModel();
+		logger.LogDebug("<<< Exiting FilterLevelValueModel()");
+		logger.LogDebug("FilterLevelValueModel(): FilterLevelValueProductSearchModel → {FilterLevelValueProductSearchModel}", FilterLevelValueProductSearchModel);
     }
 
     #endregion

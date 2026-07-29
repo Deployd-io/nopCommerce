@@ -12,7 +12,10 @@ public partial record CustomerAddressModel : BaseNopModel
 
     public CustomerAddressModel()
     {
+		logger.LogDebug(">>> Entering CustomerAddressModel()");
         Address = new AddressModel();
+		logger.LogDebug("<<< Exiting CustomerAddressModel()");
+		logger.LogDebug("CustomerAddressModel(): Address → {Address}", Address);
     }
 
     #endregion

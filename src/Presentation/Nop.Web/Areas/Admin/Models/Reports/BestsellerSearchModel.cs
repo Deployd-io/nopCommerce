@@ -14,13 +14,22 @@ public partial record BestsellerSearchModel : BaseSearchModel
 
     public BestsellerSearchModel()
     {
+		logger.LogDebug(">>> Entering BestsellerSearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableOrderStatuses = new List<SelectListItem>();
+		logger.LogDebug("BestsellerSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		logger.LogDebug("BestsellerSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailablePaymentStatuses = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		logger.LogDebug("BestsellerSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
+		logger.LogDebug("BestsellerSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		logger.LogDebug("BestsellerSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		logger.LogDebug("BestsellerSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableVendors = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting BestsellerSearchModel()");
+		logger.LogDebug("BestsellerSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

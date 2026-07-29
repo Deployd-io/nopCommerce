@@ -12,9 +12,14 @@ public partial record ShippingMethodRestrictionModel : BaseNopModel
 
     public ShippingMethodRestrictionModel()
     {
+		logger.LogDebug(">>> Entering ShippingMethodRestrictionModel()");
         AvailableShippingMethods = new List<ShippingMethodModel>();
         AvailableCountries = new List<CountryModel>();
+		logger.LogDebug("ShippingMethodRestrictionModel(): AvailableShippingMethods → {AvailableShippingMethods}", AvailableShippingMethods);
+		logger.LogDebug("ShippingMethodRestrictionModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         Restricted = new Dictionary<int, IDictionary<int, bool>>();
+		logger.LogDebug("<<< Exiting ShippingMethodRestrictionModel()");
+		logger.LogDebug("ShippingMethodRestrictionModel(): Restricted → {Restricted}", Restricted);
     }
 
     #endregion

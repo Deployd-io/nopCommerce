@@ -11,7 +11,10 @@ public partial record AddCategoryToDiscountModel : BaseNopModel
 
     public AddCategoryToDiscountModel()
     {
+		logger.LogDebug(">>> Entering AddCategoryToDiscountModel()");
         SelectedCategoryIds = new List<int>();
+		logger.LogDebug("<<< Exiting AddCategoryToDiscountModel()");
+		logger.LogDebug("AddCategoryToDiscountModel(): SelectedCategoryIds → {SelectedCategoryIds}", SelectedCategoryIds);
     }
     #endregion
 
