@@ -16,6 +16,8 @@ public partial class AddressAttributeCacheEventConsumer : CacheEventConsumer<Add
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(AddressAttribute entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopAttributeDefaults.AttributeValuesByAttributeCacheKey, nameof(AddressAttribute), entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

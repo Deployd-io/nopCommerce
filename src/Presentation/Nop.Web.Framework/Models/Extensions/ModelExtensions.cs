@@ -31,9 +31,13 @@ public static class ModelExtensions
     /// </returns>
     public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IAsyncEnumerable<T> collection, IPagingRequestModel pagingRequestModel)
     {
+		logger.LogDebug(">>> Entering ToPagedListAsync(collection={Collection},pagingRequestModel={PagingRequestModel})", collection, pagingRequestModel);
         var list = await collection.ToListAsync();
         return list.ToPagedList(pagingRequestModel);
     }
+	logger.LogDebug("<<< Exiting ToPagedListAsync(collection={Collection},pagingRequestModel={PagingRequestModel})", collection, pagingRequestModel);
+	logger.LogDebug("ToPagedListAsync(collection={Collection},pagingRequestModel={PagingRequestModel}): list → {List}", collection, pagingRequestModel, list);
+	logger.LogInformation("ToPagedListAsync(collection,pagingRequestModel)={Collection},{PagingRequestModel}: database query executed in {Arg2} ms", collection, pagingRequestModel, __logStart.ElapsedMilliseconds);
 
     /// <summary>
     /// Prepare passed list model to display in a grid

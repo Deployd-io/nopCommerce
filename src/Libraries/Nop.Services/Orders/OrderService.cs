@@ -119,6 +119,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByIdAsync(int orderId)
     {
+		logger.LogDebug(">>> Entering GetOrderByIdAsync(orderId={OrderId})", orderId);
+		logger.LogDebug("<<< Exiting GetOrderByIdAsync(orderId={OrderId})", orderId);
         return await _orderRepository.GetByIdAsync(orderId, cache => default, useShortTermCache: true);
     }
 
@@ -132,7 +134,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByCustomOrderNumberAsync(string customOrderNumber)
     {
+		logger.LogDebug(">>> Entering GetOrderByCustomOrderNumberAsync(customOrderNumber={CustomOrderNumber})", customOrderNumber);
         if (string.IsNullOrEmpty(customOrderNumber))
+		logger.LogDebug("<<< Exiting GetOrderByCustomOrderNumberAsync(customOrderNumber={CustomOrderNumber})", customOrderNumber);
             return null;
 
         return await _orderRepository.Table
@@ -149,7 +153,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByOrderItemAsync(int orderItemId)
     {
+		logger.LogDebug(">>> Entering GetOrderByOrderItemAsync(orderItemId={OrderItemId})", orderItemId);
         if (orderItemId == 0)
+		logger.LogDebug("<<< Exiting GetOrderByOrderItemAsync(orderItemId={OrderItemId})", orderItemId);
             return null;
 
         return await (from o in _orderRepository.Table
@@ -168,6 +174,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<Order>> GetOrdersByIdsAsync(int[] orderIds)
     {
+		logger.LogDebug(">>> Entering GetOrdersByIdsAsync(orderIds={OrderIds})", orderIds);
+		logger.LogDebug("<<< Exiting GetOrdersByIdsAsync(orderIds={OrderIds})", orderIds);
         return await _orderRepository.GetByIdsAsync(orderIds, includeDeleted: false);
     }
 
@@ -181,6 +189,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<Order>> GetOrdersByGuidsAsync(Guid[] orderGuids)
     {
+		logger.LogDebug(">>> Entering GetOrdersByGuidsAsync(orderGuids={OrderGuids})", orderGuids);
         if (orderGuids == null)
             return null;
 
@@ -189,6 +198,8 @@ public partial class OrderService : IOrderService
             select o;
         var orders = await query.ToListAsync();
 
+		logger.LogDebug("GetOrdersByGuidsAsync(orderGuids={OrderGuids}): orders → {Orders}", orderGuids, orders);
+		logger.LogDebug("<<< Exiting GetOrdersByGuidsAsync(orderGuids={OrderGuids})", orderGuids);
         return orders;
     }
 
@@ -202,6 +213,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByGuidAsync(Guid orderGuid)
     {
+		logger.LogDebug(">>> Entering GetOrderByGuidAsync(orderGuid={OrderGuid})", orderGuid);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (orderGuid == Guid.Empty)
             return null;
 
@@ -210,6 +223,8 @@ public partial class OrderService : IOrderService
             select o;
         var order = await query.FirstOrDefaultAsync();
 
+		logger.LogDebug("GetOrderByGuidAsync(orderGuid={OrderGuid}): order → {Order}", orderGuid, order);
+		logger.LogDebug("<<< Exiting GetOrderByGuidAsync(orderGuid={OrderGuid})", orderGuid);
         return order;
     }
 
@@ -220,9 +235,13 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderAsync(Order order)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderRepository.DeleteAsync(order);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Search orders
     /// </summary>
@@ -356,6 +375,8 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertOrderAsync(Order order)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderRepository.InsertAsync(order);
     }
 
@@ -366,6 +387,7 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderAsync(Order order)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderRepository.UpdateAsync(order);
     }
 
@@ -501,6 +523,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<OrderItem> GetOrderItemByIdAsync(int orderItemId)
     {
+		logger.LogDebug(">>> Entering GetOrderItemByIdAsync(orderItemId={OrderItemId})", orderItemId);
+		logger.LogDebug("<<< Exiting GetOrderItemByIdAsync(orderItemId={OrderItemId})", orderItemId);
         return await _orderItemRepository.GetByIdAsync(orderItemId, cache => default, useShortTermCache: true);
     }
 
@@ -514,7 +538,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Product> GetProductByOrderItemIdAsync(int orderItemId)
     {
+		logger.LogDebug(">>> Entering GetProductByOrderItemIdAsync(orderItemId={OrderItemId})", orderItemId);
         if (orderItemId == 0)
+		logger.LogDebug("<<< Exiting GetProductByOrderItemIdAsync(orderItemId={OrderItemId})", orderItemId);
             return null;
 
         return await (from p in _productRepository.Table
@@ -559,6 +585,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<OrderItem> GetOrderItemByGuidAsync(Guid orderItemGuid)
     {
+		logger.LogDebug(">>> Entering GetOrderItemByGuidAsync(orderItemGuid={OrderItemGuid})", orderItemGuid);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (orderItemGuid == Guid.Empty)
             return null;
 
@@ -566,6 +594,8 @@ public partial class OrderService : IOrderService
             where orderItem.OrderItemGuid == orderItemGuid
             select orderItem;
         var item = await query.FirstOrDefaultAsync();
+		logger.LogDebug("GetOrderItemByGuidAsync(orderItemGuid={OrderItemGuid}): item → {Item}", orderItemGuid, item);
+		logger.LogDebug("<<< Exiting GetOrderItemByGuidAsync(orderItemGuid={OrderItemGuid})", orderItemGuid);
         return item;
     }
 
@@ -592,6 +622,8 @@ public partial class OrderService : IOrderService
             select orderItem;
 
         var orderItems = await query.ToListAsync();
+		logger.LogDebug("GetDownloadableOrderItemsAsync(customerId={CustomerId}): orderItems → {OrderItems}", customerId, orderItems);
+		logger.LogDebug("<<< Exiting GetDownloadableOrderItemsAsync(customerId={CustomerId})", customerId);
         return orderItems;
     }
 
@@ -602,9 +634,19 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderItemAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering DeleteOrderItemAsync(orderItem={OrderItem})", orderItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderItemRepository.DeleteAsync(orderItem);
+		logger.LogDebug("<<< Exiting DeleteOrderItemAsync(orderItem={OrderItem})", orderItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteOrderItemAsync(orderItem)={OrderItem}: external service call took {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteOrderItemAsync(orderItem)={OrderItem}: delete query executed in {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteOrderItemAsync(orderItem)={OrderItem}: external service call took {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteOrderItemAsync(orderItem)={OrderItem}: delete query executed in {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a total number of items in all shipments
     /// </summary>
@@ -615,11 +657,13 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<int> GetTotalNumberOfItemsInAllShipmentsAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering GetTotalNumberOfItemsInAllShipmentsAsync(orderItem={OrderItem})", orderItem);
         ArgumentNullException.ThrowIfNull(orderItem);
 
         var totalInShipments = 0;
         var shipments = await _shipmentService.GetShipmentsByOrderIdAsync(orderItem.OrderId);
 
+		logger.LogDebug("GetTotalNumberOfItemsInAllShipmentsAsync(orderItem={OrderItem}): shipments → {Shipments}", orderItem, shipments);
         for (var i = 0; i < shipments.Count; i++)
         {
             var shipment = shipments[i];
@@ -631,6 +675,7 @@ public partial class OrderService : IOrderService
             }
         }
 
+		logger.LogDebug("<<< Exiting GetTotalNumberOfItemsInAllShipmentsAsync(orderItem={OrderItem})", orderItem);
         return totalInShipments;
     }
 
@@ -644,15 +689,19 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<int> GetTotalNumberOfItemsCanBeAddedToShipmentAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem})", orderItem);
         ArgumentNullException.ThrowIfNull(orderItem);
 
         var totalInShipments = await GetTotalNumberOfItemsInAllShipmentsAsync(orderItem);
 
+		logger.LogDebug("GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem}): totalInShipments → {TotalInShipments}", orderItem, totalInShipments);
         var qtyOrdered = orderItem.Quantity;
         var qtyCanBeAddedToShipmentTotal = qtyOrdered - totalInShipments;
         if (qtyCanBeAddedToShipmentTotal < 0)
+			logger.LogDebug("GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem}): qtyCanBeAddedToShipmentTotal → {QtyCanBeAddedToShipmentTotal}", orderItem, qtyCanBeAddedToShipmentTotal);
             qtyCanBeAddedToShipmentTotal = 0;
 
+		logger.LogDebug("<<< Exiting GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem})", orderItem);
         return qtyCanBeAddedToShipmentTotal;
     }
 
@@ -666,11 +715,13 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> IsDownloadAllowedAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering IsDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
         if (orderItem is null)
             return false;
 
         var order = await GetOrderByIdAsync(orderItem.OrderId);
         if (order == null || order.Deleted)
+			logger.LogDebug("IsDownloadAllowedAsync(orderItem={OrderItem}): order → {Order}", orderItem, order);
             return false;
 
         //order status
@@ -679,6 +730,7 @@ public partial class OrderService : IOrderService
 
         var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+		logger.LogDebug("IsDownloadAllowedAsync(orderItem={OrderItem}): product → {Product}", orderItem, product);
         if (product == null || !product.IsDownload)
             return false;
 
@@ -725,6 +777,7 @@ public partial class OrderService : IOrderService
                 break;
         }
 
+		logger.LogDebug("<<< Exiting IsDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
         return false;
     }
 
@@ -738,7 +791,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> IsLicenseDownloadAllowedAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering IsLicenseDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
         if (orderItem == null)
+		logger.LogDebug("<<< Exiting IsLicenseDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
             return false;
 
         return await IsDownloadAllowedAsync(orderItem) &&
@@ -753,9 +808,15 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertOrderItemAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering InsertOrderItemAsync(orderItem={OrderItem})", orderItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderItemRepository.InsertAsync(orderItem);
+		logger.LogDebug("<<< Exiting InsertOrderItemAsync(orderItem={OrderItem})", orderItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertOrderItemAsync(orderItem)={OrderItem}: save query executed in {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertOrderItemAsync(orderItem)={OrderItem}: save query executed in {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a order item
     /// </summary>
@@ -763,9 +824,15 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderItemAsync(OrderItem orderItem)
     {
+		logger.LogDebug(">>> Entering UpdateOrderItemAsync(orderItem={OrderItem})", orderItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderItemRepository.UpdateAsync(orderItem);
+		logger.LogDebug("<<< Exiting UpdateOrderItemAsync(orderItem={OrderItem})", orderItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateOrderItemAsync(orderItem)={OrderItem}: update query executed in {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateOrderItemAsync(orderItem)={OrderItem}: update query executed in {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Orders notes
@@ -780,6 +847,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<OrderNote> GetOrderNoteByIdAsync(int orderNoteId)
     {
+		logger.LogDebug(">>> Entering GetOrderNoteByIdAsync(orderNoteId={OrderNoteId})", orderNoteId);
+		logger.LogDebug("<<< Exiting GetOrderNoteByIdAsync(orderNoteId={OrderNoteId})", orderNoteId);
         return await _orderNoteRepository.GetByIdAsync(orderNoteId);
     }
 
@@ -794,16 +863,19 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<OrderNote>> GetOrderNotesByOrderIdAsync(int orderId, bool? displayToCustomer = null)
     {
+		logger.LogDebug(">>> Entering GetOrderNotesByOrderIdAsync(orderId={OrderId},displayToCustomer={DisplayToCustomer})", orderId, displayToCustomer);
         if (orderId == 0)
             return new List<OrderNote>();
 
         var query = _orderNoteRepository.Table.Where(on => on.OrderId == orderId);
 
+		logger.LogDebug("GetOrderNotesByOrderIdAsync(orderId={OrderId},displayToCustomer={DisplayToCustomer}): query → {Query}", orderId, displayToCustomer, query);
         if (displayToCustomer.HasValue)
         {
             query = query.Where(on => on.DisplayToCustomer == displayToCustomer);
         }
 
+		logger.LogDebug("<<< Exiting GetOrderNotesByOrderIdAsync(orderId={OrderId},displayToCustomer={DisplayToCustomer})", orderId, displayToCustomer);
         return await query.ToListAsync();
     }
 
@@ -814,9 +886,19 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderNoteAsync(OrderNote orderNote)
     {
+		logger.LogDebug(">>> Entering DeleteOrderNoteAsync(orderNote={OrderNote})", orderNote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderNoteRepository.DeleteAsync(orderNote);
+		logger.LogDebug("<<< Exiting DeleteOrderNoteAsync(orderNote={OrderNote})", orderNote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteOrderNoteAsync(orderNote)={OrderNote}: external service call took {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteOrderNoteAsync(orderNote)={OrderNote}: delete query executed in {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteOrderNoteAsync(orderNote)={OrderNote}: external service call took {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteOrderNoteAsync(orderNote)={OrderNote}: delete query executed in {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Formats the order note text
     /// </summary>
@@ -824,15 +906,18 @@ public partial class OrderService : IOrderService
     /// <returns>Formatted text</returns>
     public virtual string FormatOrderNoteText(OrderNote orderNote)
     {
+		logger.LogDebug(">>> Entering FormatOrderNoteText(orderNote={OrderNote})", orderNote);
         ArgumentNullException.ThrowIfNull(orderNote);
 
         var text = orderNote.Note;
 
+		logger.LogDebug("FormatOrderNoteText(orderNote={OrderNote}): text → {Text}", orderNote, text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = _htmlFormatter.FormatText(text, false, true, false, false, false, false);
 
+		logger.LogDebug("<<< Exiting FormatOrderNoteText(orderNote={OrderNote})", orderNote);
         return text;
     }
 
@@ -843,9 +928,15 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertOrderNoteAsync(OrderNote orderNote)
     {
+		logger.LogDebug(">>> Entering InsertOrderNoteAsync(orderNote={OrderNote})", orderNote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderNoteRepository.InsertAsync(orderNote);
+		logger.LogDebug("<<< Exiting InsertOrderNoteAsync(orderNote={OrderNote})", orderNote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertOrderNoteAsync(orderNote)={OrderNote}: save query executed in {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertOrderNoteAsync(orderNote)={OrderNote}: save query executed in {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Recurring payments
@@ -857,9 +948,19 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		logger.LogDebug(">>> Entering DeleteRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _recurringPaymentRepository.DeleteAsync(recurringPayment);
+		logger.LogDebug("<<< Exiting DeleteRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteRecurringPaymentAsync(recurringPayment)={RecurringPayment}: external service call took {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteRecurringPaymentAsync(recurringPayment)={RecurringPayment}: delete query executed in {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteRecurringPaymentAsync(recurringPayment)={RecurringPayment}: external service call took {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteRecurringPaymentAsync(recurringPayment)={RecurringPayment}: delete query executed in {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a recurring payment
     /// </summary>
@@ -870,6 +971,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<RecurringPayment> GetRecurringPaymentByIdAsync(int recurringPaymentId)
     {
+		logger.LogDebug(">>> Entering GetRecurringPaymentByIdAsync(recurringPaymentId={RecurringPaymentId})", recurringPaymentId);
+		logger.LogDebug("<<< Exiting GetRecurringPaymentByIdAsync(recurringPaymentId={RecurringPaymentId})", recurringPaymentId);
         return await _recurringPaymentRepository.GetByIdAsync(recurringPaymentId, cache => default);
     }
 
@@ -880,9 +983,15 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		logger.LogDebug(">>> Entering InsertRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _recurringPaymentRepository.InsertAsync(recurringPayment);
+		logger.LogDebug("<<< Exiting InsertRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertRecurringPaymentAsync(recurringPayment)={RecurringPayment}: save query executed in {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertRecurringPaymentAsync(recurringPayment)={RecurringPayment}: save query executed in {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the recurring payment
     /// </summary>
@@ -890,9 +999,15 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		logger.LogDebug(">>> Entering UpdateRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _recurringPaymentRepository.UpdateAsync(recurringPayment);
+		logger.LogDebug("<<< Exiting UpdateRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateRecurringPaymentAsync(recurringPayment)={RecurringPayment}: update query executed in {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateRecurringPaymentAsync(recurringPayment)={RecurringPayment}: update query executed in {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Search recurring payments
     /// </summary>
@@ -954,8 +1069,10 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<RecurringPaymentHistory>> GetRecurringPaymentHistoryAsync(RecurringPayment recurringPayment)
     {
+		logger.LogDebug(">>> Entering GetRecurringPaymentHistoryAsync(recurringPayment={RecurringPayment})", recurringPayment);
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
+		logger.LogDebug("<<< Exiting GetRecurringPaymentHistoryAsync(recurringPayment={RecurringPayment})", recurringPayment);
         return await _recurringPaymentHistoryRepository.Table
             .Where(rph => rph.RecurringPaymentId == recurringPayment.Id)
             .ToListAsync();
@@ -968,9 +1085,15 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertRecurringPaymentHistoryAsync(RecurringPaymentHistory recurringPaymentHistory)
     {
+		logger.LogDebug(">>> Entering InsertRecurringPaymentHistoryAsync(recurringPaymentHistory={RecurringPaymentHistory})", recurringPaymentHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _recurringPaymentHistoryRepository.InsertAsync(recurringPaymentHistory);
+		logger.LogDebug("<<< Exiting InsertRecurringPaymentHistoryAsync(recurringPaymentHistory={RecurringPaymentHistory})", recurringPaymentHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertRecurringPaymentHistoryAsync(recurringPaymentHistory)={RecurringPaymentHistory}: save query executed in {Arg1} ms", recurringPaymentHistory, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertRecurringPaymentHistoryAsync(recurringPaymentHistory)={RecurringPaymentHistory}: save query executed in {Arg1} ms", recurringPaymentHistory, __logStart.ElapsedMilliseconds);
     #endregion
 
     #endregion

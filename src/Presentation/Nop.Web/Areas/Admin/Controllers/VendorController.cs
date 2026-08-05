@@ -20,11 +20,13 @@ using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class VendorController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ForumSettings _forumSettings;
@@ -132,23 +134,28 @@ public partial class VendorController : BaseAdminController
 
     protected virtual async Task<string> ParseVendorAttributesAsync(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParseVendorAttributesAsync(form={Form})", form);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = string.Empty;
         var vendorAttributes = await _vendorAttributeService.GetAllAttributesAsync();
         foreach (var attribute in vendorAttributes)
         {
+		_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): vendorAttributes → {VendorAttributes}", form, vendorAttributes);
             var controlId = $"{NopVendorDefaults.VendorAttributePrefix}{attribute.Id}";
             StringValues ctrlAttributes;
+			_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): controlId → {ControlId}", form, controlId);
             switch (attribute.AttributeControlType)
             {
                 case AttributeControlType.DropdownList:
                 case AttributeControlType.RadioList:
                     ctrlAttributes = form[controlId];
+					_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): ctrlAttributes → {CtrlAttributes}", form, ctrlAttributes);
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
                         var selectedAttributeId = int.Parse(ctrlAttributes);
                         if (selectedAttributeId > 0)
+							_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): selectedAttributeId → {SelectedAttributeId}", form, selectedAttributeId);
                             attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                                 attribute, selectedAttributeId.ToString());
                     }
@@ -176,6 +183,7 @@ public partial class VendorController : BaseAdminController
                                  .Select(v => v.Id)
                                  .ToList())
                     {
+								_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): attributeValues → {AttributeValues}", form, attributeValues);
                         attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                             attribute, selectedAttributeId.ToString());
                     }
@@ -189,6 +197,7 @@ public partial class VendorController : BaseAdminController
                         var enteredText = ctrlAttributes.ToString().Trim();
                         attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                             attribute, enteredText);
+							_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): enteredText → {EnteredText}", form, enteredText);
                     }
 
                     break;
@@ -202,6 +211,7 @@ public partial class VendorController : BaseAdminController
             }
         }
 
+		_logger.LogDebug("<<< Exiting ParseVendorAttributesAsync(form={Form})", form);
         return attributesXml;
     }
 
@@ -212,9 +222,12 @@ public partial class VendorController : BaseAdminController
     [CheckPermission([StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE, StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE])]
     public virtual async Task<IActionResult> AddCustomerToVendorPopup()
     {
+		_logger.LogDebug(">>> Entering AddCustomerToVendorPopup()");
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorCustomerSearchModelAsync(new VendorCustomerSearchModel());
 
+		_logger.LogDebug("AddCustomerToVendorPopup(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting AddCustomerToVendorPopup()");
         return View(model);
     }
 
@@ -239,23 +252,30 @@ public partial class VendorController : BaseAdminController
     [CheckPermission([StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE, StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE])]
     public virtual async Task<IActionResult> AddCustomerToVendorPopupList(VendorCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering AddCustomerToVendorPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorCustomerListModelAsync(searchModel);
 
+		_logger.LogDebug("AddCustomerToVendorPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting AddCustomerToVendorPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorSearchModelAsync(new VendorSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
         return View(model);
     }
 
@@ -263,18 +283,23 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> List(VendorSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorListModelAsync(searchModel);
 
+		_logger.LogDebug("List(searchModel={SearchModel}): model → {Model}", searchModel, model);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorModelAsync(new VendorModel(), null);
 
+		_logger.LogDebug("Create(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -338,23 +363,28 @@ public partial class VendorController : BaseAdminController
         model = await _vendorModelFactory.PrepareVendorModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing},form={Form})", model, continueEditing, form);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(id);
         if (vendor == null || vendor.Deleted)
+			_logger.LogDebug("Edit(id={Id}): vendor → {Vendor}", id, vendor);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorModelAsync(null, vendor);
 
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
         if (!_forumSettings.AllowPrivateMessages && model.PmCustomerId > 0)
             _notificationService.WarningNotification("Private messages are disabled. Do not forget to enable them.");
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -457,6 +487,7 @@ public partial class VendorController : BaseAdminController
         model = await _vendorModelFactory.PrepareVendorModelAsync(model, vendor, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing},form={Form})", model, continueEditing, form);
         return View(model);
     }
 
@@ -464,15 +495,18 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(id);
         if (vendor == null)
+			_logger.LogDebug("Delete(id={Id}): vendor → {Vendor}", id, vendor);
             return RedirectToAction("List");
 
         //clear associated customer references
         var associatedCustomers = await _customerService.GetAllCustomersAsync(vendorId: vendor.Id);
         foreach (var customer in associatedCustomers)
         {
+		_logger.LogDebug("Delete(id={Id}): associatedCustomers → {AssociatedCustomers}", id, associatedCustomers);
             customer.VendorId = 0;
             await _customerService.UpdateCustomerAsync(customer);
         }
@@ -486,6 +520,7 @@ public partial class VendorController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Vendors.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -497,6 +532,7 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> VendorNotesSelect(VendorNoteSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering VendorNotesSelect(searchModel={SearchModel})", searchModel);
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(searchModel.VendorId)
             ?? throw new ArgumentException("No vendor found with the specified id");
@@ -504,18 +540,22 @@ public partial class VendorController : BaseAdminController
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorNoteListModelAsync(searchModel, vendor);
 
+		_logger.LogDebug("VendorNotesSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting VendorNotesSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> VendorNoteAdd(int vendorId, string message)
     {
+		_logger.LogDebug(">>> Entering VendorNoteAdd(vendorId={VendorId},message={Message})", vendorId, message);
         if (string.IsNullOrEmpty(message))
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.Vendors.VendorNotes.Fields.Note.Validation"));
 
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(vendorId);
         if (vendor == null)
+			_logger.LogDebug("VendorNoteAdd(vendorId={VendorId},message={Message}): vendor → {Vendor}", vendorId, message, vendor);
             return ErrorJson("Vendor cannot be loaded");
 
         await _vendorService.InsertVendorNoteAsync(new VendorNote
@@ -525,6 +565,7 @@ public partial class VendorController : BaseAdminController
             VendorId = vendor.Id
         });
 
+		_logger.LogDebug("<<< Exiting VendorNoteAdd(vendorId={VendorId},message={Message})", vendorId, message);
         return Json(new { Result = true });
     }
 
@@ -532,12 +573,14 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> VendorNoteDelete(int id)
     {
+		_logger.LogDebug(">>> Entering VendorNoteDelete(id={Id})", id);
         //try to get a vendor note with the specified id
         var vendorNote = await _vendorService.GetVendorNoteByIdAsync(id)
             ?? throw new ArgumentException("No vendor note found with the specified id", nameof(id));
 
         await _vendorService.DeleteVendorNoteAsync(vendorNote);
 
+		_logger.LogDebug("<<< Exiting VendorNoteDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

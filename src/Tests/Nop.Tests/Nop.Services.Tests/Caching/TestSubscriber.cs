@@ -1,19 +1,23 @@
 ﻿using System.Net;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Caching;
 
 public class TestSubscriber : ISubscriber
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected static IList<Action<RedisChannel, RedisValue>> _handlers = new List<Action<RedisChannel, RedisValue>>();
     
     public Task<TimeSpan> PingAsync(CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering PingAsync(flags={Flags})", flags);
         throw new NotImplementedException();
     }
 
     public bool TryWait(Task task)
     {
+		_logger.LogDebug(">>> Entering TryWait(task={Task})", task);
         throw new NotImplementedException();
     }
 
@@ -24,11 +28,13 @@ public class TestSubscriber : ISubscriber
 
     public T Wait<T>(Task<T> task)
     {
+		_logger.LogDebug(">>> Entering Wait(task={Task})", task);
         throw new NotImplementedException();
     }
 
     public void WaitAll(params Task[] tasks)
     {
+		_logger.LogDebug(">>> Entering WaitAll(tasks={Tasks})", tasks);
         throw new NotImplementedException();
     }
 
@@ -36,21 +42,25 @@ public class TestSubscriber : ISubscriber
 
     public TimeSpan Ping(CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering Ping(flags={Flags})", flags);
         throw new NotImplementedException();
     }
 
     public EndPoint IdentifyEndpoint(RedisChannel channel, CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering IdentifyEndpoint(channel={Channel},flags={Flags})", channel, flags);
         throw new NotImplementedException();
     }
 
     public Task<EndPoint> IdentifyEndpointAsync(RedisChannel channel, CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering IdentifyEndpointAsync(channel={Channel},flags={Flags})", channel, flags);
         throw new NotImplementedException();
     }
 
     public bool IsConnected(RedisChannel channel = new RedisChannel())
     {
+		_logger.LogDebug(">>> Entering IsConnected(channel={Channel})", channel);
         throw new NotImplementedException();
     }
 
@@ -65,15 +75,19 @@ public class TestSubscriber : ISubscriber
     /// <remarks><seealso href="https://redis.io/commands/publish" /></remarks>
     public long Publish(RedisChannel channel, RedisValue message, CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering Publish(channel={Channel},message={Message},flags={Flags})", channel, message, flags);
         foreach (var handler in _handlers) 
             handler(channel, message);
 
+		_logger.LogDebug("<<< Exiting Publish(channel={Channel},message={Message},flags={Flags})", channel, message, flags);
         return _handlers.Count;
     }
 
     /// <inheritdoc cref="M:StackExchange.Redis.ISubscriber.Publish(StackExchange.Redis.RedisChannel,StackExchange.Redis.RedisValue,StackExchange.Redis.CommandFlags)" />
     public Task<long> PublishAsync(RedisChannel channel, RedisValue message, CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering PublishAsync(channel={Channel},message={Message},flags={Flags})", channel, message, flags);
+		_logger.LogDebug("<<< Exiting PublishAsync(channel={Channel},message={Message},flags={Flags})", channel, message, flags);
         return Task.FromResult(Publish(channel, message, flags));
     }
 
@@ -102,6 +116,7 @@ public class TestSubscriber : ISubscriber
 
     public ChannelMessageQueue Subscribe(RedisChannel channel, CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering Subscribe(channel={Channel},flags={Flags})", channel, flags);
         throw new NotImplementedException();
     }
 
@@ -112,6 +127,7 @@ public class TestSubscriber : ISubscriber
 
     public EndPoint SubscribedEndpoint(RedisChannel channel)
     {
+		_logger.LogDebug(">>> Entering SubscribedEndpoint(channel={Channel})", channel);
         throw new NotImplementedException();
     }
 
@@ -127,11 +143,13 @@ public class TestSubscriber : ISubscriber
 
     public void UnsubscribeAll(CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering UnsubscribeAll(flags={Flags})", flags);
         throw new NotImplementedException();
     }
 
     public Task UnsubscribeAllAsync(CommandFlags flags = CommandFlags.None)
     {
+		_logger.LogDebug(">>> Entering UnsubscribeAllAsync(flags={Flags})", flags);
         throw new NotImplementedException();
     }
 }

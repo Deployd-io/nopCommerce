@@ -19,7 +19,10 @@ public partial class SearchTermService : ISearchTermService
 
     public SearchTermService(IRepository<SearchTerm> searchTermRepository)
     {
+		logger.LogDebug(">>> Entering SearchTermService(searchTermRepository={SearchTermRepository})", searchTermRepository);
         _searchTermRepository = searchTermRepository;
+		logger.LogDebug("<<< Exiting SearchTermService(searchTermRepository={SearchTermRepository})", searchTermRepository);
+		logger.LogDebug("SearchTermService(searchTermRepository={SearchTermRepository}): _searchTermRepository → {_searchTermRepository}", searchTermRepository, _searchTermRepository);
     }
 
     #endregion
@@ -37,6 +40,7 @@ public partial class SearchTermService : ISearchTermService
     /// </returns>
     public virtual async Task<SearchTerm> GetSearchTermByKeywordAsync(string keyword, int storeId)
     {
+		logger.LogDebug(">>> Entering GetSearchTermByKeywordAsync(keyword={Keyword},storeId={StoreId})", keyword, storeId);
         if (string.IsNullOrEmpty(keyword))
             return null;
 
@@ -46,6 +50,8 @@ public partial class SearchTermService : ISearchTermService
             select st;
         var searchTerm = await query.FirstOrDefaultAsync();
 
+		logger.LogDebug("GetSearchTermByKeywordAsync(keyword={Keyword},storeId={StoreId}): searchTerm → {SearchTerm}", keyword, storeId, searchTerm);
+		logger.LogDebug("<<< Exiting GetSearchTermByKeywordAsync(keyword={Keyword},storeId={StoreId})", keyword, storeId);
         return searchTerm;
     }
 
@@ -60,6 +66,7 @@ public partial class SearchTermService : ISearchTermService
     /// </returns>
     public virtual async Task<IPagedList<SearchTermReportLine>> GetStatsAsync(int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		logger.LogDebug(">>> Entering GetStatsAsync(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         var query = (from st in _searchTermRepository.Table
                 group st by st.Keyword into groupedResult
                 select new
@@ -70,12 +77,16 @@ public partial class SearchTermService : ISearchTermService
             .OrderByDescending(m => m.Count)
             .Select(r => new SearchTermReportLine
             {
+					logger.LogDebug("GetStatsAsync(pageIndex={PageIndex},pageSize={PageSize}): Keyword → {Keyword}", pageIndex, pageSize, Keyword);
+					logger.LogDebug("GetStatsAsync(pageIndex={PageIndex},pageSize={PageSize}): Count → {Count}", pageIndex, pageSize, Count);
                 Keyword = r.Keyword,
                 Count = r.Count
             });
 
         var result = await query.ToPagedListAsync(pageIndex, pageSize);
 
+		logger.LogDebug("GetStatsAsync(pageIndex={PageIndex},pageSize={PageSize}): result → {Result}", pageIndex, pageSize, result);
+		logger.LogDebug("<<< Exiting GetStatsAsync(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         return result;
     }
 
@@ -86,6 +97,8 @@ public partial class SearchTermService : ISearchTermService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSearchTermAsync(SearchTerm searchTerm)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _searchTermRepository.InsertAsync(searchTerm);
     }
 
@@ -96,6 +109,7 @@ public partial class SearchTermService : ISearchTermService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateSearchTermAsync(SearchTerm searchTerm)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _searchTermRepository.UpdateAsync(searchTerm);
     }
 

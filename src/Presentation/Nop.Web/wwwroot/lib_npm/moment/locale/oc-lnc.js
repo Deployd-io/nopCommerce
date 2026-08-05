@@ -3,6 +3,7 @@
 //! author : Quentin PAGÈS : https://github.com/Quenty31
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('oc-lnc', {
     months: {
@@ -63,6 +64,7 @@ export default moment.defineLocale('oc-lnc', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(r|n|t|è|a)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         var output =
             number === 1
                 ? 'r'
@@ -74,7 +76,9 @@ export default moment.defineLocale('oc-lnc', {
                       ? 't'
                       : 'è';
         if (period === 'w' || period === 'W') {
+			logger.debug(`ordinal(number=${number},period=${period}): output → ${output}`);
             output = 'a';
+			logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
         }
         return number + output;
     },

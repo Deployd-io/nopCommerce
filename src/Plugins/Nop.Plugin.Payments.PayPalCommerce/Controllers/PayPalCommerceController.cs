@@ -17,6 +17,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Controllers;
 
@@ -26,6 +27,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Controllers;
 [AuthorizeAdmin]
 public class PayPalCommerceController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly AppSettings _appSettings;
@@ -236,6 +238,7 @@ public class PayPalCommerceController : BasePluginController
         await SaveSettingAsync(settings, setting => setting.ClientId, storeId);
         await SaveSettingAsync(settings, setting => setting.SecretKey, storeId);
         await SaveSettingAsync(settings, setting => setting.MerchantId, storeId);
+		_logger.LogDebug("<<< Exiting SetCredentialsManuallyAsync(model={Model},settings={Settings},storeId={StoreId})", model, settings, storeId);
     }
 
     /// <summary>
@@ -265,6 +268,7 @@ public class PayPalCommerceController : BasePluginController
         settings.WebhookUrl = webhook.Url;
         await SaveSettingAsync(settings, setting => setting.WebhookUrl, storeId);
         await _settingService.ClearCacheAsync();
+		_logger.LogDebug("<<< Exiting EnsureWebhookCreatedAsync(settings={Settings},storeId={StoreId})", settings, storeId);
     }
 
     #endregion
@@ -276,6 +280,7 @@ public class PayPalCommerceController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var (settings, storeId) = await LoadSettingsAsync();
 
         var model = new ConfigurationModel
@@ -307,6 +312,11 @@ public class PayPalCommerceController : BasePluginController
         if (storeId > 0)
         {
             model.SetCredentialsManually_OverrideForStore = true;
+			_logger.LogDebug("Configure(): model.SetCredentialsManually_OverrideForStore → {Arg0}", model.SetCredentialsManually_OverrideForStore);
+			_logger.LogDebug("Configure(): model.UseSandbox_OverrideForStore → {Arg0}", model.UseSandbox_OverrideForStore);
+			_logger.LogDebug("Configure(): model.ClientId_OverrideForStore → {Arg0}", model.ClientId_OverrideForStore);
+			_logger.LogDebug("Configure(): model.SecretKey_OverrideForStore → {Arg0}", model.SecretKey_OverrideForStore);
+			_logger.LogDebug("Configure(): model.MerchantId_OverrideForStore → {Arg0}", model.MerchantId_OverrideForStore);
             model.UseSandbox_OverrideForStore = true;
             model.ClientId_OverrideForStore = true;
             model.SecretKey_OverrideForStore = true;
@@ -315,23 +325,31 @@ public class PayPalCommerceController : BasePluginController
             model.PaymentTypeId_OverrideForStore = await _settingService.SettingExistsAsync(settings, setting => setting.PaymentType, storeId);
             model.UseCardFields_OverrideForStore = await _settingService.SettingExistsAsync(settings, setting => setting.UseCardFields, storeId);
             model.CustomerAuthenticationRequired_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.CustomerAuthenticationRequired_OverrideForStore → {Arg0}", model.CustomerAuthenticationRequired_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.CustomerAuthenticationRequired, storeId);
             model.UseApplePay_OverrideForStore = await _settingService.SettingExistsAsync(settings, setting => setting.UseApplePay, storeId);
             model.UseGooglePay_OverrideForStore = await _settingService.SettingExistsAsync(settings, setting => setting.UseGooglePay, storeId);
             model.UseAlternativePayments_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.UseAlternativePayments_OverrideForStore → {Arg0}", model.UseAlternativePayments_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.UseAlternativePayments, storeId);
             model.UseVault_OverrideForStore = await _settingService.SettingExistsAsync(settings, setting => setting.UseVault, storeId);
             model.SkipOrderConfirmPage_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.SkipOrderConfirmPage_OverrideForStore → {Arg0}", model.SkipOrderConfirmPage_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.SkipOrderConfirmPage, storeId);
             model.DisplayButtonsOnShoppingCart_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.DisplayButtonsOnShoppingCart_OverrideForStore → {Arg0}", model.DisplayButtonsOnShoppingCart_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.DisplayButtonsOnShoppingCart, storeId);
             model.DisplayButtonsOnProductDetails_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.DisplayButtonsOnProductDetails_OverrideForStore → {Arg0}", model.DisplayButtonsOnProductDetails_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.DisplayButtonsOnProductDetails, storeId);
             model.DisplayLogoInHeaderLinks_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.DisplayLogoInHeaderLinks_OverrideForStore → {Arg0}", model.DisplayLogoInHeaderLinks_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.DisplayLogoInHeaderLinks, storeId);
             model.LogoInHeaderLinks_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.LogoInHeaderLinks_OverrideForStore → {Arg0}", model.LogoInHeaderLinks_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.LogoInHeaderLinks, storeId);
             model.DisplayLogoInFooter_OverrideForStore = await _settingService
+				_logger.LogDebug("Configure(): model.DisplayLogoInFooter_OverrideForStore → {Arg0}", model.DisplayLogoInFooter_OverrideForStore);
                 .SettingExistsAsync(settings, setting => setting.DisplayLogoInFooter, storeId);
             model.LogoInFooter_OverrideForStore = await _settingService.SettingExistsAsync(settings, setting => setting.LogoInFooter, storeId);
         }
@@ -351,6 +369,7 @@ public class PayPalCommerceController : BasePluginController
                 _notificationService.WarningNotification($"PayPal account ID of the merchant was not set correctly when updating the plugin. " +
                     $"You should either complete onboarding process again on this page or set the ID yourself on the " +
                     $"<a href=\"{url}\" target=\"_blank\">All Settings page</a> (you can find this ID in your PayPal account)", false);
+					_logger.LogDebug("Configure(): url → {Url}", url);
             }
         }
 
@@ -359,6 +378,7 @@ public class PayPalCommerceController : BasePluginController
         model.MerchantModel = await CheckMerchantStatusAsync(settings, storeId);
         if (!settings.SetCredentialsManually)
             model.MerchantId = model.MerchantModel.MerchantId;
+			_logger.LogDebug("Configure(): model.MerchantId → {Arg0}", model.MerchantId);
 
         await EnsureWebhookCreatedAsync(settings, storeId);
 
@@ -367,6 +387,7 @@ public class PayPalCommerceController : BasePluginController
             //prices and total aren't rounded, so display warning
             var url = Url.Action("AllSettings", "Setting", new { settingName = nameof(ShoppingCartSettings.RoundPricesDuringCalculation) });
             var warningMessage = string.Format(await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.RoundingWarning"), url);
+			_logger.LogDebug("Configure(): warningMessage → {WarningMessage}", warningMessage);
             _notificationService.WarningNotification(warningMessage, false);
         }
 
@@ -386,6 +407,7 @@ public class PayPalCommerceController : BasePluginController
             }
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Payments.PayPalCommerce/Views/Admin/Configure.cshtml", model);
     }
 
@@ -549,6 +571,7 @@ public class PayPalCommerceController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> RevokeAccess()
     {
+		_logger.LogDebug(">>> Entering RevokeAccess()");
         var (settings, storeId) = await LoadSettingsAsync();
 
         //delete webhook
@@ -578,23 +601,29 @@ public class PayPalCommerceController : BasePluginController
 
         var accessRevokedMessage = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Onboarding.AccessRevoked");
         _notificationService.SuccessNotification(accessRevokedMessage);
+		_logger.LogDebug("RevokeAccess(): accessRevokedMessage → {AccessRevokedMessage}", accessRevokedMessage);
 
+		_logger.LogDebug("<<< Exiting RevokeAccess()");
         return RedirectToAction("Configure");
     }
 
     public async Task<IActionResult> ChangeUseApplePay(bool enabled)
     {
+		_logger.LogDebug(">>> Entering ChangeUseApplePay(enabled={Enabled})", enabled);
         var message = string.Empty;
         if (enabled)
+		_logger.LogDebug("ChangeUseApplePay(enabled={Enabled}): message → {Message}", enabled, message);
         {
             if (!_appSettings.Get<CommonConfig>().ServeUnknownFileTypes)
             {
                 //this setting should be enabled for domain verification
                 var locale = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Fields.UseApplePay.Warning");
                 message = string.Format(locale, Url.Action("AppSettings", "Setting"));
+				_logger.LogDebug("ChangeUseApplePay(enabled={Enabled}): locale → {Locale}", enabled, locale);
             }
         }
 
+		_logger.LogDebug("<<< Exiting ChangeUseApplePay(enabled={Enabled})", enabled);
         return Json(new { Result = message });
     }
 
@@ -605,12 +634,14 @@ public class PayPalCommerceController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> PayLater()
     {
+		_logger.LogDebug(">>> Entering PayLater()");
         var (settings, _) = await LoadSettingsAsync();
         if (!settings.UseSandbox && !settings.ConfiguratorSupported)
             return RedirectToAction("Configure");
 
         var language = await _workContext.GetWorkingLanguageAsync();
         var model = new PayLaterConfigurationModel
+		_logger.LogDebug("PayLater(): language → {Language}", language);
         {
             ClientId = settings.ClientId,
             UseSandbox = settings.UseSandbox,
@@ -618,6 +649,7 @@ public class PayPalCommerceController : BasePluginController
             Locale = language.LanguageCulture?.Replace('-', '_') ?? "en_US"
         };
 
+		_logger.LogDebug("<<< Exiting PayLater()");
         return View("~/Plugins/Payments.PayPalCommerce/Views/Admin/PayLater.cshtml", model);
     }
 
@@ -625,6 +657,7 @@ public class PayPalCommerceController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> PayLaterConfig(string config)
     {
+		_logger.LogDebug(">>> Entering PayLaterConfig(config={Config})", config);
         var (settings, storeId) = await LoadSettingsAsync();
         if (!settings.UseSandbox && !settings.ConfiguratorSupported)
             return ErrorJson("Merchant messaging configurator is not available");
@@ -633,6 +666,7 @@ public class PayPalCommerceController : BasePluginController
         await SaveSettingAsync(settings, setting => setting.PayLaterConfig, storeId);
         await _settingService.ClearCacheAsync();
 
+		_logger.LogDebug("<<< Exiting PayLaterConfig(config={Config})", config);
         return Json(new { message = await _localizationService.GetResourceAsync("Admin.Plugins.Saved") });
 
     }

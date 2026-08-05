@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Plugin.Misc.Zettle.Domain.Api;
 using Nop.Plugin.Misc.Zettle.Domain.Api.OAuth;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Services;
 
@@ -13,6 +14,7 @@ namespace Nop.Plugin.Misc.Zettle.Services;
 /// </summary>
 public class ZettleHttpClient
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly HttpClient _httpClient;
@@ -26,13 +28,19 @@ public class ZettleHttpClient
 
     public ZettleHttpClient(HttpClient httpClient, ZettleSettings zettleSettings)
     {
+		_logger.LogDebug(">>> Entering ZettleHttpClient(httpClient={HttpClient},zettleSettings={ZettleSettings})", httpClient, zettleSettings);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         httpClient.Timeout = TimeSpan.FromSeconds(zettleSettings.RequestTimeout ?? ZettleDefaults.RequestTimeout);
         httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, ZettleDefaults.UserAgent);
+		_logger.LogInformation("ZettleHttpClient(httpClient,zettleSettings)={HttpClient},{ZettleSettings}: external service call took {Arg2} ms", httpClient, zettleSettings, __logStart.ElapsedMilliseconds);
         httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, MimeTypes.ApplicationJson);
         httpClient.DefaultRequestHeaders.Add(ZettleDefaults.PartnerHeader.Name, ZettleDefaults.PartnerHeader.Value);
 
         _httpClient = httpClient;
+		_logger.LogDebug("ZettleHttpClient(httpClient={HttpClient},zettleSettings={ZettleSettings}): _httpClient → {_httpClient}", httpClient, zettleSettings, _httpClient);
         _zettleSettings = zettleSettings;
+		_logger.LogDebug("<<< Exiting ZettleHttpClient(httpClient={HttpClient},zettleSettings={ZettleSettings})", httpClient, zettleSettings);
+		_logger.LogDebug("ZettleHttpClient(httpClient={HttpClient},zettleSettings={ZettleSettings}): _zettleSettings → {_zettleSettings}", httpClient, zettleSettings, _zettleSettings);
     }
 
     #endregion
@@ -45,6 +53,7 @@ public class ZettleHttpClient
     /// <returns>The asynchronous task whose result contains access token</returns>
     protected async Task<string> GetAccessTokenAsync()
     {
+		_logger.LogDebug(">>> Entering GetAccessTokenAsync()");
         if (!string.IsNullOrEmpty(_accessToken))
             return _accessToken;
 
@@ -53,11 +62,16 @@ public class ZettleHttpClient
 
         _accessToken = (await RequestAsync<GetAuthenticationRequest, Authentication>(new()
         {
+		_logger.LogDebug("GetAccessTokenAsync(): _accessToken → {_accessToken}", _accessToken);
             Assertion = _zettleSettings.ApiKey,
             ClientId = ZettleDefaults.PartnerHeader.Value,
             GrantType = "urn:ietf:params:oauth:grant-type:jwt-bearer"
+			_logger.LogDebug("GetAccessTokenAsync(): Assertion → {Assertion}", Assertion);
+			_logger.LogDebug("GetAccessTokenAsync(): ClientId → {ClientId}", ClientId);
+			_logger.LogDebug("GetAccessTokenAsync(): GrantType → {GrantType}", GrantType);
         }))?.AccessToken;
 
+		_logger.LogDebug("<<< Exiting GetAccessTokenAsync()");
         return _accessToken;
     }
 
@@ -74,9 +88,12 @@ public class ZettleHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     public async Task<TResponse> RequestAsync<TRequest, TResponse>(TRequest request) where TRequest : IApiRequest where TResponse : IApiResponse
     {
+		_logger.LogDebug(">>> Entering RequestAsync(request={Request})", request);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare request parameters
         var requestString = JsonConvert.SerializeObject(request);
         var requestContent = request is not GetAuthenticationRequest authentication
+			_logger.LogDebug("RequestAsync(request={Request}): requestString → {RequestString}", request, requestString);
             ? (ByteArrayContent)new StringContent(requestString, Encoding.UTF8, MimeTypes.ApplicationJson)
             : new FormUrlEncodedContent(new Dictionary<string, string>
             {
@@ -95,6 +112,7 @@ public class ZettleHttpClient
         {
             var accessToken = await GetAccessTokenAsync();
             requestMessage.Headers.Add(HeaderNames.Authorization, $"Bearer {accessToken}");
+			_logger.LogDebug("RequestAsync(request={Request}): accessToken → {AccessToken}", request, accessToken);
         }
 
         //add ETag
@@ -109,9 +127,13 @@ public class ZettleHttpClient
         //execute request and get result
         var httpResponse = await _httpClient.SendAsync(requestMessage);
         var responseString = await httpResponse.Content.ReadAsStringAsync();
+		_logger.LogInformation("RequestAsync(request)={Request}: external service call took {Arg1} ms", request, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("RequestAsync(request={Request}): httpResponse → {HttpResponse}", request, httpResponse);
+		_logger.LogDebug("RequestAsync(request={Request}): responseString → {ResponseString}", request, responseString);
         var result = JsonConvert.DeserializeObject<TResponse>(responseString ?? string.Empty);
         if (!string.IsNullOrEmpty(result?.Error))
         {
+			_logger.LogDebug("RequestAsync(request={Request}): result → {Result}", request, result);
             var error = !string.IsNullOrEmpty(result.ErrorDescription) ? result.ErrorDescription : result.Error;
             throw new NopException($"Request error: {error}");
         }

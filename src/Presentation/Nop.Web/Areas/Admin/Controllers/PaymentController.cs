@@ -13,11 +13,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Payments;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class PaymentController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -62,6 +64,10 @@ public partial class PaymentController : BaseAdminController
 
     public virtual IActionResult PaymentMethods()
     {
+		_logger.LogDebug(">>> Entering PaymentMethods()");
+		_logger.LogDebug(">>> Entering Methods()");
+		_logger.LogDebug("<<< Exiting Methods()");
+		_logger.LogDebug("<<< Exiting Methods(searchModel={SearchModel})", searchModel);
         return RedirectToAction("Methods");
     }
 
@@ -124,9 +130,12 @@ public partial class PaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public virtual async Task<IActionResult> MethodRestrictions()
     {
+		_logger.LogDebug(">>> Entering MethodRestrictions()");
         //prepare model
         var model = await _paymentModelFactory.PreparePaymentMethodsModelAsync(new PaymentMethodsModel());
 
+		_logger.LogDebug("MethodRestrictions(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting MethodRestrictions()");
         return View(model);
     }
 

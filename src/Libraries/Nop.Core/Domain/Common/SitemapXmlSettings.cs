@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Common;
@@ -7,9 +8,13 @@ namespace Nop.Core.Domain.Common;
 /// </summary>
 public partial class SitemapXmlSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SitemapXmlSettings()
     {
+		_logger.LogDebug(">>> Entering SitemapXmlSettings()");
         SitemapCustomUrls = new List<string>();
+		_logger.LogDebug("<<< Exiting SitemapXmlSettings()");
+		_logger.LogDebug("SitemapXmlSettings(): SitemapCustomUrls → {SitemapCustomUrls}", SitemapCustomUrls);
     }
 
     /// <summary>

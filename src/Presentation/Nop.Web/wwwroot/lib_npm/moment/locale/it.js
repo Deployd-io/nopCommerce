@@ -5,6 +5,7 @@
 //! author: Marco : https://github.com/Manfre98
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('it', {
     months: 'gennaio_febbraio_marzo_aprile_maggio_giugno_luglio_agosto_settembre_ottobre_novembre_dicembre'.split(
@@ -26,34 +27,43 @@ export default moment.defineLocale('it', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
             return (
                 '[Oggi a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
                 ']LT'
             );
+			logger.debug('<<< Exiting sameDay()');
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
             return (
                 '[Domani a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
                 ']LT'
             );
+			logger.debug('<<< Exiting nextDay()');
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return (
                 'dddd [a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
                 ']LT'
             );
+			logger.debug('<<< Exiting nextWeek()');
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
             return (
                 '[Ieri a' +
                 (this.hours() > 1 ? 'lle ' : this.hours() === 0 ? ' ' : "ll'") +
                 ']LT'
             );
+			logger.debug('<<< Exiting lastDay()');
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return (
@@ -76,6 +86,7 @@ export default moment.defineLocale('it', {
                         ']LT'
                     );
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

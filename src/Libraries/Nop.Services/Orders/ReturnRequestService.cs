@@ -46,9 +46,19 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReturnRequestAsync(ReturnRequest returnRequest)
     {
+		logger.LogDebug(">>> Entering DeleteReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestRepository.DeleteAsync(returnRequest);
+		logger.LogDebug("<<< Exiting DeleteReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReturnRequestAsync(returnRequest)={ReturnRequest}: external service call took {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReturnRequestAsync(returnRequest)={ReturnRequest}: delete query executed in {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteReturnRequestAsync(returnRequest)={ReturnRequest}: external service call took {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteReturnRequestAsync(returnRequest)={ReturnRequest}: delete query executed in {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a return request
     /// </summary>
@@ -59,6 +69,8 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<ReturnRequest> GetReturnRequestByIdAsync(int returnRequestId)
     {
+		logger.LogDebug(">>> Entering GetReturnRequestByIdAsync(returnRequestId={ReturnRequestId})", returnRequestId);
+		logger.LogDebug("<<< Exiting GetReturnRequestByIdAsync(returnRequestId={ReturnRequestId})", returnRequestId);
         return await _returnRequestRepository.GetByIdAsync(returnRequestId);
     }
 
@@ -119,13 +131,17 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>The <see cref="Task"/> containing the <see cref="ReturnRequestAvailability"/></returns>
     public virtual async Task<ReturnRequestAvailability> GetReturnRequestAvailabilityAsync(int orderId)
     {
+		logger.LogDebug(">>> Entering GetReturnRequestAvailabilityAsync(orderId={OrderId})", orderId);
         var result = new ReturnRequestAvailability();
 
+		logger.LogDebug("GetReturnRequestAvailabilityAsync(orderId={OrderId}): result → {Result}", orderId, result);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (orderId > 0)
         {
             var cancelledStatusId = (int)ReturnRequestStatus.Cancelled;
             var requestedOrderItemsForReturn =
                 from rr in _returnRequestRepository.Table
+				logger.LogDebug("GetReturnRequestAvailabilityAsync(orderId={OrderId}): cancelledStatusId → {CancelledStatusId}", orderId, cancelledStatusId);
                 where rr.ReturnRequestStatusId != cancelledStatusId
                 group rr by new
                 {
@@ -136,6 +152,7 @@ public partial class ReturnRequestService : IReturnRequestService
                     OrderItemId = g.Key.OrderItemId,
                     RequestedQuantityForReturn = g.Sum(rr => rr.Quantity)
                 };
+					logger.LogDebug("GetReturnRequestAvailabilityAsync(orderId={OrderId}): OrderItemId → {OrderItemId}", orderId, OrderItemId);
 
             var query =
                 from oi in _orderItemRepository.Table
@@ -154,8 +171,10 @@ public partial class ReturnRequestService : IReturnRequestService
                 };
 
             result.ReturnableOrderItems = await query.ToListAsync();
+			logger.LogInformation("GetReturnRequestAvailabilityAsync(orderId)={OrderId}: database query executed in {Arg1} ms", orderId, __logStart.ElapsedMilliseconds);
         }
 
+		logger.LogDebug("<<< Exiting GetReturnRequestAvailabilityAsync(orderId={OrderId})", orderId);
         return result;
     }
 
@@ -166,9 +185,19 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReturnRequestActionAsync(ReturnRequestAction returnRequestAction)
     {
+		logger.LogDebug(">>> Entering DeleteReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestActionRepository.DeleteAsync(returnRequestAction);
+		logger.LogDebug("<<< Exiting DeleteReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: external service call took {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: delete query executed in {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: external service call took {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: delete query executed in {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets all return request actions
     /// </summary>
@@ -178,12 +207,16 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<IList<ReturnRequestAction>> GetAllReturnRequestActionsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllReturnRequestActionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await _returnRequestActionRepository.GetAllAsync(query =>
         {
             return from rra in query
                 orderby rra.DisplayOrder, rra.Id
                 select rra;
+				logger.LogInformation("GetAllReturnRequestActionsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
+		logger.LogDebug("<<< Exiting GetAllReturnRequestActionsAsync()");
     }
 
     /// <summary>
@@ -196,6 +229,8 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<ReturnRequestAction> GetReturnRequestActionByIdAsync(int returnRequestActionId)
     {
+		logger.LogDebug(">>> Entering GetReturnRequestActionByIdAsync(returnRequestActionId={ReturnRequestActionId})", returnRequestActionId);
+		logger.LogDebug("<<< Exiting GetReturnRequestActionByIdAsync(returnRequestActionId={ReturnRequestActionId})", returnRequestActionId);
         return await _returnRequestActionRepository.GetByIdAsync(returnRequestActionId, cache => default);
     }
 
@@ -206,9 +241,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReturnRequestAsync(ReturnRequest returnRequest)
     {
+		logger.LogDebug(">>> Entering InsertReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestRepository.InsertAsync(returnRequest);
+		logger.LogDebug("<<< Exiting InsertReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertReturnRequestAsync(returnRequest)={ReturnRequest}: save query executed in {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertReturnRequestAsync(returnRequest)={ReturnRequest}: save query executed in {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a return request action
     /// </summary>
@@ -216,9 +257,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReturnRequestActionAsync(ReturnRequestAction returnRequestAction)
     {
+		logger.LogDebug(">>> Entering InsertReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestActionRepository.InsertAsync(returnRequestAction);
+		logger.LogDebug("<<< Exiting InsertReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: save query executed in {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: save query executed in {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the return request
     /// </summary>
@@ -226,9 +273,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReturnRequestAsync(ReturnRequest returnRequest)
     {
+		logger.LogDebug(">>> Entering UpdateReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestRepository.UpdateAsync(returnRequest);
+		logger.LogDebug("<<< Exiting UpdateReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateReturnRequestAsync(returnRequest)={ReturnRequest}: update query executed in {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateReturnRequestAsync(returnRequest)={ReturnRequest}: update query executed in {Arg1} ms", returnRequest, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the return request action
     /// </summary>
@@ -236,9 +289,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReturnRequestActionAsync(ReturnRequestAction returnRequestAction)
     {
+		logger.LogDebug(">>> Entering UpdateReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestActionRepository.UpdateAsync(returnRequestAction);
+		logger.LogDebug("<<< Exiting UpdateReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: update query executed in {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateReturnRequestActionAsync(returnRequestAction)={ReturnRequestAction}: update query executed in {Arg1} ms", returnRequestAction, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete a return request reason
     /// </summary>
@@ -246,9 +305,19 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReturnRequestReasonAsync(ReturnRequestReason returnRequestReason)
     {
+		logger.LogDebug(">>> Entering DeleteReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestReasonRepository.DeleteAsync(returnRequestReason);
+		logger.LogDebug("<<< Exiting DeleteReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: external service call took {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: delete query executed in {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: external service call took {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: delete query executed in {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets all return request reasons
     /// </summary>
@@ -258,12 +327,16 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<IList<ReturnRequestReason>> GetAllReturnRequestReasonsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllReturnRequestReasonsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await _returnRequestReasonRepository.GetAllAsync(query =>
         {
             return from rra in query
                 orderby rra.DisplayOrder, rra.Id
                 select rra;
+				logger.LogInformation("GetAllReturnRequestReasonsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
+		logger.LogDebug("<<< Exiting GetAllReturnRequestReasonsAsync()");
     }
 
     /// <summary>
@@ -276,6 +349,8 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<ReturnRequestReason> GetReturnRequestReasonByIdAsync(int returnRequestReasonId)
     {
+		logger.LogDebug(">>> Entering GetReturnRequestReasonByIdAsync(returnRequestReasonId={ReturnRequestReasonId})", returnRequestReasonId);
+		logger.LogDebug("<<< Exiting GetReturnRequestReasonByIdAsync(returnRequestReasonId={ReturnRequestReasonId})", returnRequestReasonId);
         return await _returnRequestReasonRepository.GetByIdAsync(returnRequestReasonId, cache => default);
     }
 
@@ -286,9 +361,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReturnRequestReasonAsync(ReturnRequestReason returnRequestReason)
     {
+		logger.LogDebug(">>> Entering InsertReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestReasonRepository.InsertAsync(returnRequestReason);
+		logger.LogDebug("<<< Exiting InsertReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: save query executed in {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: save query executed in {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the  return request reason
     /// </summary>
@@ -296,8 +377,14 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReturnRequestReasonAsync(ReturnRequestReason returnRequestReason)
     {
+		logger.LogDebug(">>> Entering UpdateReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _returnRequestReasonRepository.UpdateAsync(returnRequestReason);
+		logger.LogDebug("<<< Exiting UpdateReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: update query executed in {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateReturnRequestReasonAsync(returnRequestReason)={ReturnRequestReason}: update query executed in {Arg1} ms", returnRequestReason, __logStart.ElapsedMilliseconds);
     #endregion
 }

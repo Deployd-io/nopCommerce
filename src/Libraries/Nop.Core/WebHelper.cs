@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using Nop.Core.Http;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core;
 
@@ -18,6 +19,7 @@ namespace Nop.Core;
 /// </summary>
 public partial class WebHelper : IWebHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields  
 
     protected readonly IActionContextAccessor _actionContextAccessor;
@@ -53,6 +55,7 @@ public partial class WebHelper : IWebHelper
     /// <returns>True if available; otherwise false</returns>
     protected virtual bool IsRequestAvailable()
     {
+		_logger.LogDebug(">>> Entering IsRequestAvailable()");
         if (_httpContextAccessor?.HttpContext == null)
             return false;
 
@@ -63,9 +66,11 @@ public partial class WebHelper : IWebHelper
         }
         catch (Exception)
         {
+			_logger.LogError("Exception in IsRequestAvailable(): {Arg0}", ex.Message);
             return false;
         }
 
+		_logger.LogDebug("<<< Exiting IsRequestAvailable()");
         return true;
     }
 
@@ -76,8 +81,11 @@ public partial class WebHelper : IWebHelper
     /// <returns>Result</returns>
     protected virtual bool IsIpAddressSet(IPAddress address)
     {
+		_logger.LogDebug(">>> Entering IsIpAddressSet(address={Address})", address);
         var rez = address != null && address.ToString() != IPAddress.IPv6Loopback.ToString();
 
+		_logger.LogDebug("IsIpAddressSet(address={Address}): rez → {Rez}", address, rez);
+		_logger.LogDebug("<<< Exiting IsIpAddressSet(address={Address})", address);
         return rez;
     }
 
@@ -91,7 +99,9 @@ public partial class WebHelper : IWebHelper
     /// <returns>URL referrer</returns>
     public virtual string GetUrlReferrer()
     {
+		_logger.LogDebug(">>> Entering GetUrlReferrer()");
         if (!IsRequestAvailable())
+		_logger.LogDebug("<<< Exiting GetUrlReferrer()");
             return string.Empty;
 
         //URL referrer is null in some case (for example, in IE 8)
@@ -104,7 +114,9 @@ public partial class WebHelper : IWebHelper
     /// <returns>String of IP address</returns>
     public virtual string GetCurrentIpAddress()
     {
+		_logger.LogDebug(">>> Entering GetCurrentIpAddress()");
         if (!IsRequestAvailable() || _httpContextAccessor.HttpContext!.Connection.RemoteIpAddress is not { } remoteIp)
+		_logger.LogDebug("<<< Exiting GetCurrentIpAddress()");
             return string.Empty;
 
         return (remoteIp.Equals(IPAddress.IPv6Loopback) ? IPAddress.Loopback : remoteIp).ToString();
@@ -119,15 +131,18 @@ public partial class WebHelper : IWebHelper
     /// <returns>Page URL</returns>
     public virtual string GetThisPageUrl(bool includeQueryString, bool? useSsl = null, bool lowercaseUrl = false)
     {
+		_logger.LogDebug(">>> Entering GetThisPageUrl(includeQueryString={IncludeQueryString},useSsl={UseSsl},lowercaseUrl={LowercaseUrl})", includeQueryString, useSsl, lowercaseUrl);
         if (!IsRequestAvailable())
             return string.Empty;
 
         //get store location
         var storeLocation = GetStoreLocation(useSsl ?? IsCurrentConnectionSecured());
 
+		_logger.LogDebug("GetThisPageUrl(includeQueryString={IncludeQueryString},useSsl={UseSsl},lowercaseUrl={LowercaseUrl}): storeLocation → {StoreLocation}", includeQueryString, useSsl, lowercaseUrl, storeLocation);
         //add local path to the URL
         var pageUrl = $"{storeLocation.TrimEnd('/')}{_httpContextAccessor.HttpContext.Request.Path}";
 
+		_logger.LogDebug("GetThisPageUrl(includeQueryString={IncludeQueryString},useSsl={UseSsl},lowercaseUrl={LowercaseUrl}): pageUrl → {PageUrl}", includeQueryString, useSsl, lowercaseUrl, pageUrl);
         //add query string to the URL
         if (includeQueryString)
             pageUrl = $"{pageUrl}{_httpContextAccessor.HttpContext.Request.QueryString}";
@@ -136,6 +151,7 @@ public partial class WebHelper : IWebHelper
         if (lowercaseUrl)
             pageUrl = pageUrl.ToLowerInvariant();
 
+		_logger.LogDebug("<<< Exiting GetThisPageUrl(includeQueryString={IncludeQueryString},useSsl={UseSsl},lowercaseUrl={LowercaseUrl})", includeQueryString, useSsl, lowercaseUrl);
         return pageUrl;
     }
 
@@ -145,7 +161,9 @@ public partial class WebHelper : IWebHelper
     /// <returns>True if it's secured, otherwise false</returns>
     public virtual bool IsCurrentConnectionSecured()
     {
+		_logger.LogDebug(">>> Entering IsCurrentConnectionSecured()");
         if (!IsRequestAvailable())
+		_logger.LogDebug("<<< Exiting IsCurrentConnectionSecured()");
             return false;
 
         return _httpContextAccessor.HttpContext.Request.IsHttps;
@@ -158,6 +176,7 @@ public partial class WebHelper : IWebHelper
     /// <returns>Store host location</returns>
     public virtual string GetStoreHost(bool useSsl)
     {
+		_logger.LogDebug(">>> Entering GetStoreHost(useSsl={UseSsl})", useSsl);
         if (!IsRequestAvailable())
             return string.Empty;
 
@@ -169,9 +188,11 @@ public partial class WebHelper : IWebHelper
         //add scheme to the URL
         var storeHost = $"{(useSsl ? Uri.UriSchemeHttps : Uri.UriSchemeHttp)}{Uri.SchemeDelimiter}{hostHeader.FirstOrDefault()}";
 
+		_logger.LogDebug("GetStoreHost(useSsl={UseSsl}): storeHost → {StoreHost}", useSsl, storeHost);
         //ensure that host is ended with slash
         storeHost = $"{storeHost.TrimEnd('/')}/";
 
+		_logger.LogDebug("<<< Exiting GetStoreHost(useSsl={UseSsl})", useSsl);
         return storeHost;
     }
 
@@ -182,11 +203,14 @@ public partial class WebHelper : IWebHelper
     /// <returns>Store location</returns>
     public virtual string GetStoreLocation(bool? useSsl = null)
     {
+		_logger.LogDebug(">>> Entering GetStoreLocation(useSsl={UseSsl})", useSsl);
         var storeLocation = string.Empty;
 
+		_logger.LogDebug("GetStoreLocation(useSsl={UseSsl}): storeLocation → {StoreLocation}", useSsl, storeLocation);
         //get store host
         var storeHost = GetStoreHost(useSsl ?? IsCurrentConnectionSecured());
         if (!string.IsNullOrEmpty(storeHost))
+		_logger.LogDebug("GetStoreLocation(useSsl={UseSsl}): storeHost → {StoreHost}", useSsl, storeHost);
         {
             //add application path base if exists
             storeLocation = IsRequestAvailable() ? $"{storeHost.TrimEnd('/')}{_httpContextAccessor.HttpContext.Request.PathBase}" : storeHost;
@@ -200,6 +224,7 @@ public partial class WebHelper : IWebHelper
         //ensure that URL is ended with slash
         storeLocation = $"{storeLocation.TrimEnd('/')}/";
 
+		_logger.LogDebug("<<< Exiting GetStoreLocation(useSsl={UseSsl})", useSsl);
         return storeLocation;
     }
 
@@ -209,6 +234,7 @@ public partial class WebHelper : IWebHelper
     /// <returns>True if the request targets a static resource file.</returns>
     public virtual bool IsStaticResource()
     {
+		_logger.LogDebug(">>> Entering IsStaticResource()");
         if (!IsRequestAvailable())
             return false;
 
@@ -218,6 +244,8 @@ public partial class WebHelper : IWebHelper
         //source: https://github.com/aspnet/StaticFiles/blob/dev/src/Microsoft.AspNetCore.StaticFiles/FileExtensionContentTypeProvider.cs
         //if it can return content type, then it's a static file
         var contentTypeProvider = new FileExtensionContentTypeProvider();
+		_logger.LogDebug("IsStaticResource(): contentTypeProvider → {ContentTypeProvider}", contentTypeProvider);
+		_logger.LogDebug("<<< Exiting IsStaticResource()");
         return contentTypeProvider.TryGetContentType(path, out var _);
     }
 
@@ -230,6 +258,7 @@ public partial class WebHelper : IWebHelper
     /// <returns>New URL with passed query parameter</returns>
     public virtual string ModifyQueryString(string url, string key, params string[] values)
     {
+		_logger.LogDebug(">>> Entering ModifyQueryString(url={Url},key={Key},values={Values})", url, key, values);
         if (string.IsNullOrEmpty(url))
             return string.Empty;
 
@@ -239,9 +268,12 @@ public partial class WebHelper : IWebHelper
         //prepare URI object
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
         var isLocalUrl = urlHelper.IsLocalUrl(url);
+		_logger.LogDebug("ModifyQueryString(url={Url},key={Key},values={Values}): urlHelper → {UrlHelper}", url, key, values, urlHelper);
+		_logger.LogDebug("ModifyQueryString(url={Url},key={Key},values={Values}): isLocalUrl → {IsLocalUrl}", url, key, values, isLocalUrl);
 
         var uriStr = url;
         if (isLocalUrl)
+		_logger.LogDebug("ModifyQueryString(url={Url},key={Key},values={Values}): uriStr → {UriStr}", url, key, values, uriStr);
         {
             var pathBase = _httpContextAccessor.HttpContext.Request.PathBase;
             uriStr = $"{GetStoreLocation().TrimEnd('/')}{(url.StartsWith(pathBase) ? url.Replace(pathBase, "") : url)}";
@@ -249,9 +281,11 @@ public partial class WebHelper : IWebHelper
 
         var uri = new Uri(uriStr, UriKind.Absolute);
 
+		_logger.LogDebug("ModifyQueryString(url={Url},key={Key},values={Values}): uri → {Uri}", url, key, values, uri);
         //get current query parameters
         var queryParameters = QueryHelpers.ParseQuery(uri.Query);
 
+		_logger.LogDebug("ModifyQueryString(url={Url},key={Key},values={Values}): queryParameters → {QueryParameters}", url, key, values, queryParameters);
         //and add passed one
         queryParameters[key] = string.Join(",", values);
 
@@ -266,6 +300,9 @@ public partial class WebHelper : IWebHelper
         //create new URL with passed query parameters
         url = $"{(isLocalUrl ? uri.LocalPath : uri.GetLeftPart(UriPartial.Path))}{queryBuilder.ToQueryString()}{uri.Fragment}";
 
+		_logger.LogDebug("ModifyQueryString(url={Url},key={Key},values={Values}): url → {Url1}", url, key, values, url);
+		_logger.LogDebug(">>> Entering QueryString(name={Name})", name);
+		_logger.LogDebug("<<< Exiting QueryString(name={Name})", name);
         return url;
     }
 
@@ -278,6 +315,7 @@ public partial class WebHelper : IWebHelper
     /// <returns>New URL without passed query parameter</returns>
     public virtual string RemoveQueryString(string url, string key, string value = null)
     {
+		_logger.LogDebug(">>> Entering RemoveQueryString(url={Url},key={Key},value={Value})", url, key, value);
         if (string.IsNullOrEmpty(url))
             return string.Empty;
 
@@ -287,8 +325,11 @@ public partial class WebHelper : IWebHelper
         //prepare URI object
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
         var isLocalUrl = urlHelper.IsLocalUrl(url);
+		_logger.LogDebug("RemoveQueryString(url={Url},key={Key},value={Value}): urlHelper → {UrlHelper}", url, key, value, urlHelper);
+		_logger.LogDebug("RemoveQueryString(url={Url},key={Key},value={Value}): isLocalUrl → {IsLocalUrl}", url, key, value, isLocalUrl);
         var uri = new Uri(isLocalUrl ? $"{GetStoreLocation().TrimEnd('/')}{url}" : url, UriKind.Absolute);
 
+		_logger.LogDebug("RemoveQueryString(url={Url},key={Key},value={Value}): uri → {Uri}", url, key, value, uri);
         //get current query parameters
         var queryParameters = QueryHelpers.ParseQuery(uri.Query)
             .SelectMany(parameter => parameter.Value, (parameter, queryValue) => new KeyValuePair<string, string>(parameter.Key, queryValue))
@@ -308,9 +349,11 @@ public partial class WebHelper : IWebHelper
 
         var queryBuilder = new QueryBuilder(queryParameters);
 
+		_logger.LogDebug("RemoveQueryString(url={Url},key={Key},value={Value}): queryBuilder → {QueryBuilder}", url, key, value, queryBuilder);
         //create new URL without passed query parameters
         url = $"{(isLocalUrl ? uri.LocalPath : uri.GetLeftPart(UriPartial.Path))}{queryBuilder.ToQueryString()}{uri.Fragment}";
 
+		_logger.LogDebug("RemoveQueryString(url={Url},key={Key},value={Value}): url → {Url1}", url, key, value, url);
         return url;
     }
 
@@ -336,7 +379,9 @@ public partial class WebHelper : IWebHelper
     /// </summary>
     public virtual void RestartAppDomain()
     {
+		_logger.LogDebug(">>> Entering RestartAppDomain()");
         _hostApplicationLifetime.StopApplication();
+		_logger.LogDebug("<<< Exiting RestartAppDomain()");
     }
 
     /// <summary>
@@ -375,6 +420,8 @@ public partial class WebHelper : IWebHelper
     /// </summary>
     public virtual string GetCurrentRequestProtocol()
     {
+		_logger.LogDebug(">>> Entering GetCurrentRequestProtocol()");
+		_logger.LogDebug("<<< Exiting GetCurrentRequestProtocol()");
         return IsCurrentConnectionSecured() ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
     }
 
@@ -385,6 +432,7 @@ public partial class WebHelper : IWebHelper
     /// <returns>True, if HTTP request URI references to the local host</returns>
     public virtual bool IsLocalRequest(HttpRequest req)
     {
+		_logger.LogDebug(">>> Entering IsLocalRequest(req={Req})", req);
         //source: https://stackoverflow.com/a/41242493/7860424
         var connection = req.HttpContext.Connection;
         if (IsIpAddressSet(connection.RemoteIpAddress))
@@ -397,6 +445,7 @@ public partial class WebHelper : IWebHelper
                 : IPAddress.IsLoopback(connection.RemoteIpAddress);
         }
 
+		_logger.LogDebug("<<< Exiting IsLocalRequest(req={Req})", req);
         return true;
     }
 
@@ -407,14 +456,17 @@ public partial class WebHelper : IWebHelper
     /// <returns>Raw URL</returns>
     public virtual string GetRawUrl(HttpRequest request)
     {
+		_logger.LogDebug(">>> Entering GetRawUrl(request={Request})", request);
         //first try to get the raw target from request feature
         //note: value has not been UrlDecoded
         var rawUrl = request.HttpContext.Features.Get<IHttpRequestFeature>()?.RawTarget;
 
+		_logger.LogDebug("GetRawUrl(request={Request}): rawUrl → {RawUrl}", request, rawUrl);
         //or compose raw URL manually
         if (string.IsNullOrEmpty(rawUrl))
             rawUrl = $"{request.PathBase}{request.Path}{request.QueryString}";
 
+		_logger.LogDebug("<<< Exiting GetRawUrl(request={Request})", request);
         return rawUrl;
     }
 
@@ -425,9 +477,11 @@ public partial class WebHelper : IWebHelper
     /// <returns>Result</returns>
     public virtual bool IsAjaxRequest(HttpRequest request)
     {
+		_logger.LogDebug(">>> Entering IsAjaxRequest(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         if (request.Headers == null)
+		_logger.LogDebug("<<< Exiting IsAjaxRequest(request={Request})", request);
             return false;
 
         return request.Headers.XRequestedWith == "XMLHttpRequest";

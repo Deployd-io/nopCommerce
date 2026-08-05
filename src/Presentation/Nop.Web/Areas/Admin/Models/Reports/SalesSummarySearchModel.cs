@@ -2,25 +2,39 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Reports;
 
 public partial record SalesSummarySearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public SalesSummarySearchModel()
     {
+		_logger.LogDebug(">>> Entering SalesSummarySearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableOrderStatuses = new List<SelectListItem>();
+		_logger.LogDebug("SalesSummarySearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("SalesSummarySearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailablePaymentStatuses = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogDebug("SalesSummarySearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
+		_logger.LogDebug("SalesSummarySearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogDebug("SalesSummarySearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		_logger.LogDebug("SalesSummarySearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         OrderStatusIds = new List<int>();
         PaymentStatusIds = new List<int>();
+		_logger.LogDebug("SalesSummarySearchModel(): OrderStatusIds → {OrderStatusIds}", OrderStatusIds);
+		_logger.LogDebug("SalesSummarySearchModel(): PaymentStatusIds → {PaymentStatusIds}", PaymentStatusIds);
         GroupByOptions = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting SalesSummarySearchModel()");
+		_logger.LogDebug("SalesSummarySearchModel(): GroupByOptions → {GroupByOptions}", GroupByOptions);
+		_logger.LogDebug("SalesSummarySearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

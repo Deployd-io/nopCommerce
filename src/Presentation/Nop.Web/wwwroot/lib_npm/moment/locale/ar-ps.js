@@ -3,6 +3,7 @@
 //! author : Majd Al-Shihabi : https://github.com/majdal
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '١',
@@ -49,12 +50,15 @@ export default moment.defineLocale('ar-ps', {
     },
     meridiemParse: /ص|م/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return 'م' === input;
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ص';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'م';
         }
     },
@@ -83,6 +87,7 @@ export default moment.defineLocale('ar-ps', {
         yy: '%d سنوات',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string
             .replace(/[٣٤٥٦٧٨٩٠]/g, function (match) {
                 return numberMap[match];
@@ -99,6 +104,7 @@ export default moment.defineLocale('ar-ps', {
             .replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string
             .replace(/\d/g, function (match) {
                 return symbolMap[match];

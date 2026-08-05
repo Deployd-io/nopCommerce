@@ -2,6 +2,7 @@
 using Nop.Services.Customers;
 using Nop.Services.Security;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class AclSupportedModelFactory : IAclSupportedModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -38,16 +40,19 @@ public partial class AclSupportedModelFactory : IAclSupportedModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareModelCustomerRolesAsync<TModel>(TModel model) where TModel : IAclSupportedModel
     {
+		_logger.LogDebug(">>> Entering PrepareModelCustomerRolesAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available customer roles
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
         model.AvailableCustomerRoles = availableRoles.Select(role => new SelectListItem
         {
+		_logger.LogDebug("PrepareModelCustomerRolesAsync(model={Model}): availableRoles → {AvailableRoles}", model, availableRoles);
             Text = role.Name,
             Value = role.Id.ToString(),
             Selected = model.SelectedCustomerRoleIds.Contains(role.Id)
         }).ToList();
+		_logger.LogDebug("<<< Exiting PrepareModelCustomerRolesAsync(model={Model})", model);
     }
 
     /// <summary>

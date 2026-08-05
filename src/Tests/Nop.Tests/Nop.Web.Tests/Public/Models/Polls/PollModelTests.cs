@@ -1,15 +1,18 @@
 ﻿using FluentAssertions;
 using Nop.Web.Models.Polls;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Web.Tests.Public.Models.Polls;
 
 [TestFixture]
 public class PollModelTests
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     [Test]
     public void CanClone()
     {
+		_logger.LogDebug(">>> Entering CanClone()");
         //create
         var model1 = new PollModel
         {
@@ -38,5 +41,6 @@ public class PollModelTests
         model2.Answers[0].Name.Should().Be("answer 1");
         model2.Answers[0].NumberOfVotes.Should().Be(4);
         model2.Answers[0].PercentOfTotalVotes.Should().Be(5);
+		_logger.LogDebug("<<< Exiting CanClone()");
     }
 }

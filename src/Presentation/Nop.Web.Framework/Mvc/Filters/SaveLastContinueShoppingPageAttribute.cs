@@ -18,6 +18,8 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
     /// </summary>
     public SaveLastContinueShoppingPageAttribute() : base(typeof(SaveLastContinueShoppingPageFilter))
     {
+	logger.LogDebug(">>> Entering SaveLastContinueShoppingPageAttribute()");
+	logger.LogDebug("<<< Exiting SaveLastContinueShoppingPageAttribute()");
     }
 
     #endregion
@@ -42,10 +44,16 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 
         public SaveLastContinueShoppingPageFilter(IGenericAttributeService genericAttributeService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext)
         {
+			logger.LogDebug(">>> Entering SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext})", genericAttributeService, storeContext, webHelper, workContext);
             _genericAttributeService = genericAttributeService;
             _storeContext = storeContext;
+			logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _storeContext → {_storeContext}", genericAttributeService, storeContext, webHelper, workContext, _storeContext);
+			logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _genericAttributeService → {_genericAttributeService}", genericAttributeService, storeContext, webHelper, workContext, _genericAttributeService);
             _webHelper = webHelper;
+			logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", genericAttributeService, storeContext, webHelper, workContext, _webHelper);
             _workContext = workContext;
+			logger.LogDebug("<<< Exiting SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext})", genericAttributeService, storeContext, webHelper, workContext);
+			logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", genericAttributeService, storeContext, webHelper, workContext, _workContext);
         }
 
         #endregion
@@ -54,8 +62,10 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             var store = await _storeContext.GetCurrentStoreAsync();
 
+			logger.LogDebug("OnActionExecutionAsync(context={Context},next={Next}): store → {Store}", context, next, store);
             //'Continue shopping' URL
             await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(),
                 NopCustomerDefaults.LastContinueShoppingPageAttribute,
@@ -64,6 +74,7 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

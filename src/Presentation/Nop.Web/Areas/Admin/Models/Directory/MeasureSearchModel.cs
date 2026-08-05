@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Directory;
@@ -7,14 +8,21 @@ namespace Nop.Web.Areas.Admin.Models.Directory;
 /// </summary>
 public partial record MeasureSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MeasureSearchModel()
     {
+		_logger.LogDebug(">>> Entering MeasureSearchModel()");
         MeasureDimensionSearchModel = new MeasureDimensionSearchModel();
         MeasureWeightSearchModel = new MeasureWeightSearchModel();
+		_logger.LogDebug("MeasureSearchModel(): MeasureDimensionSearchModel → {MeasureDimensionSearchModel}", MeasureDimensionSearchModel);
+		_logger.LogDebug("MeasureSearchModel(): MeasureWeightSearchModel → {MeasureWeightSearchModel}", MeasureWeightSearchModel);
         AddMeasureDimension = new MeasureDimensionModel();
         AddMeasureWeight = new MeasureWeightModel();
+		_logger.LogDebug("<<< Exiting MeasureSearchModel()");
+		_logger.LogDebug("MeasureSearchModel(): AddMeasureDimension → {AddMeasureDimension}", AddMeasureDimension);
+		_logger.LogDebug("MeasureSearchModel(): AddMeasureWeight → {AddMeasureWeight}", AddMeasureWeight);
     }
 
     #endregion

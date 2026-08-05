@@ -12,8 +12,11 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
 
     protected BaseSearchModel()
     {
+		logger.LogDebug(">>> Entering BaseSearchModel()");
         //set the default values
         Length = 10;
+		logger.LogDebug("<<< Exiting BaseSearchModel()");
+		logger.LogDebug("BaseSearchModel(): Length → {Length}", Length);
     }
 
     #endregion
@@ -59,8 +62,10 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
     /// </summary>
     public virtual void SetGridPageSize()
     {
+		logger.LogDebug(">>> Entering SetGridPageSize()");
         var adminAreaSettings = EngineContext.Current.Resolve<AdminAreaSettings>();
         SetGridPageSize(adminAreaSettings?.DefaultGridPageSize ?? 0, adminAreaSettings?.GridPageSizes);
+		logger.LogDebug("<<< Exiting SetGridPageSize()");
     }
 
     /// <summary>
@@ -68,8 +73,11 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
     /// </summary>
     public virtual void SetPopupGridPageSize()
     {
+		logger.LogDebug(">>> Entering SetPopupGridPageSize()");
         var adminAreaSettings = EngineContext.Current.Resolve<AdminAreaSettings>();
         SetGridPageSize(adminAreaSettings.PopupGridPageSize, adminAreaSettings.GridPageSizes);
+		logger.LogDebug("<<< Exiting SetPopupGridPageSize()");
+		logger.LogDebug("SetPopupGridPageSize(): adminAreaSettings → {AdminAreaSettings}", adminAreaSettings);
     }
 
     /// <summary>
@@ -79,9 +87,14 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
     /// <param name="availablePageSizes">Available page sizes; pass null to use default value</param>
     public virtual void SetGridPageSize(int pageSize, string availablePageSizes = null)
     {
+		logger.LogDebug(">>> Entering SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes})", pageSize, availablePageSizes);
         Start = 0;
         Length = pageSize;
+		logger.LogDebug("SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes}): Length → {Length}", pageSize, availablePageSizes, Length);
+		logger.LogDebug("SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes}): Start → {Start}", pageSize, availablePageSizes, Start);
         AvailablePageSizes = availablePageSizes;
+		logger.LogDebug("<<< Exiting SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes})", pageSize, availablePageSizes);
+		logger.LogDebug("SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes}): AvailablePageSizes → {AvailablePageSizes1}", pageSize, availablePageSizes, AvailablePageSizes);
     }
 
     #endregion

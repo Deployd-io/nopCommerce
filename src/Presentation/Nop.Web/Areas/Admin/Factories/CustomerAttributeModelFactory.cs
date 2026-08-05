@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
@@ -71,11 +73,13 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     /// </returns>
     public virtual Task<CustomerAttributeSearchModel> PrepareCustomerAttributeSearchModelAsync(CustomerAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -89,11 +93,13 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     /// </returns>
     public virtual async Task<CustomerAttributeListModel> PrepareCustomerAttributeListModelAsync(CustomerAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customer attributes
         var customerAttributes = (await _customerAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareCustomerAttributeListModelAsync(searchModel={SearchModel}): customerAttributes → {CustomerAttributes}", searchModel, customerAttributes);
         //prepare list model
         var model = await new CustomerAttributeListModel().PrepareToGridAsync(searchModel, customerAttributes, () =>
         {
@@ -102,6 +108,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<CustomerAttributeModel>();
 
+				_logger.LogDebug("PrepareCustomerAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
 
@@ -109,6 +116,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -10,11 +10,13 @@ using Nop.Web.Areas.Admin.Models.Tasks;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ScheduleTaskController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -52,15 +54,20 @@ public partial class ScheduleTaskController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.System.MANAGE_SCHEDULE_TASKS)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _scheduleTaskModelFactory.PrepareScheduleTaskSearchModelAsync(new ScheduleTaskSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -71,6 +78,7 @@ public partial class ScheduleTaskController : BaseAdminController
         //prepare model
         var model = await _scheduleTaskModelFactory.PrepareScheduleTaskListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -110,6 +118,7 @@ public partial class ScheduleTaskController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_SCHEDULE_TASKS)]
     public virtual async Task<IActionResult> RunNow(int id)
     {
+		_logger.LogDebug(">>> Entering RunNow(id={Id})", id);
         try
         {
             //try to get a schedule task with the specified id
@@ -122,9 +131,11 @@ public partial class ScheduleTaskController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in RunNow(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		_logger.LogDebug("<<< Exiting RunNow(id={Id})", id);
         return RedirectToAction("List");
     }
 

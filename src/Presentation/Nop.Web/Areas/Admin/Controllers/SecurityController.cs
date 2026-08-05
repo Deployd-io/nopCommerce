@@ -8,11 +8,13 @@ using Nop.Web.Areas.Admin.Models.Security;
 using Nop.Web.Framework.Menu;
 using Nop.Web.Framework.Mvc.Filters;
 using ILogger = Nop.Services.Logging.ILogger;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class SecurityController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAdminMenu _adminMenu;
@@ -49,6 +51,7 @@ public partial class SecurityController : BaseAdminController
 
     public virtual async Task<IActionResult> AccessDenied(string pageUrl, string pageSystemNameKey)
     {
+		_logger.LogDebug(">>> Entering AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey})", pageUrl, pageSystemNameKey);
         if (!_menuSystemNames.Any())
         {
             void fillSystemNames(AdminMenuItem node)
@@ -57,6 +60,7 @@ public partial class SecurityController : BaseAdminController
                 {
                     var key = $"{node.ControllerName}.{node.ActionName}";
                     _menuSystemNames[key] = node.SystemName;
+					_logger.LogWarning("AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey}): key → {Key}", pageUrl, pageSystemNameKey, key);
                 }
 
                 foreach (var childNode in node.ChildNodes) 
@@ -68,8 +72,10 @@ public partial class SecurityController : BaseAdminController
 
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey}): currentCustomer → {CurrentCustomer}", pageUrl, pageSystemNameKey, currentCustomer);
         var menuSystemName = "Home";
 
+		_logger.LogDebug("AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey}): menuSystemName → {MenuSystemName}", pageUrl, pageSystemNameKey, menuSystemName);
         if (!string.IsNullOrEmpty(pageSystemNameKey))
         {
             if (_menuSystemNames.TryGetValue(pageSystemNameKey, out var value))
@@ -89,6 +95,7 @@ public partial class SecurityController : BaseAdminController
         else
             await _logger.InformationAsync($"Access denied to user #{currentCustomer.Id} '{currentCustomer.Email}' on {pageUrl}");
 
+		_logger.LogDebug("<<< Exiting AccessDenied(pageUrl={PageUrl},pageSystemNameKey={PageSystemNameKey})", pageUrl, pageSystemNameKey);
         return View(model: menuSystemName);
     }
 
@@ -96,17 +103,24 @@ public partial class SecurityController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> PermissionCategory(PermissionItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PermissionCategory(searchModel={SearchModel})", searchModel);
         var model = await _securityModelFactory.PreparePermissionItemListModelAsync(searchModel);
 
+		_logger.LogDebug("PermissionCategory(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting PermissionCategory(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> PermissionEditPopup(int id)
     {
+		_logger.LogDebug(">>> Entering PermissionEditPopup(id={Id})", id);
         var permissionRecord = await _permissionService.GetPermissionRecordByIdAsync(id);
         var model = await _securityModelFactory.PreparePermissionItemModelAsync(permissionRecord);
+		_logger.LogDebug("PermissionEditPopup(id={Id}): permissionRecord → {PermissionRecord}", id, permissionRecord);
+		_logger.LogDebug("PermissionEditPopup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting PermissionEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -147,6 +161,7 @@ public partial class SecurityController : BaseAdminController
         }
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting PermissionEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -154,17 +169,23 @@ public partial class SecurityController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> PermissionCategories(PermissionCategorySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PermissionCategories(searchModel={SearchModel})", searchModel);
         var model = await _securityModelFactory.PreparePermissionCategoryListModelAsync(searchModel);
 
+		_logger.LogDebug("PermissionCategories(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting PermissionCategories(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Permissions()
     {
+		_logger.LogDebug(">>> Entering Permissions()");
         //prepare model
         var model = await _securityModelFactory.PreparePermissionConfigurationModelAsync(new PermissionConfigurationModel());
 
+		_logger.LogDebug("Permissions(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Permissions()");
         return View(model);
     }
 

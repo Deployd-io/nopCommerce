@@ -8,17 +8,20 @@ using Nop.Core.Domain.News;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Polls;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo470;
 
 [NopSchemaMigration("2023-12-06 19:53:00", "AddIndexesMigration for 4.70.0")]
 public class AddIndexesMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Collect the UP migration expressions
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         const string databaseType = "sqlserver";
 
         if (!Schema.Table(nameof(ActivityLog)).Index("IX_ActivityLog_CustomerId").Exists())
@@ -156,5 +159,6 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .OnColumn(nameof(ForumTopic.Subject)).Ascending()
                 .WithOptions().NonClustered();
 
+	_logger.LogDebug("<<< Exiting Up()");
     }
 }

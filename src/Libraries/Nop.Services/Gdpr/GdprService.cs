@@ -86,6 +86,7 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertLogAsync(GdprLog gdprLog)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _gdprLogRepository.InsertAsync(gdprLog);
     }
 
@@ -105,6 +106,8 @@ public partial class GdprService : IGdprService
     /// </returns>
     public virtual async Task<GdprConsent> GetConsentByIdAsync(int gdprConsentId)
     {
+		logger.LogDebug(">>> Entering GetConsentByIdAsync(gdprConsentId={GdprConsentId})", gdprConsentId);
+		logger.LogDebug("<<< Exiting GetConsentByIdAsync(gdprConsentId={GdprConsentId})", gdprConsentId);
         return await _gdprConsentRepository.GetByIdAsync(gdprConsentId, cache => default);
     }
 
@@ -117,13 +120,17 @@ public partial class GdprService : IGdprService
     /// </returns>
     public virtual async Task<IList<GdprConsent>> GetAllConsentsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllConsentsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var gdprConsents = await _gdprConsentRepository.GetAllAsync(query =>
         {
             return from c in query
                 orderby c.DisplayOrder, c.Id
                 select c;
+				logger.LogInformation("GetAllConsentsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		logger.LogDebug("<<< Exiting GetAllConsentsAsync()");
         return gdprConsents;
     }
 
@@ -134,9 +141,15 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertConsentAsync(GdprConsent gdprConsent)
     {
+		logger.LogDebug(">>> Entering InsertConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _gdprConsentRepository.InsertAsync(gdprConsent);
+		logger.LogDebug("<<< Exiting InsertConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertConsentAsync(gdprConsent)={GdprConsent}: save query executed in {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertConsentAsync(gdprConsent)={GdprConsent}: save query executed in {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Update the GDPR consent
     /// </summary>
@@ -144,9 +157,15 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateConsentAsync(GdprConsent gdprConsent)
     {
+		logger.LogDebug(">>> Entering UpdateConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _gdprConsentRepository.UpdateAsync(gdprConsent);
+		logger.LogDebug("<<< Exiting UpdateConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateConsentAsync(gdprConsent)={GdprConsent}: update query executed in {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateConsentAsync(gdprConsent)={GdprConsent}: update query executed in {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete a GDPR consent
     /// </summary>
@@ -154,9 +173,19 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteConsentAsync(GdprConsent gdprConsent)
     {
+		logger.LogDebug(">>> Entering DeleteConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _gdprConsentRepository.DeleteAsync(gdprConsent);
+		logger.LogDebug("<<< Exiting DeleteConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteConsentAsync(gdprConsent)={GdprConsent}: external service call took {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteConsentAsync(gdprConsent)={GdprConsent}: delete query executed in {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteConsentAsync(gdprConsent)={GdprConsent}: external service call took {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteConsentAsync(gdprConsent)={GdprConsent}: delete query executed in {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets the latest selected value (a consent is accepted or not by a customer)
     /// </summary>
@@ -168,9 +197,11 @@ public partial class GdprService : IGdprService
     /// </returns>
     public virtual async Task<bool?> IsConsentAcceptedAsync(int consentId, int customerId)
     {
+		logger.LogDebug(">>> Entering IsConsentAcceptedAsync(consentId={ConsentId},customerId={CustomerId})", consentId, customerId);
         //get latest record
         var log = (await GetAllLogAsync(customerId: customerId, consentId: consentId, pageIndex: 0, pageSize: 1)).FirstOrDefault();
         if (log == null)
+			logger.LogDebug("IsConsentAcceptedAsync(consentId={ConsentId},customerId={CustomerId}): log → {Log}", consentId, customerId, log);
             return null;
 
         return log.RequestType switch
@@ -235,6 +266,7 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertLogAsync(Customer customer, int consentId, GdprRequestType requestType, string requestDetails)
     {
+		logger.LogDebug(">>> Entering InsertLogAsync(customer={Customer},consentId={ConsentId},requestType={RequestType},requestDetails={RequestDetails})", customer, consentId, requestType, requestDetails);
         ArgumentNullException.ThrowIfNull(customer);
 
         var gdprLog = new GdprLog
@@ -248,6 +280,7 @@ public partial class GdprService : IGdprService
         };
 
         await InsertLogAsync(gdprLog);
+		logger.LogDebug("<<< Exiting InsertLogAsync(customer={Customer},consentId={ConsentId},requestType={RequestType},requestDetails={RequestDetails})", customer, consentId, requestType, requestDetails);
     }
 
     #endregion
@@ -261,24 +294,30 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PermanentDeleteCustomerAsync(Customer customer)
     {
+		logger.LogDebug(">>> Entering PermanentDeleteCustomerAsync(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         //blog comments
         var blogComments = await _blogService.GetAllCommentsAsync(customerId: customer.Id);
         await _blogService.DeleteBlogCommentsAsync(blogComments);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): blogComments → {BlogComments}", customer, blogComments);
 
         //news comments
         var newsComments = await _newsService.GetAllCommentsAsync(customerId: customer.Id);
         await _newsService.DeleteNewsCommentsAsync(newsComments);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): newsComments → {NewsComments}", customer, newsComments);
 
         //back in stock subscriptions
         var backInStockSubscriptions = await _backInStockSubscriptionService.GetAllSubscriptionsByCustomerIdAsync(customer.Id);
         foreach (var backInStockSubscription in backInStockSubscriptions)
             await _backInStockSubscriptionService.DeleteSubscriptionAsync(backInStockSubscription);
+			logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): backInStockSubscriptions → {BackInStockSubscriptions}", customer, backInStockSubscriptions);
 
         //product review
         var productReviews = await _productReviewService.GetAllProductReviewsAsync(customer.Id);
         var reviewedProducts = await _productService.GetProductsByIdsAsync(productReviews.Select(p => p.ProductId).Distinct().ToArray());
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): productReviews → {ProductReviews}", customer, productReviews);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): reviewedProducts → {ReviewedProducts}", customer, reviewedProducts);
         await _productReviewService.DeleteProductReviewsAsync(productReviews);
         //update product totals
         foreach (var product in reviewedProducts)
@@ -292,6 +331,7 @@ public partial class GdprService : IGdprService
         var forumSubscriptions = await _forumService.GetAllSubscriptionsAsync(customer.Id);
         foreach (var forumSubscription in forumSubscriptions)
             await _forumService.DeleteSubscriptionAsync(forumSubscription);
+			logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): forumSubscriptions → {ForumSubscriptions}", customer, forumSubscriptions);
 
         //shopping cart items
         foreach (var sci in await _shoppingCartService.GetShoppingCartAsync(customer))
@@ -309,6 +349,7 @@ public partial class GdprService : IGdprService
         var newsletters = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(customer.Email);
         foreach (var newsletter in newsletters)
             await _newsLetterSubscriptionService.DeleteNewsLetterSubscriptionAsync(newsletter);
+			logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): newsletters → {Newsletters}", customer, newsletters);
 
         //addresses
         foreach (var address in await _customerService.GetAddressesByCustomerIdAsync(customer.Id))
@@ -322,6 +363,8 @@ public partial class GdprService : IGdprService
         //generic attributes
         var keyGroup = customer.GetType().Name;
         var genericAttributes = await _genericAttributeService.GetAttributesForEntityAsync(customer.Id, keyGroup);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): keyGroup → {KeyGroup}", customer, keyGroup);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): genericAttributes → {GenericAttributes}", customer, genericAttributes);
         await _genericAttributeService.DeleteAttributesAsync(genericAttributes);
 
         //ignore ActivityLog
@@ -339,18 +382,26 @@ public partial class GdprService : IGdprService
         {
             var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
             await _customerService.RemoveCustomerRoleMappingAsync(customer, registeredRole);
+			logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): registeredRole → {RegisteredRole}", customer, registeredRole);
         }
 
         if (!await _customerService.IsGuestAsync(customer))
         {
             var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
             await _customerService.AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = customer.Id, CustomerRoleId = guestRole.Id });
+			logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): guestRole → {GuestRole}", customer, guestRole);
         }
 
         var email = customer.Email;
 
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): email → {Email}", customer, email);
         //clear other information
         customer.Email = string.Empty;
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Email → {Arg1}", customer, customer.Email);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.EmailToRevalidate → {Arg1}", customer, customer.EmailToRevalidate);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Username → {Arg1}", customer, customer.Username);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Active → {Arg1}", customer, customer.Active);
+		logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Deleted → {Arg1}", customer, customer.Deleted);
         customer.EmailToRevalidate = string.Empty;
         customer.Username = string.Empty;
         customer.Active = false;
@@ -360,6 +411,7 @@ public partial class GdprService : IGdprService
 
         //raise event
         await _eventPublisher.PublishAsync(new CustomerPermanentlyDeleted(customer.Id, email));
+		logger.LogDebug("<<< Exiting PermanentDeleteCustomerAsync(customer={Customer})", customer);
     }
 
     #endregion

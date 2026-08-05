@@ -38,8 +38,12 @@ public partial class NopCardTagHelper : TagHelper
 
     public NopCardTagHelper(IViewComponentHelper viewComponentHelper, IWidgetModelFactory widgetModelFactory)
     {
+		logger.LogDebug(">>> Entering NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory})", viewComponentHelper, widgetModelFactory);
         _viewComponentHelper = viewComponentHelper;
         _widgetModelFactory = widgetModelFactory;
+		logger.LogDebug("<<< Exiting NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory})", viewComponentHelper, widgetModelFactory);
+		logger.LogDebug("NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory}): _widgetModelFactory → {_widgetModelFactory}", viewComponentHelper, widgetModelFactory, _widgetModelFactory);
+		logger.LogDebug("NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory}): _viewComponentHelper → {_viewComponentHelper}", viewComponentHelper, widgetModelFactory, _viewComponentHelper);
     }
 
     #endregion
@@ -54,6 +58,7 @@ public partial class NopCardTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -87,13 +92,16 @@ public partial class NopCardTagHelper : TagHelper
         //create card heading and append title and icon to it
         var cardHeading = new TagBuilder("div");
         cardHeading.AddCssClass("card-header with-border clearfix");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardHeading → {CardHeading}", context, output, cardHeading);
 
         if (context.AllAttributes.ContainsName(CARD_ICON_ATTRIBUTE_NAME))
         {
             var cardIcon = new TagBuilder("i");
             cardIcon.AddCssClass(context.AllAttributes[CARD_ICON_ATTRIBUTE_NAME].Value.ToString());
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardIcon → {CardIcon}", context, output, cardIcon);
             var iconContainer = new TagBuilder("div");
             iconContainer.AddCssClass("card-title");
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): iconContainer → {IconContainer}", context, output, iconContainer);
             iconContainer.InnerHtml.AppendHtml(cardIcon);
             iconContainer.InnerHtml.AppendHtml($"{context.AllAttributes[TITLE_ATTRIBUTE_NAME].Value}");
             cardHeading.InnerHtml.AppendHtml(iconContainer);
@@ -101,13 +109,16 @@ public partial class NopCardTagHelper : TagHelper
 
         var collapseIcon = new TagBuilder("i");
         collapseIcon.AddCssClass("fa");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): collapseIcon → {CollapseIcon}", context, output, collapseIcon);
         collapseIcon.AddCssClass("toggle-icon");
         collapseIcon.AddCssClass(context.AllAttributes[IS_HIDE_ATTRIBUTE_NAME].Value.Equals(true) ? "fa-plus" : "fa-minus");
 
         var cardToolContainer = new TagBuilder("div");
         cardToolContainer.AddCssClass("card-tools float-right");
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardToolContainer → {CardToolContainer}", context, output, cardToolContainer);
         var cardbtnContainer = new TagBuilder("button");
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardbtnContainer → {CardbtnContainer}", context, output, cardbtnContainer);
         cardbtnContainer.AddCssClass("btn btn-tool");
         cardbtnContainer.MergeAttribute("type", "button");
         cardbtnContainer.MergeAttribute("data-card-widget", "collapse");
@@ -121,17 +132,21 @@ public partial class NopCardTagHelper : TagHelper
 
         var modelsBefore = await _widgetModelFactory.PrepareRenderWidgetModelAsync(AdminWidgetZones.CardBefore, new WidgetNopCardModel { CardName = Name });
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): modelsBefore → {ModelsBefore}", context, output, modelsBefore);
         foreach (var model in modelsBefore)
         {
             var content = await _viewComponentHelper.InvokeAsync(model.WidgetViewComponent, model.WidgetViewComponentArguments);
             card.InnerHtml.AppendHtml(content);
+			logger.LogDebug("ProcessAsync(context={Context},output={Output}): content → {Content}", context, output, content);
         }
 
         var childContent = await output.GetChildContentAsync();
         card.InnerHtml.AppendHtml(childContent.GetContent());
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): childContent → {ChildContent}", context, output, childContent);
 
         var modelsAfter = await _widgetModelFactory.PrepareRenderWidgetModelAsync(AdminWidgetZones.CardAfter, new WidgetNopCardModel { CardName = Name });
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): modelsAfter → {ModelsAfter}", context, output, modelsAfter);
         foreach (var model in modelsAfter)
         {
             var content = await _viewComponentHelper.InvokeAsync(model.WidgetViewComponent, model.WidgetViewComponentArguments);
@@ -139,6 +154,7 @@ public partial class NopCardTagHelper : TagHelper
         }
 
         output.Content.AppendHtml(await card.RenderHtmlContentAsync());
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

@@ -19,7 +19,10 @@ public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValida
     /// </summary>
     public PhoneNumberPropertyValidator(CustomerSettings customerSettings)
     {
+		logger.LogDebug(">>> Entering PhoneNumberPropertyValidator(customerSettings={CustomerSettings})", customerSettings);
         _customerSettings = customerSettings;
+		logger.LogDebug("<<< Exiting PhoneNumberPropertyValidator(customerSettings={CustomerSettings})", customerSettings);
+		logger.LogDebug("PhoneNumberPropertyValidator(customerSettings={CustomerSettings}): _customerSettings → {_customerSettings}", customerSettings, _customerSettings);
     }
 
     /// <summary>
@@ -29,6 +32,8 @@ public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValida
     /// <returns>Result</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		logger.LogDebug(">>> Entering IsValid(context={Context},value={Value})", context, value);
+		logger.LogDebug("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return IsValid(value as string, _customerSettings);
     }
 
@@ -48,6 +53,7 @@ public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValida
             return !customerSettings.PhoneRequired;
         }
 
+		logger.LogDebug("<<< Exiting IsValid(phoneNumber={PhoneNumber},customerSettings={CustomerSettings})", phoneNumber, customerSettings);
         return customerSettings.PhoneNumberValidationUseRegex
             ? Regex.IsMatch(phoneNumber, customerSettings.PhoneNumberValidationRule, RegexOptions.CultureInvariant | RegexOptions.IgnoreCase)
             : phoneNumber.All(l => customerSettings.PhoneNumberValidationRule.Contains(l));

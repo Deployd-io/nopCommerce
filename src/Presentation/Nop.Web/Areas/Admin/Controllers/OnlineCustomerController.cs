@@ -3,11 +3,13 @@ using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class OnlineCustomerController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerModelFactory _customerModelFactory;
@@ -31,9 +33,12 @@ public partial class OnlineCustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _customerModelFactory.PrepareOnlineCustomerSearchModelAsync(new OnlineCustomerSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -44,6 +49,7 @@ public partial class OnlineCustomerController : BaseAdminController
         //prepare model
         var model = await _customerModelFactory.PrepareOnlineCustomerListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

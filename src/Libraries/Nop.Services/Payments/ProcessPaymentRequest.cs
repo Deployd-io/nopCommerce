@@ -11,9 +11,14 @@ public partial class ProcessPaymentRequest
 {
     public ProcessPaymentRequest()
     {
+		logger.LogDebug(">>> Entering ProcessPaymentRequest()");
         CustomValues = new CustomValues();
         OrderGuid = Guid.NewGuid();
+		logger.LogDebug("ProcessPaymentRequest(): CustomValues → {CustomValues}", CustomValues);
+		logger.LogDebug("ProcessPaymentRequest(): OrderGuid → {OrderGuid}", OrderGuid);
         OrderGuidGeneratedOnUtc = DateTime.UtcNow;
+		logger.LogDebug("<<< Exiting ProcessPaymentRequest()");
+		logger.LogDebug("ProcessPaymentRequest(): OrderGuidGeneratedOnUtc → {OrderGuidGeneratedOnUtc}", OrderGuidGeneratedOnUtc);
     }
 
     /// <summary>

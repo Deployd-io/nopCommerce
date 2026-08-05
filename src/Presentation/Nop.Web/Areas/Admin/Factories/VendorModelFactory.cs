@@ -16,6 +16,7 @@ using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -24,6 +25,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class VendorModelFactory : IVendorModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -88,6 +90,7 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareAssociatedCustomerModelsAsync(IList<VendorAssociatedCustomerModel> models, Vendor vendor)
     {
+		_logger.LogDebug(">>> Entering PrepareAssociatedCustomerModelsAsync(models={Models},vendor={Vendor})", models, vendor);
         ArgumentNullException.ThrowIfNull(models);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -95,12 +98,14 @@ public partial class VendorModelFactory : IVendorModelFactory
         var associatedCustomers = await _customerService.GetAllCustomersAsync(vendorId: vendor.Id);
         foreach (var customer in associatedCustomers)
         {
+		_logger.LogDebug("PrepareAssociatedCustomerModelsAsync(models={Models},vendor={Vendor}): associatedCustomers → {AssociatedCustomers}", models, vendor, associatedCustomers);
             models.Add(new VendorAssociatedCustomerModel
             {
                 Id = customer.Id,
                 Email = customer.Email
             });
         }
+		_logger.LogDebug("<<< Exiting PrepareAssociatedCustomerModelsAsync(models={Models},vendor={Vendor})", models, vendor);
     }
 
     /// <summary>
@@ -111,12 +116,14 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareVendorAttributeModelsAsync(IList<VendorModel.VendorAttributeModel> models, Vendor vendor)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor})", models, vendor);
         ArgumentNullException.ThrowIfNull(models);
 
         //get available vendor attributes
         var vendorAttributes = await _vendorAttributeService.GetAllAttributesAsync();
         foreach (var attribute in vendorAttributes)
         {
+		_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): vendorAttributes → {VendorAttributes}", models, vendor, vendorAttributes);
             var attributeModel = new VendorModel.VendorAttributeModel
             {
                 Id = attribute.Id,
@@ -131,6 +138,7 @@ public partial class VendorModelFactory : IVendorModelFactory
                 var attributeValues = await _vendorAttributeService.GetAttributeValuesAsync(attribute.Id);
                 foreach (var attributeValue in attributeValues)
                 {
+				_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): attributeValues → {AttributeValues}", models, vendor, attributeValues);
                     var attributeValueModel = new VendorModel.VendorAttributeValueModel
                     {
                         Id = attributeValue.Id,
@@ -146,6 +154,7 @@ public partial class VendorModelFactory : IVendorModelFactory
             {
                 var selectedVendorAttributes = await _genericAttributeService.GetAttributeAsync<string>(vendor, NopVendorDefaults.VendorAttributes);
                 switch (attribute.AttributeControlType)
+				_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): selectedVendorAttributes → {SelectedVendorAttributes}", models, vendor, selectedVendorAttributes);
                 {
                     case AttributeControlType.DropdownList:
                     case AttributeControlType.RadioList:
@@ -156,12 +165,14 @@ public partial class VendorModelFactory : IVendorModelFactory
                                 //clear default selection
                                 foreach (var item in attributeModel.Values)
                                     item.IsPreSelected = false;
+									_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): item.IsPreSelected → {Arg2}", models, vendor, item.IsPreSelected);
 
                                 //select new values
                                 var selectedValues = await _vendorAttributeParser.ParseAttributeValuesAsync(selectedVendorAttributes);
                                 foreach (var attributeValue in selectedValues)
                                     foreach (var item in attributeModel.Values)
                                         if (attributeValue.Id == item.Id)
+									_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): selectedValues → {SelectedValues}", models, vendor, selectedValues);
                                             item.IsPreSelected = true;
                             }
                         }
@@ -179,6 +190,8 @@ public partial class VendorModelFactory : IVendorModelFactory
                             {
                                 var enteredText = _vendorAttributeParser.ParseValues(selectedVendorAttributes, attribute.Id);
                                 if (enteredText.Any())
+									_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): enteredText → {EnteredText}", models, vendor, enteredText);
+									_logger.LogDebug("PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor}): attributeModel.DefaultValue → {Arg2}", models, vendor, attributeModel.DefaultValue);
                                     attributeModel.DefaultValue = enteredText[0];
                             }
                         }
@@ -195,6 +208,7 @@ public partial class VendorModelFactory : IVendorModelFactory
 
             models.Add(attributeModel);
         }
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeModelsAsync(models={Models},vendor={Vendor})", models, vendor);
     }
 
     /// <summary>
@@ -205,15 +219,18 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// <returns>Vendor note search model</returns>
     protected virtual VendorNoteSearchModel PrepareVendorNoteSearchModel(VendorNoteSearchModel searchModel, Vendor vendor)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorNoteSearchModel(searchModel={SearchModel},vendor={Vendor})", searchModel, vendor);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(vendor);
 
         searchModel.VendorId = vendor.Id;
+		_logger.LogDebug("PrepareVendorNoteSearchModel(searchModel={SearchModel},vendor={Vendor}): searchModel.VendorId → {Arg2}", searchModel, vendor, searchModel.VendorId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareVendorNoteSearchModel(searchModel={SearchModel},vendor={Vendor})", searchModel, vendor);
         return searchModel;
     }
 
@@ -231,11 +248,13 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// </returns>
     public virtual Task<VendorCustomerSearchModel> PrepareVendorCustomerSearchModelAsync(VendorCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareVendorCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -249,6 +268,7 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// </returns>
     public virtual async Task<VendorCustomerListModel> PrepareVendorCustomerListModelAsync(VendorCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customers
@@ -261,6 +281,7 @@ public partial class VendorModelFactory : IVendorModelFactory
             customerRoleIds: searchCustomerRoleIds,
             pageIndex: searchModel.Page - 1,
             pageSize: searchModel.PageSize);
+			_logger.LogDebug("PrepareVendorCustomerListModelAsync(searchModel={SearchModel}): searchCustomerRoleIds → {SearchCustomerRoleIds}", searchModel, searchCustomerRoleIds);
 
         //prepare grid model
         var model = await new VendorCustomerListModel().PrepareToGridAsync(searchModel, customers, () =>
@@ -274,6 +295,7 @@ public partial class VendorModelFactory : IVendorModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareVendorCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -287,11 +309,13 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// </returns>
     public virtual Task<VendorSearchModel> PrepareVendorSearchModelAsync(VendorSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareVendorSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -305,6 +329,7 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// </returns>
     public virtual async Task<VendorListModel> PrepareVendorListModelAsync(VendorSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get vendors
@@ -321,12 +346,14 @@ public partial class VendorModelFactory : IVendorModelFactory
             {
                 var vendorModel = vendor.ToModel<VendorModel>();
 
+				_logger.LogDebug("PrepareVendorListModelAsync(searchModel={SearchModel}): vendorModel → {VendorModel}", searchModel, vendorModel);
                 vendorModel.SeName = await _urlRecordService.GetSeNameAsync(vendor, 0, true, false);
 
                 return vendorModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareVendorListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -351,6 +378,7 @@ public partial class VendorModelFactory : IVendorModelFactory
             {
                 model = vendor.ToModel<VendorModel>();
                 model.SeName = await _urlRecordService.GetSeNameAsync(vendor, 0, true, false);
+				_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model → {Model1}", model, vendor, excludeProperties, model);
             }
 
             //define localized model configuration action
@@ -371,6 +399,8 @@ public partial class VendorModelFactory : IVendorModelFactory
             {
                 var pmCustomer = await _customerService.GetCustomerByIdAsync(vendor.PmCustomerId.Value);
                 model.PmCustomerInfo = pmCustomer.Email;
+				_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): pmCustomer → {PmCustomer}", model, vendor, excludeProperties, pmCustomer);
+				_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.PmCustomerInfo → {Arg3}", model, vendor, excludeProperties, model.PmCustomerInfo);
             }
 
             //prepare nested search models
@@ -381,6 +411,14 @@ public partial class VendorModelFactory : IVendorModelFactory
         if (vendor == null)
         {
             model.PageSize = 6;
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.PageSize → {Arg3}", model, vendor, excludeProperties, model.PageSize);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.Active → {Arg3}", model, vendor, excludeProperties, model.Active);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.AllowCustomersToSelectPageSize → {Arg3}", model, vendor, excludeProperties, model.AllowCustomersToSelectPageSize);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.PageSizeOptions → {Arg3}", model, vendor, excludeProperties, model.PageSizeOptions);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.PriceRangeFiltering → {Arg3}", model, vendor, excludeProperties, model.PriceRangeFiltering);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.ManuallyPriceRange → {Arg3}", model, vendor, excludeProperties, model.ManuallyPriceRange);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.PriceFrom → {Arg3}", model, vendor, excludeProperties, model.PriceFrom);
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.PriceTo → {Arg3}", model, vendor, excludeProperties, model.PriceTo);
             model.Active = true;
             model.AllowCustomersToSelectPageSize = true;
             model.PageSizeOptions = _vendorSettings.DefaultVendorPageSizeOptions;
@@ -402,9 +440,11 @@ public partial class VendorModelFactory : IVendorModelFactory
         //prepare address model
         var address = await _addressService.GetAddressByIdAsync(vendor?.AddressId ?? 0);
         if (!excludeProperties && address != null)
+			_logger.LogDebug("PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): address → {Address}", model, vendor, excludeProperties, address);
             model.Address = address.ToModel(model.Address);
         await _addressModelFactory.PrepareAddressModelAsync(model.Address, address);
 
+		_logger.LogDebug("<<< Exiting PrepareVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties})", model, vendor, excludeProperties);
         return model;
     }
 
@@ -419,6 +459,7 @@ public partial class VendorModelFactory : IVendorModelFactory
     /// </returns>
     public virtual async Task<VendorNoteListModel> PrepareVendorNoteListModelAsync(VendorNoteSearchModel searchModel, Vendor vendor)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorNoteListModelAsync(searchModel={SearchModel},vendor={Vendor})", searchModel, vendor);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -426,6 +467,7 @@ public partial class VendorModelFactory : IVendorModelFactory
         //get vendor notes
         var vendorNotes = await _vendorService.GetVendorNotesByVendorAsync(vendor.Id, searchModel.Page - 1, searchModel.PageSize);
 
+		_logger.LogDebug("PrepareVendorNoteListModelAsync(searchModel={SearchModel},vendor={Vendor}): vendorNotes → {VendorNotes}", searchModel, vendor, vendorNotes);
         //prepare list model
         var model = await new VendorNoteListModel().PrepareToGridAsync(searchModel, vendorNotes, () =>
         {
@@ -435,6 +477,7 @@ public partial class VendorModelFactory : IVendorModelFactory
                 //fill in model values from the entity        
                 var vendorNoteModel = note.ToModel<VendorNoteModel>();
 
+				_logger.LogDebug("PrepareVendorNoteListModelAsync(searchModel={SearchModel},vendor={Vendor}): vendorNoteModel → {VendorNoteModel}", searchModel, vendor, vendorNoteModel);
                 //convert dates to the user time
                 vendorNoteModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(note.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -445,6 +488,7 @@ public partial class VendorModelFactory : IVendorModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareVendorNoteListModelAsync(searchModel={SearchModel},vendor={Vendor})", searchModel, vendor);
         return model;
     }
 

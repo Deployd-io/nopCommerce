@@ -2,6 +2,7 @@
 using Nop.Core;
 using Nop.Services.Customers;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Components;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.Misc.Brevo.Components;
 /// </summary>
 public class WidgetsBrevoViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly BrevoSettings _brevoSettings;
@@ -44,6 +46,7 @@ public class WidgetsBrevoViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var trackingScript = string.Empty;
 
         //ensure Marketing Automation is enabled
@@ -55,12 +58,14 @@ public class WidgetsBrevoViewComponent : NopViewComponent
         var customerEmail = !await _customerService.IsGuestAsync(customer)
             ? customer.Email?.Replace("'", "\\'")
             : string.Empty;
+			_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customer → {Customer}", widgetZone, additionalData, customer);
 
         //prepare tracking script
         trackingScript = $"{_brevoSettings.TrackingScript}{Environment.NewLine}"
             .Replace(BrevoDefaults.TrackingScriptId, _brevoSettings.MarketingAutomationKey)
             .Replace(BrevoDefaults.TrackingScriptCustomerEmail, customerEmail);
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Misc.Brevo/Views/PublicInfo.cshtml", trackingScript);
     }
 

@@ -18,6 +18,7 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
@@ -26,6 +27,7 @@ namespace Nop.Plugin.Tax.Avalara.Controllers;
 [AutoValidateAntiforgeryToken]
 public class AvalaraController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -82,8 +84,10 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Configure(string testTaxResult = null)
     {
+		_logger.LogDebug(">>> Entering Configure(testTaxResult={TestTaxResult})", testTaxResult);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): customer → {Customer}", testTaxResult, customer);
         var model = new ConfigurationModel
         {
             AccountId = _avalaraTaxSettings.AccountId,
@@ -116,6 +120,7 @@ public class AvalaraController : BasePluginController
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
         model.AvailableCustomerRoles = availableRoles.Select(role => new SelectListItem
         {
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): availableRoles → {AvailableRoles}", testTaxResult, availableRoles);
             Text = role.Name,
             Value = role.Id.ToString(),
             Selected = model.SelectedCustomerRoleIds.Contains(role.Id)
@@ -143,6 +148,7 @@ public class AvalaraController : BasePluginController
         //get active account companies
         var activeCompanies = model.IsConfigured ? await _avalaraTaxManager.GetAccountCompaniesAsync() : null;
         if (activeCompanies?.Any() ?? false)
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): activeCompanies → {ActiveCompanies}", testTaxResult, activeCompanies);
         {
             model.Companies = activeCompanies.OrderBy(company => company.isDefault ?? false ? 0 : 1).Select(company => new SelectListItem
             {
@@ -153,10 +159,12 @@ public class AvalaraController : BasePluginController
 
         var defaultCompanyCode = _avalaraTaxSettings.CompanyCode;
         if (!model.Companies.Any())
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): defaultCompanyCode → {DefaultCompanyCode}", testTaxResult, defaultCompanyCode);
         {
             //add the special item for 'there are no companies' with empty guid value
             var noCompaniesText = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.Company.NotExist");
             model.Companies.Add(new SelectListItem { Text = noCompaniesText, Value = Guid.Empty.ToString() });
+			_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): noCompaniesText → {NoCompaniesText}", testTaxResult, noCompaniesText);
             defaultCompanyCode = Guid.Empty.ToString();
         }
         else if (string.IsNullOrEmpty(_avalaraTaxSettings.CompanyCode) || _avalaraTaxSettings.CompanyCode.Equals(Guid.Empty.ToString()))
@@ -165,6 +173,10 @@ public class AvalaraController : BasePluginController
         //set the default company
         var selectedCompany = activeCompanies?.FirstOrDefault(company => company.companyCode.Equals(defaultCompanyCode));
         model.CompanyCode = defaultCompanyCode;
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): selectedCompany → {SelectedCompany}", testTaxResult, selectedCompany);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): model.CompanyCode → {Arg1}", testTaxResult, model.CompanyCode);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): _avalaraTaxSettings.CompanyCode → {Arg1}", testTaxResult, _avalaraTaxSettings.CompanyCode);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): _avalaraTaxSettings.CompanyId → {Arg1}", testTaxResult, _avalaraTaxSettings.CompanyId);
         _avalaraTaxSettings.CompanyCode = defaultCompanyCode;
         _avalaraTaxSettings.CompanyId = selectedCompany?.id;
         await _settingService.SaveSettingAsync(_avalaraTaxSettings);
@@ -172,6 +184,7 @@ public class AvalaraController : BasePluginController
         //display warning in case of company currency differ from the primary store currency
         var primaryCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
         if (!selectedCompany?.baseCurrencyCode?.Equals(primaryCurrency?.CurrencyCode, StringComparison.InvariantCultureIgnoreCase) ?? false)
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): primaryCurrency → {PrimaryCurrency}", testTaxResult, primaryCurrency);
         {
             var warning = string.Format(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.Company.Currency.Warning"),
                 selectedCompany.name, selectedCompany.baseCurrencyCode, primaryCurrency?.CurrencyCode);
@@ -233,12 +246,15 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> CheckCredentials()
     {
+		_logger.LogDebug(">>> Entering CheckCredentials()");
         //verify credentials
         var credentials = await _avalaraTaxManager.PingAsync();
         if (credentials?.authenticated ?? false)
+		_logger.LogDebug("CheckCredentials(): credentials → {Credentials}", credentials);
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Configuration.Credentials.Verified");
             _notificationService.SuccessNotification(locale);
+			_logger.LogDebug("CheckCredentials(): locale → {Locale}", locale);
         }
         else
         {
@@ -249,6 +265,7 @@ public class AvalaraController : BasePluginController
         //check certificate setup status
         var status = await _avalaraTaxManager.GetCertificateSetupStatusAsync();
         if (status is null)
+		_logger.LogDebug("CheckCredentials(): status → {Status}", status);
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Configuration.Certificates.NotProvisioned");
             _notificationService.ErrorNotification(locale);
@@ -264,6 +281,7 @@ public class AvalaraController : BasePluginController
             _notificationService.SuccessNotification(locale);
         }
 
+		_logger.LogDebug("<<< Exiting CheckCredentials()");
         return await Configure();
     }
 
@@ -272,12 +290,15 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> RequestCertificateSetup()
     {
+		_logger.LogDebug(">>> Entering RequestCertificateSetup()");
         //request the certificate setup and display current status
         var status = await _avalaraTaxManager.GetCertificateSetupStatusAsync(true);
         if (status is null)
+		_logger.LogDebug("RequestCertificateSetup(): status → {Status}", status);
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Configuration.Certificates.NotProvisioned");
             _notificationService.ErrorNotification(locale);
+			_logger.LogDebug("RequestCertificateSetup(): locale → {Locale}", locale);
         }
         else if (status == false)
         {
@@ -290,6 +311,7 @@ public class AvalaraController : BasePluginController
             _notificationService.SuccessNotification(locale);
         }
 
+		_logger.LogDebug("<<< Exiting RequestCertificateSetup()");
         return await Configure();
     }
 
@@ -331,6 +353,7 @@ public class AvalaraController : BasePluginController
 
     public async Task<IActionResult> ChangeOriginAddressType(int typeId)
     {
+		_logger.LogDebug(">>> Entering ChangeOriginAddressType(typeId={TypeId})", typeId);
         var message = (TaxOriginAddressType)typeId switch
         {
             TaxOriginAddressType.ShippingOrigin => string.Format(await _localizationService
@@ -340,18 +363,23 @@ public class AvalaraController : BasePluginController
             _ => null
         };
 
+		_logger.LogDebug("<<< Exiting ChangeOriginAddressType(typeId={TypeId})", typeId);
         return Json(new { Result = message });
     }
 
     public async Task<IActionResult> ChangeEnableCertificates(bool enabled)
     {
+		_logger.LogDebug(">>> Entering ChangeEnableCertificates(enabled={Enabled})", enabled);
         var message = string.Empty;
         if (enabled)
+		_logger.LogDebug("ChangeEnableCertificates(enabled={Enabled}): message → {Message}", enabled, message);
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.EnableCertificates.Warning");
             message = string.Format(locale, Url.Action("CustomerUser", "Setting"));
+			_logger.LogDebug("ChangeEnableCertificates(enabled={Enabled}): locale → {Locale}", enabled, locale);
         }
 
+		_logger.LogDebug("<<< Exiting ChangeEnableCertificates(enabled={Enabled})", enabled);
         return Json(new { Result = message });
     }
 

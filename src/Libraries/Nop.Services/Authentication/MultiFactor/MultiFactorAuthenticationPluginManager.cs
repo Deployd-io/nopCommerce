@@ -39,6 +39,8 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// </returns>
     public virtual async Task<bool> HasActivePluginsAsync(Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering HasActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		logger.LogDebug("<<< Exiting HasActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return (await LoadActivePluginsAsync(_multiFactorAuthenticationSettings.ActiveAuthenticationMethodSystemNames, customer, storeId)).Any();
     }
 
@@ -53,6 +55,8 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// </returns>
     public virtual async Task<IList<IMultiFactorAuthenticationMethod>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadActivePluginsAsync(_multiFactorAuthenticationSettings.ActiveAuthenticationMethodSystemNames, customer, storeId);
     }
 
@@ -78,7 +82,10 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var authenticationMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): authenticationMethod → {AuthenticationMethod}", systemName, customer, storeId, authenticationMethod);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(authenticationMethod);
     }
 

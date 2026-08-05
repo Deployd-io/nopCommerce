@@ -3,6 +3,7 @@
 //! author : Chris Cartlidge : https://github.com/chriscartlidge
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('en-ie', {
     months: 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
@@ -48,6 +49,7 @@ export default moment.defineLocale('en-ie', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var b = number % 10,
             output =
                 ~~((number % 100) / 10) === 1

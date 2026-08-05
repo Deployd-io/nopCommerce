@@ -9,6 +9,7 @@ using Nop.Services.Media;
 using Nop.Services.Orders;
 using Nop.Services.Seo;
 using Nop.Web.Models.Order;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICurrencyService _currencyService;
@@ -119,20 +121,28 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<CustomerReturnRequestsModel> PrepareCustomerReturnRequestsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerReturnRequestsModelAsync()");
         var model = new CustomerReturnRequestsModel();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): model → {Model}", model);
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): store → {Store}", store);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var returnRequests = await _returnRequestService.SearchReturnRequestsAsync(store.Id, customer.Id);
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): customer → {Customer}", customer);
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): returnRequests → {ReturnRequests}", returnRequests);
 
         foreach (var returnRequest in returnRequests)
         {
             var orderItem = await _orderService.GetOrderItemByIdAsync(returnRequest.OrderItemId);
             if (orderItem != null)
+			_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): orderItem → {OrderItem}", orderItem);
             {
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+				_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): product → {Product}", product);
                 var download = await _downloadService.GetDownloadByIdAsync(returnRequest.UploadedFileId);
 
+				_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): download → {Download}", download);
                 var itemModel = new CustomerReturnRequestsModel.ReturnRequestModel
                 {
                     Id = returnRequest.Id,
@@ -152,6 +162,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerReturnRequestsModelAsync()");
         return model;
     }
 
@@ -164,12 +175,15 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     protected virtual async Task<IList<SubmitReturnRequestModel.OrderItemModel>> PrepareSubmitReturnRequestOrderItemModelsAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         var models = new List<SubmitReturnRequestModel.OrderItemModel>();
 
+		_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): models → {Models}", order, models);
         var returnRequestAvailability = await _returnRequestService.GetReturnRequestAvailabilityAsync(order.Id);
         if (returnRequestAvailability?.IsAllowed == true)
+		_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): returnRequestAvailability → {ReturnRequestAvailability}", order, returnRequestAvailability);
         {
             foreach (var returnableOrderItem in returnRequestAvailability.ReturnableOrderItems)
             {
@@ -179,6 +193,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
                 var orderItem = returnableOrderItem.OrderItem;
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+				_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): product → {Product}", order, product);
                 var model = new SubmitReturnRequestModel.OrderItemModel
                 {
                     Id = orderItem.Id,
@@ -191,24 +206,28 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 
                 var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
 
+				_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): languageId → {LanguageId}", order, languageId);
                 //unit price
                 if (order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax)
                 {
                     //including tax
                     var unitPriceInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceInclTax, order.CurrencyRate);
                     model.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
+					_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): unitPriceInclTaxInCustomerCurrency → {UnitPriceInclTaxInCustomerCurrency}", order, unitPriceInclTaxInCustomerCurrency);
                 }
                 else
                 {
                     //excluding tax
                     var unitPriceExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceExclTax, order.CurrencyRate);
                     model.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
+					_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): unitPriceExclTaxInCustomerCurrency → {UnitPriceExclTaxInCustomerCurrency}", order, unitPriceExclTaxInCustomerCurrency);
                 }
 
                 models.Add(model);
             }
         }
 
+		_logger.LogDebug("<<< Exiting PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order})", order);
         return models;
     }
 

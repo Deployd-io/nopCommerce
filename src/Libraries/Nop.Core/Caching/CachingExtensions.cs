@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Caching;
 
 public static class CachingExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Get a cached item. If it's not in the cache yet, then load and cache it.
     /// NOTE: this method is only kept for backwards compatibility: the async overload is preferred!
@@ -13,9 +15,12 @@ public static class CachingExtensions
     /// <returns>The cached value associated with the specified key</returns>
     public static T Get<T>(this IStaticCacheManager cacheManager, CacheKey key, Func<T> acquire)
     {
+		_logger.LogDebug(">>> Entering Get(cacheManager={CacheManager},key={Key},acquire={Acquire})", cacheManager, key, acquire);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return cacheManager.GetAsync(key, acquire).GetAwaiter().GetResult();
     }
 
+	_logger.LogInformation("Get(cacheManager,key,acquire)={CacheManager},{Key},{Acquire}: external service call took {Arg3} ms", cacheManager, key, acquire, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Remove items by cache key prefix
     /// </summary>
@@ -24,6 +29,8 @@ public static class CachingExtensions
     /// <param name="prefixParameters">Parameters to create cache key prefix</param>
     public static void RemoveByPrefix(this IStaticCacheManager cacheManager, string prefix, params object[] prefixParameters)
     {
+		_logger.LogDebug(">>> Entering RemoveByPrefix(cacheManager={CacheManager},prefix={Prefix},prefixParameters={PrefixParameters})", cacheManager, prefix, prefixParameters);
         cacheManager.RemoveByPrefixAsync(prefix, prefixParameters).Wait();
+		_logger.LogDebug("<<< Exiting RemoveByPrefix(cacheManager={CacheManager},prefix={Prefix},prefixParameters={PrefixParameters})", cacheManager, prefix, prefixParameters);
     }
 }

@@ -12,6 +12,7 @@ using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CategoryModelFactory : ICategoryModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -78,15 +80,18 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// <returns>Category product search model</returns>
     protected virtual CategoryProductSearchModel PrepareCategoryProductSearchModel(CategoryProductSearchModel searchModel, Category category)
     {
+		_logger.LogDebug(">>> Entering PrepareCategoryProductSearchModel(searchModel={SearchModel},category={Category})", searchModel, category);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(category);
 
         searchModel.CategoryId = category.Id;
+		_logger.LogDebug("PrepareCategoryProductSearchModel(searchModel={SearchModel},category={Category}): searchModel.CategoryId → {Arg2}", searchModel, category, searchModel.CategoryId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCategoryProductSearchModel(searchModel={SearchModel},category={Category})", searchModel, category);
         return searchModel;
     }
 
@@ -104,6 +109,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategorySearchModel> PrepareCategorySearchModelAsync(CategorySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -131,6 +137,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -144,6 +151,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategoryListModel> PrepareCategoryListModelAsync(CategorySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
         //get categories
         var categories = await _categoryService.GetAllCategoriesAsync(categoryName: searchModel.SearchCategoryName,
@@ -160,6 +168,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
                 //fill in model values from the entity
                 var categoryModel = category.ToModel<CategoryModel>();
 
+				_logger.LogDebug("PrepareCategoryListModelAsync(searchModel={SearchModel}): categoryModel → {CategoryModel}", searchModel, categoryModel);
                 //fill in additional values (not existing in the entity)
                 categoryModel.Breadcrumb = await _categoryService.GetFormattedBreadCrumbAsync(category);
                 categoryModel.SeName = await _urlRecordService.GetSeNameAsync(category, 0, true, false);
@@ -168,6 +177,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -192,6 +202,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             {
                 model = category.ToModel<CategoryModel>();
                 model.SeName = await _urlRecordService.GetSeNameAsync(category, 0, true, false);
+				_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model → {Model1}", model, category, excludeProperties, model);
             }
 
             //prepare nested search model
@@ -213,6 +224,14 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         if (category == null)
         {
             model.PageSize = _catalogSettings.DefaultCategoryPageSize;
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PageSize → {Arg3}", model, category, excludeProperties, model.PageSize);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PageSizeOptions → {Arg3}", model, category, excludeProperties, model.PageSizeOptions);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, category, excludeProperties, model.Published);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.AllowCustomersToSelectPageSize → {Arg3}", model, category, excludeProperties, model.AllowCustomersToSelectPageSize);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PriceRangeFiltering → {Arg3}", model, category, excludeProperties, model.PriceRangeFiltering);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.ManuallyPriceRange → {Arg3}", model, category, excludeProperties, model.ManuallyPriceRange);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PriceFrom → {Arg3}", model, category, excludeProperties, model.PriceFrom);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PriceTo → {Arg3}", model, category, excludeProperties, model.PriceTo);
             model.PageSizeOptions = _catalogSettings.DefaultCategoryPageSizeOptions;
             model.Published = true;
             model.AllowCustomersToSelectPageSize = true;
@@ -238,12 +257,14 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         //prepare model discounts
         var availableDiscounts = await _discountService.GetAllDiscountsAsync(DiscountType.AssignedToCategories, showHidden: true, isActive: null);
         await _discountSupportedModelFactory.PrepareModelDiscountsAsync(model, category, availableDiscounts, excludeProperties);
+		_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): availableDiscounts → {AvailableDiscounts}", model, category, excludeProperties, availableDiscounts);
 
         //prepare model stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, category, excludeProperties);
 
         await _baseAdminModelFactory.PreparePreTranslationSupportModelAsync(model);
 
+		_logger.LogDebug("<<< Exiting PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties})", model, category, excludeProperties);
         return model;
     }
 
@@ -258,6 +279,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategoryProductListModel> PrepareCategoryProductListModelAsync(CategoryProductSearchModel searchModel, Category category)
     {
+		_logger.LogDebug(">>> Entering PrepareCategoryProductListModelAsync(searchModel={SearchModel},category={Category})", searchModel, category);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(category);
@@ -275,6 +297,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
                 //fill in model values from the entity
                 var categoryProductModel = productCategory.ToModel<CategoryProductModel>();
 
+				_logger.LogDebug("PrepareCategoryProductListModelAsync(searchModel={SearchModel},category={Category}): categoryProductModel → {CategoryProductModel}", searchModel, category, categoryProductModel);
                 //fill in additional values (not existing in the entity)
                 categoryProductModel.ProductName = (await _productService.GetProductByIdAsync(productCategory.ProductId))?.Name;
 
@@ -282,6 +305,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCategoryProductListModelAsync(searchModel={SearchModel},category={Category})", searchModel, category);
         return model;
     }
 
@@ -295,6 +319,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<AddProductToCategorySearchModel> PrepareAddProductToCategorySearchModelAsync(AddProductToCategorySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddProductToCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available categories
@@ -315,6 +340,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddProductToCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -328,6 +354,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<AddProductToCategoryListModel> PrepareAddProductToCategoryListModelAsync(AddProductToCategorySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddProductToCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get products
@@ -347,12 +374,14 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				_logger.LogDebug("PrepareAddProductToCategoryListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAddProductToCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

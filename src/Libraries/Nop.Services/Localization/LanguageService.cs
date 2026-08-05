@@ -48,8 +48,11 @@ public partial class LanguageService : ILanguageService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLanguageAsync(Language language)
     {
+		logger.LogDebug(">>> Entering DeleteLanguageAsync(language={Language})", language);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(language);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //update default admin area language (if required)
         if (_localizationSettings.DefaultAdminLanguageId == language.Id)
             foreach (var activeLanguage in await GetAllLanguagesAsync())
@@ -58,11 +61,15 @@ public partial class LanguageService : ILanguageService
                     continue;
 
                 _localizationSettings.DefaultAdminLanguageId = activeLanguage.Id;
+				logger.LogDebug("DeleteLanguageAsync(language={Language}): _localizationSettings.DefaultAdminLanguageId → {Arg1}", language, _localizationSettings.DefaultAdminLanguageId);
                 await _settingService.SaveSettingAsync(_localizationSettings);
                 break;
             }
 
         await _languageRepository.DeleteAsync(language);
+		logger.LogDebug("<<< Exiting DeleteLanguageAsync(language={Language})", language);
+		logger.LogInformation("DeleteLanguageAsync(language)={Language}: external service call took {Arg1} ms", language, __logStart.ElapsedMilliseconds);
+		logger.LogInformation("DeleteLanguageAsync(language)={Language}: delete query executed in {Arg1} ms", language, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -76,15 +83,21 @@ public partial class LanguageService : ILanguageService
     /// </returns>
     public virtual async Task<IList<Language>> GetAllLanguagesAsync(bool showHidden = false, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetAllLanguagesAsync(showHidden={ShowHidden},storeId={StoreId})", showHidden, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LanguagesAllCacheKey, storeId, showHidden);
 
         var languages = await _staticCacheManager.GetAsync(key, async () =>
         {
+		logger.LogWarning("GetAllLanguagesAsync(showHidden={ShowHidden},storeId={StoreId}): key → {Key}", showHidden, storeId, key);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var allLanguages = await _languageRepository.GetAllAsync(async query =>
             {
+				logger.LogDebug("GetAllLanguagesAsync(showHidden={ShowHidden},storeId={StoreId}): query → {Query}", showHidden, storeId, query);
                 if (!showHidden)
                     query = query.Where(l => l.Published);
 
+				logger.LogInformation("GetAllLanguagesAsync(showHidden,storeId)={ShowHidden},{StoreId}: find query executed in {Arg2} ms", showHidden, storeId, __logStart.ElapsedMilliseconds);
                 if (storeId > 0)
                     query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
@@ -109,8 +122,11 @@ public partial class LanguageService : ILanguageService
     /// </returns>
     public virtual IList<Language> GetAllLanguages(bool showHidden = false, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetAllLanguages(showHidden={ShowHidden},storeId={StoreId})", showHidden, storeId);
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LanguagesAllCacheKey, storeId, showHidden);
 
+		logger.LogWarning("GetAllLanguages(showHidden={ShowHidden},storeId={StoreId}): key → {Key}", showHidden, storeId, key);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var languages = _staticCacheManager.Get(key, () =>
         {
             var allLanguages = _languageRepository.GetAll(query =>
@@ -118,6 +134,8 @@ public partial class LanguageService : ILanguageService
                 if (!showHidden)
                     query = query.Where(l => l.Published);
                 query = query.OrderBy(l => l.DisplayOrder).ThenBy(l => l.Id);
+				logger.LogDebug("GetAllLanguages(showHidden={ShowHidden},storeId={StoreId}): query → {Query}", showHidden, storeId, query);
+				logger.LogInformation("GetAllLanguages(showHidden,storeId)={ShowHidden},{StoreId}: find query executed in {Arg2} ms", showHidden, storeId, __logStart.ElapsedMilliseconds);
 
                 return query;
             });
@@ -131,6 +149,7 @@ public partial class LanguageService : ILanguageService
             return allLanguages;
         });
 
+		logger.LogDebug("<<< Exiting GetAllLanguages(showHidden={ShowHidden},storeId={StoreId})", showHidden, storeId);
         return languages;
     }
 
@@ -144,6 +163,8 @@ public partial class LanguageService : ILanguageService
     /// </returns>
     public virtual async Task<Language> GetLanguageByIdAsync(int languageId)
     {
+		logger.LogDebug(">>> Entering GetLanguageByIdAsync(languageId={LanguageId})", languageId);
+		logger.LogDebug("<<< Exiting GetLanguageByIdAsync(languageId={LanguageId})", languageId);
         return await _languageRepository.GetByIdAsync(languageId, cache => default);
     }
 
@@ -154,9 +175,15 @@ public partial class LanguageService : ILanguageService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertLanguageAsync(Language language)
     {
+		logger.LogDebug(">>> Entering InsertLanguageAsync(language={Language})", language);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _languageRepository.InsertAsync(language);
+		logger.LogDebug("<<< Exiting InsertLanguageAsync(language={Language})", language);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertLanguageAsync(language)={Language}: save query executed in {Arg1} ms", language, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertLanguageAsync(language)={Language}: save query executed in {Arg1} ms", language, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates a language
     /// </summary>
@@ -164,8 +191,12 @@ public partial class LanguageService : ILanguageService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateLanguageAsync(Language language)
     {
+		logger.LogDebug(">>> Entering UpdateLanguageAsync(language={Language})", language);
         //update language
         await _languageRepository.UpdateAsync(language);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateLanguageAsync(language)={Language}: update query executed in {Arg1} ms", language, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting UpdateLanguageAsync(language={Language})", language);
     }
 
     /// <summary>
@@ -175,6 +206,7 @@ public partial class LanguageService : ILanguageService
     /// <returns>ISO language code</returns>
     public virtual string GetTwoLetterIsoLanguageName(Language language)
     {
+		logger.LogDebug(">>> Entering GetTwoLetterIsoLanguageName(language={Language})", language);
         ArgumentNullException.ThrowIfNull(language);
 
         if (string.IsNullOrEmpty(language.LanguageCulture))
@@ -182,7 +214,9 @@ public partial class LanguageService : ILanguageService
 
         var culture = new CultureInfo(language.LanguageCulture);
         var code = culture.TwoLetterISOLanguageName;
+		logger.LogDebug("GetTwoLetterIsoLanguageName(language={Language}): culture → {Culture}", language, culture);
 
+		logger.LogDebug("<<< Exiting GetTwoLetterIsoLanguageName(language={Language})", language);
         return string.IsNullOrEmpty(code) ? "en" : code;
     }
 

@@ -3,6 +3,7 @@
 //! author : Orif N. Jr. : https://github.com/orif-jr
 
 import moment from '../moment';
+const logger = console;
 
 var suffixes = {
     0: '-ум',
@@ -78,6 +79,7 @@ export default moment.defineLocale('tg', {
     },
     meridiemParse: /шаб|субҳ|рӯз|бегоҳ/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -88,6 +90,9 @@ export default moment.defineLocale('tg', {
         } else if (meridiem === 'рӯз') {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'бегоҳ') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },
@@ -106,8 +111,10 @@ export default moment.defineLocale('tg', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(ум|юм)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var a = number % 10,
             b = number >= 100 ? 100 : null;
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + (suffixes[number] || suffixes[a] || suffixes[b]);
     },
     week: {

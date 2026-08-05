@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Affiliates;
 
@@ -10,13 +11,19 @@ namespace Nop.Web.Areas.Admin.Models.Affiliates;
 /// </summary>
 public partial record AffiliatedOrderSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AffiliatedOrderSearchModel()
     {
+		_logger.LogDebug(">>> Entering AffiliatedOrderSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		_logger.LogDebug("AffiliatedOrderSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
+		_logger.LogDebug("AffiliatedOrderSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableShippingStatuses = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting AffiliatedOrderSearchModel()");
+		_logger.LogDebug("AffiliatedOrderSearchModel(): AvailableShippingStatuses → {AvailableShippingStatuses}", AvailableShippingStatuses);
     }
 
     #endregion

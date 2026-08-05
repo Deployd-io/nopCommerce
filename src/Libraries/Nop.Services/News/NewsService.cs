@@ -48,9 +48,19 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsAsync(NewsItem newsItem)
     {
+		logger.LogDebug(">>> Entering DeleteNewsAsync(newsItem={NewsItem})", newsItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _newsItemRepository.DeleteAsync(newsItem);
+		logger.LogDebug("<<< Exiting DeleteNewsAsync(newsItem={NewsItem})", newsItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteNewsAsync(newsItem)={NewsItem}: external service call took {Arg1} ms", newsItem, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteNewsAsync(newsItem)={NewsItem}: delete query executed in {Arg1} ms", newsItem, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteNewsAsync(newsItem)={NewsItem}: external service call took {Arg1} ms", newsItem, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteNewsAsync(newsItem)={NewsItem}: delete query executed in {Arg1} ms", newsItem, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a news
     /// </summary>
@@ -61,6 +71,8 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<NewsItem> GetNewsByIdAsync(int newsId)
     {
+		logger.LogDebug(">>> Entering GetNewsByIdAsync(newsId={NewsId})", newsId);
+		logger.LogDebug("<<< Exiting GetNewsByIdAsync(newsId={NewsId})", newsId);
         return await _newsItemRepository.GetByIdAsync(newsId, cache => default);
     }
 
@@ -115,6 +127,8 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertNewsAsync(NewsItem news)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _newsItemRepository.InsertAsync(news);
     }
 
@@ -125,6 +139,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateNewsAsync(NewsItem news)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _newsItemRepository.UpdateAsync(news);
     }
 
@@ -136,12 +151,14 @@ public partial class NewsService : INewsService
     /// <returns>Result</returns>
     public virtual bool IsNewsAvailable(NewsItem newsItem, DateTime? dateTime = null)
     {
+		logger.LogDebug(">>> Entering IsNewsAvailable(newsItem={NewsItem},dateTime={DateTime})", newsItem, dateTime);
         ArgumentNullException.ThrowIfNull(newsItem);
 
         if (newsItem.StartDateUtc.HasValue && newsItem.StartDateUtc.Value >= dateTime)
             return false;
 
         if (newsItem.EndDateUtc.HasValue && newsItem.EndDateUtc.Value <= dateTime)
+		logger.LogDebug("<<< Exiting IsNewsAvailable(newsItem={NewsItem},dateTime={DateTime})", newsItem, dateTime);
             return false;
 
         return true;
@@ -207,6 +224,8 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<NewsComment> GetNewsCommentByIdAsync(int newsCommentId)
     {
+		logger.LogDebug(">>> Entering GetNewsCommentByIdAsync(newsCommentId={NewsCommentId})", newsCommentId);
+		logger.LogDebug("<<< Exiting GetNewsCommentByIdAsync(newsCommentId={NewsCommentId})", newsCommentId);
         return await _newsCommentRepository.GetByIdAsync(newsCommentId, cache => default, useShortTermCache: true);
     }
 
@@ -220,6 +239,8 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<IList<NewsComment>> GetNewsCommentsByIdsAsync(int[] commentIds)
     {
+		logger.LogDebug(">>> Entering GetNewsCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
+		logger.LogDebug("<<< Exiting GetNewsCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
         return await _newsCommentRepository.GetByIdsAsync(commentIds);
     }
 
@@ -235,9 +256,13 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<int> GetNewsCommentsCountAsync(NewsItem newsItem, int storeId = 0, bool? isApproved = null)
     {
+		logger.LogDebug(">>> Entering GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved})", newsItem, storeId, isApproved);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = _newsCommentRepository.Table.Where(comment => comment.NewsItemId == newsItem.Id);
 
         if (storeId > 0)
+			logger.LogDebug("GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved}): query → {Query}", newsItem, storeId, isApproved, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             query = query.Where(comment => comment.StoreId == storeId);
 
         if (isApproved.HasValue)
@@ -245,6 +270,9 @@ public partial class NewsService : INewsService
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopNewsDefaults.NewsCommentsNumberCacheKey, newsItem, storeId, isApproved);
 
+		logger.LogDebug("GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved}): cacheKey → {CacheKey}", newsItem, storeId, isApproved, cacheKey);
+		logger.LogInformation("GetNewsCommentsCountAsync(newsItem,storeId,isApproved)={NewsItem},{StoreId},{IsApproved}: external service call took {Arg3} ms", newsItem, storeId, isApproved, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved})", newsItem, storeId, isApproved);
         return await _staticCacheManager.GetAsync(cacheKey, async () => await query.CountAsync());
     }
 
@@ -255,9 +283,19 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsCommentAsync(NewsComment newsComment)
     {
+		logger.LogDebug(">>> Entering DeleteNewsCommentAsync(newsComment={NewsComment})", newsComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _newsCommentRepository.DeleteAsync(newsComment);
+		logger.LogDebug("<<< Exiting DeleteNewsCommentAsync(newsComment={NewsComment})", newsComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteNewsCommentAsync(newsComment)={NewsComment}: external service call took {Arg1} ms", newsComment, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteNewsCommentAsync(newsComment)={NewsComment}: delete query executed in {Arg1} ms", newsComment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteNewsCommentAsync(newsComment)={NewsComment}: external service call took {Arg1} ms", newsComment, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteNewsCommentAsync(newsComment)={NewsComment}: delete query executed in {Arg1} ms", newsComment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a news comments
     /// </summary>
@@ -265,10 +303,12 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsCommentsAsync(IList<NewsComment> newsComments)
     {
+		logger.LogDebug(">>> Entering DeleteNewsCommentsAsync(newsComments={NewsComments})", newsComments);
         ArgumentNullException.ThrowIfNull(newsComments);
 
         foreach (var newsComment in newsComments)
             await DeleteNewsCommentAsync(newsComment);
+			logger.LogDebug("<<< Exiting DeleteNewsCommentsAsync(newsComments={NewsComments})", newsComments);
     }
 
     /// <summary>
@@ -278,9 +318,15 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertNewsCommentAsync(NewsComment comment)
     {
+		logger.LogDebug(">>> Entering InsertNewsCommentAsync(comment={Comment})", comment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _newsCommentRepository.InsertAsync(comment);
+		logger.LogDebug("<<< Exiting InsertNewsCommentAsync(comment={Comment})", comment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertNewsCommentAsync(comment)={Comment}: save query executed in {Arg1} ms", comment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertNewsCommentAsync(comment)={Comment}: save query executed in {Arg1} ms", comment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Update a news comment
     /// </summary>
@@ -288,9 +334,15 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateNewsCommentAsync(NewsComment comment)
     {
+		logger.LogDebug(">>> Entering UpdateNewsCommentAsync(comment={Comment})", comment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _newsCommentRepository.UpdateAsync(comment);
+		logger.LogDebug("<<< Exiting UpdateNewsCommentAsync(comment={Comment})", comment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateNewsCommentAsync(comment)={Comment}: update query executed in {Arg1} ms", comment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateNewsCommentAsync(comment)={Comment}: update query executed in {Arg1} ms", comment, __logStart.ElapsedMilliseconds);
     #endregion
 
     #endregion

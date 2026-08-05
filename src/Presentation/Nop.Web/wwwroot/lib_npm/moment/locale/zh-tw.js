@@ -4,6 +4,7 @@
 //! author : Chris Lam : https://github.com/hehachris
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('zh-tw', {
     months: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split(
@@ -29,6 +30,7 @@ export default moment.defineLocale('zh-tw', {
     },
     meridiemParse: /凌晨|早上|上午|中午|下午|晚上/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -37,6 +39,9 @@ export default moment.defineLocale('zh-tw', {
         } else if (meridiem === '中午') {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === '下午' || meridiem === '晚上') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },
@@ -66,6 +71,7 @@ export default moment.defineLocale('zh-tw', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(日|月|週)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -79,6 +85,7 @@ export default moment.defineLocale('zh-tw', {
             default:
                 return number;
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
     relativeTime: {
         future: '%s後',

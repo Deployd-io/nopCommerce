@@ -3,6 +3,7 @@
 //! author : Ebrahim Byagowi : https://github.com/ebraminio
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '۱',
@@ -57,12 +58,15 @@ export default moment.defineLocale('fa', {
     },
     meridiemParse: /قبل از ظهر|بعد از ظهر/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /بعد از ظهر/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'قبل از ظهر';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'بعد از ظهر';
         }
     },
@@ -91,6 +95,7 @@ export default moment.defineLocale('fa', {
         yy: '%d سال',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string
             .replace(/[۰-۹]/g, function (match) {
                 return numberMap[match];
@@ -98,6 +103,7 @@ export default moment.defineLocale('fa', {
             .replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string
             .replace(/\d/g, function (match) {
                 return symbolMap[match];

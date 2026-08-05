@@ -6,6 +6,7 @@ using Nop.Services.Shipping;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Components.Admin;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components.Admin;
 /// </summary>
 public class ShipmentCarrierViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IGenericAttributeService _genericAttributeService;
@@ -51,6 +53,7 @@ public class ShipmentCarrierViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
@@ -66,6 +69,7 @@ public class ShipmentCarrierViewComponent : NopViewComponent
 
         var shipment = await _shipmentService.GetShipmentByIdAsync(shipmentModel.Id);
         var model = new ShipmentCarrierModel
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): shipment → {Shipment}", widgetZone, additionalData, shipment);
         {
             TrackingNumber = shipmentModel.TrackingNumber,
             PayPalCommerceShipmentCarrier = shipment is not null
@@ -73,6 +77,7 @@ public class ShipmentCarrierViewComponent : NopViewComponent
                 : null
         };
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Admin/_ShipmentCarrier.cshtml", model);
     }
 

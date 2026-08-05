@@ -9,12 +9,14 @@ using Nop.Services.Localization;
 using Nop.Services.Messages;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class NewsletterController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -66,6 +68,8 @@ public partial class NewsletterController : BasePublicController
     [ValidateCaptcha]
     public virtual async Task<IActionResult> SubscribeNewsletter(string email, bool subscribe, bool captchaValid)
     {
+		_logger.LogDebug(">>> Entering SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid})", email, subscribe, captchaValid);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //validate CAPTCHA
         if (_captchaSettings.Enabled && _captchaSettings.ShowOnNewsletterPage && !captchaValid)
             return Json(new { Success = false, Result = await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"), });
@@ -77,8 +81,11 @@ public partial class NewsletterController : BasePublicController
         //get current subscriptions
         email = email.Trim();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): email → {Email1}", email, subscribe, captchaValid, email);
+		_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): store → {Store}", email, subscribe, captchaValid, store);
         var currentSubscriptions = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(email, storeId: store.Id);
 
+		_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): currentSubscriptions → {CurrentSubscriptions}", email, subscribe, captchaValid, currentSubscriptions);
         //try to subscribe a customer for all 'ticked by default' subscriptions in the current store
         if (subscribe)
         {
@@ -88,17 +95,21 @@ public partial class NewsletterController : BasePublicController
 
             var language = await _workContext.GetWorkingLanguageAsync();
 
+			_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): language → {Language}", email, subscribe, captchaValid, language);
             //create new subscriptions
             var subscriptionGuid = currentSubscriptions.FirstOrDefault()?.NewsLetterSubscriptionGuid ?? Guid.NewGuid();
             var newSubscriptions = await subscriptionTypes.SelectAwait(async type =>
             {
+			_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): subscriptionGuid → {SubscriptionGuid}", email, subscribe, captchaValid, subscriptionGuid);
                 var existingSubscription = currentSubscriptions.FirstOrDefault(subscription => subscription.TypeId == type.Id);
                 if (existingSubscription is not null)
+				_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): existingSubscription → {ExistingSubscription}", email, subscribe, captchaValid, existingSubscription);
                 {
                     //update language if not set yet
                     if (existingSubscription.LanguageId == 0)
                     {
                         existingSubscription.LanguageId = language.Id;
+						_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): existingSubscription.LanguageId → {Arg3}", email, subscribe, captchaValid, existingSubscription.LanguageId);
                         await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(existingSubscription);
                     }
 
@@ -119,6 +130,7 @@ public partial class NewsletterController : BasePublicController
 
                 return newSubscription;
             }).Where(subscription => subscription is not null).ToListAsync();
+			_logger.LogInformation("SubscribeNewsletter(email,subscribe,captchaValid)={Email},{Subscribe},{CaptchaValid}: database query executed in {Arg3} ms", email, subscribe, captchaValid, __logStart.ElapsedMilliseconds);
 
             //send an activation message
             if (newSubscriptions.FirstOrDefault() is NewsLetterSubscription subscription)
@@ -131,6 +143,8 @@ public partial class NewsletterController : BasePublicController
                 await _workflowMessageService.SendNewsLetterSubscriptionDeactivationMessageAsync(subscription);
         }
 
+		_logger.LogDebug("SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid}): Success → {Success}", email, subscribe, captchaValid, Success);
+		_logger.LogDebug("<<< Exiting SubscribeNewsletter(email={Email},subscribe={Subscribe},captchaValid={CaptchaValid})", email, subscribe, captchaValid);
         return Json(new
         {
             Success = true,
@@ -144,10 +158,12 @@ public partial class NewsletterController : BasePublicController
     [CheckAccessClosedStore(ignore: true)]
     public virtual async Task<IActionResult> SubscriptionActivation(Guid token, bool active)
     {
+		_logger.LogDebug(">>> Entering SubscriptionActivation(token={Token},active={Active})", token, active);
         var store = await _storeContext.GetCurrentStoreAsync();
         var subscriptions = (await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByGuidAsync(token))
             .Where(subscription => subscription.StoreId == store.Id)
             .ToList();
+			_logger.LogDebug("SubscriptionActivation(token={Token},active={Active}): store → {Store}", token, active, store);
         if (!subscriptions.Any())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -159,12 +175,14 @@ public partial class NewsletterController : BasePublicController
                 if (!subscription.Active)
                 {
                     subscription.Active = true;
+					_logger.LogDebug("SubscriptionActivation(token={Token},active={Active}): subscription.Active → {Arg2}", token, active, subscription.Active);
                     await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(subscription);
                 }
 
                 //set language by subscription language (only for guests, as registered customers have the language set)
                 var customer = await _workContext.GetCurrentCustomerAsync();
                 if (!await _customerService.IsRegisteredAsync(customer) &&
+					_logger.LogDebug("SubscriptionActivation(token={Token},active={Active}): customer → {Customer}", token, active, customer);
                     await _languageService.GetLanguageByIdAsync(subscription.LanguageId) is Language language)
                 {
                     await _workContext.SetWorkingLanguageAsync(language);
@@ -179,6 +197,8 @@ public partial class NewsletterController : BasePublicController
 
         var model = await _newsletterModelFactory.PrepareSubscriptionActivationModelAsync(active);
 
+		_logger.LogDebug("SubscriptionActivation(token={Token},active={Active}): model → {Model}", token, active, model);
+		_logger.LogDebug("<<< Exiting SubscriptionActivation(token={Token},active={Active})", token, active);
         return View(model);
     }
 

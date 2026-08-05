@@ -37,8 +37,14 @@ public partial class StoreHttpClient
     /// </returns>
     public virtual async Task KeepAliveAsync()
     {
+		logger.LogDebug(">>> Entering KeepAliveAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _httpClient.GetStringAsync(NopCommonDefaults.KeepAlivePath);
+		logger.LogDebug("<<< Exiting KeepAliveAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("KeepAliveAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("KeepAliveAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     #endregion
 }

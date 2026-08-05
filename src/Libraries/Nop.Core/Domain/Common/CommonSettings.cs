@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Common;
@@ -7,9 +8,13 @@ namespace Nop.Core.Domain.Common;
 /// </summary>
 public partial class CommonSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CommonSettings()
     {
+		_logger.LogDebug(">>> Entering CommonSettings()");
         IgnoreLogWordlist = new List<string>();
+		_logger.LogDebug("<<< Exiting CommonSettings()");
+		_logger.LogDebug("CommonSettings(): IgnoreLogWordlist → {IgnoreLogWordlist}", IgnoreLogWordlist);
     }
 
     /// <summary>

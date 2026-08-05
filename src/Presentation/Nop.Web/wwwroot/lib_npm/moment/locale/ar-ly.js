@@ -3,6 +3,7 @@
 //! author : Ali Hmer: https://github.com/kikoanis
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '1',
@@ -80,12 +81,16 @@ var symbolMap = {
         ],
     },
     pluralize = function (u) {
+		logger.debug(`>>> Entering pluralize(u=${u})`);
         return function (number, withoutSuffix, string, isFuture) {
+		logger.debug(`>>> Entering function(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             var f = pluralForm(number),
                 str = plurals[u][pluralForm(number)];
+				logger.debug(`<<< Exiting function(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             if (f === 2) {
                 str = str[withoutSuffix ? 0 : 1];
             }
+			logger.debug(`<<< Exiting pluralize(u=${u})`);
             return str.replace(/%d/i, number);
         };
     },
@@ -121,12 +126,15 @@ export default moment.defineLocale('ar-ly', {
     },
     meridiemParse: /ص|م/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return 'م' === input;
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ص';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'م';
         }
     },
@@ -155,9 +163,11 @@ export default moment.defineLocale('ar-ly', {
         yy: pluralize('y'),
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string
             .replace(/\d/g, function (match) {
                 return symbolMap[match];

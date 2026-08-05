@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize v1.7.0
  *
@@ -442,6 +443,8 @@ var numberTruncate = function( value ) {
  *
  * @method [String] with either "round", "ceil", "floor", or "truncate".
  *
+logger.debug(`>>> Entering function(lexeme=${lexeme})`);
+logger.debug(`<<< Exiting function(lexeme=${lexeme})`);
  * Return function( value, incrementOrExp ):
  *
  *   @value [Number] eg. 123.45.
@@ -545,8 +548,10 @@ var numberFormatProperties = function( pattern, cldr, options ) {
 		roundFn, properties;
 
 	function getOptions( attribute, propertyIndex ) {
+		logger.debug(`>>> Entering getOptions(attribute=${attribute},propertyIndex=${propertyIndex})`);
 		if ( attribute in options ) {
 			properties[ propertyIndex ] = options[ attribute ];
+			logger.debug(`<<< Exiting getOptions(attribute=${attribute},propertyIndex=${propertyIndex})`);
 		}
 	}
 
@@ -735,6 +740,7 @@ var numberParse = function( value, properties ) {
 	value = looseMatching( value );
 
 	function parse( type ) {
+		logger.debug(`>>> Entering parse(type=${type})`);
 		return function( lexeme ) {
 
 			// Reverse localized symbols and numbering system.
@@ -779,11 +785,13 @@ var numberParse = function( value, properties ) {
 				default:
 					throw new Error( "Internal error" );
 			}
+			logger.debug(`<<< Exiting parse(type=${type})`);
 			return "";
 		};
 	}
 
 	function tokenizeNParse( _value, grammar ) {
+		logger.debug(`>>> Entering tokenizeNParse(_value=${_value},grammar=${grammar})`);
 		return grammar.some(function( statement ) {
 			var value = _value;
 
@@ -799,6 +807,7 @@ var numberParse = function( value, properties ) {
 				return true;
 			}) && !value.length;
 		});
+		logger.debug(`<<< Exiting tokenizeNParse(_value=${_value},grammar=${grammar})`);
 	}
 
 	valid = tokenizeNParse( value, grammar );
@@ -1510,6 +1519,7 @@ var numberToPartsFormatterFn = function( properties, pluralGenerator ) {
 
 
 function validateDigits( properties ) {
+	logger.debug(`>>> Entering validateDigits(properties=${properties})`);
 	var minimumIntegerDigits = properties[ 2 ],
 		minimumFractionDigits = properties[ 3 ],
 		maximumFractionDigits = properties[ 4 ],
@@ -1532,6 +1542,7 @@ function validateDigits( properties ) {
 		validateParameterRange( minimumFractionDigits, "minimumFractionDigits", 0, 20 );
 		validateParameterRange( maximumFractionDigits, "maximumFractionDigits",
 			minimumFractionDigits, 20 );
+			logger.debug(`<<< Exiting validateDigits(properties=${properties})`);
 	}
 }
 

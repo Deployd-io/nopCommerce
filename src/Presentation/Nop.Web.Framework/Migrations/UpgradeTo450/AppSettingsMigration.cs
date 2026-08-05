@@ -11,10 +11,13 @@ public class AppSettingsMigration : MigrationBase
 {
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
 
+		logger.LogDebug("Up(): fileProvider → {FileProvider}", fileProvider);
         var rootDir = fileProvider.MapPath("~/");
 
+		logger.LogDebug("Up(): rootDir → {RootDir}", rootDir);
         var config = new WebOptimizerConfig
         {
             EnableTagHelperBundling = false,
@@ -25,10 +28,13 @@ public class AppSettingsMigration : MigrationBase
         };
 
         AppSettingsHelper.SaveAppSettings(new List<IConfig> { config }, fileProvider);
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

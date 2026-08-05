@@ -42,6 +42,8 @@ public partial class RedisCacheManager : DistributedCacheManager
     /// <returns>List of cache keys</returns>
     protected virtual async Task<IEnumerable<RedisKey>> GetKeysAsync(EndPoint endPoint, string prefix = null)
     {
+		logger.LogDebug(">>> Entering GetKeysAsync(endPoint={EndPoint},prefix={Prefix})", endPoint, prefix);
+		logger.LogDebug("<<< Exiting GetKeysAsync(endPoint={EndPoint},prefix={Prefix})", endPoint, prefix);
         return await (await _connectionWrapper.GetServerAsync(endPoint))
             .KeysAsync((await _connectionWrapper.GetDatabaseAsync()).Database, string.IsNullOrEmpty(prefix) ? null : $"{prefix}*")
             .ToListAsync();
@@ -59,18 +61,24 @@ public partial class RedisCacheManager : DistributedCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task RemoveByPrefixAsync(string prefix, params object[] prefixParameters)
     {
+		logger.LogDebug(">>> Entering RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         prefix = PrepareKeyPrefix(prefix, prefixParameters);
         var db = await _connectionWrapper.GetDatabaseAsync();
+		logger.LogDebug("RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters}): prefix → {Prefix1}", prefix, prefixParameters, prefix);
+		logger.LogDebug("RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters}): db → {Db}", prefix, prefixParameters, db);
 
         var instanceName = _appSettings.Get<DistributedCacheConfig>().InstanceName ?? string.Empty;
 
+		logger.LogDebug("RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters}): instanceName → {InstanceName}", prefix, prefixParameters, instanceName);
         foreach (var endPoint in await _connectionWrapper.GetEndPointsAsync())
         {
             var keys = await GetKeysAsync(endPoint, instanceName + prefix);
             await db.KeyDeleteAsync(keys.ToArray());
+			logger.LogDebug("RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters}): keys → {Keys}", prefix, prefixParameters, keys);
         }
 
         RemoveByPrefixInstanceData(prefix);
+		logger.LogDebug("<<< Exiting RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
     }
 
     /// <summary>
@@ -79,9 +87,11 @@ public partial class RedisCacheManager : DistributedCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ClearAsync()
     {
+		logger.LogDebug(">>> Entering ClearAsync()");
         await _connectionWrapper.FlushDatabaseAsync();
 
         ClearInstanceData();
+		logger.LogDebug("<<< Exiting ClearAsync()");
     }
 
     #endregion

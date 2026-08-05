@@ -16,11 +16,13 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
 public class ItemClassificationController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -69,6 +71,7 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> List(ItemClassificationSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //get item classification
         var itemClassification = await _itemClassificationService.GetItemClassificationAsync(
             pageIndex: searchModel.Page - 1,
@@ -92,6 +95,7 @@ public class ItemClassificationController : BaseAdminController
             });
         });
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -113,29 +117,35 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (!selectedIds?.Any() ?? true)
             return NoContent();
 
         var recordsToDelete = new List<int>();
 
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): recordsToDelete → {RecordsToDelete}", selectedIds, recordsToDelete);
         foreach (var id in selectedIds)
         {
             var item = await _itemClassificationService.GetItemClassificationByIdAsync(id);
             if (item is null)
+				_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): item → {Item}", selectedIds, item);
                 continue;
 
             recordsToDelete.Add(item.Id);
         }
         await _itemClassificationService.DeleteItemsAsync(recordsToDelete);
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ClearAll()
     {
+		_logger.LogDebug(">>> Entering ClearAll()");
         await _itemClassificationService.ClearItemClassificationAsync();
 
+		_logger.LogDebug("<<< Exiting ClearAll()");
         return Json(new { Result = true });
     }
 
@@ -143,14 +153,17 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ProductToClassification()
     {
+		_logger.LogDebug(">>> Entering ProductToClassification()");
         var model = new AddProductToClassificationSearchModel();
         await _baseAdminModelFactory.PrepareProductTypesAsync(model.AvailableProductTypes);
+		_logger.LogDebug("ProductToClassification(): model → {Model}", model);
         await _baseAdminModelFactory.PrepareCategoriesAsync(model.AvailableCategories);
         await _baseAdminModelFactory.PrepareManufacturersAsync(model.AvailableManufacturers);
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores);
         await _baseAdminModelFactory.PrepareVendorsAsync(model.AvailableVendors);
         model.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting ProductToClassification()");
         return View("~/Plugins/Tax.Avalara/Views/ItemClassification/ProductToClassification.cshtml", model);
     }
 
@@ -159,6 +172,7 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ProductListToClassification(AddProductToClassificationSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductListToClassification(searchModel={SearchModel})", searchModel);
         var products = await _productService.SearchProductsAsync(showHidden: true,
             keywords: searchModel.SearchProductName,
             productType: searchModel.SearchProductTypeId > 0 ? (ProductType?)searchModel.SearchProductTypeId : null,
@@ -180,6 +194,7 @@ public class ItemClassificationController : BaseAdminController
             }).ToList();
         });
 
+		_logger.LogDebug("<<< Exiting ProductListToClassification(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -199,6 +214,7 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> StartClassification()
     {
+		_logger.LogDebug(">>> Entering StartClassification()");
         var items = (await _itemClassificationService.GetItemClassificationAsync())
             .Where(x => string.IsNullOrEmpty(x.HSClassificationRequestId))
             .ToList();
@@ -218,6 +234,7 @@ public class ItemClassificationController : BaseAdminController
             }
         }
 
+		_logger.LogDebug("<<< Exiting StartClassification()");
         return Json(new { success = true, message = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.ItemClassification.Sync.Success") });
     }
 

@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Http;
 using Nop.Services.Installation;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Infrastructure;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Infrastructure;
 /// </summary>
 public partial class RouteProvider : BaseRouteProvider, IRouteProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -17,11 +19,13 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public virtual void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		_logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         //get language pattern
         //it's not needed to use language pattern in AJAX requests and for actions returning the result directly (e.g. file to download),
         //use it only for URLs of pages that the user can go to
         var lang = GetLanguageRoutePattern();
 
+		_logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         //areas
         endpointRouteBuilder.MapControllerRoute(name: "areaRoute",
             pattern: $"{{area:exists}}/{{controller=Home}}/{{action=Index}}/{{id?}}");
@@ -785,6 +789,7 @@ public partial class RouteProvider : BaseRouteProvider, IRouteProvider
         //fallback is intended to handle cases when no other endpoint has matched
         //we use it to invoke [CheckLanguageSeoCode] and give a chance to find a localized route
         endpointRouteBuilder.MapFallbackToController("FallbackRedirect", "Common");
+		_logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     #endregion

@@ -4,6 +4,7 @@
 //! reference: http://id.wikisource.org/wiki/Pedoman_Umum_Ejaan_Bahasa_Indonesia_yang_Disempurnakan
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('id', {
     months: 'Januari_Februari_Maret_April_Mei_Juni_Juli_Agustus_September_Oktober_November_Desember'.split(
@@ -23,6 +24,7 @@ export default moment.defineLocale('id', {
     },
     meridiemParse: /pagi|siang|sore|malam/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -31,6 +33,9 @@ export default moment.defineLocale('id', {
         } else if (meridiem === 'siang') {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'sore' || meridiem === 'malam') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return hour + 12;
         }
     },

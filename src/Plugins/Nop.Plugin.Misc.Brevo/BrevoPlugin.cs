@@ -11,6 +11,7 @@ using Nop.Services.Plugins;
 using Nop.Services.ScheduleTasks;
 using Nop.Services.Stores;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.Brevo;
 /// </summary>
 public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IEmailAccountService _emailAccountService;
@@ -69,6 +71,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		_logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string> { PublicWidgetZones.HeadHtmlTag });
     }
 
@@ -79,6 +83,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+		_logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(WidgetsBrevoViewComponent);
     }
 
@@ -87,6 +93,8 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/Brevo/Configure";
     }
 
@@ -96,6 +104,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new BrevoSettings
         {
@@ -189,6 +198,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -197,13 +207,17 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //smtp accounts
         foreach (var store in await _storeService.GetAllStoresAsync())
         {
             var key = $"{nameof(BrevoSettings)}.{nameof(BrevoSettings.EmailAccountId)}";
             var emailAccountId = await _settingService.GetSettingByKeyAsync<int>(key, storeId: store.Id, loadSharedValueIfNotFound: true);
+			_logger.LogWarning("UninstallAsync(): key → {Key}", key);
+			_logger.LogDebug("UninstallAsync(): emailAccountId → {EmailAccountId}", emailAccountId);
             var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(emailAccountId);
             if (emailAccount != null)
+				_logger.LogDebug("UninstallAsync(): emailAccount → {EmailAccount}", emailAccount);
                 await _emailAccountService.DeleteEmailAccountAsync(emailAccount);
         }
 
@@ -221,6 +235,7 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
             var messageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(store.Id);
             foreach (var messageTemplate in messageTemplates)
             {
+			_logger.LogDebug("UninstallAsync(): messageTemplates → {MessageTemplates}", messageTemplates);
                 await _genericAttributeService.SaveAttributeAsync<int?>(messageTemplate, BrevoDefaults.TemplateIdAttribute, null);
             }
         }
@@ -228,12 +243,14 @@ public class BrevoPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         //schedule task
         var task = await _scheduleTaskService.GetTaskByTypeAsync(BrevoDefaults.SynchronizationTask);
         if (task != null)
+			_logger.LogDebug("UninstallAsync(): task → {Task}", task);
             await _scheduleTaskService.DeleteTaskAsync(task);
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Misc.Brevo");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

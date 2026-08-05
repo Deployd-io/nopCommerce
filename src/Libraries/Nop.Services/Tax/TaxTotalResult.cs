@@ -9,7 +9,10 @@ public partial class TaxTotalResult : BaseNopResult
 
     public TaxTotalResult()
     {
+		logger.LogDebug(">>> Entering TaxTotalResult()");
         TaxRates = new SortedDictionary<decimal, decimal>();
+		logger.LogDebug("<<< Exiting TaxTotalResult()");
+		logger.LogDebug("TaxTotalResult(): TaxRates → {TaxRates}", TaxRates);
     }
 
     #endregion

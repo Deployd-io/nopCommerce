@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Areas.Admin.Models.Payments;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class PaymentModelFactory : IPaymentModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -49,12 +51,14 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodsModel> PreparePaymentMethodsModelAsync(PaymentMethodsModel methodsModel)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodsModelAsync(methodsModel={MethodsModel})", methodsModel);
         ArgumentNullException.ThrowIfNull(methodsModel);
 
         //prepare nested search models
         await PreparePaymentMethodSearchModelAsync(methodsModel.PaymentsMethod);
         await PreparePaymentMethodRestrictionModelAsync(methodsModel.PaymentMethodRestriction);
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodsModelAsync(methodsModel={MethodsModel})", methodsModel);
         return methodsModel;
     }
 
@@ -68,11 +72,13 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodListModel> PreparePaymentMethodListModelAsync(PaymentMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get payment methods
         var paymentMethods = (await _paymentPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PreparePaymentMethodListModelAsync(searchModel={SearchModel}): paymentMethods → {PaymentMethods}", searchModel, paymentMethods);
         //prepare grid model
         var model = await new PaymentMethodListModel().PrepareToGridAsync(searchModel, paymentMethods, () =>
         {
@@ -81,6 +87,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
                 //fill in model values from the entity
                 var paymentMethodModel = method.ToPluginModel<PaymentMethodModel>();
 
+				_logger.LogDebug("PreparePaymentMethodListModelAsync(searchModel={SearchModel}): paymentMethodModel → {PaymentMethodModel}", searchModel, paymentMethodModel);
                 //fill in additional values (not existing in the entity)
                 paymentMethodModel.IsActive = _paymentPluginManager.IsPluginActive(method);
                 paymentMethodModel.ConfigurationUrl = method.GetConfigurationPageUrl();
@@ -92,6 +99,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -105,11 +113,13 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual Task<PaymentMethodSearchModel> PreparePaymentMethodSearchModelAsync(PaymentMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 

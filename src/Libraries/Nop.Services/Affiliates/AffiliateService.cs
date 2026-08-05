@@ -59,6 +59,8 @@ public partial class AffiliateService : IAffiliateService
     /// </returns>
     public virtual async Task<Affiliate> GetAffiliateByIdAsync(int affiliateId)
     {
+		logger.LogDebug(">>> Entering GetAffiliateByIdAsync(affiliateId={AffiliateId})", affiliateId);
+		logger.LogDebug("<<< Exiting GetAffiliateByIdAsync(affiliateId={AffiliateId})", affiliateId);
         return await _affiliateRepository.GetByIdAsync(affiliateId, cache => default, useShortTermCache: true);
     }
 
@@ -72,6 +74,8 @@ public partial class AffiliateService : IAffiliateService
     /// </returns>
     public virtual async Task<Affiliate> GetAffiliateByFriendlyUrlNameAsync(string friendlyUrlName)
     {
+		logger.LogDebug(">>> Entering GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName={FriendlyUrlName})", friendlyUrlName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(friendlyUrlName))
             return null;
 
@@ -81,6 +85,8 @@ public partial class AffiliateService : IAffiliateService
             select a;
         var affiliate = await query.FirstOrDefaultAsync();
 
+		logger.LogDebug("GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName={FriendlyUrlName}): affiliate → {Affiliate}", friendlyUrlName, affiliate);
+		logger.LogDebug("<<< Exiting GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName={FriendlyUrlName})", friendlyUrlName);
         return affiliate;
     }
 
@@ -91,9 +97,13 @@ public partial class AffiliateService : IAffiliateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAffiliateAsync(Affiliate affiliate)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _affiliateRepository.DeleteAsync(affiliate);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Gets all affiliates
     /// </summary>
@@ -165,6 +175,8 @@ public partial class AffiliateService : IAffiliateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAffiliateAsync(Affiliate affiliate)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _affiliateRepository.InsertAsync(affiliate);
     }
 
@@ -175,6 +187,7 @@ public partial class AffiliateService : IAffiliateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAffiliateAsync(Affiliate affiliate)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _affiliateRepository.UpdateAsync(affiliate);
     }
 

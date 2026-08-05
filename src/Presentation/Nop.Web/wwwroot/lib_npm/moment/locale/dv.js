@@ -3,6 +3,7 @@
 //! author : Jawish Hameed : https://github.com/jawish
 
 import moment from '../moment';
+const logger = console;
 
 var months = [
         'ޖެނުއަރީ',
@@ -44,12 +45,15 @@ export default moment.defineLocale('dv', {
     },
     meridiemParse: /މކ|މފ/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return 'މފ' === input;
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'މކ';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'މފ';
         }
     },
@@ -78,9 +82,11 @@ export default moment.defineLocale('dv', {
         yy: 'އަހަރު %d',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string.replace(/,/g, '،');
     },
     week: {

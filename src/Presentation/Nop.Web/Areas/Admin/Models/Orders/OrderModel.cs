@@ -4,6 +4,7 @@ using Nop.Services.Orders;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -12,20 +13,33 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record OrderModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OrderModel()
     {
+		_logger.LogDebug(">>> Entering OrderModel()");
         CustomValues = new CustomValues();
         TaxRates = new List<TaxRate>();
+		_logger.LogDebug("OrderModel(): CustomValues → {CustomValues}", CustomValues);
+		_logger.LogDebug("OrderModel(): TaxRates → {TaxRates}", TaxRates);
         GiftCards = new List<GiftCard>();
         Items = new List<OrderItemModel>();
+		_logger.LogDebug("OrderModel(): GiftCards → {GiftCards}", GiftCards);
+		_logger.LogDebug("OrderModel(): Items → {Items}", Items);
         UsedDiscounts = new List<UsedDiscountModel>();
         OrderShipmentSearchModel = new OrderShipmentSearchModel();
+		_logger.LogDebug("OrderModel(): UsedDiscounts → {UsedDiscounts}", UsedDiscounts);
+		_logger.LogDebug("OrderModel(): OrderShipmentSearchModel → {OrderShipmentSearchModel}", OrderShipmentSearchModel);
         OrderNoteSearchModel = new OrderNoteSearchModel();
         BillingAddress = new AddressModel();
+		_logger.LogDebug("OrderModel(): OrderNoteSearchModel → {OrderNoteSearchModel}", OrderNoteSearchModel);
+		_logger.LogDebug("OrderModel(): BillingAddress → {BillingAddress}", BillingAddress);
         ShippingAddress = new AddressModel();
         PickupAddress = new AddressModel();
+		_logger.LogDebug("<<< Exiting OrderModel()");
+		_logger.LogDebug("OrderModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
+		_logger.LogDebug("OrderModel(): PickupAddress → {PickupAddress}", PickupAddress);
     }
 
     #endregion

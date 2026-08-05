@@ -24,7 +24,9 @@ public partial class NopProxyStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+		logger.LogDebug(">>> Entering Configure(application={Application})", application);
         application.UseNopProxy();
+		logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

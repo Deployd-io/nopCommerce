@@ -1,4 +1,6 @@
+const logger = console;
 ﻿function createEstimateShippingPopUp(settings) {
+logger.debug(`>>> Entering createEstimateShippingPopUp(settings=${settings})`);
   var defaultSettings = {
     opener: false,
     form: false,
@@ -56,6 +58,7 @@
         self.clearShippingOptions();
         var address = self.getShippingAddress();
         self.getShippingOptions(address);
+		logger.debug(`addressChangedHandler(): address → ${address}`);
       };
       $(this.settings.countryEl, $content).on('change', function () {
         $(self.settings.stateProvinceEl, $content).val(0);
@@ -91,6 +94,7 @@
           self.params.jqXHR.abort();
 
         var url = self.settings.urlFactory(address);
+		logger.debug(`setTimeout(): url → ${url}`);
         if (url) {
           self.params.jqXHR = $.ajax({
             cache: false,
@@ -260,9 +264,13 @@
       var address = {};
       var $content = $(this.settings.contentEl);
       var selectedCountryId = $(this.settings.countryEl, $content).find(':selected');
+	logger.debug(`getShippingAddress(): selectedCountryId → ${selectedCountryId}`);
       var selectedStateProvinceId = $(this.settings.stateProvinceEl, $content).find(':selected');
+	logger.debug(`getShippingAddress(): selectedStateProvinceId → ${selectedStateProvinceId}`);
       var selectedZipPostalCode = $(this.settings.zipPostalCodeEl, $content);
+	logger.debug(`getShippingAddress(): selectedZipPostalCode → ${selectedZipPostalCode}`);
       var selectedCity = $(this.settings.cityEl, $content);
+	logger.debug(`getShippingAddress(): selectedCity → ${selectedCity}`);
 
       if (selectedCountryId && selectedCountryId.val() > 0) {
         address.countryId = selectedCountryId.val();
@@ -310,6 +318,7 @@
       if (errors.length > 0)
         this.showErrorMessage(errors);
 
+	logger.debug(`<<< Exiting createEstimateShippingPopUp(settings=${settings})`);
       return errors.length === 0;
     }
   }

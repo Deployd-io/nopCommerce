@@ -1,3 +1,4 @@
+const logger = console;
 /*!
  * 
  * Super simple WYSIWYG editor v0.9.1
@@ -10,18 +11,21 @@
  *
  */
 (function webpackUniversalModuleDefinition(root, factory) {
+	logger.debug(`>>> Entering webpackUniversalModuleDefinition(exports=${exports})`);
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else {
 		var a = factory();
+		logger.debug(`webpackUniversalModuleDefinition(exports=${exports}): a → ${a}`);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
 })(self, () => {
 return /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
 (function ($) {
+logger.debug('>>> Entering function()');
   $.extend(true, $.summernote.lang, {
     'ca-ES': {
       font: {
@@ -175,6 +179,7 @@ var __webpack_exports__ = {};
       }
     }
   });
+logger.debug('<<< Exiting function()');
 })(jQuery);
 /******/ 	return __webpack_exports__;
 /******/ })()

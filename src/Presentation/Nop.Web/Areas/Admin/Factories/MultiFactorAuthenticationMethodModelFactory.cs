@@ -2,6 +2,7 @@
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.MultiFactorAuthentication;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class MultiFactorAuthenticationMethodModelFactory : IMultiFactorAuthenticationMethodModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IMultiFactorAuthenticationPluginManager _multiFactorAuthenticationPluginManager;
@@ -20,7 +22,10 @@ public partial class MultiFactorAuthenticationMethodModelFactory : IMultiFactorA
 
     public MultiFactorAuthenticationMethodModelFactory(IMultiFactorAuthenticationPluginManager multiFactorAuthenticationPluginManager)
     {
+		_logger.LogDebug(">>> Entering MultiFactorAuthenticationMethodModelFactory(multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager})", multiFactorAuthenticationPluginManager);
         _multiFactorAuthenticationPluginManager = multiFactorAuthenticationPluginManager;
+		_logger.LogDebug("<<< Exiting MultiFactorAuthenticationMethodModelFactory(multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager})", multiFactorAuthenticationPluginManager);
+		_logger.LogDebug("MultiFactorAuthenticationMethodModelFactory(multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager}): _multiFactorAuthenticationPluginManager → {_multiFactorAuthenticationPluginManager}", multiFactorAuthenticationPluginManager, _multiFactorAuthenticationPluginManager);
     }
 
     #endregion

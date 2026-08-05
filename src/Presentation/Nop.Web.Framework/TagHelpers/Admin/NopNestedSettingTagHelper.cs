@@ -24,7 +24,10 @@ public partial class NopNestedSettingTagHelper : TagHelper
 
     public NopNestedSettingTagHelper(IHtmlGenerator generator)
     {
+		logger.LogDebug(">>> Entering NopNestedSettingTagHelper(generator={Generator})", generator);
         Generator = generator;
+		logger.LogDebug("<<< Exiting NopNestedSettingTagHelper(generator={Generator})", generator);
+		logger.LogDebug("NopNestedSettingTagHelper(generator={Generator}): Generator → {Generator1}", generator, Generator);
     }
 
     #endregion
@@ -39,6 +42,7 @@ public partial class NopNestedSettingTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -46,12 +50,18 @@ public partial class NopNestedSettingTagHelper : TagHelper
         var parentSettingName = For.Name;
         var jsConsistentParentSettingName = parentSettingName.Replace('.', '_');
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): jsConsistentParentSettingName → {JsConsistentParentSettingName}", context, output, jsConsistentParentSettingName);
         var random = CommonHelper.GenerateRandomInteger();
         var nestedSettingId = $"nestedSetting{random}";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): random → {Random}", context, output, random);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): nestedSettingId → {NestedSettingId}", context, output, nestedSettingId);
         var parentSettingId = $"parentSetting{random}";
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): parentSettingId → {ParentSettingId}", context, output, parentSettingId);
         //tag details
         output.TagName = "div";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Attributes.Add("class", "nested-setting");
 
@@ -62,8 +72,10 @@ public partial class NopNestedSettingTagHelper : TagHelper
         //use javascript
         var script = new TagBuilder("script");
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): script → {Script}", context, output, script);
         var isNot = IsConditionInvert ? "!" : "";
 
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): isNot → {IsNot}", context, output, isNot);
         script.InnerHtml.AppendHtml(
             "$(function() {" +
             $"initNestedSetting('{parentSettingName}', '{parentSettingId}', '{nestedSettingId}');"
@@ -90,6 +102,8 @@ public partial class NopNestedSettingTagHelper : TagHelper
 
         var scriptTag = await script.RenderHtmlContentAsync();
         output.PreContent.SetHtmlContent(scriptTag);
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): scriptTag → {ScriptTag}", context, output, scriptTag);
     }
 
     #endregion

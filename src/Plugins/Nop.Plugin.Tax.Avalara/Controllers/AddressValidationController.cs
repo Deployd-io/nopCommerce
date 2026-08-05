@@ -4,12 +4,14 @@ using Nop.Core.Domain.Tax;
 using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Web.Framework.Controllers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public class AddressValidationController : BaseController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -39,12 +41,15 @@ public class AddressValidationController : BaseController
     [HttpPost]
     public async Task<IActionResult> UseValidatedAddress(int addressId, bool isNewAddress)
     {
+		_logger.LogDebug(">>> Entering UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress})", addressId, isNewAddress);
         //try to get an address by the passed identifier
         var address = await _addressService.GetAddressByIdAsync(addressId);
         if (address != null)
+		_logger.LogDebug("UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress}): address → {Address}", addressId, isNewAddress, address);
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
             //add address to customer collection if it's a new
+			_logger.LogDebug("UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress}): customer → {Customer}", addressId, isNewAddress, customer);
             if (isNewAddress)
                 await _customerService.InsertCustomerAddressAsync(customer, address);
 
@@ -57,6 +62,7 @@ public class AddressValidationController : BaseController
         }
 
         //nothing to return
+		_logger.LogDebug("<<< Exiting UseValidatedAddress(addressId={AddressId},isNewAddress={IsNewAddress})", addressId, isNewAddress);
         return Content(string.Empty);
     }
 

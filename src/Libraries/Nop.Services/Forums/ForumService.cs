@@ -89,11 +89,13 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateForumStatsAsync(int forumId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (forumId == 0)
             return;
 
         var forum = await GetForumByIdAsync(forumId);
         if (forum == null)
+			logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum → {Forum}", forumId, forum);
             return;
 
         //number of topics
@@ -102,6 +104,8 @@ public partial class ForumService : IForumService
             select ft.Id;
         var numTopics = await queryNumTopics.CountAsync();
 
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): numTopics → {NumTopics}", forumId, numTopics);
+		logger.LogInformation("UpdateForumStatsAsync(forumId)={ForumId}: count query executed in {Arg1} ms", forumId, __logStart.ElapsedMilliseconds);
         //number of posts
         var queryNumPosts = from ft in _forumTopicRepository.Table
             join fp in _forumPostRepository.Table on ft.Id equals fp.TopicId
@@ -109,11 +113,15 @@ public partial class ForumService : IForumService
             select fp.Id;
         var numPosts = await queryNumPosts.CountAsync();
 
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): numPosts → {NumPosts}", forumId, numPosts);
         //last values
         var lastTopicId = 0;
         var lastPostId = 0;
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): lastTopicId → {LastTopicId}", forumId, lastTopicId);
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): lastPostId → {LastPostId}", forumId, lastPostId);
         var lastPostCustomerId = 0;
         DateTime? lastPostTime = null;
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): lastPostCustomerId → {LastPostCustomerId}", forumId, lastPostCustomerId);
         var queryLastValues = from ft in _forumTopicRepository.Table
             join fp in _forumPostRepository.Table on ft.Id equals fp.TopicId
             where ft.ForumId == forumId
@@ -124,24 +132,37 @@ public partial class ForumService : IForumService
                 LastPostId = fp.Id,
                 LastPostCustomerId = fp.CustomerId,
                 LastPostTime = fp.CreatedOnUtc
+				logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): LastTopicId → {LastTopicId}", forumId, LastTopicId);
+				logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): LastPostId → {LastPostId}", forumId, LastPostId);
+				logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): LastPostCustomerId → {LastPostCustomerId}", forumId, LastPostCustomerId);
+				logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): LastPostTime → {LastPostTime}", forumId, LastPostTime);
             };
         var lastValues = await queryLastValues.FirstOrDefaultAsync();
         if (lastValues != null)
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): lastValues → {LastValues}", forumId, lastValues);
         {
             lastTopicId = lastValues.LastTopicId;
             lastPostId = lastValues.LastPostId;
+			logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): lastPostTime → {LastPostTime}", forumId, lastPostTime);
             lastPostCustomerId = lastValues.LastPostCustomerId;
             lastPostTime = lastValues.LastPostTime;
         }
 
         //update forum
         forum.NumTopics = numTopics;
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.NumTopics → {Arg1}", forumId, forum.NumTopics);
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.NumPosts → {Arg1}", forumId, forum.NumPosts);
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastTopicId → {Arg1}", forumId, forum.LastTopicId);
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastPostId → {Arg1}", forumId, forum.LastPostId);
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastPostCustomerId → {Arg1}", forumId, forum.LastPostCustomerId);
+		logger.LogDebug("UpdateForumStatsAsync(forumId={ForumId}): forum.LastPostTime → {Arg1}", forumId, forum.LastPostTime);
         forum.NumPosts = numPosts;
         forum.LastTopicId = lastTopicId;
         forum.LastPostId = lastPostId;
         forum.LastPostCustomerId = lastPostCustomerId;
         forum.LastPostTime = lastPostTime;
         await UpdateForumAsync(forum);
+		logger.LogDebug("<<< Exiting UpdateForumStatsAsync(forumId={ForumId})", forumId);
     }
 
     /// <summary>
@@ -151,11 +172,13 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateForumTopicStatsAsync(int forumTopicId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (forumTopicId == 0)
             return;
 
         var forumTopic = await GetTopicByIdAsync(forumTopicId);
         if (forumTopic == null)
+			logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic → {ForumTopic}", forumTopicId, forumTopic);
             return;
 
         //number of posts
@@ -164,9 +187,13 @@ public partial class ForumService : IForumService
             select fp.Id;
         var numPosts = await queryNumPosts.CountAsync();
 
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): numPosts → {NumPosts}", forumTopicId, numPosts);
+		logger.LogInformation("UpdateForumTopicStatsAsync(forumTopicId)={ForumTopicId}: count query executed in {Arg1} ms", forumTopicId, __logStart.ElapsedMilliseconds);
         //last values
         var lastPostId = 0;
         var lastPostCustomerId = 0;
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastPostId → {LastPostId}", forumTopicId, lastPostId);
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastPostCustomerId → {LastPostCustomerId}", forumTopicId, lastPostCustomerId);
         DateTime? lastPostTime = null;
         var queryLastValues = from fp in _forumPostRepository.Table
             where fp.TopicId == forumTopicId
@@ -176,22 +203,36 @@ public partial class ForumService : IForumService
                 LastPostId = fp.Id,
                 LastPostCustomerId = fp.CustomerId,
                 LastPostTime = fp.CreatedOnUtc
+				logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): LastPostId → {LastPostId}", forumTopicId, LastPostId);
+				logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): LastPostCustomerId → {LastPostCustomerId}", forumTopicId, LastPostCustomerId);
+				logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): LastPostTime → {LastPostTime}", forumTopicId, LastPostTime);
+				logger.LogDebug(">>> Entering GetTopicByIdAsync(forumTopicId={ForumTopicId},increaseViews={IncreaseViews})", forumTopicId, increaseViews);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				logger.LogInformation("GetTopicByIdAsync(forumTopicId,increaseViews)={ForumTopicId},{IncreaseViews}: find query executed in {Arg2} ms", forumTopicId, increaseViews, __logStart.ElapsedMilliseconds);
+				logger.LogDebug("<<< Exiting GetTopicByIdAsync(forumTopicId={ForumTopicId},increaseViews={IncreaseViews})", forumTopicId, increaseViews);
             };
         var lastValues = await queryLastValues.FirstOrDefaultAsync();
         if (lastValues != null)
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastValues → {LastValues}", forumTopicId, lastValues);
         {
             lastPostId = lastValues.LastPostId;
             lastPostCustomerId = lastValues.LastPostCustomerId;
             lastPostTime = lastValues.LastPostTime;
+			logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): lastPostTime → {LastPostTime}", forumTopicId, lastPostTime);
         }
 
         //update topic
         forumTopic.NumPosts = numPosts;
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.NumPosts → {Arg1}", forumTopicId, forumTopic.NumPosts);
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.LastPostId → {Arg1}", forumTopicId, forumTopic.LastPostId);
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.LastPostCustomerId → {Arg1}", forumTopicId, forumTopic.LastPostCustomerId);
+		logger.LogDebug("UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId}): forumTopic.LastPostTime → {Arg1}", forumTopicId, forumTopic.LastPostTime);
         forumTopic.LastPostId = lastPostId;
         forumTopic.LastPostCustomerId = lastPostCustomerId;
         forumTopic.LastPostTime = lastPostTime;
 
         await UpdateTopicAsync(forumTopic);
+		logger.LogDebug("<<< Exiting UpdateForumTopicStatsAsync(forumTopicId={ForumTopicId})", forumTopicId);
     }
 
     /// <summary>
@@ -201,11 +242,13 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateCustomerStatsAsync(int customerId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (customerId == 0)
             return;
 
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
 
+		logger.LogDebug("UpdateCustomerStatsAsync(customerId={CustomerId}): customer → {Customer}", customerId, customer);
         if (customer == null)
             return;
 
@@ -214,6 +257,8 @@ public partial class ForumService : IForumService
             select fp.Id;
         var numPosts = await query.CountAsync();
 
+		logger.LogDebug("UpdateCustomerStatsAsync(customerId={CustomerId}): numPosts → {NumPosts}", customerId, numPosts);
+		logger.LogInformation("UpdateCustomerStatsAsync(customerId)={CustomerId}: count query executed in {Arg1} ms", customerId, __logStart.ElapsedMilliseconds);
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ForumPostCountAttribute, numPosts);
     }
 
@@ -253,9 +298,15 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteForumGroupAsync(ForumGroup forumGroup)
     {
+		logger.LogDebug(">>> Entering DeleteForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumGroupRepository.DeleteAsync(forumGroup);
+		logger.LogDebug("<<< Exiting DeleteForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
     }
 
+	logger.LogInformation("DeleteForumGroupAsync(forumGroup)={ForumGroup}: external service call took {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteForumGroupAsync(forumGroup)={ForumGroup}: delete query executed in {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a forum group
     /// </summary>
@@ -266,6 +317,8 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumGroup> GetForumGroupByIdAsync(int forumGroupId)
     {
+		logger.LogDebug(">>> Entering GetForumGroupByIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
+		logger.LogDebug("<<< Exiting GetForumGroupByIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
         return await _forumGroupRepository.GetByIdAsync(forumGroupId, cache => default);
     }
 
@@ -278,12 +331,16 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<IList<ForumGroup>> GetAllForumGroupsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllForumGroupsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await _forumGroupRepository.GetAllAsync(query =>
         {
             return from fg in query
                 orderby fg.DisplayOrder, fg.Id
                 select fg;
+				logger.LogInformation("GetAllForumGroupsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
+		logger.LogDebug("<<< Exiting GetAllForumGroupsAsync()");
     }
 
     /// <summary>
@@ -293,9 +350,15 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertForumGroupAsync(ForumGroup forumGroup)
     {
+		logger.LogDebug(">>> Entering InsertForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumGroupRepository.InsertAsync(forumGroup);
+		logger.LogDebug("<<< Exiting InsertForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertForumGroupAsync(forumGroup)={ForumGroup}: save query executed in {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertForumGroupAsync(forumGroup)={ForumGroup}: save query executed in {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the forum group
     /// </summary>
@@ -303,9 +366,15 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateForumGroupAsync(ForumGroup forumGroup)
     {
+		logger.LogDebug(">>> Entering UpdateForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumGroupRepository.UpdateAsync(forumGroup);
+		logger.LogDebug("<<< Exiting UpdateForumGroupAsync(forumGroup={ForumGroup})", forumGroup);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateForumGroupAsync(forumGroup)={ForumGroup}: update query executed in {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateForumGroupAsync(forumGroup)={ForumGroup}: update query executed in {Arg1} ms", forumGroup, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a forum
     /// </summary>
@@ -313,6 +382,7 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteForumAsync(Forum forum)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(forum);
 
         //delete forum subscriptions (topics)
@@ -359,14 +429,18 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<IList<Forum>> GetAllForumsByGroupIdAsync(int forumGroupId)
     {
+		logger.LogDebug(">>> Entering GetAllForumsByGroupIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var forums = await _forumRepository.GetAllAsync(query =>
         {
             return from f in query
                 orderby f.DisplayOrder, f.Id
                 where f.ForumGroupId == forumGroupId
                 select f;
+				logger.LogInformation("GetAllForumsByGroupIdAsync(forumGroupId)={ForumGroupId}: find query executed in {Arg1} ms", forumGroupId, __logStart.ElapsedMilliseconds);
         }, cache => cache.PrepareKeyForDefaultCache(NopForumDefaults.ForumByForumGroupCacheKey, forumGroupId));
 
+		logger.LogDebug("<<< Exiting GetAllForumsByGroupIdAsync(forumGroupId={ForumGroupId})", forumGroupId);
         return forums;
     }
 
@@ -377,6 +451,8 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertForumAsync(Forum forum)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumRepository.InsertAsync(forum);
     }
 
@@ -387,6 +463,7 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateForumAsync(Forum forum)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         // if the forum group is changed then clear cache for the previous group 
         // (we can't use the event consumer because it will work after saving the changes in DB)
         var forumToUpdate = await _forumRepository.LoadOriginalCopyAsync(forum);
@@ -403,8 +480,10 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTopicAsync(ForumTopic forumTopic)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(forumTopic);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customerId = forumTopic.CustomerId;
         var forumId = forumTopic.ForumId;
 
@@ -524,6 +603,7 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTopicAsync(ForumTopic forumTopic, bool sendNotifications)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumTopicRepository.InsertAsync(forumTopic);
 
         //update stats
@@ -547,6 +627,7 @@ public partial class ForumService : IForumService
             if (!string.IsNullOrEmpty(customer?.Email))
                 await _workflowMessageService.SendNewForumTopicMessageAsync(customer, forumTopic, forum, languageId);
         }
+		logger.LogDebug("<<< Exiting InsertTopicAsync(forumTopic={ForumTopic},sendNotifications={SendNotifications})", forumTopic, sendNotifications);
     }
 
     /// <summary>
@@ -556,6 +637,7 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTopicAsync(ForumTopic forumTopic)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumTopicRepository.UpdateAsync(forumTopic);
     }
 
@@ -603,21 +685,29 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePostAsync(ForumPost forumPost)
     {
+		logger.LogDebug(">>> Entering DeletePostAsync(forumPost={ForumPost})", forumPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(forumPost);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var forumTopicId = forumPost.TopicId;
         var customerId = forumPost.CustomerId;
         var forumTopic = await GetTopicByIdAsync(forumTopicId);
+		logger.LogDebug("DeletePostAsync(forumPost={ForumPost}): customerId → {CustomerId}", forumPost, customerId);
+		logger.LogDebug("DeletePostAsync(forumPost={ForumPost}): forumTopic → {ForumTopic}", forumPost, forumTopic);
         var forumId = forumTopic.ForumId;
 
         //delete topic if it was the first post
         var deleteTopic = false;
         var firstPost = await GetFirstPostAsync(forumTopic);
+		logger.LogDebug("DeletePostAsync(forumPost={ForumPost}): deleteTopic → {DeleteTopic}", forumPost, deleteTopic);
+		logger.LogDebug("DeletePostAsync(forumPost={ForumPost}): firstPost → {FirstPost}", forumPost, firstPost);
         if (firstPost != null && firstPost.Id == forumPost.Id)
             deleteTopic = true;
 
         //delete forum post
         await _forumPostRepository.DeleteAsync(forumPost);
+		logger.LogInformation("DeletePostAsync(forumPost)={ForumPost}: delete query executed in {Arg1} ms", forumPost, __logStart.ElapsedMilliseconds);
 
         //delete topic
         if (deleteTopic)
@@ -629,6 +719,8 @@ public partial class ForumService : IForumService
 
         await UpdateForumStatsAsync(forumId);
         await UpdateCustomerStatsAsync(customerId);
+		logger.LogDebug("<<< Exiting DeletePostAsync(forumPost={ForumPost})", forumPost);
+		logger.LogInformation("DeletePostAsync(forumPost)={ForumPost}: external service call took {Arg1} ms", forumPost, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -641,6 +733,8 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumPost> GetPostByIdAsync(int forumPostId)
     {
+		logger.LogDebug(">>> Entering GetPostByIdAsync(forumPostId={ForumPostId})", forumPostId);
+		logger.LogDebug("<<< Exiting GetPostByIdAsync(forumPostId={ForumPostId})", forumPostId);
         return await _forumPostRepository.GetByIdAsync(forumPostId, cache => default, useShortTermCache: true);
     }
 
@@ -710,11 +804,16 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPostAsync(ForumPost forumPost, bool sendNotifications)
     {
+		logger.LogDebug(">>> Entering InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications})", forumPost, sendNotifications);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPostRepository.InsertAsync(forumPost);
 
+		logger.LogInformation("InsertPostAsync(forumPost,sendNotifications)={ForumPost},{SendNotifications}: save query executed in {Arg2} ms", forumPost, sendNotifications, __logStart.ElapsedMilliseconds);
         //update stats
         var customerId = forumPost.CustomerId;
         var forumTopic = await GetTopicByIdAsync(forumPost.TopicId);
+		logger.LogDebug("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): customerId → {CustomerId}", forumPost, sendNotifications, customerId);
+		logger.LogDebug("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): forumTopic → {ForumTopic}", forumPost, sendNotifications, forumTopic);
         var forumId = forumTopic.ForumId;
 
         await UpdateForumTopicStatsAsync(forumPost.TopicId);
@@ -727,9 +826,12 @@ public partial class ForumService : IForumService
 
         var forum = await GetForumByIdAsync(forumTopic.ForumId);
         var subscriptions = await GetAllSubscriptionsAsync(topicId: forumTopic.Id);
+		logger.LogDebug("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): forum → {Forum}", forumPost, sendNotifications, forum);
+		logger.LogDebug("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): subscriptions → {Subscriptions}", forumPost, sendNotifications, subscriptions);
 
         var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
 
+		logger.LogDebug("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): languageId → {LanguageId}", forumPost, sendNotifications, languageId);
         var friendlyTopicPageIndex = await CalculateTopicPageIndexAsync(forumPost.TopicId,
             _forumSettings.PostsPageSize > 0 ? _forumSettings.PostsPageSize : 10,
             forumPost.Id) + 1;
@@ -741,9 +843,11 @@ public partial class ForumService : IForumService
 
             var customer = await _customerService.GetCustomerByIdAsync(subscription.CustomerId);
 
+			logger.LogDebug("InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications}): customer → {Customer}", forumPost, sendNotifications, customer);
             if (!string.IsNullOrEmpty(customer?.Email))
                 await _workflowMessageService.SendNewForumPostMessageAsync(customer, forumPost, forumTopic, forum, friendlyTopicPageIndex, languageId);
         }
+		logger.LogDebug("<<< Exiting InsertPostAsync(forumPost={ForumPost},sendNotifications={SendNotifications})", forumPost, sendNotifications);
     }
 
     /// <summary>
@@ -753,9 +857,15 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePostAsync(ForumPost forumPost)
     {
+		logger.LogDebug(">>> Entering UpdatePostAsync(forumPost={ForumPost})", forumPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPostRepository.UpdateAsync(forumPost);
+		logger.LogDebug("<<< Exiting UpdatePostAsync(forumPost={ForumPost})", forumPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdatePostAsync(forumPost)={ForumPost}: update query executed in {Arg1} ms", forumPost, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdatePostAsync(forumPost)={ForumPost}: update query executed in {Arg1} ms", forumPost, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a private message
     /// </summary>
@@ -763,9 +873,19 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePrivateMessageAsync(PrivateMessage privateMessage)
     {
+		logger.LogDebug(">>> Entering DeletePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPrivateMessageRepository.DeleteAsync(privateMessage);
+		logger.LogDebug("<<< Exiting DeletePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeletePrivateMessageAsync(privateMessage)={PrivateMessage}: external service call took {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeletePrivateMessageAsync(privateMessage)={PrivateMessage}: delete query executed in {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeletePrivateMessageAsync(privateMessage)={PrivateMessage}: external service call took {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeletePrivateMessageAsync(privateMessage)={PrivateMessage}: delete query executed in {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a private message
     /// </summary>
@@ -776,6 +896,8 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<PrivateMessage> GetPrivateMessageByIdAsync(int privateMessageId)
     {
+		logger.LogDebug(">>> Entering GetPrivateMessageByIdAsync(privateMessageId={PrivateMessageId})", privateMessageId);
+		logger.LogDebug("<<< Exiting GetPrivateMessageByIdAsync(privateMessageId={PrivateMessageId})", privateMessageId);
         return await _forumPrivateMessageRepository.GetByIdAsync(privateMessageId, cache => default, useShortTermCache: true);
     }
 
@@ -834,8 +956,11 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPrivateMessageAsync(PrivateMessage privateMessage)
     {
+		logger.LogDebug(">>> Entering InsertPrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPrivateMessageRepository.InsertAsync(privateMessage);
 
+		logger.LogInformation("InsertPrivateMessageAsync(privateMessage)={PrivateMessage}: save query executed in {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
         var customerTo = await _customerService.GetCustomerByIdAsync(privateMessage.ToCustomerId)
                          ?? throw new NopException("Recipient could not be loaded");
 
@@ -845,6 +970,7 @@ public partial class ForumService : IForumService
         //Email notification
         if (_forumSettings.NotifyAboutPrivateMessages)
             await _workflowMessageService.SendPrivateMessageNotificationAsync(privateMessage, (await _workContext.GetWorkingLanguageAsync()).Id);
+			logger.LogDebug("<<< Exiting InsertPrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
     }
 
     /// <summary>
@@ -854,12 +980,19 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePrivateMessageAsync(PrivateMessage privateMessage)
     {
+		logger.LogDebug(">>> Entering UpdatePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(privateMessage);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (privateMessage.IsDeletedByAuthor && privateMessage.IsDeletedByRecipient)
             await _forumPrivateMessageRepository.DeleteAsync(privateMessage);
+			logger.LogInformation("UpdatePrivateMessageAsync(privateMessage)={PrivateMessage}: delete query executed in {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
         else
             await _forumPrivateMessageRepository.UpdateAsync(privateMessage);
+			logger.LogDebug("<<< Exiting UpdatePrivateMessageAsync(privateMessage={PrivateMessage})", privateMessage);
+			logger.LogInformation("UpdatePrivateMessageAsync(privateMessage)={PrivateMessage}: external service call took {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
+			logger.LogInformation("UpdatePrivateMessageAsync(privateMessage)={PrivateMessage}: update query executed in {Arg1} ms", privateMessage, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -869,9 +1002,19 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSubscriptionAsync(ForumSubscription forumSubscription)
     {
+		logger.LogDebug(">>> Entering DeleteSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumSubscriptionRepository.DeleteAsync(forumSubscription);
+		logger.LogDebug("<<< Exiting DeleteSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteSubscriptionAsync(forumSubscription)={ForumSubscription}: external service call took {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteSubscriptionAsync(forumSubscription)={ForumSubscription}: delete query executed in {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteSubscriptionAsync(forumSubscription)={ForumSubscription}: external service call took {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteSubscriptionAsync(forumSubscription)={ForumSubscription}: delete query executed in {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a forum subscription
     /// </summary>
@@ -882,6 +1025,8 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumSubscription> GetSubscriptionByIdAsync(int forumSubscriptionId)
     {
+		logger.LogDebug(">>> Entering GetSubscriptionByIdAsync(forumSubscriptionId={ForumSubscriptionId})", forumSubscriptionId);
+		logger.LogDebug("<<< Exiting GetSubscriptionByIdAsync(forumSubscriptionId={ForumSubscriptionId})", forumSubscriptionId);
         return await _forumSubscriptionRepository.GetByIdAsync(forumSubscriptionId, cache => default, useShortTermCache: true);
     }
 
@@ -930,9 +1075,15 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSubscriptionAsync(ForumSubscription forumSubscription)
     {
+		logger.LogDebug(">>> Entering InsertSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumSubscriptionRepository.InsertAsync(forumSubscription);
+		logger.LogDebug("<<< Exiting InsertSubscriptionAsync(forumSubscription={ForumSubscription})", forumSubscription);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertSubscriptionAsync(forumSubscription)={ForumSubscription}: save query executed in {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertSubscriptionAsync(forumSubscription)={ForumSubscription}: save query executed in {Arg1} ms", forumSubscription, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Check whether customer is allowed to create new topics
     /// </summary>
@@ -951,6 +1102,7 @@ public partial class ForumService : IForumService
             return false;
 
         if (await _customerService.IsGuestAsync(customer) && !_forumSettings.AllowGuestsToCreateTopics)
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToCreateTopicAsync(customer={Customer},forum={Forum})", customer, forum);
             return false;
 
         return true;
@@ -984,6 +1136,7 @@ public partial class ForumService : IForumService
 
         var ownTopic = customer.Id == topic.CustomerId;
 
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToEditTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         return ownTopic;
     }
 
@@ -1005,6 +1158,7 @@ public partial class ForumService : IForumService
             return false;
 
         if (await _customerService.IsGuestAsync(customer))
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToMoveTopicAsync(customer={Customer},topic={Topic})", customer, topic);
             return false;
 
         return await _customerService.IsForumModeratorAsync(customer);
@@ -1038,6 +1192,7 @@ public partial class ForumService : IForumService
 
         var ownTopic = customer.Id == topic.CustomerId;
 
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToDeleteTopicAsync(customer={Customer},topic={Topic})", customer, topic);
         return ownTopic;
     }
 
@@ -1059,6 +1214,7 @@ public partial class ForumService : IForumService
             return false;
 
         if (await _customerService.IsGuestAsync(customer) && !_forumSettings.AllowGuestsToCreatePosts)
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToCreatePostAsync(customer={Customer},topic={Topic})", customer, topic);
             return false;
 
         return true;
@@ -1092,6 +1248,7 @@ public partial class ForumService : IForumService
 
         var ownPost = customer.Id == post.CustomerId;
 
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToEditPostAsync(customer={Customer},post={Post})", customer, post);
         return ownPost;
     }
 
@@ -1123,6 +1280,7 @@ public partial class ForumService : IForumService
 
         var ownPost = customer.Id == post.CustomerId;
 
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToDeletePostAsync(customer={Customer},post={Post})", customer, post);
         return ownPost;
     }
 
@@ -1140,6 +1298,7 @@ public partial class ForumService : IForumService
             return false;
 
         if (await _customerService.IsGuestAsync(customer))
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToSetTopicPriorityAsync(customer={Customer})", customer);
             return false;
 
         return await _customerService.IsForumModeratorAsync(customer);
@@ -1159,6 +1318,7 @@ public partial class ForumService : IForumService
             return false;
 
         if (customer.IsSearchEngineAccount() || await _customerService.IsGuestAsync(customer))
+		logger.LogDebug("<<< Exiting IsCustomerAllowedToSubscribeAsync(customer={Customer})", customer);
             return false;
 
         return true;
@@ -1202,7 +1362,9 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<ForumPostVote> GetPostVoteAsync(int postId, Customer customer)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (customer == null)
+		logger.LogDebug("<<< Exiting GetPostVoteAsync(postId={PostId},customer={Customer})", postId, customer);
             return null;
 
         return await _forumPostVoteRepository.Table
@@ -1223,6 +1385,7 @@ public partial class ForumService : IForumService
         if (customer == null)
             return 0;
 
+		logger.LogDebug("<<< Exiting GetNumberOfPostVotesAsync(customer={Customer},createdFromUtc={CreatedFromUtc})", customer, createdFromUtc);
         return await _forumPostVoteRepository.Table
             .CountAsync(pv => pv.CustomerId == customer.Id && pv.CreatedOnUtc > createdFromUtc);
     }
@@ -1234,13 +1397,19 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPostVoteAsync(ForumPostVote postVote)
     {
+		logger.LogDebug(">>> Entering InsertPostVoteAsync(postVote={PostVote})", postVote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _forumPostVoteRepository.InsertAsync(postVote);
 
+		logger.LogInformation("InsertPostVoteAsync(postVote)={PostVote}: save query executed in {Arg1} ms", postVote, __logStart.ElapsedMilliseconds);
         //update post
         var post = await GetPostByIdAsync(postVote.ForumPostId);
         post.VoteCount = postVote.IsUp ? ++post.VoteCount : --post.VoteCount;
+		logger.LogDebug("InsertPostVoteAsync(postVote={PostVote}): post → {Post}", postVote, post);
+		logger.LogDebug("InsertPostVoteAsync(postVote={PostVote}): post.VoteCount → {Arg1}", postVote, post.VoteCount);
 
         await UpdatePostAsync(post);
+		logger.LogDebug("<<< Exiting InsertPostVoteAsync(postVote={PostVote})", postVote);
     }
 
     /// <summary>
@@ -1250,15 +1419,23 @@ public partial class ForumService : IForumService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePostVoteAsync(ForumPostVote postVote)
     {
+		logger.LogDebug(">>> Entering DeletePostVoteAsync(postVote={PostVote})", postVote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(postVote);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeletePostVoteAsync(postVote)={PostVote}: delete query executed in {Arg1} ms", postVote, __logStart.ElapsedMilliseconds);
         await _forumPostVoteRepository.DeleteAsync(postVote);
 
         // update post
         var post = await GetPostByIdAsync(postVote.ForumPostId);
         post.VoteCount = postVote.IsUp ? --post.VoteCount : ++post.VoteCount;
+		logger.LogDebug("DeletePostVoteAsync(postVote={PostVote}): post → {Post}", postVote, post);
+		logger.LogDebug("DeletePostVoteAsync(postVote={PostVote}): post.VoteCount → {Arg1}", postVote, post.VoteCount);
+		logger.LogInformation("DeletePostVoteAsync(postVote)={PostVote}: external service call took {Arg1} ms", postVote, __logStart.ElapsedMilliseconds);
 
         await UpdatePostAsync(post);
+		logger.LogDebug("<<< Exiting DeletePostVoteAsync(postVote={PostVote})", postVote);
     }
 
     /// <summary>
@@ -1268,8 +1445,10 @@ public partial class ForumService : IForumService
     /// <returns>Formatted text</returns>
     public virtual string FormatPostText(ForumPost forumPost)
     {
+		logger.LogDebug(">>> Entering FormatPostText(forumPost={ForumPost})", forumPost);
         var text = forumPost.Text;
 
+		logger.LogDebug("FormatPostText(forumPost={ForumPost}): text → {Text}", forumPost, text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
@@ -1291,6 +1470,7 @@ public partial class ForumService : IForumService
                 break;
         }
 
+		logger.LogDebug("<<< Exiting FormatPostText(forumPost={ForumPost})", forumPost);
         return text;
     }
 
@@ -1334,6 +1514,8 @@ public partial class ForumService : IForumService
             return string.Empty;
 
         text = _htmlFormatter.FormatText(text, false, true, false, false, false, false);
+		logger.LogDebug("FormatForumSignatureText(text={Text}): text → {Text1}", text, text);
+		logger.LogDebug("<<< Exiting FormatForumSignatureText(text={Text})", text);
         return text;
     }
 
@@ -1344,13 +1526,16 @@ public partial class ForumService : IForumService
     /// <returns>Formatted text</returns>
     public virtual string FormatPrivateMessageText(PrivateMessage pm)
     {
+		logger.LogDebug(">>> Entering FormatPrivateMessageText(pm={Pm})", pm);
         var text = pm.Text;
 
+		logger.LogDebug("FormatPrivateMessageText(pm={Pm}): text → {Text}", pm, text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = _htmlFormatter.FormatText(text, false, true, false, true, false, false);
 
+		logger.LogDebug("<<< Exiting FormatPrivateMessageText(pm={Pm})", pm);
         return text;
     }
 
@@ -1383,10 +1568,13 @@ public partial class ForumService : IForumService
     /// </returns>
     public virtual async Task<string> GetForumGroupSeNameAsync(ForumGroup forumGroup)
     {
+		logger.LogDebug(">>> Entering GetForumGroupSeNameAsync(forumGroup={ForumGroup})", forumGroup);
         ArgumentNullException.ThrowIfNull(forumGroup);
 
         var seName = await _urlRecordService.GetSeNameAsync(forumGroup.Name, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls);
 
+		logger.LogDebug("GetForumGroupSeNameAsync(forumGroup={ForumGroup}): seName → {SeName}", forumGroup, seName);
+		logger.LogDebug("<<< Exiting GetForumGroupSeNameAsync(forumGroup={ForumGroup})", forumGroup);
         return seName;
     }
 

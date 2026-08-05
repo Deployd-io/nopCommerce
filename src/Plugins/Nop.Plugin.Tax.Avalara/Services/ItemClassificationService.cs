@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Data;
 using Nop.Plugin.Tax.Avalara.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Services;
 
@@ -9,6 +10,7 @@ namespace Nop.Plugin.Tax.Avalara.Services;
 /// </summary>
 public class ItemClassificationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxSettings _avalaraTaxSettings;
@@ -71,6 +73,8 @@ public class ItemClassificationService
     /// </returns>
     public async Task<ItemClassification> GetItemClassificationByIdAsync(int itemId)
     {
+		_logger.LogDebug(">>> Entering GetItemClassificationByIdAsync(itemId={ItemId})", itemId);
+		_logger.LogDebug("<<< Exiting GetItemClassificationByIdAsync(itemId={ItemId})", itemId);
         return await _itemClassificationRepository.GetByIdAsync(itemId);
     }
 
@@ -84,7 +88,9 @@ public class ItemClassificationService
     /// </returns>
     public async Task<ItemClassification> GetItemClassificationByRequestIdAsync(string requestId)
     {
+		_logger.LogDebug(">>> Entering GetItemClassificationByRequestIdAsync(requestId={RequestId})", requestId);
         if (string.IsNullOrEmpty(requestId))
+		_logger.LogDebug("<<< Exiting GetItemClassificationByRequestIdAsync(requestId={RequestId})", requestId);
             return null;
 
         return await _itemClassificationRepository.Table
@@ -98,11 +104,15 @@ public class ItemClassificationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task AddItemClassificationAsync(List<int> productIds)
     {
+		_logger.LogDebug(">>> Entering AddItemClassificationAsync(productIds={ProductIds})", productIds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!productIds?.Any() ?? true)
             return;
 
         var newProductIds = productIds.Except(await _itemClassificationRepository.Table.Select(record => record.ProductId).ToListAsync()).ToList();
         if (!newProductIds.Any())
+			_logger.LogDebug("AddItemClassificationAsync(productIds={ProductIds}): newProductIds → {NewProductIds}", productIds, newProductIds);
+			_logger.LogInformation("AddItemClassificationAsync(productIds)={ProductIds}: find query executed in {Arg1} ms", productIds, __logStart.ElapsedMilliseconds);
             return;
 
         if (!_avalaraTaxSettings.SelectedCountryIds?.Any() ?? true)
@@ -116,6 +126,8 @@ public class ItemClassificationService
         }));
 
         await _itemClassificationRepository.InsertAsync(records.ToList(), false);
+		_logger.LogInformation("AddItemClassificationAsync(productIds)={ProductIds}: save query executed in {Arg1} ms", productIds, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting AddItemClassificationAsync(productIds={ProductIds})", productIds);
     }
 
     /// <summary>
@@ -125,9 +137,13 @@ public class ItemClassificationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateItemClassificationAsync(ItemClassification item)
     {
+		_logger.LogDebug(">>> Entering UpdateItemClassificationAsync(item={Item})", item);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(item);
 
         await _itemClassificationRepository.UpdateAsync(item, false);
+		_logger.LogDebug("<<< Exiting UpdateItemClassificationAsync(item={Item})", item);
+		_logger.LogInformation("UpdateItemClassificationAsync(item)={Item}: update query executed in {Arg1} ms", item, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -137,17 +153,33 @@ public class ItemClassificationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteItemsAsync(List<int> ids)
     {
+		_logger.LogDebug(">>> Entering DeleteItemsAsync(ids={Ids})", ids);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _itemClassificationRepository.DeleteAsync(item => ids.Contains(item.Id));
+		_logger.LogDebug("<<< Exiting DeleteItemsAsync(ids={Ids})", ids);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteItemsAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteItemsAsync(ids)={Ids}: delete query executed in {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteItemsAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	_logger.LogInformation("DeleteItemsAsync(ids)={Ids}: delete query executed in {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Clear the item classification
     /// </summary>
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ClearItemClassificationAsync()
     {
+		_logger.LogDebug(">>> Entering ClearItemClassificationAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _itemClassificationRepository.TruncateAsync();
+		_logger.LogDebug("<<< Exiting ClearItemClassificationAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("ClearItemClassificationAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("ClearItemClassificationAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     #endregion
 }

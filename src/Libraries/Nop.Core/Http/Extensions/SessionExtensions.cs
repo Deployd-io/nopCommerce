@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Http.Extensions;
 
@@ -8,6 +9,7 @@ namespace Nop.Core.Http.Extensions;
 /// </summary>
 public static class SessionExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Set value to Session
     /// </summary>
@@ -34,12 +36,14 @@ public static class SessionExtensions
     /// </returns>
     public static async Task<T> GetAsync<T>(this ISession session, string key)
     {
+		_logger.LogDebug(">>> Entering GetAsync(session={Session},key={Key})", session, key);
         await LoadAsync(session);
         var value = session.GetString(key);
         return value == null ? default : JsonConvert.DeserializeObject<T>(value);
     }
 
     /// <summary>
+	_logger.LogDebug("GetAsync(session={Session},key={Key}): value → {Value}", session, key, value);
     /// Remove the given key from session if present.
     /// </summary>
     /// <param name="session">Session</param>
@@ -47,8 +51,10 @@ public static class SessionExtensions
     /// <returns> A task that represents the asynchronous operation</returns>
     public static async Task RemoveAsync(this ISession session, string key)
     {
+		_logger.LogDebug(">>> Entering RemoveAsync(session={Session},key={Key})", session, key);
         await LoadAsync(session);
         session.Remove(key);
+		_logger.LogDebug("<<< Exiting RemoveAsync(session={Session},key={Key})", session, key);
     }
 
     /// <summary>
@@ -58,8 +64,15 @@ public static class SessionExtensions
     /// <returns> A task that represents the asynchronous operation</returns>
     public static async Task ClearAsync(this ISession session)
     {
+		_logger.LogDebug(">>> Entering ClearAsync(session={Session})", session);
         await LoadAsync(session);
         session.Clear();
+		_logger.LogDebug("<<< Exiting ClearAsync(session={Session})", session);
+		_logger.LogDebug(">>> Entering LoadAsync(session={Session})", session);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("LoadAsync(session)={Session}: find query executed in {Arg1} ms", session, __logStart.ElapsedMilliseconds);
+		_logger.LogError("Exception in LoadAsync(session={Session}): {Arg1}", session, ex.Message);
+		_logger.LogDebug("<<< Exiting LoadAsync(session={Session})", session);
     }
 
     /// <summary>
@@ -69,12 +82,15 @@ public static class SessionExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task LoadAsync(ISession session)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             await session.LoadAsync();
+			_logger.LogInformation("LoadAsync(session)={Session}: find query executed in {Arg1} ms", session, __logStart.ElapsedMilliseconds);
         }
         catch
         {
+			_logger.LogError("Exception in LoadAsync(session={Session}): {Arg1}", session, ex.Message);
             //fallback to synchronous handling
         }
     }

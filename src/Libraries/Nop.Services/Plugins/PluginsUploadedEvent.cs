@@ -13,7 +13,10 @@ public partial class PluginsUploadedEvent
     /// <param name="uploadedPlugins">Uploaded plugins</param>
     public PluginsUploadedEvent(IList<PluginDescriptor> uploadedPlugins)
     {
+		logger.LogDebug(">>> Entering PluginsUploadedEvent(uploadedPlugins={UploadedPlugins})", uploadedPlugins);
         UploadedPlugins = uploadedPlugins;
+		logger.LogDebug("<<< Exiting PluginsUploadedEvent(uploadedPlugins={UploadedPlugins})", uploadedPlugins);
+		logger.LogDebug("PluginsUploadedEvent(uploadedPlugins={UploadedPlugins}): UploadedPlugins → {UploadedPlugins1}", uploadedPlugins, UploadedPlugins);
     }
 
     #endregion

@@ -3,6 +3,7 @@
 //! author : suvash : https://github.com/suvash
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '१',
@@ -53,17 +54,22 @@ export default moment.defineLocale('ne', {
         LLLL: 'dddd, D MMMM YYYY, Aको h:mm बजे',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[१२३४५६७८९०]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     meridiemParse: /राति|बिहान|दिउँसो|साँझ/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -74,6 +80,9 @@ export default moment.defineLocale('ne', {
         } else if (meridiem === 'दिउँसो') {
             return hour >= 10 ? hour : hour + 12;
         } else if (meridiem === 'साँझ') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },

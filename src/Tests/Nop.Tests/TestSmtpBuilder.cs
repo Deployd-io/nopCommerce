@@ -5,11 +5,13 @@ using Nop.Core.Domain.Messages;
 using Nop.Core.Infrastructure;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests;
 
 public class TestSmtpBuilder : SmtpBuilder
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public TestSmtpBuilder(EmailAccountSettings emailAccountSettings, 
         IEmailAccountService emailAccountService,
         ILocalizationService localizationService,
@@ -19,6 +21,8 @@ public class TestSmtpBuilder : SmtpBuilder
 
     public override Task<SmtpClient> BuildAsync(EmailAccount emailAccount = null)
     {
+		_logger.LogDebug(">>> Entering BuildAsync(emailAccount={EmailAccount})", emailAccount);
+		_logger.LogDebug("<<< Exiting BuildAsync(emailAccount={EmailAccount})", emailAccount);
         return Task.FromResult<SmtpClient>(new TestSmtpClient());
     }
 

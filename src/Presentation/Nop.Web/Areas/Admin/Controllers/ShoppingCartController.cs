@@ -6,11 +6,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.ShoppingCart;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ShoppingCartController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -39,9 +41,12 @@ public partial class ShoppingCartController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.CURRENT_CARTS_MANAGE)]
     public virtual async Task<IActionResult> CurrentCarts()
     {
+		_logger.LogDebug(">>> Entering CurrentCarts()");
         //prepare model
         var model = await _shoppingCartModelFactory.PrepareShoppingCartSearchModelAsync(new ShoppingCartSearchModel());
 
+		_logger.LogDebug("CurrentCarts(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting CurrentCarts()");
         return View(model);
     }
 
@@ -52,6 +57,7 @@ public partial class ShoppingCartController : BaseAdminController
         //prepare model
         var model = await _shoppingCartModelFactory.PrepareShoppingCartListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting CurrentCarts(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -59,6 +65,7 @@ public partial class ShoppingCartController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.CURRENT_CARTS_MANAGE)]
     public virtual async Task<IActionResult> GetCartDetails(ShoppingCartItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering GetCartDetails(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
                        ?? throw new ArgumentException("No customer found with the specified id");
@@ -66,6 +73,8 @@ public partial class ShoppingCartController : BaseAdminController
         //prepare model
         var model = await _shoppingCartModelFactory.PrepareShoppingCartItemListModelAsync(searchModel, customer);
 
+		_logger.LogDebug("GetCartDetails(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting GetCartDetails(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -73,8 +82,10 @@ public partial class ShoppingCartController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.CURRENT_CARTS_MANAGE)]
     public virtual async Task<IActionResult> DeleteItem(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteItem(id={Id})", id);
         await _shoppingCartService.DeleteShoppingCartItemAsync(id);
 
+		_logger.LogDebug("<<< Exiting DeleteItem(id={Id})", id);
         return new NullJsonResult();
     }
 

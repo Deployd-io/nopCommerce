@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core;
 
 namespace Nop.Data.Migrations;
@@ -7,6 +8,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public partial class NopUpdateMigrationAttribute : NopMigrationAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Initializes a new instance of the NopUpdateMigrationAttribute class
     /// </summary>
@@ -14,8 +16,11 @@ public partial class NopUpdateMigrationAttribute : NopMigrationAttribute
     /// <param name="nopVersion">nopCommerce full version</param>
     /// <param name="migrationType">The migration type</param>
     public NopUpdateMigrationAttribute(string dateTime, string nopVersion, UpdateMigrationType migrationType) :
+		_logger.LogDebug(">>> Entering NopUpdateMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},migrationType={MigrationType})", dateTime, nopVersion, migrationType);
+		_logger.LogDebug("<<< Exiting NopUpdateMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},migrationType={MigrationType})", dateTime, nopVersion, migrationType);
         base(dateTime, nopVersion, migrationType, MigrationProcessType.Update)
     {
         ApplyInDbOnDebugMode = !_config.NopVersion.Equals(NopVersion.CURRENT_VERSION, StringComparison.CurrentCultureIgnoreCase);
+		_logger.LogDebug("NopUpdateMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},migrationType={MigrationType}): ApplyInDbOnDebugMode → {ApplyInDbOnDebugMode}", dateTime, nopVersion, migrationType, ApplyInDbOnDebugMode);
     }
 }

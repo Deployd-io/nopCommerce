@@ -19,6 +19,7 @@ using Nop.Web.Framework.Extensions;
 using Nop.Web.Infrastructure;
 using Nop.Web.Models.Boards;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -27,6 +28,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ForumModelFactory : IForumModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -95,6 +97,7 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SelectListItem>> ForumTopicTypesListAsync()
     {
+		_logger.LogDebug(">>> Entering ForumTopicTypesListAsync()");
         var list = new List<SelectListItem>
         {
             new() {
@@ -113,6 +116,7 @@ public partial class ForumModelFactory : IForumModelFactory
             }
         };
 
+		_logger.LogDebug("<<< Exiting ForumTopicTypesListAsync()");
         return list;
     }
 
@@ -125,10 +129,14 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SelectListItem>> ForumGroupsForumsListAsync()
     {
+		_logger.LogDebug(">>> Entering ForumGroupsForumsListAsync()");
         var forumsList = new List<SelectListItem>();
         var separator = "--";
+		_logger.LogDebug("ForumGroupsForumsListAsync(): forumsList → {ForumsList}", forumsList);
+		_logger.LogDebug("ForumGroupsForumsListAsync(): separator → {Separator}", separator);
         var forumGroups = await _forumService.GetAllForumGroupsAsync();
 
+		_logger.LogDebug("ForumGroupsForumsListAsync(): forumGroups → {ForumGroups}", forumGroups);
         foreach (var fg in forumGroups)
         {
             // Add the forum group with Value of 0 so it won't be used as a target forum
@@ -137,10 +145,12 @@ public partial class ForumModelFactory : IForumModelFactory
             var forums = await _forumService.GetAllForumsByGroupIdAsync(fg.Id);
             foreach (var f in forums)
             {
+			_logger.LogDebug("ForumGroupsForumsListAsync(): forums → {Forums}", forums);
                 forumsList.Add(new SelectListItem { Text = $"{separator}{f.Name}", Value = f.Id.ToString() });
             }
         }
 
+		_logger.LogDebug("<<< Exiting ForumGroupsForumsListAsync()");
         return forumsList;
     }
 
@@ -185,14 +195,19 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<BoardsIndexModel> PrepareBoardsIndexModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareBoardsIndexModelAsync()");
         var model = new BoardsIndexModel();
 
+		_logger.LogDebug("PrepareBoardsIndexModelAsync(): model → {Model}", model);
         var forumGroups = await _forumService.GetAllForumGroupsAsync();
         foreach (var forumGroup in forumGroups)
         {
+		_logger.LogDebug("PrepareBoardsIndexModelAsync(): forumGroups → {ForumGroups}", forumGroups);
             var forumGroupModel = await PrepareForumGroupModelAsync(forumGroup);
             model.ForumGroups.Add(forumGroupModel);
+			_logger.LogDebug("PrepareBoardsIndexModelAsync(): forumGroupModel → {ForumGroupModel}", forumGroupModel);
         }
+		_logger.LogDebug("<<< Exiting PrepareBoardsIndexModelAsync()");
         return model;
     }
 
@@ -205,6 +220,7 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<ActiveDiscussionsModel> PrepareActiveDiscussionsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareActiveDiscussionsModelAsync()");
         var model = new ActiveDiscussionsModel
         {
             ViewAllLinkEnabled = true,
@@ -216,10 +232,13 @@ public partial class ForumModelFactory : IForumModelFactory
         var topics = await _forumService.GetActiveTopicsAsync(0, 0, _forumSettings.HomepageActiveDiscussionsTopicCount);
         foreach (var topic in topics)
         {
+		_logger.LogDebug("PrepareActiveDiscussionsModelAsync(): topics → {Topics}", topics);
             var topicModel = await PrepareForumTopicRowModelAsync(topic);
             model.ForumTopics.Add(topicModel);
+			_logger.LogDebug("PrepareActiveDiscussionsModelAsync(): topicModel → {TopicModel}", topicModel);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareActiveDiscussionsModelAsync()");
         return model;
     }
 
@@ -619,14 +638,18 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<EditForumPostModel> PreparePostEditModelAsync(ForumPost forumPost, bool excludeProperties)
     {
+		_logger.LogDebug(">>> Entering PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties})", forumPost, excludeProperties);
         ArgumentNullException.ThrowIfNull(forumPost);
 
         var forumTopic = await _forumService.GetTopicByIdAsync(forumPost.TopicId) ?? throw new ArgumentException("forum topic cannot be loaded");
 
+		_logger.LogDebug("PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties}): forumTopic → {ForumTopic}", forumPost, excludeProperties, forumTopic);
         var forum = await _forumService.GetForumByIdAsync(forumTopic.ForumId) ?? throw new ArgumentException("forum cannot be loaded");
 
+		_logger.LogDebug("PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties}): forum → {Forum}", forumPost, excludeProperties, forum);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var model = new EditForumPostModel
+		_logger.LogDebug("PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties}): customer → {Customer}", forumPost, excludeProperties, customer);
         {
             Id = forumPost.Id,
             ForumTopicId = forumTopic.Id,
@@ -642,14 +665,17 @@ public partial class ForumModelFactory : IForumModelFactory
         if (!excludeProperties)
         {
             model.Text = forumPost.Text;
+			_logger.LogDebug("PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties}): model.Text → {Arg2}", forumPost, excludeProperties, model.Text);
             //subscription
             if (model.IsCustomerAllowedToSubscribe)
             {
                 var forumSubscription = (await _forumService.GetAllSubscriptionsAsync(customer.Id, 0, forumTopic.Id, 0, 1)).FirstOrDefault();
                 model.Subscribed = forumSubscription != null;
+				_logger.LogDebug("PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties}): forumSubscription → {ForumSubscription}", forumPost, excludeProperties, forumSubscription);
             }
         }
 
+		_logger.LogDebug("<<< Exiting PreparePostEditModelAsync(forumPost={ForumPost},excludeProperties={ExcludeProperties})", forumPost, excludeProperties);
         return model;
     }
 
@@ -845,6 +871,7 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<LastPostModel> PrepareLastPostModelAsync(ForumPost forumPost, bool showTopic)
     {
+		_logger.LogDebug(">>> Entering PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic})", forumPost, showTopic);
         var model = new LastPostModel
         {
             ShowTopic = showTopic
@@ -856,28 +883,36 @@ public partial class ForumModelFactory : IForumModelFactory
 
         var topic = await _forumService.GetTopicByIdAsync(forumPost.TopicId);
 
+		_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): topic → {Topic}", forumPost, showTopic, topic);
         if (topic is null)
             return model;
 
         var customer = await _customerService.GetCustomerByIdAsync(forumPost.CustomerId);
 
+		_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): customer → {Customer}", forumPost, showTopic, customer);
+		_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): model.Id → {Arg2}", forumPost, showTopic, model.Id);
+		_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): model.ForumTopicId → {Arg2}", forumPost, showTopic, model.ForumTopicId);
         model.Id = forumPost.Id;
         model.ForumTopicId = topic.Id;
         model.ForumTopicSeName = await _forumService.GetTopicSeNameAsync(topic);
         model.ForumTopicSubject = _forumService.StripTopicSubject(topic);
         model.CustomerId = forumPost.CustomerId;
+		_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): model.CustomerId → {Arg2}", forumPost, showTopic, model.CustomerId);
         model.AllowViewingProfiles = _customerSettings.AllowViewingProfiles && !await _customerService.IsGuestAsync(customer);
         model.CustomerName = await _customerService.FormatUsernameAsync(customer);
         //created on string
         var languageCode = (await _workContext.GetWorkingLanguageAsync()).LanguageCulture;
         if (_forumSettings.RelativeDateTimeFormattingEnabled)
+		_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): languageCode → {LanguageCode}", forumPost, showTopic, languageCode);
         {
             var postCreatedAgo = forumPost.CreatedOnUtc.RelativeFormat(languageCode);
             model.PostCreatedOnStr = string.Format(await _localizationService.GetResourceAsync("Common.RelativeDateTime.Past"), postCreatedAgo);
+			_logger.LogDebug("PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic}): postCreatedAgo → {PostCreatedAgo}", forumPost, showTopic, postCreatedAgo);
         }
         else
             model.PostCreatedOnStr = (await _dateTimeHelper.ConvertToUserTimeAsync(forumPost.CreatedOnUtc, DateTimeKind.Utc)).ToString("f");
 
+		_logger.LogDebug("<<< Exiting PrepareLastPostModelAsync(forumPost={ForumPost},showTopic={ShowTopic})", forumPost, showTopic);
         return model;
     }
 
@@ -936,32 +971,41 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<CustomerForumSubscriptionsModel> PrepareCustomerForumSubscriptionsModelAsync(int? page)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerForumSubscriptionsModelAsync(page={Page})", page);
         var pageIndex = 0;
         if (page > 0)
+		_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): pageIndex → {PageIndex}", page, pageIndex);
         {
             pageIndex = page.Value - 1;
         }
 
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): customer → {Customer}", page, customer);
         var pageSize = _forumSettings.ForumSubscriptionsPageSize;
 
         var list = await _forumService.GetAllSubscriptionsAsync(customer.Id, 0, 0, pageIndex, pageSize);
 
+		_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): list → {List}", page, list);
         var model = new CustomerForumSubscriptionsModel();
 
+		_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): model → {Model}", page, model);
         foreach (var forumSubscription in list)
         {
             var forumTopicId = forumSubscription.TopicId;
             var forumId = forumSubscription.ForumId;
             var topicSubscription = false;
             var title = string.Empty;
+			_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): topicSubscription → {TopicSubscription}", page, topicSubscription);
+			_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): title → {Title}", page, title);
             var slug = string.Empty;
 
+			_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): slug → {Slug}", page, slug);
             if (forumTopicId > 0)
             {
                 topicSubscription = true;
                 var forumTopic = await _forumService.GetTopicByIdAsync(forumTopicId);
+				_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): forumTopic → {ForumTopic}", page, forumTopic);
                 if (forumTopic != null)
                 {
                     title = forumTopic.Subject;
@@ -972,6 +1016,7 @@ public partial class ForumModelFactory : IForumModelFactory
             {
                 var forum = await _forumService.GetForumByIdAsync(forumId);
                 if (forum != null)
+				_logger.LogDebug("PrepareCustomerForumSubscriptionsModelAsync(page={Page}): forum → {Forum}", page, forum);
                 {
                     title = forum.Name;
                     slug = await _forumService.GetForumSeNameAsync(forum);
@@ -1000,6 +1045,7 @@ public partial class ForumModelFactory : IForumModelFactory
             RouteValues = new ForumSubscriptionsRouteValues { PageNumber = pageIndex }
         };
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerForumSubscriptionsModelAsync(page={Page})", page);
         return model;
     }
 

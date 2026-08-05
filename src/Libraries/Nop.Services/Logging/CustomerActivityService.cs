@@ -46,6 +46,7 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateActivityTypeAsync(ActivityLogType activityLogType)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _activityLogTypeRepository.UpdateAsync(activityLogType);
     }
 
@@ -58,13 +59,17 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<IList<ActivityLogType>> GetAllActivityTypesAsync()
     {
+		logger.LogDebug(">>> Entering GetAllActivityTypesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var activityLogTypes = await _activityLogTypeRepository.GetAllAsync(query =>
         {
             return from alt in query
                 orderby alt.Name
                 select alt;
+				logger.LogInformation("GetAllActivityTypesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		logger.LogDebug("<<< Exiting GetAllActivityTypesAsync()");
         return activityLogTypes;
     }
 
@@ -78,6 +83,8 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<ActivityLogType> GetActivityTypeByIdAsync(int activityLogTypeId)
     {
+		logger.LogDebug(">>> Entering GetActivityTypeByIdAsync(activityLogTypeId={ActivityLogTypeId})", activityLogTypeId);
+		logger.LogDebug("<<< Exiting GetActivityTypeByIdAsync(activityLogTypeId={ActivityLogTypeId})", activityLogTypeId);
         return await _activityLogTypeRepository.GetByIdAsync(activityLogTypeId, cache => default);
     }
 
@@ -93,6 +100,7 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<ActivityLog> InsertActivityAsync(string systemKeyword, string comment, BaseEntity entity = null)
     {
+		logger.LogDebug(">>> Entering InsertActivityAsync(systemKeyword={SystemKeyword},comment={Comment},entity={Entity})", systemKeyword, comment, entity);
         return await InsertActivityAsync(await _workContext.GetCurrentCustomerAsync(), systemKeyword, comment, entity);
     }
 
@@ -192,9 +200,19 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteActivityAsync(ActivityLog activityLog)
     {
+		logger.LogDebug(">>> Entering DeleteActivityAsync(activityLog={ActivityLog})", activityLog);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _activityLogRepository.DeleteAsync(activityLog);
+		logger.LogDebug("<<< Exiting DeleteActivityAsync(activityLog={ActivityLog})", activityLog);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteActivityAsync(activityLog)={ActivityLog}: external service call took {Arg1} ms", activityLog, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteActivityAsync(activityLog)={ActivityLog}: delete query executed in {Arg1} ms", activityLog, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteActivityAsync(activityLog)={ActivityLog}: external service call took {Arg1} ms", activityLog, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteActivityAsync(activityLog)={ActivityLog}: delete query executed in {Arg1} ms", activityLog, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets all activity log items
     /// </summary>
@@ -257,6 +275,8 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<ActivityLog> GetActivityByIdAsync(int activityLogId)
     {
+		logger.LogDebug(">>> Entering GetActivityByIdAsync(activityLogId={ActivityLogId})", activityLogId);
+		logger.LogDebug("<<< Exiting GetActivityByIdAsync(activityLogId={ActivityLogId})", activityLogId);
         return await _activityLogRepository.GetByIdAsync(activityLogId);
     }
 
@@ -266,8 +286,14 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearAllActivitiesAsync()
     {
+		logger.LogDebug(">>> Entering ClearAllActivitiesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _activityLogRepository.TruncateAsync();
+		logger.LogDebug("<<< Exiting ClearAllActivitiesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("ClearAllActivitiesAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("ClearAllActivitiesAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     #endregion
 }

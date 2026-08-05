@@ -53,16 +53,24 @@ public partial class ArtificialIntelligenceHttpClient
     /// </returns>
     public virtual async Task<string> SendQueryAsync(string query)
     {
+		logger.LogDebug(">>> Entering SendQueryAsync(query={Query})");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var request = _artificialIntelligenceHttpClientHelper.CreateRequest(_artificialIntelligenceSettings, query);
 
+		logger.LogDebug("SendQueryAsync(query={Query}): request → {Request}", request);
         var httpResponse = await _httpClient.SendAsync(request);
         var response = await httpResponse.Content.ReadAsStringAsync();
+		logger.LogInformation("SendQueryAsync(query)={Query}: external service call took {Arg1} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("SendQueryAsync(query={Query}): httpResponse → {HttpResponse}", httpResponse);
+		logger.LogDebug("SendQueryAsync(query={Query}): response → {Response}", response);
 
         if (!httpResponse.IsSuccessStatusCode)
             throw new NopException(httpResponse.ReasonPhrase, innerException: new Exception(response));
 
         var result = _artificialIntelligenceHttpClientHelper.ParseResponse(response);
 
+		logger.LogDebug("SendQueryAsync(query={Query}): result → {Result}", result);
+		logger.LogDebug("<<< Exiting SendQueryAsync(query={Query})");
         return result;
     }
 

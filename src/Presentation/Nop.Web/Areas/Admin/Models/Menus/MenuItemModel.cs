@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Menus;
 
@@ -9,27 +10,43 @@ namespace Nop.Web.Areas.Admin.Models.Menus;
 /// </summary>
 public partial record MenuItemModel : BaseNopEntityModel, IAclSupportedModel, IStoreMappingSupportedModel, ILocalizedModel<MenuItemLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MenuItemModel()
     {
+		_logger.LogDebug(">>> Entering MenuItemModel()");
         AvailableMenuItemTypes = new List<SelectListItem>();
         AvailableMenuItems = new List<SelectListItem>();
+		_logger.LogDebug("MenuItemModel(): AvailableMenuItemTypes → {AvailableMenuItemTypes}", AvailableMenuItemTypes);
+		_logger.LogDebug("MenuItemModel(): AvailableMenuItems → {AvailableMenuItems}", AvailableMenuItems);
 
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("MenuItemModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
 
+		_logger.LogDebug("MenuItemModel(): AvailableStores → {AvailableStores}", AvailableStores);
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogDebug("MenuItemModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
 
+		_logger.LogDebug("MenuItemModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         AvailableMenuItemTemplates = new List<SelectListItem>();
+		_logger.LogDebug("MenuItemModel(): AvailableMenuItemTemplates → {AvailableMenuItemTemplates}", AvailableMenuItemTemplates);
         AvailableStandardRoutes = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogDebug("MenuItemModel(): AvailableStandardRoutes → {AvailableStandardRoutes}", AvailableStandardRoutes);
+		_logger.LogDebug("MenuItemModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableVendors = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("MenuItemModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		_logger.LogDebug("MenuItemModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableTopics = new List<SelectListItem>();
 
+		_logger.LogDebug("MenuItemModel(): AvailableTopics → {AvailableTopics}", AvailableTopics);
         Locales = new List<MenuItemLocalizedModel>();
+		_logger.LogDebug("<<< Exiting MenuItemModel()");
+		_logger.LogDebug("MenuItemModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

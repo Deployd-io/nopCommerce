@@ -19,8 +19,10 @@ public abstract partial class NopViewComponent : ViewComponent
     /// <returns>A <see cref="ViewViewComponentResult"/>.</returns>
     public new ViewViewComponentResult View<TModel>(string viewName, TModel model)
     {
+		logger.LogDebug(">>> Entering View(viewName={ViewName},model={Model})", viewName, model);
         var eventPublisher = EngineContext.Current.Resolve<IEventPublisher>();
         eventPublisher.ModelPrepared(model);
+		logger.LogDebug("View(viewName={ViewName},model={Model}): eventPublisher → {EventPublisher}", viewName, model, eventPublisher);
 
         //invoke the base method
         return base.View(viewName, model);
@@ -35,6 +37,7 @@ public abstract partial class NopViewComponent : ViewComponent
     {
         var eventPublisher = EngineContext.Current.Resolve<IEventPublisher>();
         eventPublisher.ModelPrepared(model);
+		logger.LogDebug("View(model={Model}): eventPublisher → {EventPublisher}", model, eventPublisher);
 
         //invoke the base method
         return base.View(model);
@@ -48,6 +51,7 @@ public abstract partial class NopViewComponent : ViewComponent
     public new ViewViewComponentResult View(string viewName)
     {
         //invoke the base method
+		logger.LogDebug("<<< Exiting View(viewName={ViewName},model={Model})", viewName, model);
         return base.View(viewName);
     }
 }

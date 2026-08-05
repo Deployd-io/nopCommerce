@@ -188,13 +188,16 @@ public partial class TranslationModelFactory : ITranslationModelFactory
 
         public TranslationClientHelper(TranslationSettings translationSettings)
         {
+			logger.LogDebug(">>> Entering TranslationClientHelper(translationSettings={TranslationSettings})", translationSettings);
             switch ((TranslationServiceType)translationSettings.TranslationServiceId)
             {
                 case TranslationServiceType.GoogleTranslate:
                     {
                         if (!string.IsNullOrEmpty(translationSettings.GoogleApiKey))
                             _googleClient = Google.Cloud.Translation.V2.TranslationClient.CreateFromApiKey(translationSettings.GoogleApiKey);
+							logger.LogDebug("TranslationClientHelper(translationSettings={TranslationSettings}): _googleClient → {_googleClient}", translationSettings, _googleClient);
                         _deeplClient = null;
+						logger.LogDebug("TranslationClientHelper(translationSettings={TranslationSettings}): _deeplClient → {_deeplClient}", translationSettings, _deeplClient);
                     }
                     break;
 
@@ -206,6 +209,7 @@ public partial class TranslationModelFactory : ITranslationModelFactory
                     }
                     break;
             }
+			logger.LogDebug("<<< Exiting TranslationClientHelper(translationSettings={TranslationSettings})", translationSettings);
         }
 
         #endregion

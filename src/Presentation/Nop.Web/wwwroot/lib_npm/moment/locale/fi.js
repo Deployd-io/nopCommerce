@@ -3,6 +3,7 @@
 //! author : Tarmo Aidantausta : https://github.com/bleadof
 
 import moment from '../moment';
+const logger = console;
 
 var numbersPast =
         'nolla yksi kaksi kolme neljä viisi kuusi seitsemän kahdeksan yhdeksän'.split(
@@ -21,6 +22,7 @@ var numbersPast =
         numbersPast[9],
     ];
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = '';
     switch (key) {
         case 's':
@@ -55,9 +57,13 @@ function translate(number, withoutSuffix, key, isFuture) {
             break;
     }
     result = verbalNumber(number, isFuture) + ' ' + result;
+	logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture}): result → ${result}`);
+	logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return result;
 }
 function verbalNumber(number, isFuture) {
+	logger.debug(`>>> Entering verbalNumber(number=${number},isFuture=${isFuture})`);
+	logger.debug(`<<< Exiting verbalNumber(number=${number},isFuture=${isFuture})`);
     return number < 10
         ? isFuture
             ? numbersFuture[number]

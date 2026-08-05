@@ -12,11 +12,13 @@ using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class PollController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -48,15 +50,20 @@ public partial class PollController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.POLLS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _pollModelFactory.PreparePollSearchModelAsync(new PollSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -67,15 +74,19 @@ public partial class PollController : BaseAdminController
         //prepare model
         var model = await _pollModelFactory.PreparePollListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _pollModelFactory.PreparePollModelAsync(new PollModel(), null);
 
+		_logger.LogDebug("Create(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -103,20 +114,25 @@ public partial class PollController : BaseAdminController
         model = await _pollModelFactory.PreparePollModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.POLLS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a poll with the specified id
         var poll = await _pollService.GetPollByIdAsync(id);
         if (poll == null)
+			_logger.LogDebug("Edit(id={Id}): poll → {Poll}", id, poll);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _pollModelFactory.PreparePollModelAsync(null, poll);
 
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -149,6 +165,7 @@ public partial class PollController : BaseAdminController
         model = await _pollModelFactory.PreparePollModelAsync(model, poll, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -156,15 +173,18 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a poll with the specified id
         var poll = await _pollService.GetPollByIdAsync(id);
         if (poll == null)
+			_logger.LogDebug("Delete(id={Id}): poll → {Poll}", id, poll);
             return RedirectToAction("List");
 
         await _pollService.DeletePollAsync(poll);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Polls.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -176,6 +196,7 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_VIEW)]
     public virtual async Task<IActionResult> PollAnswers(PollAnswerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PollAnswers(searchModel={SearchModel})", searchModel);
         //try to get a poll with the specified id
         var poll = await _pollService.GetPollByIdAsync(searchModel.PollId)
             ?? throw new ArgumentException("No poll found with the specified id");
@@ -183,6 +204,8 @@ public partial class PollController : BaseAdminController
         //prepare model
         var model = await _pollModelFactory.PreparePollAnswerListModelAsync(searchModel, poll);
 
+		_logger.LogDebug("PollAnswers(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting PollAnswers(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -223,12 +246,14 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PollAnswerDelete(int id)
     {
+		_logger.LogDebug(">>> Entering PollAnswerDelete(id={Id})", id);
         //try to get a poll answer with the specified id
         var pollAnswer = await _pollService.GetPollAnswerByIdAsync(id)
             ?? throw new ArgumentException("No poll answer found with the specified id", nameof(id));
 
         await _pollService.DeletePollAnswerAsync(pollAnswer);
 
+		_logger.LogDebug("<<< Exiting PollAnswerDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

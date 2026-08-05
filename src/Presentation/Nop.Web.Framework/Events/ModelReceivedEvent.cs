@@ -17,8 +17,12 @@ public partial class ModelReceivedEvent<T>
     /// <param name="modelState">Model state</param>
     public ModelReceivedEvent(T model, ModelStateDictionary modelState)
     {
+		logger.LogDebug(">>> Entering ModelReceivedEvent(model={Model},modelState={ModelState})", model, modelState);
         Model = model;
         ModelState = modelState;
+		logger.LogDebug("<<< Exiting ModelReceivedEvent(model={Model},modelState={ModelState})", model, modelState);
+		logger.LogDebug("ModelReceivedEvent(model={Model},modelState={ModelState}): ModelState → {ModelState1}", model, modelState, ModelState);
+		logger.LogDebug("ModelReceivedEvent(model={Model},modelState={ModelState}): Model → {Model1}", model, modelState, Model);
     }
 
     #endregion

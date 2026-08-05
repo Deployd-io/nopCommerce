@@ -95,6 +95,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     protected virtual async Task<bool> AreMultipleItemsAsync(IList<GetShippingOptionRequest.PackageItem> items)
     {
+		logger.LogDebug(">>> Entering AreMultipleItemsAsync(items={Items})", items);
         //no items
         if (!items.Any())
             return false;
@@ -106,6 +107,7 @@ public partial class ShippingService : IShippingService
         //or single item
         var singleItem = items.First();
 
+		logger.LogDebug("AreMultipleItemsAsync(items={Items}): singleItem → {SingleItem}", items, singleItem);
         //but quantity more than one
         if (singleItem.GetQuantity() > 1)
             return true;
@@ -119,6 +121,7 @@ public partial class ShippingService : IShippingService
             .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct);
 
         //whether to ship associated products
+		logger.LogDebug("<<< Exiting AreMultipleItemsAsync(items={Items})", items);
         return await associatedAttributeValues.AnyAwaitAsync(async attributeValue =>
             (await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId))?.IsShipEnabled ?? false);
     }
@@ -182,10 +185,12 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<decimal> GetShoppingCartItemWeightAsync(ShoppingCartItem shoppingCartItem, bool ignoreFreeShippedItems = false)
     {
+		logger.LogDebug(">>> Entering GetShoppingCartItemWeightAsync(shoppingCartItem={ShoppingCartItem},ignoreFreeShippedItems={IgnoreFreeShippedItems})", shoppingCartItem, ignoreFreeShippedItems);
         ArgumentNullException.ThrowIfNull(shoppingCartItem);
 
         var product = await _productService.GetProductByIdAsync(shoppingCartItem.ProductId);
 
+		logger.LogDebug("GetShoppingCartItemWeightAsync(shoppingCartItem={ShoppingCartItem},ignoreFreeShippedItems={IgnoreFreeShippedItems}): product → {Product}", shoppingCartItem, ignoreFreeShippedItems, product);
         return await GetShoppingCartItemWeightAsync(product, shoppingCartItem.AttributesXml, ignoreFreeShippedItems);
     }
 
@@ -403,6 +408,8 @@ public partial class ShippingService : IShippingService
                     .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
                     .SelectAwait(async attributeValue => await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId)).ToListAsync();
                 product = associatedProducts.FirstOrDefault(associatedProduct => associatedProduct != null && associatedProduct.IsShipEnabled);
+				logger.LogDebug(">>> Entering IsShipEnabledAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
+				logger.LogDebug("<<< Exiting IsShipEnabledAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
             }
 
             if (product == null)
@@ -680,11 +687,13 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<bool> IsShipEnabledAsync(ShoppingCartItem shoppingCartItem)
     {
+		logger.LogDebug(">>> Entering IsShipEnabledAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
         //whether the product requires shipping
         if (shoppingCartItem.ProductId != 0 && (await _productService.GetProductByIdAsync(shoppingCartItem.ProductId))?.IsShipEnabled == true)
             return true;
 
         if (string.IsNullOrEmpty(shoppingCartItem.AttributesXml))
+		logger.LogDebug("<<< Exiting IsShipEnabledAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
             return false;
 
         //or whether associated products of the shopping cart item require shipping
@@ -703,6 +712,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<bool> IsFreeShippingAsync(ShoppingCartItem shoppingCartItem)
     {
+		logger.LogDebug(">>> Entering IsFreeShippingAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
         //first, check whether shipping is required
         if (!await IsShipEnabledAsync(shoppingCartItem))
             return true;
@@ -712,6 +722,7 @@ public partial class ShippingService : IShippingService
             return false;
 
         if (string.IsNullOrEmpty(shoppingCartItem.AttributesXml))
+		logger.LogDebug("<<< Exiting IsFreeShippingAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
             return true;
 
         //and whether associated products of the shopping cart item is free shipping
@@ -730,6 +741,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<decimal> GetAdditionalShippingChargeAsync(ShoppingCartItem shoppingCartItem)
     {
+		logger.LogDebug(">>> Entering GetAdditionalShippingChargeAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
         //first, check whether shipping is free
         if (await IsFreeShippingAsync(shoppingCartItem))
             return decimal.Zero;
@@ -737,6 +749,7 @@ public partial class ShippingService : IShippingService
         //get additional shipping charge of the product
         var additionalShippingCharge = ((await _productService.GetProductByIdAsync(shoppingCartItem.ProductId))?.AdditionalShippingCharge ?? decimal.Zero) * shoppingCartItem.Quantity;
 
+		logger.LogDebug("GetAdditionalShippingChargeAsync(shoppingCartItem={ShoppingCartItem}): additionalShippingCharge → {AdditionalShippingCharge}", shoppingCartItem, additionalShippingCharge);
         if (string.IsNullOrEmpty(shoppingCartItem.AttributesXml))
             return additionalShippingCharge;
 
@@ -745,6 +758,7 @@ public partial class ShippingService : IShippingService
             .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
             .SumAwaitAsync(async attributeValue => (await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId))?.AdditionalShippingCharge ?? decimal.Zero);
 
+		logger.LogDebug("<<< Exiting GetAdditionalShippingChargeAsync(shoppingCartItem={ShoppingCartItem})", shoppingCartItem);
         return additionalShippingCharge;
     }
 
