@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize v1.7.0
  *
@@ -193,6 +194,7 @@ var stringRepeat = function( str, count ) {
 
 
 function expandBestMatchFormat( skeletonWithoutFractionalSeconds, bestMatchFormat ) {
+	logger.debug(`>>> Entering expandBestMatchFormat(skeletonWithoutFractionalSeconds=${skeletonWithoutFractionalSeconds},bestMatchFormat=${bestMatchFormat})`);
 	var i, j, bestMatchFormatParts, matchedType, matchedLength, requestedType,
 		requestedLength, requestedSkeletonParts,
 
@@ -216,6 +218,7 @@ function expandBestMatchFormat( skeletonWithoutFractionalSeconds, bestMatchForma
 		}
 	}
 
+	logger.debug(`<<< Exiting expandBestMatchFormat(skeletonWithoutFractionalSeconds=${skeletonWithoutFractionalSeconds},bestMatchFormat=${bestMatchFormat})`);
 	return bestMatchFormatParts.join( "" );
 }
 
@@ -369,6 +372,8 @@ var dateExpandPattern = function( options, cldr ) {
 		getBestMatchPattern = dateExpandPatternGetBestMatchPattern;
 
 	function combineDateTime( type, datePattern, timePattern ) {
+		logger.debug(`>>> Entering combineDateTime(type=${type},datePattern=${datePattern},timePattern=${timePattern})`);
+		logger.debug(`<<< Exiting combineDateTime(type=${type},datePattern=${datePattern},timePattern=${timePattern})`);
 		return formatMessage(
 			cldr.main([
 				"dates/calendars/gregorian/dateTimeFormats",
@@ -609,7 +614,9 @@ var dateFormatProperties = function( pattern, cldr, timeZone ) {
 		widths = [ "abbreviated", "wide", "narrow" ];
 
 	function setNumberFormatterPattern( pad ) {
+		logger.debug(`>>> Entering setNumberFormatterPattern(pad=${pad})`);
 		properties.numberFormatters[ pad ] = stringPad( "", pad );
+		logger.debug(`<<< Exiting setNumberFormatterPattern(pad=${pad})`);
 	}
 
 	if ( timeZone ) {
@@ -973,6 +980,7 @@ function definePrivateProperty(object, property, value) {
 }
 
 function getUntilsIndex(original, untils) {
+logger.debug(`>>> Entering getUntilsIndex(original=${original},untils=${untils})`);
   var index = 0;
   var originalTime = original.getTime();
 
@@ -980,6 +988,7 @@ function getUntilsIndex(original, untils) {
   while (index < untils.length - 1 && originalTime >= untils[index]) {
     index++;
   }
+logger.debug(`<<< Exiting getUntilsIndex(original=${original},untils=${untils})`);
   return index;
 }
 
@@ -1560,37 +1569,45 @@ var dateTokenizer = function( value, numberParser, properties ) {
 		}
 
 		function oneDigitIfLengthOne() {
+			logger.debug('>>> Entering oneDigitIfLengthOne()');
 			if ( length === 1 ) {
 
 				// Unicode equivalent to /\d/
 				numeric = true;
+				logger.debug('<<< Exiting oneDigitIfLengthOne()');
 				return tokenRe = digitsRe;
 			}
 		}
 
 		function oneOrTwoDigitsIfLengthOne() {
+			logger.debug('>>> Entering oneOrTwoDigitsIfLengthOne()');
 			if ( length === 1 ) {
 
 				// Unicode equivalent to /\d\d?/
 				numeric = true;
+				logger.debug('<<< Exiting oneOrTwoDigitsIfLengthOne()');
 				return tokenRe = new RegExp( "^(" + digitsRe.source + "){1,2}" );
 			}
 		}
 
 		function oneOrTwoDigitsIfLengthOneOrTwo() {
+			logger.debug('>>> Entering oneOrTwoDigitsIfLengthOneOrTwo()');
 			if ( length === 1 || length === 2 ) {
 
 				// Unicode equivalent to /\d\d?/
 				numeric = true;
+				logger.debug('<<< Exiting oneOrTwoDigitsIfLengthOneOrTwo()');
 				return tokenRe = new RegExp( "^(" + digitsRe.source + "){1,2}" );
 			}
 		}
 
 		function twoDigitsIfLengthTwo() {
+			logger.debug('>>> Entering twoDigitsIfLengthTwo()');
 			if ( length === 2 ) {
 
 				// Unicode equivalent to /\d\d/
 				numeric = true;
+				logger.debug('<<< Exiting twoDigitsIfLengthTwo()');
 				return tokenRe = new RegExp( "^(" + digitsRe.source + "){2}" );
 			}
 		}
@@ -1598,6 +1615,7 @@ var dateTokenizer = function( value, numberParser, properties ) {
 		// Brute-force test every locale entry in an attempt to match the given value.
 		// Return the first found one (and set token accordingly), or null.
 		function lookup( path ) {
+			logger.debug(`>>> Entering lookup(path=${path})`);
 			var array = properties[ path.join( "/" ) ];
 
 			if ( !array ) {
@@ -1606,6 +1624,7 @@ var dateTokenizer = function( value, numberParser, properties ) {
 
 			// array of pairs [key, value] sorted by desc value length.
 			array.some(function( item ) {
+				logger.debug('>>> Entering some()');
 				var valueRe = item[ 1 ];
 				if ( valueRe.test( value ) ) {
 					token.value = item[ 0 ];
@@ -2031,6 +2050,7 @@ var dateTokenizerProperties = function( pattern, cldr, timeZone ) {
 		}
 
 		re = re.split( ";" ).map(function( part ) {
+			logger.debug('>>> Entering map()');
 			return gmtFormat.replace( "{0}", part );
 		}).join( "|" );
 
@@ -2064,6 +2084,7 @@ var dateTokenizerProperties = function( pattern, cldr, timeZone ) {
 			}).sort(function( a, b ) {
 				return b[ 1 ].source.length - a[ 1 ].source.length;
 			});
+			logger.debug('>>> Entering replace()');
 
 		// If typeof value === "string".
 		} else {
@@ -2840,6 +2861,8 @@ var dateToPartsFormatterFn = function( numberFormatters, properties ) {
 
 
 function optionsHasStyle( options ) {
+	logger.debug(`>>> Entering optionsHasStyle(options=${options})`);
+	logger.debug(`<<< Exiting optionsHasStyle(options=${options})`);
 	return options.skeleton !== undefined ||
 		options.date !== undefined ||
 		options.time !== undefined ||
@@ -2863,12 +2886,15 @@ function validateRequiredCldr( path, value ) {
 }
 
 function validateOptionsPreset( options ) {
+	logger.debug(`>>> Entering validateOptionsPreset(options=${options})`);
 	validateOptionsPresetEach( "date", options );
 	validateOptionsPresetEach( "time", options );
 	validateOptionsPresetEach( "datetime", options );
+	logger.debug(`<<< Exiting validateOptionsPreset(options=${options})`);
 }
 
 function validateOptionsPresetEach( type, options ) {
+	logger.debug(`>>> Entering validateOptionsPresetEach(type=${type},options=${options})`);
 	var value = options[ type ];
 	validate(
 		"E_INVALID_OPTIONS",
@@ -2876,18 +2902,22 @@ function validateOptionsPresetEach( type, options ) {
 		value === undefined || [ "short", "medium", "long", "full" ].indexOf( value ) !== -1,
 		{ type: type, value: value }
 	);
+	logger.debug(`<<< Exiting validateOptionsPresetEach(type=${type},options=${options})`);
 }
 
 function validateOptionsSkeleton( pattern, skeleton ) {
+	logger.debug(`>>> Entering validateOptionsSkeleton(pattern=${pattern},skeleton=${skeleton})`);
 	validate(
 		"E_INVALID_OPTIONS",
 		"Invalid `{skeleton: \"{value}\"}` based on provided CLDR.",
 		skeleton === undefined || ( typeof pattern === "string" && pattern ),
 		{ type: "skeleton", value: skeleton }
 	);
+	logger.debug(`<<< Exiting validateOptionsSkeleton(pattern=${pattern},skeleton=${skeleton})`);
 }
 
 function validateRequiredIana( timeZone ) {
+	logger.debug(`>>> Entering validateRequiredIana(timeZone=${timeZone})`);
 	return function( path, value ) {
 
 		if ( !/globalize-iana/.test( path ) ) {
@@ -2904,6 +2934,7 @@ function validateRequiredIana( timeZone ) {
 			}
 		);
 	};
+	logger.debug(`<<< Exiting validateRequiredIana(timeZone=${timeZone})`);
 }
 
 /**

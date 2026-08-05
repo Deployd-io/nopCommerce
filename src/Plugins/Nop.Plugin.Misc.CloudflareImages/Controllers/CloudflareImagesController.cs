@@ -7,6 +7,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.CloudflareImages.Controllers;
 
@@ -15,6 +16,7 @@ namespace Nop.Plugin.Misc.CloudflareImages.Controllers;
 [AutoValidateAntiforgeryToken]
 public class CloudflareImagesController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly CloudflareImagesSettings _cloudflareImagesSettings;
@@ -44,6 +46,7 @@ public class CloudflareImagesController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public IActionResult Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             Enabled = _cloudflareImagesSettings.Enabled,
@@ -53,6 +56,7 @@ public class CloudflareImagesController : BasePluginController
             RequestTimeout = _cloudflareImagesSettings.RequestTimeout
         };
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.CloudflareImages/Views/Configure.cshtml", model);
     }
 

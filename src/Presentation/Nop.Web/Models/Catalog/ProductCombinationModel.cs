@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
@@ -7,6 +8,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record ProductCombinationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -25,7 +27,10 @@ public partial record ProductCombinationModel : BaseNopModel
 
     public ProductCombinationModel()
     {
+		_logger.LogDebug(">>> Entering ProductCombinationModel()");
         Attributes = new List<ProductAttributeModel>();
+		_logger.LogDebug("<<< Exiting ProductCombinationModel()");
+		_logger.LogDebug("ProductCombinationModel(): Attributes → {Attributes}", Attributes);
     }
 
     #endregion

@@ -16,6 +16,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Areas.Admin.Models.Discounts;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -24,6 +25,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class DiscountModelFactory : IDiscountModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -112,15 +114,18 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// <returns>Discount product search model</returns>
     protected virtual DiscountProductSearchModel PrepareDiscountProductSearchModel(DiscountProductSearchModel searchModel, Discount discount)
     {
+		_logger.LogDebug(">>> Entering PrepareDiscountProductSearchModel(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(discount);
 
         searchModel.DiscountId = discount.Id;
+		_logger.LogDebug("PrepareDiscountProductSearchModel(searchModel={SearchModel},discount={Discount}): searchModel.DiscountId → {Arg2}", searchModel, discount, searchModel.DiscountId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareDiscountProductSearchModel(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         return searchModel;
     }
 
@@ -132,15 +137,18 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// <returns>Discount category search model</returns>
     protected virtual DiscountCategorySearchModel PrepareDiscountCategorySearchModel(DiscountCategorySearchModel searchModel, Discount discount)
     {
+		_logger.LogDebug(">>> Entering PrepareDiscountCategorySearchModel(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(discount);
 
         searchModel.DiscountId = discount.Id;
+		_logger.LogDebug("PrepareDiscountCategorySearchModel(searchModel={SearchModel},discount={Discount}): searchModel.DiscountId → {Arg2}", searchModel, discount, searchModel.DiscountId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareDiscountCategorySearchModel(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         return searchModel;
     }
 
@@ -179,6 +187,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<DiscountSearchModel> PrepareDiscountSearchModelAsync(DiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available discount types
@@ -209,6 +218,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -222,20 +232,25 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<DiscountListModel> PrepareDiscountListModelAsync(DiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter discounts
         var discountType = searchModel.SearchDiscountTypeId > 0 ? (DiscountType?)searchModel.SearchDiscountTypeId : null;
         var startDateUtc = searchModel.SearchStartDate.HasValue ?
+			_logger.LogDebug("PrepareDiscountListModelAsync(searchModel={SearchModel}): discountType → {DiscountType}", searchModel, discountType);
             (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.SearchStartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()) : null;
         var endDateUtc = searchModel.SearchEndDate.HasValue ?
             (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.SearchEndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1) : null;
         var isActive = searchModel.IsActiveId == 0 ? null : (bool?)(searchModel.IsActiveId == 1);
 
+		_logger.LogDebug("PrepareDiscountListModelAsync(searchModel={SearchModel}): isActive → {IsActive}", searchModel, isActive);
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+		_logger.LogDebug("PrepareDiscountListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         {
             searchModel.SearchVendorId = currentVendor.Id;
+			_logger.LogDebug("PrepareDiscountListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             discountType = DiscountType.AssignedToSkus;
         }
 
@@ -257,6 +272,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
                 //fill in model values from the entity
                 var discountModel = discount.ToModel<DiscountModel>();
 
+				_logger.LogDebug("PrepareDiscountListModelAsync(searchModel={SearchModel}): discountModel → {DiscountModel}", searchModel, discountModel);
                 //fill in additional values (not existing in the entity)
                 discountModel.DiscountTypeName = await _localizationService.GetLocalizedEnumAsync(discount.DiscountType);
                 discountModel.PrimaryStoreCurrencyCode = (await _currencyService
@@ -267,6 +283,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -470,6 +487,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<DiscountProductListModel> PrepareDiscountProductListModelAsync(DiscountProductSearchModel searchModel, Discount discount)
     {
+		_logger.LogDebug(">>> Entering PrepareDiscountProductListModelAsync(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(discount);
@@ -487,6 +505,10 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             {
                 var discountProductModel = product.ToModel<DiscountProductModel>();
                 discountProductModel.ProductId = product.Id;
+				_logger.LogDebug("PrepareDiscountProductListModelAsync(searchModel={SearchModel},discount={Discount}): discountProductModel → {DiscountProductModel}", searchModel, discount, discountProductModel);
+				_logger.LogDebug("PrepareDiscountProductListModelAsync(searchModel={SearchModel},discount={Discount}): discountProductModel.ProductId → {Arg2}", searchModel, discount, discountProductModel.ProductId);
+				_logger.LogDebug("PrepareDiscountProductListModelAsync(searchModel={SearchModel},discount={Discount}): discountProductModel.ProductName → {Arg2}", searchModel, discount, discountProductModel.ProductName);
+				_logger.LogDebug("PrepareDiscountProductListModelAsync(searchModel={SearchModel},discount={Discount}): discountProductModel.VendorId → {Arg2}", searchModel, discount, discountProductModel.VendorId);
                 discountProductModel.ProductName = product.Name;
                 discountProductModel.VendorId = product.VendorId;
 
@@ -494,6 +516,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareDiscountProductListModelAsync(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         return model;
     }
 
@@ -507,6 +530,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<AddProductToDiscountSearchModel> PrepareAddProductToDiscountSearchModelAsync(AddProductToDiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddProductToDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -529,6 +553,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddProductToDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -542,11 +567,14 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<AddProductToDiscountListModel> PrepareAddProductToDiscountListModelAsync(AddProductToDiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddProductToDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         if (currentVendor != null)
+			_logger.LogDebug("PrepareAddProductToDiscountListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
+			_logger.LogDebug("PrepareAddProductToDiscountListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
             searchModel.SearchVendorId = currentVendor.Id;
 
         //get products
@@ -566,11 +594,13 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             {
                 var productModel = product.ToModel<ProductModel>();
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
+				_logger.LogDebug("PrepareAddProductToDiscountListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
 
                 return productModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAddProductToDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -585,6 +615,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<DiscountCategoryListModel> PrepareDiscountCategoryListModelAsync(DiscountCategorySearchModel searchModel, Discount discount)
     {
+		_logger.LogDebug(">>> Entering PrepareDiscountCategoryListModelAsync(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(discount);
@@ -602,13 +633,16 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             {
                 var discountCategoryModel = category.ToModel<DiscountCategoryModel>();
 
+				_logger.LogDebug("PrepareDiscountCategoryListModelAsync(searchModel={SearchModel},discount={Discount}): discountCategoryModel → {DiscountCategoryModel}", searchModel, discount, discountCategoryModel);
                 discountCategoryModel.CategoryName = await _categoryService.GetFormattedBreadCrumbAsync(category);
                 discountCategoryModel.CategoryId = category.Id;
+				_logger.LogDebug("PrepareDiscountCategoryListModelAsync(searchModel={SearchModel},discount={Discount}): discountCategoryModel.CategoryId → {Arg2}", searchModel, discount, discountCategoryModel.CategoryId);
 
                 return discountCategoryModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareDiscountCategoryListModelAsync(searchModel={SearchModel},discount={Discount})", searchModel, discount);
         return model;
     }
 
@@ -622,11 +656,13 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual Task<AddCategoryToDiscountSearchModel> PrepareAddCategoryToDiscountSearchModelAsync(AddCategoryToDiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddCategoryToDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddCategoryToDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -640,6 +676,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<AddCategoryToDiscountListModel> PrepareAddCategoryToDiscountListModelAsync(AddCategoryToDiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddCategoryToDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get categories
@@ -655,6 +692,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
                 //fill in model values from the entity
                 var categoryModel = category.ToModel<CategoryModel>();
 
+				_logger.LogDebug("PrepareAddCategoryToDiscountListModelAsync(searchModel={SearchModel}): categoryModel → {CategoryModel}", searchModel, categoryModel);
                 //fill in additional values (not existing in the entity)
                 categoryModel.Breadcrumb = await _categoryService.GetFormattedBreadCrumbAsync(category);
                 categoryModel.SeName = await _urlRecordService.GetSeNameAsync(category, 0, true, false);
@@ -663,6 +701,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAddCategoryToDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -714,11 +753,13 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual Task<AddManufacturerToDiscountSearchModel> PrepareAddManufacturerToDiscountSearchModelAsync(AddManufacturerToDiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddManufacturerToDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddManufacturerToDiscountSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -732,6 +773,7 @@ public partial class DiscountModelFactory : IDiscountModelFactory
     /// </returns>
     public virtual async Task<AddManufacturerToDiscountListModel> PrepareAddManufacturerToDiscountListModelAsync(AddManufacturerToDiscountSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddManufacturerToDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get manufacturers
@@ -746,11 +788,13 @@ public partial class DiscountModelFactory : IDiscountModelFactory
             {
                 var manufacturerModel = manufacturer.ToModel<ManufacturerModel>();
                 manufacturerModel.SeName = await _urlRecordService.GetSeNameAsync(manufacturer, 0, true, false);
+				_logger.LogDebug("PrepareAddManufacturerToDiscountListModelAsync(searchModel={SearchModel}): manufacturerModel → {ManufacturerModel}", searchModel, manufacturerModel);
 
                 return manufacturerModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAddManufacturerToDiscountListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

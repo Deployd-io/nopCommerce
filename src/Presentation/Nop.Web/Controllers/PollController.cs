@@ -6,12 +6,14 @@ using Nop.Services.Localization;
 using Nop.Services.Polls;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class PollController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -47,21 +49,26 @@ public partial class PollController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> Vote(int pollAnswerId)
     {
+		_logger.LogDebug(">>> Entering Vote(pollAnswerId={PollAnswerId})", pollAnswerId);
         var pollAnswer = await _pollService.GetPollAnswerByIdAsync(pollAnswerId);
         if (pollAnswer == null)
+			_logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): pollAnswer → {PollAnswer}", pollAnswerId, pollAnswer);
             return Json(new { error = "No poll answer found with the specified id" });
 
         var poll = await _pollService.GetPollByIdAsync(pollAnswer.PollId);
 
+		_logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): poll → {Poll}", pollAnswerId, poll);
         if (!poll.Published || !await _storeMappingService.AuthorizeAsync(poll))
             return Json(new { error = "Poll is not available" });
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (await _customerService.IsGuestAsync(customer) && !poll.AllowGuestsToVote)
+			_logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): customer → {Customer}", pollAnswerId, customer);
             return Json(new { error = await _localizationService.GetResourceAsync("Polls.OnlyRegisteredUsersVote") });
 
         var alreadyVoted = await _pollService.AlreadyVotedAsync(poll.Id, customer.Id);
         if (!alreadyVoted)
+		_logger.LogDebug("Vote(pollAnswerId={PollAnswerId}): alreadyVoted → {AlreadyVoted}", pollAnswerId, alreadyVoted);
         {
             //vote
             await _pollService.InsertPollVotingRecordAsync(new PollVotingRecord
@@ -77,6 +84,7 @@ public partial class PollController : BasePublicController
             await _pollService.UpdatePollAsync(poll);
         }
 
+		_logger.LogDebug("<<< Exiting Vote(pollAnswerId={PollAnswerId})", pollAnswerId);
         return Json(new
         {
             html = await RenderPartialViewToStringAsync("_Poll", await _pollModelFactory.PreparePollModelAsync(poll, true)),

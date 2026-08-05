@@ -79,9 +79,11 @@ public partial class InstallController : Controller
         };
         countries.AddRange(from country in ISO3166.GetCollection()
             from localization in ISO3166.GetLocalizationInfo(country.Alpha2)
+			using Microsoft.Extensions.Logging;
             let lang = ISO3166.GetLocalizationInfo(country.Alpha2).Count() > 1 ? $" [{localization.Language} language]" : string.Empty
             let item = new SelectListItem
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 Value = $"{country.Alpha2}-{localization.Culture}",
                 Text = $"{country.Name}{lang}",
                 Selected = (localization.Culture == browserCulture) && browserCulture[^2..] == country.Alpha2
@@ -127,6 +129,7 @@ public partial class InstallController : Controller
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -146,6 +149,7 @@ public partial class InstallController : Controller
         PrepareLanguageList(model);
         PrepareCountryList(model);
 
+		_logger.LogDebug("<<< Exiting Index()");
         return View(model);
     }
 
@@ -335,19 +339,23 @@ public partial class InstallController : Controller
 
     public virtual IActionResult ChangeLanguage(string language)
     {
+		_logger.LogDebug(">>> Entering ChangeLanguage(language={Language})", language);
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         _locService.Value.SaveCurrentLanguage(language);
 
         //Reload the page
+		_logger.LogDebug("<<< Exiting ChangeLanguage(language={Language})", language);
         return RedirectToAction("Index", "Install");
     }
 
     [HttpPost]
     public virtual IActionResult RestartInstall()
     {
+		_logger.LogDebug(">>> Entering RestartInstall()");
         if (DataSettingsManager.IsDatabaseInstalled())
+		_logger.LogDebug("<<< Exiting RestartInstall()");
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         return View("Index", new InstallModel { RestartUrl = Url.RouteUrl(NopRouteNames.Standard.INSTALLATION) });
@@ -355,12 +363,14 @@ public partial class InstallController : Controller
 
     public virtual IActionResult RestartApplication()
     {
+		_logger.LogDebug(">>> Entering RestartApplication()");
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         //restart application
         _webHelper.Value.RestartAppDomain();
 
+		_logger.LogDebug("<<< Exiting RestartApplication()");
         return new EmptyResult();
     }
 

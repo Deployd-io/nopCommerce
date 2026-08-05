@@ -6,6 +6,7 @@ using Nop.Core.Infrastructure;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
@@ -18,6 +19,7 @@ namespace Nop.Web.Areas.Admin.Controllers;
 [NotNullValidationMessage]
 public abstract partial class BaseAdminController : BaseController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Creates an object that serializes the specified object to JSON.
     /// </summary>
@@ -25,9 +27,11 @@ public abstract partial class BaseAdminController : BaseController
     /// <returns>The created object that serializes the specified data to JSON format for the response.</returns>
     public override JsonResult Json(object data)
     {
+		_logger.LogDebug(">>> Entering Json(data={Data})", data);
         //use IsoDateFormat on writing JSON text to fix issue with dates in grid
         var useIsoDateFormat = EngineContext.Current.Resolve<AdminAreaSettings>()?.UseIsoDateFormatInJsonResult ?? false;
         var serializerSettings = EngineContext.Current.Resolve<IOptions<MvcNewtonsoftJsonOptions>>()?.Value?.SerializerSettings
+								_logger.LogDebug("Json(data={Data}): useIsoDateFormat → {UseIsoDateFormat}", data, useIsoDateFormat);
                                  ?? new JsonSerializerSettings();
 
         if (!useIsoDateFormat)
@@ -36,6 +40,7 @@ public abstract partial class BaseAdminController : BaseController
         serializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
         serializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Unspecified;
 
+		_logger.LogDebug("<<< Exiting Json(data={Data})", data);
         return base.Json(data, serializerSettings);
     }
 

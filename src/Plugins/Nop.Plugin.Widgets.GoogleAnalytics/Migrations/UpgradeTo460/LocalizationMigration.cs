@@ -4,23 +4,29 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.GoogleAnalytics.Migrations.UpgradeTo460;
 
 [NopMigration("2022-04-05 17:00:00", "Widgets.GoogleAnalytics 1.74. Update localizations", MigrationProcessType.Update)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		_logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
         var (languageId, _) = this.GetLanguageData();
 
         //use localizationService to add, update and delete localization resources
@@ -29,5 +35,6 @@ public class LocalizationMigration : MigrationBase
             ["Plugins.Widgets.GoogleAnalytics.Instructions"] = "<p>Google Analytics is a free website stats tool from Google. It keeps track of statistics about the visitors and eCommerce conversion on your website.<br /><br />Follow the next steps to enable Google Analytics integration:<br /><ul><li><a href=\"http://www.google.com/analytics/\" target=\"_blank\">Create a Google Analytics account</a> and follow the wizard to add your website</li><li>Copy the Tracking ID into the 'ID' box below</li><li>Click the 'Save' button below and Google Analytics will be integrated into your store</li></ul><br /></p>"
 
         }, languageId);
+		_logger.LogDebug("<<< Exiting Up()");
     }
 }

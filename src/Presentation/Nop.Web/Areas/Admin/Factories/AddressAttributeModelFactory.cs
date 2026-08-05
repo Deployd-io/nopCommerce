@@ -6,6 +6,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -14,6 +15,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class AddressAttributeModelFactory : IAddressAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeParser<AddressAttribute, AddressAttributeValue> _addressAttributeParser;
@@ -48,15 +50,18 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
     /// <returns>Address attribute value search model</returns>
     protected virtual AddressAttributeValueSearchModel PrepareAddressAttributeValueSearchModel(AddressAttributeValueSearchModel searchModel, AddressAttribute addressAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareAddressAttributeValueSearchModel(searchModel={SearchModel},addressAttribute={AddressAttribute})", searchModel, addressAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(addressAttribute);
 
         searchModel.AddressAttributeId = addressAttribute.Id;
+		_logger.LogDebug("PrepareAddressAttributeValueSearchModel(searchModel={SearchModel},addressAttribute={AddressAttribute}): searchModel.AddressAttributeId → {Arg2}", searchModel, addressAttribute, searchModel.AddressAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddressAttributeValueSearchModel(searchModel={SearchModel},addressAttribute={AddressAttribute})", searchModel, addressAttribute);
         return searchModel;
     }
 
@@ -74,11 +79,13 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
     /// </returns>
     public virtual Task<AddressAttributeSearchModel> PrepareAddressAttributeSearchModelAsync(AddressAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddressAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddressAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -92,11 +99,13 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
     /// </returns>
     public virtual async Task<AddressAttributeListModel> PrepareAddressAttributeListModelAsync(AddressAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddressAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get address attributes
         var addressAttributes = (await _addressAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareAddressAttributeListModelAsync(searchModel={SearchModel}): addressAttributes → {AddressAttributes}", searchModel, addressAttributes);
         //prepare grid model
         var model = await new AddressAttributeListModel().PrepareToGridAsync(searchModel, addressAttributes, () =>
         {
@@ -105,6 +114,7 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<AddressAttributeModel>();
 
+				_logger.LogDebug("PrepareAddressAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
 
@@ -112,6 +122,7 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAddressAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -228,11 +239,13 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareCustomAddressAttributesAsync(IList<AddressModel.AddressAttributeModel> models, Address address)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomAddressAttributesAsync(models={Models},address={Address})", models, address);
         ArgumentNullException.ThrowIfNull(models);
 
         var attributes = await _addressAttributeService.GetAllAttributesAsync();
         foreach (var attribute in attributes)
         {
+		_logger.LogDebug("PrepareCustomAddressAttributesAsync(models={Models},address={Address}): attributes → {Attributes}", models, address, attributes);
             var attributeModel = new AddressModel.AddressAttributeModel
             {
                 Id = attribute.Id,
@@ -247,6 +260,7 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
                 var attributeValues = await _addressAttributeService.GetAttributeValuesAsync(attribute.Id);
                 foreach (var attributeValue in attributeValues)
                 {
+				_logger.LogDebug("PrepareCustomAddressAttributesAsync(models={Models},address={Address}): attributeValues → {AttributeValues}", models, address, attributeValues);
                     var attributeValueModel = new AddressModel.AddressAttributeValueModel
                     {
                         Id = attributeValue.Id,
@@ -270,12 +284,14 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
                         //clear default selection
                         foreach (var item in attributeModel.Values)
                             item.IsPreSelected = false;
+							_logger.LogDebug("PrepareCustomAddressAttributesAsync(models={Models},address={Address}): item.IsPreSelected → {Arg2}", models, address, item.IsPreSelected);
 
                         //select new values
                         var selectedValues = await _addressAttributeParser.ParseAttributeValuesAsync(selectedAddressAttributes);
                         foreach (var attributeValue in selectedValues)
                         foreach (var item in attributeModel.Values)
                             if (attributeValue.Id == item.Id)
+						_logger.LogDebug("PrepareCustomAddressAttributesAsync(models={Models},address={Address}): selectedValues → {SelectedValues}", models, address, selectedValues);
                                 item.IsPreSelected = true;
                     }
                 }
@@ -293,6 +309,8 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
                     {
                         var enteredText = _addressAttributeParser.ParseValues(selectedAddressAttributes, attribute.Id);
                         if (enteredText.Any())
+							_logger.LogDebug("PrepareCustomAddressAttributesAsync(models={Models},address={Address}): enteredText → {EnteredText}", models, address, enteredText);
+							_logger.LogDebug("PrepareCustomAddressAttributesAsync(models={Models},address={Address}): attributeModel.DefaultValue → {Arg2}", models, address, attributeModel.DefaultValue);
                             attributeModel.DefaultValue = enteredText[0];
                     }
                 }
@@ -308,6 +326,7 @@ public partial class AddressAttributeModelFactory : IAddressAttributeModelFactor
 
             models.Add(attributeModel);
         }
+		_logger.LogDebug("<<< Exiting PrepareCustomAddressAttributesAsync(models={Models},address={Address})", models, address);
     }
 
     #endregion

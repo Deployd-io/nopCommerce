@@ -1,14 +1,20 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.News;
 
 public partial record NewsItemModel : BaseNopEntityModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public NewsItemModel()
     {
+		_logger.LogDebug(">>> Entering NewsItemModel()");
         Comments = new List<NewsCommentModel>();
         AddNewComment = new AddNewsCommentModel();
+		_logger.LogDebug("<<< Exiting NewsItemModel()");
+		_logger.LogDebug("NewsItemModel(): Comments → {Comments}", Comments);
+		_logger.LogDebug("NewsItemModel(): AddNewComment → {AddNewComment}", AddNewComment);
     }
 
     public string MetaKeywords { get; set; }

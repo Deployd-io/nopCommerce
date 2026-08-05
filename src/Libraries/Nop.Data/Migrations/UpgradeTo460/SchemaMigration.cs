@@ -6,42 +6,67 @@ using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Tax;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo460;
 
 [NopSchemaMigration("2022-07-20 00:00:10", "SchemaMigration for 4.60.0")]
 public class SchemaMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Collect the UP migration expressions
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         // add column
         var customerTableName = nameof(Customer);
 
+		_logger.LogDebug("Up(): customerTableName → {CustomerTableName}", customerTableName);
         var firstNameCustomerColumnName = nameof(Customer.FirstName);
         var lastNameCustomerColumnName = nameof(Customer.LastName);
+		_logger.LogDebug("Up(): firstNameCustomerColumnName → {FirstNameCustomerColumnName}", firstNameCustomerColumnName);
+		_logger.LogDebug("Up(): lastNameCustomerColumnName → {LastNameCustomerColumnName}", lastNameCustomerColumnName);
         var genderCustomerColumnName = nameof(Customer.Gender);
         var dobCustomerColumnName = nameof(Customer.DateOfBirth);
+		_logger.LogDebug("Up(): genderCustomerColumnName → {GenderCustomerColumnName}", genderCustomerColumnName);
+		_logger.LogDebug("Up(): dobCustomerColumnName → {DobCustomerColumnName}", dobCustomerColumnName);
         var companyCustomerColumnName = nameof(Customer.Company);
         var address1CustomerColumnName = nameof(Customer.StreetAddress);
+		_logger.LogDebug("Up(): companyCustomerColumnName → {CompanyCustomerColumnName}", companyCustomerColumnName);
+		_logger.LogDebug("Up(): address1CustomerColumnName → {Address1CustomerColumnName}", address1CustomerColumnName);
         var address2CustomerColumnName = nameof(Customer.StreetAddress2);
         var zipCustomerColumnName = nameof(Customer.ZipPostalCode);
+		_logger.LogDebug("Up(): address2CustomerColumnName → {Address2CustomerColumnName}", address2CustomerColumnName);
+		_logger.LogDebug("Up(): zipCustomerColumnName → {ZipCustomerColumnName}", zipCustomerColumnName);
         var cityCustomerColumnName = nameof(Customer.City);
         var countyCustomerColumnName = nameof(Customer.County);
+		_logger.LogDebug("Up(): cityCustomerColumnName → {CityCustomerColumnName}", cityCustomerColumnName);
+		_logger.LogDebug("Up(): countyCustomerColumnName → {CountyCustomerColumnName}", countyCustomerColumnName);
         var countryIdCustomerColumnName = nameof(Customer.CountryId);
         var stateIdCustomerColumnName = nameof(Customer.StateProvinceId);
+		_logger.LogDebug("Up(): countryIdCustomerColumnName → {CountryIdCustomerColumnName}", countryIdCustomerColumnName);
+		_logger.LogDebug("Up(): stateIdCustomerColumnName → {StateIdCustomerColumnName}", stateIdCustomerColumnName);
         var phoneCustomerColumnName = nameof(Customer.Phone);
         var faxCustomerColumnName = nameof(Customer.Fax);
+		_logger.LogDebug("Up(): phoneCustomerColumnName → {PhoneCustomerColumnName}", phoneCustomerColumnName);
+		_logger.LogDebug("Up(): faxCustomerColumnName → {FaxCustomerColumnName}", faxCustomerColumnName);
         var vatNumberCustomerColumnName = nameof(Customer.VatNumber);
         var vatNumberStatusIdCustomerColumnName = nameof(Customer.VatNumberStatusId);
+		_logger.LogDebug("Up(): vatNumberCustomerColumnName → {VatNumberCustomerColumnName}", vatNumberCustomerColumnName);
+		_logger.LogDebug("Up(): vatNumberStatusIdCustomerColumnName → {VatNumberStatusIdCustomerColumnName}", vatNumberStatusIdCustomerColumnName);
         var timeZoneIdCustomerColumnName = nameof(Customer.TimeZoneId);
         var attributeXmlCustomerColumnName = nameof(Customer.CustomCustomerAttributesXML);
+		_logger.LogDebug("Up(): timeZoneIdCustomerColumnName → {TimeZoneIdCustomerColumnName}", timeZoneIdCustomerColumnName);
+		_logger.LogDebug("Up(): attributeXmlCustomerColumnName → {AttributeXmlCustomerColumnName}", attributeXmlCustomerColumnName);
         var currencyIdCustomerColumnName = nameof(Customer.CurrencyId);
         var languageIdCustomerColumnName = nameof(Customer.LanguageId);
+		_logger.LogDebug("Up(): currencyIdCustomerColumnName → {CurrencyIdCustomerColumnName}", currencyIdCustomerColumnName);
+		_logger.LogDebug("Up(): languageIdCustomerColumnName → {LanguageIdCustomerColumnName}", languageIdCustomerColumnName);
         var taxDisplayTypeIdCustomerColumnName = nameof(Customer.TaxDisplayTypeId);
 
+		_logger.LogDebug("Up(): taxDisplayTypeIdCustomerColumnName → {TaxDisplayTypeIdCustomerColumnName}", taxDisplayTypeIdCustomerColumnName);
         if (!Schema.Table(customerTableName).Column(firstNameCustomerColumnName).Exists())
         {
             Alter.Table(customerTableName)
@@ -151,11 +176,14 @@ public class SchemaMigration : ForwardOnlyMigration
         //5705
         var discountTableName = nameof(Discount);
         var isActiveDiscountColumnName = nameof(Discount.IsActive);
+		_logger.LogDebug("Up(): discountTableName → {DiscountTableName}", discountTableName);
+		_logger.LogDebug("Up(): isActiveDiscountColumnName → {IsActiveDiscountColumnName}", isActiveDiscountColumnName);
 
         if (!Schema.Table(discountTableName).Column(isActiveDiscountColumnName).Exists())
         {
             Alter.Table(discountTableName)
                 .AddColumn(isActiveDiscountColumnName).AsBoolean().NotNullable().SetExistingRowsTo(true);
         }
+		_logger.LogDebug("<<< Exiting Up()");
     }
 }

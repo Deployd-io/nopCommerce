@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize Runtime v1.7.0
  *
@@ -61,12 +62,15 @@ var validateParameterTypeDate = function( value, name ) {
 
 var ZonedDateTime = (function() {
 function definePrivateProperty(object, property, value) {
+logger.debug(`>>> Entering definePrivateProperty(object=${object},property=${property},value=${value})`);
   Object.defineProperty(object, property, {
     value: value
   });
+logger.debug(`<<< Exiting definePrivateProperty(object=${object},property=${property},value=${value})`);
 }
 
 function getUntilsIndex(original, untils) {
+logger.debug(`>>> Entering getUntilsIndex(original=${original},untils=${untils})`);
   var index = 0;
   var originalTime = original.getTime();
 
@@ -74,10 +78,12 @@ function getUntilsIndex(original, untils) {
   while (index < untils.length - 1 && originalTime >= untils[index]) {
     index++;
   }
+logger.debug(`<<< Exiting getUntilsIndex(original=${original},untils=${untils})`);
   return index;
 }
 
 function setWrap(fn) {
+logger.debug(`>>> Entering setWrap(fn=${fn})`);
   var offset1 = this.getTimezoneOffset();
   var ret = fn();
   this.original.setTime(new Date(this.getTime()));
@@ -1131,6 +1137,7 @@ var dateTokenizer = function( value, numberParser, properties ) {
 			var aux, isPositive,
 				match = value.match( tokenRe );
 			numberParser = numberParser || function( value ) {
+				logger.debug(`>>> Entering function(value=${value})`);
 				return +value;
 			};
 
@@ -1167,37 +1174,45 @@ var dateTokenizer = function( value, numberParser, properties ) {
 		}
 
 		function oneDigitIfLengthOne() {
+			logger.debug('>>> Entering oneDigitIfLengthOne()');
 			if ( length === 1 ) {
 
 				// Unicode equivalent to /\d/
 				numeric = true;
+				logger.debug('<<< Exiting oneDigitIfLengthOne()');
 				return tokenRe = digitsRe;
 			}
 		}
 
 		function oneOrTwoDigitsIfLengthOne() {
+			logger.debug('>>> Entering oneOrTwoDigitsIfLengthOne()');
 			if ( length === 1 ) {
 
 				// Unicode equivalent to /\d\d?/
 				numeric = true;
+				logger.debug('<<< Exiting oneOrTwoDigitsIfLengthOne()');
 				return tokenRe = new RegExp( "^(" + digitsRe.source + "){1,2}" );
 			}
 		}
 
 		function oneOrTwoDigitsIfLengthOneOrTwo() {
+			logger.debug('>>> Entering oneOrTwoDigitsIfLengthOneOrTwo()');
 			if ( length === 1 || length === 2 ) {
 
 				// Unicode equivalent to /\d\d?/
 				numeric = true;
+				logger.debug('<<< Exiting oneOrTwoDigitsIfLengthOneOrTwo()');
 				return tokenRe = new RegExp( "^(" + digitsRe.source + "){1,2}" );
 			}
 		}
 
 		function twoDigitsIfLengthTwo() {
+			logger.debug('>>> Entering twoDigitsIfLengthTwo()');
 			if ( length === 2 ) {
 
 				// Unicode equivalent to /\d\d/
 				numeric = true;
+				logger.debug('<<< Exiting twoDigitsIfLengthTwo()');
 				return tokenRe = new RegExp( "^(" + digitsRe.source + "){2}" );
 			}
 		}
@@ -1205,6 +1220,7 @@ var dateTokenizer = function( value, numberParser, properties ) {
 		// Brute-force test every locale entry in an attempt to match the given value.
 		// Return the first found one (and set token accordingly), or null.
 		function lookup( path ) {
+			logger.debug(`>>> Entering lookup(path=${path})`);
 			var array = properties[ path.join( "/" ) ];
 
 			if ( !array ) {
@@ -1213,6 +1229,7 @@ var dateTokenizer = function( value, numberParser, properties ) {
 
 			// array of pairs [key, value] sorted by desc value length.
 			array.some(function( item ) {
+				logger.debug('>>> Entering some()');
 				var valueRe = item[ 1 ];
 				if ( valueRe.test( value ) ) {
 					token.value = item[ 0 ];
@@ -1591,6 +1608,8 @@ Globalize._dateToPartsFormatterFn = dateToPartsFormatterFn;
 Globalize._validateParameterTypeDate = validateParameterTypeDate;
 
 function optionsHasStyle( options ) {
+	logger.debug(`>>> Entering optionsHasStyle(options=${options})`);
+	logger.debug(`<<< Exiting optionsHasStyle(options=${options})`);
 	return options.skeleton !== undefined ||
 		options.date !== undefined ||
 		options.time !== undefined ||

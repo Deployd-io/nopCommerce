@@ -6,6 +6,7 @@ using Nop.Services.Catalog;
 using Nop.Services.Directory;
 using Nop.Services.Media;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Services;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Misc.Omnisend.Services;
 /// </summary>
 public class OmnisendHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private string _primaryStoreCurrencyCode;
@@ -53,13 +55,17 @@ public class OmnisendHelper
     /// </summary>
     public async Task<string> GetPrimaryStoreCurrencyCodeAsync()
     {
+		_logger.LogDebug(">>> Entering GetPrimaryStoreCurrencyCodeAsync()");
         if (!string.IsNullOrEmpty(_primaryStoreCurrencyCode))
             return _primaryStoreCurrencyCode;
 
         var currency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
 
+		_logger.LogDebug("GetPrimaryStoreCurrencyCodeAsync(): currency → {Currency}", currency);
         _primaryStoreCurrencyCode = currency.CurrencyCode;
+		_logger.LogDebug("GetPrimaryStoreCurrencyCodeAsync(): _primaryStoreCurrencyCode → {_primaryStoreCurrencyCode}", _primaryStoreCurrencyCode);
 
+		_logger.LogDebug("<<< Exiting GetPrimaryStoreCurrencyCodeAsync()");
         return _primaryStoreCurrencyCode;
     }
 
@@ -91,6 +97,8 @@ public class OmnisendHelper
     /// <param name="product">Product</param>
     public async Task<string> GetProductUrlAsync(Product product)
     {
+		_logger.LogDebug(">>> Entering GetProductUrlAsync(product={Product})", product);
+		_logger.LogDebug("<<< Exiting GetProductUrlAsync(product={Product})", product);
         return await _nopUrlHelper.RouteGenericUrlAsync(product, _webHelper.GetCurrentRequestProtocol());
     }
 
@@ -100,6 +108,7 @@ public class OmnisendHelper
     /// <param name="product">Product</param>
     public async Task<ProductDto.Image> GetProductPictureUrlAsync(Product product)
     {
+		_logger.LogDebug(">>> Entering GetProductPictureUrlAsync(product={Product})", product);
         var picture = (await _pictureService
             .GetPicturesByProductIdAsync(product.Id, 1)).DefaultIfEmpty(null).FirstOrDefault();
 
@@ -107,9 +116,12 @@ public class OmnisendHelper
 
         var storeLocation = _webHelper.GetStoreLocation();
 
+		_logger.LogDebug("GetProductPictureUrlAsync(product={Product}): storeLocation → {StoreLocation}", product, storeLocation);
         if (!url.StartsWith(storeLocation))
             url = storeLocation + url;
+			_logger.LogInformation("GetProductPictureUrlAsync(product={Product}): url → {Url}", product, url);
 
+		_logger.LogDebug("<<< Exiting GetProductPictureUrlAsync(product={Product})", product);
         return new ProductDto.Image { ImageId = (picture?.Id ?? 0).ToString(), Url = url };
     }
 

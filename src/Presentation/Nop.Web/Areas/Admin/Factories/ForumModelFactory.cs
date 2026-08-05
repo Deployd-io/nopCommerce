@@ -4,6 +4,7 @@ using Nop.Services.Helpers;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Forums;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ForumModelFactory : IForumModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDateTimeHelper _dateTimeHelper;
@@ -23,8 +25,12 @@ public partial class ForumModelFactory : IForumModelFactory
 
     public ForumModelFactory(IDateTimeHelper dateTimeHelper, IForumService forumService)
     {
+		_logger.LogDebug(">>> Entering ForumModelFactory(dateTimeHelper={DateTimeHelper},forumService={ForumService})", dateTimeHelper, forumService);
         _dateTimeHelper = dateTimeHelper;
         _forumService = forumService;
+		_logger.LogDebug("<<< Exiting ForumModelFactory(dateTimeHelper={DateTimeHelper},forumService={ForumService})", dateTimeHelper, forumService);
+		_logger.LogDebug("ForumModelFactory(dateTimeHelper={DateTimeHelper},forumService={ForumService}): _forumService → {_forumService}", dateTimeHelper, forumService, _forumService);
+		_logger.LogDebug("ForumModelFactory(dateTimeHelper={DateTimeHelper},forumService={ForumService}): _dateTimeHelper → {_dateTimeHelper}", dateTimeHelper, forumService, _dateTimeHelper);
     }
 
     #endregion
@@ -38,11 +44,13 @@ public partial class ForumModelFactory : IForumModelFactory
     /// <returns>Forum search model</returns>
     protected virtual ForumSearchModel PrepareForumSearchModel(ForumSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareForumSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareForumSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -60,6 +68,7 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual Task<ForumGroupSearchModel> PrepareForumGroupSearchModelAsync(ForumGroupSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareForumGroupSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare nested search model
@@ -68,6 +77,7 @@ public partial class ForumModelFactory : IForumModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareForumGroupSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -81,11 +91,13 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<ForumGroupListModel> PrepareForumGroupListModelAsync(ForumGroupSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareForumGroupListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get forum groups
         var forumGroups = (await _forumService.GetAllForumGroupsAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareForumGroupListModelAsync(searchModel={SearchModel}): forumGroups → {ForumGroups}", searchModel, forumGroups);
         //prepare list model
         var model = await new ForumGroupListModel().PrepareToGridAsync(searchModel, forumGroups, () =>
         {
@@ -94,6 +106,7 @@ public partial class ForumModelFactory : IForumModelFactory
                 //fill in model values from the entity
                 var forumGroupModel = forumGroup.ToModel<ForumGroupModel>();
 
+				_logger.LogDebug("PrepareForumGroupListModelAsync(searchModel={SearchModel}): forumGroupModel → {ForumGroupModel}", searchModel, forumGroupModel);
                 //convert dates to the user time
                 forumGroupModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(forumGroup.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -101,6 +114,7 @@ public partial class ForumModelFactory : IForumModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareForumGroupListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -138,6 +152,7 @@ public partial class ForumModelFactory : IForumModelFactory
     /// </returns>
     public virtual async Task<ForumListModel> PrepareForumListModelAsync(ForumSearchModel searchModel, ForumGroup forumGroup)
     {
+		_logger.LogDebug(">>> Entering PrepareForumListModelAsync(searchModel={SearchModel},forumGroup={ForumGroup})", searchModel, forumGroup);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(forumGroup);
@@ -145,6 +160,7 @@ public partial class ForumModelFactory : IForumModelFactory
         //get forums
         var forums = (await _forumService.GetAllForumsByGroupIdAsync(forumGroup.Id)).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareForumListModelAsync(searchModel={SearchModel},forumGroup={ForumGroup}): forums → {Forums}", searchModel, forumGroup, forums);
         //prepare list model
         var model = await new ForumListModel().PrepareToGridAsync(searchModel, forums, () =>
         {
@@ -153,6 +169,7 @@ public partial class ForumModelFactory : IForumModelFactory
                 //fill in model values from the entity
                 var forumModel = forum.ToModel<ForumModel>();
 
+				_logger.LogDebug("PrepareForumListModelAsync(searchModel={SearchModel},forumGroup={ForumGroup}): forumModel → {ForumModel}", searchModel, forumGroup, forumModel);
                 //convert dates to the user time
                 forumModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(forum.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -160,6 +177,7 @@ public partial class ForumModelFactory : IForumModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareForumListModelAsync(searchModel={SearchModel},forumGroup={ForumGroup})", searchModel, forumGroup);
         return model;
     }
 

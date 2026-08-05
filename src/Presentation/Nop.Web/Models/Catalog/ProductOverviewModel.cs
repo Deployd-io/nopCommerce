@@ -2,18 +2,27 @@
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record ProductOverviewModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductOverviewModel()
     {
+		_logger.LogDebug(">>> Entering ProductOverviewModel()");
         ProductPrice = new ProductPriceModel();
         PictureModels = new List<PictureModel>();
+		_logger.LogDebug("ProductOverviewModel(): ProductPrice → {ProductPrice}", ProductPrice);
+		_logger.LogDebug("ProductOverviewModel(): PictureModels → {PictureModels}", PictureModels);
         ProductSpecificationModel = new ProductSpecificationModel();
         ReviewOverviewModel = new ProductReviewOverviewModel();
+		_logger.LogDebug("ProductOverviewModel(): ProductSpecificationModel → {ProductSpecificationModel}", ProductSpecificationModel);
+		_logger.LogDebug("ProductOverviewModel(): ReviewOverviewModel → {ReviewOverviewModel}", ReviewOverviewModel);
         ProductToWishlist = new ProductToWishlistModel();
+		_logger.LogDebug("<<< Exiting ProductOverviewModel()");
+		_logger.LogDebug("ProductOverviewModel(): ProductToWishlist → {ProductToWishlist}", ProductToWishlist);
     }
 
     public string Name { get; set; }

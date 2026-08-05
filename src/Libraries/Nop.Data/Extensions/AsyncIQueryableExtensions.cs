@@ -1,11 +1,13 @@
 ﻿using System.Linq.Expressions;
 using LinqToDB;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace System.Linq;
 
 public static class AsyncIQueryableExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Determines whether all the elements of a sequence satisfy a condition
     /// </summary>
@@ -227,6 +229,7 @@ public static class AsyncIQueryableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static Task<bool> ContainsAsync<TSource>(this IQueryable<TSource> source, TSource item)
     {
+		_logger.LogDebug(">>> Entering ContainsAsync(source={Source},item={Item})", source, item);
         return AsyncExtensions.ContainsAsync(source, item);
     }
 
@@ -308,10 +311,13 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<TSource> MaxAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering MaxAsync(source={Source})", source);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return AsyncExtensions.MaxAsync(source);
     }
 
     /// <summary>
+	_logger.LogInformation("MaxAsync(source)={Source}: database query executed in {Arg1} ms", source, __logStart.ElapsedMilliseconds);
     /// Invokes a projection function on each element of a generic sequence
     /// and returns the maximum resulting value
     /// </summary>
@@ -340,10 +346,13 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<TSource> MinAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering MinAsync(source={Source})", source);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return AsyncExtensions.MinAsync(source);
     }
 
     /// <summary>
+	_logger.LogInformation("MinAsync(source)={Source}: database query executed in {Arg1} ms", source, __logStart.ElapsedMilliseconds);
     /// Invokes a projection function on each element of a generic sequence
     /// and returns the minimum resulting value
     /// </summary>
@@ -625,10 +634,13 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering ToListAsync(source={Source})", source);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return AsyncExtensions.ToListAsync(source);
     }
 
     /// <summary>
+	_logger.LogInformation("ToListAsync(source)={Source}: database query executed in {Arg1} ms", source, __logStart.ElapsedMilliseconds);
     /// Asynchronously loads data from query to an array
     /// </summary>
     /// <typeparam name="TSource">Query element type</typeparam>
@@ -639,10 +651,13 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering ToArrayAsync(source={Source})", source);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return AsyncExtensions.ToArrayAsync(source);
     }
 
     /// <summary>
+	_logger.LogInformation("ToArrayAsync(source)={Source}: database query executed in {Arg1} ms", source, __logStart.ElapsedMilliseconds);
     /// Ctor
     /// </summary>
     /// <param name="source">source</param>
@@ -652,16 +667,22 @@ public static class AsyncIQueryableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, bool getOnlyTotalCount = false)
     {
+		_logger.LogDebug(">>> Entering ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", source, pageIndex, pageSize, getOnlyTotalCount);
         if (source == null)
             return new PagedList<T>(new List<T>(), pageIndex, pageSize);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         //min allowed page size is 1
         pageSize = Math.Max(pageSize, 1);
 
+		_logger.LogDebug("ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): pageSize → {PageSize1}", source, pageIndex, pageSize, getOnlyTotalCount, pageSize);
         var count = await source.CountAsync();
 
+		_logger.LogDebug("ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): count → {Count}", source, pageIndex, pageSize, getOnlyTotalCount, count);
+		_logger.LogInformation("ToPagedListAsync(source,pageIndex,pageSize,getOnlyTotalCount)={Source},{PageIndex},{PageSize},{GetOnlyTotalCount}: count query executed in {Arg4} ms", source, pageIndex, pageSize, getOnlyTotalCount, __logStart.ElapsedMilliseconds);
         var data = new List<T>();
 
+		_logger.LogDebug("ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): data → {Data}", source, pageIndex, pageSize, getOnlyTotalCount, data);
         if (!getOnlyTotalCount && count > 0)
             data.AddRange(await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync());
 
@@ -676,6 +697,7 @@ public static class AsyncIQueryableExtensions
     /// <returns>A query that can be enumerated asynchronously.</returns>
     public static IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IQueryable<T> source)
     {
+		_logger.LogDebug(">>> Entering ToAsyncEnumerable(source={Source})", source);
         return AsyncExtensions.AsAsyncEnumerable(source);
     }
 }

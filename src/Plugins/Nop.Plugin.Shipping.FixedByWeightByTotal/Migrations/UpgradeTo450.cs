@@ -1,16 +1,20 @@
 ﻿using FluentMigrator;
 using Nop.Data.Migrations;
 using Nop.Plugin.Shipping.FixedByWeightByTotal.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Migrations;
 
 [NopMigration("2021-10-29 11:00:00", "Shipping.FixedByWeightByTotal change decimal precision", MigrationProcessType.Update)]
 public class ChangeDecimalPrecision : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         var tableName = nameof(ShippingByWeightByTotalRecord);
 
+		_logger.LogDebug("Up(): tableName → {TableName}", tableName);
         foreach (var columnName in new[]
                  {
                      nameof(ShippingByWeightByTotalRecord.WeightFrom),
@@ -29,10 +33,13 @@ public class ChangeDecimalPrecision : Migration
             Alter.Table(tableName)
                 .AlterColumn(columnName).AsDecimal(18, 4);
         }
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

@@ -13,12 +13,14 @@ public class LocalizationMigration : MigrationBase
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
 
+		logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
         //use localizationService to add, update and delete localization resources
         localizationService.DeleteLocaleResources(new List<string>
         {
@@ -762,11 +764,14 @@ public class LocalizationMigration : MigrationBase
             //#5429
             ["Search.NoResultsText"] = "Catalog.Products.NoResult"
         }, languages, localizationService);
+		logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

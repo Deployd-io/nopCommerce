@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Messages;
 
@@ -10,15 +11,22 @@ namespace Nop.Web.Areas.Admin.Models.Messages;
 /// </summary>
 public partial record MessageTemplateModel : BaseNopEntityModel, ILocalizedModel<MessageTemplateLocalizedModel>, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MessageTemplateModel()
     {
+		_logger.LogDebug(">>> Entering MessageTemplateModel()");
         Locales = new List<MessageTemplateLocalizedModel>();
         AvailableEmailAccounts = new List<SelectListItem>();
+		_logger.LogDebug("MessageTemplateModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("MessageTemplateModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
 
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("MessageTemplateModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting MessageTemplateModel()");
+		_logger.LogDebug("MessageTemplateModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion
@@ -84,7 +92,10 @@ public partial record MessageTemplateLocalizedModel : ILocalizedLocaleModel
 {
     public MessageTemplateLocalizedModel()
     {
+		_logger.LogDebug(">>> Entering MessageTemplateLocalizedModel()");
         AvailableEmailAccounts = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting MessageTemplateLocalizedModel()");
+		_logger.LogDebug("MessageTemplateLocalizedModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
     }
 
     public int LanguageId { get; set; }

@@ -5,6 +5,7 @@ using Nop.Core.Domain.Stores;
 using Nop.Core.Events;
 using Nop.Services.Events;
 using Nop.Services.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Services;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Misc.Brevo.Services;
 /// Represents event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<EmailUnsubscribedEvent>,
     IConsumer<EmailSubscribedEvent>,
     IConsumer<EntityInsertedEvent<ShoppingCartItem>>,
@@ -57,6 +59,7 @@ public class EventConsumer :
 
         //unsubscribe contact
         await _brevoEmailManager.UnsubscribeAsync(eventMessage.Subscription);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -113,6 +116,7 @@ public class EventConsumer :
 
         //handle event
         await _marketingAutomationManager.HandleShoppingCartChangedEventAsync(eventMessage.Entity);
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

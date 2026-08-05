@@ -5,6 +5,7 @@
 //! author : Tal Ater : https://github.com/TalAter
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('he', {
     months: 'ינואר_פברואר_מרץ_אפריל_מאי_יוני_יולי_אוגוסט_ספטמבר_אוקטובר_נובמבר_דצמבר'.split(
@@ -44,6 +45,7 @@ export default moment.defineLocale('he', {
         mm: '%d דקות',
         h: 'שעה',
         hh: function (number) {
+			logger.debug(`>>> Entering hh(number=${number})`);
             if (number === 2) {
                 return 'שעתיים';
             }
@@ -51,6 +53,7 @@ export default moment.defineLocale('he', {
         },
         d: 'יום',
         dd: function (number) {
+			logger.debug(`>>> Entering dd(number=${number})`);
             if (number === 2) {
                 return 'יומיים';
             }
@@ -58,6 +61,7 @@ export default moment.defineLocale('he', {
         },
         M: 'חודש',
         MM: function (number) {
+			logger.debug(`>>> Entering MM(number=${number})`);
             if (number === 2) {
                 return 'חודשיים';
             }
@@ -65,9 +69,11 @@ export default moment.defineLocale('he', {
         },
         y: 'שנה',
         yy: function (number) {
+			logger.debug(`>>> Entering yy(number=${number})`);
             if (number === 2) {
                 return 'שנתיים';
             } else if (number % 10 === 0 && number !== 10) {
+				logger.debug(`<<< Exiting yy(number=${number})`);
                 return number + ' שנה';
             }
             return number + ' שנים';
@@ -76,9 +82,11 @@ export default moment.defineLocale('he', {
     meridiemParse:
         /אחה"צ|לפנה"צ|אחרי הצהריים|לפני הצהריים|לפנות בוקר|בבוקר|בערב/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /^(אחה"צ|אחרי הצהריים|בערב)$/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 5) {
             return 'לפנות בוקר';
         } else if (hour < 10) {
@@ -88,6 +96,7 @@ export default moment.defineLocale('he', {
         } else if (hour < 18) {
             return isLower ? 'אחה"צ' : 'אחרי הצהריים';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'בערב';
         }
     },

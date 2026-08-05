@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -8,12 +9,17 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerAttributeModel : BaseNopEntityModel, ILocalizedModel<CustomerAttributeLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerAttributeModel()
     {
+		_logger.LogDebug(">>> Entering CustomerAttributeModel()");
         Locales = new List<CustomerAttributeLocalizedModel>();
         CustomerAttributeValueSearchModel = new CustomerAttributeValueSearchModel();
+		_logger.LogDebug("<<< Exiting CustomerAttributeModel()");
+		_logger.LogDebug("CustomerAttributeModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("CustomerAttributeModel(): CustomerAttributeValueSearchModel → {CustomerAttributeValueSearchModel}", CustomerAttributeValueSearchModel);
     }
 
     #endregion

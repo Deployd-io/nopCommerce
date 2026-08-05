@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Payments;
 
@@ -8,13 +9,19 @@ namespace Nop.Web.Areas.Admin.Models.Payments;
 /// </summary>
 public partial record PaymentMethodRestrictionModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PaymentMethodRestrictionModel()
     {
+		_logger.LogDebug(">>> Entering PaymentMethodRestrictionModel()");
         AvailablePaymentMethods = new List<PaymentMethodModel>();
         AvailableCountries = new List<CountryModel>();
+		_logger.LogDebug("PaymentMethodRestrictionModel(): AvailablePaymentMethods → {AvailablePaymentMethods}", AvailablePaymentMethods);
+		_logger.LogDebug("PaymentMethodRestrictionModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         Restricted = new Dictionary<string, IDictionary<int, bool>>();
+		_logger.LogDebug("<<< Exiting PaymentMethodRestrictionModel()");
+		_logger.LogDebug("PaymentMethodRestrictionModel(): Restricted → {Restricted}", Restricted);
     }
 
     #endregion

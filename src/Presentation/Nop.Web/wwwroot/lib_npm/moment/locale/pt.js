@@ -3,6 +3,7 @@
 //! author : Jefferson : https://github.com/jalex79
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('pt', {
     months: 'janeiro_fevereiro_março_abril_maio_junho_julho_agosto_setembro_outubro_novembro_dezembro'.split(
@@ -30,9 +31,11 @@ export default moment.defineLocale('pt', {
         nextWeek: 'dddd [às] LT',
         lastDay: '[Ontem às] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return this.day() === 0 || this.day() === 6
                 ? '[Último] dddd [às] LT' // Saturday + Sunday
                 : '[Última] dddd [às] LT'; // Monday - Friday
+				logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

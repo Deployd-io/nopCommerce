@@ -24,9 +24,11 @@ public static class UrlHelperExtensions
     public static string RouteUrl<TEntity>(this IUrlHelper urlHelper, object values = null, string protocol = null, string host = null, string fragment = null)
         where TEntity : BaseEntity, ISlugSupported
     {
+		logger.LogDebug(">>> Entering RouteUrl(urlHelper={UrlHelper},values={Values},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, values, protocol, host, fragment);
         var nopUrlHelper = EngineContext.Current.Resolve<INopUrlHelper>();
         return nopUrlHelper.RouteGenericUrlAsync<TEntity>(values, protocol, host, fragment).Result;
     }
+	logger.LogDebug("RouteUrl(urlHelper={UrlHelper},values={Values},protocol={Protocol},host={Host},fragment={Fragment}): nopUrlHelper → {NopUrlHelper}", urlHelper, values, protocol, host, fragment, nopUrlHelper);
 
     /// <summary>
     /// Generate a URL for topic by the specified system name
@@ -40,7 +42,10 @@ public static class UrlHelperExtensions
     [Obsolete("Following the ticket #7818, this extension method is no longer used and will be removed in the next version of nopCommerce")]
     public static string RouteTopicUrl(this IUrlHelper urlHelper, string systemName, string protocol = null, string host = null, string fragment = null)
     {
+		logger.LogDebug(">>> Entering RouteTopicUrl(urlHelper={UrlHelper},systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, systemName, protocol, host, fragment);
         var nopUrlHelper = EngineContext.Current.Resolve<INopUrlHelper>();
+		logger.LogDebug("RouteTopicUrl(urlHelper={UrlHelper},systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment}): nopUrlHelper → {NopUrlHelper}", urlHelper, systemName, protocol, host, fragment, nopUrlHelper);
+		logger.LogDebug("<<< Exiting RouteTopicUrl(urlHelper={UrlHelper},systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, systemName, protocol, host, fragment);
         return nopUrlHelper.RouteTopicUrlAsync(systemName, protocol, host, fragment).Result;
     }
 }

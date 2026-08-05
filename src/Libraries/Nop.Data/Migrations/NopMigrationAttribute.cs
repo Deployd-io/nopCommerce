@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using FluentMigrator;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -9,6 +10,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public partial class NopMigrationAttribute : MigrationAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly MigrationConfig _config;
@@ -25,8 +27,10 @@ public partial class NopMigrationAttribute : MigrationAttribute
     public NopMigrationAttribute(string dateTime, MigrationProcessType targetMigrationProcess = MigrationProcessType.NoMatter) :
         this(new MigrationConfig
         {
+			_logger.LogDebug(">>> Entering NopMigrationAttribute(dateTime={DateTime},targetMigrationProcess={TargetMigrationProcess})", dateTime, targetMigrationProcess);
             DateTime = dateTime,
             TargetMigrationProcess = targetMigrationProcess
+			_logger.LogDebug("<<< Exiting NopMigrationAttribute(dateTime={DateTime},targetMigrationProcess={TargetMigrationProcess})", dateTime, targetMigrationProcess);
         })
     {
     }
@@ -43,6 +47,7 @@ public partial class NopMigrationAttribute : MigrationAttribute
             DateTime = dateTime,
             Description = description,
             TargetMigrationProcess = targetMigrationProcess
+			_logger.LogDebug(">>> Entering NopMigrationAttribute(dateTime={DateTime},nopVersion={NopVersion},updateMigrationType={UpdateMigrationType},targetMigrationProcess={TargetMigrationProcess})", dateTime, nopVersion, updateMigrationType, targetMigrationProcess);
         })
     {
     }
@@ -71,7 +76,9 @@ public partial class NopMigrationAttribute : MigrationAttribute
     /// <param name="config">The migration configuration data</param>
     protected NopMigrationAttribute(MigrationConfig config) : base(config.Version, config.Description)
     {
+		_logger.LogDebug(">>> Entering NopMigrationAttribute(config={Config})", config);
         _config = config;
+		_logger.LogDebug("NopMigrationAttribute(config={Config}): _config → {_config}", config, _config);
     }
 
     #endregion

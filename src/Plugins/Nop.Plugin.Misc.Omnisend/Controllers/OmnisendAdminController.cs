@@ -8,6 +8,7 @@ using Nop.Services.Messages;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Controllers;
 
@@ -16,6 +17,7 @@ namespace Nop.Plugin.Misc.Omnisend.Controllers;
 [AutoValidateAntiforgeryToken]
 public class OmnisendAdminController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ILocalizationService _localizationService;
@@ -64,6 +66,7 @@ public class OmnisendAdminController : BasePluginController
         model.BlockSyncOrders = model.Batches.Any(p => needBlock(p, OmnisendDefaults.OrdersEndpoint));
         model.BlockSyncProducts = model.Batches.Any(p => needBlock(p, OmnisendDefaults.ProductsEndpoint)) ||
             batches.Any(p => needBlock(p, OmnisendDefaults.CategoriesEndpoint));
+			_logger.LogDebug("<<< Exiting FillBatchesAsync(model={Model})", model);
     }
 
     #endregion
@@ -72,6 +75,7 @@ public class OmnisendAdminController : BasePluginController
 
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             ApiKey = _omnisendSettings.ApiKey,
@@ -80,6 +84,7 @@ public class OmnisendAdminController : BasePluginController
 
         await FillBatchesAsync(model);
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.Omnisend/Views/Configure.cshtml", model);
     }
 
@@ -121,11 +126,13 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-contacts")]
     public async Task<IActionResult> SyncContacts()
     {
+		_logger.LogDebug(">>> Entering SyncContacts()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncContactsAsync();
 
+		_logger.LogDebug("<<< Exiting SyncContacts()");
         return await Configure();
     }
 
@@ -133,12 +140,14 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-products")]
     public async Task<IActionResult> SyncProducts()
     {
+		_logger.LogDebug(">>> Entering SyncProducts()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncCategoriesAsync();
         await _omnisendService.SyncProductsAsync();
 
+		_logger.LogDebug("<<< Exiting SyncProducts()");
         return await Configure();
     }
 
@@ -146,12 +155,14 @@ public class OmnisendAdminController : BasePluginController
     [FormValueRequired("sync-orders")]
     public async Task<IActionResult> SyncOrders()
     {
+		_logger.LogDebug(">>> Entering SyncOrders()");
         if (!ModelState.IsValid || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return await Configure();
 
         await _omnisendService.SyncOrdersAsync();
         await _omnisendService.SyncCartsAsync();
 
+		_logger.LogDebug("<<< Exiting SyncOrders()");
         return await Configure();
     }
 

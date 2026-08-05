@@ -28,11 +28,15 @@ public static partial class ApplicationPartManagerExtensions
 
     static ApplicationPartManagerExtensions()
     {
+		logger.LogDebug(">>> Entering ApplicationPartManagerExtensions()");
         //we use the default file provider, since the DI isn't initialized yet
         _fileProvider = CommonHelper.DefaultFileProvider;
+		logger.LogDebug("ApplicationPartManagerExtensions(): _fileProvider → {_fileProvider}", _fileProvider);
 
         _baseAppLibraries = new List<KeyValuePair<string, Version>>();
+		logger.LogDebug("ApplicationPartManagerExtensions(): _baseAppLibraries → {_baseAppLibraries}", _baseAppLibraries);
         _pluginLibraries = new Dictionary<string, Version>();
+		logger.LogDebug("ApplicationPartManagerExtensions(): _pluginLibraries → {_pluginLibraries}", _pluginLibraries);
 
         //get all libraries from /bin/{version}/ directory
         foreach (var file in _fileProvider.GetFiles(AppDomain.CurrentDomain.BaseDirectory, "*.dll"))
@@ -46,8 +50,10 @@ public static partial class ApplicationPartManagerExtensions
         //get all libraries from refs directory
         var refsPathName = _fileProvider.Combine(Environment.CurrentDirectory, NopPluginDefaults.RefsPathName);
         if (_fileProvider.DirectoryExists(refsPathName))
+			logger.LogDebug("ApplicationPartManagerExtensions(): refsPathName → {RefsPathName}", refsPathName);
             foreach (var file in _fileProvider.GetFiles(refsPathName, "*.dll"))
                 _baseAppLibraries.Add(new KeyValuePair<string, Version>(_fileProvider.GetFileName(file), GetAssemblyVersion(file)));
+				logger.LogDebug("<<< Exiting ApplicationPartManagerExtensions()");
     }
 
     #endregion
@@ -69,15 +75,18 @@ public static partial class ApplicationPartManagerExtensions
 
     private static Version GetAssemblyVersion(string filePath)
     {
+		logger.LogDebug(">>> Entering GetAssemblyVersion(filePath={FilePath})", filePath);
         try
         {
             return AssemblyName.GetAssemblyName(filePath).Version;
         }
         catch (BadImageFormatException)
         {
+			logger.LogError("Exception in GetAssemblyVersion(filePath={FilePath}): {Arg1}", filePath, ex.Message);
             //ignore
         }
 
+		logger.LogDebug("<<< Exiting GetAssemblyVersion(filePath={FilePath})", filePath);
         return null;
     }
 
@@ -110,15 +119,18 @@ public static partial class ApplicationPartManagerExtensions
     /// <returns>Assembly</returns>
     private static Assembly AddApplicationParts(ApplicationPartManager applicationPartManager, string assemblyFile, bool useUnsafeLoadAssembly)
     {
+		logger.LogDebug(">>> Entering AddApplicationParts(applicationPartManager={ApplicationPartManager},assemblyFile={AssemblyFile},useUnsafeLoadAssembly={UseUnsafeLoadAssembly})", applicationPartManager, assemblyFile, useUnsafeLoadAssembly);
         //try to load a assembly
         Assembly assembly;
 
         try
         {
             assembly = Assembly.LoadFrom(assemblyFile);
+			logger.LogDebug("AddApplicationParts(applicationPartManager={ApplicationPartManager},assemblyFile={AssemblyFile},useUnsafeLoadAssembly={UseUnsafeLoadAssembly}): assembly → {Assembly}", applicationPartManager, assemblyFile, useUnsafeLoadAssembly, assembly);
         }
         catch (FileLoadException)
         {
+			logger.LogError("Exception in AddApplicationParts(applicationPartManager={ApplicationPartManager},assemblyFile={AssemblyFile},useUnsafeLoadAssembly={UseUnsafeLoadAssembly}): {Arg3}", applicationPartManager, assemblyFile, useUnsafeLoadAssembly, ex.Message);
             if (useUnsafeLoadAssembly)
             {
                 //if an application has been copied from the web, it is flagged by Windows as being a web application,
@@ -136,6 +148,7 @@ public static partial class ApplicationPartManagerExtensions
         //register the plugin definition
         applicationPartManager.ApplicationParts.Add(new AssemblyPart(assembly));
 
+		logger.LogDebug("<<< Exiting AddApplicationParts(applicationPartManager={ApplicationPartManager},assemblyFile={AssemblyFile},useUnsafeLoadAssembly={UseUnsafeLoadAssembly})", applicationPartManager, assemblyFile, useUnsafeLoadAssembly);
         return assembly;
     }
 
@@ -177,10 +190,12 @@ public static partial class ApplicationPartManagerExtensions
     /// <returns>Result of check</returns>
     private static bool IsAlreadyLoaded(string filePath, string pluginName)
     {
+		logger.LogDebug(">>> Entering IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName})", filePath, pluginName);
         //ignore already loaded libraries
         //(we do it because not all libraries are loaded immediately after application start)
         var fileName = _fileProvider.GetFileName(filePath);
         if (_baseAppLibraries.Any(library => library.Key.Equals(fileName, StringComparison.InvariantCultureIgnoreCase)))
+			logger.LogDebug("IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName}): fileName → {FileName}", filePath, pluginName, fileName);
             return true;
 
         try
@@ -188,6 +203,7 @@ public static partial class ApplicationPartManagerExtensions
             //get filename without extension
             var fileNameWithoutExtension = _fileProvider.GetFileNameWithoutExtension(filePath);
             if (string.IsNullOrEmpty(fileNameWithoutExtension))
+				logger.LogDebug("IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName}): fileNameWithoutExtension → {FileNameWithoutExtension}", filePath, pluginName, fileNameWithoutExtension);
                 throw new Exception($"Cannot get file extension for {fileName}");
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -195,6 +211,7 @@ public static partial class ApplicationPartManagerExtensions
                 //compare assemblies by file names
                 var assemblyName = (assembly.FullName ?? string.Empty).Split(',').FirstOrDefault();
                 if (!fileNameWithoutExtension.Equals(assemblyName, StringComparison.InvariantCultureIgnoreCase))
+					logger.LogDebug("IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName}): assemblyName → {AssemblyName}", filePath, pluginName, assemblyName);
                     continue;
 
                 //loaded assembly not found
@@ -202,6 +219,7 @@ public static partial class ApplicationPartManagerExtensions
                 {
                     //add it to the list to find collisions later
                     pluginLoadedAssemblyInfo = new PluginLoadedAssemblyInfo(assemblyName, GetAssemblyVersion(assembly.Location));
+					logger.LogDebug("IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName}): pluginLoadedAssemblyInfo → {PluginLoadedAssemblyInfo}", filePath, pluginName, pluginLoadedAssemblyInfo);
                     _loadedAssemblies.Add(assemblyName, pluginLoadedAssemblyInfo);
                 }
 
@@ -213,10 +231,12 @@ public static partial class ApplicationPartManagerExtensions
         }
         catch
         {
+			logger.LogError("Exception in IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName}): {Arg2}", filePath, pluginName, ex.Message);
             // ignored
         }
 
         //nothing found
+		logger.LogDebug("<<< Exiting IsAlreadyLoaded(filePath={FilePath},pluginName={PluginName})", filePath, pluginName);
         return false;
     }
 
@@ -231,6 +251,7 @@ public static partial class ApplicationPartManagerExtensions
     /// <param name="pluginConfig">Plugin config</param>
     public static void InitializePlugins(this ApplicationPartManager applicationPartManager, PluginConfig pluginConfig)
     {
+		logger.LogDebug(">>> Entering InitializePlugins(applicationPartManager={ApplicationPartManager},pluginConfig={PluginConfig})", applicationPartManager, pluginConfig);
         ArgumentNullException.ThrowIfNull(applicationPartManager);
 
         ArgumentNullException.ThrowIfNull(pluginConfig);
@@ -304,6 +325,7 @@ public static partial class ApplicationPartManagerExtensions
             }
             catch (Exception exception)
             {
+				logger.LogError("Exception in InitializePlugins(applicationPartManager={ApplicationPartManager},pluginConfig={PluginConfig}): {Arg2}", applicationPartManager, pluginConfig, ex.Message);
                 //throw full exception
                 var message = string.Empty;
                 for (var inner = exception; inner != null; inner = inner.InnerException)
@@ -322,6 +344,7 @@ public static partial class ApplicationPartManagerExtensions
                     !type.IsAbstract));
             NameCompatibilityManager.AdditionalNameCompatibilities.AddRange(nameCompatibilityList);
         }
+		logger.LogDebug("<<< Exiting InitializePlugins(applicationPartManager={ApplicationPartManager},pluginConfig={PluginConfig})", applicationPartManager, pluginConfig);
     }
 
     #endregion

@@ -12,12 +12,14 @@ using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Infrastructure;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class BackInStockSubscriptionController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBackInStockSubscriptionService _backInStockSubscriptionService;
@@ -66,12 +68,16 @@ public partial class BackInStockSubscriptionController : BasePublicController
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> SubscribePopup(int productId)
     {
+		_logger.LogDebug(">>> Entering SubscribePopup(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null || product.Deleted)
+			_logger.LogDebug("SubscribePopup(productId={ProductId}): product → {Product}", productId, product);
             throw new ArgumentException("No product found with the specified id");
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SubscribePopup(productId={ProductId}): customer → {Customer}", productId, customer);
+		_logger.LogDebug("SubscribePopup(productId={ProductId}): store → {Store}", productId, store);
         var model = new BackInStockSubscribeModel
         {
             ProductId = product.Id,
@@ -90,22 +96,28 @@ public partial class BackInStockSubscriptionController : BasePublicController
         {
             //out of stock
             model.SubscriptionAllowed = true;
+			_logger.LogDebug("SubscribePopup(productId={ProductId}): model.SubscriptionAllowed → {Arg1}", productId, model.SubscriptionAllowed);
+			_logger.LogDebug("SubscribePopup(productId={ProductId}): model.AlreadySubscribed → {Arg1}", productId, model.AlreadySubscribed);
             model.AlreadySubscribed = await _backInStockSubscriptionService
                 .FindSubscriptionAsync(customer.Id, product.Id, store.Id) != null;
         }
 
+		_logger.LogDebug("<<< Exiting SubscribePopup(productId={ProductId})", productId);
         return PartialView(model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> SubscribePopupPOST(int productId)
     {
+		_logger.LogDebug(">>> Entering SubscribePopupPOST(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null || product.Deleted)
+			_logger.LogDebug("SubscribePopupPOST(productId={ProductId}): product → {Product}", productId, product);
             throw new ArgumentException("No product found with the specified id");
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _customerService.IsRegisteredAsync(customer))
+			_logger.LogDebug("SubscribePopupPOST(productId={ProductId}): customer → {Customer}", productId, customer);
             return Content(await _localizationService.GetResourceAsync("BackInStockSubscriptions.OnlyRegistered"));
 
         if (product.ManageInventoryMethod == ManageInventoryMethod.ManageStock &&
@@ -116,6 +128,7 @@ public partial class BackInStockSubscriptionController : BasePublicController
             //out of stock
             var store = await _storeContext.GetCurrentStoreAsync();
             var subscription = await _backInStockSubscriptionService
+				_logger.LogDebug("SubscribePopupPOST(productId={ProductId}): store → {Store}", productId, store);
                 .FindSubscriptionAsync(customer.Id, product.Id, store.Id);
             if (subscription != null)
             {
@@ -152,12 +165,14 @@ public partial class BackInStockSubscriptionController : BasePublicController
         }
 
         //subscription not possible
+		_logger.LogDebug("<<< Exiting SubscribePopupPOST(productId={ProductId})", productId);
         return Content(await _localizationService.GetResourceAsync("BackInStockSubscriptions.NotAllowed"));
     }
 
     // My account / Back in stock subscriptions
     public virtual async Task<IActionResult> CustomerSubscriptions(int? pageNumber)
     {
+		_logger.LogDebug(">>> Entering CustomerSubscriptions(pageNumber={PageNumber})", pageNumber);
         if (_customerSettings.HideBackInStockSubscriptionsTab)
         {
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
@@ -165,6 +180,7 @@ public partial class BackInStockSubscriptionController : BasePublicController
 
         var pageIndex = 0;
         if (pageNumber > 0)
+		_logger.LogDebug("CustomerSubscriptions(pageNumber={PageNumber}): pageIndex → {PageIndex}", pageNumber, pageIndex);
         {
             pageIndex = pageNumber.Value - 1;
         }
@@ -172,15 +188,19 @@ public partial class BackInStockSubscriptionController : BasePublicController
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("CustomerSubscriptions(pageNumber={PageNumber}): customer → {Customer}", pageNumber, customer);
+		_logger.LogDebug("CustomerSubscriptions(pageNumber={PageNumber}): store → {Store}", pageNumber, store);
         var list = await _backInStockSubscriptionService.GetAllSubscriptionsByCustomerIdAsync(customer.Id,
             store.Id, pageIndex, pageSize);
 
         var model = new CustomerBackInStockSubscriptionsModel();
 
+		_logger.LogDebug("CustomerSubscriptions(pageNumber={PageNumber}): model → {Model}", pageNumber, model);
         foreach (var subscription in list)
         {
             var product = await _productService.GetProductByIdAsync(subscription.ProductId);
 
+			_logger.LogDebug("CustomerSubscriptions(pageNumber={PageNumber}): product → {Product}", pageNumber, product);
             if (product != null)
             {
                 var subscriptionModel = new CustomerBackInStockSubscriptionsModel.BackInStockSubscriptionModel
@@ -205,12 +225,14 @@ public partial class BackInStockSubscriptionController : BasePublicController
             RouteValues = new BackInStockSubscriptionsRouteValues { PageNumber = pageIndex }
         };
 
+		_logger.LogDebug("<<< Exiting CustomerSubscriptions(pageNumber={PageNumber})", pageNumber);
         return View(model);
     }
 
     [HttpPost, ActionName("CustomerSubscriptions")]
     public virtual async Task<IActionResult> CustomerSubscriptionsPOST(IFormCollection formCollection)
     {
+		_logger.LogDebug(">>> Entering CustomerSubscriptionsPOST(formCollection={FormCollection})", formCollection);
         foreach (var key in formCollection.Keys)
         {
             var value = formCollection[key];
@@ -219,9 +241,12 @@ public partial class BackInStockSubscriptionController : BasePublicController
             {
                 var id = key.Replace("biss", "").Trim();
                 if (int.TryParse(id, out var subscriptionId))
+				_logger.LogDebug("CustomerSubscriptionsPOST(formCollection={FormCollection}): id → {Id}", formCollection, id);
                 {
                     var subscription = await _backInStockSubscriptionService.GetSubscriptionByIdAsync(subscriptionId);
                     var customer = await _workContext.GetCurrentCustomerAsync();
+					_logger.LogDebug("CustomerSubscriptionsPOST(formCollection={FormCollection}): subscription → {Subscription}", formCollection, subscription);
+					_logger.LogDebug("CustomerSubscriptionsPOST(formCollection={FormCollection}): customer → {Customer}", formCollection, customer);
                     if (subscription != null && subscription.CustomerId == customer.Id)
                     {
                         await _backInStockSubscriptionService.DeleteSubscriptionAsync(subscription);
@@ -230,6 +255,7 @@ public partial class BackInStockSubscriptionController : BasePublicController
             }
         }
 
+		_logger.LogDebug("<<< Exiting CustomerSubscriptionsPOST(formCollection={FormCollection})", formCollection);
         return RedirectToRoute(NopRouteNames.Standard.CUSTOMER_BACK_IN_STOCK_SUBSCRIPTIONS);
     }
 

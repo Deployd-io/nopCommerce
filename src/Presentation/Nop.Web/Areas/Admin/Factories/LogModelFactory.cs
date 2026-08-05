@@ -8,6 +8,7 @@ using Nop.Web.Areas.Admin.Models.Logging;
 using Nop.Web.Framework.Models.Extensions;
 using ILogger = Nop.Services.Logging.ILogger;
 using LogLevel = Nop.Core.Domain.Logging.LogLevel;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -16,6 +17,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class LogModelFactory : ILogModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -58,6 +60,7 @@ public partial class LogModelFactory : ILogModelFactory
     /// </returns>
     public virtual async Task<LogSearchModel> PrepareLogSearchModelAsync(LogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available log levels
@@ -66,6 +69,7 @@ public partial class LogModelFactory : ILogModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -79,6 +83,7 @@ public partial class LogModelFactory : ILogModelFactory
     /// </returns>
     public virtual async Task<LogListModel> PrepareLogListModelAsync(LogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareLogListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter log
@@ -88,6 +93,7 @@ public partial class LogModelFactory : ILogModelFactory
             ? (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnTo.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1) : null;
         var logLevel = searchModel.LogLevelId > 0 ? (LogLevel?)searchModel.LogLevelId : null;
 
+		_logger.LogDebug("PrepareLogListModelAsync(searchModel={SearchModel}): logLevel → {LogLevel}", searchModel, logLevel);
         //get log
         var logItems = await _logger.GetAllLogsAsync(message: searchModel.Message,
             fromUtc: createdOnFromValue,
@@ -104,6 +110,7 @@ public partial class LogModelFactory : ILogModelFactory
                 //fill in model values from the entity
                 var logModel = logItem.ToModel<LogModel>();
 
+				_logger.LogDebug("PrepareLogListModelAsync(searchModel={SearchModel}): logModel → {LogModel}", searchModel, logModel);
                 //convert dates to the user time
                 logModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(logItem.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -111,12 +118,14 @@ public partial class LogModelFactory : ILogModelFactory
                 logModel.LogLevel = await _localizationService.GetLocalizedEnumAsync(logItem.LogLevel);
                 logModel.ShortMessage = _htmlFormatter.FormatText(logItem.ShortMessage, false, true, false, false, false, false);
                 logModel.FullMessage = string.Empty;
+				_logger.LogDebug("PrepareLogListModelAsync(searchModel={SearchModel}): logModel.FullMessage → {Arg1}", searchModel, logModel.FullMessage);
                 logModel.CustomerEmail = (await _customerService.GetCustomerByIdAsync(logItem.CustomerId ?? 0))?.Email ?? string.Empty;
 
                 return logModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareLogListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -139,6 +148,7 @@ public partial class LogModelFactory : ILogModelFactory
             {
                 model = log.ToModel<LogModel>();
 
+				_logger.LogDebug("PrepareLogModelAsync(model={Model},log={Log},excludeProperties={ExcludeProperties}): model → {Model1}", model, log, excludeProperties, model);
                 model.LogLevel = await _localizationService.GetLocalizedEnumAsync(log.LogLevel);
                 model.ShortMessage = _htmlFormatter.FormatText(log.ShortMessage, false, true, false, false, false, false);
                 model.FullMessage = _htmlFormatter.FormatText(log.FullMessage, false, true, false, false, false, false);
@@ -146,6 +156,7 @@ public partial class LogModelFactory : ILogModelFactory
                 model.CustomerEmail = log.CustomerId.HasValue ? (await _customerService.GetCustomerByIdAsync(log.CustomerId.Value))?.Email : string.Empty;
             }
         }
+		_logger.LogDebug("<<< Exiting PrepareLogModelAsync(model={Model},log={Log},excludeProperties={ExcludeProperties})", model, log, excludeProperties);
         return model;
     }
 

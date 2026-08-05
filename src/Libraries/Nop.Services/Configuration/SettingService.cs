@@ -68,6 +68,10 @@ public partial class SettingService : ISettingService
                     //already added
                     //most probably it's the setting with the same name but for some certain store (storeId > 0)
                     value.Add(settingForCaching);
+					logger.LogDebug(">>> Entering GetAllSettingsAsync()");
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					logger.LogInformation("GetAllSettingsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+					logger.LogDebug("<<< Exiting GetAllSettingsAsync()");
             }
 
             return dictionary;
@@ -148,6 +152,10 @@ public partial class SettingService : ISettingService
                 StoreId = storeId
             };
             await InsertSettingAsync(setting, clearCache);
+			logger.LogDebug(">>> Entering GetSettingByIdAsync(settingId={SettingId})", settingId);
+			logger.LogDebug("<<< Exiting GetSettingByIdAsync(settingId={SettingId})", settingId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			logger.LogInformation("GetSettingByIdAsync(settingId)={SettingId}: find query executed in {Arg1} ms", settingId, __logStart.ElapsedMilliseconds);
         }
     }
 
@@ -186,6 +194,10 @@ public partial class SettingService : ISettingService
             };
             InsertSetting(setting, clearCache);
         }
+		logger.LogDebug(">>> Entering InsertSettingAsync(setting={Setting},clearCache={ClearCache})", setting, clearCache);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertSettingAsync(setting,clearCache)={Setting},{ClearCache}: save query executed in {Arg2} ms", setting, clearCache, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting InsertSettingAsync(setting={Setting},clearCache={ClearCache})", setting, clearCache);
     }
 
     #endregion
@@ -200,6 +212,7 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSettingAsync(Setting setting, bool clearCache = true)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _settingRepository.InsertAsync(setting);
 
         //cache
@@ -214,6 +227,7 @@ public partial class SettingService : ISettingService
     /// <param name="clearCache">A value indicating whether to clear cache after setting update</param>
     public virtual void InsertSetting(Setting setting, bool clearCache = true)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _settingRepository.Insert(setting);
 
         //cache
@@ -229,6 +243,7 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateSettingAsync(Setting setting, bool clearCache = true)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(setting);
 
         await _settingRepository.UpdateAsync(setting);
@@ -245,6 +260,7 @@ public partial class SettingService : ISettingService
     /// <param name="clearCache">A value indicating whether to clear cache after setting update</param>
     public virtual void UpdateSetting(Setting setting, bool clearCache = true)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(setting);
 
         _settingRepository.Update(setting);
@@ -261,10 +277,13 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSettingAsync(Setting setting)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _settingRepository.DeleteAsync(setting);
 
         //cache
         await ClearCacheAsync();
+		logger.LogDebug(">>> Entering DeleteSettingAsync()");
+		logger.LogDebug("<<< Exiting DeleteSettingAsync()");
     }
 
     /// <summary>
@@ -273,6 +292,7 @@ public partial class SettingService : ISettingService
     /// <param name="setting">Setting</param>
     public virtual void DeleteSetting(Setting setting)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _settingRepository.Delete(setting);
 
         //cache
@@ -286,6 +306,7 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSettingsAsync(IList<Setting> settings)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _settingRepository.DeleteAsync(settings);
 
         //cache
@@ -314,6 +335,8 @@ public partial class SettingService : ISettingService
     /// </returns>
     public virtual Setting GetSettingById(int settingId)
     {
+		logger.LogDebug(">>> Entering GetSettingById(settingId={SettingId})", settingId);
+		logger.LogDebug("<<< Exiting GetSettingById(settingId={SettingId})", settingId);
         return _settingRepository.GetById(settingId, cache => default);
     }
 
@@ -334,16 +357,20 @@ public partial class SettingService : ISettingService
 
         var settings = await GetAllSettingsDictionaryAsync();
         key = key.Trim().ToLowerInvariant();
+		logger.LogDebug("GetSettingAsync(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound}): settings → {Settings}", key, storeId, loadSharedValueIfNotFound, settings);
+		logger.LogWarning("GetSettingAsync(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound}): key → {Key1}", key, storeId, loadSharedValueIfNotFound, key);
         if (!settings.TryGetValue(key, out var value))
             return null;
 
         var settingsByKey = value;
         var setting = settingsByKey.FirstOrDefault(x => x.StoreId == storeId);
 
+		logger.LogDebug("GetSettingAsync(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound}): setting → {Setting}", key, storeId, loadSharedValueIfNotFound, setting);
         //load shared value?
         if (setting == null && storeId > 0 && loadSharedValueIfNotFound)
             setting = settingsByKey.FirstOrDefault(x => x.StoreId == 0);
 
+		logger.LogDebug("<<< Exiting GetSettingAsync(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound})", key, storeId, loadSharedValueIfNotFound);
         return setting;
     }
 
@@ -363,16 +390,20 @@ public partial class SettingService : ISettingService
 
         var settings = GetAllSettingsDictionary();
         key = key.Trim().ToLowerInvariant();
+		logger.LogDebug("GetSetting(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound}): settings → {Settings}", key, storeId, loadSharedValueIfNotFound, settings);
+		logger.LogWarning("GetSetting(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound}): key → {Key1}", key, storeId, loadSharedValueIfNotFound, key);
         if (!settings.TryGetValue(key, out var value))
             return null;
 
         var settingsByKey = value;
         var setting = settingsByKey.FirstOrDefault(x => x.StoreId == storeId);
 
+		logger.LogDebug("GetSetting(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound}): setting → {Setting}", key, storeId, loadSharedValueIfNotFound, setting);
         //load shared value?
         if (setting == null && storeId > 0 && loadSharedValueIfNotFound)
             setting = settingsByKey.FirstOrDefault(x => x.StoreId == 0);
 
+		logger.LogDebug("<<< Exiting GetSetting(key={Key},storeId={StoreId},loadSharedValueIfNotFound={LoadSharedValueIfNotFound})", key, storeId, loadSharedValueIfNotFound);
         return setting;
     }
 
@@ -477,13 +508,17 @@ public partial class SettingService : ISettingService
     /// </returns>
     public virtual async Task<IList<Setting>> GetAllSettingsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllSettingsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var settings = await _settingRepository.GetAllAsync(query =>
         {
             return from s in query
                 orderby s.Name, s.StoreId
                 select s;
+				logger.LogInformation("GetAllSettingsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		logger.LogDebug("<<< Exiting GetAllSettingsAsync()");
         return settings;
     }
 
@@ -495,10 +530,14 @@ public partial class SettingService : ISettingService
     /// </returns>
     public virtual IList<Setting> GetAllSettings()
     {
+		logger.LogDebug(">>> Entering GetAllSettings()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var settings = _settingRepository.GetAll(query => from s in query
             orderby s.Name, s.StoreId
             select s, cache => default);
+			logger.LogInformation("GetAllSettings(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting GetAllSettings()");
         return settings;
     }
 
@@ -553,6 +592,7 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<T> LoadSettingAsync<T>(int storeId = 0) where T : ISettings, new()
     {
+		logger.LogDebug(">>> Entering LoadSettingAsync(storeId={StoreId})", storeId);
         return (T)await LoadSettingAsync(typeof(T), storeId);
     }
 
@@ -563,6 +603,7 @@ public partial class SettingService : ISettingService
     /// <param name="storeId">Store identifier for which settings should be loaded</param>
     public virtual T LoadSetting<T>(int storeId = 0) where T : ISettings, new()
     {
+		logger.LogDebug(">>> Entering LoadSetting(storeId={StoreId})", storeId);
         return (T)LoadSetting(typeof(T), storeId);
     }
 
@@ -574,8 +615,10 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<ISettings> LoadSettingAsync(Type type, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering LoadSettingAsync(type={Type},storeId={StoreId})", type, storeId);
         var settings = Activator.CreateInstance(type);
 
+		logger.LogDebug("LoadSettingAsync(type={Type},storeId={StoreId}): settings → {Settings}", type, storeId, settings);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return settings as ISettings;
 
@@ -587,8 +630,10 @@ public partial class SettingService : ISettingService
 
             var key = type.Name + "." + prop.Name;
             //load by store
+			logger.LogWarning("LoadSettingAsync(type={Type},storeId={StoreId}): key → {Key}", type, storeId, key);
             var setting = await GetSettingByKeyAsync<string>(key, storeId: storeId, loadSharedValueIfNotFound: true);
             if (setting == null)
+				logger.LogDebug("LoadSettingAsync(type={Type},storeId={StoreId}): setting → {Setting}", type, storeId, setting);
                 continue;
 
             if (!TypeDescriptor.GetConverter(prop.PropertyType).CanConvertFrom(typeof(string)))
@@ -599,6 +644,7 @@ public partial class SettingService : ISettingService
 
             var value = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFromInvariantString(setting);
 
+			logger.LogDebug("LoadSettingAsync(type={Type},storeId={StoreId}): value → {Value}", type, storeId, value);
             //set property
             prop.SetValue(settings, value, null);
         }
@@ -616,6 +662,7 @@ public partial class SettingService : ISettingService
     {
         var settings = Activator.CreateInstance(type);
 
+		logger.LogDebug("LoadSetting(type={Type},storeId={StoreId}): settings → {Settings}", type, storeId, settings);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return settings as ISettings;
 
@@ -627,8 +674,10 @@ public partial class SettingService : ISettingService
 
             var key = type.Name + "." + prop.Name;
             //load by store
+			logger.LogWarning("LoadSetting(type={Type},storeId={StoreId}): key → {Key}", type, storeId, key);
             var setting = GetSettingByKey<string>(key, storeId: storeId, loadSharedValueIfNotFound: true);
             if (setting == null)
+				logger.LogDebug("LoadSetting(type={Type},storeId={StoreId}): setting → {Setting}", type, storeId, setting);
                 continue;
 
             if (!TypeDescriptor.GetConverter(prop.PropertyType).CanConvertFrom(typeof(string)))
@@ -639,10 +688,12 @@ public partial class SettingService : ISettingService
 
             var value = TypeDescriptor.GetConverter(prop.PropertyType).ConvertFromInvariantString(setting);
 
+			logger.LogDebug("LoadSetting(type={Type},storeId={StoreId}): value → {Value}", type, storeId, value);
             //set property
             prop.SetValue(settings, value, null);
         }
 
+		logger.LogDebug("<<< Exiting LoadSetting(storeId={StoreId})", storeId);
         return settings as ISettings;
     }
 
@@ -655,6 +706,7 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveSettingAsync<T>(T settings, int storeId = 0) where T : ISettings, new()
     {
+		logger.LogDebug(">>> Entering SaveSettingAsync(settings={Settings},storeId={StoreId})", settings, storeId);
         /* We do not clear cache after each setting update.
          * This behavior can increase performance because cached settings will not be cleared 
          * and loaded from database after each update */
@@ -669,6 +721,8 @@ public partial class SettingService : ISettingService
 
             var key = typeof(T).Name + "." + prop.Name;
             var value = prop.GetValue(settings, null);
+			logger.LogWarning("SaveSettingAsync(settings={Settings},storeId={StoreId}): key → {Key}", settings, storeId, key);
+			logger.LogDebug("SaveSettingAsync(settings={Settings},storeId={StoreId}): value → {Value}", settings, storeId, value);
             if (value != null)
                 await SetSettingAsync(prop.PropertyType, key, value, storeId, false);
             else
@@ -677,6 +731,7 @@ public partial class SettingService : ISettingService
 
         //and now clear cache
         await ClearCacheAsync();
+		logger.LogDebug("<<< Exiting SaveSettingAsync(settings={Settings},storeId={StoreId})", settings, storeId);
     }
 
     /// <summary>
@@ -687,6 +742,7 @@ public partial class SettingService : ISettingService
     /// <param name="settings">Setting instance</param>
     public virtual void SaveSetting<T>(T settings, int storeId = 0) where T : ISettings, new()
     {
+		logger.LogDebug(">>> Entering SaveSetting(settings={Settings},storeId={StoreId})", settings, storeId);
         /* We do not clear cache after each setting update.
          * This behavior can increase performance because cached settings will not be cleared 
          * and loaded from database after each update */
@@ -701,6 +757,8 @@ public partial class SettingService : ISettingService
 
             var key = typeof(T).Name + "." + prop.Name;
             var value = prop.GetValue(settings, null);
+			logger.LogWarning("SaveSetting(settings={Settings},storeId={StoreId}): key → {Key}", settings, storeId, key);
+			logger.LogDebug("SaveSetting(settings={Settings},storeId={StoreId}): value → {Value}", settings, storeId, value);
             if (value != null)
                 SetSetting(prop.PropertyType, key, value, storeId, false);
             else
@@ -709,6 +767,7 @@ public partial class SettingService : ISettingService
 
         //and now clear cache
         ClearCache();
+		logger.LogDebug("<<< Exiting SaveSetting(settings={Settings},storeId={StoreId})", settings, storeId);
     }
 
     /// <summary>
@@ -796,10 +855,13 @@ public partial class SettingService : ISettingService
     {
         var settingsToDelete = new List<Setting>();
         var allSettings = await GetAllSettingsAsync();
+		logger.LogDebug("DeleteSettingAsync(): settingsToDelete → {SettingsToDelete}", settingsToDelete);
+		logger.LogDebug("DeleteSettingAsync(): allSettings → {AllSettings}", allSettings);
         foreach (var prop in typeof(T).GetProperties())
         {
             var key = typeof(T).Name + "." + prop.Name;
             settingsToDelete.AddRange(allSettings.Where(x => x.Name.Equals(key, StringComparison.InvariantCultureIgnoreCase)));
+			logger.LogWarning("DeleteSettingAsync(): key → {Key}", key);
         }
 
         await DeleteSettingsAsync(settingsToDelete);
@@ -837,7 +899,9 @@ public partial class SettingService : ISettingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearCacheAsync()
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync()");
         await _staticCacheManager.RemoveByPrefixAsync(NopEntityCacheDefaults<Setting>.Prefix);
+		logger.LogDebug("<<< Exiting ClearCacheAsync()");
     }
 
     /// <summary>
@@ -845,7 +909,9 @@ public partial class SettingService : ISettingService
     /// </summary>
     public virtual void ClearCache()
     {
+		logger.LogDebug(">>> Entering ClearCache()");
         _staticCacheManager.RemoveByPrefix(NopEntityCacheDefaults<Setting>.Prefix);
+		logger.LogDebug("<<< Exiting ClearCache()");
     }
 
     /// <summary>

@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Stores;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class StoreModelFactory : IStoreModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -49,11 +51,13 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual Task<StoreSearchModel> PrepareStoreSearchModelAsync(StoreSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareStoreSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareStoreSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -67,11 +71,13 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual async Task<StoreListModel> PrepareStoreListModelAsync(StoreSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareStoreListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get stores
         var stores = (await _storeService.GetAllStoresAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareStoreListModelAsync(searchModel={SearchModel}): stores → {Stores}", searchModel, stores);
         //prepare list model
         var model = new StoreListModel().PrepareToGrid(searchModel, stores, () =>
         {
@@ -79,6 +85,7 @@ public partial class StoreModelFactory : IStoreModelFactory
             return stores.Select(store => store.ToModel<StoreModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareStoreListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

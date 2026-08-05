@@ -1,3 +1,4 @@
+const logger = console;
 ﻿/*
 ** nopCommerce custom js functions
 */
@@ -5,33 +6,43 @@
 
 
 function OpenWindow(query, w, h, scroll) {
+	logger.debug(`>>> Entering OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll})`);
     var l = (screen.width - w) / 2;
     var t = (screen.height - h) / 2;
+	logger.debug(`OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll}): l → ${l}`);
+	logger.debug(`OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll}): t → ${t}`);
 
     winprops = 'resizable=0, height=' + h + ',width=' + w + ',top=' + t + ',left=' + l + 'w';
     if (scroll) winprops += ',scrollbars=1';
     var f = window.open(query, "_blank", winprops);
+	logger.debug(`<<< Exiting OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll})`);
 }
 
 function setLocation(url) {
+	logger.debug(`>>> Entering setLocation(url=${url})`);
     window.location.href = url;
+	logger.debug(`<<< Exiting setLocation(url=${url})`);
 }
 
 function displayAjaxLoading(display) {
+	logger.debug(`>>> Entering displayAjaxLoading(display=${display})`);
     if (display) {
         $('.ajax-loading-block-window').show();
     }
     else {
         $('.ajax-loading-block-window').hide('slow');
+		logger.debug(`<<< Exiting displayAjaxLoading(display=${display})`);
     }
 }
 
 function displayPopupNotification(message, messagetype, modal) {
+	logger.debug(`>>> Entering displayPopupNotification(message=${message},messagetype=${messagetype},modal=${modal})`);
     //types: success, error, warning
     var container;
     if (messagetype == 'success') {
         //success
         container = $('#dialog-notifications-success');
+		logger.debug(`<<< Exiting displayPopupNotification(message=${message},messagetype=${messagetype},modal=${modal})`);
     }
     else if (messagetype == 'error') {
         //error
@@ -184,14 +195,17 @@ function htmlDecode(value) {
 
 // CSRF (XSRF) security
 function addAntiForgeryToken(data) {
+	logger.debug(`>>> Entering addAntiForgeryToken(data=${data})`);
     //if the object is undefined, create a new one.
     if (!data) {
         data = {};
     }
     //add token
     var tokenInput = $('input[name=__RequestVerificationToken]');
+	logger.debug(`addAntiForgeryToken(data=${data}): data → ${data}`);
     if (tokenInput.length) {
         data.__RequestVerificationToken = tokenInput.val();
     }
+	logger.debug(`addAntiForgeryToken(data=${data}): tokenInput → ${tokenInput}`);
     return data;
 };

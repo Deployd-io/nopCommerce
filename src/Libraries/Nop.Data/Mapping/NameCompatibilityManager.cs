@@ -22,8 +22,10 @@ public static partial class NameCompatibilityManager
 
     private static void Initialize()
     {
+		_logger.LogDebug(">>> Entering Initialize()");
         //perform with locked access to resources
         using (new ReaderWriteLockDisposable(_locker))
+		using Microsoft.Extensions.Logging;
         {
             if (_isInitialized)
                 return;
@@ -36,6 +38,7 @@ public static partial class NameCompatibilityManager
 
             foreach (var nameCompatibility in compatibilities.Distinct())
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 if (_loadedFor.Contains(nameCompatibility.GetType()))
                     continue;
 
@@ -52,6 +55,7 @@ public static partial class NameCompatibilityManager
 
             _isInitialized = true;
         }
+		_logger.LogDebug("<<< Exiting Initialize()");
     }
 
     #endregion
@@ -65,9 +69,11 @@ public static partial class NameCompatibilityManager
     /// <returns>Table name</returns>
     public static string GetTableName(Type type)
     {
+		_logger.LogDebug(">>> Entering GetTableName(type={Type})", type);
         if (!_isInitialized)
             Initialize();
 
+		_logger.LogDebug("<<< Exiting GetTableName(type={Type})", type);
         return _tableNames.TryGetValue(type, out var value) ? value : type.Name;
     }
 
@@ -79,9 +85,11 @@ public static partial class NameCompatibilityManager
     /// <returns>Column name</returns>
     public static string GetColumnName(Type type, string propertyName)
     {
+		_logger.LogDebug(">>> Entering GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
         if (!_isInitialized)
             Initialize();
 
+		_logger.LogDebug("<<< Exiting GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
         return _columnName.ContainsKey((type, propertyName)) ? _columnName[(type, propertyName)] : propertyName;
     }
 

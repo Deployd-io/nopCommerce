@@ -15,6 +15,7 @@ using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Menu;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Services;
 
@@ -28,6 +29,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
     IConsumer<EntityUpdatedEvent<ShoppingCartItem>>,
     IConsumer<ShoppingCartItemMovedToOrderItemEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -107,6 +109,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
             IconClass = "far fa-dot-circle",
             PermissionNames = new List<string> { RfqPermissionConfigManager.ADMIN_ACCESS_RFQ }
         });
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -232,6 +235,9 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
         }
 
         await _rfqService.UpdateQuoteItemsAsync(items);
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("HandleEventAsync(eventMessage)={EventMessage}: update query executed in {Arg1} ms", eventMessage, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -246,6 +252,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
 
         var quoteItem = await _rfqService.GetQuoteItemByShoppingCartItemIdAsync(eventMessage.Entity.Id);
         
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): quoteItem → {QuoteItem}", eventMessage, quoteItem);
         if (quoteItem == null || eventMessage.Entity.Quantity == quoteItem.OfferedQty)
             return;
 

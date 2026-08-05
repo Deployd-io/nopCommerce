@@ -10,8 +10,10 @@
 // The group was formed by Mesopotamia Foundation
 
 import moment from '../moment';
+const logger = console;
 
 function processRelativeTime(num, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering processRelativeTime(num=${num},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var format = {
         s: ['çend sanîye', 'çend sanîyeyan'],
         ss: [num + ' sanîye', num + ' sanîyeyan'],
@@ -28,20 +30,25 @@ function processRelativeTime(num, withoutSuffix, key, isFuture) {
         y: ['salek', 'salekê'],
         yy: [num + ' sal', num + ' salan'],
     };
+	logger.debug(`<<< Exiting processRelativeTime(num=${num},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return withoutSuffix ? format[key][0] : format[key][1];
 }
 // function obliqueNumSuffix(num) {
+logger.debug(`>>> Entering obliqueNumSuffix(num=${num})`);
 //     if(num.includes(':'))
 //         num = parseInt(num.split(':')[0]);
 //     else
 //         num = parseInt(num);
 //     return num == 0 || num % 10 == 1 ? 'ê'
 //                         : (num > 10 && num % 10 == 0 ? 'î' : 'an');
+logger.debug(`<<< Exiting obliqueNumSuffix(num=${num})`);
 // }
 function ezafeNumSuffix(num) {
+	logger.debug(`>>> Entering ezafeNumSuffix(num=${num})`);
     num = '' + num;
     var l = num.substring(num.length - 1),
         ll = num.length > 1 ? num.substring(num.length - 2) : '';
+		logger.debug(`ezafeNumSuffix(num=${num}): num → ${num}`);
     if (
         !(ll == 12 || ll == 13) &&
         (l == '2' || l == '3' || ll == '50' || l == '70' || l == '80')
@@ -63,9 +70,11 @@ export default moment.defineLocale('ku-kmr', {
     weekdaysShort: 'Yek_Du_Sê_Çar_Pên_În_Şem'.split('_'),
     weekdaysMin: 'Ye_Du_Sê_Ça_Pê_În_Şe'.split('_'),
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 12) {
             return isLower ? 'bn' : 'BN';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'pn' : 'PN';
         }
     },
@@ -109,9 +118,12 @@ export default moment.defineLocale('ku-kmr', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(?:yê|ê|\.)/,
     ordinal: function (num, period) {
+		logger.debug(`>>> Entering ordinal(num=${num},period=${period})`);
         var p = period.toLowerCase();
         if (p.includes('w') || p.includes('m')) return num + '.';
+		logger.debug(`ordinal(num=${num},period=${period}): p → ${p}`);
 
+		logger.debug(`<<< Exiting ordinal(num=${num},period=${period})`);
         return num + ezafeNumSuffix(num);
     },
     week: {

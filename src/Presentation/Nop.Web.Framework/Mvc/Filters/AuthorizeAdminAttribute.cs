@@ -18,8 +18,12 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public AuthorizeAdminAttribute(bool ignore = false) : base(typeof(AuthorizeAdminFilter))
     {
+		logger.LogDebug(">>> Entering AuthorizeAdminAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		logger.LogDebug("<<< Exiting AuthorizeAdminAttribute(ignore={Ignore})", ignore);
+		logger.LogDebug("AuthorizeAdminAttribute(ignore={Ignore}): Arguments → {Arguments}", ignore, Arguments);
+		logger.LogDebug("AuthorizeAdminAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
     }
 
     #endregion
@@ -51,8 +55,12 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
 
         public AuthorizeAdminFilter(bool ignoreFilter, IPermissionService permissionService)
         {
+			logger.LogDebug(">>> Entering AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
             _ignoreFilter = ignoreFilter;
             _permissionService = permissionService;
+			logger.LogDebug("<<< Exiting AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
+			logger.LogDebug("AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _permissionService → {_permissionService}", ignoreFilter, permissionService, _permissionService);
+			logger.LogDebug("AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, permissionService, _ignoreFilter);
         }
 
         #endregion
@@ -66,6 +74,7 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task AuthorizeAdminAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering AuthorizeAdminAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -89,6 +98,7 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
                 if (!await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL))
                     context.Result = new ChallengeResult();
             }
+			logger.LogDebug("<<< Exiting AuthorizeAdminAsync(context={Context})", context);
         }
 
         #endregion
@@ -102,7 +112,9 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await AuthorizeAdminAsync(context);
+			logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

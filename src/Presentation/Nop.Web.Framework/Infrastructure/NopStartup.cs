@@ -75,6 +75,7 @@ public partial class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //file provider
         services.AddScoped<INopFileProvider, NopFileProvider>();
 
@@ -92,6 +93,7 @@ public partial class NopStartup : INopStartup
         var appSettings = Singleton<AppSettings>.Instance;
         var distributedCacheConfig = appSettings.Get<DistributedCacheConfig>();
 
+		logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): distributedCacheConfig → {DistributedCacheConfig}", services, configuration, distributedCacheConfig);
         services.AddTransient(typeof(IConcurrentCollection<>), typeof(ConcurrentTrie<>));
 
         services.AddSingleton<ICacheKeyManager, CacheKeyManager>();
@@ -276,6 +278,7 @@ public partial class NopStartup : INopStartup
         var settings = typeFinder.FindClassesOfType(typeof(ISettings), false).ToList();
         foreach (var setting in settings)
         {
+		logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): settings → {Settings}", services, configuration, settings);
             services.AddScoped(setting, serviceProvider =>
             {
                 var storeId = DataSettingsManager.IsDatabaseInstalled()
@@ -312,6 +315,7 @@ public partial class NopStartup : INopStartup
         foreach (var consumer in consumers)
         foreach (var findInterface in consumer.FindInterfaces((type, criteria) =>
                  {
+		logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): consumers → {Consumers}", services, configuration, consumers);
                      var isMatch = type.IsGenericType && ((Type)criteria).IsAssignableFrom(type.GetGenericTypeDefinition());
                      return isMatch;
                  }, typeof(IConsumer<>)))
@@ -323,7 +327,9 @@ public partial class NopStartup : INopStartup
         //register the Lazy resolver for .Net IoC
         var useAutofac = appSettings.Get<CommonConfig>().UseAutofac;
         if (!useAutofac)
+			logger.LogDebug("ConfigureServices(services={Services},configuration={Configuration}): useAutofac → {UseAutofac}", services, configuration, useAutofac);
             services.AddScoped(typeof(Lazy<>), typeof(LazyInstance<>));
+			logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -332,6 +338,8 @@ public partial class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+	logger.LogDebug(">>> Entering Configure(application={Application})", application);
+	logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

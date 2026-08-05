@@ -12,11 +12,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Affiliates;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class AffiliateController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -54,15 +56,20 @@ public partial class AffiliateController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateSearchModelAsync(new AffiliateSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -73,15 +80,19 @@ public partial class AffiliateController : BaseAdminController
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateModelAsync(new AffiliateModel(), null);
 
+		_logger.LogDebug("Create(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -126,20 +137,25 @@ public partial class AffiliateController : BaseAdminController
         model = await _affiliateModelFactory.PrepareAffiliateModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(id);
         if (affiliate == null || affiliate.Deleted)
+			_logger.LogDebug("Edit(id={Id}): affiliate → {Affiliate}", id, affiliate);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliateModelAsync(null, affiliate);
 
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -190,6 +206,7 @@ public partial class AffiliateController : BaseAdminController
         model = await _affiliateModelFactory.PrepareAffiliateModelAsync(model, affiliate, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -198,9 +215,11 @@ public partial class AffiliateController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(id);
         if (affiliate == null)
+			_logger.LogDebug("Delete(id={Id}): affiliate → {Affiliate}", id, affiliate);
             return RedirectToAction("List");
 
         await _affiliateService.DeleteAffiliateAsync(affiliate);
@@ -211,6 +230,7 @@ public partial class AffiliateController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Affiliates.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -218,6 +238,7 @@ public partial class AffiliateController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> AffiliatedOrderListGrid(AffiliatedOrderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering AffiliatedOrderListGrid(searchModel={SearchModel})", searchModel);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(searchModel.AffliateId)
                         ?? throw new ArgumentException("No affiliate found with the specified id");
@@ -225,6 +246,8 @@ public partial class AffiliateController : BaseAdminController
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliatedOrderListModelAsync(searchModel, affiliate);
 
+		_logger.LogDebug("AffiliatedOrderListGrid(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting AffiliatedOrderListGrid(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -232,6 +255,7 @@ public partial class AffiliateController : BaseAdminController
     [CheckPermission(StandardPermission.Promotions.AFFILIATES_VIEW)]
     public virtual async Task<IActionResult> AffiliatedCustomerList(AffiliatedCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering AffiliatedCustomerList(searchModel={SearchModel})", searchModel);
         //try to get an affiliate with the specified id
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(searchModel.AffliateId)
                         ?? throw new ArgumentException("No affiliate found with the specified id");
@@ -239,6 +263,8 @@ public partial class AffiliateController : BaseAdminController
         //prepare model
         var model = await _affiliateModelFactory.PrepareAffiliatedCustomerListModelAsync(searchModel, affiliate);
 
+		_logger.LogDebug("AffiliatedCustomerList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting AffiliatedCustomerList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

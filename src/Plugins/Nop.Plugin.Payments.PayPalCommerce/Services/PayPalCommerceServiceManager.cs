@@ -46,6 +46,7 @@ using NopOrder = Nop.Core.Domain.Orders.Order;
 using NopShippingOption = Nop.Core.Domain.Shipping.ShippingOption;
 using Order = Nop.Plugin.Payments.PayPalCommerce.Services.Api.Models.Order;
 using ShippingOption = Nop.Plugin.Payments.PayPalCommerce.Services.Api.Models.ShippingOption;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Services;
 
@@ -54,6 +55,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Services;
 /// </summary>
 public class PayPalCommerceServiceManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly CurrencySettings _currencySettings;
@@ -242,6 +244,7 @@ public class PayPalCommerceServiceManager
 
             return amount is not null ? PrepareMoney(amount.Value, currencyCode).Value : null;
         }, new($"{PayPalCommerceDefaults.SystemName}.Messages.Amount-{productId ?? 0}"));
+		_logger.LogDebug("<<< Exiting PrepareMessagesAmountAsync(placement={Placement},customer={Customer},currencyCode={CurrencyCode},productId={ProductId})", placement, customer, currencyCode, productId);
     }
 
     #endregion
@@ -285,25 +288,32 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<CartDetails> PrepareCartDetailsAsync(ButtonPlacement placement, bool withShipping = true)
     {
+		_logger.LogDebug(">>> Entering PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping})", placement, withShipping);
         //get the primary store currency
         var currencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
         if (string.IsNullOrEmpty(currencyCode))
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): currencyCode → {CurrencyCode}", placement, withShipping, currencyCode);
             throw new NopException("Primary store currency not set");
 
         //get customer shopping cart
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): customer → {Customer}", placement, withShipping, customer);
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): store → {Store}", placement, withShipping, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
         if (!cart.Any())
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): cart → {Cart}", placement, withShipping, cart);
             throw new NopException("Shopping cart is empty");
 
         //get billing address
         var billingAddress = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
         if (placement == ButtonPlacement.PaymentMethod && billingAddress is null)
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): billingAddress → {BillingAddress}", placement, withShipping, billingAddress);
             throw new NopException("Customer billing address not set");
 
         var shippingIsRequired = await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
 
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): shippingIsRequired → {ShippingIsRequired}", placement, withShipping, shippingIsRequired);
         var details = new CartDetails
         {
             Placement = placement,
@@ -320,10 +330,14 @@ public class PayPalCommerceServiceManager
 
         //get shipping details
         details.ShippingOption = await _genericAttributeService
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): details.ShippingOption → {Arg2}", placement, withShipping, details.ShippingOption);
             .GetAttributeAsync<NopShippingOption>(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, store.Id);
         details.PickupPoint = await _genericAttributeService
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): details.PickupPoint → {Arg2}", placement, withShipping, details.PickupPoint);
             .GetAttributeAsync<PickupPoint>(customer, NopCustomerDefaults.SelectedPickupPointAttribute, store.Id);
         details.IsPickup = _shippingSettings.AllowPickupInStore && details.PickupPoint is not null;
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): details.IsPickup → {Arg2}", placement, withShipping, details.IsPickup);
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping}): details.ShippingAddress → {Arg2}", placement, withShipping, details.ShippingAddress);
         details.ShippingAddress = details.IsPickup ? new NopAddress
         {
             Address1 = details.PickupPoint.Address,
@@ -336,6 +350,7 @@ public class PayPalCommerceServiceManager
             CreatedOnUtc = DateTime.UtcNow
         } : await _addressService.GetAddressByIdAsync(customer.ShippingAddressId ?? 0);
         if (placement == ButtonPlacement.PaymentMethod && shippingIsRequired && details.ShippingAddress is null)
+		_logger.LogDebug("<<< Exiting PrepareCartDetailsAsync(placement={Placement},withShipping={WithShipping})", placement, withShipping);
             throw new NopException("Customer shipping address not set");
 
         return details;
@@ -471,6 +486,7 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<List<Item>> PrepareOrderItemsAsync(CartDetails details)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //cart items
         var items = await details.Cart.SelectAwait(async item =>
         {
@@ -1079,6 +1095,7 @@ public class PayPalCommerceServiceManager
 
             return paymentToken;
         }).Where(token => token is not null).ToList();
+		_logger.LogDebug("<<< Exiting PreparePaymentTokensAsync(settings={Settings},tokens={Tokens})", settings, tokens);
     }
 
     /// <summary>
@@ -1110,6 +1127,7 @@ public class PayPalCommerceServiceManager
     /// <returns>SHA256 hash</returns>
     private static string GetSha256Hash(string stringToHash)
     {
+		_logger.LogDebug(">>> Entering GetSha256Hash(stringToHash={StringToHash})", stringToHash);
         return SHA256.HashData(Encoding.Default.GetBytes(stringToHash)).Aggregate(string.Empty, (current, next) => $"{current}{next:x2}");
     }
 
@@ -1147,7 +1165,9 @@ public class PayPalCommerceServiceManager
     /// <returns>Result</returns>
     public static bool IsConfigured(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConfigured(settings={Settings})", settings);
         //client id and secret are required to request remote services
+		_logger.LogDebug("<<< Exiting IsConfigured(settings={Settings})", settings);
         return !string.IsNullOrEmpty(settings?.ClientId) && !string.IsNullOrEmpty(settings.SecretKey);
     }
 
@@ -1158,7 +1178,9 @@ public class PayPalCommerceServiceManager
     /// <returns>Result</returns>
     public static bool IsConnected(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConnected(settings={Settings})", settings);
         //webhook is required to accept notifications
+		_logger.LogDebug("<<< Exiting IsConnected(settings={Settings})", settings);
         return IsConfigured(settings) && !string.IsNullOrEmpty(settings.WebhookUrl);
     }
 
@@ -3055,6 +3077,8 @@ public class PayPalCommerceServiceManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteWebhookAsync(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering DeleteWebhookAsync(settings={Settings})", settings);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await HandleFunctionAsync(async () =>
         {
             if (!IsConnected(settings))
@@ -3064,8 +3088,10 @@ public class PayPalCommerceServiceManager
             if (webhook is not null)
                 await _httpClient.RequestAsync<DeleteWebhookRequest, EmptyResponse>(new() { WebhookId = webhook.Id }, settings);
 
+			_logger.LogInformation("DeleteWebhookAsync(settings)={Settings}: external service call took {Arg1} ms", settings, __logStart.ElapsedMilliseconds);
             return true;
         });
+		_logger.LogDebug("<<< Exiting DeleteWebhookAsync(settings={Settings})", settings);
     }
 
     /// <summary>
@@ -3094,6 +3120,8 @@ public class PayPalCommerceServiceManager
             //define a local function to validate the webhook event and get its resource
             async Task<IWebhookResource> getWebhookResource<TResource>() where TResource : class, IWebhookResource
             {
+				_logger.LogDebug(">>> Entering getWebhookResource()");
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 //verify webhook event data
                 var verifyRequest = new CreateWebhookSignatureRequest
                 {
@@ -3107,6 +3135,8 @@ public class PayPalCommerceServiceManager
                 };
                 var result = await _httpClient.RequestAsync<CreateWebhookSignatureRequest, CreateWebhookSignatureResponse>(verifyRequest, settings);
 
+				_logger.LogInformation("getWebhookResource(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+				_logger.LogDebug("getWebhookResource(): result → {Result}", result);
                 if (result?.VerificationStatus?.ToUpper() != WebhookSignatureVerificationStatusType.SUCCESS.ToString())
                     throw new NopException("Webhook error", new NopException($"Webhook signature verification {result?.VerificationStatus}"));
 
@@ -3372,6 +3402,7 @@ public class PayPalCommerceServiceManager
 
             return true;
         });
+		_logger.LogDebug("<<< Exiting HandleWebhookAsync(settings={Settings},request={Request})", settings, request);
     }
 
     #endregion

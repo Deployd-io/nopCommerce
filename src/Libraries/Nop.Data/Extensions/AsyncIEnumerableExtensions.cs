@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace System.Linq;
 
 public static class AsyncIEnumerableExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Projects each element of an async-enumerable sequence into a new form by applying
     /// an asynchronous selector function to each member of the source sequence and awaiting
@@ -78,7 +80,10 @@ public static class AsyncIEnumerableExtensions
     {
         async ValueTask<IAsyncEnumerable<TResult>> getAsyncEnumerable(TSource items)
         {
+			_logger.LogDebug(">>> Entering getAsyncEnumerable(items={Items})", items);
             var rez = await predicate(items);
+			_logger.LogDebug("getAsyncEnumerable(items={Items}): rez → {Rez}", items, rez);
+			_logger.LogDebug("<<< Exiting getAsyncEnumerable(items={Items})", items);
             return rez.ToAsyncEnumerable();
         }
 
@@ -177,10 +182,13 @@ public static class AsyncIEnumerableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static Task<List<TSource>> ToListAsync<TSource>(this IEnumerable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering ToListAsync(source={Source})", source);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return source.ToAsyncEnumerable().ToListAsync().AsTask();
     }
 
     /// <summary>
+	_logger.LogInformation("ToListAsync(source)={Source}: database query executed in {Arg1} ms", source, __logStart.ElapsedMilliseconds);
     /// Sorts the elements of a sequence in descending order according to a key obtained
     /// by invoking a transform function on each element and awaiting the result
     /// </summary>

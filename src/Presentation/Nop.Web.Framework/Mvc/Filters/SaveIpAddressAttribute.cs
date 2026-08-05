@@ -19,6 +19,8 @@ public sealed class SaveIpAddressAttribute : TypeFilterAttribute
     /// </summary>
     public SaveIpAddressAttribute() : base(typeof(SaveIpAddressFilter))
     {
+	logger.LogDebug(">>> Entering SaveIpAddressAttribute()");
+	logger.LogDebug("<<< Exiting SaveIpAddressAttribute()");
     }
 
     #endregion
@@ -63,6 +65,8 @@ public sealed class SaveIpAddressAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SaveIpAddressAsync(ActionExecutingContext context)
         {
+			logger.LogDebug(">>> Entering SaveIpAddressAsync(context={Context})", context);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ArgumentNullException.ThrowIfNull(context);
 
             //only in GET requests
@@ -79,19 +83,24 @@ public sealed class SaveIpAddressAttribute : TypeFilterAttribute
             //get current IP address
             var currentIpAddress = _webHelper.GetCurrentIpAddress();
 
+			logger.LogDebug("SaveIpAddressAsync(context={Context}): currentIpAddress → {CurrentIpAddress}", context, currentIpAddress);
             if (string.IsNullOrEmpty(currentIpAddress))
                 return;
 
             //update customer's IP address
             var customer = await _workContext.GetCurrentCustomerAsync();
             if (_workContext.OriginalCustomerIfImpersonated == null &&
+				logger.LogDebug("SaveIpAddressAsync(context={Context}): customer → {Customer}", context, customer);
                 !currentIpAddress.Equals(customer.LastIpAddress, StringComparison.InvariantCultureIgnoreCase))
             {
                 customer.LastIpAddress = currentIpAddress;
+				logger.LogDebug("SaveIpAddressAsync(context={Context}): customer.LastIpAddress → {Arg1}", context, customer.LastIpAddress);
 
                 //update customer without event notification
                 await _customerRepository.UpdateAsync(customer, false);
+				logger.LogInformation("SaveIpAddressAsync(context)={Context}: update query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
             }
+			logger.LogDebug("<<< Exiting SaveIpAddressAsync(context={Context})", context);
         }
 
         #endregion
@@ -106,9 +115,11 @@ public sealed class SaveIpAddressAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await SaveIpAddressAsync(context);
             if (context.Result == null)
                 await next();
+				logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

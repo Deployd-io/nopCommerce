@@ -5,8 +5,10 @@
 //! author : Emanuel Cepoi : https://github.com/cepem
 
 import moment from '../moment';
+const logger = console;
 
 function relativeTimeWithPlural(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var format = {
             ss: 'secunde',
             mm: 'minute',
@@ -20,6 +22,8 @@ function relativeTimeWithPlural(number, withoutSuffix, key) {
     if (number % 100 >= 20 || (number >= 100 && number % 100 === 0)) {
         separator = ' de ';
     }
+	logger.debug(`relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key}): separator → ${separator}`);
+	logger.debug(`<<< Exiting relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     return number + separator + format[key];
 }
 

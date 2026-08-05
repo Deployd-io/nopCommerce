@@ -29,6 +29,7 @@ using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.Order;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -37,6 +38,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class OrderModelFactory : IOrderModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -205,11 +207,16 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<CustomerOrderListModel> PrepareCustomerOrderListModelAsync(int? page, OrderHistoryPeriods limit)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerOrderListModelAsync(page={Page},limit={Limit})", page, limit);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): customer → {Customer}", page, limit, customer);
+		_logger.LogDebug("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): store → {Store}", page, limit, store);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var pageSize = _orderSettings.CustomerOrdersPageSize;
         var pageIndex = Math.Max((page ?? 0) - 1, 0);
 
+		_logger.LogDebug("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): pageIndex → {PageIndex}", page, limit, pageIndex);
         var orders = await _orderService.SearchOrdersAsync(storeId: store.Id,
             customerId: customer.Id,
             createdFromUtc: limit == OrderHistoryPeriods.All ? null : DateTime.UtcNow.AddDays((int)limit * -1),
@@ -223,6 +230,8 @@ public partial class OrderModelFactory : IOrderModelFactory
                 ID = enumValue.ToString().ToLower(),
                 Name = await _localizationService.GetLocalizedEnumAsync(enumValue)
             }).ToListAsync();
+				_logger.LogDebug("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): Name → {Name}", page, limit, Name);
+				_logger.LogInformation("PrepareCustomerOrderListModelAsync(page,limit)={Page},{Limit}: database query executed in {Arg2} ms", page, limit, __logStart.ElapsedMilliseconds);
 
         var model = new CustomerOrderListModel
         {
@@ -254,10 +263,12 @@ public partial class OrderModelFactory : IOrderModelFactory
             };
             var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
             orderModel.OrderTotal = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, (await _workContext.GetWorkingLanguageAsync()).Id);
+			_logger.LogDebug("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): orderTotalInCustomerCurrency → {OrderTotalInCustomerCurrency}", page, limit, orderTotalInCustomerCurrency);
 
             model.Orders.Add(orderModel);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerOrderListModelAsync(page={Page},limit={Limit})", page, limit);
         return model;
     }
 
@@ -270,16 +281,21 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<CustomerRecurringPaymentListModel> PrepareCustomerRecurringPaymentListModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRecurringPaymentListModelAsync()");
         var model = new CustomerRecurringPaymentListModel();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareCustomerRecurringPaymentListModelAsync(): model → {Model}", model);
+		_logger.LogDebug("PrepareCustomerRecurringPaymentListModelAsync(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		_logger.LogDebug("PrepareCustomerRecurringPaymentListModelAsync(): store → {Store}", store);
         var recurringPayments = await _orderService.SearchRecurringPaymentsAsync(store.Id,
             customer.Id);
         foreach (var recurringPayment in recurringPayments)
         {
             var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
 
+			_logger.LogDebug("PrepareCustomerRecurringPaymentListModelAsync(): order → {Order}", order);
             var recurringPaymentModel = new CustomerRecurringPaymentModel
             {
                 Id = recurringPayment.Id,
@@ -297,6 +313,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             model.RecurringPayments.Add(recurringPaymentModel);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRecurringPaymentListModelAsync()");
         return model;
     }
 
@@ -647,10 +664,12 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<ShipmentDetailsModel> PrepareShipmentDetailsModelAsync(Shipment shipment)
     {
+		_logger.LogDebug(">>> Entering PrepareShipmentDetailsModelAsync(shipment={Shipment})", shipment);
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("order cannot be loaded");
         var model = new ShipmentDetailsModel
+		_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): order → {Order}", shipment, order);
         {
             Id = shipment.Id
         };
@@ -665,22 +684,31 @@ public partial class OrderModelFactory : IOrderModelFactory
         if (!string.IsNullOrEmpty(shipment.TrackingNumber))
         {
             model.TrackingNumber = shipment.TrackingNumber;
+			_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): model.TrackingNumber → {Arg1}", shipment, model.TrackingNumber);
             var shipmentTracker = await _shipmentService.GetShipmentTrackerAsync(shipment);
             if (shipmentTracker != null)
+			_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentTracker → {ShipmentTracker}", shipment, shipmentTracker);
             {
                 model.TrackingNumberUrl = await shipmentTracker.GetUrlAsync(shipment.TrackingNumber, shipment);
                 if (_shippingSettings.DisplayShipmentEventsToCustomers)
                 {
                     var shipmentEvents = await shipmentTracker.GetShipmentEventsAsync(shipment.TrackingNumber, shipment);
                     if (shipmentEvents != null)
+					_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentEvents → {ShipmentEvents}", shipment, shipmentEvents);
                     {
                         foreach (var shipmentEvent in shipmentEvents)
                         {
                             var shipmentStatusEventModel = new ShipmentDetailsModel.ShipmentStatusEventModel();
                             var shipmentEventCountry = await _countryService.GetCountryByTwoLetterIsoCodeAsync(shipmentEvent.CountryCode);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel → {ShipmentStatusEventModel}", shipment, shipmentStatusEventModel);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentEventCountry → {ShipmentEventCountry}", shipment, shipmentEventCountry);
                             shipmentStatusEventModel.Country = shipmentEventCountry != null
                                 ? await _localizationService.GetLocalizedAsync(shipmentEventCountry, x => x.Name) : shipmentEvent.CountryCode;
                             shipmentStatusEventModel.Status = shipmentEvent.Status;
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.Status → {Arg1}", shipment, shipmentStatusEventModel.Status);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.Date → {Arg1}", shipment, shipmentStatusEventModel.Date);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.EventName → {Arg1}", shipment, shipmentStatusEventModel.EventName);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.Location → {Arg1}", shipment, shipmentStatusEventModel.Location);
                             shipmentStatusEventModel.Date = shipmentEvent.Date;
                             shipmentStatusEventModel.EventName = shipmentEvent.EventName;
                             shipmentStatusEventModel.Location = shipmentEvent.Location;
@@ -693,14 +721,17 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         //products in this shipment
         model.ShowSku = _catalogSettings.ShowSkuOnProductDetailsPage;
+		_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): model.ShowSku → {Arg1}", shipment, model.ShowSku);
         foreach (var shipmentItem in await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id))
         {
             var orderItem = await _orderService.GetOrderItemByIdAsync(shipmentItem.OrderItemId);
             if (orderItem == null)
+				_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): orderItem → {OrderItem}", shipment, orderItem);
                 continue;
 
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+			_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): product → {Product}", shipment, product);
             var shipmentItemModel = new ShipmentDetailsModel.ShipmentItemModel
             {
                 Id = shipmentItem.Id,
@@ -728,6 +759,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         //order details model
         model.Order = await PrepareOrderDetailsModelAsync(order);
 
+		_logger.LogDebug("<<< Exiting PrepareShipmentDetailsModelAsync(shipment={Shipment})", shipment);
         return model;
     }
 
@@ -741,12 +773,17 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<CustomerRewardPointsModel> PrepareCustomerRewardPointsAsync(int? page)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRewardPointsAsync(page={Page})", page);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get reward points history
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): customer → {Customer}", page, customer);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): store → {Store}", page, store);
         var pageSize = _rewardPointsSettings.PageSize;
         var rewardPoints = await _rewardPointService.GetRewardPointsHistoryAsync(customer.Id, store.Id, true, pageIndex: --page ?? 0, pageSize: pageSize);
 
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): rewardPoints → {RewardPoints}", page, rewardPoints);
         //prepare model
         var model = new CustomerRewardPointsModel
         {
@@ -765,6 +802,7 @@ public partial class OrderModelFactory : IOrderModelFactory
                 };
             }).ToListAsync(),
 
+			_logger.LogInformation("PrepareCustomerRewardPointsAsync(page)={Page}: database query executed in {Arg1} ms", page, __logStart.ElapsedMilliseconds);
             PagerModel = new PagerModel(_localizationService)
             {
                 PageSize = rewardPoints.PageSize,
@@ -780,8 +818,13 @@ public partial class OrderModelFactory : IOrderModelFactory
         //current amount/balance
         var rewardPointsBalance = await _rewardPointService.GetRewardPointsBalanceAsync(customer.Id, store.Id);
         var rewardPointsAmountBase = await _orderTotalCalculationService.ConvertRewardPointsToAmountAsync(rewardPointsBalance);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): rewardPointsBalance → {RewardPointsBalance}", page, rewardPointsBalance);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): rewardPointsAmountBase → {RewardPointsAmountBase}", page, rewardPointsAmountBase);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): model.RewardPointsBalance → {Arg1}", page, model.RewardPointsBalance);
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
         var rewardPointsAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(rewardPointsAmountBase, currentCurrency);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): currentCurrency → {CurrentCurrency}", page, currentCurrency);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): rewardPointsAmount → {RewardPointsAmount}", page, rewardPointsAmount);
         model.RewardPointsBalance = rewardPointsBalance;
         model.RewardPointsAmount = await _priceFormatter.FormatPriceAsync(rewardPointsAmount, true, false);
 
@@ -789,9 +832,13 @@ public partial class OrderModelFactory : IOrderModelFactory
         var minimumRewardPointsBalance = _rewardPointsSettings.MinimumRewardPointsToUse;
         var minimumRewardPointsAmountBase = await _orderTotalCalculationService.ConvertRewardPointsToAmountAsync(minimumRewardPointsBalance);
         var minimumRewardPointsAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(minimumRewardPointsAmountBase, currentCurrency);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): minimumRewardPointsAmountBase → {MinimumRewardPointsAmountBase}", page, minimumRewardPointsAmountBase);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): minimumRewardPointsAmount → {MinimumRewardPointsAmount}", page, minimumRewardPointsAmount);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): model.MinimumRewardPointsBalance → {Arg1}", page, model.MinimumRewardPointsBalance);
         model.MinimumRewardPointsBalance = minimumRewardPointsBalance;
         model.MinimumRewardPointsAmount = await _priceFormatter.FormatPriceAsync(minimumRewardPointsAmount, true, false);
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRewardPointsAsync(page={Page})", page);
         return model;
     }
 

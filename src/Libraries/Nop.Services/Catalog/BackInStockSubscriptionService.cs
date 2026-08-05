@@ -44,9 +44,13 @@ public partial class BackInStockSubscriptionService : IBackInStockSubscriptionSe
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSubscriptionAsync(BackInStockSubscription subscription)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _backInStockSubscriptionRepository.DeleteAsync(subscription);
     }
 
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
     /// <summary>
     /// Gets all subscriptions
     /// </summary>
@@ -116,6 +120,8 @@ public partial class BackInStockSubscriptionService : IBackInStockSubscriptionSe
     /// </returns>
     public virtual async Task<BackInStockSubscription> GetSubscriptionByIdAsync(int subscriptionId)
     {
+		logger.LogDebug(">>> Entering GetSubscriptionByIdAsync(subscriptionId={SubscriptionId})", subscriptionId);
+		logger.LogDebug("<<< Exiting GetSubscriptionByIdAsync(subscriptionId={SubscriptionId})", subscriptionId);
         return await _backInStockSubscriptionRepository.GetByIdAsync(subscriptionId, cache => default, useShortTermCache: true);
     }
 
@@ -126,6 +132,7 @@ public partial class BackInStockSubscriptionService : IBackInStockSubscriptionSe
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSubscriptionAsync(BackInStockSubscription subscription)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _backInStockSubscriptionRepository.InsertAsync(subscription);
     }
 
@@ -139,19 +146,26 @@ public partial class BackInStockSubscriptionService : IBackInStockSubscriptionSe
     /// </returns>
     public virtual async Task<int> SendNotificationsToSubscribersAsync(Product product)
     {
+		logger.LogDebug(">>> Entering SendNotificationsToSubscribersAsync(product={Product})", product);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var result = 0;
         var subscriptions = await GetAllSubscriptionsByProductIdAsync(product.Id);
+		logger.LogDebug("SendNotificationsToSubscribersAsync(product={Product}): result → {Result}", product, result);
+		logger.LogDebug("SendNotificationsToSubscribersAsync(product={Product}): subscriptions → {Subscriptions}", product, subscriptions);
         foreach (var subscription in subscriptions)
         {
             var customer = await _customerRepository.GetByIdAsync(subscription.CustomerId);
             result += (await _workflowMessageService.SendBackInStockNotificationAsync(subscription, customer?.LanguageId ?? 0)).Count;
+			logger.LogDebug("SendNotificationsToSubscribersAsync(product={Product}): customer → {Customer}", product, customer);
+			logger.LogInformation("SendNotificationsToSubscribersAsync(product)={Product}: find query executed in {Arg1} ms", product, __logStart.ElapsedMilliseconds);
         }
 
         for (var i = 0; i <= subscriptions.Count - 1; i++)
             await DeleteSubscriptionAsync(subscriptions[i]);
 
+		logger.LogDebug("<<< Exiting SendNotificationsToSubscribersAsync(product={Product})", product);
         return result;
     }
 

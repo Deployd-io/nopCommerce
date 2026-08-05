@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ProductAttributeModelFactory : IProductAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -98,11 +100,13 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     /// </returns>
     public virtual Task<ProductAttributeSearchModel> PrepareProductAttributeSearchModelAsync(ProductAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareProductAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareProductAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -116,6 +120,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
     /// </returns>
     public virtual async Task<ProductAttributeListModel> PrepareProductAttributeListModelAsync(ProductAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareProductAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get product attributes
@@ -132,6 +137,7 @@ public partial class ProductAttributeModelFactory : IProductAttributeModelFactor
 
         });
 
+		_logger.LogDebug("<<< Exiting PrepareProductAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

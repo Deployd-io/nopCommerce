@@ -1,12 +1,17 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record VendorNavigationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public VendorNavigationModel()
     {
+		_logger.LogDebug(">>> Entering VendorNavigationModel()");
         Vendors = new List<VendorBriefInfoModel>();
+		_logger.LogDebug("<<< Exiting VendorNavigationModel()");
+		_logger.LogDebug("VendorNavigationModel(): Vendors → {Vendors}", Vendors);
     }
 
     public IList<VendorBriefInfoModel> Vendors { get; set; }

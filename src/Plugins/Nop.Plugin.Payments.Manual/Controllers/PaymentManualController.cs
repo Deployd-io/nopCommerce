@@ -9,6 +9,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.Manual.Controllers;
 
@@ -17,6 +18,7 @@ namespace Nop.Plugin.Payments.Manual.Controllers;
 [AutoValidateAntiforgeryToken]
 public class PaymentManualController : BasePaymentController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -49,9 +51,12 @@ public class PaymentManualController : BasePaymentController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var manualPaymentSettings = await _settingService.LoadSettingAsync<ManualPaymentSettings>(storeScope);
+		_logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
+		_logger.LogDebug("Configure(): manualPaymentSettings → {ManualPaymentSettings}", manualPaymentSettings);
 
         var model = new ConfigurationModel
         {
@@ -68,6 +73,7 @@ public class PaymentManualController : BasePaymentController
             model.AdditionalFeePercentage_OverrideForStore = await _settingService.SettingExistsAsync(manualPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Payments.Manual/Views/Configure.cshtml", model);
     }
 

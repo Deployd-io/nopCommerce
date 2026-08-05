@@ -5,12 +5,14 @@ using Nop.Data.Migrations;
 using Nop.Plugin.Widgets.FacebookPixel.Domain;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Data;
 
 [NopMigration("2022-03-18 12:00:00", "Widgets.FacebookPixel 2.00. Conversions API", MigrationProcessType.Update)]
 public class ConversionsApiMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILanguageService _languageService;
@@ -36,11 +38,13 @@ public class ConversionsApiMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         var facebookPixelConfigurationTableName = NameCompatibilityManager.GetTableName(typeof(FacebookPixelConfiguration));
 
+		_logger.LogDebug("Up(): facebookPixelConfigurationTableName → {FacebookPixelConfigurationTableName}", facebookPixelConfigurationTableName);
         //add ConversionsApiEnabled column if not exists
         if (!Schema.Table(facebookPixelConfigurationTableName).Column(nameof(FacebookPixelConfiguration.ConversionsApiEnabled)).Exists())
         {
@@ -83,6 +87,7 @@ public class ConversionsApiMigration : MigrationBase
             "Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled",
             "Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled.Hint"
         });
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -90,7 +95,9 @@ public class ConversionsApiMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //nothing
+		_logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

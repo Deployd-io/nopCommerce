@@ -3,6 +3,7 @@ using FluentMigrator;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -11,6 +12,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public partial class MigrationManager : IMigrationManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IFilteringMigrationSource _filteringMigrationSource;
@@ -134,10 +136,12 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="migrationInfo">Migration to rollback</param>
     public virtual void ApplyDownMigration(IMigrationInfo migrationInfo)
     {
+		_logger.LogDebug(">>> Entering ApplyDownMigration(migrationInfo={MigrationInfo})", migrationInfo);
         ArgumentNullException.ThrowIfNull(migrationInfo);
 
         _migrationRunner.Down(migrationInfo.Migration);
         _versionLoader.Value.DeleteVersion(migrationInfo.Version);
+		_logger.LogDebug("<<< Exiting ApplyDownMigration(migrationInfo={MigrationInfo})", migrationInfo);
     }
 
     /// <summary>
@@ -147,6 +151,7 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="commitVersionOnly">Commit only version information</param>
     public virtual void ApplyUpMigration(IMigrationInfo migrationInfo, bool commitVersionOnly = false)
     {
+		_logger.LogDebug(">>> Entering ApplyUpMigration(migrationInfo={MigrationInfo},commitVersionOnly={CommitVersionOnly})", migrationInfo, commitVersionOnly);
         ArgumentNullException.ThrowIfNull(migrationInfo);
 
         if (!commitVersionOnly)
@@ -157,6 +162,7 @@ public partial class MigrationManager : IMigrationManager
 #endif
         _versionLoader.Value
             .UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+			_logger.LogDebug("<<< Exiting ApplyUpMigration(migrationInfo={MigrationInfo},commitVersionOnly={CommitVersionOnly})", migrationInfo, commitVersionOnly);
     }
 
     #endregion

@@ -20,8 +20,12 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
 
     public PasswordPropertyValidator(ILocalizationService localizationService, CustomerSettings customerSettings)
     {
+		logger.LogDebug(">>> Entering PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
         _localizationService = localizationService;
         _customerSettings = customerSettings;
+		logger.LogDebug("<<< Exiting PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
+		logger.LogDebug("PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings}): _customerSettings → {_customerSettings}", localizationService, customerSettings, _customerSettings);
+		logger.LogDebug("PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings}): _localizationService → {_localizationService}", localizationService, customerSettings, _localizationService);
     }
 
     #endregion
@@ -30,6 +34,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
 
     private async Task<string> GetValidationMessageAsync()
     {
+		logger.LogDebug(">>> Entering GetValidationMessageAsync()");
         var regExpError = new StringBuilder()
             .AppendJoin(' ',
                 await _localizationService.GetResourceAsync("Validation.Password.Rule"),
@@ -47,6 +52,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
         if (_customerSettings.PasswordRequireNonAlphanumeric)
             regExpError.AppendFormat(", {0}", await _localizationService.GetResourceAsync("Validation.Password.RequireNonAlphanumeric"));
 
+		logger.LogDebug("<<< Exiting GetValidationMessageAsync()");
         return regExpError.ToString();
     }
 
@@ -60,6 +66,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
     /// <returns>True if valid, otherwise false</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		logger.LogDebug(">>> Entering IsValid(context={Context},value={Value})", context, value);
         var password = value as string;
 
         if (string.IsNullOrEmpty(password))
@@ -74,6 +81,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
             return false;
         }
 
+		logger.LogDebug("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return true;
     }
 
@@ -83,6 +91,8 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
     /// <param name="errorCode">The currently configured error code for the validator</param>
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
+		logger.LogDebug(">>> Entering GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+		logger.LogDebug("<<< Exiting GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
         return GetValidationMessageAsync().Result;
     }
 

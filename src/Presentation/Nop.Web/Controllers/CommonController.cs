@@ -20,12 +20,14 @@ using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Themes;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Sitemap;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class CommonController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -102,6 +104,8 @@ public partial class CommonController : BasePublicController
 
     public virtual IActionResult PageNotFound()
     {
+		_logger.LogDebug(">>> Entering PageNotFound()");
+		_logger.LogDebug("<<< Exiting PageNotFound()");
         return View();
     }
 
@@ -111,8 +115,11 @@ public partial class CommonController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> SetLanguage(int langid, string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering SetLanguage(langid={Langid},returnUrl={ReturnUrl})", langid, returnUrl);
         var language = await _languageService.GetLanguageByIdAsync(langid);
         if (!language?.Published ?? false)
+			_logger.LogDebug("SetLanguage(langid={Langid},returnUrl={ReturnUrl}): language → {Language}", langid, returnUrl, language);
+			_logger.LogDebug("SetLanguage(langid={Langid},returnUrl={ReturnUrl}): returnUrl → {ReturnUrl1}", langid, returnUrl, returnUrl);
             language = await _workContext.GetWorkingLanguageAsync();
 
         //home page
@@ -136,6 +143,7 @@ public partial class CommonController : BasePublicController
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
 
+		_logger.LogDebug("<<< Exiting SetLanguage(langid={Langid},returnUrl={ReturnUrl})", langid, returnUrl);
         return Redirect(returnUrl);
     }
 
@@ -143,8 +151,11 @@ public partial class CommonController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> SetCurrency(int customerCurrency, string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering SetCurrency(customerCurrency={CustomerCurrency},returnUrl={ReturnUrl})", customerCurrency, returnUrl);
         var currency = await _currencyService.GetCurrencyByIdAsync(customerCurrency);
         if (currency != null)
+			_logger.LogDebug("SetCurrency(customerCurrency={CustomerCurrency},returnUrl={ReturnUrl}): currency → {Currency}", customerCurrency, returnUrl, currency);
+			_logger.LogDebug("SetCurrency(customerCurrency={CustomerCurrency},returnUrl={ReturnUrl}): returnUrl → {ReturnUrl1}", customerCurrency, returnUrl, returnUrl);
             await _workContext.SetWorkingCurrencyAsync(currency);
 
         //home page
@@ -155,6 +166,7 @@ public partial class CommonController : BasePublicController
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
 
+		_logger.LogDebug("<<< Exiting SetCurrency(customerCurrency={CustomerCurrency},returnUrl={ReturnUrl})", customerCurrency, returnUrl);
         return Redirect(returnUrl);
     }
 
@@ -162,8 +174,11 @@ public partial class CommonController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> SetTaxType(int customerTaxType, string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering SetTaxType(customerTaxType={CustomerTaxType},returnUrl={ReturnUrl})", customerTaxType, returnUrl);
         var taxDisplayType = (TaxDisplayType)Enum.ToObject(typeof(TaxDisplayType), customerTaxType);
         await _workContext.SetTaxDisplayTypeAsync(taxDisplayType);
+		_logger.LogDebug("SetTaxType(customerTaxType={CustomerTaxType},returnUrl={ReturnUrl}): taxDisplayType → {TaxDisplayType}", customerTaxType, returnUrl, taxDisplayType);
+		_logger.LogDebug("SetTaxType(customerTaxType={CustomerTaxType},returnUrl={ReturnUrl}): returnUrl → {ReturnUrl1}", customerTaxType, returnUrl, returnUrl);
 
         //home page
         if (string.IsNullOrEmpty(returnUrl))
@@ -173,6 +188,7 @@ public partial class CommonController : BasePublicController
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
 
+		_logger.LogDebug("<<< Exiting SetTaxType(customerTaxType={CustomerTaxType},returnUrl={ReturnUrl})", customerTaxType, returnUrl);
         return Redirect(returnUrl);
     }
 
@@ -181,9 +197,12 @@ public partial class CommonController : BasePublicController
     [CheckAccessClosedStore(ignore: true)]
     public virtual async Task<IActionResult> ContactUs()
     {
+		_logger.LogDebug(">>> Entering ContactUs()");
         var model = new ContactUsModel();
         model = await _commonModelFactory.PrepareContactUsModelAsync(model, false);
+		_logger.LogDebug("ContactUs(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting ContactUs()");
         return View(model);
     }
 
@@ -201,15 +220,18 @@ public partial class CommonController : BasePublicController
 
         model = await _commonModelFactory.PrepareContactUsModelAsync(model, true);
 
+		_logger.LogDebug("ContactUsSend(model={Model},captchaValid={CaptchaValid}): model → {Model1}", model, captchaValid, model);
         if (ModelState.IsValid)
         {
             var subject = _commonSettings.SubjectFieldOnContactUsForm ? model.Subject : null;
             var body = _htmlFormatter.FormatText(model.Enquiry, false, true, false, false, false, false);
 
+			_logger.LogDebug("ContactUsSend(model={Model},captchaValid={CaptchaValid}): body → {Body}", model, captchaValid, body);
             await _workflowMessageService.SendContactUsMessageAsync((await _workContext.GetWorkingLanguageAsync()).Id,
                 model.Email, model.FullName, subject, body);
 
             model.SuccessfullySent = true;
+			_logger.LogDebug("ContactUsSend(model={Model},captchaValid={CaptchaValid}): model.SuccessfullySent → {Arg2}", model, captchaValid, model.SuccessfullySent);
             model.Result = await _localizationService.GetResourceAsync("ContactUs.YourEnquiryHasBeenSent");
 
             //activity log
@@ -219,22 +241,27 @@ public partial class CommonController : BasePublicController
             return View(model);
         }
 
+		_logger.LogDebug("<<< Exiting ContactUsSend(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
     //contact vendor page
     public virtual async Task<IActionResult> ContactVendor(int vendorId)
     {
+		_logger.LogDebug(">>> Entering ContactVendor(vendorId={VendorId})", vendorId);
         if (!_vendorSettings.AllowCustomersToContactVendors)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var vendor = await _vendorService.GetVendorByIdAsync(vendorId);
         if (vendor == null || !vendor.Active || vendor.Deleted)
+			_logger.LogDebug("ContactVendor(vendorId={VendorId}): vendor → {Vendor}", vendorId, vendor);
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = new ContactVendorModel();
         model = await _commonModelFactory.PrepareContactVendorModelAsync(model, vendor, false);
+		_logger.LogDebug("ContactVendor(vendorId={VendorId}): model → {Model}", vendorId, model);
 
+		_logger.LogDebug("<<< Exiting ContactVendor(vendorId={VendorId})", vendorId);
         return View(model);
     }
 
@@ -257,31 +284,38 @@ public partial class CommonController : BasePublicController
 
         model = await _commonModelFactory.PrepareContactVendorModelAsync(model, vendor, true);
 
+		_logger.LogDebug("ContactVendorSend(model={Model},captchaValid={CaptchaValid}): model → {Model1}", model, captchaValid, model);
         if (ModelState.IsValid)
         {
             var subject = _commonSettings.SubjectFieldOnContactUsForm ? model.Subject : null;
             var body = _htmlFormatter.FormatText(model.Enquiry, false, true, false, false, false, false);
 
+			_logger.LogDebug("ContactVendorSend(model={Model},captchaValid={CaptchaValid}): body → {Body}", model, captchaValid, body);
             await _workflowMessageService.SendContactVendorMessageAsync(vendor, (await _workContext.GetWorkingLanguageAsync()).Id,
                 model.Email, model.FullName, subject, body);
 
             model.SuccessfullySent = true;
+			_logger.LogDebug("ContactVendorSend(model={Model},captchaValid={CaptchaValid}): model.SuccessfullySent → {Arg2}", model, captchaValid, model.SuccessfullySent);
             model.Result = await _localizationService.GetResourceAsync("ContactVendor.YourEnquiryHasBeenSent");
 
             return View(model);
         }
 
+		_logger.LogDebug("<<< Exiting ContactVendorSend(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
     //sitemap page
     public virtual async Task<IActionResult> Sitemap(SitemapPageModel pageModel)
     {
+		_logger.LogDebug(">>> Entering Sitemap(pageModel={PageModel})", pageModel);
         if (!_sitemapSettings.SitemapEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _sitemapModelFactory.PrepareSitemapModelAsync(pageModel);
 
+		_logger.LogDebug("Sitemap(pageModel={PageModel}): model → {Model}", pageModel, model);
+		_logger.LogDebug("<<< Exiting Sitemap(pageModel={PageModel})", pageModel);
         return View(model);
     }
 
@@ -294,6 +328,7 @@ public partial class CommonController : BasePublicController
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> SitemapXml(int? id)
     {
+		_logger.LogDebug(">>> Entering SitemapXml(id={Id})", id);
         if (!_sitemapXmlSettings.SitemapXmlEnabled)
             return StatusCode(StatusCodes.Status403Forbidden);
 
@@ -304,14 +339,18 @@ public partial class CommonController : BasePublicController
         }
         catch
         {
+			_logger.LogError("Exception in SitemapXml(id={Id}): {Arg1}", id, ex.Message);
+			_logger.LogDebug("<<< Exiting SitemapXml(id={Id})", id);
             return StatusCode(StatusCodes.Status503ServiceUnavailable);
         }
     }
 
     public virtual async Task<IActionResult> SetStoreTheme(string themeName, string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering SetStoreTheme(themeName={ThemeName},returnUrl={ReturnUrl})", themeName, returnUrl);
         await _themeContext.SetWorkingThemeNameAsync(themeName);
 
+		_logger.LogDebug("SetStoreTheme(themeName={ThemeName},returnUrl={ReturnUrl}): returnUrl → {ReturnUrl1}", themeName, returnUrl, returnUrl);
         //home page
         if (string.IsNullOrEmpty(returnUrl))
             returnUrl = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
@@ -320,6 +359,7 @@ public partial class CommonController : BasePublicController
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
 
+		_logger.LogDebug("<<< Exiting SetStoreTheme(themeName={ThemeName},returnUrl={ReturnUrl})", themeName, returnUrl);
         return Redirect(returnUrl);
     }
 
@@ -330,6 +370,7 @@ public partial class CommonController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual async Task<IActionResult> EuCookieLawAccept()
     {
+		_logger.LogDebug(">>> Entering EuCookieLawAccept()");
         if (!_storeInformationSettings.DisplayEuCookieLawWarning)
             //disabled
             return Json(new { stored = false });
@@ -337,6 +378,8 @@ public partial class CommonController : BasePublicController
         //save setting
         var store = await _storeContext.GetCurrentStoreAsync();
         await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.EuCookieLawAcceptedAttribute, true, store.Id);
+		_logger.LogDebug("EuCookieLawAccept(): store → {Store}", store);
+		_logger.LogDebug("<<< Exiting EuCookieLawAccept()");
         return Json(new { stored = true });
     }
 
@@ -349,8 +392,11 @@ public partial class CommonController : BasePublicController
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> RobotsTextFile()
     {
+		_logger.LogDebug(">>> Entering RobotsTextFile()");
         var robotsFileContent = await _commonModelFactory.PrepareRobotsTextFileAsync();
 
+		_logger.LogDebug("RobotsTextFile(): robotsFileContent → {RobotsFileContent}", robotsFileContent);
+		_logger.LogDebug("<<< Exiting RobotsTextFile()");
         return Content(robotsFileContent, MimeTypes.TextPlain);
     }
 
@@ -360,7 +406,9 @@ public partial class CommonController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual IActionResult GenericUrl()
     {
+		_logger.LogDebug(">>> Entering GenericUrl()");
         //seems that no entity was found
+		_logger.LogDebug("<<< Exiting GenericUrl()");
         return InvokeHttp404();
     }
 
@@ -369,17 +417,22 @@ public partial class CommonController : BasePublicController
     [CheckAccessClosedStore(ignore: true)]
     public virtual IActionResult StoreClosed()
     {
+		_logger.LogDebug(">>> Entering StoreClosed()");
+		_logger.LogDebug("<<< Exiting StoreClosed()");
         return View();
     }
 
     //helper method to redirect users. Workaround for GenericPathRoute class where we're not allowed to do it
     public virtual IActionResult InternalRedirect(string url, bool permanentRedirect)
     {
+		_logger.LogDebug(">>> Entering InternalRedirect(url={Url},permanentRedirect={PermanentRedirect})", url, permanentRedirect);
         //ensure it's invoked from our GenericPathRoute class
         if (!HttpContext.Items.TryGetValue(NopHttpDefaults.GenericRouteInternalRedirect, out var value) || value is not bool redirect || !redirect)
         {
             url = Url.RouteUrl(NopRouteNames.General.HOMEPAGE);
             permanentRedirect = false;
+			_logger.LogDebug("InternalRedirect(url={Url},permanentRedirect={PermanentRedirect}): url → {Url1}", url, permanentRedirect, url);
+			_logger.LogDebug("InternalRedirect(url={Url},permanentRedirect={PermanentRedirect}): permanentRedirect → {PermanentRedirect1}", url, permanentRedirect, permanentRedirect);
         }
 
         //home page
@@ -397,6 +450,7 @@ public partial class CommonController : BasePublicController
         }
 
         if (permanentRedirect)
+		_logger.LogDebug("<<< Exiting InternalRedirect(url={Url},permanentRedirect={PermanentRedirect})", url, permanentRedirect);
             return RedirectPermanent(url);
 
         return Redirect(url);
@@ -408,7 +462,9 @@ public partial class CommonController : BasePublicController
     [CheckAccessPublicStore(ignore: true)]
     public virtual IActionResult FallbackRedirect()
     {
+		_logger.LogDebug(">>> Entering FallbackRedirect()");
         //nothing was found
+		_logger.LogDebug("<<< Exiting FallbackRedirect()");
         return InvokeHttp404();
     }
 

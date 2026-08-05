@@ -1,17 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record SearchModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SearchModel()
     {
+		_logger.LogDebug(">>> Entering SearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("SearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		_logger.LogDebug("SearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableVendors = new List<SelectListItem>();
         CatalogProductsModel = new CatalogProductsModel();
+		_logger.LogDebug("<<< Exiting SearchModel()");
+		_logger.LogDebug("SearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		_logger.LogDebug("SearchModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
     }
 
     /// <summary>

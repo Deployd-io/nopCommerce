@@ -48,9 +48,19 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteBlogPostAsync(BlogPost blogPost)
     {
+		logger.LogDebug(">>> Entering DeleteBlogPostAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogPostRepository.DeleteAsync(blogPost);
+		logger.LogDebug("<<< Exiting DeleteBlogPostAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteBlogPostAsync(blogPost)={BlogPost}: external service call took {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteBlogPostAsync(blogPost)={BlogPost}: delete query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteBlogPostAsync(blogPost)={BlogPost}: external service call took {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteBlogPostAsync(blogPost)={BlogPost}: delete query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a blog post
     /// </summary>
@@ -61,6 +71,8 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<BlogPost> GetBlogPostByIdAsync(int blogPostId)
     {
+		logger.LogDebug(">>> Entering GetBlogPostByIdAsync(blogPostId={BlogPostId})", blogPostId);
+		logger.LogDebug("<<< Exiting GetBlogPostByIdAsync(blogPostId={BlogPostId})", blogPostId);
         return await _blogPostRepository.GetByIdAsync(blogPostId, cache => default, useShortTermCache: true);
     }
 
@@ -203,9 +215,15 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertBlogPostAsync(BlogPost blogPost)
     {
+		logger.LogDebug(">>> Entering InsertBlogPostAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogPostRepository.InsertAsync(blogPost);
+		logger.LogDebug("<<< Exiting InsertBlogPostAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertBlogPostAsync(blogPost)={BlogPost}: save query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertBlogPostAsync(blogPost)={BlogPost}: save query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the blog post
     /// </summary>
@@ -213,9 +231,15 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateBlogPostAsync(BlogPost blogPost)
     {
+		logger.LogDebug(">>> Entering UpdateBlogPostAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogPostRepository.UpdateAsync(blogPost);
+		logger.LogDebug("<<< Exiting UpdateBlogPostAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateBlogPostAsync(blogPost)={BlogPost}: update query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateBlogPostAsync(blogPost)={BlogPost}: update query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Returns all posts published between the two dates.
     /// </summary>
@@ -247,6 +271,8 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<IList<string>> ParseTagsAsync(BlogPost blogPost)
     {
+		logger.LogDebug(">>> Entering ParseTagsAsync(blogPost={BlogPost})", blogPost);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(blogPost);
 
         if (blogPost.Tags == null)
@@ -256,7 +282,9 @@ public partial class BlogService : IBlogService
             .Select(tag => tag.Trim())
             .Where(tag => !string.IsNullOrEmpty(tag))
             .ToListAsync();
+			logger.LogInformation("ParseTagsAsync(blogPost)={BlogPost}: database query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting ParseTagsAsync(blogPost={BlogPost})", blogPost);
         return tags;
     }
 
@@ -268,12 +296,14 @@ public partial class BlogService : IBlogService
     /// <returns>Result</returns>
     public virtual bool BlogPostIsAvailable(BlogPost blogPost, DateTime? dateTime = null)
     {
+		logger.LogDebug(">>> Entering BlogPostIsAvailable(blogPost={BlogPost},dateTime={DateTime})", blogPost, dateTime);
         ArgumentNullException.ThrowIfNull(blogPost);
 
         if (blogPost.StartDateUtc.HasValue && blogPost.StartDateUtc.Value >= (dateTime ?? DateTime.UtcNow))
             return false;
 
         if (blogPost.EndDateUtc.HasValue && blogPost.EndDateUtc.Value <= (dateTime ?? DateTime.UtcNow))
+		logger.LogDebug("<<< Exiting BlogPostIsAvailable(blogPost={BlogPost},dateTime={DateTime})", blogPost, dateTime);
             return false;
 
         return true;
@@ -339,6 +369,8 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<BlogComment> GetBlogCommentByIdAsync(int blogCommentId)
     {
+		logger.LogDebug(">>> Entering GetBlogCommentByIdAsync(blogCommentId={BlogCommentId})", blogCommentId);
+		logger.LogDebug("<<< Exiting GetBlogCommentByIdAsync(blogCommentId={BlogCommentId})", blogCommentId);
         return await _blogCommentRepository.GetByIdAsync(blogCommentId, cache => default, useShortTermCache: true);
     }
 
@@ -352,6 +384,8 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<IList<BlogComment>> GetBlogCommentsByIdsAsync(int[] commentIds)
     {
+		logger.LogDebug(">>> Entering GetBlogCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
+		logger.LogDebug("<<< Exiting GetBlogCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
         return await _blogCommentRepository.GetByIdsAsync(commentIds);
     }
 
@@ -367,9 +401,13 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<int> GetBlogCommentsCountAsync(BlogPost blogPost, int storeId = 0, bool? isApproved = null)
     {
+		logger.LogDebug(">>> Entering GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved})", blogPost, storeId, isApproved);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = _blogCommentRepository.Table.Where(comment => comment.BlogPostId == blogPost.Id);
 
         if (storeId > 0)
+			logger.LogDebug("GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved}): query → {Query}", blogPost, storeId, isApproved, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             query = query.Where(comment => comment.StoreId == storeId);
 
         if (isApproved.HasValue)
@@ -377,6 +415,9 @@ public partial class BlogService : IBlogService
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopBlogsDefaults.BlogCommentsNumberCacheKey, blogPost, storeId, isApproved);
 
+		logger.LogDebug("GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved}): cacheKey → {CacheKey}", blogPost, storeId, isApproved, cacheKey);
+		logger.LogInformation("GetBlogCommentsCountAsync(blogPost,storeId,isApproved)={BlogPost},{StoreId},{IsApproved}: external service call took {Arg3} ms", blogPost, storeId, isApproved, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved})", blogPost, storeId, isApproved);
         return await _staticCacheManager.GetAsync(cacheKey, async () => await query.CountAsync());
     }
 
@@ -387,9 +428,19 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteBlogCommentAsync(BlogComment blogComment)
     {
+		logger.LogDebug(">>> Entering DeleteBlogCommentAsync(blogComment={BlogComment})", blogComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogCommentRepository.DeleteAsync(blogComment);
+		logger.LogDebug("<<< Exiting DeleteBlogCommentAsync(blogComment={BlogComment})", blogComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteBlogCommentAsync(blogComment)={BlogComment}: external service call took {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteBlogCommentAsync(blogComment)={BlogComment}: delete query executed in {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteBlogCommentAsync(blogComment)={BlogComment}: external service call took {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteBlogCommentAsync(blogComment)={BlogComment}: delete query executed in {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes blog comments
     /// </summary>
@@ -397,9 +448,19 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteBlogCommentsAsync(IList<BlogComment> blogComments)
     {
+		logger.LogDebug(">>> Entering DeleteBlogCommentsAsync(blogComments={BlogComments})", blogComments);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogCommentRepository.DeleteAsync(blogComments);
+		logger.LogDebug("<<< Exiting DeleteBlogCommentsAsync(blogComments={BlogComments})", blogComments);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteBlogCommentsAsync(blogComments)={BlogComments}: external service call took {Arg1} ms", blogComments, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteBlogCommentsAsync(blogComments)={BlogComments}: delete query executed in {Arg1} ms", blogComments, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteBlogCommentsAsync(blogComments)={BlogComments}: external service call took {Arg1} ms", blogComments, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteBlogCommentsAsync(blogComments)={BlogComments}: delete query executed in {Arg1} ms", blogComments, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a blog comment
     /// </summary>
@@ -407,9 +468,15 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertBlogCommentAsync(BlogComment blogComment)
     {
+		logger.LogDebug(">>> Entering InsertBlogCommentAsync(blogComment={BlogComment})", blogComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogCommentRepository.InsertAsync(blogComment);
+		logger.LogDebug("<<< Exiting InsertBlogCommentAsync(blogComment={BlogComment})", blogComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertBlogCommentAsync(blogComment)={BlogComment}: save query executed in {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertBlogCommentAsync(blogComment)={BlogComment}: save query executed in {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Update a blog comment
     /// </summary>
@@ -417,9 +484,15 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateBlogCommentAsync(BlogComment blogComment)
     {
+		logger.LogDebug(">>> Entering UpdateBlogCommentAsync(blogComment={BlogComment})", blogComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogCommentRepository.UpdateAsync(blogComment);
+		logger.LogDebug("<<< Exiting UpdateBlogCommentAsync(blogComment={BlogComment})", blogComment);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateBlogCommentAsync(blogComment)={BlogComment}: update query executed in {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateBlogCommentAsync(blogComment)={BlogComment}: update query executed in {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
     #endregion
 
     #endregion

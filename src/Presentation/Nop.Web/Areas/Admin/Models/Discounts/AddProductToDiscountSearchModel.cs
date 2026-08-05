@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Discounts;
 
@@ -9,15 +10,23 @@ namespace Nop.Web.Areas.Admin.Models.Discounts;
 /// </summary>
 public partial record AddProductToDiscountSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToDiscountSearchModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToDiscountSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToDiscountSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		_logger.LogDebug("AddProductToDiscountSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToDiscountSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("AddProductToDiscountSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting AddProductToDiscountSearchModel()");
+		_logger.LogDebug("AddProductToDiscountSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

@@ -60,8 +60,10 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// </returns>
     public virtual (bool filterLevel1, bool filterLevel2, bool filterLevel3) IsFilterLevelDisabled()
     {
+		logger.LogDebug(">>> Entering IsFilterLevelDisabled(filterLevel1={FilterLevel1},filterLevel2={FilterLevel2},filterLevel3={FilterLevel3})", filterLevel1, filterLevel2, filterLevel3);
         var filterLevelEnumDisabled = _filterLevelSettings.FilterLevelEnumDisabled;
 
+		logger.LogDebug("<<< Exiting IsFilterLevelDisabled(filterLevel1={FilterLevel1},filterLevel2={FilterLevel2},filterLevel3={FilterLevel3})", filterLevel1, filterLevel2, filterLevel3);
         return (filterLevelEnumDisabled.Contains((int)FilterLevelEnum.FilterLevel1),
                 filterLevelEnumDisabled.Contains((int)FilterLevelEnum.FilterLevel2),
                 filterLevelEnumDisabled.Contains((int)FilterLevelEnum.FilterLevel3));
@@ -81,6 +83,8 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// </returns>
     public virtual async Task<IPagedList<FilterLevelValue>> GetAllFilterLevelValuesAsync(string filterLevel1Value = null, string filterLevel2Value = null, string filterLevel3Value = null, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		logger.LogDebug(">>> Entering GetAllFilterLevelValuesAsync(filterLevel1Value={FilterLevel1Value},filterLevel2Value={FilterLevel2Value},filterLevel3Value={FilterLevel3Value},pageIndex={PageIndex},pageSize={PageSize})", filterLevel1Value, filterLevel2Value, filterLevel3Value, pageIndex, pageSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = IsFilterLevelDisabled();
 
         return await _filterLevelValueRepository.GetAllPagedAsync(query =>
@@ -88,6 +92,7 @@ public partial class FilterLevelValueService : IFilterLevelValueService
             //filter by filter level 1 value
             if (!string.IsNullOrEmpty(filterLevel1Value) && filterLevel1Value != "0" && !filterLevel1Disabled)
                 query = query.Where(pc => pc.FilterLevel1Value == filterLevel1Value);
+				logger.LogInformation("GetAllFilterLevelValuesAsync(filterLevel1Value,filterLevel2Value,filterLevel3Value,pageIndex,pageSize)={FilterLevel1Value},{FilterLevel2Value},{FilterLevel3Value},{PageIndex},{PageSize}: find query executed in {Arg5} ms", filterLevel1Value, filterLevel2Value, filterLevel3Value, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
             //filter by filter level 2 value
             if (!string.IsNullOrEmpty(filterLevel2Value) && filterLevel2Value != "0" && !filterLevel2Disabled)
@@ -98,12 +103,14 @@ public partial class FilterLevelValueService : IFilterLevelValueService
                 query = query.Where(pc => pc.FilterLevel3Value == filterLevel3Value);
 
             query = query
+				logger.LogDebug("GetAllFilterLevelValuesAsync(filterLevel1Value={FilterLevel1Value},filterLevel2Value={FilterLevel2Value},filterLevel3Value={FilterLevel3Value},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", filterLevel1Value, filterLevel2Value, filterLevel3Value, pageIndex, pageSize, query);
                 .OrderBy(flv => flv.FilterLevel1Value)
                 .ThenBy(flv => flv.FilterLevel2Value)
                 .ThenBy(flv => flv.FilterLevel3Value);
 
             return query;
         }, pageIndex, pageSize);
+		logger.LogDebug("<<< Exiting GetAllFilterLevelValuesAsync(filterLevel1Value={FilterLevel1Value},filterLevel2Value={FilterLevel2Value},filterLevel3Value={FilterLevel3Value},pageIndex={PageIndex},pageSize={PageSize})", filterLevel1Value, filterLevel2Value, filterLevel3Value, pageIndex, pageSize);
     }
 
     /// <summary>
@@ -113,9 +120,15 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertFilterLevelValueAsync(FilterLevelValue filterLevelValue)
     {
+		logger.LogDebug(">>> Entering InsertFilterLevelValueAsync(filterLevelValue={FilterLevelValue})", filterLevelValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _filterLevelValueRepository.InsertAsync(filterLevelValue);
+		logger.LogDebug("<<< Exiting InsertFilterLevelValueAsync(filterLevelValue={FilterLevelValue})", filterLevelValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: save query executed in {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: save query executed in {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a filter level value
     /// </summary>
@@ -126,6 +139,8 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// </returns>
     public virtual async Task<FilterLevelValue> GetFilterLevelValueByIdAsync(int filterLevelValueId)
     {
+		logger.LogDebug(">>> Entering GetFilterLevelValueByIdAsync(filterLevelValueId={FilterLevelValueId})", filterLevelValueId);
+		logger.LogDebug("<<< Exiting GetFilterLevelValueByIdAsync(filterLevelValueId={FilterLevelValueId})", filterLevelValueId);
         return await _filterLevelValueRepository.GetByIdAsync(filterLevelValueId);
     }
 
@@ -139,12 +154,14 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// </returns>
     public virtual async Task<IList<FilterLevelValue>> GetFilterLevelValuesByProductIdAsync(int productId)
     {
+		logger.LogDebug(">>> Entering GetFilterLevelValuesByProductIdAsync(productId={ProductId})", productId);
         var query = from flv_map in _filterLevelValueProductMappingRepository.Table
                     join flv in _filterLevelValueRepository.Table on flv_map.FilterLevelValueId equals flv.Id
                     where flv_map.ProductId == productId
                     orderby flv.Id
                     select flv;
 
+		logger.LogDebug("<<< Exiting GetFilterLevelValuesByProductIdAsync(productId={ProductId})", productId);
         return await  query.ToListAsync();
     }
 
@@ -158,6 +175,8 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// </returns>
     public virtual async Task<IList<FilterLevelValue>> GetFilterLevelValuesByIdsAsync(int[] filterLevelValueIds)
     {
+		logger.LogDebug(">>> Entering GetFilterLevelValuesByIdsAsync(filterLevelValueIds={FilterLevelValueIds})", filterLevelValueIds);
+		logger.LogDebug("<<< Exiting GetFilterLevelValuesByIdsAsync(filterLevelValueIds={FilterLevelValueIds})", filterLevelValueIds);
         return await _filterLevelValueRepository.GetByIdsAsync(filterLevelValueIds, includeDeleted: false);
     }
 
@@ -168,9 +187,13 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateFilterLevelValueAsync(FilterLevelValue filterLevelValue)
     {
+		logger.LogDebug(">>> Entering UpdateFilterLevelValueAsync(filterLevelValue={FilterLevelValue})", filterLevelValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(filterLevelValue);
 
         await _filterLevelValueRepository.UpdateAsync(filterLevelValue);
+		logger.LogDebug("<<< Exiting UpdateFilterLevelValueAsync(filterLevelValue={FilterLevelValue})", filterLevelValue);
+		logger.LogInformation("UpdateFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: update query executed in {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -180,9 +203,19 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteFilterLevelValueAsync(FilterLevelValue filterLevelValue)
     {
+		logger.LogDebug(">>> Entering DeleteFilterLevelValueAsync(filterLevelValue={FilterLevelValue})", filterLevelValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _filterLevelValueRepository.DeleteAsync(filterLevelValue);
+		logger.LogDebug("<<< Exiting DeleteFilterLevelValueAsync(filterLevelValue={FilterLevelValue})", filterLevelValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: external service call took {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: delete query executed in {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: external service call took {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteFilterLevelValueAsync(filterLevelValue)={FilterLevelValue}: delete query executed in {Arg1} ms", filterLevelValue, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete filter level values
     /// </summary>
@@ -190,9 +223,15 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteFilterLevelValuesAsync(IList<FilterLevelValue> filterLevelValues)
     {
+		logger.LogDebug(">>> Entering DeleteFilterLevelValuesAsync(filterLevelValues={FilterLevelValues})", filterLevelValues);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(filterLevelValues);
 
         await _filterLevelValueRepository.DeleteAsync(filterLevelValues);
+		logger.LogDebug("<<< Exiting DeleteFilterLevelValuesAsync(filterLevelValues={FilterLevelValues})", filterLevelValues);
+		logger.LogInformation("DeleteFilterLevelValuesAsync(filterLevelValues)={FilterLevelValues}: external service call took {Arg1} ms", filterLevelValues, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteFilterLevelValuesAsync(filterLevelValues)={FilterLevelValues}: delete query executed in {Arg1} ms", filterLevelValues, __logStart.ElapsedMilliseconds);
     }
 
     #region Mapping
@@ -272,6 +311,8 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// </returns>
     public virtual async Task<FilterLevelValueProductMapping> GetFilterLevelValueProductByIdAsync(int filterLevelValueProductId)
     {
+		logger.LogDebug(">>> Entering GetFilterLevelValueProductByIdAsync(filterLevelValueProductId={FilterLevelValueProductId})", filterLevelValueProductId);
+		logger.LogDebug("<<< Exiting GetFilterLevelValueProductByIdAsync(filterLevelValueProductId={FilterLevelValueProductId})", filterLevelValueProductId);
         return await _filterLevelValueProductMappingRepository.GetByIdAsync(filterLevelValueProductId);
     }
 
@@ -282,9 +323,19 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteFilterLevelValueProductAsync(FilterLevelValueProductMapping filterLevelValueProduct)
     {
+		logger.LogDebug(">>> Entering DeleteFilterLevelValueProductAsync(filterLevelValueProduct={FilterLevelValueProduct})", filterLevelValueProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _filterLevelValueProductMappingRepository.DeleteAsync(filterLevelValueProduct);
+		logger.LogDebug("<<< Exiting DeleteFilterLevelValueProductAsync(filterLevelValueProduct={FilterLevelValueProduct})", filterLevelValueProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteFilterLevelValueProductAsync(filterLevelValueProduct)={FilterLevelValueProduct}: external service call took {Arg1} ms", filterLevelValueProduct, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteFilterLevelValueProductAsync(filterLevelValueProduct)={FilterLevelValueProduct}: delete query executed in {Arg1} ms", filterLevelValueProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteFilterLevelValueProductAsync(filterLevelValueProduct)={FilterLevelValueProduct}: external service call took {Arg1} ms", filterLevelValueProduct, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteFilterLevelValueProductAsync(filterLevelValueProduct)={FilterLevelValueProduct}: delete query executed in {Arg1} ms", filterLevelValueProduct, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a filter level value product mapping
     /// </summary>
@@ -292,9 +343,15 @@ public partial class FilterLevelValueService : IFilterLevelValueService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductFilterLevelValueAsync(FilterLevelValueProductMapping filterLevelValueProduct)
     {
+		logger.LogDebug(">>> Entering InsertProductFilterLevelValueAsync(filterLevelValueProduct={FilterLevelValueProduct})", filterLevelValueProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _filterLevelValueProductMappingRepository.InsertAsync(filterLevelValueProduct);
+		logger.LogDebug("<<< Exiting InsertProductFilterLevelValueAsync(filterLevelValueProduct={FilterLevelValueProduct})", filterLevelValueProduct);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertProductFilterLevelValueAsync(filterLevelValueProduct)={FilterLevelValueProduct}: save query executed in {Arg1} ms", filterLevelValueProduct, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertProductFilterLevelValueAsync(filterLevelValueProduct)={FilterLevelValueProduct}: save query executed in {Arg1} ms", filterLevelValueProduct, __logStart.ElapsedMilliseconds);
     #endregion
 
     #endregion

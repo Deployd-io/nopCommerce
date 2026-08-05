@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -10,11 +11,15 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record CustomerSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerSettingsModel()
     {
+		_logger.LogDebug(">>> Entering CustomerSettingsModel()");
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting CustomerSettingsModel()");
+		_logger.LogDebug("CustomerSettingsModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

@@ -12,6 +12,7 @@ using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Areas.Admin.Models.Reports;
 using Nop.Web.Framework.Models.DataTables;
 using ILogger = Nop.Services.Logging.ILogger;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class HomeModelFactory : IHomeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AdminAreaSettings _adminAreaSettings;
@@ -354,6 +356,8 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<NopCommerceNewsModel> PrepareNopCommerceNewsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareNopCommerceNewsModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = new NopCommerceNewsModel
         {
             HideAdvertisements = _adminAreaSettings.HideAdvertisementsOnAdminArea
@@ -370,6 +374,7 @@ public partial class HomeModelFactory : IHomeModelFactory
                 }
                 catch (AggregateException exception)
                 {
+					_logger.LogError("Exception in PrepareNopCommerceNewsModelAsync(): {Arg0}", ex.Message);
                     //rethrow actual excepion
                     throw exception.InnerException;
                 }
@@ -379,6 +384,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             {
                 var item = rssData.Items.ElementAt(i);
                 var newsItem = new NopCommerceNewsDetailsModel
+				_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): item → {Item}", item);
                 {
                     Title = item.TitleText,
                     Summary = XmlHelper.XmlDecode(item.Content?.Value ?? string.Empty),
@@ -393,14 +399,17 @@ public partial class HomeModelFactory : IHomeModelFactory
 
                 var firstRequest = string.IsNullOrEmpty(_adminAreaSettings.LastNewsTitleAdminArea);
                 if (_adminAreaSettings.LastNewsTitleAdminArea == newsItem.Title)
+					_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): firstRequest → {FirstRequest}", firstRequest);
                     continue;
 
                 _adminAreaSettings.LastNewsTitleAdminArea = newsItem.Title;
+				_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): _adminAreaSettings.LastNewsTitleAdminArea → {Arg0}", _adminAreaSettings.LastNewsTitleAdminArea);
                 await _settingService.SaveSettingAsync(_adminAreaSettings);
 
                 //new item
                 if (!firstRequest)
                     model.HasNewItems = true;
+					_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): model.HasNewItems → {Arg0}", model.HasNewItems);
             }
         }
         catch (Exception ex)
@@ -408,6 +417,8 @@ public partial class HomeModelFactory : IHomeModelFactory
             await _logger.ErrorAsync("No access to the news. Website www.nopcommerce.com is not available.", ex);
         }
 
+		_logger.LogInformation("PrepareNopCommerceNewsModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareNopCommerceNewsModelAsync()");
         return model;
     }
 

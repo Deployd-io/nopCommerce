@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -10,13 +11,19 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerSearchModel : BaseSearchModel, IAclSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerSearchModel()
     {
+		_logger.LogDebug(">>> Entering CustomerSearchModel()");
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogDebug("CustomerSearchModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		_logger.LogDebug("CustomerSearchModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         AvailableActiveValues = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting CustomerSearchModel()");
+		_logger.LogDebug("CustomerSearchModel(): AvailableActiveValues → {AvailableActiveValues}", AvailableActiveValues);
     }
 
     #endregion

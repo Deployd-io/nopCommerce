@@ -2,16 +2,20 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Catalog;
 
 [TestFixture]
 public class TierPriceExtensionTests
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     [Test]
     public void CanRemoveDuplicatedQuantities()
     {
+		_logger.LogDebug(">>> Entering CanRemoveDuplicatedQuantities()");
         var tierPrices = new List<TierPrice>
+		_logger.LogDebug("<<< Exiting CanRemoveDuplicatedQuantities()");
         {
             new() {
                 //will be removed

@@ -3,12 +3,14 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Plugin.Misc.Zettle.Domain;
 using Nop.Services.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Data;
 
 [NopMigration("2024-04-16 00:00:00", "Misc.Zettle 4.70.5 Inventory balance tracking", MigrationProcessType.Update)]
 public class InventoryBalanceMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ISettingService _settingService;
@@ -19,7 +21,10 @@ public class InventoryBalanceMigration : MigrationBase
 
     public InventoryBalanceMigration(ISettingService settingService)
     {
+		_logger.LogDebug(">>> Entering InventoryBalanceMigration(settingService={SettingService})", settingService);
         _settingService = settingService;
+		_logger.LogDebug("<<< Exiting InventoryBalanceMigration(settingService={SettingService})", settingService);
+		_logger.LogDebug("InventoryBalanceMigration(settingService={SettingService}): _settingService → {_settingService}", settingService, _settingService);
     }
 
     #endregion
@@ -31,6 +36,7 @@ public class InventoryBalanceMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -41,9 +47,11 @@ public class InventoryBalanceMigration : MigrationBase
         //delete settings
         var setting = _settingService.GetSetting($"{nameof(ZettleSettings)}.InventoryTrackingIds");
         if (setting is null)
+			_logger.LogDebug("Up(): setting → {Setting}", setting);
             return;
 
         _settingService.DeleteSetting(setting);
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -51,7 +59,9 @@ public class InventoryBalanceMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //nothing
+		_logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

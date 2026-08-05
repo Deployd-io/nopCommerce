@@ -1,6 +1,7 @@
 ﻿using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Affiliates;
 
@@ -9,13 +10,19 @@ namespace Nop.Web.Areas.Admin.Models.Affiliates;
 /// </summary>
 public partial record AffiliateModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AffiliateModel()
     {
+		_logger.LogDebug(">>> Entering AffiliateModel()");
         Address = new AddressModel();
         AffiliatedOrderSearchModel = new AffiliatedOrderSearchModel();
+		_logger.LogDebug("AffiliateModel(): Address → {Address}", Address);
+		_logger.LogDebug("AffiliateModel(): AffiliatedOrderSearchModel → {AffiliatedOrderSearchModel}", AffiliatedOrderSearchModel);
         AffiliatedCustomerSearchModel = new AffiliatedCustomerSearchModel();
+		_logger.LogDebug("<<< Exiting AffiliateModel()");
+		_logger.LogDebug("AffiliateModel(): AffiliatedCustomerSearchModel → {AffiliatedCustomerSearchModel}", AffiliatedCustomerSearchModel);
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Components;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Components;
 /// </summary>
 public partial class AclCustomerRolesViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     public IViewComponentResult Invoke(object additionalData)
     {
+		_logger.LogDebug(">>> Entering Invoke(additionalData={AdditionalData})", additionalData);
         if (additionalData is not IAclSupportedModel model)
+		_logger.LogDebug("<<< Exiting Invoke(additionalData={AdditionalData})", additionalData);
             return Content(string.Empty);
         
         return View(model);

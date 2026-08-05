@@ -1,16 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Boards;
 
 public partial record SearchModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SearchModel()
     {
+		_logger.LogDebug(">>> Entering SearchModel()");
         LimitList = new List<SelectListItem>();
         ForumList = new List<SelectListItem>();
+		_logger.LogDebug("SearchModel(): LimitList → {LimitList}", LimitList);
+		_logger.LogDebug("SearchModel(): ForumList → {ForumList}", ForumList);
         WithinList = new List<SelectListItem>();
         ForumTopics = new List<ForumTopicRowModel>();
+		_logger.LogDebug("<<< Exiting SearchModel()");
+		_logger.LogDebug("SearchModel(): WithinList → {WithinList}", WithinList);
+		_logger.LogDebug("SearchModel(): ForumTopics → {ForumTopics}", ForumTopics);
     }
 
     public bool ShowAdvancedSearch { get; set; }

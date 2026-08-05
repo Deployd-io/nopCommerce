@@ -20,6 +20,7 @@ using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Customer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Services;
 
@@ -27,6 +28,7 @@ namespace Nop.Plugin.Tax.Avalara.Services;
 /// Represents plugin event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<CustomerActivatedEvent>,
     IConsumer<CustomerPermanentlyDeleted>,
     IConsumer<EntityDeletedEvent<Order>>,
@@ -103,6 +105,7 @@ public class EventConsumer :
 
         //create customer
         await _avalaraTaxManager.CreateOrUpdateCustomerAsync(eventMessage.Customer);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -121,6 +124,7 @@ public class EventConsumer :
 
         //delete customer
         await _avalaraTaxManager.DeleteCustomerAsync(eventMessage.CustomerId);
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -138,6 +142,7 @@ public class EventConsumer :
         //ensure that Avalara tax provider is active for the passed customer, since it's the event from the public area
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, customer))
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): customer → {Customer}", eventMessage, customer);
             return;
 
         if (!_avalaraTaxSettings.EnableCertificates)
@@ -150,11 +155,14 @@ public class EventConsumer :
             {
                 var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
                 if (!customerRoleIds.Intersect(_avalaraTaxSettings.CustomerRoleIds).Any())
+					_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): customerRoleIds → {CustomerRoleIds}", eventMessage, customerRoleIds);
                     return;
             }
 
             var infoItem = navigationModel.CustomerNavigationItems.FirstOrDefault(item => item.Tab == (int)CustomerNavigationEnum.Info);
             var position = navigationModel.CustomerNavigationItems.IndexOf(infoItem) + 1;
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): infoItem → {InfoItem}", eventMessage, infoItem);
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): position → {Position}", eventMessage, position);
             navigationModel.CustomerNavigationItems.Insert(position, new CustomerNavigationItemModel
             {
                 RouteName = AvalaraTaxDefaults.ExemptionCertificatesRouteName,

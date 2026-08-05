@@ -12,11 +12,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Stores;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class StoreController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -102,9 +104,12 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _storeModelFactory.PrepareStoreSearchModelAsync(new StoreSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -115,15 +120,19 @@ public partial class StoreController : BaseAdminController
         //prepare model
         var model = await _storeModelFactory.PrepareStoreListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _storeModelFactory.PrepareStoreModelAsync(new StoreModel(), null);
 
+		_logger.LogDebug("Create(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -157,6 +166,7 @@ public partial class StoreController : BaseAdminController
         model = await _storeModelFactory.PrepareStoreModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -164,21 +174,26 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> SetStoreSslByCurrentRequestScheme(int id)
     {
+		_logger.LogDebug(">>> Entering SetStoreSslByCurrentRequestScheme(id={Id})", id);
         //try to get a store with the specified id
         var store = await _storeService.GetStoreByIdAsync(id);
         if (store == null)
+			_logger.LogDebug("SetStoreSslByCurrentRequestScheme(id={Id}): store → {Store}", id, store);
             return RedirectToAction("List");
 
         var value = _webHelper.IsCurrentConnectionSecured();
 
+		_logger.LogDebug("SetStoreSslByCurrentRequestScheme(id={Id}): value → {Value}", id, value);
         if (store.SslEnabled != value)
         {
             store.SslEnabled = value;
+			_logger.LogDebug("SetStoreSslByCurrentRequestScheme(id={Id}): store.SslEnabled → {Arg1}", id, store.SslEnabled);
             await _storeService.UpdateStoreAsync(store);
 
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Stores.Ssl.Updated"));
         }
 
+		_logger.LogDebug("<<< Exiting SetStoreSslByCurrentRequestScheme(id={Id})", id);
         return RedirectToAction("Edit", new { id = id });
     }
 
@@ -186,14 +201,18 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a store with the specified id
         var store = await _storeService.GetStoreByIdAsync(id);
         if (store == null)
+			_logger.LogDebug("Edit(id={Id}): store → {Store}", id, store);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _storeModelFactory.PrepareStoreModelAsync(null, store);
 
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -233,6 +252,7 @@ public partial class StoreController : BaseAdminController
         model = await _storeModelFactory.PrepareStoreModelAsync(model, store, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -240,9 +260,11 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a store with the specified id
         var store = await _storeService.GetStoreByIdAsync(id);
         if (store == null)
+			_logger.LogDebug("Delete(id={Id}): store → {Store}", id, store);
             return RedirectToAction("List");
 
         try
@@ -263,6 +285,7 @@ public partial class StoreController : BaseAdminController
             //when we had two stores and now have only one store, we also should delete all "per store" settings
             var allStores = await _storeService.GetAllStoresAsync();
             if (allStores.Count == 1)
+			_logger.LogDebug("Delete(id={Id}): allStores → {AllStores}", id, allStores);
             {
                 settingsToDelete = (await _settingService
                         .GetAllSettingsAsync())
@@ -277,7 +300,9 @@ public partial class StoreController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, ex.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = store.Id });
         }
     }

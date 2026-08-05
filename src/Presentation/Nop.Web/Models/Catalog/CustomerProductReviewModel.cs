@@ -1,14 +1,19 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Infrastructure;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record CustomerProductReviewModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerProductReviewModel()
     {
+		_logger.LogDebug(">>> Entering CustomerProductReviewModel()");
         AdditionalProductReviewList = new List<ProductReviewReviewTypeMappingModel>();
+		_logger.LogDebug("<<< Exiting CustomerProductReviewModel()");
+		_logger.LogDebug("CustomerProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
     }
     public int ProductId { get; set; }
     public string ProductName { get; set; }
@@ -26,7 +31,10 @@ public partial record CustomerProductReviewsModel : BaseNopModel
 {
     public CustomerProductReviewsModel()
     {
+		_logger.LogDebug(">>> Entering CustomerProductReviewsModel()");
         ProductReviews = new List<CustomerProductReviewModel>();
+		_logger.LogDebug("<<< Exiting CustomerProductReviewsModel()");
+		_logger.LogDebug("CustomerProductReviewsModel(): ProductReviews → {ProductReviews}", ProductReviews);
     }
 
     public IList<CustomerProductReviewModel> ProductReviews { get; set; }

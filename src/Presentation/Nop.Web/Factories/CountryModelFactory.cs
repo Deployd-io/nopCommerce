@@ -2,6 +2,7 @@
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Models.Directory;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class CountryModelFactory : ICountryModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -47,13 +49,16 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual async Task<IList<StateProvinceModel>> GetStatesByCountryIdAsync(int countryId, bool addSelectStateItem)
     {
+		_logger.LogDebug(">>> Entering GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         var country = await _countryService.GetCountryByIdAsync(countryId);
         var states =
             (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country?.Id ?? 0,
                 (await _workContext.GetWorkingLanguageAsync()).Id)).ToList();
+			_logger.LogDebug("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): country → {Country}", countryId, addSelectStateItem, country);
         
         var result = new List<StateProvinceModel>();
         
+		_logger.LogDebug("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): result → {Result}", countryId, addSelectStateItem, result);
         foreach (var state in states)
             result.Add(new StateProvinceModel
             {
@@ -99,6 +104,7 @@ public partial class CountryModelFactory : ICountryModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         return result;
     }
 
