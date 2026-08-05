@@ -10,11 +10,13 @@ using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Services.Shipping.Pickup;
 using Nop.Services.Shipping.Tracking;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore;
 
 public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -106,6 +108,8 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		_logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		_logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 
@@ -114,6 +118,8 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/PickupInStore/Configure";
     }
 
@@ -123,9 +129,12 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //sample pickup point
         var country = await _countryService.GetCountryByThreeLetterIsoCodeAsync("USA");
         var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync("NY", country?.Id);
+		_logger.LogDebug("InstallAsync(): country → {Country}", country);
+		_logger.LogDebug("InstallAsync(): state → {State}", state);
 
         var address = new Address
         {
@@ -179,6 +188,7 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -187,10 +197,12 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Pickup.PickupInStore");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

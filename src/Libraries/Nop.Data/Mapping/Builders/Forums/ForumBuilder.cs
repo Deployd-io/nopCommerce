@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Builders.Create.Table;
 using Nop.Core.Domain.Forums;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Forums;
 
@@ -9,6 +10,7 @@ namespace Nop.Data.Mapping.Builders.Forums;
 /// </summary>
 public partial class ForumBuilder : NopEntityBuilder<Forum>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -17,9 +19,11 @@ public partial class ForumBuilder : NopEntityBuilder<Forum>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Forum.Name)).AsString(200).NotNullable()
             .WithColumn(nameof(Forum.ForumGroupId)).AsInt32().ForeignKey<ForumGroup>();
+			_logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

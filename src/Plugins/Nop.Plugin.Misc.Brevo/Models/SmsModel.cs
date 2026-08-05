@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Models;
 
@@ -9,12 +10,17 @@ namespace Nop.Plugin.Misc.Brevo.Models;
 /// </summary>
 public record SmsModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public SmsModel()
     {
+		_logger.LogDebug(">>> Entering SmsModel()");
         AvailableMessages = new List<SelectListItem>();
         AvailablePhoneTypes = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting SmsModel()");
+		_logger.LogDebug("SmsModel(): AvailableMessages → {AvailableMessages}", AvailableMessages);
+		_logger.LogDebug("SmsModel(): AvailablePhoneTypes → {AvailablePhoneTypes}", AvailablePhoneTypes);
     }
 
     #endregion

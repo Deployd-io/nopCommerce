@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	// UMD returnExports
 	if ( typeof define === "function" && define.amd ) {
@@ -61,6 +63,7 @@ var formatMessage = Globalize._formatMessage,
  * Format relative time.
  */
 var relativeTimeFormat = function( value, numberFormatter, pluralGenerator, properties ) {
+logger.debug(`>>> Entering relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 
 	var relativeTime,
 		message = properties[ "relative-type-" + value ];
@@ -74,7 +77,10 @@ var relativeTimeFormat = function( value, numberFormatter, pluralGenerator, prop
 
 	value = Math.abs( value );
 
+	logger.debug(`relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties}): value → ${value}`);
 	message = relativeTime[ "relativeTimePattern-count-" + pluralGenerator( value ) ];
+	logger.debug(`relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties}): message → ${message}`);
+	logger.debug(`<<< Exiting relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 	return formatMessage( message, [ numberFormatter( value ) ] );
 };
 
@@ -82,10 +88,14 @@ var relativeTimeFormat = function( value, numberFormatter, pluralGenerator, prop
 
 
 var relativeTimeFormatterFn = function( numberFormatter, pluralGenerator, properties ) {
+	logger.debug(`>>> Entering relativeTimeFormatterFn(numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 	return function relativeTimeFormatter( value ) {
+	logger.debug(`>>> Entering relativeTimeFormatter(value=${value})`);
 		validateParameterPresence( value, "value" );
+		logger.debug(`<<< Exiting relativeTimeFormatterFn(numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 		validateParameterTypeNumber( value, "value" );
 
+		logger.debug(`<<< Exiting relativeTimeFormatter(value=${value})`);
 		return relativeTimeFormat( value, numberFormatter, pluralGenerator, properties );
 	};
 
@@ -107,6 +117,7 @@ var relativeTimeFormatterFn = function( numberFormatter, pluralGenerator, proper
  * Return relative time properties.
  */
 var relativeTimeProperties = function( unit, cldr, options ) {
+logger.debug(`>>> Entering relativeTimeProperties(unit=${unit},cldr=${cldr},options=${options})`);
 
 	var form = options.form,
 		raw, properties, key, match;
@@ -115,6 +126,7 @@ var relativeTimeProperties = function( unit, cldr, options ) {
 		unit = unit + "-" + form;
 	}
 
+	logger.debug(`relativeTimeProperties(unit=${unit},cldr=${cldr},options=${options}): unit → ${unit}`);
 	raw = cldr.main( [ "dates", "fields", unit ] );
 	properties = {
 		"relativeTime-type-future": raw[ "relativeTime-type-future" ],
@@ -129,6 +141,7 @@ var relativeTimeProperties = function( unit, cldr, options ) {
 		}
 	}
 
+	logger.debug(`<<< Exiting relativeTimeProperties(unit=${unit},cldr=${cldr},options=${options})`);
 	return properties;
 };
 

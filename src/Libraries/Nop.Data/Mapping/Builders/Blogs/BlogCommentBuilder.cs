@@ -3,6 +3,7 @@ using Nop.Core.Domain.Blogs;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Stores;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Blogs;
 
@@ -11,6 +12,7 @@ namespace Nop.Data.Mapping.Builders.Blogs;
 /// </summary>
 public partial class BlogCommentBuilder : NopEntityBuilder<BlogComment>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -19,10 +21,12 @@ public partial class BlogCommentBuilder : NopEntityBuilder<BlogComment>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(BlogComment.StoreId)).AsInt32().ForeignKey<Store>()
             .WithColumn(nameof(BlogComment.CustomerId)).AsInt32().ForeignKey<Customer>()
             .WithColumn(nameof(BlogComment.BlogPostId)).AsInt32().ForeignKey<BlogPost>();
+			_logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

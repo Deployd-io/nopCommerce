@@ -4,13 +4,16 @@ using Nop.Core.Domain.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Validators.Directory;
 
 public partial class CurrencyValidator : BaseNopValidator<CurrencyModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CurrencyValidator(ILocalizationService localizationService)
     {
+		_logger.LogDebug(">>> Entering CurrencyValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name)
             .NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Currencies.Fields.Name.Required"))
             .Length(1, 50).WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Currencies.Fields.Name.Range"));
@@ -35,11 +38,13 @@ public partial class CurrencyValidator : BaseNopValidator<CurrencyModel>
                 }
                 catch
                 {
+					_logger.LogError("Exception in CurrencyValidator(localizationService={LocalizationService}): {Arg1}", localizationService, ex.Message);
                     return false;
                 }
             })
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Configuration.Currencies.Fields.DisplayLocale.Validation"));
 
         SetDatabaseValidationRules<Currency>();
+		_logger.LogDebug("<<< Exiting CurrencyValidator(localizationService={LocalizationService})", localizationService);
     }
 }

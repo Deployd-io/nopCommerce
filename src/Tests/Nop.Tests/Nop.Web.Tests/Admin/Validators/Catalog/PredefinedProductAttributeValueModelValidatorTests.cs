@@ -3,18 +3,23 @@ using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Areas.Admin.Validators.Catalog;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Web.Tests.Admin.Validators.Catalog;
 
 [TestFixture]
 public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private PredefinedProductAttributeValueModelValidator _validator;
 
     [OneTimeSetUp]
     public void Setup()
     {
+		_logger.LogDebug(">>> Entering Setup()");
         _validator = new PredefinedProductAttributeValueModelValidator(GetService<ILocalizationService>());
+		_logger.LogDebug("<<< Exiting Setup()");
+		_logger.LogDebug("Setup(): _validator → {_validator}", _validator);
     }
 
     #region Name Validation Tests
@@ -22,51 +27,61 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
     [Test]
     public void ShouldHaveErrorWhenNameIsNull()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenNameIsNull()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = null
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenNameIsNull()");
     }
 
     [Test]
     public void ShouldHaveErrorWhenNameIsEmpty()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenNameIsEmpty()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = string.Empty
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenNameIsEmpty()");
     }
 
     [Test]
     public void ShouldHaveErrorWhenNameIsWhitespace()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenNameIsWhitespace()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "   "
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenNameIsWhitespace()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameIsSpecified()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameIsSpecified()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "Small"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameIsSpecified()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameHasValidValue()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameHasValidValue()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "Large Size"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameHasValidValue()");
     }
 
     #endregion
@@ -76,6 +91,7 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
     [Test]
     public void ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "Medium",
@@ -90,6 +106,7 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.ProductAttributeId);
         result.ShouldNotHaveValidationErrorFor(x => x.PriceAdjustment);
         result.ShouldNotHaveValidationErrorFor(x => x.PriceAdjustmentUsePercentage);
@@ -97,6 +114,7 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
         result.ShouldNotHaveValidationErrorFor(x => x.Cost);
         result.ShouldNotHaveValidationErrorFor(x => x.IsPreSelected);
         result.ShouldNotHaveValidationErrorFor(x => x.DisplayOrder);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorForOtherPropertiesWhenNameIsValid()");
     }
 
     #endregion
@@ -106,51 +124,61 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
     [Test]
     public void ShouldNotHaveErrorWhenNameIsMinimalValidValue()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameIsMinimalValidValue()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "A"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameIsMinimalValidValue()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameIsLongValidValue()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameIsLongValidValue()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = new string('A', 400) // Maximum length based on database schema
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameIsLongValidValue()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameContainsSpecialCharacters()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameContainsSpecialCharacters()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "Size: XL (Extra Large) - 100%"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameContainsSpecialCharacters()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameContainsNumbers()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameContainsNumbers()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "Size 42"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameContainsNumbers()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenNameContainsUnicodeCharacters()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenNameContainsUnicodeCharacters()");
         var model = new PredefinedProductAttributeValueModel
         {
             Name = "Größe: Groß"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenNameContainsUnicodeCharacters()");
     }
 
     #endregion
@@ -160,6 +188,7 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
     [Test]
     public void ShouldPassValidationWhenAllPropertiesAreValid()
     {
+		_logger.LogDebug(">>> Entering ShouldPassValidationWhenAllPropertiesAreValid()");
         var model = new PredefinedProductAttributeValueModel
         {
             Id = 1,
@@ -175,11 +204,14 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldNotHaveAnyValidationErrors();
+		_logger.LogDebug("<<< Exiting ShouldPassValidationWhenAllPropertiesAreValid()");
+		_logger.LogDebug("ShouldPassValidationWhenAllPropertiesAreValid(): result → {Result}", result);
     }
 
     [Test]
     public void ShouldFailValidationOnlyForNameWhenNameIsInvalid()
     {
+		_logger.LogDebug(">>> Entering ShouldFailValidationOnlyForNameWhenNameIsInvalid()");
         var model = new PredefinedProductAttributeValueModel
         {
             Id = 1,
@@ -195,6 +227,7 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
 
         var result = _validator.TestValidate(model);
         result.ShouldHaveValidationErrorFor(x => x.Name);
+		_logger.LogDebug("ShouldFailValidationOnlyForNameWhenNameIsInvalid(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.ProductAttributeId);
         result.ShouldNotHaveValidationErrorFor(x => x.PriceAdjustment);
         result.ShouldNotHaveValidationErrorFor(x => x.PriceAdjustmentUsePercentage);
@@ -202,6 +235,7 @@ public class PredefinedProductAttributeValueModelValidatorTests : BaseNopTest
         result.ShouldNotHaveValidationErrorFor(x => x.Cost);
         result.ShouldNotHaveValidationErrorFor(x => x.IsPreSelected);
         result.ShouldNotHaveValidationErrorFor(x => x.DisplayOrder);
+		_logger.LogDebug("<<< Exiting ShouldFailValidationOnlyForNameWhenNameIsInvalid()");
     }
 
     #endregion

@@ -6,6 +6,7 @@ using Nop.Core;
 using Nop.Core.Domain.Logging;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Services;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Misc.Omnisend.Services;
 /// </summary>
 public class OmnisendHttpClient
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly HttpClient _httpClient;
@@ -58,9 +60,12 @@ public class OmnisendHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     private async Task<string> RequestAsync(string apiUri, string data = null, HttpMethod httpMethod = null)
     {
+		_logger.LogDebug(">>> Entering RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //specifies whether to skip BrandId parameter validation
         var skipBrandIdCheck = apiUri.Equals(OmnisendDefaults.AccountsApiUrl);
 
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): skipBrandIdCheck → {SkipBrandIdCheck}", apiUri, data, httpMethod, skipBrandIdCheck);
         if (string.IsNullOrEmpty(_omnisendSettings.BrandId) && !skipBrandIdCheck)
         {
             if (_omnisendSettings.LogRequestErrors)
@@ -74,10 +79,12 @@ public class OmnisendHttpClient
 
         var requestUri = new Uri(apiUri);
 
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): requestUri → {RequestUri}", apiUri, data, httpMethod, requestUri);
         if (_omnisendSettings.LogRequests)
         {
             var logMessage = $"{httpMethod.Method.ToUpper()} {requestUri.PathAndQuery}{Environment.NewLine}";
             logMessage += $"Host: {requestUri.Host}{Environment.NewLine}";
+			_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): logMessage → {LogMessage}", apiUri, data, httpMethod, logMessage);
             if (httpMethod != HttpMethod.Get)
             {
                 logMessage += $"Content-Type: {MimeTypes.ApplicationJson}{Environment.NewLine}";
@@ -100,6 +107,9 @@ public class OmnisendHttpClient
 
         var httpResponse = await _httpClient.SendAsync(request);
         var response = await httpResponse.Content.ReadAsStringAsync();
+		_logger.LogInformation("RequestAsync(apiUri,data,httpMethod)={ApiUri},{Data},{HttpMethod}: external service call {ApiUri1} took {Arg4} ms", apiUri, data, httpMethod, apiUri, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): httpResponse → {HttpResponse}", apiUri, data, httpMethod, httpResponse);
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): response → {Response}", apiUri, data, httpMethod, response);
 
         if (_omnisendSettings.LogRequests)
         {
@@ -130,6 +140,7 @@ public class OmnisendHttpClient
                     throw new NopException("Omnisend unknown error.");
                 }
         }
+		_logger.LogDebug("<<< Exiting RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
     }
 
     private async Task<T> RequestAsync<T>(string apiUri, string data = null, HttpMethod httpMethod = null)
@@ -141,10 +152,12 @@ public class OmnisendHttpClient
 
     private async Task<T> PerformRequestAsync<T>(Func<Task<T>> request)
     {
+		_logger.LogDebug(">>> Entering PerformRequestAsync(request={Request})", request);
         try
         {
             var result = await request();
 
+			_logger.LogDebug("PerformRequestAsync(request={Request}): result → {Result}", request, result);
             return result;
         }
         catch (Exception exception)
@@ -156,6 +169,7 @@ public class OmnisendHttpClient
 
             var logMessage = $"{OmnisendDefaults.SystemName} error: {Environment.NewLine}{errorMessage}";
             await _logger.ErrorAsync(logMessage, exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("PerformRequestAsync(request={Request}): logMessage → {LogMessage}", request, logMessage);
 
             return default;
         }

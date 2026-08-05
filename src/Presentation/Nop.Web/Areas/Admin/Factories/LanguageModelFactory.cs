@@ -7,6 +7,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Localization;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class LanguageModelFactory : ILanguageModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -55,15 +57,18 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// <returns>Locale resource search model</returns>
     protected virtual LocaleResourceSearchModel PrepareLocaleResourceSearchModel(LocaleResourceSearchModel searchModel, Language language)
     {
+		_logger.LogDebug(">>> Entering PrepareLocaleResourceSearchModel(searchModel={SearchModel},language={Language})", searchModel, language);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(language);
 
         searchModel.LanguageId = language.Id;
+		_logger.LogDebug("PrepareLocaleResourceSearchModel(searchModel={SearchModel},language={Language}): searchModel.LanguageId → {Arg2}", searchModel, language, searchModel.LanguageId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareLocaleResourceSearchModel(searchModel={SearchModel},language={Language})", searchModel, language);
         return searchModel;
     }
 
@@ -81,11 +86,13 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual Task<LanguageSearchModel> PrepareLanguageSearchModelAsync(LanguageSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareLanguageSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareLanguageSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -99,17 +106,20 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual async Task<LanguageListModel> PrepareLanguageListModelAsync(LanguageSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareLanguageListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get languages
         var languages = (await _languageService.GetAllLanguagesAsync(showHidden: true)).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareLanguageListModelAsync(searchModel={SearchModel}): languages → {Languages}", searchModel, languages);
         //prepare list model
         var model = new LanguageListModel().PrepareToGrid(searchModel, languages, () =>
         {
             return languages.Select(language => language.ToModel<LanguageModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareLanguageListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -172,6 +182,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual async Task<LocaleResourceListModel> PrepareLocaleResourceListModelAsync(LocaleResourceSearchModel searchModel, Language language)
     {
+		_logger.LogDebug(">>> Entering PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language})", searchModel, language);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(language);
@@ -179,6 +190,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
         //get locale resources
         var localeResources = (await _localizationService.GetAllResourceValuesAsync(language.Id, loadPublicLocales: null))
             .OrderBy(localeResource => localeResource.Key).AsQueryable();
+			_logger.LogDebug("PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language}): localeResources → {LocaleResources}", searchModel, language, localeResources);
 
         //filter locale resources
         if (!string.IsNullOrEmpty(searchModel.SearchResourceName))
@@ -188,6 +200,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
 
         var pagedLocaleResources = await localeResources.ToPagedListAsync(searchModel.Page - 1, searchModel.PageSize);
 
+		_logger.LogDebug("PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language}): pagedLocaleResources → {PagedLocaleResources}", searchModel, language, pagedLocaleResources);
         //prepare list model
         var model = new LocaleResourceListModel().PrepareToGrid(searchModel, pagedLocaleResources, () =>
         {
@@ -201,6 +214,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language})", searchModel, language);
         return model;
     }
 

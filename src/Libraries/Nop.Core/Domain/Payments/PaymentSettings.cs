@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Payments;
@@ -7,9 +8,13 @@ namespace Nop.Core.Domain.Payments;
 /// </summary>
 public partial class PaymentSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public PaymentSettings()
     {
+		_logger.LogDebug(">>> Entering PaymentSettings()");
         ActivePaymentMethodSystemNames = new List<string>();
+		_logger.LogDebug("<<< Exiting PaymentSettings()");
+		_logger.LogDebug("PaymentSettings(): ActivePaymentMethodSystemNames → {ActivePaymentMethodSystemNames}", ActivePaymentMethodSystemNames);
     }
 
     /// <summary>

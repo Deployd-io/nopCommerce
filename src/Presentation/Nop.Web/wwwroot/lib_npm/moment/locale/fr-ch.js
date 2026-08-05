@@ -3,6 +3,7 @@
 //! author : Gaspard Bucher : https://github.com/gaspard
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('fr-ch', {
     months: 'janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre'.split(
@@ -51,6 +52,7 @@ export default moment.defineLocale('fr-ch', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(er|e)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             // Words with masculine grammatical gender: mois, trimestre, jour
             default:
@@ -66,6 +68,7 @@ export default moment.defineLocale('fr-ch', {
             case 'W':
                 return number + (number === 1 ? 're' : 'e');
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
     week: {
         dow: 1, // Monday is the first day of the week.

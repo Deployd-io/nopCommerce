@@ -2,6 +2,7 @@
 using Nop.Core.Caching;
 using Nop.Data;
 using Nop.Plugin.Shipping.FixedByWeightByTotal.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Services;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Services;
 /// </summary>
 public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FixedByWeightByTotalSettings _pluginSettings;
@@ -187,6 +189,8 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// </returns>
     public virtual async Task<ShippingByWeightByTotalRecord> GetByIdAsync(int shippingByWeightRecordId)
     {
+		_logger.LogDebug(">>> Entering GetByIdAsync(shippingByWeightRecordId={ShippingByWeightRecordId})", shippingByWeightRecordId);
+		_logger.LogDebug("<<< Exiting GetByIdAsync(shippingByWeightRecordId={ShippingByWeightRecordId})", shippingByWeightRecordId);
         return await _sbwtRepository.GetByIdAsync(shippingByWeightRecordId);
     }
 
@@ -197,9 +201,13 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShippingByWeightRecordAsync(ShippingByWeightByTotalRecord shippingByWeightRecord)
     {
+		_logger.LogDebug(">>> Entering InsertShippingByWeightRecordAsync(shippingByWeightRecord={ShippingByWeightRecord})", shippingByWeightRecord);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _sbwtRepository.InsertAsync(shippingByWeightRecord, false);
 
         await _staticCacheManager.RemoveByPrefixAsync(FixedByWeightByTotalDefaults.ShippingByWeightByTotalCachePrefix);
+		_logger.LogInformation("InsertShippingByWeightRecordAsync(shippingByWeightRecord)={ShippingByWeightRecord}: save query executed in {Arg1} ms", shippingByWeightRecord, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting InsertShippingByWeightRecordAsync(shippingByWeightRecord={ShippingByWeightRecord})", shippingByWeightRecord);
     }
 
     /// <summary>
@@ -209,9 +217,13 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateShippingByWeightRecordAsync(ShippingByWeightByTotalRecord shippingByWeightRecord)
     {
+		_logger.LogDebug(">>> Entering UpdateShippingByWeightRecordAsync(shippingByWeightRecord={ShippingByWeightRecord})", shippingByWeightRecord);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _sbwtRepository.UpdateAsync(shippingByWeightRecord, false);
 
         await _staticCacheManager.RemoveByPrefixAsync(FixedByWeightByTotalDefaults.ShippingByWeightByTotalCachePrefix);
+		_logger.LogInformation("UpdateShippingByWeightRecordAsync(shippingByWeightRecord)={ShippingByWeightRecord}: update query executed in {Arg1} ms", shippingByWeightRecord, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting UpdateShippingByWeightRecordAsync(shippingByWeightRecord={ShippingByWeightRecord})", shippingByWeightRecord);
     }
 
     /// <summary>
@@ -221,9 +233,15 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShippingByWeightRecordAsync(ShippingByWeightByTotalRecord shippingByWeightRecord)
     {
+		_logger.LogDebug(">>> Entering DeleteShippingByWeightRecordAsync(shippingByWeightRecord={ShippingByWeightRecord})", shippingByWeightRecord);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _sbwtRepository.DeleteAsync(shippingByWeightRecord, false);
 
         await _staticCacheManager.RemoveByPrefixAsync(FixedByWeightByTotalDefaults.ShippingByWeightByTotalCachePrefix);
+		_logger.LogDebug("<<< Exiting DeleteShippingByWeightRecordAsync(shippingByWeightRecord={ShippingByWeightRecord})", shippingByWeightRecord);
+		_logger.LogInformation("DeleteShippingByWeightRecordAsync(shippingByWeightRecord)={ShippingByWeightRecord}: external service call took {Arg1} ms", shippingByWeightRecord, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteShippingByWeightRecordAsync(shippingByWeightRecord)={ShippingByWeightRecord}: delete query executed in {Arg1} ms", shippingByWeightRecord, __logStart.ElapsedMilliseconds);
     }
 
     #endregion

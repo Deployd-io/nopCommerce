@@ -1,6 +1,7 @@
 ﻿using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -9,11 +10,15 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record VendorSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public VendorSettingsModel()
     {
+		_logger.LogDebug(">>> Entering VendorSettingsModel()");
         VendorAttributeSearchModel = new VendorAttributeSearchModel();
+		_logger.LogDebug("<<< Exiting VendorSettingsModel()");
+		_logger.LogDebug("VendorSettingsModel(): VendorAttributeSearchModel → {VendorAttributeSearchModel}", VendorAttributeSearchModel);
     }
 
     #endregion

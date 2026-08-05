@@ -5,11 +5,13 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Http;
 using Nop.Services.Common;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Components;
 
 public partial class EuCookieLawViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly IGenericAttributeService _genericAttributeService;
     protected readonly IStoreContext _storeContext;
     protected readonly IWorkContext _workContext;
@@ -28,6 +30,7 @@ public partial class EuCookieLawViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		_logger.LogDebug(">>> Entering InvokeAsync()");
         if (!_storeInformationSettings.DisplayEuCookieLawWarning)
             //disabled
             return Content("");
@@ -46,6 +49,7 @@ public partial class EuCookieLawViewComponent : NopViewComponent
         //ignore notification?
         //right now it's used during logout so popup window is not displayed twice
         if (TempData[$"{NopCookieDefaults.Prefix}{NopCookieDefaults.IgnoreEuCookieLawWarning}"] != null && Convert.ToBoolean(TempData[$"{NopCookieDefaults.Prefix}{NopCookieDefaults.IgnoreEuCookieLawWarning}"]))
+		_logger.LogDebug("<<< Exiting InvokeAsync()");
             return Content("");
 
         return View();

@@ -19,8 +19,11 @@ public partial class RenderDate : IRender
 
     public RenderDate()
     {
+		logger.LogDebug(">>> Entering RenderDate()");
         //set default values
         Format = DEFAULT_DATE_FORMAT;
+		logger.LogDebug("<<< Exiting RenderDate()");
+		logger.LogDebug("RenderDate(): Format → {Format}", Format);
     }
 
     #endregion

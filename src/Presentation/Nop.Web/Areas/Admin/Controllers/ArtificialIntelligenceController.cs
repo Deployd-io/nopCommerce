@@ -12,11 +12,13 @@ using Nop.Services.News;
 using Nop.Services.Topics;
 using Nop.Services.Vendors;
 using Nop.Web.Areas.Admin.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ArtificialIntelligenceController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IArtificialIntelligenceService _artificialIntelligenceService;
@@ -57,6 +59,7 @@ public partial class ArtificialIntelligenceController : BaseAdminController
 
     public virtual async Task<IActionResult> GenerateMetaTags(MetaTagsGeneratorModel metaTagsGeneratorModel)
     {
+		_logger.LogDebug(">>> Entering GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel})", metaTagsGeneratorModel);
         var metaTitle = string.Empty;
         var metaKeywords = string.Empty;
         var metaDescription = string.Empty;
@@ -68,30 +71,37 @@ public partial class ArtificialIntelligenceController : BaseAdminController
                 case nameof(Product):
                     var product = await _productService.GetProductByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsForLocalizedEntityAsync(product, metaTagsGeneratorModel.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): product → {Product}", metaTagsGeneratorModel, product);
                     break;
                 case nameof(Category):
                     var category = await _categoryService.GetCategoryByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsForLocalizedEntityAsync(category, metaTagsGeneratorModel.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): category → {Category}", metaTagsGeneratorModel, category);
                     break;
                 case nameof(BlogPost):
                     var blogPost = await _blogService.GetBlogPostByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsAsync(blogPost, blogPost.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): blogPost → {BlogPost}", metaTagsGeneratorModel, blogPost);
                     break;
                 case nameof(Manufacturer):
                     var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsForLocalizedEntityAsync(manufacturer, metaTagsGeneratorModel.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): manufacturer → {Manufacturer}", metaTagsGeneratorModel, manufacturer);
                     break;
                 case nameof(NewsItem):
                     var newsItem = await _newsService.GetNewsByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsAsync(newsItem, newsItem.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): newsItem → {NewsItem}", metaTagsGeneratorModel, newsItem);
                     break;
                 case nameof(Topic):
                     var topic = await _topicService.GetTopicByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsForLocalizedEntityAsync(topic, metaTagsGeneratorModel.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): topic → {Topic}", metaTagsGeneratorModel, topic);
                     break;
                 case nameof(Vendor):
                     var vendor = await _vendorService.GetVendorByIdAsync(metaTagsGeneratorModel.EntityId);
                     (metaTitle, metaKeywords, metaDescription) = await _artificialIntelligenceService.CreateMetaTagsForLocalizedEntityAsync(vendor, metaTagsGeneratorModel.LanguageId);
+					_logger.LogDebug("GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): vendor → {Vendor}", metaTagsGeneratorModel, vendor);
                     break;
             }
 
@@ -99,6 +109,8 @@ public partial class ArtificialIntelligenceController : BaseAdminController
         }
         catch (NopException e)
         {
+			_logger.LogError("Exception in GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel}): {Arg1}", metaTagsGeneratorModel, ex.Message);
+			_logger.LogDebug("<<< Exiting GenerateMetaTags(metaTagsGeneratorModel={MetaTagsGeneratorModel})", metaTagsGeneratorModel);
             return ErrorJson(e.Message);
         }
     }

@@ -4,6 +4,7 @@
 //! author : David Raison : https://github.com/kwisatz
 
 import moment from '../moment';
+const logger = console;
 
 function processRelativeTime(number, withoutSuffix, key, isFuture) {
     var format = {
@@ -16,17 +17,23 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
     return withoutSuffix ? format[key][0] : format[key][1];
 }
 function processFutureTime(string) {
+	logger.debug(`>>> Entering processFutureTime(string=${string})`);
     var number = string.substr(0, string.indexOf(' '));
     if (eifelerRegelAppliesToNumber(number)) {
         return 'a ' + string;
     }
+	logger.debug(`processFutureTime(string=${string}): number → ${number}`);
+	logger.debug(`<<< Exiting processFutureTime(string=${string})`);
     return 'an ' + string;
 }
 function processPastTime(string) {
+	logger.debug(`>>> Entering processPastTime(string=${string})`);
     var number = string.substr(0, string.indexOf(' '));
     if (eifelerRegelAppliesToNumber(number)) {
         return 'viru ' + string;
     }
+	logger.debug(`processPastTime(string=${string}): number → ${number}`);
+	logger.debug(`<<< Exiting processPastTime(string=${string})`);
     return 'virun ' + string;
 }
 /**
@@ -67,6 +74,7 @@ function eifelerRegelAppliesToNumber(number) {
     } else {
         // Anything larger than 4 digits: recursively check first n-3 digits
         number = number / 1000;
+		logger.debug(`<<< Exiting eifelerRegelAppliesToNumber(number=${number})`);
         return eifelerRegelAppliesToNumber(number);
     }
 }
@@ -102,6 +110,7 @@ export default moment.defineLocale('lb', {
         nextWeek: 'dddd [um] LT',
         lastDay: '[Gëschter um] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             // Different date string for 'Dënschdeg' (Tuesday) and 'Donneschdeg' (Thursday) due to phonological rule
             switch (this.day()) {
                 case 2:

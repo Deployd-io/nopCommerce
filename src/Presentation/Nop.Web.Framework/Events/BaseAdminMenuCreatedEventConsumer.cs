@@ -22,7 +22,10 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
     /// </summary>
     protected BaseAdminMenuCreatedEventConsumer(IPluginManager<IPlugin> pluginManager)
     {
+		logger.LogDebug(">>> Entering BaseAdminMenuCreatedEventConsumer(pluginManager={PluginManager})", pluginManager);
         _pluginManager = pluginManager;
+		logger.LogDebug("<<< Exiting BaseAdminMenuCreatedEventConsumer(pluginManager={PluginManager})", pluginManager);
+		logger.LogDebug("BaseAdminMenuCreatedEventConsumer(pluginManager={PluginManager}): _pluginManager → {_pluginManager}", pluginManager, _pluginManager);
     }
 
     #endregion
@@ -39,6 +42,8 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
     /// </returns>
     protected virtual Task<bool> CheckAccessAsync()
     {
+		logger.LogDebug(">>> Entering CheckAccessAsync()");
+		logger.LogDebug("<<< Exiting CheckAccessAsync()");
         return Task.FromResult(true);
     }
 
@@ -68,11 +73,13 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(AdminMenuCreatedEvent eventMessage)
     {
+		logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!await CheckAccessAsync())
             return;
 
         var plugin = await _pluginManager.LoadPluginBySystemNameAsync(PluginSystemName);
 
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): plugin → {Plugin}", eventMessage, plugin);
         //the LoadPluginBySystemNameAsync method returns only plugins that are already fully installed,
         //while the IConsumer<AdminMenuCreatedEvent> event can be called before the installation is complete
         if (plugin == null)
@@ -80,6 +87,7 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
 
         var newItem = await GetAdminMenuItemAsync(plugin);
 
+		logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): newItem → {NewItem}", eventMessage, newItem);
         if (newItem == null)
             return;
 
@@ -102,6 +110,7 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
             default:
                 throw new ArgumentOutOfRangeException();
         }
+		logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

@@ -18,7 +18,9 @@ public partial class StoreCacheEventConsumer : CacheEventConsumer<Store>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Store entity)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(NopEntityCacheDefaults<ShoppingCartItem>.AllPrefix);
         await RemoveByPrefixAsync(NopLocalizationDefaults.LanguagesByStorePrefix, entity);
+		logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

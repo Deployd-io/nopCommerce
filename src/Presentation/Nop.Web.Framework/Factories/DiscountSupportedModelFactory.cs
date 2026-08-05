@@ -20,7 +20,10 @@ public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFact
 
     public DiscountSupportedModelFactory(IDiscountService discountService)
     {
+		logger.LogDebug(">>> Entering DiscountSupportedModelFactory(discountService={DiscountService})", discountService);
         _discountService = discountService;
+		logger.LogDebug("<<< Exiting DiscountSupportedModelFactory(discountService={DiscountService})", discountService);
+		logger.LogDebug("DiscountSupportedModelFactory(discountService={DiscountService}): _discountService → {_discountService}", discountService, _discountService);
     }
 
     #endregion
@@ -36,6 +39,7 @@ public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFact
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task<TModel> PrepareModelDiscountsAsync<TModel>(TModel model, IList<Discount> availableDiscounts) where TModel : IDiscountSupportedModel
     {
+		logger.LogDebug(">>> Entering PrepareModelDiscountsAsync(model={Model},availableDiscounts={AvailableDiscounts})", model, availableDiscounts);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available discounts

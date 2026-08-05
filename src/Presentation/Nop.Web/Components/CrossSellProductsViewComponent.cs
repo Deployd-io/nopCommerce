@@ -7,11 +7,13 @@ using Nop.Services.Security;
 using Nop.Services.Stores;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Components;
 
 public partial class CrossSellProductsViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly IAclService _aclService;
     protected readonly IProductModelFactory _productModelFactory;
     protected readonly IProductService _productService;
@@ -42,8 +44,12 @@ public partial class CrossSellProductsViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(int? productThumbPictureSize)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("InvokeAsync(productThumbPictureSize={ProductThumbPictureSize}): store → {Store}", productThumbPictureSize, store);
+		_logger.LogDebug("InvokeAsync(productThumbPictureSize={ProductThumbPictureSize}): cart → {Cart}", productThumbPictureSize, cart);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var products = await (await _productService.GetCrossSellProductsByShoppingCartAsync(cart, _shoppingCartSettings.CrossSellsNumber))
             //ACL and store mapping
@@ -52,6 +58,7 @@ public partial class CrossSellProductsViewComponent : NopViewComponent
             .Where(p => _productService.ProductIsAvailable(p))
             //visible individually
             .Where(p => p.VisibleIndividually).ToListAsync();
+			_logger.LogInformation("InvokeAsync(productThumbPictureSize)={ProductThumbPictureSize}: database query executed in {Arg1} ms", productThumbPictureSize, __logStart.ElapsedMilliseconds);
 
         if (!products.Any())
             return Content("");
@@ -64,6 +71,7 @@ public partial class CrossSellProductsViewComponent : NopViewComponent
                 productThumbPictureSize: productThumbPictureSize, forceRedirectionAfterAddingToCart: true))
             .ToList();
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
         return View(model);
     }
 }

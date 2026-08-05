@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Services.ScheduleTasks;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Controllers;
 [AutoValidateAntiforgeryToken]
 public partial class ScheduleTaskController : Controller
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly IScheduleTaskService _scheduleTaskService;
     protected readonly IScheduleTaskRunner _taskRunner;
 
@@ -22,13 +24,16 @@ public partial class ScheduleTaskController : Controller
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> RunTask(string taskType)
     {
+		_logger.LogDebug(">>> Entering RunTask(taskType={TaskType})", taskType);
         var scheduleTask = await _scheduleTaskService.GetTaskByTypeAsync(taskType);
         if (scheduleTask == null)
+			_logger.LogDebug("RunTask(taskType={TaskType}): scheduleTask → {ScheduleTask}", taskType, scheduleTask);
             //schedule task cannot be loaded
             return NoContent();
 
         await _taskRunner.ExecuteAsync(scheduleTask);
 
+		_logger.LogDebug("<<< Exiting RunTask(taskType={TaskType})", taskType);
         return NoContent();
     }
 }

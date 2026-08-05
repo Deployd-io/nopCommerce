@@ -13,9 +13,12 @@ public static class CurrentOSUser
 
     static CurrentOSUser()
     {
+		logger.LogDebug(">>> Entering CurrentOSUser()");
         Name = Environment.UserName;
 
+		logger.LogDebug("CurrentOSUser(): Name → {Name}", Name);
         DomainName = Environment.UserDomainName;
+		logger.LogDebug("CurrentOSUser(): DomainName → {DomainName}", DomainName);
 
         switch (Environment.OSVersion.Platform)
         {
@@ -28,9 +31,12 @@ public static class CurrentOSUser
                 break;
             default:
                 UserId = Name;
+				logger.LogDebug("CurrentOSUser(): UserId → {UserId}", UserId);
                 Groups = new List<string>();
+				logger.LogDebug("CurrentOSUser(): Groups → {Groups}", Groups);
                 break;
         }
+		logger.LogDebug("<<< Exiting CurrentOSUser()");
     }
 
     #endregion
@@ -43,8 +49,12 @@ public static class CurrentOSUser
     [SupportedOSPlatform("windows")]
     public static void PopulateWindowsUser()
     {
+		logger.LogDebug(">>> Entering PopulateWindowsUser()");
         Groups = WindowsIdentity.GetCurrent().Groups?.Select(p => p.Value).ToList();
         UserId = Name;
+		logger.LogDebug("<<< Exiting PopulateWindowsUser()");
+		logger.LogDebug("PopulateWindowsUser(): Groups → {Groups}", Groups);
+		logger.LogDebug("PopulateWindowsUser(): UserId → {UserId}", UserId);
     }
 
     /// <summary>
@@ -52,6 +62,7 @@ public static class CurrentOSUser
     /// </summary>
     public static void PopulateLinuxUser()
     {
+		logger.LogDebug(">>> Entering PopulateLinuxUser()");
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
@@ -69,10 +80,15 @@ public static class CurrentOSUser
 
         var res = process.StandardOutput.ReadToEnd();
 
+		logger.LogDebug("PopulateLinuxUser(): res → {Res}", res);
         var respars = res.Split("\n");
 
+		logger.LogDebug("PopulateLinuxUser(): respars → {Respars}", respars);
+		logger.LogDebug("PopulateLinuxUser(): Groups → {Groups}", Groups);
         UserId = respars[0];
+		logger.LogDebug("PopulateLinuxUser(): UserId → {UserId}", UserId);
         Groups = respars[1].Split(" ").ToList();
+		logger.LogDebug("<<< Exiting PopulateLinuxUser()");
     }
 
     #endregion

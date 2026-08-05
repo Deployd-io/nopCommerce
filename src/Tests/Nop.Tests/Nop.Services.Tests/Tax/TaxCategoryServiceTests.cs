@@ -1,17 +1,22 @@
 ﻿using Nop.Core.Domain.Tax;
 using Nop.Services.Tax;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Tax;
 
 [TestFixture]
 public class TaxCategoryServiceTests : ServiceTest<TaxCategory>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private ITaxCategoryService _taxCategoryService;
 
     public TaxCategoryServiceTests()
     {
+		_logger.LogDebug(">>> Entering TaxCategoryServiceTests()");
         _taxCategoryService = GetService<ITaxCategoryService>();
+		_logger.LogDebug("<<< Exiting TaxCategoryServiceTests()");
+		_logger.LogDebug("TaxCategoryServiceTests(): _taxCategoryService → {_taxCategoryService}", _taxCategoryService);
     }
 
     protected override CrudData<TaxCategory> CrudData

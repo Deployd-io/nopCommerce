@@ -50,8 +50,10 @@ public partial class RewardPointService : IRewardPointService
     /// </returns>
     protected virtual async Task<IQueryable<RewardPointsHistory>> GetRewardPointsQueryAsync(int customerId, int? storeId, bool showNotActivated = false)
     {
+		logger.LogDebug(">>> Entering GetRewardPointsQueryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated})", customerId, storeId, showNotActivated);
         var query = _rewardPointsHistoryRepository.Table;
 
+		logger.LogDebug("GetRewardPointsQueryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated}): query → {Query}", customerId, storeId, showNotActivated, query);
         //filter by customer
         if (customerId > 0)
             query = query.Where(historyEntry => historyEntry.CustomerId == customerId);
@@ -67,6 +69,7 @@ public partial class RewardPointService : IRewardPointService
         //update points balance
         await UpdateRewardPointsBalanceAsync(query);
 
+		logger.LogDebug("<<< Exiting GetRewardPointsQueryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated})", customerId, storeId, showNotActivated);
         return query;
     }
 
@@ -77,11 +80,14 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateRewardPointsBalanceAsync(IQueryable<RewardPointsHistory> query)
     {
+		logger.LogDebug(">>> Entering UpdateRewardPointsBalanceAsync(query={Query})", query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get expired points
         var nowUtc = DateTime.UtcNow;
         var expiredPoints = await query
             .Where(historyEntry => historyEntry.EndDateUtc < nowUtc && historyEntry.ValidPoints > 0)
             .OrderBy(historyEntry => historyEntry.CreatedOnUtc).ThenBy(historyEntry => historyEntry.Id).ToListAsync();
+			logger.LogInformation("UpdateRewardPointsBalanceAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         //reduce the balance for these points
         foreach (var historyEntry in expiredPoints)
@@ -97,6 +103,7 @@ public partial class RewardPointService : IRewardPointService
             });
 
             historyEntry.ValidPoints = 0;
+			logger.LogDebug("UpdateRewardPointsBalanceAsync(query={Query}): historyEntry.ValidPoints → {Arg1}", query, historyEntry.ValidPoints);
             await UpdateRewardPointsHistoryEntryAsync(historyEntry);
         }
 
@@ -120,8 +127,10 @@ public partial class RewardPointService : IRewardPointService
         {
             currentPointsBalance += historyEntry.Points;
             historyEntry.PointsBalance = currentPointsBalance;
+			logger.LogDebug("UpdateRewardPointsBalanceAsync(query={Query}): historyEntry.PointsBalance → {Arg1}", query, historyEntry.PointsBalance);
             await UpdateRewardPointsHistoryEntryAsync(historyEntry);
         }
+		logger.LogDebug("<<< Exiting UpdateRewardPointsBalanceAsync(query={Query})", query);
     }
 
     /// <summary>
@@ -131,9 +140,13 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertRewardPointsHistoryEntryAsync(RewardPointsHistory rewardPointsHistory)
     {
+		logger.LogDebug(">>> Entering InsertRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _rewardPointsHistoryRepository.InsertAsync(rewardPointsHistory);
+		logger.LogDebug("<<< Exiting InsertRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
     }
 
+	logger.LogInformation("InsertRewardPointsHistoryEntryAsync(rewardPointsHistory)={RewardPointsHistory}: save query executed in {Arg1} ms", rewardPointsHistory, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Methods
@@ -177,10 +190,12 @@ public partial class RewardPointService : IRewardPointService
     /// </returns>
     public virtual async Task<int> GetRewardPointsBalanceAsync(int customerId, int storeId)
     {
+		logger.LogDebug(">>> Entering GetRewardPointsBalanceAsync(customerId={CustomerId},storeId={StoreId})", customerId, storeId);
         var query = (await GetRewardPointsQueryAsync(customerId, storeId))
             .OrderByDescending(historyEntry => historyEntry.CreatedOnUtc).ThenByDescending(historyEntry => historyEntry.Id);
 
         //return point balance of the first actual history entry
+		logger.LogDebug("<<< Exiting GetRewardPointsBalanceAsync(customerId={CustomerId},storeId={StoreId})", customerId, storeId);
         return (await query.FirstOrDefaultAsync())?.PointsBalance ?? 0;
     }
 
@@ -257,6 +272,8 @@ public partial class RewardPointService : IRewardPointService
     /// </returns>
     public virtual async Task<RewardPointsHistory> GetRewardPointsHistoryEntryByIdAsync(int rewardPointsHistoryId)
     {
+		logger.LogDebug(">>> Entering GetRewardPointsHistoryEntryByIdAsync(rewardPointsHistoryId={RewardPointsHistoryId})", rewardPointsHistoryId);
+		logger.LogDebug("<<< Exiting GetRewardPointsHistoryEntryByIdAsync(rewardPointsHistoryId={RewardPointsHistoryId})", rewardPointsHistoryId);
         return await _rewardPointsHistoryRepository.GetByIdAsync(rewardPointsHistoryId);
     }
 
@@ -267,9 +284,15 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateRewardPointsHistoryEntryAsync(RewardPointsHistory rewardPointsHistory)
     {
+		logger.LogDebug(">>> Entering UpdateRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _rewardPointsHistoryRepository.UpdateAsync(rewardPointsHistory);
+		logger.LogDebug("<<< Exiting UpdateRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateRewardPointsHistoryEntryAsync(rewardPointsHistory)={RewardPointsHistory}: update query executed in {Arg1} ms", rewardPointsHistory, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateRewardPointsHistoryEntryAsync(rewardPointsHistory)={RewardPointsHistory}: update query executed in {Arg1} ms", rewardPointsHistory, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete the reward point history entry
     /// </summary>
@@ -277,8 +300,14 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteRewardPointsHistoryEntryAsync(RewardPointsHistory rewardPointsHistory)
     {
+		logger.LogDebug(">>> Entering DeleteRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _rewardPointsHistoryRepository.DeleteAsync(rewardPointsHistory);
+		logger.LogDebug("<<< Exiting DeleteRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteRewardPointsHistoryEntryAsync(rewardPointsHistory)={RewardPointsHistory}: external service call took {Arg1} ms", rewardPointsHistory, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteRewardPointsHistoryEntryAsync(rewardPointsHistory)={RewardPointsHistory}: external service call took {Arg1} ms", rewardPointsHistory, __logStart.ElapsedMilliseconds);
     #endregion
 }

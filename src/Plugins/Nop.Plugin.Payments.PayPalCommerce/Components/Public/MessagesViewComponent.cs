@@ -7,6 +7,7 @@ using Nop.Plugin.Payments.PayPalCommerce.Factories;
 using Nop.Plugin.Payments.PayPalCommerce.Services;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Components.Public;
 
@@ -15,6 +16,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components.Public;
 /// </summary>
 public class MessagesViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly PayPalCommerceModelFactory _modelFactory;
@@ -49,6 +51,7 @@ public class MessagesViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
@@ -62,6 +65,7 @@ public class MessagesViewComponent : NopViewComponent
         //get messages placement
         var routeName = HttpContext.GetEndpoint()?.Metadata.GetMetadata<RouteNameMetadata>()?.RouteName;
         var isCartPage = routeName == NopRouteNames.General.CART;
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): routeName → {RouteName}", widgetZone, additionalData, routeName);
         var isPaymentMethodPage = routeName == PayPalCommerceDefaults.Route.PaymentInfo;
         var isCheckoutPage = (HttpContext.Request.RouteValues?.TryGetValue("controller", out var controller) ?? false) &&
             string.Equals(controller.ToString(), "Checkout", StringComparison.InvariantCultureIgnoreCase);
@@ -73,6 +77,8 @@ public class MessagesViewComponent : NopViewComponent
         var placement = isCartPage ? ButtonPlacement.Cart : ButtonPlacement.PaymentMethod;
         var model = await _modelFactory.PrepareMessagesModelAsync(placement, loadScript);
 
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/_Messages.cshtml", model);
     }
 

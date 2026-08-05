@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -46,11 +48,13 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     /// </returns>
     public virtual Task<ReviewTypeSearchModel> PrepareReviewTypeSearchModelAsync(ReviewTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReviewTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareReviewTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -64,11 +68,13 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     /// </returns>
     public virtual async Task<ReviewTypeListModel> PrepareReviewTypeListModelAsync(ReviewTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReviewTypeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get review types
         var reviewTypes = (await _reviewTypeService.GetAllReviewTypesAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareReviewTypeListModelAsync(searchModel={SearchModel}): reviewTypes → {ReviewTypes}", searchModel, reviewTypes);
         //prepare list model
         var model = new ReviewTypeListModel().PrepareToGrid(searchModel, reviewTypes, () =>
         {
@@ -76,6 +82,7 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
             return reviewTypes.Select(reviewType => reviewType.ToModel<ReviewTypeModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareReviewTypeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

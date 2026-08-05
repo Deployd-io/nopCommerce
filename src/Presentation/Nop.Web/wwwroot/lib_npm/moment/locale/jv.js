@@ -4,6 +4,7 @@
 //! reference: http://jv.wikipedia.org/wiki/Basa_Jawa
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('jv', {
     months: 'Januari_Februari_Maret_April_Mei_Juni_Juli_Agustus_September_Oktober_Nopember_Desember'.split(
@@ -23,6 +24,7 @@ export default moment.defineLocale('jv', {
     },
     meridiemParse: /enjing|siyang|sonten|ndalu/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -31,6 +33,9 @@ export default moment.defineLocale('jv', {
         } else if (meridiem === 'siyang') {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'sonten' || meridiem === 'ndalu') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return hour + 12;
         }
     },

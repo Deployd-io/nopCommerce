@@ -10,11 +10,13 @@ using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
 public class TaxTransactionLogController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -54,6 +56,7 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> LogList(TaxTransactionLogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering LogList(searchModel={SearchModel})", searchModel);
         //prepare filter parameters
         var createdFromValue = searchModel.CreatedFrom.HasValue
             ? (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync())
@@ -79,6 +82,7 @@ public class TaxTransactionLogController : BaseAdminController
             });
         });
 
+		_logger.LogDebug("<<< Exiting LogList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -86,20 +90,24 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         await _taxTransactionLogService.DeleteTaxTransactionLogAsync(selectedIds.ToArray());
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> View(int id)
     {
+		_logger.LogDebug(">>> Entering View(id={Id})", id);
         //try to get log item with the passed identifier
         var logItem = await _taxTransactionLogService.GetTaxTransactionLogByIdAsync(id);
         if (logItem == null)
+			_logger.LogDebug("View(id={Id}): logItem → {LogItem}", id, logItem);
             return RedirectToAction("Configure", "Avalara");
 
         var model = new TaxTransactionLogModel
@@ -114,6 +122,7 @@ public class TaxTransactionLogController : BaseAdminController
             CreatedDate = await _dateTimeHelper.ConvertToUserTimeAsync(logItem.CreatedDateUtc, DateTimeKind.Utc)
         };
 
+		_logger.LogDebug("<<< Exiting View(id={Id})", id);
         return View("~/Plugins/Tax.Avalara/Views/Log/View.cshtml", model);
     }
 
@@ -121,22 +130,27 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get log item with the passed identifier
         var logItem = await _taxTransactionLogService.GetTaxTransactionLogByIdAsync(id);
         if (logItem != null)
+		_logger.LogDebug("Delete(id={Id}): logItem → {LogItem}", id, logItem);
         {
             await _taxTransactionLogService.DeleteTaxTransactionLogAsync(logItem);
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Log.Deleted"));
         }
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("Configure", "Avalara");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ClearAll()
     {
+		_logger.LogDebug(">>> Entering ClearAll()");
         await _taxTransactionLogService.ClearLogAsync();
 
+		_logger.LogDebug("<<< Exiting ClearAll()");
         return Json(new { Result = true });
     }
 

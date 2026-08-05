@@ -52,12 +52,16 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<int> GetSpecificationAttributeOptionIdAsync(string specAttributeName, string specAttributeOptionName)
     {
+		logger.LogDebug(">>> Entering GetSpecificationAttributeOptionIdAsync(specAttributeName={SpecAttributeName},specAttributeOptionName={SpecAttributeOptionName})", specAttributeName, specAttributeOptionName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var specificationAttribute = await Table<SpecificationAttribute>()
             .SingleAsync(sa => sa.Name == specAttributeName);
+			logger.LogInformation("GetSpecificationAttributeOptionIdAsync(specAttributeName,specAttributeOptionName)={SpecAttributeName},{SpecAttributeOptionName}: database query executed in {Arg2} ms", specAttributeName, specAttributeOptionName, __logStart.ElapsedMilliseconds);
 
         var specificationAttributeOption = await Table<SpecificationAttributeOption>()
             .SingleAsync(sao => sao.Name == specAttributeOptionName && sao.SpecificationAttributeId == specificationAttribute.Id);
 
+		logger.LogDebug("<<< Exiting GetSpecificationAttributeOptionIdAsync(specAttributeName={SpecAttributeName},specAttributeOptionName={SpecAttributeOptionName})", specAttributeName, specAttributeOptionName);
         return specificationAttributeOption.Id;
     }
 
@@ -92,17 +96,27 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallProductsAsync(SampleProducts jsonData)
     {
+		logger.LogDebug(">>> Entering InstallProductsAsync(jsonData={JsonData})", jsonData);
         //products
         var allProducts = new List<Product>();
 
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): allProducts → {AllProducts}", jsonData, allProducts);
         var productTemplates = new Dictionary<string, int>();
         var taxCategories = new Dictionary<string, int>();
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): productTemplates → {ProductTemplates}", jsonData, productTemplates);
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): taxCategories → {TaxCategories}", jsonData, taxCategories);
         var categories = new Dictionary<string, int>();
         var manufacturers = new Dictionary<string, int>();
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): categories → {Categories}", jsonData, categories);
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): manufacturers → {Manufacturers}", jsonData, manufacturers);
         var productAttributes = new Dictionary<string, int>();
         var productAvailabilityRanges = new Dictionary<string, int>();
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): productAttributes → {ProductAttributes}", jsonData, productAttributes);
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): productAvailabilityRanges → {ProductAvailabilityRanges}", jsonData, productAvailabilityRanges);
         var deliveryDates = new Dictionary<string, int>();
         var products = new Dictionary<string, int>();
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): deliveryDates → {DeliveryDates}", jsonData, deliveryDates);
+		logger.LogDebug("InstallProductsAsync(jsonData={JsonData}): products → {Products}", jsonData, products);
 
         async Task<int> getAndSaveId(Dictionary<string, int> dict, string key, Func<string, Task<int>> foo)
         {
@@ -120,6 +134,8 @@ public partial class InstallationService
 
         async Task<int> getProductTemplate(string templateName)
         {
+			logger.LogDebug(">>> Entering getProductTemplate(templateName={TemplateName})", templateName);
+			logger.LogDebug("<<< Exiting getProductTemplate(templateName={TemplateName})", templateName);
             return await getAndSaveId(productTemplates, templateName,
                 async tName => await GetFirstEntityIdAsync<ProductTemplate>(pt => pt.Name == tName) ??
                     throw new Exception($"\"{tName}\" template could not be loaded"));
@@ -127,42 +143,56 @@ public partial class InstallationService
 
         async Task<int> getTaxCategoryId(string taxCategoryName)
         {
+			logger.LogDebug(">>> Entering getTaxCategoryId(taxCategoryName={TaxCategoryName})", taxCategoryName);
+			logger.LogDebug("<<< Exiting getTaxCategoryId(taxCategoryName={TaxCategoryName})", taxCategoryName);
             return await getAndSaveId(taxCategories, taxCategoryName, async tcName => await GetFirstEntityIdAsync<TaxCategory>(tc => tc.Name == tcName) ??
                 throw new Exception($"\"{tcName}\" tax category could not be loaded"));
         }
 
         async Task<int> getCategoryId(string categoryName)
         {
+			logger.LogDebug(">>> Entering getCategoryId(categoryName={CategoryName})", categoryName);
+			logger.LogDebug("<<< Exiting getCategoryId(categoryName={CategoryName})", categoryName);
             return await getAndSaveId(categories, categoryName, async cName => await GetFirstEntityIdAsync<Category>(c => c.Name == cName) ??
                 throw new Exception($"\"{cName}\" category could not be loaded"));
         }
 
         async Task<int> getManufacturerId(string manufacturerName)
         {
+			logger.LogDebug(">>> Entering getManufacturerId(manufacturerName={ManufacturerName})", manufacturerName);
+			logger.LogDebug("<<< Exiting getManufacturerId(manufacturerName={ManufacturerName})", manufacturerName);
             return await getAndSaveId(manufacturers, manufacturerName, async mName => await GetFirstEntityIdAsync<Manufacturer>(m => m.Name == mName) ??
                 throw new Exception($"\"{mName}\" manufacturer could not be loaded"));
         }
 
         async Task<int> getProductAttributeId(string productAttributeName)
         {
+			logger.LogDebug(">>> Entering getProductAttributeId(productAttributeName={ProductAttributeName})", productAttributeName);
+			logger.LogDebug("<<< Exiting getProductAttributeId(productAttributeName={ProductAttributeName})", productAttributeName);
             return await getAndSaveId(productAttributes, productAttributeName, async paName => await GetFirstEntityIdAsync<ProductAttribute>(pa => pa.Name == paName) ??
                 throw new Exception($"\"{paName}\" product attribute could not be loaded"));
         }
 
         async Task<int> getProductAvailabilityRangeId(string productAvailabilityRangeName)
         {
+			logger.LogDebug(">>> Entering getProductAvailabilityRangeId(productAvailabilityRangeName={ProductAvailabilityRangeName})", productAvailabilityRangeName);
+			logger.LogDebug("<<< Exiting getProductAvailabilityRangeId(productAvailabilityRangeName={ProductAvailabilityRangeName})", productAvailabilityRangeName);
             return await getAndSaveId(productAvailabilityRanges, productAvailabilityRangeName, async parName => await GetFirstEntityIdAsync<ProductAvailabilityRange>(par => par.Name == parName) ??
                 throw new Exception($"\"{parName}\" product availability range could not be loaded"));
         }
 
         async Task<int> getDeliveryDateId(string deliveryDateName)
         {
+			logger.LogDebug(">>> Entering getDeliveryDateId(deliveryDateName={DeliveryDateName})", deliveryDateName);
+			logger.LogDebug("<<< Exiting getDeliveryDateId(deliveryDateName={DeliveryDateName})", deliveryDateName);
             return await getAndSaveId(deliveryDates, deliveryDateName, async ddName => await GetFirstEntityIdAsync<DeliveryDate>(dd => dd.Name == ddName) ??
                 throw new Exception($"\"{ddName}\" delivery date could not be loaded"));
         }
 
         async Task<int> getProductId(string productSku)
         {
+			logger.LogDebug(">>> Entering getProductId(productSku={ProductSku})", productSku);
+			logger.LogDebug("<<< Exiting getProductId(productSku={ProductSku})", productSku);
             return await getAndSaveId(products, productSku, async sku => await GetFirstEntityIdAsync<Product>(p => p.Sku == sku) ??
                 throw new Exception($"Product with SKU = \"{sku}\" could not be loaded"));
         }
@@ -174,6 +204,8 @@ public partial class InstallationService
 
         async Task insertProduct(SampleProducts.SampleProduct sample, int parentGroupedProductId = 0)
         {
+			logger.LogDebug(">>> Entering insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId})", sample, parentGroupedProductId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var product = new Product
             {
                 ProductType = sample.ProductType,
@@ -246,6 +278,7 @@ public partial class InstallationService
                 await downloadService.InsertDownloadAsync(download);
 
                 product.DownloadId = download.Id;
+				logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): product.DownloadId → {Arg2}", sample, parentGroupedProductId, product.DownloadId);
             }
 
             if (sample.SampleDownload != null)
@@ -262,6 +295,7 @@ public partial class InstallationService
                 await downloadService.InsertDownloadAsync(download);
 
                 product.HasSampleDownload = true;
+				logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): product.HasSampleDownload → {Arg2}", sample, parentGroupedProductId, product.HasSampleDownload);
                 product.DownloadId = download.Id;
             }
 
@@ -289,12 +323,16 @@ public partial class InstallationService
             {
                 var productPictures = new List<ProductPicture>();
 
+				logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): productPictures → {ProductPictures}", sample, parentGroupedProductId, productPictures);
                 foreach (var pictureName in sample.ProductPictures)
                     productPictures.Add(new()
                     {
                         ProductId = product.Id,
                         PictureId = await InsertPictureAsync(pictureName, product.Name),
                         DisplayOrder = 1
+						logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): ProductId → {ProductId}", sample, parentGroupedProductId, ProductId);
+						logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): PictureId → {PictureId}", sample, parentGroupedProductId, PictureId);
+						logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): DisplayOrder → {DisplayOrder}", sample, parentGroupedProductId, DisplayOrder);
                     });
 
                 await _dataProvider.BulkInsertEntitiesAsync(productPictures);
@@ -313,6 +351,7 @@ public partial class InstallationService
 
                 var productAttributeValues = new List<ProductAttributeValue>();
 
+				logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): productAttributeValues → {ProductAttributeValues}", sample, parentGroupedProductId, productAttributeValues);
                 foreach (var sampleProductAttributeValue in productAttributeMapping.AttributeValues)
                 {
                     var productAttributeValue = new ProductAttributeValue
@@ -340,6 +379,7 @@ public partial class InstallationService
                                     PictureId = await InsertProductPictureAsync(product, p),
                                     ProductAttributeValueId = productAttributeValue.Id
                                 }).ToListAsync());
+								logger.LogInformation("InstallProductsAsync(jsonData)={JsonData}: database query executed in {Arg1} ms", jsonData, __logStart.ElapsedMilliseconds);
                     }
                     else
                         productAttributeValues.Add(productAttributeValue);
@@ -363,6 +403,7 @@ public partial class InstallationService
             {
                 var productSpecificationAttributes = new List<ProductSpecificationAttribute>();
 
+				logger.LogDebug("insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId}): productSpecificationAttributes → {ProductSpecificationAttributes}", sample, parentGroupedProductId, productSpecificationAttributes);
                 foreach (var specificationAttribute in sample.ProductSpecificationAttribute)
                     productSpecificationAttributes.Add(new ProductSpecificationAttribute
                     {
@@ -386,6 +427,7 @@ public partial class InstallationService
                     Price = tp.Price,
                     ProductId = product.Id
                 }));
+				logger.LogDebug("<<< Exiting insertProduct(sample={Sample},parentGroupedProductId={ParentGroupedProductId})", sample, parentGroupedProductId);
         }
 
         foreach (var sample in jsonData.Products)
@@ -449,6 +491,7 @@ public partial class InstallationService
                 Message = "The stock quantity has been edited",
                 CreatedOnUtc = DateTime.UtcNow
             });
+			logger.LogDebug("<<< Exiting InstallProductsAsync(jsonData={JsonData})", jsonData);
     }
 
     #endregion

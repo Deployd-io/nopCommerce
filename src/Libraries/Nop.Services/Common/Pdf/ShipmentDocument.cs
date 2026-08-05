@@ -12,11 +12,14 @@ public partial class ShipmentDocument : PdfDocument<ProductItem>
 
     private PdfGrid CreateDefaultHeader()
     {
+		logger.LogDebug(">>> Entering CreateDefaultHeader()");
         var headerTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
 
+		logger.LogDebug("CreateDefaultHeader(): headerTable → {HeaderTable}", headerTable);
         headerTable.AddCell(BuildPdfPCell<ShipmentDocument>(source => OrderNumberText, OrderNumberText));
         headerTable.AddCell(BuildPdfPCell<ShipmentDocument>(source => ShipmentNumberText, ShipmentNumberText));
 
+		logger.LogDebug("<<< Exiting CreateDefaultHeader()");
         return headerTable;
     }
 
@@ -30,6 +33,7 @@ public partial class ShipmentDocument : PdfDocument<ProductItem>
     /// <param name="pdfStreamOutput">Stream for PDF output</param>
     public override void Generate(Stream pdfStreamOutput)
     {
+		logger.LogDebug(">>> Entering Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
         Document
             .MainTablePreferences(table =>
             {
@@ -58,6 +62,7 @@ public partial class ShipmentDocument : PdfDocument<ProductItem>
                 events.PdfDoc.Add(BuildAddressTable<ShipmentDocument>(p => p.Address, Address));
             }))
             .Generate(builder => builder.AsPdfStream(pdfStreamOutput, closeStream: false));
+			logger.LogDebug("<<< Exiting Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
     }
 
     #endregion

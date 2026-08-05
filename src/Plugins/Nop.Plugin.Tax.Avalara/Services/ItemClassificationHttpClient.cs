@@ -3,6 +3,7 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Plugin.Tax.Avalara.ItemClassificationAPI;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Services;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Tax.Avalara.Services;
 /// </summary>
 public class ItemClassificationHttpClient
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxSettings _avalaraTaxSettings;
@@ -45,6 +47,7 @@ public class ItemClassificationHttpClient
     /// <returns>Security token</returns>
     protected string PrepareSecurity()
     {
+		_logger.LogDebug(">>> Entering PrepareSecurity()");
         if (_avalaraTaxSettings.AccountId is null)
             throw new NopException("AccountId not set");
 
@@ -52,6 +55,8 @@ public class ItemClassificationHttpClient
             throw new NopException("LicenseKey is not set");
 
         var s = $"{_avalaraTaxSettings.AccountId}:{_avalaraTaxSettings.LicenseKey}";
+		_logger.LogDebug("PrepareSecurity(): s → {S}", s);
+		_logger.LogDebug("<<< Exiting PrepareSecurity()");
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(s));
     }
 
@@ -68,32 +73,43 @@ public class ItemClassificationHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     public async Task<TResponse> RequestAsync<TRequest, TResponse>(TRequest request) where TRequest : Request where TResponse : Response
     {
+		_logger.LogDebug(">>> Entering RequestAsync(request={Request})", request);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             //prepare request parameters
             var requestString = JsonConvert.SerializeObject(request);
             var requestContent = new StringContent(requestString, Encoding.Default, MimeTypes.ApplicationJson);
+			_logger.LogDebug("RequestAsync(request={Request}): requestString → {RequestString}", request, requestString);
+			_logger.LogDebug("RequestAsync(request={Request}): requestContent → {RequestContent}", request, requestContent);
 
             //execute request and get response
             var requestMessage = new HttpRequestMessage(new HttpMethod(request.Method), request.Path) { Content = requestContent };
 
+			_logger.LogDebug("RequestAsync(request={Request}): requestMessage → {RequestMessage}", request, requestMessage);
             //add authorization
             var securityToken = PrepareSecurity();
 
+			_logger.LogDebug("RequestAsync(request={Request}): securityToken → {SecurityToken}", request, securityToken);
             //call PrepareSecurity
             requestMessage.Headers.Add(HeaderNames.Authorization, $"Basic {securityToken}");
 
             var httpResponse = await _httpClient.SendAsync(requestMessage);
 
+			_logger.LogInformation("RequestAsync(request)={Request}: external service call {SecurityToken} took {Arg2} ms", request, securityToken, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("RequestAsync(request={Request}): httpResponse → {HttpResponse}", request, httpResponse);
             //return result
             TResponse result = null;
             var responseString = await httpResponse.Content.ReadAsStringAsync();
+			_logger.LogDebug("RequestAsync(request={Request}): result → {Result}", request, result);
+			_logger.LogDebug("RequestAsync(request={Request}): responseString → {ResponseString}", request, responseString);
             try
             {
                 result = JsonConvert.DeserializeObject<TResponse>(responseString ?? string.Empty);
             }
             catch (Exception ex)
             {
+				_logger.LogError("Exception in RequestAsync(request={Request}): {Arg1}", request, ex.Message);
                 throw new NopException($"Item HS classification error: response content invalid - {ex.Message}");
             }
             if (!string.IsNullOrEmpty(result?.Error?.Code))
@@ -109,9 +125,11 @@ public class ItemClassificationHttpClient
         }
         catch (AggregateException exception)
         {
+			_logger.LogError("Exception in RequestAsync(request={Request}): {Arg1}", request, ex.Message);
             //rethrow actual exception
             throw exception.InnerException;
         }
+		_logger.LogDebug("<<< Exiting RequestAsync(request={Request})", request);
     }
 
     #endregion

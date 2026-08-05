@@ -36,6 +36,7 @@ public static class HttpClientExtensions
 
     public static void ProcessResponse(this HttpClient httpClient, HttpResponseMessage response, UPSSettings upsSettings)
     {
+		logger.LogDebug(">>> Entering ProcessResponse(httpClient={HttpClient},response={Response},upsSettings={UpsSettings})", httpClient, response, upsSettings);
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(response);
         ArgumentNullException.ThrowIfNull(upsSettings);
@@ -46,5 +47,6 @@ public static class HttpClientExtensions
 
         var logger = EngineContext.Current.Resolve<ILogger>();
         logger.Information($"UPS rates. Response: {response}{Environment.NewLine}Content: {response.Content.ReadAsStringAsync().Result}");
+		logger.LogDebug("<<< Exiting ProcessResponse(httpClient={HttpClient},response={Response},upsSettings={UpsSettings})", httpClient, response, upsSettings);
     }
 }

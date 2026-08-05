@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using System.Runtime.CompilerServices;
 
 namespace Nop.Core.Infrastructure;
@@ -7,6 +8,7 @@ namespace Nop.Core.Infrastructure;
 /// </summary>
 public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected volatile TrieNode _root = new();
@@ -22,7 +24,10 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
     /// </summary>
     protected ConcurrentTrie(TrieNode subtreeRoot)
     {
+		_logger.LogDebug(">>> Entering ConcurrentTrie(subtreeRoot={SubtreeRoot})", subtreeRoot);
         _root.Children[subtreeRoot.Label[0]] = subtreeRoot;
+		_logger.LogDebug("<<< Exiting ConcurrentTrie(subtreeRoot={SubtreeRoot})", subtreeRoot);
+		_logger.LogDebug(">>> Entering ConcurrentTrie()");
     }
 
     /// <summary>
@@ -30,6 +35,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
     /// </summary>
     public ConcurrentTrie()
     {
+	_logger.LogDebug("<<< Exiting ConcurrentTrie()");
     }
 
     #endregion
@@ -39,12 +45,15 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected static int GetCommonPrefixLength(ReadOnlySpan<char> s1, ReadOnlySpan<char> s2)
     {
+		_logger.LogDebug(">>> Entering GetCommonPrefixLength(s1={S1},s2={S2})", s1, s2);
         var i = 0;
         var minLength = Math.Min(s1.Length, s2.Length);
 
+		_logger.LogDebug("GetCommonPrefixLength(s1={S1},s2={S2}): minLength → {MinLength}", s1, s2, minLength);
         while (i < minLength && s2[i] == s1[i])
             i++;
 
+		_logger.LogDebug("<<< Exiting GetCommonPrefixLength(s1={S1},s2={S2})", s1, s2);
         return i;
     }
 
@@ -61,17 +70,21 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
     protected virtual bool Find(string key, TrieNode subtreeRoot, out TrieNode node)
     {
+		_logger.LogDebug(">>> Entering Find(key={Key},subtreeRoot={SubtreeRoot})", key, subtreeRoot);
         node = subtreeRoot;
 
+		_logger.LogDebug("Find(key={Key},subtreeRoot={SubtreeRoot}): node → {Node}", key, subtreeRoot, node);
         if (key.Length == 0)
             return true;
 
         var suffix = key.AsSpan();
 
+		_logger.LogDebug("Find(key={Key},subtreeRoot={SubtreeRoot}): suffix → {Suffix}", key, subtreeRoot, suffix);
         while (true)
         {
             var nodeLock = GetLock(node);
             nodeLock.EnterReadLock();
+			_logger.LogDebug("Find(key={Key},subtreeRoot={SubtreeRoot}): nodeLock → {NodeLock}", key, subtreeRoot, nodeLock);
 
             try
             {
@@ -85,6 +98,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
             var span = node.Label.AsSpan();
             var i = GetCommonPrefixLength(suffix, span);
+			_logger.LogDebug("Find(key={Key},subtreeRoot={SubtreeRoot}): span → {Span}", key, subtreeRoot, span);
 
             if (i != span.Length)
                 return false;
@@ -94,12 +108,16 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
             suffix = suffix[i..];
         }
+		_logger.LogDebug("<<< Exiting Find(key={Key},subtreeRoot={SubtreeRoot})", key, subtreeRoot);
     }
 
     protected virtual TrieNode GetOrAddNode(ReadOnlySpan<char> key, TValue value, bool overwrite = false)
     {
+		_logger.LogDebug(">>> Entering GetOrAddNode(key={Key},value={Value},overwrite={Overwrite})", key, value, overwrite);
         var node = _root;
         var suffix = key;
+		_logger.LogDebug("GetOrAddNode(key={Key},value={Value},overwrite={Overwrite}): node → {Node}", key, value, overwrite, node);
+		_logger.LogDebug("GetOrAddNode(key={Key},value={Value},overwrite={Overwrite}): suffix → {Suffix}", key, value, overwrite, suffix);
         ReaderWriterLockSlim nodeLock;
         char c;
         TrieNode nextNode;
@@ -111,6 +129,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
             {
                 c = suffix[0];
                 nodeLock = GetLock(node);
+				_logger.LogDebug("GetOrAddNode(key={Key},value={Value},overwrite={Overwrite}): nodeLock → {NodeLock}", key, value, overwrite, nodeLock);
                 nodeLock.EnterUpgradeableReadLock();
 
                 try
@@ -119,6 +138,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
                     {
                         var label = nextNode.Label.AsSpan();
                         var i = GetCommonPrefixLength(label, suffix);
+						_logger.LogDebug("GetOrAddNode(key={Key},value={Value},overwrite={Overwrite}): label → {Label}", key, value, overwrite, label);
                         // suffix starts with label
                         if (i == label.Length)
                         {
@@ -152,6 +172,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
                     {
                         var suffixNode = new TrieNode(suffix);
                         suffixNode.SetValue(value);
+						_logger.LogDebug("GetOrAddNode(key={Key},value={Value},overwrite={Overwrite}): suffixNode → {SuffixNode}", key, value, overwrite, suffixNode);
 
                         return node.Children[c] = suffixNode;
                     }
@@ -212,6 +233,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
                 // label starts with suffix, so we can return splitNode
                 if (i == suffix.Length)
                     outNode = splitNode;
+					_logger.LogDebug("GetOrAddNode(key={Key},value={Value},overwrite={Overwrite}): outNode → {OutNode}", key, value, overwrite, outNode);
                 // the keys diverge, so we need to branch from splitNode
                 else
                     splitNode.Children[suffix[i]] = outNode = new TrieNode(suffix[i..]);
@@ -239,14 +261,17 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
         // we failed to add a node, so we have to retry;
         // the recursive call is placed at the end to enable tail-recursion optimization
+		_logger.LogDebug("<<< Exiting GetOrAddNode(key={Key},value={Value},overwrite={Overwrite})", key, value, overwrite);
         return GetOrAddNode(key, value, overwrite);
     }
 
     protected virtual void Remove(TrieNode subtreeRoot, ReadOnlySpan<char> key)
     {
+		_logger.LogDebug(">>> Entering Remove(subtreeRoot={SubtreeRoot},key={Key})", subtreeRoot, key);
         TrieNode node = null, grandparent = null;
         var parent = subtreeRoot;
         var i = 0;
+		_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): parent → {Parent}", subtreeRoot, key, parent);
         _structureLock.EnterReadLock();
         try
         {
@@ -254,6 +279,8 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
             {
                 var c = key[i];
                 var parentLock = GetLock(parent);
+				_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): c → {C}", subtreeRoot, key, c);
+				_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): parentLock → {ParentLock}", subtreeRoot, key, parentLock);
                 parentLock.EnterReadLock();
 
                 try
@@ -268,6 +295,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
                 var label = node.Label.AsSpan();
                 var k = GetCommonPrefixLength(key[i..], label);
+				_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): label → {Label}", subtreeRoot, key, label);
 
                 // is this the node we're looking for?
                 if (k == label.Length && k == key.Length - i)
@@ -285,6 +313,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
                 i += label.Length;
                 grandparent = parent;
+				_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): grandparent → {Grandparent}", subtreeRoot, key, grandparent);
                 parent = node;
             }
         }
@@ -304,7 +333,9 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
         {
             var nodeLock = GetLock(node);
             var parentLock = GetLock(parent);
+			_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): nodeLock → {NodeLock}", subtreeRoot, key, nodeLock);
             var grandparentLock = grandparent != null ? GetLock(grandparent) : null;
+			_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): grandparentLock → {GrandparentLock}", subtreeRoot, key, grandparentLock);
             var lockAlreadyHeld = nodeLock == parentLock || nodeLock == grandparentLock;
 
             if (lockAlreadyHeld)
@@ -351,6 +382,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
                                 var child = parent.Children.First().Value;
                                 grandparent.Children[c] = new TrieNode(parent.Label + child.Label, child);
+								_logger.LogDebug("Remove(subtreeRoot={SubtreeRoot},key={Key}): child → {Child}", subtreeRoot, key, child);
                                 parent.Delete();
                             }
                             finally
@@ -398,15 +430,19 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
         {
             _structureLock.ExitWriteLock();
         }
+		_logger.LogDebug(">>> Entering Remove(key={Key})", key);
+		_logger.LogDebug("<<< Exiting Remove(subtreeRoot={SubtreeRoot},key={Key})", subtreeRoot, key);
     }
     
     protected virtual bool SearchOrPrune(string prefix, bool prune, out TrieNode subtreeRoot)
     {
+		_logger.LogDebug(">>> Entering SearchOrPrune(prefix={Prefix},prune={Prune})", prefix, prune);
         ArgumentNullException.ThrowIfNull(prefix);
 
         if (prefix.Length == 0)
         {
             subtreeRoot = _root;
+			_logger.LogDebug("SearchOrPrune(prefix={Prefix},prune={Prune}): subtreeRoot → {SubtreeRoot}", prefix, prune, subtreeRoot);
             return true;
         }
 
@@ -414,6 +450,8 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
         var node = _root;
         var parent = node;
         var span = prefix.AsSpan();
+		_logger.LogDebug("SearchOrPrune(prefix={Prefix},prune={Prune}): parent → {Parent}", prefix, prune, parent);
+		_logger.LogDebug("SearchOrPrune(prefix={Prefix},prune={Prune}): span → {Span}", prefix, prune, span);
         var i = 0;
 
         while (i < span.Length)
@@ -421,6 +459,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
             var c = span[i];
             var parentLock = GetLock(parent);
             parentLock.EnterUpgradeableReadLock();
+			_logger.LogDebug("SearchOrPrune(prefix={Prefix},prune={Prune}): parentLock → {ParentLock}", prefix, prune, parentLock);
 
             try
             {
@@ -429,6 +468,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
                 var label = node.Label.AsSpan();
                 var k = GetCommonPrefixLength(span[i..], label);
+				_logger.LogDebug("SearchOrPrune(prefix={Prefix},prune={Prune}): label → {Label}", prefix, prune, label);
 
                 if (k == span.Length - i)
                 {
@@ -465,6 +505,8 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
             parent = node;
         }
 
+		_logger.LogDebug(">>> Entering Prune(prefix={Prefix})", prefix);
+		_logger.LogDebug("<<< Exiting Prune(prefix={Prefix})", prefix);
         return false;
     }
 
@@ -482,10 +524,14 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
     /// </returns>
     public virtual bool TryGetValue(string key, out TValue value)
     {
+		_logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
         ArgumentNullException.ThrowIfNull(key);
 
         value = default;
+		_logger.LogDebug("TryGetValue(key={Key}): value → {Value}", key, value);
 
+		_logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
+		_logger.LogDebug("<<< Exiting TryGetValue()");
         return Find(key, _root, out var node) && node.TryGetValue(out value);
     }
 
@@ -496,7 +542,9 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
     /// <param name="value">The value to be associated with <paramref name="key"/></param>
     public virtual void Add(string key, TValue value)
     {
+		_logger.LogDebug(">>> Entering Add(key={Key},value={Value})", key, value);
         if (string.IsNullOrEmpty(key))
+			_logger.LogDebug("<<< Exiting Add(key={Key},value={Value})", key, value);
             throw new ArgumentException($"'{nameof(key)}' cannot be null or empty.", nameof(key));
 
         GetOrAddNode(key, value, true);
@@ -507,7 +555,10 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
     /// </summary>
     public virtual void Clear()
     {
+		_logger.LogDebug(">>> Entering Clear()");
         _root = new TrieNode();
+		_logger.LogDebug("<<< Exiting Clear()");
+		_logger.LogDebug("Clear(): _root → {_root}", _root);
     }
 
     /// <summary>
@@ -609,13 +660,16 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
         // defaults to 8 times the number of processor cores
         public StripedReaderWriterLock(int nLocks = 0)
         {
+			_logger.LogDebug(">>> Entering StripedReaderWriterLock(nLocks={NLocks})", nLocks);
             if (nLocks == 0)
                 nLocks = Environment.ProcessorCount * MULTIPLIER;
 
             _locks = new ReaderWriterLockSlim[nLocks];
+			_logger.LogDebug("StripedReaderWriterLock(nLocks={NLocks}): _locks → {_locks}", nLocks, _locks);
 
             for (var i = 0; i < nLocks; i++)
                 _locks[i] = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+				_logger.LogDebug("<<< Exiting StripedReaderWriterLock(nLocks={NLocks})", nLocks);
         }
 
         #endregion
@@ -627,6 +681,7 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
         /// </summary>
         public ReaderWriterLockSlim GetLock(object obj)
         {
+			_logger.LogDebug("<<< Exiting GetLock(obj={Obj})", obj);
             return _locks[obj.GetHashCode() % _locks.Length];
         }
 
@@ -650,8 +705,12 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
         public TrieNode(string label = "")
         {
+			_logger.LogDebug(">>> Entering TrieNode(label={Label})", label);
             Label = label;
             Children = new Dictionary<char, TrieNode>();
+			_logger.LogDebug("<<< Exiting TrieNode(label={Label})", label);
+			_logger.LogDebug("TrieNode(label={Label}): Children → {Children}", label, Children);
+			_logger.LogDebug("TrieNode(label={Label}): Label → {Label1}", label, Label);
         }
 
         public TrieNode(ReadOnlySpan<char> label) : this(label.ToString())
@@ -696,32 +755,45 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
         public bool TryRemoveValue(out TValue value)
         {
+			_logger.LogDebug(">>> Entering TryRemoveValue()");
             var wrapper = Interlocked.Exchange(ref _value, null);
             value = default;
+			_logger.LogDebug("TryRemoveValue(): wrapper → {Wrapper}", wrapper);
+			_logger.LogDebug("TryRemoveValue(): value → {Value}", value);
 
             if (wrapper == null)
                 return false;
 
             value = wrapper.Value;
 
+			_logger.LogDebug("<<< Exiting TryRemoveValue()");
             return true;
         }
 
         public void SetValue(TValue value)
         {
+			_logger.LogDebug(">>> Entering SetValue(value={Value})", value);
             _value = new ValueWrapper(value);
+			_logger.LogDebug("<<< Exiting SetValue(value={Value})", value);
+			_logger.LogDebug("SetValue(value={Value}): _value → {_value}", value, _value);
         }
 
         public TValue GetOrAddValue(TValue value)
         {
+			_logger.LogDebug(">>> Entering GetOrAddValue(value={Value})", value);
             var wrapper = Interlocked.CompareExchange(ref _value, new ValueWrapper(value), null);
 
+			_logger.LogDebug("GetOrAddValue(value={Value}): wrapper → {Wrapper}", value, wrapper);
+			_logger.LogDebug("<<< Exiting GetOrAddValue(value={Value})", value);
             return wrapper != null ? wrapper.Value : value;
         }
 
         public void Delete()
         {
+			_logger.LogDebug(">>> Entering Delete()");
             _value = _deleted;
+			_logger.LogDebug("<<< Exiting Delete()");
+			_logger.LogDebug("Delete(): _value → {_value}", _value);
         }
 
         #endregion
@@ -746,7 +818,10 @@ public partial class ConcurrentTrie<TValue> : IConcurrentCollection<TValue>
 
             public ValueWrapper(TValue value)
             {
+				_logger.LogDebug(">>> Entering ValueWrapper(value={Value})", value);
                 Value = value;
+				_logger.LogDebug("<<< Exiting ValueWrapper(value={Value})", value);
+				_logger.LogDebug("ValueWrapper(value={Value}): Value → {Value1}", value, Value);
             }
         }
 

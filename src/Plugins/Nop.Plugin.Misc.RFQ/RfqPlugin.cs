@@ -11,6 +11,7 @@ using Nop.Services.Plugins;
 using Nop.Services.Security;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.RFQ;
 /// </summary>
 public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly EmailAccountSettings _emailAccountSettings;
@@ -62,6 +64,8 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(RfqDefaults.ConfigurationRouteName);
     }
 
@@ -74,6 +78,8 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		_logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             PublicWidgetZones.OrderSummaryContentAfter,
@@ -88,10 +94,12 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         if (widgetZone == PublicWidgetZones.OrderSummaryContentAfter)
             return typeof(AddRfqComponent);
 
         if (widgetZone == PublicWidgetZones.AccountNavigationAfter)
+		_logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
             return typeof(CustomerRfqMenuComponent);
 
         return null;
@@ -103,6 +111,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new RfqSettings
         {
@@ -121,8 +130,11 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 
         var messageTemplates = new List<MessageTemplate>();
         var allMessageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(0);
+		_logger.LogDebug("InstallAsync(): messageTemplates → {MessageTemplates}", messageTemplates);
+		_logger.LogDebug("InstallAsync(): allMessageTemplates → {AllMessageTemplates}", allMessageTemplates);
         var existsMessageTemplateNames = allMessageTemplates.Select(t => t.Name).ToList();
 
+		_logger.LogDebug("InstallAsync(): existsMessageTemplateNames → {ExistsMessageTemplateNames}", existsMessageTemplateNames);
         if (!existsMessageTemplateNames.Contains(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE))
         {
             messageTemplates.Add(new MessageTemplate
@@ -262,6 +274,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -270,6 +283,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<RfqSettings>();
 
@@ -294,6 +308,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
 
         var deletedMessageTemplates = new List<MessageTemplate>();
         deletedMessageTemplates.AddRange((await _messageTemplateService.GetMessageTemplatesByNameAsync(RfqDefaults.CUSTOMER_SENT_NEW_REQUEST_QUOTE)).ToList());
+		_logger.LogDebug("UninstallAsync(): deletedMessageTemplates → {DeletedMessageTemplates}", deletedMessageTemplates);
         deletedMessageTemplates.AddRange((await _messageTemplateService.GetMessageTemplatesByNameAsync(RfqDefaults.ADMIN_SENT_NEW_QUOTE)).ToList());
 
         deletedMessageTemplates = deletedMessageTemplates.Where(mt => mt != null).ToList();
@@ -308,6 +323,7 @@ public class RfqPlugin : BasePlugin, IMiscPlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourceAsync($"Admin.ContentManagement.MessageTemplates.Description.{RfqDefaults.ADMIN_SENT_NEW_QUOTE}");
         await _localizationService.DeleteLocaleResourcesAsync("Security.Permission.Misc.RFQ.AccessRFQ.Admin.AccessRFQ");
         await _localizationService.DeleteLocaleResourcesAsync("Security.Permission.Misc.RFQ.AccessRFQ.PublicStore.AccessRFQ");
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

@@ -21,12 +21,14 @@ using Nop.Web.Factories;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Models.Vendors;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class VendorController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -99,14 +101,18 @@ public partial class VendorController : BasePublicController
 
     protected virtual async Task<string> ParseVendorAttributesAsync(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParseVendorAttributesAsync(form={Form})", form);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = "";
         var attributes = await _vendorAttributeService.GetAllAttributesAsync();
+		_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): attributesXml → {AttributesXml}", form, attributesXml);
+		_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): attributes → {Attributes}", form, attributes);
         foreach (var attribute in attributes)
         {
             var controlId = $"{NopVendorDefaults.VendorAttributePrefix}{attribute.Id}";
             switch (attribute.AttributeControlType)
+			_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): controlId → {ControlId}", form, controlId);
             {
                 case AttributeControlType.DropdownList:
                 case AttributeControlType.RadioList:
@@ -116,6 +122,7 @@ public partial class VendorController : BasePublicController
                     {
                         var selectedAttributeId = int.Parse(ctrlAttributes);
                         if (selectedAttributeId > 0)
+							_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): selectedAttributeId → {SelectedAttributeId}", form, selectedAttributeId);
                             attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                                 attribute, selectedAttributeId.ToString());
                     }
@@ -146,6 +153,7 @@ public partial class VendorController : BasePublicController
                                  .Select(v => v.Id)
                                  .ToList())
                     {
+								_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): attributeValues → {AttributeValues}", form, attributeValues);
                         attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                             attribute, selectedAttributeId.ToString());
                     }
@@ -160,6 +168,7 @@ public partial class VendorController : BasePublicController
                         var enteredText = ctrlAttributes.ToString().Trim();
                         attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                             attribute, enteredText);
+							_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): enteredText → {EnteredText}", form, enteredText);
                     }
                 }
                     break;
@@ -173,6 +182,7 @@ public partial class VendorController : BasePublicController
             }
         }
 
+		_logger.LogDebug("<<< Exiting ParseVendorAttributesAsync(form={Form})", form);
         return attributesXml;
     }
 
@@ -182,6 +192,7 @@ public partial class VendorController : BasePublicController
 
     public virtual async Task<IActionResult> ApplyVendor()
     {
+		_logger.LogDebug(">>> Entering ApplyVendor()");
         if (!_vendorSettings.AllowCustomersToApplyForVendorAccount)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -190,6 +201,8 @@ public partial class VendorController : BasePublicController
 
         var model = new ApplyVendorModel();
         model = await _vendorModelFactory.PrepareApplyVendorModelAsync(model, true, false, null);
+		_logger.LogDebug("ApplyVendor(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting ApplyVendor()");
         return View(model);
     }
 
@@ -289,11 +302,14 @@ public partial class VendorController : BasePublicController
 
         //If we got this far, something failed, redisplay form
         model = await _vendorModelFactory.PrepareApplyVendorModelAsync(model, false, true, vendorAttributesXml);
+		_logger.LogDebug("ApplyVendorSubmit(model={Model},captchaValid={CaptchaValid},uploadedFile={UploadedFile},form={Form}): model → {Model1}", model, captchaValid, uploadedFile, form, model);
+		_logger.LogDebug("<<< Exiting ApplyVendorSubmit(model={Model},captchaValid={CaptchaValid},uploadedFile={UploadedFile},form={Form})", model, captchaValid, uploadedFile, form);
         return View(model);
     }
 
     public virtual async Task<IActionResult> Info()
     {
+		_logger.LogDebug(">>> Entering Info()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -302,6 +318,8 @@ public partial class VendorController : BasePublicController
 
         var model = new VendorInfoModel();
         model = await _vendorModelFactory.PrepareVendorInfoModelAsync(model, false);
+		_logger.LogDebug("Info(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Info()");
         return View(model);
     }
 
@@ -381,6 +399,8 @@ public partial class VendorController : BasePublicController
 
         //If we got this far, something failed, redisplay form
         model = await _vendorModelFactory.PrepareVendorInfoModelAsync(model, true, vendorAttributesXml);
+		_logger.LogDebug("Info(model={Model},uploadedFile={UploadedFile},form={Form}): model → {Model1}", model, uploadedFile, form, model);
+		_logger.LogDebug("<<< Exiting Info(model={Model},uploadedFile={UploadedFile},form={Form})", model, uploadedFile, form);
         return View(model);
     }
 
@@ -388,25 +408,30 @@ public partial class VendorController : BasePublicController
     [FormValueRequired("remove-picture")]
     public virtual async Task<IActionResult> RemovePicture()
     {
+		_logger.LogDebug(">>> Entering RemovePicture()");
         if (!await _customerService.IsRegisteredAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
         var vendor = await _workContext.GetCurrentVendorAsync();
         if (vendor == null || !_vendorSettings.AllowVendorsToEditInfo)
+			_logger.LogDebug("RemovePicture(): vendor → {Vendor}", vendor);
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
 
         var picture = await _pictureService.GetPictureByIdAsync(vendor.PictureId);
 
+		_logger.LogDebug("RemovePicture(): picture → {Picture}", picture);
         if (picture != null)
             await _pictureService.DeletePictureAsync(picture);
 
         vendor.PictureId = 0;
+		_logger.LogDebug("RemovePicture(): vendor.PictureId → {Arg0}", vendor.PictureId);
         await _vendorService.UpdateVendorAsync(vendor);
 
         //notifications
         if (_vendorSettings.NotifyStoreOwnerAboutVendorInformationChange)
             await _workflowMessageService.SendVendorInformationChangeStoreOwnerNotificationAsync(vendor, _localizationSettings.DefaultAdminLanguageId);
 
+		_logger.LogDebug("<<< Exiting RemovePicture()");
         return RedirectToAction("Info");
     }
 

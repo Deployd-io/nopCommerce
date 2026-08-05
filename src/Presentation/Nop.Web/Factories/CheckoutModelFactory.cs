@@ -19,11 +19,13 @@ using Nop.Services.Stores;
 using Nop.Services.Tax;
 using Nop.Web.Models.Checkout;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
 public partial class CheckoutModelFactory : ICheckoutModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -138,6 +140,8 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     protected virtual async Task<CheckoutPickupPointsModel> PrepareCheckoutPickupPointsModelAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutPickupPointsModelAsync(cart={Cart})", cart);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = new CheckoutPickupPointsModel
         {
             AllowPickupInStore = _shippingSettings.AllowPickupInStore
@@ -147,14 +151,20 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
             return model;
 
         model.DisplayPickupPointsOnMap = _shippingSettings.DisplayPickupPointsOnMap;
+		_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): model.DisplayPickupPointsOnMap → {Arg1}", cart, model.DisplayPickupPointsOnMap);
+		_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): model.GoogleMapsApiKey → {Arg1}", cart, model.GoogleMapsApiKey);
         model.GoogleMapsApiKey = _shippingSettings.GoogleMapsApiKey;
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): customer → {Customer}", cart, customer);
+		_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): store → {Store}", cart, store);
         var pickupPointProviders = await _pickupPluginManager.LoadActivePluginsAsync(customer, store.Id);
         if (pickupPointProviders.Any())
+		_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): pickupPointProviders → {PickupPointProviders}", cart, pickupPointProviders);
         {
             var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
             var address = customer.BillingAddressId.HasValue
+				_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): languageId → {LanguageId}", cart, languageId);
                 ? await _addressService.GetAddressByIdAsync(customer.BillingAddressId.Value)
                 : null;
             var pickupPointsResponse = await _shippingService.GetPickupPointsAsync(cart, address,
@@ -168,11 +178,14 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
                     .GetAttributeAsync<ShippingOption>(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, store.Id);
 
                 model.PickupInStore = selectedShippingOption is not null && selectedShippingOption.IsPickupInStore;
+				_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): model.PickupInStore → {Arg1}", cart, model.PickupInStore);
 
                 model.PickupPoints = await pickupPointsResponse.PickupPoints.SelectAwait(async point =>
                 {
                     var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(point.CountryCode);
                     var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(point.StateAbbreviation, country?.Id);
+					_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): country → {Country}", cart, country);
+					_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): state → {State}", cart, state);
 
                     var pickupPointModel = new CheckoutPickupPointModel
                     {
@@ -194,14 +207,17 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
                     
                     var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
                     
+					_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): currentCurrency → {CurrentCurrency}", cart, currentCurrency);
                     //adjust rate
                     var (shippingTotal, _) = await _orderTotalCalculationService.AdjustShippingRateAsync(point.PickupFee, cart, true);
                     var (rateBase, _) = await _taxService.GetShippingPriceAsync(shippingTotal, customer);
                     var rate = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(rateBase, currentCurrency);
                     pickupPointModel.PickupFee = await _priceFormatter.FormatShippingPriceAsync(rate, true);
+					_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): rate → {Rate}", cart, rate);
 
                     return pickupPointModel;
                 }).ToListAsync();
+				_logger.LogInformation("PrepareCheckoutPickupPointsModelAsync(cart)={Cart}: database query executed in {Arg1} ms", cart, __logStart.ElapsedMilliseconds);
             }
             else
                 foreach (var error in pickupPointsResponse.Errors)
@@ -211,6 +227,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
         //only available pickup points
         var shippingProviders = await _shippingPluginManager.LoadActivePluginsAsync(customer, store.Id);
         if (!shippingProviders.Any())
+		_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): shippingProviders → {ShippingProviders}", cart, shippingProviders);
         {
             if (!pickupPointProviders.Any())
             {
@@ -218,10 +235,12 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
                 model.Warnings.Add(await _localizationService.GetResourceAsync("Checkout.PickupPoints.NotAvailable"));
             }
             model.PickupInStoreOnly = true;
+			_logger.LogDebug("PrepareCheckoutPickupPointsModelAsync(cart={Cart}): model.PickupInStoreOnly → {Arg1}", cart, model.PickupInStoreOnly);
             model.PickupInStore = true;
             return model;
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutPickupPointsModelAsync(cart={Cart})", cart);
         return model;
     }
 
@@ -362,6 +381,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual async Task<CheckoutShippingMethodModel> PrepareShippingMethodModelAsync(IList<ShoppingCartItem> cart, Address shippingAddress)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress})", cart, shippingAddress);
         var model = new CheckoutShippingMethodModel
         {
             DisplayPickupInStore = _orderSettings.DisplayPickupInStoreOnShippingMethodPage
@@ -372,8 +392,11 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): customer → {Customer}", cart, shippingAddress, customer);
+		_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): store → {Store}", cart, shippingAddress, store);
         var getShippingOptionResponse = await _shippingService.GetShippingOptionsAsync(cart, shippingAddress, customer, storeId: store.Id);
         if (getShippingOptionResponse.Success)
+		_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): getShippingOptionResponse → {GetShippingOptionResponse}", cart, shippingAddress, getShippingOptionResponse);
         {
             //performance optimization. cache returned shipping options.
             //we'll use them later (after a customer has selected an option).
@@ -399,6 +422,8 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
                 var (rateBase, _) = await _taxService.GetShippingPriceAsync(shippingTotal, customer);
                 var rate = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(rateBase, await _workContext.GetWorkingCurrencyAsync());
                 soModel.Fee = await _priceFormatter.FormatShippingPriceAsync(rate, true);
+				_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): rate → {Rate}", cart, shippingAddress, rate);
+				_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): soModel.Rate → {Arg2}", cart, shippingAddress, soModel.Rate);
                 soModel.Rate = rate;
                 model.ShippingMethods.Add(soModel);
             }
@@ -422,8 +447,10 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
                         so.Name.Equals(selectedShippingOption.Name, StringComparison.InvariantCultureIgnoreCase) &&
                         !string.IsNullOrEmpty(so.ShippingRateComputationMethodSystemName) &&
                         so.ShippingRateComputationMethodSystemName.Equals(selectedShippingOption.ShippingRateComputationMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
+						_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): shippingOptionToSelect → {ShippingOptionToSelect}", cart, shippingAddress, shippingOptionToSelect);
                 if (shippingOptionToSelect != null) 
                     shippingOptionToSelect.Selected = true;
+					_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): shippingOptionToSelect.Selected → {Arg2}", cart, shippingAddress, shippingOptionToSelect.Selected);
             }
             //if no option has been selected, let's do it for the first one
             if (model.ShippingMethods.FirstOrDefault(so => so.Selected) == null)
@@ -436,11 +463,13 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
             //notify about shipping from multiple locations
             if (_shippingSettings.NotifyCustomerAboutShippingFromMultipleLocations) 
                 model.NotifyCustomerAboutShippingFromMultipleLocations = getShippingOptionResponse.ShippingFromMultipleLocations;
+				_logger.LogDebug("PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress}): model.NotifyCustomerAboutShippingFromMultipleLocations → {Arg2}", cart, shippingAddress, model.NotifyCustomerAboutShippingFromMultipleLocations);
         }
         else
             foreach (var error in getShippingOptionResponse.Errors)
                 model.Warnings.Add(error);
 
+		_logger.LogDebug("<<< Exiting PrepareShippingMethodModelAsync(cart={Cart},shippingAddress={ShippingAddress})", cart, shippingAddress);
         return model;
     }
 
@@ -455,20 +484,28 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual async Task<CheckoutPaymentMethodModel> PreparePaymentMethodModelAsync(IList<ShoppingCartItem> cart, int filterByCountryId)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId})", cart, filterByCountryId);
         var model = new CheckoutPaymentMethodModel();
 
+		_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): model → {Model}", cart, filterByCountryId, model);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): customer → {Customer}", cart, filterByCountryId, customer);
+		_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): store → {Store}", cart, filterByCountryId, store);
 
         //reward points
         if (_rewardPointsSettings.Enabled && !await _shoppingCartService.ShoppingCartIsRecurringAsync(cart))
         {
             var shoppingCartTotal = await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart, true, false);
             if (shoppingCartTotal.redeemedRewardPoints > 0)
+			_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): shoppingCartTotal → {ShoppingCartTotal}", cart, filterByCountryId, shoppingCartTotal);
             {
                 model.DisplayRewardPoints = true;
+				_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): model.DisplayRewardPoints → {Arg2}", cart, filterByCountryId, model.DisplayRewardPoints);
                 model.RewardPointsToUseAmount = await _priceFormatter.FormatPriceAsync(shoppingCartTotal.redeemedRewardPointsAmount, true, false);
                 model.RewardPointsToUse = shoppingCartTotal.redeemedRewardPoints;
+				_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): model.RewardPointsToUse → {Arg2}", cart, filterByCountryId, model.RewardPointsToUse);
                 model.RewardPointsBalance = await _rewardPointService.GetRewardPointsBalanceAsync(customer.Id, store.Id);
 
                 //are points enough to pay for entire order? like if this option (to use them) was selected
@@ -482,6 +519,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
             .Where(pm => pm.PaymentMethodType == PaymentMethodType.Standard || pm.PaymentMethodType == PaymentMethodType.Redirection)
             .WhereAwait(async pm => !await pm.HidePaymentMethodAsync(cart))
             .ToListAsync();
+			_logger.LogInformation("PreparePaymentMethodModelAsync(cart,filterByCountryId)={Cart},{FilterByCountryId}: database query executed in {Arg2} ms", cart, filterByCountryId, __logStart.ElapsedMilliseconds);
         foreach (var pm in paymentMethods)
         {
             if (await _shoppingCartService.ShoppingCartIsRecurringAsync(cart) && pm.RecurringPaymentType == RecurringPaymentType.NotSupported)
@@ -497,8 +535,10 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
             //payment method additional fee
             var paymentMethodAdditionalFee = await _paymentService.GetAdditionalHandlingFeeAsync(cart, pm.PluginDescriptor.SystemName);
             var (rateBase, _) = await _taxService.GetPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFee, customer);
+			_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): paymentMethodAdditionalFee → {PaymentMethodAdditionalFee}", cart, filterByCountryId, paymentMethodAdditionalFee);
             var rate = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(rateBase, await _workContext.GetWorkingCurrencyAsync());
 
+			_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): rate → {Rate}", cart, filterByCountryId, rate);
             if (rate > decimal.Zero)
                 pmModel.Fee = await _priceFormatter.FormatPaymentMethodAdditionalFeeAsync(rate, true);
 
@@ -512,8 +552,10 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
         {
             var paymentMethodToSelect = model.PaymentMethods.ToList()
                 .Find(pm => pm.PaymentMethodSystemName.Equals(selectedPaymentMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
+				_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): paymentMethodToSelect → {PaymentMethodToSelect}", cart, filterByCountryId, paymentMethodToSelect);
             if (paymentMethodToSelect != null)
                 paymentMethodToSelect.Selected = true;
+				_logger.LogDebug("PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId}): paymentMethodToSelect.Selected → {Arg2}", cart, filterByCountryId, paymentMethodToSelect.Selected);
         }
         //if no option has been selected, let's do it for the first one
         if (model.PaymentMethods.FirstOrDefault(so => so.Selected) == null)
@@ -523,6 +565,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
                 paymentMethodToSelect.Selected = true;
         }
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodModelAsync(cart={Cart},filterByCountryId={FilterByCountryId})", cart, filterByCountryId);
         return model;
     }
 
@@ -536,6 +579,8 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual Task<CheckoutPaymentInfoModel> PreparePaymentInfoModelAsync(IPaymentMethod paymentMethod)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentInfoModelAsync(paymentMethod={PaymentMethod})", paymentMethod);
+		_logger.LogDebug("<<< Exiting PreparePaymentInfoModelAsync(paymentMethod={PaymentMethod})", paymentMethod);
         return Task.FromResult(new CheckoutPaymentInfoModel
         {
             PaymentViewComponent = paymentMethod.GetPublicViewComponent(),
@@ -553,6 +598,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual async Task<CheckoutConfirmModel> PrepareConfirmOrderModelAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering PrepareConfirmOrderModelAsync(cart={Cart})", cart);
         var model = new CheckoutConfirmModel
         {
             //terms of service
@@ -564,10 +610,13 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
         //min order amount validation
         var minOrderTotalAmountOk = await _orderProcessingService.ValidateMinOrderTotalAmountAsync(cart);
         if (!minOrderTotalAmountOk)
+		_logger.LogDebug("PrepareConfirmOrderModelAsync(cart={Cart}): minOrderTotalAmountOk → {MinOrderTotalAmountOk}", cart, minOrderTotalAmountOk);
         {
             var minOrderTotalAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(_orderSettings.MinOrderTotalAmount, await _workContext.GetWorkingCurrencyAsync());
             model.MinOrderTotalWarning = string.Format(await _localizationService.GetResourceAsync("Checkout.MinOrderTotalAmount"), await _priceFormatter.FormatPriceAsync(minOrderTotalAmount, true, false));
+			_logger.LogDebug("PrepareConfirmOrderModelAsync(cart={Cart}): minOrderTotalAmount → {MinOrderTotalAmount}", cart, minOrderTotalAmount);
         }
+		_logger.LogDebug("<<< Exiting PrepareConfirmOrderModelAsync(cart={Cart})", cart);
         return model;
     }
 
@@ -581,6 +630,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual Task<CheckoutCompletedModel> PrepareCheckoutCompletedModelAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutCompletedModelAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         var model = new CheckoutCompletedModel
@@ -590,6 +640,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
             CustomOrderNumber = order.CustomOrderNumber
         };
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutCompletedModelAsync(order={Order})", order);
         return Task.FromResult(model);
     }
 
@@ -603,8 +654,10 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual Task<CheckoutProgressModel> PrepareCheckoutProgressModelAsync(CheckoutProgressStep step)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutProgressModelAsync(step={Step})", step);
         var model = new CheckoutProgressModel { CheckoutProgressStep = step };
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutProgressModelAsync(step={Step})", step);
         return Task.FromResult(model);
     }
 
@@ -618,10 +671,12 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
     /// </returns>
     public virtual async Task<OnePageCheckoutModel> PrepareOnePageCheckoutModelAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering PrepareOnePageCheckoutModelAsync(cart={Cart})", cart);
         ArgumentNullException.ThrowIfNull(cart);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("PrepareOnePageCheckoutModelAsync(cart={Cart}): customer → {Customer}", cart, customer);
         var model = new OnePageCheckoutModel
         {
             ShippingRequired = await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart),
@@ -633,6 +688,7 @@ public partial class CheckoutModelFactory : ICheckoutModelFactory
 
         await PrepareBillingAddressModelAsync(model.BillingAddress, cart, prePopulateNewAddressWithCustomerFields: true);
 
+		_logger.LogDebug("<<< Exiting PrepareOnePageCheckoutModelAsync(cart={Cart})", cart);
         return model;
     }
 

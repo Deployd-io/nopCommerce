@@ -424,14 +424,17 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<string> ParseCustomAttributesAsync(IFormCollection form, string attributeControlName)
     {
+		logger.LogDebug(">>> Entering ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName})", form, attributeControlName);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = string.Empty;
 
+		logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): attributesXml → {AttributesXml}", form, attributeControlName, attributesXml);
         foreach (var attribute in await _attributeService.GetAllAttributesAsync())
         {
             var controlId = string.Format(attributeControlName, attribute.Id);
             var attributeValues = form[controlId];
+			logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): controlId → {ControlId}", form, attributeControlName, controlId);
             switch (attribute.AttributeControlType)
             {
                 case AttributeControlType.DropdownList:
@@ -456,6 +459,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                     var readOnlyAttributeValues = await _attributeService.GetAttributeValuesAsync(attribute.Id);
                     foreach (var readOnlyAttributeValue in readOnlyAttributeValues)
                     {
+					logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): readOnlyAttributeValues → {ReadOnlyAttributeValues}", form, attributeControlName, readOnlyAttributeValues);
                         if (!readOnlyAttributeValue.IsPreSelected)
                             continue;
 
@@ -479,6 +483,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
             }
         }
 
+		logger.LogDebug("<<< Exiting ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName})", form, attributeControlName);
         return attributesXml;
     }
 
@@ -493,6 +498,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<bool?> IsConditionMetAsync(string conditionAttributeXml, string selectedAttributesXml)
     {
+		logger.LogDebug(">>> Entering IsConditionMetAsync(conditionAttributeXml={ConditionAttributeXml},selectedAttributesXml={SelectedAttributesXml})", conditionAttributeXml, selectedAttributesXml);
         if (string.IsNullOrEmpty(conditionAttributeXml))
             //no condition
             return null;
@@ -525,6 +531,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 allFound = false;
         }
 
+		logger.LogDebug("<<< Exiting IsConditionMetAsync(conditionAttributeXml={ConditionAttributeXml},selectedAttributesXml={SelectedAttributesXml})", conditionAttributeXml, selectedAttributesXml);
         return allFound;
     }
 

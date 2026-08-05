@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.FilterLevels;
@@ -7,9 +8,13 @@ namespace Nop.Core.Domain.FilterLevels;
 /// </summary>
 public partial class FilterLevelSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public FilterLevelSettings()
     {
+		_logger.LogDebug(">>> Entering FilterLevelSettings()");
         FilterLevelEnumDisabled = new List<int>();
+		_logger.LogDebug("<<< Exiting FilterLevelSettings()");
+		_logger.LogDebug("FilterLevelSettings(): FilterLevelEnumDisabled → {FilterLevelEnumDisabled}", FilterLevelEnumDisabled);
     }
 
     /// <summary>

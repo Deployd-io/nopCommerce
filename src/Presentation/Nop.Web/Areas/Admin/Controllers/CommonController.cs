@@ -18,11 +18,13 @@ using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CommonController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Const
 
     protected const string EXPORT_IMPORT_PATH = @"files\exportimport";
@@ -97,27 +99,36 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> SystemInfo()
     {
+		_logger.LogDebug(">>> Entering SystemInfo()");
         //prepare model
         var model = await _commonModelFactory.PrepareSystemInfoModelAsync(new SystemInfoModel());
 
+		_logger.LogDebug("SystemInfo(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting SystemInfo()");
         return View(model);
     }
 
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> Warnings()
     {
+		_logger.LogDebug(">>> Entering Warnings()");
         //prepare model
         var model = await _commonModelFactory.PrepareSystemWarningModelsAsync();
 
+		_logger.LogDebug("Warnings(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Warnings()");
         return View(model);
     }
 
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> Maintenance()
     {
+		_logger.LogDebug(">>> Entering Maintenance()");
         //prepare model
         var model = await _commonModelFactory.PrepareMaintenanceModelAsync(new MaintenanceModel());
 
+		_logger.LogDebug("Maintenance(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Maintenance()");
         return View(model);
     }
 
@@ -152,6 +163,8 @@ public partial class CommonController : BaseAdminController
 
         //prepare model
         model = await _commonModelFactory.PrepareMaintenanceModelAsync(model);
+		_logger.LogDebug("MaintenanceDeleteThumbFiles(model={Model}): model → {Model1}", model, model);
+		_logger.LogDebug("<<< Exiting MaintenanceDeleteThumbFiles(model={Model})", model);
         return View(model);
     }
 
@@ -238,9 +251,12 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> BackupFiles(BackupFileSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering BackupFiles(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _commonModelFactory.PrepareBackupFileListModelAsync(searchModel);
 
+		_logger.LogDebug("BackupFiles(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting BackupFiles(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -262,6 +278,8 @@ public partial class CommonController : BaseAdminController
         //prepare model
         model = await _commonModelFactory.PrepareMaintenanceModelAsync(new MaintenanceModel());
 
+		_logger.LogDebug("BackupDatabase(model={Model}): model → {Model1}", model, model);
+		_logger.LogDebug("<<< Exiting BackupDatabase(model={Model})", model);
         return View(model);
     }
 
@@ -343,6 +361,8 @@ public partial class CommonController : BaseAdminController
         //prepare model
         model = await _commonModelFactory.PrepareMaintenanceModelAsync(model);
 
+		_logger.LogDebug("BackupAction(model={Model}): model → {Model1}", model, model);
+		_logger.LogDebug("<<< Exiting BackupAction(model={Model})", model);
         return View(model);
     }
 
@@ -364,8 +384,10 @@ public partial class CommonController : BaseAdminController
 
     public virtual async Task<IActionResult> SetLanguage(int langid, string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering SetLanguage(langid={Langid},returnUrl={ReturnUrl})", langid, returnUrl);
         var language = await _languageService.GetLanguageByIdAsync(langid);
         if (language != null)
+			_logger.LogDebug("SetLanguage(langid={Langid},returnUrl={ReturnUrl}): language → {Language}", langid, returnUrl, language);
             await _workContext.SetWorkingLanguageAsync(language);
 
         //home page
@@ -374,6 +396,7 @@ public partial class CommonController : BaseAdminController
 
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
+		_logger.LogDebug("<<< Exiting SetLanguage(langid={Langid},returnUrl={ReturnUrl})", langid, returnUrl);
             return RedirectToAction("Index", "Home", new { area = AreaNames.ADMIN });
 
         return Redirect(returnUrl);
@@ -383,6 +406,7 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> ClearCache(string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering ClearCache(returnUrl={ReturnUrl})", returnUrl);
         await _staticCacheManager.ClearAsync();
 
         //home page
@@ -391,6 +415,7 @@ public partial class CommonController : BaseAdminController
 
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
+		_logger.LogDebug("<<< Exiting ClearCache(returnUrl={ReturnUrl})", returnUrl);
             return RedirectToAction("Index", "Home", new { area = AreaNames.ADMIN });
 
         return Redirect(returnUrl);
@@ -400,6 +425,7 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual IActionResult RestartApplication(string returnUrl = "")
     {
+		_logger.LogDebug(">>> Entering RestartApplication(returnUrl={ReturnUrl})", returnUrl);
         //home page
         if (string.IsNullOrEmpty(returnUrl))
             returnUrl = Url.Action("Index", "Home", new { area = AreaNames.ADMIN });
@@ -408,6 +434,7 @@ public partial class CommonController : BaseAdminController
         if (!Url.IsLocalUrl(returnUrl))
             returnUrl = Url.Action("Index", "Home", new { area = AreaNames.ADMIN });
 
+		_logger.LogDebug("<<< Exiting RestartApplication()");
         return View("RestartApplication", returnUrl);
     }
 
@@ -428,9 +455,12 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> SeNames()
     {
+		_logger.LogDebug(">>> Entering SeNames()");
         //prepare model
         var model = await _commonModelFactory.PrepareUrlRecordSearchModelAsync(new UrlRecordSearchModel());
 
+		_logger.LogDebug("SeNames(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting SeNames()");
         return View(model);
     }
 
@@ -441,6 +471,7 @@ public partial class CommonController : BaseAdminController
         //prepare model
         var model = await _commonModelFactory.PrepareUrlRecordListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting SeNames(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -448,11 +479,13 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_MAINTENANCE)]
     public virtual async Task<IActionResult> DeleteSelectedSeNames(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelectedSeNames(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         await _urlRecordService.DeleteUrlRecordsAsync(await _urlRecordService.GetUrlRecordsByIdsAsync(selectedIds.ToArray()));
 
+		_logger.LogDebug("<<< Exiting DeleteSelectedSeNames(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -460,22 +493,29 @@ public partial class CommonController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public virtual async Task<IActionResult> PopularSearchTermsReport(PopularSearchTermSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PopularSearchTermsReport(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _commonModelFactory.PreparePopularSearchTermListModelAsync(searchModel);
 
+		_logger.LogDebug("PopularSearchTermsReport(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting PopularSearchTermsReport(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     //action displaying notification (warning) to a store owner that entered SE URL already exists
     public virtual async Task<IActionResult> UrlReservedWarning(string entityId, string entityName, string seName)
     {
+		_logger.LogDebug(">>> Entering UrlReservedWarning(entityId={EntityId},entityName={EntityName},seName={SeName})", entityId, entityName, seName);
         if (string.IsNullOrEmpty(seName))
             return Json(new { Result = string.Empty });
 
         _ = int.TryParse(entityId, out var parsedEntityId);
         var validatedSeName = await _urlRecordService.ValidateSeNameAsync(parsedEntityId, entityName, seName, null, false);
+		_logger.LogDebug("UrlReservedWarning(entityId={EntityId},entityName={EntityName},seName={SeName}): _ → {_}", entityId, entityName, seName, _);
+		_logger.LogDebug("UrlReservedWarning(entityId={EntityId},entityName={EntityName},seName={SeName}): validatedSeName → {ValidatedSeName}", entityId, entityName, seName, validatedSeName);
 
         if (seName.Equals(validatedSeName, StringComparison.InvariantCultureIgnoreCase))
+		_logger.LogDebug("<<< Exiting UrlReservedWarning(entityId={EntityId},entityName={EntityName},seName={SeName})", entityId, entityName, seName);
             return Json(new { Result = string.Empty });
 
         return Json(new { Result = string.Format(await _localizationService.GetResourceAsync("Admin.System.Warnings.URL.Reserved"), validatedSeName) });

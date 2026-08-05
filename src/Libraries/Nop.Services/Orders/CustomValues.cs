@@ -25,11 +25,13 @@ public partial class CustomValues : List<CustomValue>
     /// <returns>XML of custom values</returns>
     public virtual string SerializeToXml()
     {
+		logger.LogDebug(">>> Entering SerializeToXml()");
         if (!this.Any())
             return string.Empty;
 
         using var textWriter = new StringWriter();
 
+		logger.LogDebug("SerializeToXml(): textWriter → {TextWriter}", textWriter);
         var root = new XElement("DictionarySerializer");
         root.Add(this.Select(value => new XElement("item",
             new XElement("key", value.Name),
@@ -37,13 +39,17 @@ public partial class CustomValues : List<CustomValue>
             new XElement("displayToCustomer", value.DisplayToCustomer),
             new XElement("location", (int)value.DisplayLocation),
             new XElement("createdOn", value.CreatedOnUtc?.Ticks ?? 0))));
+			logger.LogWarning("SerializeToXml(): root → {Root}", root);
 
         var document = new XDocument();
         document.Add(root);
+		logger.LogDebug("SerializeToXml(): document → {Document}", document);
         document.Save(textWriter, SaveOptions.DisableFormatting);
 
         var result = textWriter.ToString();
 
+		logger.LogDebug("SerializeToXml(): result → {Result}", result);
+		logger.LogDebug("<<< Exiting SerializeToXml()");
         return result;
     }
 
@@ -55,6 +61,7 @@ public partial class CustomValues : List<CustomValue>
     /// <returns>Custom values</returns>
     public virtual void FillByXml(string customValuesXml, bool displayToCustomerOnly = false)
     {
+		logger.LogDebug(">>> Entering FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly})", customValuesXml, displayToCustomerOnly);
         Clear();
 
         if (string.IsNullOrWhiteSpace(customValuesXml))
@@ -70,10 +77,14 @@ public partial class CustomValues : List<CustomValue>
         {
             using var textReader = new StringReader(customValuesXml);
             var rootElement = XDocument.Load(textReader).Root;
+			logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): textReader → {TextReader}", customValuesXml, displayToCustomerOnly, textReader);
+			logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): rootElement → {RootElement}", customValuesXml, displayToCustomerOnly, rootElement);
             AddRange(rootElement!.Elements("item").Select(i =>
             {
                 var name = i.Element("key")!.Value;
                 var value = i.Element("value")!.Value;
+				logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): name → {Name}", customValuesXml, displayToCustomerOnly, name);
+				logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): value → {Value}", customValuesXml, displayToCustomerOnly, value);
                 var displayLocation = int.TryParse(i.Element("location")?.Value, out var location) && Enum.IsDefined(typeof(CustomValueDisplayLocation), location)
                     ? (CustomValueDisplayLocation)location
                     : defaultLocation;
@@ -89,8 +100,10 @@ public partial class CustomValues : List<CustomValue>
         }
         catch
         {
+			logger.LogError("Exception in FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): {Arg2}", customValuesXml, displayToCustomerOnly, ex.Message);
             //ignore
         }
+		logger.LogDebug("<<< Exiting FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly})", customValuesXml, displayToCustomerOnly);
     }
 
     /// <summary>

@@ -100,6 +100,7 @@ public partial class PriceFormatter : IPriceFormatter
     protected virtual async Task<string> FormatShippingPriceAsync(decimal price, bool showCurrency,
         Currency targetCurrency, int languageId, bool priceIncludesTax, bool showTax)
     {
+		logger.LogDebug("<<< Exiting FormatShippingPriceAsync(price={Price},showCurrency={ShowCurrency})", price, showCurrency);
         return await FormatPriceAsync(price, showCurrency, targetCurrency, languageId, priceIncludesTax, showTax);
     }
 
@@ -119,6 +120,7 @@ public partial class PriceFormatter : IPriceFormatter
     protected virtual async Task<string> FormatPaymentMethodAdditionalFeeAsync(decimal price, bool showCurrency,
         Currency targetCurrency, int languageId, bool priceIncludesTax, bool showTax)
     {
+		logger.LogDebug("<<< Exiting FormatPaymentMethodAdditionalFeeAsync(price={Price},showCurrency={ShowCurrency})", price, showCurrency);
         return await FormatPriceAsync(price, showCurrency, targetCurrency, languageId,
             priceIncludesTax, showTax);
     }
@@ -137,6 +139,8 @@ public partial class PriceFormatter : IPriceFormatter
     /// </returns>
     public virtual async Task<string> FormatPriceAsync(decimal price)
     {
+		logger.LogDebug(">>> Entering FormatPriceAsync(price={Price})", price);
+		logger.LogDebug("<<< Exiting FormatPriceAsync(price={Price})", price);
         return await FormatPriceAsync(price, true, await _workContext.GetWorkingCurrencyAsync());
     }
 
@@ -153,6 +157,8 @@ public partial class PriceFormatter : IPriceFormatter
     public virtual async Task<string> FormatPriceAsync(decimal price, bool showCurrency, Currency targetCurrency)
     {
         var priceIncludesTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+		logger.LogDebug("FormatPriceAsync(price={Price},showCurrency={ShowCurrency},targetCurrency={TargetCurrency}): priceIncludesTax → {PriceIncludesTax}", price, showCurrency, targetCurrency, priceIncludesTax);
+		logger.LogDebug("<<< Exiting FormatPriceAsync(price={Price},showCurrency={ShowCurrency},targetCurrency={TargetCurrency})", price, showCurrency, targetCurrency);
         return await FormatPriceAsync(price, showCurrency, targetCurrency, (await _workContext.GetWorkingLanguageAsync()).Id, priceIncludesTax);
     }
 
@@ -325,6 +331,7 @@ public partial class PriceFormatter : IPriceFormatter
     /// </returns>
     public virtual async Task<string> FormatRentalProductPeriodAsync(Product product, string price)
     {
+		logger.LogDebug(">>> Entering FormatRentalProductPeriodAsync(product={Product},price={Price})", product, price);
         ArgumentNullException.ThrowIfNull(product);
 
         if (!product.IsRental)
@@ -340,6 +347,7 @@ public partial class PriceFormatter : IPriceFormatter
             RentalPricePeriod.Years => string.Format(await _localizationService.GetResourceAsync("Products.Price.Rental.Years"), price, product.RentalPriceLength),
             _ => throw new NopException("Not supported rental period"),
         };
+		logger.LogDebug("<<< Exiting FormatRentalProductPeriodAsync(product={Product},price={Price})", product, price);
         return result;
     }
 
@@ -355,6 +363,7 @@ public partial class PriceFormatter : IPriceFormatter
     public virtual async Task<string> FormatShippingPriceAsync(decimal price, bool showCurrency)
     {
         var priceIncludesTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+		logger.LogDebug("FormatShippingPriceAsync(price={Price},showCurrency={ShowCurrency}): priceIncludesTax → {PriceIncludesTax}", price, showCurrency, priceIncludesTax);
         return await FormatShippingPriceAsync(price, showCurrency, await _workContext.GetWorkingCurrencyAsync(), (await _workContext.GetWorkingLanguageAsync()).Id, priceIncludesTax);
     }
 
@@ -467,6 +476,8 @@ public partial class PriceFormatter : IPriceFormatter
     /// <returns>Formatted tax rate</returns>
     public virtual string FormatTaxRate(decimal taxRate)
     {
+		logger.LogDebug(">>> Entering FormatTaxRate(taxRate={TaxRate})", taxRate);
+		logger.LogDebug("<<< Exiting FormatTaxRate(taxRate={TaxRate})", taxRate);
         return taxRate.ToString("G29", CultureInfo.InvariantCulture);
     }
 
@@ -482,6 +493,7 @@ public partial class PriceFormatter : IPriceFormatter
     /// </returns>
     public virtual async Task<string> FormatBasePriceAsync(Product product, decimal? productPrice, decimal? totalWeight = null)
     {
+		logger.LogDebug(">>> Entering FormatBasePriceAsync(product={Product},productPrice={ProductPrice},totalWeight={TotalWeight})", product, productPrice, totalWeight);
         ArgumentNullException.ThrowIfNull(product);
 
         if (!product.BasepriceEnabled)
@@ -494,10 +506,12 @@ public partial class PriceFormatter : IPriceFormatter
         var referenceAmount = product.BasepriceBaseAmount;
         var productUnit = await _measureService.GetMeasureWeightByIdAsync(product.BasepriceUnitId);
         //measure weight cannot be loaded
+		logger.LogDebug("FormatBasePriceAsync(product={Product},productPrice={ProductPrice},totalWeight={TotalWeight}): productUnit → {ProductUnit}", product, productPrice, totalWeight, productUnit);
         if (productUnit == null)
             return null;
         var referenceUnit = await _measureService.GetMeasureWeightByIdAsync(product.BasepriceBaseUnitId);
         //measure weight cannot be loaded
+		logger.LogDebug("FormatBasePriceAsync(product={Product},productPrice={ProductPrice},totalWeight={TotalWeight}): referenceUnit → {ReferenceUnit}", product, productPrice, totalWeight, referenceUnit);
         if (referenceUnit == null)
             return null;
 
@@ -509,9 +523,12 @@ public partial class PriceFormatter : IPriceFormatter
                         referenceAmount;
         var basePriceInCurrentCurrency = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(basePrice, await _workContext.GetWorkingCurrencyAsync());
         var basePriceStr = await FormatPriceAsync(basePriceInCurrentCurrency, true, false);
+		logger.LogDebug("FormatBasePriceAsync(product={Product},productPrice={ProductPrice},totalWeight={TotalWeight}): basePriceInCurrentCurrency → {BasePriceInCurrentCurrency}", product, productPrice, totalWeight, basePriceInCurrentCurrency);
+		logger.LogDebug("FormatBasePriceAsync(product={Product},productPrice={ProductPrice},totalWeight={TotalWeight}): basePriceStr → {BasePriceStr}", product, productPrice, totalWeight, basePriceStr);
 
         var result = string.Format(await _localizationService.GetResourceAsync("Products.BasePrice"),
             basePriceStr, referenceAmount.ToString("G29"), referenceUnit.Name);
+		logger.LogDebug("<<< Exiting FormatBasePriceAsync(product={Product},productPrice={ProductPrice},totalWeight={TotalWeight})", product, productPrice, totalWeight);
         return result;
     }
 

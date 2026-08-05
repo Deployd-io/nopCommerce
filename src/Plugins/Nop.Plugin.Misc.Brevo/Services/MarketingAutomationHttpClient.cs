@@ -3,6 +3,7 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Plugin.Misc.Brevo.MarketingAutomation;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Services;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Misc.Brevo.Services;
 /// </summary>
 public class MarketingAutomationHttpClient
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly HttpClient _httpClient;
@@ -46,19 +48,27 @@ public class MarketingAutomationHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     public async Task RequestAsync<TRequest>(TRequest request) where TRequest : Request
     {
+		_logger.LogDebug(">>> Entering RequestAsync(request={Request})", request);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             var requestString = JsonConvert.SerializeObject(request);
             var requestContent = new StringContent(requestString, Encoding.Default, MimeTypes.ApplicationJson);
+			_logger.LogDebug("RequestAsync(request={Request}): requestString → {RequestString}", request, requestString);
+			_logger.LogDebug("RequestAsync(request={Request}): requestContent → {RequestContent}", request, requestContent);
+			_logger.LogInformation("RequestAsync(request)={Request}: external service call took {Arg1} ms", request, __logStart.ElapsedMilliseconds);
             var requestMessage = new HttpRequestMessage(new HttpMethod(request.Method), request.Path) { Content = requestContent };
             var httpResponse = await _httpClient.SendAsync(requestMessage);
+			_logger.LogDebug("RequestAsync(request={Request}): requestMessage → {RequestMessage}", request, requestMessage);
             httpResponse.EnsureSuccessStatusCode();
         }
         catch (AggregateException exception)
         {
+			_logger.LogError("Exception in RequestAsync(request={Request}): {Arg1}", request, ex.Message);
             //rethrow actual exception
             throw exception.InnerException;
         }
+		_logger.LogDebug("<<< Exiting RequestAsync(request={Request})", request);
     }
 
     #endregion

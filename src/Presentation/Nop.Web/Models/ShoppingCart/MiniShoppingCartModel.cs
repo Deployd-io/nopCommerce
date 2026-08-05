@@ -1,13 +1,18 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.ShoppingCart;
 
 public partial record MiniShoppingCartModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public MiniShoppingCartModel()
     {
+		_logger.LogDebug(">>> Entering MiniShoppingCartModel()");
         Items = new List<ShoppingCartItemModel>();
+		_logger.LogDebug("<<< Exiting MiniShoppingCartModel()");
+		_logger.LogDebug("MiniShoppingCartModel(): Items → {Items}", Items);
     }
 
     public IList<ShoppingCartItemModel> Items { get; set; }
@@ -26,7 +31,10 @@ public partial record MiniShoppingCartModel : BaseNopModel
     {
         public ShoppingCartItemModel()
         {
+			_logger.LogDebug(">>> Entering ShoppingCartItemModel()");
             Picture = new PictureModel();
+			_logger.LogDebug("<<< Exiting ShoppingCartItemModel()");
+			_logger.LogDebug("ShoppingCartItemModel(): Picture → {Picture}", Picture);
         }
 
         public int ProductId { get; set; }

@@ -24,7 +24,10 @@ public sealed class NopResourceDisplayNameAttribute : DisplayNameAttribute, IMod
     /// <param name="resourceKey">Key of the locale resource</param>
     public NopResourceDisplayNameAttribute(string resourceKey) : base(resourceKey)
     {
+		logger.LogDebug(">>> Entering NopResourceDisplayNameAttribute(resourceKey={ResourceKey})", resourceKey);
         ResourceKey = resourceKey;
+		logger.LogDebug("<<< Exiting NopResourceDisplayNameAttribute(resourceKey={ResourceKey})", resourceKey);
+		logger.LogDebug("NopResourceDisplayNameAttribute(resourceKey={ResourceKey}): ResourceKey → {ResourceKey1}", resourceKey, ResourceKey);
     }
 
     #endregion

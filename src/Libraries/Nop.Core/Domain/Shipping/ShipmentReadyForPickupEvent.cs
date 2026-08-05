@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Shipping;
 
 /// <summary>
@@ -5,13 +6,17 @@
 /// </summary>
 public partial class ShipmentReadyForPickupEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
     /// <param name="shipment">Shipment</param>
     public ShipmentReadyForPickupEvent(Shipment shipment)
     {
+		_logger.LogDebug(">>> Entering ShipmentReadyForPickupEvent(shipment={Shipment})", shipment);
         Shipment = shipment;
+		_logger.LogDebug("<<< Exiting ShipmentReadyForPickupEvent(shipment={Shipment})", shipment);
+		_logger.LogDebug("ShipmentReadyForPickupEvent(shipment={Shipment}): Shipment → {Shipment1}", shipment, Shipment);
     }
 
     /// <summary>

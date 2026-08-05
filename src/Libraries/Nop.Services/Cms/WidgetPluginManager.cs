@@ -41,13 +41,18 @@ public partial class WidgetPluginManager : PluginManager<IWidgetPlugin>, IWidget
     /// </returns>
     public virtual async Task<IList<IWidgetPlugin>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0, string widgetZone = null)
     {
+		logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},widgetZone={WidgetZone})", customer, storeId, widgetZone);
         var widgets = await LoadActivePluginsAsync(_widgetSettings.ActiveWidgetSystemNames, customer, storeId);
 
+		logger.LogDebug("LoadActivePluginsAsync(customer={Customer},storeId={StoreId},widgetZone={WidgetZone}): widgets → {Widgets}", customer, storeId, widgetZone, widgets);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //filter by widget zone
         if (!string.IsNullOrEmpty(widgetZone))
             widgets = await widgets.WhereAwait(async widget =>
                 (await widget.GetWidgetZonesAsync()).Contains(widgetZone, StringComparer.InvariantCultureIgnoreCase)).ToListAsync();
+				logger.LogInformation("LoadActivePluginsAsync(customer,storeId,widgetZone)={Customer},{StoreId},{WidgetZone}: find query executed in {Arg3} ms", customer, storeId, widgetZone, __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId},widgetZone={WidgetZone})", customer, storeId, widgetZone);
         return widgets;
     }
 
@@ -73,8 +78,11 @@ public partial class WidgetPluginManager : PluginManager<IWidgetPlugin>, IWidget
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var widget = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
 
+		logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): widget → {Widget}", systemName, customer, storeId, widget);
+		logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(widget);
     }
 

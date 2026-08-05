@@ -18,7 +18,10 @@ public partial class LocalizedModelFactory : ILocalizedModelFactory
 
     public LocalizedModelFactory(ILanguageService languageService)
     {
+		logger.LogDebug(">>> Entering LocalizedModelFactory(languageService={LanguageService})", languageService);
         _languageService = languageService;
+		logger.LogDebug("<<< Exiting LocalizedModelFactory(languageService={LanguageService})", languageService);
+		logger.LogDebug("LocalizedModelFactory(languageService={LanguageService}): _languageService → {_languageService}", languageService, _languageService);
     }
 
     #endregion

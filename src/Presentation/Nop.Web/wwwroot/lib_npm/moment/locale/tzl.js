@@ -4,6 +4,7 @@
 //! author : Iustì Canun
 
 import moment from '../moment';
+const logger = console;
 
 // After the year there should be a slash and the amount of years since December 26, 1979 in Roman numerals.
 // This is currently too difficult (maybe even impossible) to add.
@@ -25,12 +26,15 @@ export default moment.defineLocale('tzl', {
     },
     meridiemParse: /d\'o|d\'a/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return "d'o" === input.toLowerCase();
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours > 11) {
             return isLower ? "d'o" : "D'O";
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? "d'a" : "D'A";
         }
     },
@@ -67,6 +71,7 @@ export default moment.defineLocale('tzl', {
 });
 
 function processRelativeTime(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var format = {
         s: ['viensas secunds', "'iensas secunds"],
         ss: [number + ' secunds', '' + number + ' secunds'],
@@ -81,6 +86,7 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
         y: ["'n ar", "'iens ar"],
         yy: [number + ' ars', '' + number + ' ars'],
     };
+	logger.debug(`<<< Exiting processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return isFuture
         ? format[key][0]
         : withoutSuffix

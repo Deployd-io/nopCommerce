@@ -16,10 +16,12 @@ using Nop.Services.Events;
 using Nop.Services.Logging;
 using Nop.Services.Orders;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.GoogleAnalytics;
 
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<OrderPlacedEvent>,
     IConsumer<OrderPaidEvent>,
     IConsumer<OrderRefundedEvent>
@@ -71,6 +73,8 @@ public class EventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task<bool> IsPluginEnabledAsync()
     {
+		_logger.LogDebug(">>> Entering IsPluginEnabledAsync()");
+		_logger.LogDebug("<<< Exiting IsPluginEnabledAsync()");
         return await _widgetPluginManager.IsPluginActiveAsync(GoogleAnalyticsDefaults.SystemName);
     }
 
@@ -172,6 +176,7 @@ public class EventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(OrderRefundedEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         //ensure the plugin is installed and active
         if (!await IsPluginEnabledAsync())
             return;
@@ -181,6 +186,8 @@ public class EventConsumer :
         //settings per store
         var store = await _storeService.GetStoreByIdAsync(order.StoreId) ?? await _storeContext.GetCurrentStoreAsync();
         var googleAnalyticsSettings = await _settingService.LoadSettingAsync<GoogleAnalyticsSettings>(store.Id);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): store → {Store}", eventMessage, store);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): googleAnalyticsSettings → {GoogleAnalyticsSettings}", eventMessage, googleAnalyticsSettings);
 
         //ecommerce is disabled
         if (!googleAnalyticsSettings.EnableEcommerce)
@@ -191,6 +198,7 @@ public class EventConsumer :
 
         if (sendRequest)
             await ProcessOrderEventAsync(order, googleAnalyticsSettings, GoogleAnalyticsDefaults.OrderRefundedEventName);
+			_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

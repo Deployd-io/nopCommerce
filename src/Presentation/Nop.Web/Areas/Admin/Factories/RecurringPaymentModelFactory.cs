@@ -9,6 +9,7 @@ using Nop.Services.Payments;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDateTimeHelper _dateTimeHelper;
@@ -87,11 +89,13 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
     /// </returns>
     public virtual Task<RecurringPaymentSearchModel> PrepareRecurringPaymentSearchModelAsync(RecurringPaymentSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareRecurringPaymentSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareRecurringPaymentSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -105,6 +109,7 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
     /// </returns>
     public virtual async Task<RecurringPaymentListModel> PrepareRecurringPaymentListModelAsync(RecurringPaymentSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareRecurringPaymentListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get recurringPayments
@@ -119,8 +124,11 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
                 //fill in model values from the entity
                 var recurringPaymentModel = recurringPayment.ToModel<RecurringPaymentModel>();
 
+				_logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): recurringPaymentModel → {RecurringPaymentModel}", searchModel, recurringPaymentModel);
                 var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
                 var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+				_logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): order → {Order}", searchModel, order);
+				_logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): customer → {Customer}", searchModel, customer);
 
                 //convert dates to the user time
                 if ((await _orderProcessingService.GetNextPaymentDateAsync(recurringPayment)) is DateTime nextPaymentDate)
@@ -135,6 +143,8 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
 
                 //fill in additional values (not existing in the entity)
                 recurringPaymentModel.CustomerId = customer.Id;
+				_logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): recurringPaymentModel.CustomerId → {Arg1}", searchModel, recurringPaymentModel.CustomerId);
+				_logger.LogDebug("PrepareRecurringPaymentListModelAsync(searchModel={SearchModel}): recurringPaymentModel.InitialOrderId → {Arg1}", searchModel, recurringPaymentModel.InitialOrderId);
                 recurringPaymentModel.InitialOrderId = order.Id;
 
                 recurringPaymentModel.CyclePeriodStr = await _localizationService.GetLocalizedEnumAsync(recurringPayment.CyclePeriod);
@@ -146,6 +156,7 @@ public partial class RecurringPaymentModelFactory : IRecurringPaymentModelFactor
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareRecurringPaymentListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

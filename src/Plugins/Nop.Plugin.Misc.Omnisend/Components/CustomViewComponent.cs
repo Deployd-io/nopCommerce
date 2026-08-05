@@ -11,6 +11,7 @@ using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Models.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Components;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.Omnisend.Components;
 /// </summary>
 public class WidgetsOmnisendViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICustomerService _customerService;
@@ -110,6 +112,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
 
         await _genericAttributeService.SaveAttributeAsync(customer,
             OmnisendDefaults.IdentifyContactAttribute, identifyScript);
+			_logger.LogDebug("<<< Exiting GenerateGuestScriptAsync(customer={Customer})", customer);
     }
 
     #endregion
@@ -127,6 +130,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure tracking is enabled
         if (!_omnisendSettings.UseTracking || string.IsNullOrEmpty(_omnisendSettings.BrandId))
             return Content(string.Empty);
@@ -154,6 +158,7 @@ public class WidgetsOmnisendViewComponent : NopViewComponent
                 .Replace(OmnisendDefaults.ProductUrl,
                     await _nopUrlHelper.RouteGenericUrlAsync<Product>(new { productDetails.SeName }, _webHelper.GetCurrentRequestProtocol()));
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return string.IsNullOrEmpty(script)
             ? Content(string.Empty)
             : new HtmlContentViewComponentResult(new HtmlString(script));

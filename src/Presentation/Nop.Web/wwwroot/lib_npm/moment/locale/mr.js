@@ -4,6 +4,7 @@
 //! author : Vivek Athalye : https://github.com/vnathalye
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '१',
@@ -31,8 +32,10 @@ var symbolMap = {
     };
 
 function relativeTimeMr(number, withoutSuffix, string, isFuture) {
+	logger.debug(`>>> Entering relativeTimeMr(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
     var output = '';
     if (withoutSuffix) {
+		logger.debug(`relativeTimeMr(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture}): output → ${output}`);
         switch (string) {
             case 's':
                 output = 'काही सेकंद';
@@ -111,6 +114,7 @@ function relativeTimeMr(number, withoutSuffix, string, isFuture) {
                 break;
         }
     }
+	logger.debug(`<<< Exiting relativeTimeMr(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
     return output.replace(/%d/i, number);
 }
 
@@ -159,17 +163,22 @@ export default moment.defineLocale('mr', {
         yy: relativeTimeMr,
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[१२३४५६७८९०]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     meridiemParse: /पहाटे|सकाळी|दुपारी|सायंकाळी|रात्री/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -180,6 +189,9 @@ export default moment.defineLocale('mr', {
             meridiem === 'सायंकाळी' ||
             meridiem === 'रात्री'
         ) {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour >= 12 ? hour : hour + 12;
         }
     },

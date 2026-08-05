@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Models;
 
@@ -8,11 +9,15 @@ namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Models;
 /// </summary>
 public record ConfigurationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering ConfigurationModel()");
         GoogleAuthenticatorSearchModel = new GoogleAuthenticatorSearchModel();
+		_logger.LogDebug("<<< Exiting ConfigurationModel()");
+		_logger.LogDebug("ConfigurationModel(): GoogleAuthenticatorSearchModel → {GoogleAuthenticatorSearchModel}", GoogleAuthenticatorSearchModel);
     }
 
     #endregion

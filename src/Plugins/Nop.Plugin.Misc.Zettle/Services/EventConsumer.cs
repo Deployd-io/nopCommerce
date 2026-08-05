@@ -6,6 +6,7 @@ using Nop.Services.Events;
 using Nop.Services.Plugins;
 using Nop.Services.Security;
 using Nop.Web.Framework.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Services;
 
@@ -13,6 +14,7 @@ namespace Nop.Plugin.Misc.Zettle.Services;
 /// Represents plugin event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     BaseAdminMenuCreatedEventConsumer,
     IConsumer<EntityInsertedEvent<Product>>,
     IConsumer<EntityUpdatedEvent<Product>>,
@@ -83,6 +85,8 @@ public class EventConsumer :
     /// </returns>
     protected override async Task<bool> CheckAccessAsync()
     {
+		_logger.LogDebug(">>> Entering CheckAccessAsync()");
+		_logger.LogDebug("<<< Exiting CheckAccessAsync()");
         return await _permissionService.AuthorizeAsync(StandardPermission.Configuration.MANAGE_PLUGINS);
     }
 
@@ -104,6 +108,7 @@ public class EventConsumer :
             return;
 
         await _zettleRecordService.CreateOrUpdateRecordAsync(OperationType.Create, eventMessage.Entity.Id);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -312,6 +317,7 @@ public class EventConsumer :
                 await _zettleRecordService.CreateOrUpdateRecordAsync(OperationType.Update, combination.ProductId, combination.Id);
             }
         }
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -330,12 +336,15 @@ public class EventConsumer :
         var products = await _productService.GetProductsByProductAttributeIdAsync(eventMessage.Entity.Id);
         foreach (var product in products)
         {
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): products → {Products}", eventMessage, products);
             await _zettleRecordService.CreateOrUpdateRecordAsync(OperationType.Update, product.Id);
             var combinations = await _productAttributeService.GetAllProductAttributeCombinationsAsync(product.Id);
             foreach (var combination in combinations)
             {
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): combinations → {Combinations}", eventMessage, combinations);
                 var mappings = await _productAttributeParser.ParseProductAttributeMappingsAsync(combination.AttributesXml);
                 if (mappings.Any(mapping => mapping.ProductAttributeId == eventMessage.Entity.Id))
+					_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): mappings → {Mappings}", eventMessage, mappings);
                     await _zettleRecordService.CreateOrUpdateRecordAsync(OperationType.Delete, combination.ProductId, combination.Id);
                 else
                     await _zettleRecordService.CreateOrUpdateRecordAsync(OperationType.Update, combination.ProductId, combination.Id);

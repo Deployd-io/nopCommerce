@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * CLDR JavaScript Library v0.5.4
  * http://jquery.com/
@@ -13,6 +14,7 @@
  * http://git.io/h4lmVg
  */
 (function( factory ) {
+logger.debug('>>> Entering function()');
 
 	if ( typeof define === "function" && define.amd ) {
 		// AMD.
@@ -44,6 +46,7 @@ var EventEmitter;
 EventEmitter = (function () {
 
 
+	logger.debug('<<< Exiting function()');
 	/**
 	 * Class for managing events.
 	 * Can be extended to provide event functionality in other classes.
@@ -84,7 +87,10 @@ EventEmitter = (function () {
 	 * @api private
 	 */
 	function alias(name) {
+		logger.debug(`>>> Entering alias(name=${name})`);
 		return function aliasClosure() {
+		logger.debug('>>> Entering aliasClosure()');
+			logger.debug('<<< Exiting aliasClosure()');
 			return this[name].apply(this, arguments);
 		};
 	}
@@ -99,10 +105,12 @@ EventEmitter = (function () {
 	 * @return {Function[]|Object} All listener functions for the event.
 	 */
 	proto.getListeners = function getListeners(evt) {
+		logger.debug(`>>> Entering getListeners(evt=${evt})`);
 		var events = this._getEvents();
 		var response;
 		var key;
 
+		logger.debug(`getListeners(evt=${evt}): events → ${events}`);
 		// Return a concatenated array of all matching events if
 		// the selector is a regular expression.
 		if (evt instanceof RegExp) {
@@ -117,6 +125,8 @@ EventEmitter = (function () {
 			response = events[evt] || (events[evt] = []);
 		}
 
+		logger.debug(`getListeners(evt=${evt}): response → ${response}`);
+		logger.debug(`<<< Exiting getListeners(evt=${evt})`);
 		return response;
 	};
 
@@ -144,14 +154,18 @@ EventEmitter = (function () {
 	 * @return {Object} All listener functions for an event in an object.
 	 */
 	proto.getListenersAsObject = function getListenersAsObject(evt) {
+		logger.debug(`>>> Entering getListenersAsObject(evt=${evt})`);
 		var listeners = this.getListeners(evt);
 		var response;
+		logger.debug(`getListenersAsObject(evt=${evt}): listeners → ${listeners}`);
 
 		if (listeners instanceof Array) {
 			response = {};
 			response[evt] = listeners;
+			logger.debug(`getListenersAsObject(evt=${evt}): response → ${response}`);
 		}
 
+		logger.debug(`<<< Exiting getListenersAsObject(evt=${evt})`);
 		return response || listeners;
 	};
 
@@ -166,8 +180,11 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.addListener = function addListener(evt, listener) {
+		logger.debug(`>>> Entering addListener(evt=${evt},listener=${listener})`);
 		var listeners = this.getListenersAsObject(evt);
 		var listenerIsWrapped = typeof listener === 'object';
+		logger.debug(`addListener(evt=${evt},listener=${listener}): listeners → ${listeners}`);
+		logger.debug(`addListener(evt=${evt},listener=${listener}): listenerIsWrapped → ${listenerIsWrapped}`);
 		var key;
 
 		for (key in listeners) {
@@ -179,6 +196,7 @@ EventEmitter = (function () {
 			}
 		}
 
+		logger.debug(`<<< Exiting addListener(evt=${evt},listener=${listener})`);
 		return this;
 	};
 
@@ -196,6 +214,8 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.addOnceListener = function addOnceListener(evt, listener) {
+		logger.debug(`>>> Entering addOnceListener(evt=${evt},listener=${listener})`);
+		logger.debug(`<<< Exiting addOnceListener(evt=${evt},listener=${listener})`);
 		return this.addListener(evt, {
 			listener: listener,
 			once: true
@@ -215,7 +235,9 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.defineEvent = function defineEvent(evt) {
+		logger.debug(`>>> Entering defineEvent(evt=${evt})`);
 		this.getListeners(evt);
+		logger.debug(`<<< Exiting defineEvent(evt=${evt})`);
 		return this;
 	};
 
@@ -226,9 +248,11 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.defineEvents = function defineEvents(evts) {
+		logger.debug(`>>> Entering defineEvents(evts=${evts})`);
 		for (var i = 0; i < evts.length; i += 1) {
 			this.defineEvent(evts[i]);
 		}
+		logger.debug(`<<< Exiting defineEvents(evts=${evts})`);
 		return this;
 	};
 
@@ -241,20 +265,24 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.removeListener = function removeListener(evt, listener) {
+		logger.debug(`>>> Entering removeListener(evt=${evt},listener=${listener})`);
 		var listeners = this.getListenersAsObject(evt);
 		var index;
+		logger.debug(`removeListener(evt=${evt},listener=${listener}): listeners → ${listeners}`);
 		var key;
 
 		for (key in listeners) {
 			if (listeners.hasOwnProperty(key)) {
 				index = indexOfListener(listeners[key], listener);
 
+				logger.debug(`removeListener(evt=${evt},listener=${listener}): index → ${index}`);
 				if (index !== -1) {
 					listeners[key].splice(index, 1);
 				}
 			}
 		}
 
+		logger.debug(`<<< Exiting removeListener(evt=${evt},listener=${listener})`);
 		return this;
 	};
 
@@ -349,8 +377,10 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.removeEvent = function removeEvent(evt) {
+		logger.debug(`>>> Entering removeEvent(evt=${evt})`);
 		var type = typeof evt;
 		var events = this._getEvents();
+		logger.debug(`removeEvent(evt=${evt}): events → ${events}`);
 		var key;
 
 		// Remove different things depending on the state of evt
@@ -371,6 +401,7 @@ EventEmitter = (function () {
 			delete this._events;
 		}
 
+		logger.debug(`<<< Exiting removeEvent(evt=${evt})`);
 		return this;
 	};
 
@@ -439,7 +470,10 @@ EventEmitter = (function () {
 	 * @return {Object} Current instance of EventEmitter for chaining.
 	 */
 	proto.emit = function emit(evt) {
+		logger.debug(`>>> Entering emit(evt=${evt})`);
 		var args = Array.prototype.slice.call(arguments, 1);
+		logger.debug(`emit(evt=${evt}): args → ${args}`);
+		logger.debug(`<<< Exiting emit(evt=${evt})`);
 		return this.emitEvent(evt, args);
 	};
 
@@ -465,10 +499,12 @@ EventEmitter = (function () {
 	 * @api private
 	 */
 	proto._getOnceReturnValue = function _getOnceReturnValue() {
+		logger.debug('>>> Entering _getOnceReturnValue()');
 		if (this.hasOwnProperty('_onceReturnValue')) {
 			return this._onceReturnValue;
 		}
 		else {
+			logger.debug('<<< Exiting _getOnceReturnValue()');
 			return true;
 		}
 	};
@@ -480,6 +516,8 @@ EventEmitter = (function () {
 	 * @api private
 	 */
 	proto._getEvents = function _getEvents() {
+		logger.debug('>>> Entering _getEvents()');
+		logger.debug('<<< Exiting _getEvents()');
 		return this._events || (this._events = {});
 	};
 
@@ -489,7 +527,9 @@ EventEmitter = (function () {
 	 * @return {Function} Non conflicting EventEmitter class.
 	 */
 	EventEmitter.noConflict = function noConflict() {
+		logger.debug('>>> Entering noConflict()');
 		exports.EventEmitter = originalGlobalValue;
+		logger.debug('<<< Exiting noConflict()');
 		return EventEmitter;
 	};
 
@@ -500,7 +540,9 @@ EventEmitter = (function () {
 
 
 	var validateTypeFunction = function( value, name ) {
+		logger.debug(`>>> Entering validateTypeFunction(value=${value},name=${name})`);
 		validateType( value, name, typeof value === "undefined" || typeof value === "function", "Function" );
+		logger.debug(`<<< Exiting validateTypeFunction(value=${value},name=${name})`);
 	};
 
 
@@ -511,9 +553,11 @@ EventEmitter = (function () {
 
 	function validateTypeEvent( value, name ) {
 		validateType( value, name, typeof value === "string" || value instanceof RegExp, "String or RegExp" );
+		logger.debug(`<<< Exiting validateTypeEvent(value=${value},name=${name})`);
 	}
 
 	function validateThenCall( method, self ) {
+		logger.debug(`>>> Entering validateThenCall(method=${method})`);
 		return function( event, listener ) {
 			validatePresence( event, "event" );
 			validateTypeEvent( event, "event" );
@@ -521,19 +565,25 @@ EventEmitter = (function () {
 			validatePresence( listener, "listener" );
 			validateTypeFunction( listener, "listener" );
 
+			logger.debug(`<<< Exiting validateThenCall(method=${method})`);
 			return self[ method ].apply( self, arguments );
 		};
 	}
 
 	function off( self ) {
+		logger.debug('>>> Entering off()');
+		logger.debug('<<< Exiting off()');
 		return validateThenCall( "off", self );
 	}
 
 	function on( self ) {
+		logger.debug('>>> Entering on()');
 		return validateThenCall( "on", self );
 	}
 
 	function once( self ) {
+		logger.debug('>>> Entering once()');
+		logger.debug('<<< Exiting once()');
 		return validateThenCall( "once", self );
 	}
 
@@ -548,6 +598,7 @@ EventEmitter = (function () {
 	Cldr.prototype.init = function() {
 		var ee;
 		this.ee = ee = new EventEmitter();
+		logger.debug(`function(): ee → ${ee}`);
 		this.off = off( ee );
 		this.on = on( ee );
 		this.once = once( ee );
@@ -560,6 +611,7 @@ EventEmitter = (function () {
 	 * overload again.
 	 */
 	function getOverload() {
+	logger.debug('>>> Entering getOverload()');
 
 		/**
 		 * Overload Cldr.prototype.get().
@@ -568,8 +620,11 @@ EventEmitter = (function () {
 		Cldr.prototype.get = function( path ) {
 			var value = superGet.apply( this, arguments );
 			path = pathNormalize( path, this.attributes ).join( "/" );
+			logger.debug(`function(path=${path}): value → ${value}`);
+			logger.debug(`function(path=${path}): path → ${path}`);
 			globalEe.trigger( "get", [ path, value ] );
 			this.ee.trigger( "get", [ path, value ] );
+			logger.debug('<<< Exiting getOverload()');
 			return value;
 		};
 	}

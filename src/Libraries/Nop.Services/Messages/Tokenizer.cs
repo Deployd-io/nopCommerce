@@ -20,7 +20,10 @@ public partial class Tokenizer : ITokenizer
 
     public Tokenizer(MessageTemplatesSettings messageTemplatesSettings)
     {
+		logger.LogDebug(">>> Entering Tokenizer(messageTemplatesSettings={MessageTemplatesSettings})", messageTemplatesSettings);
         _messageTemplatesSettings = messageTemplatesSettings;
+		logger.LogDebug("<<< Exiting Tokenizer(messageTemplatesSettings={MessageTemplatesSettings})", messageTemplatesSettings);
+		logger.LogDebug("Tokenizer(messageTemplatesSettings={MessageTemplatesSettings}): _messageTemplatesSettings → {_messageTemplatesSettings}", messageTemplatesSettings, _messageTemplatesSettings);
     }
 
     #endregion
@@ -36,6 +39,7 @@ public partial class Tokenizer : ITokenizer
     /// <returns>A string that is equivalent to the current string except that all instances of pattern are replaced with replacement string</returns>
     protected string Replace(string original, string pattern, string replacement)
     {
+		logger.LogDebug(">>> Entering Replace(original={Original},pattern={Pattern},replacement={Replacement})", original, pattern, replacement);
         //for case sensitive comparison use base string.Replace() method
         var stringComparison = _messageTemplatesSettings.CaseInvariantReplacement ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         if (stringComparison == StringComparison.Ordinal)
@@ -44,10 +48,14 @@ public partial class Tokenizer : ITokenizer
         //or do some routine work here
         var count = 0;
         var position0 = 0;
+		logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): count → {Count}", original, pattern, replacement, count);
+		logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): position0 → {Position0}", original, pattern, replacement, position0);
         int position1;
 
         var inc = original.Length / pattern.Length * (replacement.Length - pattern.Length);
         var chars = new char[original.Length + Math.Max(0, inc)];
+		logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): inc → {Inc}", original, pattern, replacement, inc);
+		logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): chars → {Chars}", original, pattern, replacement, chars);
         while ((position1 = original.IndexOf(pattern, position0, stringComparison)) != -1)
         {
             for (var i = position0; i < position1; ++i)
@@ -63,6 +71,7 @@ public partial class Tokenizer : ITokenizer
         for (var i = position0; i < original.Length; ++i)
             chars[count++] = original[i];
 
+		logger.LogDebug("<<< Exiting Replace(original={Original},pattern={Pattern},replacement={Replacement})", original, pattern, replacement);
         return new string(chars, 0, count);
     }
 
@@ -76,10 +85,12 @@ public partial class Tokenizer : ITokenizer
     /// <returns>Text with all token keys replaces by token value</returns>
     protected string ReplaceTokens(string template, IEnumerable<Token> tokens, bool htmlEncode = false, bool stringWithQuotes = false)
     {
+		logger.LogDebug(">>> Entering ReplaceTokens(template={Template},tokens={Tokens},htmlEncode={HtmlEncode},stringWithQuotes={StringWithQuotes})", template, tokens, htmlEncode, stringWithQuotes);
         foreach (var token in tokens)
         {
             var tokenValue = token.Value ?? string.Empty;
 
+			logger.LogDebug("ReplaceTokens(template={Template},tokens={Tokens},htmlEncode={HtmlEncode},stringWithQuotes={StringWithQuotes}): tokenValue → {TokenValue}", template, tokens, htmlEncode, stringWithQuotes, tokenValue);
             //wrap the value in quotes
             if (stringWithQuotes && tokenValue is string)
                 tokenValue = $"\"{tokenValue}\"";
@@ -92,7 +103,9 @@ public partial class Tokenizer : ITokenizer
 
             template = Replace(template, $@"%{token.Key}%", tokenValue.ToString());
         }
+		logger.LogDebug("ReplaceTokens(template={Template},tokens={Tokens},htmlEncode={HtmlEncode},stringWithQuotes={StringWithQuotes}): template → {Template1}", template, tokens, htmlEncode, stringWithQuotes, template);
 
+		logger.LogDebug("<<< Exiting ReplaceTokens(template={Template},tokens={Tokens},htmlEncode={HtmlEncode},stringWithQuotes={StringWithQuotes})", template, tokens, htmlEncode, stringWithQuotes);
         return template;
     }
 
@@ -104,6 +117,7 @@ public partial class Tokenizer : ITokenizer
     /// <returns>Text with all conditional statements replaces by appropriate values</returns>
     protected string ReplaceConditionalStatements(string template, IEnumerable<Token> tokens)
     {
+		logger.LogDebug(">>> Entering ReplaceConditionalStatements(template={Template},tokens={Tokens})", template, tokens);
         //define regex rules
         var regexFullConditionalSatement = new Regex(@"(?:(?'Group' %if)|(?'Condition-Group' endif%)|(?! (%if|endif%)).)*(?(Group)(?!))",
             RegexOptions.Compiled | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.IgnoreCase);
@@ -117,6 +131,8 @@ public partial class Tokenizer : ITokenizer
                 capture.Index,
                 FullStatement = capture.Value,
                 Condition = regexCondition.Match(capture.Value).Value
+				logger.LogDebug("ReplaceConditionalStatements(template={Template},tokens={Tokens}): FullStatement → {FullStatement}", template, tokens, FullStatement);
+				logger.LogDebug("ReplaceConditionalStatements(template={Template},tokens={Tokens}): Condition → {Condition}", template, tokens, Condition);
             })).ToList();
 
         if (!conditionalStatements.Any())
@@ -127,25 +143,30 @@ public partial class Tokenizer : ITokenizer
         {
             var conditionIsMet = false;
             if (!string.IsNullOrEmpty(statement.Condition))
+			logger.LogDebug("ReplaceConditionalStatements(template={Template},tokens={Tokens}): conditionIsMet → {ConditionIsMet}", template, tokens, conditionIsMet);
             {
                 try
                 {
                     //replace tokens (string values are wrap in quotes)
                     var conditionString = ReplaceTokens(statement.Condition, tokens, stringWithQuotes: true);
                     conditionIsMet = new[] { statement }.AsQueryable().Where(conditionString).Any();
+					logger.LogDebug("ReplaceConditionalStatements(template={Template},tokens={Tokens}): conditionString → {ConditionString}", template, tokens, conditionString);
                 }
                 catch
                 {
+					logger.LogError("Exception in ReplaceConditionalStatements(template={Template},tokens={Tokens}): {Arg2}", template, tokens, ex.Message);
                     // ignored
                 }
             }
 
             template = template.Replace(conditionIsMet ? statement.Condition : statement.FullStatement, string.Empty);
         }
+		logger.LogDebug("ReplaceConditionalStatements(template={Template},tokens={Tokens}): template → {Template1}", template, tokens, template);
 
         template = template.Replace("%if", string.Empty).Replace("endif%", string.Empty);
 
         //return template with resolved conditional statements
+		logger.LogDebug("<<< Exiting ReplaceConditionalStatements(template={Template},tokens={Tokens})", template, tokens);
         return template;
     }
 
@@ -172,6 +193,7 @@ public partial class Tokenizer : ITokenizer
         //replace tokens
         template = ReplaceTokens(template, tokens, htmlEncode);
 
+		logger.LogDebug("<<< Exiting Replace(template={Template},tokens={Tokens},htmlEncode={HtmlEncode})", template, tokens, htmlEncode);
         return template;
     }
 

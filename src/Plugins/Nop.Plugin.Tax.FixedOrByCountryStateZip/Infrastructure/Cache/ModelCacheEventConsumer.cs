@@ -5,6 +5,7 @@ using Nop.Plugin.Tax.FixedOrByCountryStateZip.Domain;
 using Nop.Plugin.Tax.FixedOrByCountryStateZip.Services;
 using Nop.Services.Configuration;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.FixedOrByCountryStateZip.Infrastructure.Cache;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Tax.FixedOrByCountryStateZip.Infrastructure.Cache;
 /// Model cache event consumer (used for caching of presentation layer models)
 /// </summary>
 public class ModelCacheEventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     //tax rates
     IConsumer<EntityInsertedEvent<TaxRate>>,
     IConsumer<EntityUpdatedEvent<TaxRate>>,
@@ -85,6 +87,8 @@ public class ModelCacheEventConsumer :
     {
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(TAXRATE_PATTERN_KEY);
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -96,18 +100,21 @@ public class ModelCacheEventConsumer :
     {
         var taxCategory = eventMessage?.Entity;
         if (taxCategory == null)
+			_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
             return;
 
         //delete an appropriate record when tax category is deleted
         var recordsToDelete = (await _taxRateService.GetAllTaxRatesAsync()).Where(taxRate => taxRate.TaxCategoryId == taxCategory.Id).ToList();
         foreach (var taxRate in recordsToDelete)
         {
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): recordsToDelete → {RecordsToDelete}", eventMessage, recordsToDelete);
             await _taxRateService.DeleteTaxRateAsync(taxRate);
         }
 
         //delete saved fixed rate if exists
         var setting = await _settingService.GetSettingAsync(string.Format(FixedOrByCountryStateZipDefaults.FIXED_RATE_SETTINGS_KEY, taxCategory.Id));
         if (setting != null)
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): setting → {Setting}", eventMessage, setting);
             await _settingService.DeleteSettingAsync(setting);
     }
 

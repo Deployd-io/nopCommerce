@@ -13,6 +13,7 @@ using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Plugins;
 using Nop.Services.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.FixedOrByCountryStateZip;
 
@@ -21,6 +22,7 @@ namespace Nop.Plugin.Tax.FixedOrByCountryStateZip;
 /// </summary>
 public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FixedOrByCountryStateZipTaxSettings _countryStateZipSettings;
@@ -84,8 +86,11 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
     /// </returns>
     public async Task<TaxRateResult> GetTaxRateAsync(TaxRateRequest taxRateRequest)
     {
+		_logger.LogDebug(">>> Entering GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var result = new TaxRateResult();
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): result → {Result}", taxRateRequest, result);
         //the tax rate calculation by fixed rate
         if (!_countryStateZipSettings.CountryStateZipEnabled)
         {
@@ -104,6 +109,7 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(ModelCacheEventConsumer.ALL_TAX_RATES_MODEL_KEY);
         var allTaxRates = await _staticCacheManager.GetAsync(cacheKey, async () => (await _taxRateService.GetAllTaxRatesAsync()).Select(taxRate => new TaxRate
         {
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): cacheKey → {CacheKey}", taxRateRequest, cacheKey);
             Id = taxRate.Id,
             StoreId = taxRate.StoreId,
             TaxCategoryId = taxRate.TaxCategoryId,
@@ -119,25 +125,35 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
         var stateProvinceId = taxRateRequest.Address.StateProvinceId;
         var zip = taxRateRequest.Address.ZipPostalCode?.Trim() ?? string.Empty;
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): zip → {Zip}", taxRateRequest, zip);
         var existingRates = allTaxRates.Where(taxRate => taxRate.CountryId == countryId && taxRate.TaxCategoryId == taxCategoryId);
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): existingRates → {ExistingRates}", taxRateRequest, existingRates);
         //filter by store
         var matchedByStore = existingRates.Where(taxRate => storeId == taxRate.StoreId || taxRate.StoreId == 0);
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): matchedByStore → {MatchedByStore}", taxRateRequest, matchedByStore);
         //filter by state/province
         var matchedByStateProvince = matchedByStore.Where(taxRate => stateProvinceId == taxRate.StateProvinceId || taxRate.StateProvinceId == 0);
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): matchedByStateProvince → {MatchedByStateProvince}", taxRateRequest, matchedByStateProvince);
         //filter by zip
         var matchedByZip = matchedByStateProvince.Where(taxRate => string.IsNullOrWhiteSpace(taxRate.Zip) || taxRate.Zip.Equals(zip, StringComparison.InvariantCultureIgnoreCase));
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): matchedByZip → {MatchedByZip}", taxRateRequest, matchedByZip);
         //sort from particular to general, more particular cases will be the first
         var foundRecords = matchedByZip.OrderBy(r => r.StoreId == 0).ThenBy(r => r.StateProvinceId == 0).ThenBy(r => string.IsNullOrEmpty(r.Zip));
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): foundRecords → {FoundRecords}", taxRateRequest, foundRecords);
         var foundRecord = foundRecords.FirstOrDefault();
 
+		_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): foundRecord → {FoundRecord}", taxRateRequest, foundRecord);
         if (foundRecord != null)
             result.TaxRate = foundRecord.Percentage;
+			_logger.LogDebug("GetTaxRateAsync(taxRateRequest={TaxRateRequest}): result.TaxRate → {Arg1}", taxRateRequest, result.TaxRate);
 
+		_logger.LogInformation("GetTaxRateAsync(taxRateRequest)={TaxRateRequest}: external service call took {Arg1} ms", taxRateRequest, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetTaxRateAsync(taxRateRequest={TaxRateRequest})", taxRateRequest);
         return result;
     }
 
@@ -151,6 +167,7 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
     /// </returns>
     public async Task<TaxTotalResult> GetTaxTotalAsync(TaxTotalRequest taxTotalRequest)
     {
+		_logger.LogDebug(">>> Entering GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         if (_httpContextAccessor.HttpContext.Items.TryGetValue("nop.TaxTotal", out var result)
             && result is (TaxTotalResult taxTotalResult, decimal paymentTax))
         {
@@ -163,6 +180,8 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
 
         var taxRates = new SortedDictionary<decimal, decimal>();
         var taxTotal = decimal.Zero;
+		_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxRates → {TaxRates}", taxTotalRequest, taxRates);
+		_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotal → {TaxTotal}", taxTotalRequest, taxTotal);
 
         //order sub total (items + checkout attributes)
         var (_, _, _, _, orderSubTotalTaxRates) = await _orderTotalCalculationService
@@ -187,6 +206,7 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
         //shipping
         var shippingTax = decimal.Zero;
         if (_taxSettings.ShippingIsTaxable)
+		_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): shippingTax → {ShippingTax}", taxTotalRequest, shippingTax);
         {
             var (shippingExclTax, _, _) = await _orderTotalCalculationService
                 .GetShoppingCartShippingTotalAsync(taxTotalRequest.ShoppingCart, false);
@@ -216,6 +236,7 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
         //payment method additional fee
         var paymentMethodAdditionalFeeTax = decimal.Zero;
         if (_taxSettings.PaymentMethodAdditionalFeeIsTaxable)
+		_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): paymentMethodAdditionalFeeTax → {PaymentMethodAdditionalFeeTax}", taxTotalRequest, paymentMethodAdditionalFeeTax);
         {
             var paymentMethodSystemName = taxTotalRequest.Customer != null
                 ? await _genericAttributeService
@@ -251,10 +272,12 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
             taxTotal = decimal.Zero;
 
         taxTotalResult = new TaxTotalResult { TaxTotal = taxTotal, TaxRates = taxRates, };
+		_logger.LogDebug("GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest}): taxTotalResult → {TaxTotalResult}", taxTotalRequest, taxTotalResult);
 
         //store values within the scope of the request to avoid duplicate calculations
         _httpContextAccessor.HttpContext.Items.TryAdd("nop.TaxTotal", (taxTotalResult, paymentMethodAdditionalFeeTax));
 
+		_logger.LogDebug("<<< Exiting GetTaxTotalAsync(taxTotalRequest={TaxTotalRequest})", taxTotalRequest);
         return taxTotalResult;
     }
 
@@ -263,6 +286,8 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/FixedOrByCountryStateZip/Configure";
     }
 
@@ -272,6 +297,7 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new FixedOrByCountryStateZipTaxSettings());
 
@@ -308,6 +334,7 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -316,6 +343,8 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //settings
         await _settingService.DeleteSettingAsync<FixedOrByCountryStateZipTaxSettings>();
 
@@ -323,12 +352,14 @@ public class FixedOrByCountryStateZipTaxProvider : BasePlugin, ITaxProvider
         var fixedRates = await (await _taxCategoryService.GetAllTaxCategoriesAsync())
             .SelectAwait(async taxCategory => await _settingService.GetSettingAsync(string.Format(FixedOrByCountryStateZipDefaults.FIXED_RATE_SETTINGS_KEY, taxCategory.Id)))
             .Where(setting => setting != null).ToListAsync();
+			_logger.LogInformation("UninstallAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         await _settingService.DeleteSettingsAsync(fixedRates);
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Tax.FixedOrByCountryStateZip");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

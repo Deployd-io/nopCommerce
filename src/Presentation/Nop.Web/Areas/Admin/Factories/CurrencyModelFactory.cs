@@ -7,6 +7,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CurrencyModelFactory : ICurrencyModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -84,14 +86,17 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareExchangeRateModelsAsync(IList<CurrencyExchangeRateModel> models)
     {
+		_logger.LogDebug(">>> Entering PrepareExchangeRateModelsAsync(models={Models})", models);
         ArgumentNullException.ThrowIfNull(models);
 
         //get exchange rates
         var exchangeRates = await _currencyService.GetCurrencyLiveRatesAsync();
 
+		_logger.LogDebug("PrepareExchangeRateModelsAsync(models={Models}): exchangeRates → {ExchangeRates}", models, exchangeRates);
         //filter by existing currencies
         var currencies = await _currencyService.GetAllCurrenciesAsync(true);
         exchangeRates = exchangeRates
+			_logger.LogDebug("PrepareExchangeRateModelsAsync(models={Models}): currencies → {Currencies}", models, currencies);
             .Where(rate => currencies
                 .Any(currency => currency.CurrencyCode.Equals(rate.CurrencyCode, StringComparison.InvariantCultureIgnoreCase))).ToList();
 
@@ -100,6 +105,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
         {
             models.Add(new CurrencyExchangeRateModel { CurrencyCode = rate.CurrencyCode, Rate = rate.Rate });
         }
+		_logger.LogDebug("<<< Exiting PrepareExchangeRateModelsAsync(models={Models})", models);
     }
 
     #endregion
@@ -117,6 +123,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
     /// </returns>
     public virtual async Task<CurrencySearchModel> PrepareCurrencySearchModelAsync(CurrencySearchModel searchModel, bool prepareExchangeRates = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCurrencySearchModelAsync(searchModel={SearchModel},prepareExchangeRates={PrepareExchangeRates})", searchModel, prepareExchangeRates);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare exchange rate provider model
@@ -125,6 +132,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCurrencySearchModelAsync(searchModel={SearchModel},prepareExchangeRates={PrepareExchangeRates})", searchModel, prepareExchangeRates);
         return searchModel;
     }
 
@@ -138,11 +146,13 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
     /// </returns>
     public virtual async Task<CurrencyListModel> PrepareCurrencyListModelAsync(CurrencySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCurrencyListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get currencies
         var currencies = (await _currencyService.GetAllCurrenciesAsync(showHidden: true)).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareCurrencyListModelAsync(searchModel={SearchModel}): currencies → {Currencies}", searchModel, currencies);
         //prepare list model
         var model = new CurrencyListModel().PrepareToGrid(searchModel, currencies, () =>
         {
@@ -151,6 +161,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
                 //fill in model values from the entity
                 var currencyModel = currency.ToModel<CurrencyModel>();
 
+				_logger.LogDebug("PrepareCurrencyListModelAsync(searchModel={SearchModel}): currencyModel → {CurrencyModel}", searchModel, currencyModel);
                 //fill in additional values (not existing in the entity)
                 currencyModel.IsPrimaryExchangeRateCurrency = currency.Id == _currencySettings.PrimaryExchangeRateCurrencyId;
                 currencyModel.IsPrimaryStoreCurrency = currency.Id == _currencySettings.PrimaryStoreCurrencyId;
@@ -159,6 +170,7 @@ public partial class CurrencyModelFactory : ICurrencyModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCurrencyListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

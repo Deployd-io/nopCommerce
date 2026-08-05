@@ -13,8 +13,12 @@ public partial class RenderButtonEdit : IRender
     /// <param name="url">URL to the edit action</param>
     public RenderButtonEdit(DataUrl url)
     {
+		logger.LogDebug(">>> Entering RenderButtonEdit(url={Url})", url);
         Url = url;
         ClassName = NopButtonClassDefaults.Default;
+		logger.LogDebug("<<< Exiting RenderButtonEdit(url={Url})", url);
+		logger.LogDebug("RenderButtonEdit(url={Url}): ClassName → {ClassName}", url, ClassName);
+		logger.LogInformation("RenderButtonEdit(url={Url}): Url → {Url1}", url, Url);
     }
 
     #endregion

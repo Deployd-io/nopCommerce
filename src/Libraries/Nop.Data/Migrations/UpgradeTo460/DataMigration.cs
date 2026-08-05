@@ -11,17 +11,22 @@ using Nop.Core.Domain.Messages;
 using Nop.Core.Domain.ScheduleTasks;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo460;
 
 [NopUpdateMigration("2023-07-26 14:00:00", "4.60", UpdateMigrationType.Data)]
 public class DataMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly INopDataProvider _dataProvider;
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		_logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
+		_logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -29,9 +34,11 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         //#6789 GenericAttribute was previously named CustomCustomerAttributes and not CustomCustomerAttributesXML
         var customCustomerAttributeName = "CustomCustomerAttributes";
 
+		_logger.LogDebug("Up(): customCustomerAttributeName → {CustomCustomerAttributeName}", customCustomerAttributeName);
         //#4601 customer attribute values to customer table column values
         var attributeKeys = new[] { nameof(Customer.FirstName), nameof(Customer.LastName), nameof(Customer.Gender),
             nameof(Customer.Company), nameof(Customer.StreetAddress), nameof(Customer.StreetAddress2), nameof(Customer.ZipPostalCode),
@@ -42,8 +49,11 @@ public class DataMigration : Migration
 
         var languages = _dataProvider.GetTable<Language>().ToList();
         var currencies = _dataProvider.GetTable<Currency>().ToList();
+		_logger.LogDebug("Up(): languages → {Languages}", languages);
+		_logger.LogDebug("Up(): currencies → {Currencies}", currencies);
         var customerRole = _dataProvider.GetTable<CustomerRole>().FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.RegisteredRoleName);
         var customerRoleId = customerRole?.Id ?? 0;
+		_logger.LogDebug("Up(): customerRole → {CustomerRole}", customerRole);
 
         var query =
             from c in _dataProvider.GetTable<Customer>()
@@ -76,6 +86,7 @@ public class DataMigration : Migration
         {
             var str = CommonHelper.EnsureMaximumLength(attributes.FirstOrDefault(ga => ga.Key == key)?.Value, maxLength);
 
+			_logger.LogDebug("Up(): str → {Str}", str);
             return castTo(str);
         }
 
@@ -83,12 +94,14 @@ public class DataMigration : Migration
         {
             var customers = query.ToPagedListAsync(pageIndex++, pageSize).Result;
 
+			_logger.LogDebug("Up(): customers → {Customers}", customers);
             if (!customers.Any())
                 break;
 
             var customerIds = customers.Select(c => c.Id).ToList();
             var genericAttributes = _dataProvider.GetTable<GenericAttribute>()
                 .Where(ga => ga.KeyGroup == nameof(Customer) && customerIds.Contains(ga.EntityId) && attributeKeys.Contains(ga.Key)).ToList();
+				_logger.LogDebug("Up(): customerIds → {CustomerIds}", customerIds);
 
             if (!genericAttributes.Any())
                 continue;
@@ -97,6 +110,7 @@ public class DataMigration : Migration
             {
                 var customerAttributes = genericAttributes.Where(ga => ga.EntityId == customer.Id).ToList();
                 if (!customerAttributes.Any())
+					_logger.LogDebug("Up(): customerAttributes → {CustomerAttributes}", customerAttributes);
                     continue;
 
                 customer.FirstName = getAttributeValue(customerAttributes, nameof(Customer.FirstName), castToString);
@@ -132,6 +146,7 @@ public class DataMigration : Migration
         //#3777 new activity log types
         var activityLogTypeTable = _dataProvider.GetTable<ActivityLogType>();
 
+		_logger.LogDebug("Up(): activityLogTypeTable → {ActivityLogTypeTable}", activityLogTypeTable);
         if (!activityLogTypeTable.Any(alt => string.Compare(alt.SystemKeyword, "ImportNewsLetterSubscriptions", StringComparison.InvariantCultureIgnoreCase) == 0))
             _dataProvider.InsertEntity(
                 new ActivityLogType
@@ -248,6 +263,7 @@ public class DataMigration : Migration
 
             var customerRoles = _dataProvider.GetTable<CustomerRole>();
             if (!forceMultifactorAuthentication)
+				_logger.LogDebug("Up(): customerRoles → {CustomerRoles}", customerRoles);
                 customerRoles = customerRoles.Where(cr => cr.SystemName == NopCustomerDefaults.AdministratorsRoleName || cr.SystemName == NopCustomerDefaults.RegisteredRoleName);
 
             foreach (var role in customerRoles.ToList())
@@ -294,14 +310,19 @@ public class DataMigration : Migration
         //#6395
         var paRange = _dataProvider.GetTable<ProductAvailabilityRange>().FirstOrDefault(par => string.Compare(par.Name, "2 week", StringComparison.InvariantCultureIgnoreCase) == 0);
         if (paRange is not null)
+		_logger.LogDebug("Up(): paRange → {PaRange}", paRange);
         {
             paRange.Name = "2 weeks";
+			_logger.LogDebug("Up(): paRange.Name → {Arg0}", paRange.Name);
             _dataProvider.UpdateEntity(paRange);
         }
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

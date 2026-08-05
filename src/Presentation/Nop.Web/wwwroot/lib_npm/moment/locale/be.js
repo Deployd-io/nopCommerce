@@ -5,9 +5,13 @@
 //! Author : Menelion Elensúle : https://github.com/Oire
 
 import moment from '../moment';
+const logger = console;
 
 function plural(word, num) {
+	logger.debug(`>>> Entering plural(word=${word},num=${num})`);
     var forms = word.split('_');
+	logger.debug(`plural(word=${word},num=${num}): forms → ${forms}`);
+	logger.debug(`<<< Exiting plural(word=${word},num=${num})`);
     return num % 10 === 1 && num % 100 !== 11
         ? forms[0]
         : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
@@ -15,6 +19,7 @@ function plural(word, num) {
           : forms[2];
 }
 function relativeTimeWithPlural(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var format = {
         ss: withoutSuffix ? 'секунда_секунды_секунд' : 'секунду_секунды_секунд',
         mm: withoutSuffix ? 'хвіліна_хвіліны_хвілін' : 'хвіліну_хвіліны_хвілін',
@@ -28,6 +33,7 @@ function relativeTimeWithPlural(number, withoutSuffix, key) {
     } else if (key === 'h') {
         return withoutSuffix ? 'гадзіна' : 'гадзіну';
     } else {
+		logger.debug(`<<< Exiting relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
         return number + ' ' + plural(format[key], +number);
     }
 }
@@ -69,9 +75,11 @@ export default moment.defineLocale('be', {
         nextDay: '[Заўтра ў] LT',
         lastDay: '[Учора ў] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             return '[У] dddd [ў] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                 case 3:
@@ -83,6 +91,7 @@ export default moment.defineLocale('be', {
                 case 4:
                     return '[У мінулы] dddd [ў] LT';
             }
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },
@@ -103,9 +112,11 @@ export default moment.defineLocale('be', {
     },
     meridiemParse: /ночы|раніцы|дня|вечара/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /^(дня|вечара)$/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 4) {
             return 'ночы';
         } else if (hour < 12) {
@@ -113,11 +124,13 @@ export default moment.defineLocale('be', {
         } else if (hour < 17) {
             return 'дня';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'вечара';
         }
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(і|ы|га)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'M':
             case 'd':
@@ -134,6 +147,7 @@ export default moment.defineLocale('be', {
             default:
                 return number;
         }
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
     },
     week: {
         dow: 1, // Monday is the first day of the week.

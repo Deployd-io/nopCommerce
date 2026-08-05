@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Infrastructure.Installation;
 
 /// <summary>
@@ -5,9 +6,13 @@
 /// </summary>
 public partial class InstallationLanguage
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public InstallationLanguage()
     {
+		_logger.LogDebug(">>> Entering InstallationLanguage()");
         Resources = new List<InstallationLocaleResource>();
+		_logger.LogDebug("<<< Exiting InstallationLanguage()");
+		_logger.LogDebug("InstallationLanguage(): Resources → {Resources}", Resources);
     }
     public string Name { get; set; }
     public string Code { get; set; }

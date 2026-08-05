@@ -1,14 +1,18 @@
 ﻿using System.Data;
 using FluentMigrator.Runner.Generators.MySql;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.DataProviders.Fluentmigrator;
 
 public partial class NopMySql5TypeMap : MySql5TypeMap
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected override void SetupMySqlTypeMaps()
     {
+		_logger.LogDebug(">>> Entering SetupMySqlTypeMaps()");
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		_logger.LogDebug("SetupMySqlTypeMaps(): dataSettings → {DataSettings}", dataSettings);
         if (dataSettings.DataProvider != DataProviderType.MySql)
             return;
 
@@ -19,6 +23,7 @@ public partial class NopMySql5TypeMap : MySql5TypeMap
 
         var collation = !string.IsNullOrEmpty(dataSettings.Collation) ? $"COLLATE {dataSettings.Collation}" : string.Empty;
 
+		_logger.LogDebug("SetupMySqlTypeMaps(): collation → {Collation}", collation);
         SetTypeMap(DbType.StringFixedLength, $"TEXT {charSet} {collation}", TextCapacity);
         SetTypeMap(DbType.StringFixedLength, $"MEDIUMTEXT {charSet} {collation}", MediumTextCapacity);
         SetTypeMap(DbType.StringFixedLength, $"LONGTEXT {charSet} {collation}", LongTextCapacity);
@@ -26,5 +31,6 @@ public partial class NopMySql5TypeMap : MySql5TypeMap
         SetTypeMap(DbType.String, $"TEXT {charSet} {collation}", TextCapacity);
         SetTypeMap(DbType.String, $"MEDIUMTEXT {charSet} {collation}", MediumTextCapacity);
         SetTypeMap(DbType.String, $"LONGTEXT {charSet} {collation}", LongTextCapacity);
+		_logger.LogDebug("<<< Exiting SetupMySqlTypeMaps()");
     }
 }

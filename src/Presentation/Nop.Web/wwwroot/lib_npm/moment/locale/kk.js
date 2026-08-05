@@ -3,6 +3,7 @@
 //! authors : Nurlan Rakhimzhanov : https://github.com/nurlan
 
 import moment from '../moment';
+const logger = console;
 
 var suffixes = {
     0: '-ші',
@@ -71,8 +72,10 @@ export default moment.defineLocale('kk', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(ші|шы)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var a = number % 10,
             b = number >= 100 ? 100 : null;
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + (suffixes[number] || suffixes[a] || suffixes[b]);
     },
     week: {

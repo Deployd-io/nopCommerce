@@ -19,6 +19,7 @@ using Nop.Web.Areas.Admin.Models.Plugins;
 using Nop.Web.Areas.Admin.Models.Topics;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Infrastructure;
 
@@ -34,6 +35,7 @@ public partial class AclEventConsumer : IConsumer<ModelPreparedEvent<BaseNopMode
     IConsumer<EntityInsertedEvent<Menu>>,
     IConsumer<EntityInsertedEvent<MenuItem>>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -140,6 +142,8 @@ public partial class AclEventConsumer : IConsumer<ModelPreparedEvent<BaseNopMode
                 await _aclSupportedModelFactory.PrepareModelCustomerRolesAsync(onlineCustomerSearchModel);
                 break;
         }
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -154,41 +158,48 @@ public partial class AclEventConsumer : IConsumer<ModelPreparedEvent<BaseNopMode
 
         var key = string.Empty;
 
+		_logger.LogWarning("HandleEventAsync(eventMessage={EventMessage}): key → {Key}", eventMessage, key);
         switch (eventMessage.Model)
         {
             case ManufacturerModel manufacturerModel:
                 var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(manufacturerModel.Id);
                 await _aclService.SaveAclAsync(manufacturer, manufacturerModel.SelectedCustomerRoleIds);
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): manufacturer → {Manufacturer}", eventMessage, manufacturer);
                 key = manufacturer == null ? manufacturerModel.Name : string.Empty;
                 break;
 
             case MenuModel menuModel:
                 var menu = await _menuService.GetMenuByIdAsync(menuModel.Id);
                 await _aclService.SaveAclAsync(menu, menuModel.SelectedCustomerRoleIds);
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): menu → {Menu}", eventMessage, menu);
                 key = menu == null ? menuModel.Name : string.Empty;
                 break;
 
             case MenuItemModel menuItemModel:
                 var menuItem = await _menuService.GetMenuItemByIdAsync(menuItemModel.Id);
                 await _aclService.SaveAclAsync(menuItem, menuItemModel.SelectedCustomerRoleIds);
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): menuItem → {MenuItem}", eventMessage, menuItem);
                 key = menuItem == null ? $"{nameof(MenuItem)}:{menuItemModel.Title}:{menuItemModel.MenuId}:{menuItemModel.MenuItemTypeId}" : string.Empty;
                 break;
 
             case ProductModel productModel:
                 var product = await _productService.GetProductByIdAsync(productModel.Id);
                 await _aclService.SaveAclAsync(product, productModel.SelectedCustomerRoleIds);
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): product → {Product}", eventMessage, product);
                 key = product == null ? productModel.Name : string.Empty;
                 break;
 
             case TopicModel topicModel:
                 var topic = await _topicService.GetTopicByIdAsync(topicModel.Id);
                 await _aclService.SaveAclAsync(topic, topicModel.SelectedCustomerRoleIds);
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): topic → {Topic}", eventMessage, topic);
                 key = topic == null ? topicModel.Title : string.Empty;
                 break;
 
             case CategoryModel categoryModel:
                 var category = await _categoryService.GetCategoryByIdAsync(categoryModel.Id);
                 await _aclService.SaveAclAsync(category, categoryModel.SelectedCustomerRoleIds);
+				_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): category → {Category}", eventMessage, category);
                 key = category == null ? categoryModel.Name : string.Empty;
                 break;
         }

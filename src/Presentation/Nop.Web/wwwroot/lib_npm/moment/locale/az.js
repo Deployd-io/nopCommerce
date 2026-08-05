@@ -3,6 +3,7 @@
 //! author : topchiyev : https://github.com/topchiyev
 
 import moment from '../moment';
+const logger = console;
 
 var suffixes = {
     1: '-inci',
@@ -71,9 +72,11 @@ export default moment.defineLocale('az', {
     },
     meridiemParse: /gecə|səhər|gündüz|axşam/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /^(gündüz|axşam)$/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 4) {
             return 'gecə';
         } else if (hour < 12) {
@@ -81,11 +84,13 @@ export default moment.defineLocale('az', {
         } else if (hour < 17) {
             return 'gündüz';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'axşam';
         }
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(ıncı|inci|nci|üncü|ncı|uncu)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         if (number === 0) {
             // special case for zero
             return number + '-ıncı';
@@ -93,6 +98,7 @@ export default moment.defineLocale('az', {
         var a = number % 10,
             b = (number % 100) - a,
             c = number >= 100 ? 100 : null;
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + (suffixes[a] || suffixes[b] || suffixes[c]);
     },
     week: {

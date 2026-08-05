@@ -11,11 +11,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Topics;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class TopicController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -96,15 +98,20 @@ public partial class TopicController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _topicModelFactory.PrepareTopicSearchModelAsync(new TopicSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -115,6 +122,7 @@ public partial class TopicController : BaseAdminController
         //prepare model
         var model = await _topicModelFactory.PrepareTopicListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -125,9 +133,12 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _topicModelFactory.PrepareTopicModelAsync(new TopicModel(), null);
 
+		_logger.LogDebug("Create(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -169,20 +180,25 @@ public partial class TopicController : BaseAdminController
         model = await _topicModelFactory.PrepareTopicModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a topic with the specified id
         var topic = await _topicService.GetTopicByIdAsync(id);
         if (topic == null)
+			_logger.LogDebug("Edit(id={Id}): topic → {Topic}", id, topic);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _topicModelFactory.PrepareTopicModelAsync(null, topic);
 
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -229,6 +245,7 @@ public partial class TopicController : BaseAdminController
         model = await _topicModelFactory.PrepareTopicModelAsync(model, topic, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -236,9 +253,11 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a topic with the specified id
         var topic = await _topicService.GetTopicByIdAsync(id);
         if (topic == null)
+			_logger.LogDebug("Delete(id={Id}): topic → {Topic}", id, topic);
             return RedirectToAction("List");
 
         await _topicService.DeleteTopicAsync(topic);
@@ -249,6 +268,7 @@ public partial class TopicController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteTopic",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteTopic"), topic.Title ?? topic.SystemName), topic);
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 

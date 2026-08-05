@@ -11,11 +11,13 @@ using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Seo;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Factories;
 
 public class CustomerModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICurrencyService _currencyService;
@@ -115,21 +117,33 @@ public class CustomerModelFactory
     /// </returns>
     public async Task<RequestQuoteModel> PrepareRequestQuoteModelAsync(RequestQuote requestQuote, IList<RequestQuoteItem> requestQuoteItems = null, RequestQuoteModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model})", requestQuote, requestQuoteItems, model);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(requestQuote);
 
         var items = requestQuoteItems ?? await _rfqService.GetRequestQuoteItemsAsync(requestQuote.Id);
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): items → {Items}", requestQuote, requestQuoteItems, model, items);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): currentCurrency → {CurrentCurrency}", requestQuote, requestQuoteItems, model, currentCurrency);
 
         var modelItems = await items.SelectAwait(async item => await PrepareRequestQuoteItemModelAsync(requestQuote, item, currentCurrency)).ToListAsync();
 
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): modelItems → {ModelItems}", requestQuote, requestQuoteItems, model, modelItems);
+		_logger.LogInformation("PrepareRequestQuoteModelAsync(requestQuote,requestQuoteItems,model)={RequestQuote},{RequestQuoteItems},{Model}: database query executed in {Arg3} ms", requestQuote, requestQuoteItems, model, __logStart.ElapsedMilliseconds);
         model ??= new RequestQuoteModel();
 
         if (requestQuote.Status != 0)
             model.Status = await _localizationService.GetLocalizedEnumAsync(requestQuote.Status);
 
         model.StatusType = requestQuote.Status;
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.StatusType → {Arg3}", requestQuote, requestQuoteItems, model, model.StatusType);
         model.CreatedOnUtc = await _dateTimeHelper.ConvertToUserTimeAsync(requestQuote.CreatedOnUtc, DateTimeKind.Utc);
         model.CustomerNotes = requestQuote.CustomerNotes;
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.CustomerNotes → {Arg3}", requestQuote, requestQuoteItems, model, model.CustomerNotes);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.Id → {Arg3}", requestQuote, requestQuoteItems, model, model.Id);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.CustomerId → {Arg3}", requestQuote, requestQuoteItems, model, model.CustomerId);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.CustomerItems → {Arg3}", requestQuote, requestQuoteItems, model, model.CustomerItems);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.QuoteId → {Arg3}", requestQuote, requestQuoteItems, model, model.QuoteId);
         model.Id = requestQuote.Id;
         model.CustomerId = requestQuote.CustomerId;
         model.CustomerItems = modelItems;
@@ -140,6 +154,8 @@ public class CustomerModelFactory
 
         var quote = await _rfqService.GetQuoteByIdAsync(requestQuote.QuoteId.Value);
         model.QuoteStatus = quote.Status;
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): quote → {Quote}", requestQuote, requestQuoteItems, model, quote);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.QuoteStatus → {Arg3}", requestQuote, requestQuoteItems, model, model.QuoteStatus);
 
         return model;
     }
@@ -235,6 +251,7 @@ public class CustomerModelFactory
     /// </returns>
     public async Task<RequestQuoteModel> PrepareRequestQuoteModelAsync(RequestQuoteModel model)
     {
+		_logger.LogDebug("<<< Exiting PrepareRequestQuoteModelAsync(model={Model})", model);
         return await PrepareRequestQuoteModelAsync(await _rfqService.GetRequestQuoteByIdAsync(model.Id), model: model);
     }
 

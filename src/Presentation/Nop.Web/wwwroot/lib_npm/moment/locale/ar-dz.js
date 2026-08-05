@@ -7,6 +7,7 @@
 //! author : Noureddine LOUAHEDJ : https://github.com/noureddinem
 
 import moment from '../moment';
+const logger = console;
 
 var pluralForm = function (n) {
         return n === 0
@@ -72,12 +73,16 @@ var pluralForm = function (n) {
         ],
     },
     pluralize = function (u) {
+		logger.debug(`>>> Entering pluralize(u=${u})`);
         return function (number, withoutSuffix, string, isFuture) {
+		logger.debug(`>>> Entering function(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             var f = pluralForm(number),
                 str = plurals[u][pluralForm(number)];
+				logger.debug(`<<< Exiting function(number=${number},withoutSuffix=${withoutSuffix},string=${string},isFuture=${isFuture})`);
             if (f === 2) {
                 str = str[withoutSuffix ? 0 : 1];
             }
+			logger.debug(`<<< Exiting pluralize(u=${u})`);
             return str.replace(/%d/i, number);
         };
     },
@@ -113,12 +118,15 @@ export default moment.defineLocale('ar-dz', {
     },
     meridiemParse: /ص|م/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return 'م' === input;
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ص';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'م';
         }
     },
@@ -147,6 +155,7 @@ export default moment.defineLocale('ar-dz', {
         yy: pluralize('y'),
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string.replace(/,/g, '،');
     },
     week: {

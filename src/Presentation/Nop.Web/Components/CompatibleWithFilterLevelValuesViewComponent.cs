@@ -3,11 +3,13 @@ using Nop.Core.Domain.FilterLevels;
 using Nop.Services.FilterLevels;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Components;
 
 public partial class CompatibleWithFilterLevelValuesViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly FilterLevelSettings _filterLevelSettings;
     protected readonly IFilterLevelValueModelFactory _filterLevelValueModelFactory;
     protected readonly IFilterLevelValueService _filterLevelValueService;
@@ -23,6 +25,7 @@ public partial class CompatibleWithFilterLevelValuesViewComponent : NopViewCompo
 
     public async Task<IViewComponentResult> InvokeAsync(int productId)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(productId={ProductId})", productId);
         if (_filterLevelSettings.FilterLevelEnabled && _filterLevelSettings.DisplayOnProductDetailsPage)
         {
             //get filter level values
@@ -31,9 +34,11 @@ public partial class CompatibleWithFilterLevelValuesViewComponent : NopViewCompo
 
             var model = _filterLevelValueModelFactory.PrepareFilterLevelValueOverviewModel(filterLevelValues);
 
+			_logger.LogDebug("InvokeAsync(productId={ProductId}): model → {Model}", productId, model);
             return View(model);
         }
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(productId={ProductId})", productId);
         return Content(string.Empty);
     }
 }

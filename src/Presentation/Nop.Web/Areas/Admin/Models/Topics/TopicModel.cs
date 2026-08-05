@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Topics;
 
@@ -11,18 +12,27 @@ namespace Nop.Web.Areas.Admin.Models.Topics;
 /// </summary>
 public partial record TopicModel : BaseNopEntityModel, IAclSupportedModel, ILocalizedModel<TopicLocalizedModel>, IStoreMappingSupportedModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public TopicModel()
     {
+		_logger.LogDebug(">>> Entering TopicModel()");
         AvailableTopicTemplates = new List<SelectListItem>();
         Locales = new List<TopicLocalizedModel>();
+		_logger.LogDebug("TopicModel(): AvailableTopicTemplates → {AvailableTopicTemplates}", AvailableTopicTemplates);
+		_logger.LogDebug("TopicModel(): Locales → {Locales}", Locales);
 
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogDebug("TopicModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
 
+		_logger.LogDebug("TopicModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("TopicModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting TopicModel()");
+		_logger.LogDebug("TopicModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

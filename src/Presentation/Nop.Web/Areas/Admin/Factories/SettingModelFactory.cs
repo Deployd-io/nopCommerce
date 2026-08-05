@@ -147,16 +147,20 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareStoreThemeModelsAsync(IList<StoreInformationSettingsModel.ThemeModel> models)
     {
+		_logger.LogDebug(">>> Entering PrepareStoreThemeModelsAsync(models={Models})", models);
         ArgumentNullException.ThrowIfNull(models);
 
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var storeInformationSettings = await _settingService.LoadSettingAsync<StoreInformationSettings>(storeId);
+		_logger.LogDebug("PrepareStoreThemeModelsAsync(models={Models}): storeId → {StoreId}", models, storeId);
+		_logger.LogDebug("PrepareStoreThemeModelsAsync(models={Models}): storeInformationSettings → {StoreInformationSettings}", models, storeInformationSettings);
 
         //get available themes
         var availableThemes = await _themeProvider.GetThemesAsync();
         foreach (var theme in availableThemes)
         {
+		_logger.LogDebug("PrepareStoreThemeModelsAsync(models={Models}): availableThemes → {AvailableThemes}", models, availableThemes);
             models.Add(new StoreInformationSettingsModel.ThemeModel
             {
                 FriendlyName = theme.FriendlyName,
@@ -167,6 +171,7 @@ public partial class SettingModelFactory : ISettingModelFactory
                 Selected = theme.SystemName.Equals(storeInformationSettings.DefaultStoreTheme, StringComparison.InvariantCultureIgnoreCase)
             });
         }
+		_logger.LogDebug("<<< Exiting PrepareStoreThemeModelsAsync(models={Models})", models);
     }
 
     /// <summary>
@@ -179,11 +184,13 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual Task<SortOptionSearchModel> PrepareSortOptionSearchModelAsync(SortOptionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSortOptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareSortOptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -197,11 +204,13 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual Task<FilterLevelSearchModel> PrepareFilterLevelSearchModelAsync(FilterLevelSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -250,11 +259,13 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual Task<GdprConsentSearchModel> PrepareGdprConsentSearchModelAsync(GdprConsentSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareGdprConsentSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareGdprConsentSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -267,13 +278,18 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<AddressSettingsModel> PrepareAddressSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareAddressSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var addressSettings = await _settingService.LoadSettingAsync<AddressSettings>(storeId);
+		_logger.LogDebug("PrepareAddressSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareAddressSettingsModelAsync(): addressSettings → {AddressSettings}", addressSettings);
 
         //fill in model values from the entity
         var model = addressSettings.ToSettingsModel<AddressSettingsModel>();
 
+		_logger.LogDebug("PrepareAddressSettingsModelAsync(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting PrepareAddressSettingsModelAsync()");
         return model;
     }
 
@@ -286,13 +302,18 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<CustomerSettingsModel> PrepareCustomerSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var customerSettings = await _settingService.LoadSettingAsync<CustomerSettings>(storeId);
+		_logger.LogDebug("PrepareCustomerSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareCustomerSettingsModelAsync(): customerSettings → {CustomerSettings}", customerSettings);
 
         //fill in model values from the entity
         var model = customerSettings.ToSettingsModel<CustomerSettingsModel>();
 
+		_logger.LogDebug("PrepareCustomerSettingsModelAsync(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting PrepareCustomerSettingsModelAsync()");
         return model;
     }
 
@@ -305,13 +326,18 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<MultiFactorAuthenticationSettingsModel> PrepareMultiFactorAuthenticationSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareMultiFactorAuthenticationSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var multiFactorAuthenticationSettings = await _settingService.LoadSettingAsync<MultiFactorAuthenticationSettings>(storeId);
+		_logger.LogDebug("PrepareMultiFactorAuthenticationSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareMultiFactorAuthenticationSettingsModelAsync(): multiFactorAuthenticationSettings → {MultiFactorAuthenticationSettings}", multiFactorAuthenticationSettings);
 
         //fill in model values from the entity
         var model = multiFactorAuthenticationSettings.ToSettingsModel<MultiFactorAuthenticationSettingsModel>();
 
+		_logger.LogDebug("PrepareMultiFactorAuthenticationSettingsModelAsync(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting PrepareMultiFactorAuthenticationSettingsModelAsync()");
         return model;
 
     }
@@ -325,9 +351,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<DateTimeSettingsModel> PrepareDateTimeSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareDateTimeSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var dateTimeSettings = await _settingService.LoadSettingAsync<DateTimeSettings>(storeId);
+		_logger.LogDebug("PrepareDateTimeSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareDateTimeSettingsModelAsync(): dateTimeSettings → {DateTimeSettings}", dateTimeSettings);
 
         //fill in model values from the entity
         var model = new DateTimeSettingsModel
@@ -337,10 +366,12 @@ public partial class SettingModelFactory : ISettingModelFactory
 
         //fill in additional values (not existing in the entity)
         model.DefaultStoreTimeZoneId = _dateTimeHelper.DefaultStoreTimeZone.Id;
+		_logger.LogDebug("PrepareDateTimeSettingsModelAsync(): model.DefaultStoreTimeZoneId → {Arg0}", model.DefaultStoreTimeZoneId);
 
         //prepare available time zones
         await _baseAdminModelFactory.PrepareTimeZonesAsync(model.AvailableTimeZones, false);
 
+		_logger.LogDebug("<<< Exiting PrepareDateTimeSettingsModelAsync()");
         return model;
     }
 
@@ -353,9 +384,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<ExternalAuthenticationSettingsModel> PrepareExternalAuthenticationSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareExternalAuthenticationSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var externalAuthenticationSettings = await _settingService.LoadSettingAsync<ExternalAuthenticationSettings>(storeId);
+		_logger.LogDebug("PrepareExternalAuthenticationSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareExternalAuthenticationSettingsModelAsync(): externalAuthenticationSettings → {ExternalAuthenticationSettings}", externalAuthenticationSettings);
 
         //fill in model values from the entity
         var model = new ExternalAuthenticationSettingsModel
@@ -363,6 +397,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             AllowCustomersToRemoveAssociations = externalAuthenticationSettings.AllowCustomersToRemoveAssociations
         };
 
+		_logger.LogDebug("<<< Exiting PrepareExternalAuthenticationSettingsModelAsync()");
         return model;
     }
 
@@ -375,11 +410,15 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<StoreInformationSettingsModel> PrepareStoreInformationSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareStoreInformationSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var storeInformationSettings = await _settingService.LoadSettingAsync<StoreInformationSettings>(storeId);
+		_logger.LogDebug("PrepareStoreInformationSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareStoreInformationSettingsModelAsync(): storeInformationSettings → {StoreInformationSettings}", storeInformationSettings);
         var commonSettings = await _settingService.LoadSettingAsync<CommonSettings>(storeId);
 
+		_logger.LogDebug("PrepareStoreInformationSettingsModelAsync(): commonSettings → {CommonSettings}", commonSettings);
         //fill in model values from the entity
         var model = new StoreInformationSettingsModel
         {
@@ -417,6 +456,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.UseSystemEmailForContactUsForm_OverrideForStore = await _settingService.SettingExistsAsync(commonSettings, x => x.UseSystemEmailForContactUsForm, storeId);
         model.PopupForTermsOfServiceLinks_OverrideForStore = await _settingService.SettingExistsAsync(commonSettings, x => x.PopupForTermsOfServiceLinks, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareStoreInformationSettingsModelAsync()");
         return model;
     }
 
@@ -429,9 +469,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<SitemapSettingsModel> PrepareSitemapSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareSitemapSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var sitemapSettings = await _settingService.LoadSettingAsync<SitemapSettings>(storeId);
+		_logger.LogDebug("PrepareSitemapSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareSitemapSettingsModelAsync(): sitemapSettings → {SitemapSettings}", sitemapSettings);
 
         //fill in model values from the entity
         var model = new SitemapSettingsModel
@@ -461,6 +504,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.SitemapIncludeNews_OverrideForStore = await _settingService.SettingExistsAsync(sitemapSettings, x => x.SitemapIncludeNews, storeId);
         model.SitemapIncludeTopics_OverrideForStore = await _settingService.SettingExistsAsync(sitemapSettings, x => x.SitemapIncludeTopics, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareSitemapSettingsModelAsync()");
         return model;
     }
 
@@ -473,9 +517,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<MinificationSettingsModel> PrepareMinificationSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareMinificationSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var minificationSettings = await _settingService.LoadSettingAsync<CommonSettings>(storeId);
+		_logger.LogDebug("PrepareMinificationSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareMinificationSettingsModelAsync(): minificationSettings → {MinificationSettings}", minificationSettings);
 
         //fill in model values from the entity
         var model = new MinificationSettingsModel
@@ -491,6 +538,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.EnableHtmlMinification_OverrideForStore = await _settingService.SettingExistsAsync(minificationSettings, x => x.EnableHtmlMinification, storeId);
         model.UseResponseCompression_OverrideForStore = await _settingService.SettingExistsAsync(minificationSettings, x => x.UseResponseCompression, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareMinificationSettingsModelAsync()");
         return model;
     }
 
@@ -503,9 +551,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<SeoSettingsModel> PrepareSeoSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareSeoSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var seoSettings = await _settingService.LoadSettingAsync<SeoSettings>(storeId);
+		_logger.LogDebug("PrepareSeoSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareSeoSettingsModelAsync(): seoSettings → {SeoSettings}", seoSettings);
 
         //fill in model values from the entity
         var model = new SeoSettingsModel
@@ -540,6 +591,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.CustomHeadTags_OverrideForStore = await _settingService.SettingExistsAsync(seoSettings, x => x.CustomHeadTags, storeId);
         model.MicrodataEnabled_OverrideForStore = await _settingService.SettingExistsAsync(seoSettings, x => x.MicrodataEnabled, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareSeoSettingsModelAsync()");
         return model;
     }
 
@@ -552,9 +604,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<SecuritySettingsModel> PrepareSecuritySettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareSecuritySettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var securitySettings = await _settingService.LoadSettingAsync<SecuritySettings>(storeId);
+		_logger.LogDebug("PrepareSecuritySettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareSecuritySettingsModelAsync(): securitySettings → {SecuritySettings}", securitySettings);
 
         //fill in model values from the entity
         var model = new SecuritySettingsModel
@@ -567,6 +622,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         if (securitySettings.AdminAreaAllowedIpAddresses != null)
             model.AdminAreaAllowedIpAddresses = string.Join(",", securitySettings.AdminAreaAllowedIpAddresses);
 
+		_logger.LogDebug("<<< Exiting PrepareSecuritySettingsModelAsync()");
         return model;
     }
 
@@ -579,13 +635,17 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<CaptchaSettingsModel> PrepareCaptchaSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCaptchaSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var captchaSettings = await _settingService.LoadSettingAsync<CaptchaSettings>(storeId);
+		_logger.LogDebug("PrepareCaptchaSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareCaptchaSettingsModelAsync(): captchaSettings → {CaptchaSettings}", captchaSettings);
 
         //fill in model values from the entity
         var model = captchaSettings.ToSettingsModel<CaptchaSettingsModel>();
 
+		_logger.LogDebug("PrepareCaptchaSettingsModelAsync(): model → {Model}", model);
         model.CaptchaTypeValues = await captchaSettings.CaptchaType.ToSelectListAsync();
 
         if (storeId <= 0)
@@ -610,6 +670,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.CaptchaType_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.CaptchaType, storeId);
         model.ReCaptchaV3ScoreThreshold_OverrideForStore = await _settingService.SettingExistsAsync(captchaSettings, x => x.ReCaptchaV3ScoreThreshold, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareCaptchaSettingsModelAsync()");
         return model;
     }
 
@@ -622,9 +683,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<PdfSettingsModel> PreparePdfSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PreparePdfSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var pdfSettings = await _settingService.LoadSettingAsync<PdfSettings>(storeId);
+		_logger.LogDebug("PreparePdfSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PreparePdfSettingsModelAsync(): pdfSettings → {PdfSettings}", pdfSettings);
 
         //fill in model values from the entity
         var model = new PdfSettingsModel
@@ -646,6 +710,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.InvoiceFooterTextColumn1_OverrideForStore = await _settingService.SettingExistsAsync(pdfSettings, x => x.InvoiceFooterTextColumn1, storeId);
         model.InvoiceFooterTextColumn2_OverrideForStore = await _settingService.SettingExistsAsync(pdfSettings, x => x.InvoiceFooterTextColumn2, storeId);
 
+		_logger.LogDebug("<<< Exiting PreparePdfSettingsModelAsync()");
         return model;
     }
 
@@ -658,9 +723,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<LocalizationSettingsModel> PrepareLocalizationSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareLocalizationSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var localizationSettings = await _settingService.LoadSettingAsync<LocalizationSettings>(storeId);
+		_logger.LogDebug("PrepareLocalizationSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareLocalizationSettingsModelAsync(): localizationSettings → {LocalizationSettings}", localizationSettings);
 
         //fill in model values from the entity
         var model = new LocalizationSettingsModel
@@ -673,6 +741,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             LoadAllUrlRecordsOnStartup = localizationSettings.LoadAllUrlRecordsOnStartup
         };
 
+		_logger.LogDebug("<<< Exiting PrepareLocalizationSettingsModelAsync()");
         return model;
     }
 
@@ -685,9 +754,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<TranslationSettingsModel> PrepareTranslationSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareTranslationSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var translationSettings = await _settingService.LoadSettingAsync<TranslationSettings>(storeId);
+		_logger.LogDebug("PrepareTranslationSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareTranslationSettingsModelAsync(): translationSettings → {TranslationSettings}", translationSettings);
 
         //fill in model values from the entity
         var model = new TranslationSettingsModel
@@ -703,10 +775,12 @@ public partial class SettingModelFactory : ISettingModelFactory
         //prepare available translation services
         var availableTranslationServices = await TranslationServiceType.GoogleTranslate.ToSelectListAsync(false);
         model.AvailableTranslationService = availableTranslationServices.ToList();
+		_logger.LogDebug("PrepareTranslationSettingsModelAsync(): availableTranslationServices → {AvailableTranslationServices}", availableTranslationServices);
 
         //prepare available languages
         await _baseAdminModelFactory.PrepareLanguagesAsync(model.AvailableLanguages, false);
 
+		_logger.LogDebug("<<< Exiting PrepareTranslationSettingsModelAsync()");
         return model;
     }
 
@@ -719,9 +793,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<AdminAreaSettingsModel> PrepareAdminAreaSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareAdminAreaSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var adminAreaSettings = await _settingService.LoadSettingAsync<AdminAreaSettings>(storeId);
+		_logger.LogDebug("PrepareAdminAreaSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareAdminAreaSettingsModelAsync(): adminAreaSettings → {AdminAreaSettings}", adminAreaSettings);
 
         //fill in model values from the entity
         var model = new AdminAreaSettingsModel
@@ -736,6 +813,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             model.UseRichEditorInMessageTemplates_OverrideForStore = await _settingService.SettingExistsAsync(adminAreaSettings, x => x.UseRichEditorInMessageTemplates, storeId);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareAdminAreaSettingsModelAsync()");
         return model;
     }
 
@@ -761,9 +839,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<CustomHtmlSettingsModel> PrepareCustomHtmlSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCustomHtmlSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var commonSettings = await _settingService.LoadSettingAsync<CommonSettings>(storeId);
+		_logger.LogDebug("PrepareCustomHtmlSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareCustomHtmlSettingsModelAsync(): commonSettings → {CommonSettings}", commonSettings);
 
         //fill in model values from the entity
         var model = new CustomHtmlSettingsModel
@@ -779,6 +860,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             model.FooterCustomHtml_OverrideForStore = await _settingService.SettingExistsAsync(commonSettings, x => x.FooterCustomHtml, storeId);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCustomHtmlSettingsModelAsync()");
         return model;
     }
 
@@ -792,6 +874,7 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     protected virtual async Task<RobotsTxtSettingsModel> PrepareRobotsTxtSettingsModelAsync(RobotsTxtSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareRobotsTxtSettingsModelAsync(model={Model})", model);
         var additionsInstruction =
             string.Format(
                 await _localizationService.GetResourceAsync("Admin.Configuration.Settings.GeneralCommon.RobotsAdditionsInstruction"),
@@ -803,6 +886,8 @@ public partial class SettingModelFactory : ISettingModelFactory
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var robotsTxtSettings = await _settingService.LoadSettingAsync<RobotsTxtSettings>(storeId);
+		_logger.LogDebug("PrepareRobotsTxtSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareRobotsTxtSettingsModelAsync(model={Model}): robotsTxtSettings → {RobotsTxtSettings}", model, robotsTxtSettings);
 
         model ??= new RobotsTxtSettingsModel
         {
@@ -823,6 +908,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             }));
 
         model.AdditionsInstruction = additionsInstruction;
+		_logger.LogDebug("PrepareRobotsTxtSettingsModelAsync(model={Model}): model.AdditionsInstruction → {Arg1}", model, model.AdditionsInstruction);
 
         if (storeId <= 0)
             return model;
@@ -833,6 +919,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.DisallowPaths_OverrideForStore = await _settingService.SettingExistsAsync(robotsTxtSettings, x => x.DisallowPaths, storeId);
         model.LocalizableDisallowPaths_OverrideForStore = await _settingService.SettingExistsAsync(robotsTxtSettings, x => x.LocalizableDisallowPaths, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareRobotsTxtSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -850,6 +937,7 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<AppSettingsModel> PrepareAppSettingsModel(AppSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareAppSettingsModel(model={Model})", model);
         model ??= new AppSettingsModel
         {
             CacheConfigModel = _appSettings.Get<CacheConfig>().ToConfigModel<CacheConfigModel>(),
@@ -871,8 +959,10 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.EnvironmentVariables.AddRange(from property in model.GetType().GetProperties()
             where property.Name != nameof(AppSettingsModel.EnvironmentVariables)
             from pp in property.PropertyType.GetProperties()
+			using Microsoft.Extensions.Logging;
             where Environment.GetEnvironmentVariables().Contains($"{property.Name.Replace("Model", "").Replace("DataConfig", "ConnectionStrings")}__{pp.Name}")
             select $"{property.Name}_{pp.Name}");
+		_logger.LogDebug("<<< Exiting PrepareAppSettingsModel(model={Model})", model);
         return model;
     }
 
@@ -886,15 +976,20 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<BlogSettingsModel> PrepareBlogSettingsModelAsync(BlogSettingsModel model = null)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         //load settings for a chosen store scope
+		_logger.LogDebug(">>> Entering PrepareBlogSettingsModelAsync(model={Model})", model);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var blogSettings = await _settingService.LoadSettingAsync<BlogSettings>(storeId);
+		_logger.LogDebug("PrepareBlogSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareBlogSettingsModelAsync(model={Model}): blogSettings → {BlogSettings}", model, blogSettings);
 
         //fill in model values from the entity
         model ??= blogSettings.ToSettingsModel<BlogSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareBlogSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
 
         if (storeId <= 0)
             return model;
@@ -908,6 +1003,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.ShowHeaderRssUrl_OverrideForStore = await _settingService.SettingExistsAsync(blogSettings, x => x.ShowHeaderRssUrl, storeId);
         model.BlogCommentsMustBeApproved_OverrideForStore = await _settingService.SettingExistsAsync(blogSettings, x => x.BlogCommentsMustBeApproved, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareBlogSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -921,15 +1017,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<VendorSettingsModel> PrepareVendorSettingsModelAsync(VendorSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var vendorSettings = await _settingService.LoadSettingAsync<VendorSettings>(storeId);
+		_logger.LogDebug("PrepareVendorSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareVendorSettingsModelAsync(model={Model}): vendorSettings → {VendorSettings}", model, vendorSettings);
 
         //fill in model values from the entity
         model ??= vendorSettings.ToSettingsModel<VendorSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareVendorSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
 
         //fill in overridden values
         if (storeId > 0)
@@ -950,6 +1050,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         //prepare nested search model
         await _vendorAttributeModelFactory.PrepareVendorAttributeSearchModelAsync(model.VendorAttributeSearchModel);
 
+		_logger.LogDebug("<<< Exiting PrepareVendorSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -963,15 +1064,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<ForumSettingsModel> PrepareForumSettingsModelAsync(ForumSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareForumSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var forumSettings = await _settingService.LoadSettingAsync<ForumSettings>(storeId);
+		_logger.LogDebug("PrepareForumSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareForumSettingsModelAsync(model={Model}): forumSettings → {ForumSettings}", model, forumSettings);
 
         //fill in model values from the entity
         model ??= forumSettings.ToSettingsModel<ForumSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareForumSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
         model.ForumEditorValues = await forumSettings.ForumEditor.ToSelectListAsync();
 
         if (storeId <= 0)
@@ -1002,6 +1107,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.SearchResultsPageSize_OverrideForStore = await _settingService.SettingExistsAsync(forumSettings, x => x.SearchResultsPageSize, storeId);
         model.ActiveDiscussionsPageSize_OverrideForStore = await _settingService.SettingExistsAsync(forumSettings, x => x.ActiveDiscussionsPageSize, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareForumSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1015,15 +1121,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<NewsSettingsModel> PrepareNewsSettingsModelAsync(NewsSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var newsSettings = await _settingService.LoadSettingAsync<NewsSettings>(storeId);
+		_logger.LogDebug("PrepareNewsSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareNewsSettingsModelAsync(model={Model}): newsSettings → {NewsSettings}", model, newsSettings);
 
         //fill in model values from the entity
         model ??= newsSettings.ToSettingsModel<NewsSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareNewsSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
 
         if (storeId <= 0)
             return model;
@@ -1038,6 +1148,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.ShowHeaderRssUrl_OverrideForStore = await _settingService.SettingExistsAsync(newsSettings, x => x.ShowHeaderRssUrl, storeId);
         model.NewsCommentsMustBeApproved_OverrideForStore = await _settingService.SettingExistsAsync(newsSettings, x => x.NewsCommentsMustBeApproved, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareNewsSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1051,15 +1162,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<ShippingSettingsModel> PrepareShippingSettingsModelAsync(ShippingSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var shippingSettings = await _settingService.LoadSettingAsync<ShippingSettings>(storeId);
+		_logger.LogDebug("PrepareShippingSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareShippingSettingsModelAsync(model={Model}): shippingSettings → {ShippingSettings}", model, shippingSettings);
 
         //fill in model values from the entity
         model ??= shippingSettings.ToSettingsModel<ShippingSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareShippingSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
         model.PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
         model.SortShippingValues = await shippingSettings.ShippingSorting.ToSelectListAsync();
 
@@ -1091,10 +1206,12 @@ public partial class SettingModelFactory : ISettingModelFactory
         //prepare shipping origin address
         var originAddress = await _addressService.GetAddressByIdAsync(shippingSettings.ShippingOriginAddressId);
         if (originAddress != null)
+			_logger.LogDebug("PrepareShippingSettingsModelAsync(model={Model}): originAddress → {OriginAddress}", model, originAddress);
             model.ShippingOriginAddress = originAddress.ToModel(model.ShippingOriginAddress);
         await _addressModelFactory.PrepareAddressModelAsync(model.ShippingOriginAddress, originAddress);
         model.ShippingOriginAddress.ZipPostalCodeRequired = true;
 
+		_logger.LogDebug("<<< Exiting PrepareShippingSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1108,9 +1225,12 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<TaxSettingsModel> PrepareTaxSettingsModelAsync(TaxSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareTaxSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var taxSettings = await _settingService.LoadSettingAsync<TaxSettings>(storeId);
+		_logger.LogDebug("PrepareTaxSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareTaxSettingsModelAsync(model={Model}): taxSettings → {TaxSettings}", model, taxSettings);
 
         //fill in model values from the entity
         model ??= taxSettings.ToSettingsModel<TaxSettingsModel>();
@@ -1119,6 +1239,7 @@ public partial class SettingModelFactory : ISettingModelFactory
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareTaxSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
 
         //fill in overridden values
         if (storeId > 0)
@@ -1164,10 +1285,12 @@ public partial class SettingModelFactory : ISettingModelFactory
         //prepare default tax address
         var defaultAddress = await _addressService.GetAddressByIdAsync(taxSettings.DefaultTaxAddressId);
         if (defaultAddress != null)
+			_logger.LogDebug("PrepareTaxSettingsModelAsync(model={Model}): defaultAddress → {DefaultAddress}", model, defaultAddress);
             model.DefaultTaxAddress = defaultAddress.ToModel(model.DefaultTaxAddress);
         await _addressModelFactory.PrepareAddressModelAsync(model.DefaultTaxAddress, defaultAddress);
         model.DefaultTaxAddress.ZipPostalCodeRequired = true;
 
+		_logger.LogDebug("<<< Exiting PrepareTaxSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1181,15 +1304,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<CatalogSettingsModel> PrepareCatalogSettingsModelAsync(CatalogSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareCatalogSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var catalogSettings = await _settingService.LoadSettingAsync<CatalogSettings>(storeId);
+		_logger.LogDebug("PrepareCatalogSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareCatalogSettingsModelAsync(model={Model}): catalogSettings → {CatalogSettings}", model, catalogSettings);
 
         //fill in model values from the entity
         model ??= catalogSettings.ToSettingsModel<CatalogSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareCatalogSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
         model.PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
         model.AttributeValueOutOfStockDisplayTypes = await catalogSettings.AttributeValueOutOfStockDisplayType.ToSelectListAsync();
         model.ProductUrlStructureTypes = await ((ProductUrlStructureType)catalogSettings.ProductUrlStructureTypeId).ToSelectListAsync();
@@ -1307,6 +1434,7 @@ public partial class SettingModelFactory : ISettingModelFactory
 
         await PrepareArtificialIntelligenceSettingsModelAsync(model.ArtificialIntelligenceSettingsModel);
 
+		_logger.LogDebug("<<< Exiting PrepareCatalogSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1320,6 +1448,7 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<FilterLevelSettingsModel> PrepareFilterLevelSettingsModelAsync(FilterLevelSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelSettingsModelAsync(model={Model})", model);
         //load settings
 
         //fill in model values from the entity
@@ -1327,6 +1456,7 @@ public partial class SettingModelFactory : ISettingModelFactory
 
         //prepare nested search model
         await PrepareFilterLevelSearchModelAsync(model.FilterLevelSearchModel);
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1340,11 +1470,13 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<FilterLevelListModel> PrepareFilterLevelListModelAsync(FilterLevelSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get filter levels
         var filterLevels = Enum.GetValues(typeof(FilterLevelEnum)).OfType<FilterLevelEnum>().ToList().ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareFilterLevelListModelAsync(searchModel={SearchModel}): filterLevels → {FilterLevels}", searchModel, filterLevels);
         //prepare list model
         var model = await new FilterLevelListModel().PrepareToGridAsync(searchModel, filterLevels, () =>
         {
@@ -1353,6 +1485,7 @@ public partial class SettingModelFactory : ISettingModelFactory
                 //fill in model values from the entity
                 var filterLevelModel = new FilterLevelModel { Id = (int)filterLevel };
 
+				_logger.LogDebug("PrepareFilterLevelListModelAsync(searchModel={SearchModel}): filterLevelModel → {FilterLevelModel}", searchModel, filterLevelModel);
                 //fill in additional values (not existing in the entity)
                 filterLevelModel.Name = await _localizationService.GetLocalizedEnumAsync(filterLevel);
                 filterLevelModel.Enabled = !_filterLevelSettings.FilterLevelEnumDisabled.Contains((int)filterLevel);
@@ -1361,6 +1494,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             }).OrderBy(filterLevel => filterLevel.Id);
         });
 
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1408,14 +1542,18 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<SortOptionListModel> PrepareSortOptionListModelAsync(SortOptionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSortOptionListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var catalogSettings = await _settingService.LoadSettingAsync<CatalogSettings>(storeId);
+		_logger.LogDebug("PrepareSortOptionListModelAsync(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
+		_logger.LogDebug("PrepareSortOptionListModelAsync(searchModel={SearchModel}): catalogSettings → {CatalogSettings}", searchModel, catalogSettings);
 
         //get sort options
         var sortOptions = Enum.GetValues(typeof(ProductSortingEnum)).OfType<ProductSortingEnum>().ToList().ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareSortOptionListModelAsync(searchModel={SearchModel}): sortOptions → {SortOptions}", searchModel, sortOptions);
         //prepare list model
         var model = await new SortOptionListModel().PrepareToGridAsync(searchModel, sortOptions, () =>
         {
@@ -1424,16 +1562,19 @@ public partial class SettingModelFactory : ISettingModelFactory
                 //fill in model values from the entity
                 var sortOptionModel = new SortOptionModel { Id = (int)option };
 
+				_logger.LogDebug("PrepareSortOptionListModelAsync(searchModel={SearchModel}): sortOptionModel → {SortOptionModel}", searchModel, sortOptionModel);
                 //fill in additional values (not existing in the entity)
                 sortOptionModel.Name = await _localizationService.GetLocalizedEnumAsync(option);
                 sortOptionModel.IsActive = !catalogSettings.ProductSortingEnumDisabled.Contains((int)option);
                 sortOptionModel.DisplayOrder = catalogSettings
+					_logger.LogDebug("PrepareSortOptionListModelAsync(searchModel={SearchModel}): sortOptionModel.DisplayOrder → {Arg1}", searchModel, sortOptionModel.DisplayOrder);
                     .ProductSortingEnumDisplayOrder.TryGetValue((int)option, out var value) ? value : (int)option;
 
                 return sortOptionModel;
             }).OrderBy(option => option.DisplayOrder);
         });
 
+		_logger.LogDebug("<<< Exiting PrepareSortOptionListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1447,15 +1588,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<RewardPointsSettingsModel> PrepareRewardPointsSettingsModelAsync(RewardPointsSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareRewardPointsSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var rewardPointsSettings = await _settingService.LoadSettingAsync<RewardPointsSettings>(storeId);
+		_logger.LogDebug("PrepareRewardPointsSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareRewardPointsSettingsModelAsync(model={Model}): rewardPointsSettings → {RewardPointsSettings}", model, rewardPointsSettings);
 
         //fill in model values from the entity
         model ??= rewardPointsSettings.ToSettingsModel<RewardPointsSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareRewardPointsSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
         model.PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
         model.ActivatePointsImmediately = model.ActivationDelay <= 0;
 
@@ -1477,6 +1622,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.DisplayHowMuchWillBeEarned_OverrideForStore = await _settingService.SettingExistsAsync(rewardPointsSettings, x => x.DisplayHowMuchWillBeEarned, storeId);
         model.PageSize_OverrideForStore = await _settingService.SettingExistsAsync(rewardPointsSettings, x => x.PageSize, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareRewardPointsSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1490,15 +1636,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<OrderSettingsModel> PrepareOrderSettingsModelAsync(OrderSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareOrderSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var orderSettings = await _settingService.LoadSettingAsync<OrderSettings>(storeId);
+		_logger.LogDebug("PrepareOrderSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareOrderSettingsModelAsync(model={Model}): orderSettings → {OrderSettings}", model, orderSettings);
 
         //fill in model values from the entity
         model ??= orderSettings.ToSettingsModel<OrderSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareOrderSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
         model.PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
         model.OrderIdent = await _dataProvider.GetTableIdentAsync<Order>();
 
@@ -1539,6 +1689,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         await _returnRequestModelFactory.PrepareReturnRequestReasonSearchModelAsync(model.ReturnRequestReasonSearchModel);
         await _returnRequestModelFactory.PrepareReturnRequestActionSearchModelAsync(model.ReturnRequestActionSearchModel);
 
+		_logger.LogDebug("<<< Exiting PrepareOrderSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1552,15 +1703,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<ShoppingCartSettingsModel> PrepareShoppingCartSettingsModelAsync(ShoppingCartSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareShoppingCartSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var shoppingCartSettings = await _settingService.LoadSettingAsync<ShoppingCartSettings>(storeId);
+		_logger.LogDebug("PrepareShoppingCartSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareShoppingCartSettingsModelAsync(model={Model}): shoppingCartSettings → {ShoppingCartSettings}", model, shoppingCartSettings);
 
         //fill in model values from the entity
         model ??= shoppingCartSettings.ToSettingsModel<ShoppingCartSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareShoppingCartSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
 
         if (storeId <= 0)
             return model;
@@ -1588,6 +1743,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.AllowCartItemEditing_OverrideForStore = await _settingService.SettingExistsAsync(shoppingCartSettings, x => x.AllowCartItemEditing, storeId);
         model.GroupTierPricesForDistinctShoppingCartItems_OverrideForStore = await _settingService.SettingExistsAsync(shoppingCartSettings, x => x.GroupTierPricesForDistinctShoppingCartItems, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareShoppingCartSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1601,15 +1757,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<MediaSettingsModel> PrepareMediaSettingsModelAsync(MediaSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareMediaSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var mediaSettings = await _settingService.LoadSettingAsync<MediaSettings>(storeId);
+		_logger.LogDebug("PrepareMediaSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareMediaSettingsModelAsync(model={Model}): mediaSettings → {MediaSettings}", model, mediaSettings);
 
         //fill in model values from the entity
         model ??= mediaSettings.ToSettingsModel<MediaSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareMediaSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
         model.PicturesStoredIntoDatabase = await _pictureService.IsStoreInDbAsync();
 
         if (storeId <= 0)
@@ -1635,6 +1795,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.AllowSvgUploads_OverrideForStore = await _settingService.SettingExistsAsync(mediaSettings, x => x.AllowSvgUploads, storeId);
         model.ProductDefaultImageId_OverrideForStore = await _settingService.SettingExistsAsync(mediaSettings, x => x.ProductDefaultImageId, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareMediaSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1648,6 +1809,7 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<CustomerUserSettingsModel> PrepareCustomerUserSettingsModelAsync(CustomerUserSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerUserSettingsModelAsync(model={Model})", model);
         model ??= new CustomerUserSettingsModel
         {
             ActiveStoreScopeConfiguration = await _storeContext.GetActiveStoreScopeConfigurationAsync()
@@ -1678,6 +1840,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         await _customerAttributeModelFactory.PrepareCustomerAttributeSearchModelAsync(model.CustomerAttributeSearchModel);
         await _addressAttributeModelFactory.PrepareAddressAttributeSearchModelAsync(model.AddressAttributeSearchModel);
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerUserSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1691,15 +1854,19 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<GdprSettingsModel> PrepareGdprSettingsModelAsync(GdprSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareGdprSettingsModelAsync(model={Model})", model);
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var gdprSettings = await _settingService.LoadSettingAsync<GdprSettings>(storeId);
+		_logger.LogDebug("PrepareGdprSettingsModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
+		_logger.LogDebug("PrepareGdprSettingsModelAsync(model={Model}): gdprSettings → {GdprSettings}", model, gdprSettings);
 
         //fill in model values from the entity
         model ??= gdprSettings.ToSettingsModel<GdprSettingsModel>();
 
         //fill in additional values (not existing in the entity)
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareGdprSettingsModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
 
         //prepare nested search model
         await PrepareGdprConsentSearchModelAsync(model.GdprConsentSearchModel);
@@ -1714,6 +1881,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         model.LogUserProfileChanges_OverrideForStore = await _settingService.SettingExistsAsync(gdprSettings, x => x.LogUserProfileChanges, storeId);
         model.DeleteInactiveCustomersAfterMonths_OverrideForStore = await _settingService.SettingExistsAsync(gdprSettings, x => x.DeleteInactiveCustomersAfterMonths, storeId);
 
+		_logger.LogDebug("<<< Exiting PrepareGdprSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1727,11 +1895,13 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<GdprConsentListModel> PrepareGdprConsentListModelAsync(GdprConsentSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareGdprConsentListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get sort options
         var consentList = (await _gdprService.GetAllConsentsAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareGdprConsentListModelAsync(searchModel={SearchModel}): consentList → {ConsentList}", searchModel, consentList);
         //prepare list model
         var model = await new GdprConsentListModel().PrepareToGridAsync(searchModel, consentList, () =>
         {
@@ -1739,14 +1909,17 @@ public partial class SettingModelFactory : ISettingModelFactory
             {
                 var gdprConsentModel = consent.ToModel<GdprConsentModel>();
 
+				_logger.LogDebug("PrepareGdprConsentListModelAsync(searchModel={SearchModel}): gdprConsentModel → {GdprConsentModel}", searchModel, gdprConsentModel);
                 var gdprConsent = await _gdprService.GetConsentByIdAsync(gdprConsentModel.Id);
                 gdprConsentModel.Message = await _localizationService.GetLocalizedAsync(gdprConsent, entity => entity.Message);
+				_logger.LogDebug("PrepareGdprConsentListModelAsync(searchModel={SearchModel}): gdprConsent → {GdprConsent}", searchModel, gdprConsent);
                 gdprConsentModel.RequiredMessage = await _localizationService.GetLocalizedAsync(gdprConsent, entity => entity.RequiredMessage);
 
                 return gdprConsentModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareGdprConsentListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1798,6 +1971,7 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<GeneralCommonSettingsModel> PrepareGeneralCommonSettingsModelAsync(GeneralCommonSettingsModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareGeneralCommonSettingsModelAsync(model={Model})", model);
         model ??= new GeneralCommonSettingsModel
         {
             ActiveStoreScopeConfiguration = await _storeContext.GetActiveStoreScopeConfigurationAsync()
@@ -1839,6 +2013,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         //prepare custom HTML settings model
         model.CustomHtmlSettings = await PrepareCustomHtmlSettingsModelAsync();
 
+		_logger.LogDebug("<<< Exiting PrepareGeneralCommonSettingsModelAsync(model={Model})", model);
         return model;
     }
 
@@ -1851,13 +2026,18 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<ProductEditorSettingsModel> PrepareProductEditorSettingsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareProductEditorSettingsModelAsync()");
         //load settings for a chosen store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var productEditorSettings = await _settingService.LoadSettingAsync<ProductEditorSettings>(storeId);
+		_logger.LogDebug("PrepareProductEditorSettingsModelAsync(): storeId → {StoreId}", storeId);
+		_logger.LogDebug("PrepareProductEditorSettingsModelAsync(): productEditorSettings → {ProductEditorSettings}", productEditorSettings);
 
         //fill in model values from the entity
         var model = productEditorSettings.ToSettingsModel<ProductEditorSettingsModel>();
 
+		_logger.LogDebug("PrepareProductEditorSettingsModelAsync(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting PrepareProductEditorSettingsModelAsync()");
         return model;
     }
 
@@ -1871,6 +2051,7 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<SettingSearchModel> PrepareSettingSearchModelAsync(SettingSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSettingSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare model to add
@@ -1879,6 +2060,7 @@ public partial class SettingModelFactory : ISettingModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareSettingSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1892,11 +2074,13 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<SettingListModel> PrepareSettingListModelAsync(SettingSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSettingListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get settings
         var settings = (await _settingService.GetAllSettingsAsync()).AsQueryable();
 
+		_logger.LogDebug("PrepareSettingListModelAsync(searchModel={SearchModel}): settings → {Settings}", searchModel, settings);
         //filter settings
         if (!string.IsNullOrEmpty(searchModel.SearchSettingName))
             settings = settings.Where(setting => setting.Name.ToLowerInvariant().Contains(searchModel.SearchSettingName.ToLowerInvariant()));
@@ -1905,6 +2089,7 @@ public partial class SettingModelFactory : ISettingModelFactory
 
         var pagedSettings = settings.ToList().ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareSettingListModelAsync(searchModel={SearchModel}): pagedSettings → {PagedSettings}", searchModel, pagedSettings);
         //prepare list model
         var model = await new SettingListModel().PrepareToGridAsync(searchModel, pagedSettings, () =>
         {
@@ -1913,8 +2098,10 @@ public partial class SettingModelFactory : ISettingModelFactory
                 //fill in model values from the entity
                 var settingModel = setting.ToModel<SettingModel>();
 
+				_logger.LogDebug("PrepareSettingListModelAsync(searchModel={SearchModel}): settingModel → {SettingModel}", searchModel, settingModel);
                 //fill in additional values (not existing in the entity)
                 settingModel.Store = setting.StoreId > 0
+					_logger.LogDebug("PrepareSettingListModelAsync(searchModel={SearchModel}): settingModel.Store → {Arg1}", searchModel, settingModel.Store);
                     ? (await _storeService.GetStoreByIdAsync(setting.StoreId))?.Name ?? "Deleted"
                     : await _localizationService.GetResourceAsync("Admin.Configuration.Settings.AllSettings.Fields.StoreName.AllStores");
 
@@ -1922,6 +2109,7 @@ public partial class SettingModelFactory : ISettingModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareSettingListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1935,12 +2123,14 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<SettingModeModel> PrepareSettingModeModelAsync(string modeName)
     {
+		_logger.LogDebug(">>> Entering PrepareSettingModeModelAsync(modeName={ModeName})", modeName);
         var model = new SettingModeModel
         {
             ModeName = modeName,
             Enabled = await _genericAttributeService.GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), modeName)
         };
 
+		_logger.LogDebug("<<< Exiting PrepareSettingModeModelAsync(modeName={ModeName})", modeName);
         return model;
     }
 
@@ -1953,12 +2143,14 @@ public partial class SettingModelFactory : ISettingModelFactory
     /// </returns>
     public virtual async Task<StoreScopeConfigurationModel> PrepareStoreScopeConfigurationModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareStoreScopeConfigurationModelAsync()");
         var model = new StoreScopeConfigurationModel
         {
             Stores = (await _storeService.GetAllStoresAsync()).Select(store => store.ToModel<StoreModel>()).ToList(),
             StoreId = await _storeContext.GetActiveStoreScopeConfigurationAsync()
         };
 
+		_logger.LogDebug("<<< Exiting PrepareStoreScopeConfigurationModelAsync()");
         return model;
     }
 

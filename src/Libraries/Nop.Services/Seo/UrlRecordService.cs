@@ -43,12 +43,15 @@ public partial class UrlRecordService : IUrlRecordService
         _workContext = workContext;
         _localizationSettings = localizationSettings;
         _seoSettings = seoSettings;
+		logger.LogDebug(">>> Entering UrlRecordService()");
+		logger.LogDebug("<<< Exiting UrlRecordService()");
     }
 
     static UrlRecordService()
     {
         _okChars = new HashSet<char>("abcdefghijklmnopqrstuvwxyz1234567890 _-");
 
+		logger.LogDebug("UrlRecordService(): _okChars → {_okChars}", _okChars);
         // stores unicode characters and their "normalized"
         // values to a hash table. Character codes are referenced
         // by hex numbers because that's the most common way to
@@ -57,6 +60,7 @@ public partial class UrlRecordService : IUrlRecordService
         // upper-case comments are identifiers from the Unicode database. 
         // lower- and mixed-case comments are the author's
         _seoCharacterTable = new Dictionary<char, string>
+		logger.LogDebug("UrlRecordService(): _seoCharacterTable → {_seoCharacterTable}", _seoCharacterTable);
         {
             { '\u0041', "A" },
             { '\u0042', "B" },
@@ -1108,6 +1112,9 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteUrlRecordsAsync(IList<UrlRecord> urlRecords)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _urlRecordRepository.DeleteAsync(urlRecords);
     }
 
@@ -1121,6 +1128,8 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<IList<UrlRecord>> GetUrlRecordsByIdsAsync(int[] urlRecordIds)
     {
+		logger.LogDebug(">>> Entering GetUrlRecordsByIdsAsync(urlRecordIds={UrlRecordIds})", urlRecordIds);
+		logger.LogDebug("<<< Exiting GetUrlRecordsByIdsAsync(urlRecordIds={UrlRecordIds})", urlRecordIds);
         return await _urlRecordRepository.GetByIdsAsync(urlRecordIds, _ => default);
     }
 
@@ -1131,6 +1140,8 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertUrlRecordAsync(UrlRecord urlRecord)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _urlRecordRepository.InsertAsync(urlRecord);
     }
 
@@ -1141,6 +1152,8 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateUrlRecordAsync(UrlRecord urlRecord)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _urlRecordRepository.UpdateAsync(urlRecord);
     }
 
@@ -1154,8 +1167,10 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<UrlRecord> GetBySlugAsync(string slug)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(slug))
             return null;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         if (_localizationSettings.LoadAllUrlRecordsOnStartup)
         {
@@ -1183,6 +1198,7 @@ public partial class UrlRecordService : IUrlRecordService
 
             return await query.FirstOrDefaultAsync();
         });
+		logger.LogDebug("<<< Exiting GetBySlugAsync(slug={Slug})", slug);
     }
 
     /// <summary>
@@ -1233,6 +1249,9 @@ public partial class UrlRecordService : IUrlRecordService
         {
             //value tuples aren't json-serializable by default, so we use a string key
             static string formatKey(string name, int id) => $"{name}:{id}";
+			logger.LogDebug(">>> Entering formatKey(name={Name},id={Id})", name, id);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			logger.LogInformation("formatKey(name,id)={Name},{Id}: external service call took {Arg2} ms", name, id, __logStart.ElapsedMilliseconds);
 
             var activeSlugs = await _staticCacheManager.GetAsync(
                 _staticCacheManager.PrepareKeyForDefaultCache(NopSeoDefaults.UrlRecordEntityIdLookupCacheKey, languageId),
@@ -1240,15 +1259,19 @@ public partial class UrlRecordService : IUrlRecordService
                     .Where(x => x.IsActive && x.LanguageId == languageId)
                     .GroupBy(x => formatKey(x.EntityName, x.EntityId))
                     .ToDictionary(g => g.Key, g => g.MinBy(x => x.Id)!.Slug));
+				logger.LogDebug("<<< Exiting formatKey(name={Name},id={Id})", name, id);
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return activeSlugs.TryGetValue(formatKey(entityName, entityId), out var slug)
                 ? slug
                 : string.Empty;
+				logger.LogInformation("formatKey(name,id)={Name},{Id}: database query executed in {Arg2} ms", name, id, __logStart.ElapsedMilliseconds);
         }
 
         //gradual loading
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopSeoDefaults.UrlRecordCacheKey, entityId, entityName, languageId);
 
+		logger.LogWarning("async(): key → {Key}", key);
         return await _staticCacheManager.GetAsync(key, async () =>
         {
             var query = from ur in _urlRecordRepository.Table
@@ -1262,10 +1285,14 @@ public partial class UrlRecordService : IUrlRecordService
             //little hack here. nulls aren't cacheable so set it to ""
             return await query.FirstOrDefaultAsync() ?? string.Empty;
         });
+		logger.LogDebug("<<< Exiting async()");
+		logger.LogDebug("<<< Exiting GetActiveSlugAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId})", entityId, entityName, languageId);
     }
 
+	logger.LogInformation("async(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Save slug
+	logger.LogInformation("async(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     /// </summary>
     /// <typeparam name="T">Type</typeparam>
     /// <param name="entity">Entity</param>
@@ -1274,11 +1301,14 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveSlugAsync<T>(T entity, string slug, int languageId) where T : BaseEntity, ISlugSupported
     {
+		logger.LogDebug(">>> Entering SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId})", entity, slug, languageId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): entityName → {EntityName}", entity, slug, languageId, entityName);
         var query = from ur in _urlRecordRepository.Table
                     where ur.EntityId == entityId &&
                         ur.EntityName == entityName &&
@@ -1287,18 +1317,23 @@ public partial class UrlRecordService : IUrlRecordService
                     select ur;
         var allUrlRecords = await query.ToListAsync();
         var activeUrlRecord = allUrlRecords.FirstOrDefault(x => x.IsActive);
+		logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): allUrlRecords → {AllUrlRecords}", entity, slug, languageId, allUrlRecords);
+		logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): activeUrlRecord → {ActiveUrlRecord}", entity, slug, languageId, activeUrlRecord);
+		logger.LogInformation("SaveSlugAsync(entity,slug,languageId)={Entity},{Slug},{LanguageId}: database query executed in {Arg3} ms", entity, slug, languageId, __logStart.ElapsedMilliseconds);
         UrlRecord nonActiveRecordWithSpecifiedSlug;
 
         if (activeUrlRecord == null && !string.IsNullOrWhiteSpace(slug))
         {
             //find in non-active records with the specified slug
             nonActiveRecordWithSpecifiedSlug = allUrlRecords
+				logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): nonActiveRecordWithSpecifiedSlug → {NonActiveRecordWithSpecifiedSlug}", entity, slug, languageId, nonActiveRecordWithSpecifiedSlug);
                 .FirstOrDefault(
                     x => x.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase) && !x.IsActive);
             if (nonActiveRecordWithSpecifiedSlug != null)
             {
                 //mark non-active record as active
                 nonActiveRecordWithSpecifiedSlug.IsActive = true;
+				logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): nonActiveRecordWithSpecifiedSlug.IsActive → {Arg3}", entity, slug, languageId, nonActiveRecordWithSpecifiedSlug.IsActive);
                 await UpdateUrlRecordAsync(nonActiveRecordWithSpecifiedSlug);
             }
             else
@@ -1320,6 +1355,7 @@ public partial class UrlRecordService : IUrlRecordService
         {
             //disable the previous active URL record
             activeUrlRecord.IsActive = false;
+			logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): activeUrlRecord.IsActive → {Arg3}", entity, slug, languageId, activeUrlRecord.IsActive);
             await UpdateUrlRecordAsync(activeUrlRecord);
         }
 
@@ -1328,6 +1364,7 @@ public partial class UrlRecordService : IUrlRecordService
 
         //it should not be the same slug as in active URL record
         if (activeUrlRecord.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase))
+			logger.LogDebug("<<< Exiting SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId})", entity, slug, languageId);
             return;
 
         //find in non-active records with the specified slug
@@ -1451,6 +1488,7 @@ public partial class UrlRecordService : IUrlRecordService
         var seName = WhitespaceHyphenRegex().Replace(sb.ToString(), "-");
         seName = UnderscoreRegex().Replace(seName, "_");
 
+		logger.LogDebug("<<< Exiting GetSeNameAsync(name={Name},convertNonWesternChars={ConvertNonWesternChars},allowUnicodeCharsInUrls={AllowUnicodeCharsInUrls})", name, convertNonWesternChars, allowUnicodeCharsInUrls);
         return Task.FromResult(seName);
     }
 
@@ -1467,10 +1505,12 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<string> ValidateSeNameAsync<T>(T entity, string seName, string name, bool ensureNotEmpty) where T : BaseEntity, ISlugSupported
     {
+		logger.LogDebug(">>> Entering ValidateSeNameAsync(entity={Entity},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty})", entity, seName, name, ensureNotEmpty);
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityName = entity.GetType().Name;
 
+		logger.LogDebug("ValidateSeNameAsync(entity={Entity},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): entityName → {EntityName}", entity, seName, name, ensureNotEmpty, entityName);
         return await ValidateSeNameAsync(entity.Id, entityName, seName, name, ensureNotEmpty);
     }
 
@@ -1529,6 +1569,7 @@ public partial class UrlRecordService : IUrlRecordService
 
         seName = tempSeName;
 
+		logger.LogDebug("<<< Exiting ValidateSeNameAsync(entity={Entity},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty})", entity, seName, name, ensureNotEmpty);
         return seName;
     }
 
