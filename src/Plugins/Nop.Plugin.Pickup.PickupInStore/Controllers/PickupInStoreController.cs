@@ -15,6 +15,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Controllers;
 
@@ -23,6 +24,7 @@ namespace Nop.Plugin.Pickup.PickupInStore.Controllers;
 [AutoValidateAntiforgeryToken]
 public class PickupInStoreController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -67,9 +69,12 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //prepare model
         var model = await _storePickupPointModelFactory.PrepareStorePickupPointSearchModelAsync(new StorePickupPointSearchModel());
 
+		_logger.LogDebug("Configure(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Pickup.PickupInStore/Views/Configure.cshtml", model);
     }
 
@@ -77,15 +82,19 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> List(StorePickupPointSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _storePickupPointModelFactory.PrepareStorePickupPointListModelAsync(searchModel);
 
+		_logger.LogDebug("List(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         var model = new StorePickupPointModel
         {
             Address = new AddressModel()
@@ -110,6 +119,7 @@ public class PickupInStoreController : BasePluginController
         foreach (var store in await _storeService.GetAllStoresAsync())
             model.AvailableStores.Add(new SelectListItem { Text = store.Name, Value = store.Id.ToString() });
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View("~/Plugins/Pickup.PickupInStore/Views/Create.cshtml", model);
     }
 
@@ -152,8 +162,10 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         var pickupPoint = await _storePickupPointService.GetStorePickupPointByIdAsync(id);
         if (pickupPoint == null)
+			_logger.LogDebug("Edit(id={Id}): pickupPoint → {PickupPoint}", id, pickupPoint);
             return RedirectToAction("Configure");
 
         var model = new StorePickupPointModel
@@ -172,8 +184,10 @@ public class PickupInStoreController : BasePluginController
 
         var address = await _addressService.GetAddressByIdAsync(pickupPoint.AddressId);
         if (address != null)
+		_logger.LogDebug("Edit(id={Id}): address → {Address}", id, address);
         {
             model.Address = new AddressModel
+			_logger.LogDebug("Edit(id={Id}): model.Address → {Arg1}", id, model.Address);
             {
                 Address1 = address.Address1,
                 City = address.City,
@@ -203,6 +217,7 @@ public class PickupInStoreController : BasePluginController
         foreach (var store in await _storeService.GetAllStoresAsync())
             model.AvailableStores.Add(new SelectListItem { Text = store.Name, Value = store.Id.ToString(), Selected = store.Id == model.StoreId });
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View("~/Plugins/Pickup.PickupInStore/Views/Edit.cshtml", model);
     }
 
@@ -250,16 +265,20 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var pickupPoint = await _storePickupPointService.GetStorePickupPointByIdAsync(id);
         if (pickupPoint == null)
+			_logger.LogDebug("Delete(id={Id}): pickupPoint → {PickupPoint}", id, pickupPoint);
             return RedirectToAction("Configure");
 
         var address = await _addressService.GetAddressByIdAsync(pickupPoint.AddressId);
         if (address != null)
+			_logger.LogDebug("Delete(id={Id}): address → {Address}", id, address);
             await _addressService.DeleteAddressAsync(address);
 
         await _storePickupPointService.DeleteStorePickupPointAsync(pickupPoint);
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return new NullJsonResult();
     }
 

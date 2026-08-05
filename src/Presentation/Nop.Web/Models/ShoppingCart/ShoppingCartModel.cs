@@ -4,21 +4,32 @@ using Nop.Services.Orders;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.ShoppingCart;
 
 public partial record ShoppingCartModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ShoppingCartModel()
     {
+		_logger.LogDebug(">>> Entering ShoppingCartModel()");
         Items = new List<ShoppingCartItemModel>();
         Warnings = new List<string>();
+		_logger.LogDebug("ShoppingCartModel(): Items → {Items}", Items);
+		_logger.LogDebug("ShoppingCartModel(): Warnings → {Warnings}", Warnings);
         DiscountBox = new DiscountBoxModel();
         GiftCardBox = new GiftCardBoxModel();
+		_logger.LogDebug("ShoppingCartModel(): DiscountBox → {DiscountBox}", DiscountBox);
+		_logger.LogDebug("ShoppingCartModel(): GiftCardBox → {GiftCardBox}", GiftCardBox);
         CheckoutAttributes = new List<CheckoutAttributeModel>();
         OrderReviewData = new OrderReviewDataModel();
+		_logger.LogDebug("ShoppingCartModel(): CheckoutAttributes → {CheckoutAttributes}", CheckoutAttributes);
+		_logger.LogDebug("ShoppingCartModel(): OrderReviewData → {OrderReviewData}", OrderReviewData);
 
         ButtonPaymentMethodViewComponents = new List<Type>();
+		_logger.LogDebug("<<< Exiting ShoppingCartModel()");
+		_logger.LogDebug("ShoppingCartModel(): ButtonPaymentMethodViewComponents → {ButtonPaymentMethodViewComponents}", ButtonPaymentMethodViewComponents);
     }
 
     public bool OnePageCheckoutEnabled { get; set; }
@@ -52,9 +63,14 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public ShoppingCartItemModel()
         {
+			_logger.LogDebug(">>> Entering ShoppingCartItemModel()");
             Picture = new PictureModel();
             AllowedQuantities = new List<SelectListItem>();
+			_logger.LogDebug("ShoppingCartItemModel(): Picture → {Picture}", Picture);
+			_logger.LogDebug("ShoppingCartItemModel(): AllowedQuantities → {AllowedQuantities}", AllowedQuantities);
             Warnings = new List<string>();
+			_logger.LogDebug("<<< Exiting ShoppingCartItemModel()");
+			_logger.LogDebug("ShoppingCartItemModel(): Warnings → {Warnings}", Warnings);
         }
 
         public string Sku { get; set; }
@@ -99,8 +115,12 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public CheckoutAttributeModel()
         {
+			_logger.LogDebug(">>> Entering CheckoutAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<CheckoutAttributeValueModel>();
+			_logger.LogDebug("<<< Exiting CheckoutAttributeModel()");
+			_logger.LogDebug("CheckoutAttributeModel(): AllowedFileExtensions → {AllowedFileExtensions}", AllowedFileExtensions);
+			_logger.LogDebug("CheckoutAttributeModel(): Values → {Values}", Values);
         }
 
         public string Name { get; set; }
@@ -149,8 +169,12 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public DiscountBoxModel()
         {
+			_logger.LogDebug(">>> Entering DiscountBoxModel()");
             AppliedDiscountsWithCodes = new List<DiscountInfoModel>();
             Messages = new List<string>();
+			_logger.LogDebug("<<< Exiting DiscountBoxModel()");
+			_logger.LogDebug("DiscountBoxModel(): AppliedDiscountsWithCodes → {AppliedDiscountsWithCodes}", AppliedDiscountsWithCodes);
+			_logger.LogDebug("DiscountBoxModel(): Messages → {Messages}", Messages);
         }
 
         public List<DiscountInfoModel> AppliedDiscountsWithCodes { get; set; }
@@ -175,10 +199,16 @@ public partial record ShoppingCartModel : BaseNopModel
     {
         public OrderReviewDataModel()
         {
+			_logger.LogDebug(">>> Entering OrderReviewDataModel()");
             BillingAddress = new AddressModel();
             ShippingAddress = new AddressModel();
+			_logger.LogDebug("OrderReviewDataModel(): BillingAddress → {BillingAddress}", BillingAddress);
+			_logger.LogDebug("OrderReviewDataModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
             PickupAddress = new AddressModel();
             CustomValues = new CustomValues();
+			_logger.LogDebug("<<< Exiting OrderReviewDataModel()");
+			_logger.LogDebug("OrderReviewDataModel(): PickupAddress → {PickupAddress}", PickupAddress);
+			_logger.LogDebug("OrderReviewDataModel(): CustomValues → {CustomValues}", CustomValues);
         }
         public bool Display { get; set; }
 

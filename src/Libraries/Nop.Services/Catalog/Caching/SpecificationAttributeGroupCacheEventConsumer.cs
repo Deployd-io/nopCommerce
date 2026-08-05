@@ -16,7 +16,9 @@ public partial class SpecificationAttributeGroupCacheEventConsumer : CacheEventC
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(SpecificationAttributeGroup entity, EntityEventType entityEventType)
     {
+		logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         if (entityEventType != EntityEventType.Insert)
             await RemoveByPrefixAsync(NopCatalogDefaults.SpecificationAttributeGroupByProductPrefix);
+			logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

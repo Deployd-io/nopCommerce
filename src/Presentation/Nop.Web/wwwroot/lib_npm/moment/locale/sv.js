@@ -3,6 +3,7 @@
 //! author : Jens Alm : https://github.com/ulmus
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('sv', {
     months: 'januari_februari_mars_april_maj_juni_juli_augusti_september_oktober_november_december'.split(
@@ -48,6 +49,7 @@ export default moment.defineLocale('sv', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(\:e|\:a)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var b = number % 10,
             output =
                 ~~((number % 100) / 10) === 1

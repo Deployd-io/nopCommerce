@@ -9,6 +9,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptionModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -65,6 +67,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionSearchModel> PrepareNewsLetterSubscriptionSearchModelAsync(NewsLetterSubscriptionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -98,6 +101,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -111,11 +115,13 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionListModel> PrepareNewsLetterSubscriptionListModelAsync(NewsLetterSubscriptionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter newsletter subscriptions
         var isActivatedOnly = searchModel.ActiveId == 0 ? null : searchModel.ActiveId == 1 ? true : (bool?)false;
         var startDateValue = !searchModel.StartDate.HasValue ? null
+			_logger.LogDebug("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): isActivatedOnly → {IsActivatedOnly}", searchModel, isActivatedOnly);
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
@@ -132,6 +138,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
 
         var types = await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync(searchModel.StoreId);
 
+		_logger.LogDebug("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): types → {Types}", searchModel, types);
         //prepare list model
         var model = await new NewsLetterSubscriptionListModel().PrepareToGridAsync(searchModel, newsletterSubscriptions, () =>
         {
@@ -140,6 +147,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
                 //fill in model values from the entity
                 var subscriptionModel = subscription.ToModel<NewsLetterSubscriptionModel>();
 
+				_logger.LogDebug("PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel}): subscriptionModel → {SubscriptionModel}", searchModel, subscriptionModel);
                 //convert dates to the user time
                 subscriptionModel.CreatedOn = (await _dateTimeHelper.ConvertToUserTimeAsync(subscription.CreatedOnUtc, DateTimeKind.Utc)).ToString();
 
@@ -153,6 +161,7 @@ public partial class NewsLetterSubscriptionModelFactory : INewsLetterSubscriptio
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

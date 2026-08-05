@@ -670,6 +670,7 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearShoppingCartAsync(Customer customer, int storeId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         var cart = await GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, storeId);
@@ -712,15 +713,20 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<int> DeleteExpiredShoppingCartItemsAsync(DateTime olderThanUtc)
     {
+		logger.LogDebug(">>> Entering DeleteExpiredShoppingCartItemsAsync(olderThanUtc={OlderThanUtc})", olderThanUtc);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from sci in _sciRepository.Table
             where sci.UpdatedOnUtc < olderThanUtc
             select sci;
 
         var cartItems = await query.ToListAsync();
 
+		logger.LogDebug("DeleteExpiredShoppingCartItemsAsync(olderThanUtc={OlderThanUtc}): cartItems → {CartItems}", olderThanUtc, cartItems);
+		logger.LogInformation("DeleteExpiredShoppingCartItemsAsync(olderThanUtc)={OlderThanUtc}: database query executed in {Arg1} ms", olderThanUtc, __logStart.ElapsedMilliseconds);
         foreach (var cartItem in cartItems)
             await DeleteShoppingCartItemAsync(cartItem);
 
+		logger.LogDebug("<<< Exiting DeleteExpiredShoppingCartItemsAsync(olderThanUtc={OlderThanUtc})", olderThanUtc);
         return cartItems.Count;
     }
 
@@ -1716,12 +1722,14 @@ public partial class ShoppingCartService : IShoppingCartService
 
         async Task addRequiredProductsToCartAsync(int qty = 0, int? wishlistId = null)
         {
+			logger.LogDebug(">>> Entering addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId})", qty, wishlistId);
             if (!product.RequireOtherProducts)
                 return;
 
             //get these required products
             var requiredProducts = await _productService.GetProductsByIdsAsync(_productService.ParseRequiredProductIds(product));
             if (!requiredProducts.Any())
+				logger.LogDebug("addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId}): requiredProducts → {RequiredProducts}", qty, wishlistId, requiredProducts);
                 return;
 
             var finalRequiredProducts = requiredProducts.GroupBy(p => p.Id)
@@ -1731,6 +1739,7 @@ public partial class ShoppingCartService : IShoppingCartService
             {
                 var productsRequiringRequiredProduct = await GetProductsRequiringProductAsync(cart, requiredProduct.Product);
 
+				logger.LogDebug("addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId}): productsRequiringRequiredProduct → {ProductsRequiringRequiredProduct}", qty, wishlistId, productsRequiringRequiredProduct);
                 //get the required quantity of the required product
                 var requiredProductRequiredQuantity = (qty > 0 ? qty : quantity) +
                                                       cart.Where(ci => productsRequiringRequiredProduct.Any(p => p.Id == ci.ProductId))
@@ -1740,6 +1749,7 @@ public partial class ShoppingCartService : IShoppingCartService
                 //whether required product is already in the cart in the required quantity
                 var quantityToAdd = requiredProductRequiredQuantity * requiredProduct.Count - (cart.FirstOrDefault(item => item.ProductId == requiredProduct.Product.Id)?.Quantity ?? 0);
                 if (quantityToAdd <= 0)
+					logger.LogDebug("addRequiredProductsToCartAsync(qty={Qty},wishlistId={WishlistId}): quantityToAdd → {QuantityToAdd}", qty, wishlistId, quantityToAdd);
                     continue;
 
                 if (addRequiredProducts && product.AutomaticallyAddRequiredProducts)
@@ -1839,6 +1849,7 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task MoveItemToCustomWishlistAsync(int shoppingCartItemId, int? wishlistId = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var shoppingCartItemFrom = await _sciRepository.GetByIdAsync(shoppingCartItemId, cache => default);
         if (shoppingCartItemFrom == null)
             return;
@@ -1866,6 +1877,7 @@ public partial class ShoppingCartService : IShoppingCartService
             shoppingCartItemFrom.UpdatedOnUtc = DateTime.UtcNow;
             await _sciRepository.UpdateAsync(shoppingCartItemFrom);
         }
+		logger.LogDebug("<<< Exiting MoveItemToCustomWishlistAsync(shoppingCartItemId={ShoppingCartItemId},wishlistId={WishlistId})", shoppingCartItemId, wishlistId);
     }
 
     /// <summary>
@@ -1877,6 +1889,7 @@ public partial class ShoppingCartService : IShoppingCartService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task MigrateShoppingCartAsync(Customer fromCustomer, Customer toCustomer, bool includeCouponCodes)
     {
+		logger.LogDebug(">>> Entering MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes})", fromCustomer, toCustomer, includeCouponCodes);
         ArgumentNullException.ThrowIfNull(fromCustomer);
         ArgumentNullException.ThrowIfNull(toCustomer);
 
@@ -1886,11 +1899,13 @@ public partial class ShoppingCartService : IShoppingCartService
         //shopping cart items
         var fromCart = await GetShoppingCartAsync(fromCustomer);
 
+		logger.LogDebug("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): fromCart → {FromCart}", fromCustomer, toCustomer, includeCouponCodes, fromCart);
         for (var i = 0; i < fromCart.Count; i++)
         {
             var sci = fromCart[i];
             var product = await _productService.GetProductByIdAsync(sci.ProductId);
 
+			logger.LogDebug("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): product → {Product}", fromCustomer, toCustomer, includeCouponCodes, product);
             await AddToCartAsync(toCustomer, product, sci.ShoppingCartType, sci.StoreId,
                 sci.AttributesXml, sci.CustomerEnteredPrice,
                 sci.RentalStartDateUtc, sci.RentalEndDateUtc, sci.Quantity, false);
@@ -1917,7 +1932,10 @@ public partial class ShoppingCartService : IShoppingCartService
         //move selected checkout attributes
         var store = await _storeContext.GetCurrentStoreAsync();
         var checkoutAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(fromCustomer, NopCustomerDefaults.CheckoutAttributes, store.Id);
+		logger.LogDebug("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): store → {Store}", fromCustomer, toCustomer, includeCouponCodes, store);
+		logger.LogDebug("MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes}): checkoutAttributesXml → {CheckoutAttributesXml}", fromCustomer, toCustomer, includeCouponCodes, checkoutAttributesXml);
         await _genericAttributeService.SaveAttributeAsync(toCustomer, NopCustomerDefaults.CheckoutAttributes, checkoutAttributesXml, store.Id);
+		logger.LogDebug("<<< Exiting MigrateShoppingCartAsync(fromCustomer={FromCustomer},toCustomer={ToCustomer},includeCouponCodes={IncludeCouponCodes})", fromCustomer, toCustomer, includeCouponCodes);
     }
 
     /// <summary>
@@ -1930,6 +1948,8 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<bool> ShoppingCartRequiresShippingAsync(IList<ShoppingCartItem> shoppingCart)
     {
+		logger.LogDebug(">>> Entering ShoppingCartRequiresShippingAsync(shoppingCart={ShoppingCart})", shoppingCart);
+		logger.LogDebug("<<< Exiting ShoppingCartRequiresShippingAsync(shoppingCart={ShoppingCart})", shoppingCart);
         return await shoppingCart.AnyAwaitAsync(async shoppingCartItem => await _shippingService.IsShipEnabledAsync(shoppingCartItem));
     }
 
@@ -1943,9 +1963,11 @@ public partial class ShoppingCartService : IShoppingCartService
     /// </returns>
     public virtual async Task<bool> ShoppingCartIsRecurringAsync(IList<ShoppingCartItem> shoppingCart)
     {
+		logger.LogDebug(">>> Entering ShoppingCartIsRecurringAsync(shoppingCart={ShoppingCart})", shoppingCart);
         ArgumentNullException.ThrowIfNull(shoppingCart);
 
         if (!shoppingCart.Any())
+		logger.LogDebug("<<< Exiting ShoppingCartIsRecurringAsync(shoppingCart={ShoppingCart})", shoppingCart);
             return false;
 
         return await _productService.HasAnyRecurringProductAsync(shoppingCart.Select(sci => sci.ProductId).ToArray());

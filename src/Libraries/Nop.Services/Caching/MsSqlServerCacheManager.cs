@@ -70,11 +70,16 @@ public partial class MsSqlServerCacheManager : DistributedCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task RemoveByPrefixAsync(string prefix, params object[] prefixParameters)
     {
+		logger.LogDebug(">>> Entering RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         prefix = PrepareKeyPrefix(prefix, prefixParameters);
 
+		logger.LogDebug("RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters}): prefix → {Prefix1}", prefix, prefixParameters, prefix);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var command =
             new SqlCommand(
                 $"DELETE FROM {_distributedCacheConfig.SchemaName}.{_distributedCacheConfig.TableName} WHERE Id LIKE @Prefix + '%'");
+				logger.LogDebug("<<< Exiting RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
+				logger.LogInformation("RemoveByPrefixAsync(prefix,prefixParameters)={Prefix},{PrefixParameters}: delete query executed in {Arg2} ms", prefix, prefixParameters, __logStart.ElapsedMilliseconds);
 
         await PerformActionAsync(command, new SqlParameter("Prefix", SqlDbType.NVarChar) { Value = prefix });
 
@@ -87,13 +92,17 @@ public partial class MsSqlServerCacheManager : DistributedCacheManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ClearAsync()
     {
+		logger.LogDebug(">>> Entering ClearAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var command =
             new SqlCommand(
                 $"TRUNCATE TABLE {_distributedCacheConfig.SchemaName}.{_distributedCacheConfig.TableName}");
+				logger.LogInformation("ClearAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         await PerformActionAsync(command);
 
         ClearInstanceData();
+		logger.LogDebug("<<< Exiting ClearAsync()");
     }
 
     #endregion

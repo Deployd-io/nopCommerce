@@ -21,8 +21,12 @@ public partial class CheckVatService : ICheckVatService
 
     public CheckVatService(IHttpClientFactory httpClientFactory, TaxSettings taxSettings)
     {
+		logger.LogDebug(">>> Entering CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings})", httpClientFactory, taxSettings);
         _httpClientFactory = httpClientFactory;
         _taxSettings = taxSettings;
+		logger.LogDebug("<<< Exiting CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings})", httpClientFactory, taxSettings);
+		logger.LogDebug("CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings}): _taxSettings → {_taxSettings}", httpClientFactory, taxSettings, _taxSettings);
+		logger.LogDebug("CheckVatService(httpClientFactory={HttpClientFactory},taxSettings={TaxSettings}): _httpClientFactory → {_httpClientFactory}", httpClientFactory, taxSettings, _httpClientFactory);
     }
 
     #endregion
@@ -38,11 +42,14 @@ public partial class CheckVatService : ICheckVatService
     /// </returns>
     protected virtual async Task<string> GetHmrcAccessTokenAsync()
     {
+		logger.LogDebug(">>> Entering GetHmrcAccessTokenAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(_taxSettings.HmrcClientId) || string.IsNullOrEmpty(_taxSettings.HmrcClientSecret))
             return null;
 
         var client = _httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient);
         client.BaseAddress = new Uri(_taxSettings.HmrcApiUrl);
+		logger.LogDebug("GetHmrcAccessTokenAsync(): client → {Client}", client);
 
         var data = new FormUrlEncodedContent(new[]
         {
@@ -54,9 +61,12 @@ public partial class CheckVatService : ICheckVatService
 
         var response = await client.PostAsync(NopTaxDefaults.HmrcOauthTokenUrl, data);
 
+		logger.LogDebug("GetHmrcAccessTokenAsync(): response → {Response}", response);
         if (!response.IsSuccessStatusCode)
             return null;
 
+		logger.LogInformation("GetHmrcAccessTokenAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetHmrcAccessTokenAsync()");
         return JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(),
             new
             {

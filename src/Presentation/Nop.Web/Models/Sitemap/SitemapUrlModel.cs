@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Sitemap;
@@ -7,6 +8,7 @@ namespace Nop.Web.Models.Sitemap;
 /// </summary>
 public partial record SitemapUrlModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -18,10 +20,20 @@ public partial record SitemapUrlModel : BaseNopModel
     /// <param name="updatedOn">Updated on</param>
     public SitemapUrlModel(string location, IList<string> alternateLocations, UpdateFrequency frequency, DateTime updatedOn)
     {
+		_logger.LogDebug(">>> Entering SitemapUrlModel(location={Location},alternateLocations={AlternateLocations},frequency={Frequency},updatedOn={UpdatedOn})", location, alternateLocations, frequency, updatedOn);
         Location = location;
         AlternateLocations = alternateLocations ?? new List<string>();
+		_logger.LogDebug("SitemapUrlModel(location={Location},alternateLocations={AlternateLocations},frequency={Frequency},updatedOn={UpdatedOn}): AlternateLocations → {AlternateLocations1}", location, alternateLocations, frequency, updatedOn, AlternateLocations);
         UpdateFrequency = frequency;
         UpdatedOn = updatedOn;
+		_logger.LogDebug("SitemapUrlModel(location={Location},alternateLocations={AlternateLocations},frequency={Frequency},updatedOn={UpdatedOn}): UpdateFrequency → {UpdateFrequency}", location, alternateLocations, frequency, updatedOn, UpdateFrequency);
+		_logger.LogDebug("SitemapUrlModel(location={Location},alternateLocations={AlternateLocations},frequency={Frequency},updatedOn={UpdatedOn}): UpdatedOn → {UpdatedOn1}", location, alternateLocations, frequency, updatedOn, UpdatedOn);
+		_logger.LogDebug("SitemapUrlModel(location={Location},alternateLocations={AlternateLocations},frequency={Frequency},updatedOn={UpdatedOn}): Location → {Location1}", location, alternateLocations, frequency, updatedOn, Location);
+		_logger.LogDebug("SitemapUrlModel(location={Location},sitemapUrl={SitemapUrl}): AlternateLocations → {AlternateLocations}", location, sitemapUrl, AlternateLocations);
+		_logger.LogDebug("SitemapUrlModel(location={Location},sitemapUrl={SitemapUrl}): UpdateFrequency → {UpdateFrequency}", location, sitemapUrl, UpdateFrequency);
+		_logger.LogDebug("<<< Exiting SitemapUrlModel(location={Location},sitemapUrl={SitemapUrl})", location, sitemapUrl);
+		_logger.LogDebug("SitemapUrlModel(location={Location},sitemapUrl={SitemapUrl}): UpdatedOn → {UpdatedOn}", location, sitemapUrl, UpdatedOn);
+		_logger.LogDebug("SitemapUrlModel(location={Location},sitemapUrl={SitemapUrl}): Location → {Location1}", location, sitemapUrl, Location);
     }
 
     /// <summary>

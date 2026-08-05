@@ -7,6 +7,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.AzureBlob.Controllers;
 
@@ -15,6 +16,7 @@ namespace Nop.Plugin.Misc.AzureBlob.Controllers;
 [AutoValidateAntiforgeryToken]
 public class AzureBlobController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly AzureBlobSettings _azureBlobSettings;
@@ -44,6 +46,7 @@ public class AzureBlobController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public IActionResult Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             AppendContainerName = _azureBlobSettings.AppendContainerName,
@@ -53,6 +56,7 @@ public class AzureBlobController : BasePluginController
             EndPoint = _azureBlobSettings.EndPoint,
         };
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.AzureBlob/Views/Configure.cshtml", model);
     }
 

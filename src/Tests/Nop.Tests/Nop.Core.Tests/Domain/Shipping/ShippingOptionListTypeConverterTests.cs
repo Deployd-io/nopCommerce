@@ -2,30 +2,39 @@
 using FluentAssertions;
 using Nop.Core.Domain.Shipping;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Core.Tests.Domain.Shipping;
 
 [TestFixture]
 public class ShippingOptionListTypeConverterTests
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     [OneTimeSetUp]
     public void SetUp()
     {
+		_logger.LogDebug(">>> Entering SetUp()");
         TypeDescriptor.AddAttributes(typeof(List<ShippingOption>),
             new TypeConverterAttribute(typeof(ShippingOptionListTypeConverter)));
+			_logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [Test]
     public void CanGetTypeConverter()
     {
+		_logger.LogDebug(">>> Entering CanGetTypeConverter()");
         var converter = TypeDescriptor.GetConverter(typeof(List<ShippingOption>));
         converter.GetType().Should().Be(typeof(ShippingOptionListTypeConverter));
+		_logger.LogDebug("<<< Exiting CanGetTypeConverter()");
+		_logger.LogDebug("CanGetTypeConverter(): converter → {Converter}", converter);
     }
 
     [Test]
     public void CanConvertShippingOptionListToStringAndBack()
     {
+		_logger.LogDebug(">>> Entering CanConvertShippingOptionListToStringAndBack()");
         var shippingOptionsInput = new List<ShippingOption>
+		_logger.LogDebug("<<< Exiting CanConvertShippingOptionListToStringAndBack()");
         {
             new() {
                 Name = "a1",

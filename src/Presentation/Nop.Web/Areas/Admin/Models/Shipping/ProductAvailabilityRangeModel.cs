@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Shipping;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Shipping;
 /// </summary>
 public partial record ProductAvailabilityRangeModel : BaseNopEntityModel, ILocalizedModel<ProductAvailabilityRangeLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductAvailabilityRangeModel()
     {
+		_logger.LogDebug(">>> Entering ProductAvailabilityRangeModel()");
         Locales = new List<ProductAvailabilityRangeLocalizedModel>();
+		_logger.LogDebug("<<< Exiting ProductAvailabilityRangeModel()");
+		_logger.LogDebug("ProductAvailabilityRangeModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

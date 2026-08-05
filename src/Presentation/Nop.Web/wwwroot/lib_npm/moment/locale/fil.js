@@ -4,6 +4,7 @@
 //! author : Matthew Co : https://github.com/matthewdeeco
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('fil', {
     months: 'Enero_Pebrero_Marso_Abril_Mayo_Hunyo_Hulyo_Agosto_Setyembre_Oktubre_Nobyembre_Disyembre'.split(
@@ -49,6 +50,7 @@ export default moment.defineLocale('fil', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return number;
     },
     week: {

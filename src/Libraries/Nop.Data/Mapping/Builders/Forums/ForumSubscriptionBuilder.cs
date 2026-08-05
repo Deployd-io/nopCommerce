@@ -3,6 +3,7 @@ using FluentMigrator.Builders.Create.Table;
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Forums;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Forums;
 
@@ -11,6 +12,7 @@ namespace Nop.Data.Mapping.Builders.Forums;
 /// </summary>
 public partial class ForumSubscriptionBuilder : NopEntityBuilder<ForumSubscription>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -19,7 +21,9 @@ public partial class ForumSubscriptionBuilder : NopEntityBuilder<ForumSubscripti
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table.WithColumn(nameof(ForumSubscription.CustomerId)).AsInt32().ForeignKey<Customer>(onDelete: Rule.None);
+		_logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

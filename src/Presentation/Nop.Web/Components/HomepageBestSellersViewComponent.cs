@@ -9,11 +9,13 @@ using Nop.Services.Stores;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
 using Nop.Web.Infrastructure.Cache;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Components;
 
 public partial class HomepageBestSellersViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly CatalogSettings _catalogSettings;
     protected readonly IAclService _aclService;
     protected readonly IOrderReportService _orderReportService;
@@ -44,10 +46,13 @@ public partial class HomepageBestSellersViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync(int? productThumbPictureSize)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!_catalogSettings.ShowBestsellersOnHomepage || _catalogSettings.NumberOfBestsellersOnHomepage == 0)
             return Content("");
 
         //load and cache report
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var report = await _staticCacheManager.GetAsync(
             _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.HomepageBestsellersIdsKey,
@@ -55,7 +60,10 @@ public partial class HomepageBestSellersViewComponent : NopViewComponent
             async () => await (await _orderReportService.BestSellersReportAsync(
                 storeId: store.Id,
                 pageSize: _catalogSettings.NumberOfBestsellersOnHomepage)).ToListAsync());
+			_logger.LogDebug("InvokeAsync(productThumbPictureSize={ProductThumbPictureSize}): store → {Store}", productThumbPictureSize, store);
+			_logger.LogInformation("InvokeAsync(productThumbPictureSize)={ProductThumbPictureSize}: external service call took {Arg1} ms", productThumbPictureSize, __logStart.ElapsedMilliseconds);
 
+		_logger.LogInformation("async(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         //load products
         var products = await (await _productService.GetProductsByIdsAsync(report.Select(x => x.ProductId).ToArray()))
             //ACL and store mapping
@@ -68,6 +76,8 @@ public partial class HomepageBestSellersViewComponent : NopViewComponent
 
         //prepare model
         var model = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, true, true, productThumbPictureSize)).ToList();
+		_logger.LogDebug("<<< Exiting InvokeAsync(productThumbPictureSize={ProductThumbPictureSize})", productThumbPictureSize);
         return View(model);
     }
+	_logger.LogDebug("<<< Exiting async()");
 }

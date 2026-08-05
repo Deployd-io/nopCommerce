@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Data;
 using Nop.Plugin.Misc.Zettle.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Services;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.Misc.Zettle.Services;
 /// </summary>
 public class ZettleRecordService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<Category> _categoryRepository;
@@ -105,6 +107,8 @@ public class ZettleRecordService
     /// </returns>
     public async Task<ZettleRecord> GetRecordByIdAsync(int id)
     {
+		_logger.LogDebug(">>> Entering GetRecordByIdAsync(id={Id})", id);
+		_logger.LogDebug("<<< Exiting GetRecordByIdAsync(id={Id})", id);
         return await _repository.GetByIdAsync(id, null);
     }
 
@@ -115,9 +119,15 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task InsertRecordAsync(ZettleRecord record)
     {
+		_logger.LogDebug(">>> Entering InsertRecordAsync(record={Record})", record);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _repository.InsertAsync(record, false);
+		_logger.LogDebug("<<< Exiting InsertRecordAsync(record={Record})", record);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("InsertRecordAsync(record)={Record}: save query executed in {Arg1} ms", record, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("InsertRecordAsync(record)={Record}: save query executed in {Arg1} ms", record, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Insert records
     /// </summary>
@@ -125,6 +135,7 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task InsertRecordsAsync(List<ZettleRecord> records)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _repository.InsertAsync(records, false);
     }
 
@@ -135,9 +146,15 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateRecordAsync(ZettleRecord record)
     {
+		_logger.LogDebug(">>> Entering UpdateRecordAsync(record={Record})", record);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _repository.UpdateAsync(record, false);
+		_logger.LogDebug("<<< Exiting UpdateRecordAsync(record={Record})", record);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("UpdateRecordAsync(record)={Record}: update query executed in {Arg1} ms", record, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("UpdateRecordAsync(record)={Record}: update query executed in {Arg1} ms", record, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Update records
     /// </summary>
@@ -145,6 +162,7 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateRecordsAsync(List<ZettleRecord> records)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _repository.UpdateAsync(records, false);
     }
 
@@ -155,9 +173,19 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteRecordAsync(ZettleRecord record)
     {
+		_logger.LogDebug(">>> Entering DeleteRecordAsync(record={Record})", record);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _repository.DeleteAsync(record, false);
+		_logger.LogDebug("<<< Exiting DeleteRecordAsync(record={Record})", record);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteRecordAsync(record)={Record}: external service call took {Arg1} ms", record, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteRecordAsync(record)={Record}: delete query executed in {Arg1} ms", record, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteRecordAsync(record)={Record}: external service call took {Arg1} ms", record, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	_logger.LogInformation("DeleteRecordAsync(record)={Record}: delete query executed in {Arg1} ms", record, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete records
     /// </summary>
@@ -165,28 +193,46 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteRecordsAsync(List<int> ids)
     {
+		_logger.LogDebug(">>> Entering DeleteRecordsAsync(ids={Ids})", ids);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _repository.DeleteAsync(record => ids.Contains(record.Id));
+		_logger.LogDebug("<<< Exiting DeleteRecordsAsync(ids={Ids})", ids);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteRecordsAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteRecordsAsync(ids)={Ids}: delete query executed in {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteRecordsAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	_logger.LogInformation("DeleteRecordsAsync(ids)={Ids}: delete query executed in {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Clear all records
     /// </summary>
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ClearRecordsAsync()
     {
+		_logger.LogDebug(">>> Entering ClearRecordsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (_zettleSettings.ClearRecordsOnChangeCredentials)
             await _repository.TruncateAsync();
+			_logger.LogInformation("ClearRecordsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         else
         {
             var records = (await GetAllRecordsAsync()).ToList();
             foreach (var record in records)
             {
+			_logger.LogDebug("ClearRecordsAsync(): records → {Records}", records);
                 record.ImageUrl = string.Empty;
+				_logger.LogDebug("ClearRecordsAsync(): record.ImageUrl → {Arg0}", record.ImageUrl);
+				_logger.LogDebug("ClearRecordsAsync(): record.UpdatedOnUtc → {Arg0}", record.UpdatedOnUtc);
+				_logger.LogDebug("ClearRecordsAsync(): record.OperationType → {Arg0}", record.OperationType);
                 record.UpdatedOnUtc = null;
                 record.OperationType = OperationType.Create;
             }
             await UpdateRecordsAsync(records);
         }
+		_logger.LogDebug("<<< Exiting ClearRecordsAsync()");
     }
 
     /// <summary>
@@ -235,8 +281,10 @@ public class ZettleRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task CreateOrUpdateRecordAsync(OperationType operationType, int productId, int attributeCombinationId = 0)
     {
+		_logger.LogDebug(">>> Entering CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId})", operationType, productId, attributeCombinationId);
         if (productId == 0 && attributeCombinationId == 0)
             return;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var existingRecord = await _repository.Table.
             FirstOrDefaultAsync(record => record.ProductId == productId && record.CombinationId == attributeCombinationId);
@@ -252,6 +300,7 @@ public class ZettleRecordService
             if (attributeCombinationId == 0 || (await _repository.Table.FirstOrDefaultAsync(record => record.ProductId == productId)) is not ZettleRecord productRecord)
             {
                 var (records, _) = await PrepareRecordsToAddAsync([productId]);
+				_logger.LogInformation("CreateOrUpdateRecordAsync(operationType,productId,attributeCombinationId)={OperationType},{ProductId},{AttributeCombinationId}: database query executed in {Arg3} ms", operationType, productId, attributeCombinationId, __logStart.ElapsedMilliseconds);
                 await InsertRecordsAsync(records);
             }
             else
@@ -267,6 +316,15 @@ public class ZettleRecordService
                     ImageSyncEnabled = _zettleSettings.ImageSyncEnabled,
                     InventoryTrackingEnabled = _zettleSettings.InventoryTrackingEnabled,
                     OperationType = operationType
+					_logger.LogInformation("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): Active → {Active}", operationType, productId, attributeCombinationId, Active);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): ProductId → {ProductId1}", operationType, productId, attributeCombinationId, ProductId);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): CombinationId → {CombinationId}", operationType, productId, attributeCombinationId, CombinationId);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): Uuid → {Uuid}", operationType, productId, attributeCombinationId, Uuid);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): VariantUuid → {VariantUuid}", operationType, productId, attributeCombinationId, VariantUuid);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): PriceSyncEnabled → {PriceSyncEnabled}", operationType, productId, attributeCombinationId, PriceSyncEnabled);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): ImageSyncEnabled → {ImageSyncEnabled}", operationType, productId, attributeCombinationId, ImageSyncEnabled);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): InventoryTrackingEnabled → {InventoryTrackingEnabled}", operationType, productId, attributeCombinationId, InventoryTrackingEnabled);
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): OperationType → {OperationType1}", operationType, productId, attributeCombinationId, OperationType);
                 });
             }
 
@@ -284,6 +342,7 @@ public class ZettleRecordService
                 if (operationType == OperationType.Delete)
                 {
                     existingRecord.OperationType = OperationType.Delete;
+					_logger.LogDebug("CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId}): existingRecord.OperationType → {Arg3}", operationType, productId, attributeCombinationId, existingRecord.OperationType);
                     await UpdateRecordAsync(existingRecord);
                 }
                 return;
@@ -300,6 +359,7 @@ public class ZettleRecordService
             case OperationType.None:
                 existingRecord.OperationType = operationType;
                 await UpdateRecordAsync(existingRecord);
+				_logger.LogDebug("<<< Exiting CreateOrUpdateRecordAsync(operationType={OperationType},productId={ProductId},attributeCombinationId={AttributeCombinationId})", operationType, productId, attributeCombinationId);
                 return;
         }
     }
@@ -314,17 +374,22 @@ public class ZettleRecordService
     /// </returns>
     public async Task<int> AddRecordsAsync(List<int> productIds)
     {
+		_logger.LogDebug(">>> Entering AddRecordsAsync(productIds={ProductIds})", productIds);
         if (!productIds?.Any() ?? true)
             return 0;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var newProductIds = productIds.Except(await _repository.Table.Select(record => record.ProductId).ToListAsync()).ToList();
         
+		_logger.LogDebug("AddRecordsAsync(productIds={ProductIds}): newProductIds → {NewProductIds}", productIds, newProductIds);
+		_logger.LogInformation("AddRecordsAsync(productIds)={ProductIds}: find query executed in {Arg1} ms", productIds, __logStart.ElapsedMilliseconds);
         if (!newProductIds.Any())
             return 0;
 
         var (records, invalidProducts) = await PrepareRecordsToAddAsync(newProductIds);
         await InsertRecordsAsync(records);
 
+		_logger.LogDebug("<<< Exiting AddRecordsAsync(productIds={ProductIds})", productIds);
         return invalidProducts;
     }
 

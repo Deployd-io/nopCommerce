@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Shipping;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Shipping;
 /// </summary>
 public partial record ShippingMethodModel : BaseNopEntityModel, ILocalizedModel<ShippingMethodLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ShippingMethodModel()
     {
+		_logger.LogDebug(">>> Entering ShippingMethodModel()");
         Locales = new List<ShippingMethodLocalizedModel>();
+		_logger.LogDebug("<<< Exiting ShippingMethodModel()");
+		_logger.LogDebug("ShippingMethodModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

@@ -22,6 +22,8 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
 
     public NopTextAreaTagHelper(IHtmlGenerator generator) : base(generator)
     {
+	logger.LogDebug(">>> Entering NopTextAreaTagHelper(generator={Generator})", generator);
+	logger.LogDebug("<<< Exiting NopTextAreaTagHelper(generator={Generator})", generator);
     }
 
     #endregion
@@ -36,12 +38,15 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
 
         //tag details
         output.TagName = "textarea";
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
 
         //merge classes
@@ -53,6 +58,7 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
         //set custom html attributes
         var htmlAttributesDictionary = HtmlHelper.AnonymousObjectToHtmlAttributes(CustomHtmlAttributes);
         if (htmlAttributesDictionary?.Count > 0)
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributesDictionary → {HtmlAttributesDictionary}", context, output, htmlAttributesDictionary);
         {
             foreach (var (key, value) in htmlAttributesDictionary)
             {
@@ -63,8 +69,10 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
         //additional parameters
         var rowsNumber = output.Attributes.ContainsName("rows") ? output.Attributes["rows"].Value : 4;
         output.Attributes.SetAttribute("rows", rowsNumber);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): rowsNumber → {RowsNumber}", context, output, rowsNumber);
         var colsNumber = output.Attributes.ContainsName("cols") ? output.Attributes["cols"].Value : 20;
         output.Attributes.SetAttribute("cols", colsNumber);
+		logger.LogDebug("ProcessAsync(context={Context},output={Output}): colsNumber → {ColsNumber}", context, output, colsNumber);
 
         //required asterisk
         if (bool.TryParse(IsRequired, out var required) && required)
@@ -74,6 +82,7 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
         }
 
         await base.ProcessAsync(context, output);
+		logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

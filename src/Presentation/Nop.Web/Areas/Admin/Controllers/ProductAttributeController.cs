@@ -12,11 +12,13 @@ using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ProductAttributeController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -90,15 +92,20 @@ public partial class ProductAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _productAttributeModelFactory.PrepareProductAttributeSearchModelAsync(new ProductAttributeSearchModel());
 
+		_logger.LogDebug("List(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -109,15 +116,19 @@ public partial class ProductAttributeController : BaseAdminController
         //prepare model
         var model = await _productAttributeModelFactory.PrepareProductAttributeListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _productAttributeModelFactory.PrepareProductAttributeModelAsync(new ProductAttributeModel(), null);
 
+		_logger.LogDebug("Create(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -147,20 +158,25 @@ public partial class ProductAttributeController : BaseAdminController
         model = await _productAttributeModelFactory.PrepareProductAttributeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a product attribute with the specified id
         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(id);
         if (productAttribute == null)
+			_logger.LogDebug("Edit(id={Id}): productAttribute → {ProductAttribute}", id, productAttribute);
             return RedirectToAction("List");
 
         //prepare model
         var model = await _productAttributeModelFactory.PrepareProductAttributeModelAsync(null, productAttribute);
 
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -196,6 +212,7 @@ public partial class ProductAttributeController : BaseAdminController
         model = await _productAttributeModelFactory.PrepareProductAttributeModelAsync(model, productAttribute, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -203,20 +220,25 @@ public partial class ProductAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PreTranslate(int itemId)
     {
+		_logger.LogDebug(">>> Entering PreTranslate(itemId={ItemId})", itemId);
         var translationModel = new TranslationModel();
 
+		_logger.LogDebug("PreTranslate(itemId={ItemId}): translationModel → {TranslationModel}", itemId, translationModel);
         //try to get a product attribute with the specified id
         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(itemId);
         if (productAttribute == null)
+			_logger.LogDebug("PreTranslate(itemId={ItemId}): productAttribute → {ProductAttribute}", itemId, productAttribute);
             return Json(translationModel);
 
         //prepare model
         var model = await _productAttributeModelFactory.PrepareProductAttributeModelAsync(null, productAttribute);
 
+		_logger.LogDebug("PreTranslate(itemId={ItemId}): model → {Model}", itemId, model);
         translationModel = await _translationModelFactory.PrepareTranslationModelAsync(model,
             (nameof(ProductAttributeLocalizedModel.Name), false),
             (nameof(ProductAttributeLocalizedModel.Description), true));
 
+		_logger.LogDebug("<<< Exiting PreTranslate(itemId={ItemId})", itemId);
         return Json(translationModel);
     }
 
@@ -224,9 +246,11 @@ public partial class ProductAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a product attribute with the specified id
         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(id);
         if (productAttribute == null)
+			_logger.LogDebug("Delete(id={Id}): productAttribute → {ProductAttribute}", id, productAttribute);
             return RedirectToAction("List");
 
         await _productAttributeService.DeleteProductAttributeAsync(productAttribute);
@@ -237,6 +261,7 @@ public partial class ProductAttributeController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Attributes.ProductAttributes.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -244,16 +269,20 @@ public partial class ProductAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var productAttributes = await _productAttributeService.GetProductAttributeByIdsAsync(selectedIds.ToArray());
         await _productAttributeService.DeleteProductAttributesAsync(productAttributes);
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): productAttributes → {ProductAttributes}", selectedIds, productAttributes);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteProductAttribute");
         await _customerActivityService.InsertActivitiesAsync("DeleteProductAttribute", productAttributes, productAttribute => string.Format(activityLogFormat, productAttribute.Name));
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -265,6 +294,7 @@ public partial class ProductAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> UsedByProducts(ProductAttributeProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering UsedByProducts(searchModel={SearchModel})", searchModel);
         //try to get a product attribute with the specified id
         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(searchModel.ProductAttributeId)
             ?? throw new ArgumentException("No product attribute found with the specified id");
@@ -272,6 +302,8 @@ public partial class ProductAttributeController : BaseAdminController
         //prepare model
         var model = await _productAttributeModelFactory.PrepareProductAttributeProductListModelAsync(searchModel, productAttribute);
 
+		_logger.LogDebug("UsedByProducts(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting UsedByProducts(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -283,6 +315,7 @@ public partial class ProductAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> PredefinedProductAttributeValueList(PredefinedProductAttributeValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PredefinedProductAttributeValueList(searchModel={SearchModel})", searchModel);
         //try to get a product attribute with the specified id
         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(searchModel.ProductAttributeId)
             ?? throw new ArgumentException("No product attribute found with the specified id");
@@ -290,12 +323,15 @@ public partial class ProductAttributeController : BaseAdminController
         //prepare model
         var model = await _productAttributeModelFactory.PreparePredefinedProductAttributeValueListModelAsync(searchModel, productAttribute);
 
+		_logger.LogDebug("PredefinedProductAttributeValueList(searchModel={SearchModel}): model → {Model}", searchModel, model);
+		_logger.LogDebug("<<< Exiting PredefinedProductAttributeValueList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PredefinedProductAttributeValueCreatePopup(int productAttributeId)
     {
+		_logger.LogDebug(">>> Entering PredefinedProductAttributeValueCreatePopup(productAttributeId={ProductAttributeId})", productAttributeId);
         //try to get a product attribute with the specified id
         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(productAttributeId)
             ?? throw new ArgumentException("No product attribute found with the specified id", nameof(productAttributeId));
@@ -304,6 +340,7 @@ public partial class ProductAttributeController : BaseAdminController
         var model = await _productAttributeModelFactory
             .PreparePredefinedProductAttributeValueModelAsync(new PredefinedProductAttributeValueModel(), productAttribute, null);
 
+		_logger.LogDebug("<<< Exiting PredefinedProductAttributeValueCreatePopup(productAttributeId={ProductAttributeId})", productAttributeId);
         return View(model);
     }
 
@@ -332,12 +369,14 @@ public partial class ProductAttributeController : BaseAdminController
         model = await _productAttributeModelFactory.PreparePredefinedProductAttributeValueModelAsync(model, productAttribute, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting PredefinedProductAttributeValueCreatePopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> PredefinedProductAttributeValueEditPopup(int id)
     {
+		_logger.LogDebug(">>> Entering PredefinedProductAttributeValueEditPopup(id={Id})", id);
         //try to get a predefined product attribute value with the specified id
         var productAttributeValue = await _productAttributeService.GetPredefinedProductAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No predefined product attribute value found with the specified id");
@@ -349,6 +388,8 @@ public partial class ProductAttributeController : BaseAdminController
         //prepare model
         var model = await _productAttributeModelFactory.PreparePredefinedProductAttributeValueModelAsync(null, productAttribute, productAttributeValue);
 
+		_logger.LogDebug("PredefinedProductAttributeValueEditPopup(id={Id}): model → {Model}", id, model);
+		_logger.LogDebug("<<< Exiting PredefinedProductAttributeValueEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -380,6 +421,7 @@ public partial class ProductAttributeController : BaseAdminController
         model = await _productAttributeModelFactory.PreparePredefinedProductAttributeValueModelAsync(model, productAttribute, productAttributeValue, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting PredefinedProductAttributeValueEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -387,12 +429,14 @@ public partial class ProductAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PredefinedProductAttributeValueDelete(int id)
     {
+		_logger.LogDebug(">>> Entering PredefinedProductAttributeValueDelete(id={Id})", id);
         //try to get a predefined product attribute value with the specified id
         var productAttributeValue = await _productAttributeService.GetPredefinedProductAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No predefined product attribute value found with the specified id", nameof(id));
 
         await _productAttributeService.DeletePredefinedProductAttributeValueAsync(productAttributeValue);
 
+		_logger.LogDebug("<<< Exiting PredefinedProductAttributeValueDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

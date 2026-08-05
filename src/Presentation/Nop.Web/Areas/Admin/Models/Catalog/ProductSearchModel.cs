@@ -2,6 +2,7 @@
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -10,18 +11,29 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductSearchModel()
     {
+		_logger.LogDebug(">>> Entering ProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("ProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		_logger.LogDebug("ProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogDebug("ProductSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("ProductSearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
         AvailableVendors = new List<SelectListItem>();
         AvailableProductTypes = new List<SelectListItem>();
+		_logger.LogDebug("ProductSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		_logger.LogDebug("ProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
         AvailablePublishedOptions = new List<SelectListItem>();
         LicenseCheckModel = new();
+		_logger.LogDebug("<<< Exiting ProductSearchModel()");
+		_logger.LogDebug("ProductSearchModel(): AvailablePublishedOptions → {AvailablePublishedOptions}", AvailablePublishedOptions);
+		_logger.LogDebug("ProductSearchModel(): LicenseCheckModel → {LicenseCheckModel}", LicenseCheckModel);
     }
 
     #endregion

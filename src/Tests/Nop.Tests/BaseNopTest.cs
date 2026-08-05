@@ -91,6 +91,7 @@ using Nop.Web.Infrastructure.Installation;
 using SkiaSharp;
 using IAuthenticationService = Nop.Services.Authentication.IAuthenticationService;
 using Task = System.Threading.Tasks.Task;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests;
 
@@ -101,19 +102,24 @@ public partial class BaseNopTest
     protected BaseNopTest()
     {
         SetDataProviderType(DataProviderType.Unknown);
+		_logger.LogDebug(">>> Entering BaseNopTest()");
+		_logger.LogDebug("<<< Exiting BaseNopTest()");
     }
 
     public ServiceProvider ServiceProvider => _serviceProvider;
 
     private static void Init()
     {
+		_logger.LogDebug(">>> Entering Init()");
         var dataProvider = _serviceProvider.GetService<IDataProviderManager>().DataProvider;
 
+		_logger.LogDebug("Init(): dataProvider → {DataProvider}", dataProvider);
         dataProvider.CreateDatabase();
         dataProvider.InitializeDatabase();
 
         var installationService = _serviceProvider.GetService<IInstallationService>();
 
+		_logger.LogDebug("Init(): installationService → {InstallationService}", installationService);
         installationService.InstallAsync(
             new InstallationSettings
             {
@@ -128,34 +134,45 @@ public partial class BaseNopTest
 
         var permissionService = EngineContext.Current.Resolve<IPermissionService>();
         permissionService.InsertPermissionsAsync().Wait();
+		_logger.LogDebug("Init(): permissionService → {PermissionService}", permissionService);
 
         //init theme provider
         var themeProvider = EngineContext.Current.Resolve<IThemeProvider>();
         themeProvider.InitializeAsync().Wait();
+		_logger.LogDebug("<<< Exiting Init()");
+		_logger.LogDebug("Init(): themeProvider → {ThemeProvider}", themeProvider);
     }
 
     protected static void PropertiesShouldEqual<T1, T2>(T1 obj1, T2 obj2, params string[] filter)
     {
+		_logger.LogDebug(">>> Entering PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter})", obj1, obj2, filter);
         var object1Properties = typeof(T1).GetProperties();
         var object2Properties = typeof(T2).GetProperties();
+		_logger.LogDebug("PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter}): object1Properties → {Object1Properties}", obj1, obj2, filter, object1Properties);
+		_logger.LogDebug("PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter}): object2Properties → {Object2Properties}", obj1, obj2, filter, object2Properties);
 
         foreach (var object1Property in object1Properties)
         {
             var name = object1Property.Name;
 
+			_logger.LogDebug("PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter}): name → {Name}", obj1, obj2, filter, name);
             if (filter.Contains(name))
                 continue;
 
             var object2Property = Array.Find(object2Properties, p => p.Name == name);
 
+			_logger.LogDebug("PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter}): object2Property → {Object2Property}", obj1, obj2, filter, object2Property);
             if (object2Property == null)
                 continue;
 
             var object1PropertyValue = object1Property.GetValue(obj1);
             var object2PropertyValue = object2Property.GetValue(obj2);
+			_logger.LogDebug("PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter}): object1PropertyValue → {Object1PropertyValue}", obj1, obj2, filter, object1PropertyValue);
+			_logger.LogDebug("PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter}): object2PropertyValue → {Object2PropertyValue}", obj1, obj2, filter, object2PropertyValue);
 
             object1PropertyValue.Should().Be(object2PropertyValue, $"The property \"{typeof(T1).Name}.{object1Property.Name}\" of these objects is not equal");
         }
+		_logger.LogDebug("<<< Exiting PropertiesShouldEqual(obj1={Obj1},obj2={Obj2},filter={Filter})", obj1, obj2, filter);
     }
 
     static BaseNopTest()
@@ -169,6 +186,7 @@ public partial class BaseNopTest
 
         var services = new ServiceCollection();
 
+		_logger.LogDebug("BaseNopTest(): services → {Services}", services);
         var rootPath =
             new DirectoryInfo(
                     $"{Directory.GetCurrentDirectory().Split("bin")[0]}{Path.Combine([.. @"\..\..\Presentation\Nop.Web".Split('\\', '/')])}")
@@ -177,6 +195,7 @@ public partial class BaseNopTest
         //Presentation\Nop.Web\wwwroot
         var webHostEnvironment = new Mock<IWebHostEnvironment>();
         webHostEnvironment.Setup(p => p.WebRootPath).Returns(Path.Combine(rootPath, "wwwroot"));
+		_logger.LogDebug("BaseNopTest(): webHostEnvironment → {WebHostEnvironment}", webHostEnvironment);
         webHostEnvironment.Setup(p => p.ContentRootPath).Returns(rootPath);
         webHostEnvironment.Setup(p => p.EnvironmentName).Returns("test");
         webHostEnvironment.Setup(p => p.ApplicationName).Returns("nopCommerce");
@@ -184,6 +203,7 @@ public partial class BaseNopTest
 
         var htmlHelper = new Mock<IHtmlHelper>();
         services.AddSingleton(htmlHelper.Object);
+		_logger.LogDebug("BaseNopTest(): htmlHelper → {HtmlHelper}", htmlHelper);
 
         //file provider
         services.AddTransient<INopFileProvider, NopFileProvider>();
@@ -193,6 +213,8 @@ public partial class BaseNopTest
 
         var memoryCache = new MemoryCache(new MemoryCacheOptions());
         var typeFinder = new WebAppTypeFinder();
+		_logger.LogDebug("BaseNopTest(): memoryCache → {MemoryCache}", memoryCache);
+		_logger.LogDebug("BaseNopTest(): typeFinder → {TypeFinder}", typeFinder);
         Singleton<ITypeFinder>.Instance = typeFinder;
 
         var mAssemblies = typeFinder.FindClassesOfType<ForwardOnlyMigration>()
@@ -208,31 +230,38 @@ public partial class BaseNopTest
 
         var appSettings = new AppSettings(configurations);
         appSettings.Update(new List<IConfig> { Singleton<DataConfig>.Instance });
+		_logger.LogDebug("BaseNopTest(): appSettings → {AppSettings}", appSettings);
         Singleton<AppSettings>.Instance = appSettings;
         services.AddSingleton(appSettings);
 
         var hostApplicationLifetime = new Mock<IHostApplicationLifetime>();
         services.AddSingleton(hostApplicationLifetime.Object);
+		_logger.LogDebug("BaseNopTest(): hostApplicationLifetime → {HostApplicationLifetime}", hostApplicationLifetime);
 
         services.AddWebEncoders();
 
         var httpContext = new DefaultHttpContext();
         httpContext.Request.Headers.Append(HeaderNames.Host, NopTestsDefaults.HostIpAddress);
+		_logger.LogDebug("BaseNopTest(): httpContext → {HttpContext}", httpContext);
         httpContext.Session = new TestSeesion();
 
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
         httpContextAccessor.Setup(p => p.HttpContext).Returns(httpContext);
+		_logger.LogDebug("BaseNopTest(): httpContextAccessor → {HttpContextAccessor}", httpContextAccessor);
 
         services.AddSingleton(httpContextAccessor.Object);
 
         var actionContextAccessor = new Mock<IActionContextAccessor>();
         actionContextAccessor.Setup(x => x.ActionContext)
             .Returns(new ActionContext(httpContext, httpContext.GetRouteData(), new ActionDescriptor()));
+			_logger.LogDebug("BaseNopTest(): actionContextAccessor → {ActionContextAccessor}", actionContextAccessor);
 
         services.AddSingleton(actionContextAccessor.Object);
 
         var urlHelperFactory = new Mock<IUrlHelperFactory>();
         var urlHelper = new NopTestUrlHelper(actionContextAccessor.Object.ActionContext);
+		_logger.LogDebug("BaseNopTest(): urlHelperFactory → {UrlHelperFactory}", urlHelperFactory);
+		_logger.LogDebug("BaseNopTest(): urlHelper → {UrlHelper}", urlHelper);
 
         urlHelperFactory.Setup(x => x.GetUrlHelper(It.IsAny<ActionContext>()))
             .Returns(urlHelper);
@@ -244,6 +273,7 @@ public partial class BaseNopTest
         var tempDataDictionaryFactory = new Mock<ITempDataDictionaryFactory>();
         var dataDictionary = new TempDataDictionary(httpContextAccessor.Object.HttpContext,
             new Mock<ITempDataProvider>().Object);
+			_logger.LogDebug("BaseNopTest(): tempDataDictionaryFactory → {TempDataDictionaryFactory}", tempDataDictionaryFactory);
         tempDataDictionaryFactory.Setup(f => f.GetTempData(It.IsAny<HttpContext>())).Returns(dataDictionary);
         services.AddSingleton(tempDataDictionaryFactory.Object);
 
@@ -279,6 +309,7 @@ public partial class BaseNopTest
 
         var memoryDistributedCache = new MemoryDistributedCache(new TestMemoryDistributedCacheOptions());
         services.AddSingleton<IDistributedCache>(memoryDistributedCache);
+		_logger.LogDebug("BaseNopTest(): memoryDistributedCache → {MemoryDistributedCache}", memoryDistributedCache);
         services.AddScoped<MemoryDistributedCacheManager>();
         services.AddSingleton(new DistributedCacheLocker(memoryDistributedCache));
 
@@ -426,8 +457,10 @@ public partial class BaseNopTest
         var settings = typeFinder.FindClassesOfType(typeof(ISettings), false).ToList();
         foreach (var setting in settings)
         {
+		_logger.LogDebug("BaseNopTest(): settings → {Settings}", settings);
             services.AddTransient(setting,
                 context => context.GetRequiredService<ISettingService>().LoadSettingAsync(setting).Result);
+				_logger.LogDebug("BaseNopTest(): context → {Context}", context);
 
 
         }
@@ -438,6 +471,7 @@ public partial class BaseNopTest
             var interfaces = consumer.FindInterfaces((type, criteria) => type.IsGenericType && ((Type)criteria).IsAssignableFrom(type.GetGenericTypeDefinition()), typeof(IConsumer<>));
             foreach (var findInterface in interfaces)
             {
+			_logger.LogDebug("BaseNopTest(): interfaces → {Interfaces}", interfaces);
                 services.AddTransient(findInterface, consumer);
             }
         }
@@ -565,6 +599,7 @@ public partial class BaseNopTest
         services.AddTransient<Web.Factories.IVendorModelFactory, Web.Factories.VendorModelFactory>();
 
         _serviceProvider = services.BuildServiceProvider();
+		_logger.LogDebug("BaseNopTest(): _serviceProvider → {_serviceProvider}", _serviceProvider);
 
         EngineContext.Replace(new NopTestEngine(_serviceProvider));
 
@@ -573,6 +608,7 @@ public partial class BaseNopTest
 
     protected static T GetService<T>()
     {
+		_logger.LogDebug(">>> Entering GetService()");
         return _serviceProvider.GetRequiredService<T>();
     }
 
@@ -583,8 +619,12 @@ public partial class BaseNopTest
 
     public static bool SetDataProviderType(DataProviderType type)
     {
+		_logger.LogDebug(">>> Entering SetDataProviderType(type={Type})", type);
         var dataConfig = Singleton<DataConfig>.Instance ?? new DataConfig();
 
+		_logger.LogDebug("SetDataProviderType(type={Type}): dataConfig → {DataConfig}", type, dataConfig);
+		_logger.LogDebug("SetDataProviderType(type={Type}): dataConfig.DataProvider → {Arg1}", type, dataConfig.DataProvider);
+		_logger.LogDebug("SetDataProviderType(type={Type}): dataConfig.ConnectionString → {Arg1}", type, dataConfig.ConnectionString);
         dataConfig.DataProvider = type;
         dataConfig.ConnectionString = string.Empty;
 
@@ -607,11 +647,13 @@ public partial class BaseNopTest
         Singleton<DataConfig>.Instance = dataConfig;
         var flag = !string.IsNullOrEmpty(dataConfig.ConnectionString);
 
+		_logger.LogDebug("SetDataProviderType(type={Type}): flag → {Flag}", type, flag);
         if (Singleton<AppSettings>.Instance == null)
             return flag;
 
         Singleton<AppSettings>.Instance.Update(new List<IConfig> { Singleton<DataConfig>.Instance });
 
+		_logger.LogDebug("<<< Exiting SetDataProviderType(type={Type})", type);
         return flag;
     }
 
@@ -621,15 +663,21 @@ public partial class BaseNopTest
     {
         public NopTestUrlHelper(ActionContext actionContext) : base(actionContext)
         {
+		_logger.LogDebug(">>> Entering NopTestUrlHelper(actionContext={ActionContext})", actionContext);
+		_logger.LogDebug("<<< Exiting NopTestUrlHelper(actionContext={ActionContext})", actionContext);
         }
 
         public override string Action(UrlActionContext actionContext)
         {
+			_logger.LogDebug(">>> Entering Action(actionContext={ActionContext})", actionContext);
+			_logger.LogDebug("<<< Exiting Action(actionContext={ActionContext})", actionContext);
             return string.Empty;
         }
 
         public override string RouteUrl(UrlRouteContext routeContext)
         {
+			_logger.LogDebug(">>> Entering RouteUrl(routeContext={RouteContext})", routeContext);
+			_logger.LogDebug("<<< Exiting RouteUrl(routeContext={RouteContext})", routeContext);
             return string.Empty;
         }
     }
@@ -647,7 +695,10 @@ public partial class BaseNopTest
 
         public NopTestEngine(IServiceProvider serviceProvider)
         {
+			_logger.LogDebug(">>> Entering NopTestEngine(serviceProvider={ServiceProvider})", serviceProvider);
             _internalServiceProvider = serviceProvider;
+			_logger.LogDebug("<<< Exiting NopTestEngine(serviceProvider={ServiceProvider})", serviceProvider);
+			_logger.LogDebug("NopTestEngine(serviceProvider={ServiceProvider}): _internalServiceProvider → {_internalServiceProvider}", serviceProvider, _internalServiceProvider);
         }
 
         public override IServiceProvider ServiceProvider => _internalServiceProvider;
@@ -655,18 +706,25 @@ public partial class BaseNopTest
 
     public class TestAuthenticationService : IAuthenticationService
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public Task SignInAsync(Customer customer, bool isPersistent)
         {
+			_logger.LogDebug(">>> Entering SignInAsync(customer={Customer},isPersistent={IsPersistent})", customer, isPersistent);
+			_logger.LogDebug("<<< Exiting SignInAsync(customer={Customer},isPersistent={IsPersistent})", customer, isPersistent);
             return Task.CompletedTask;
         }
 
         public Task SignOutAsync()
         {
+			_logger.LogDebug(">>> Entering SignOutAsync()");
+			_logger.LogDebug("<<< Exiting SignOutAsync()");
             return Task.CompletedTask;
         }
 
         public async Task<Customer> GetAuthenticatedCustomerAsync()
         {
+			_logger.LogDebug(">>> Entering GetAuthenticatedCustomerAsync()");
+			_logger.LogDebug("<<< Exiting GetAuthenticatedCustomerAsync()");
             return await _serviceProvider.GetService<ICustomerService>().GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
         }
     }
@@ -803,6 +861,8 @@ public partial class BaseNopTest
     {
         public TestMemoryDistributedCache()
         {
+		_logger.LogDebug(">>> Entering TestMemoryDistributedCache()");
+		_logger.LogDebug("<<< Exiting TestMemoryDistributedCache()");
         }
     }
 
@@ -817,35 +877,47 @@ public partial class BaseNopTest
 
         public Task LoadAsync(CancellationToken cancellationToken = new())
         {
+			_logger.LogDebug(">>> Entering LoadAsync(cancellationToken={CancellationToken})", cancellationToken);
+			_logger.LogDebug("<<< Exiting LoadAsync(cancellationToken={CancellationToken})", cancellationToken);
             return Task.CompletedTask;
         }
 
         public Task CommitAsync(CancellationToken cancellationToken = new())
         {
+			_logger.LogDebug(">>> Entering CommitAsync(cancellationToken={CancellationToken})", cancellationToken);
+			_logger.LogDebug("<<< Exiting CommitAsync(cancellationToken={CancellationToken})", cancellationToken);
             return Task.CompletedTask;
         }
 
         public bool TryGetValue(string key, out byte[] value)
         {
+			_logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
+			_logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
             return _sessison.TryGetValue(key, out value);
         }
 
         public void Set(string key, byte[] value)
         {
+			_logger.LogDebug(">>> Entering Set(key={Key},value={Value})", key, value);
             if (!_sessison.ContainsKey(key))
                 _sessison.TryAdd(key, value);
             else
                 _sessison[key] = value;
+				_logger.LogDebug("<<< Exiting Set(key={Key},value={Value})", key, value);
         }
 
         public void Remove(string key)
         {
+			_logger.LogDebug(">>> Entering Remove(key={Key})", key);
             _sessison.Remove(key, out _);
+			_logger.LogDebug("<<< Exiting Remove(key={Key})", key);
         }
 
         public void Clear()
         {
+			_logger.LogDebug(">>> Entering Clear()");
             _sessison.Clear();
+			_logger.LogDebug("<<< Exiting Clear()");
         }
 
         public bool IsAvailable => true;

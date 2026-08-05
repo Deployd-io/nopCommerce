@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize Runtime v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	"use strict";
 
@@ -71,6 +73,7 @@ var formatMessage = Globalize._formatMessage,
  * http://www.unicode.org/reports/tr35/tr35-35/tr35-general.html#durationUnit
  */
 var unitFormat = function( value, numberFormatter, pluralGenerator, unitProperties ) {
+	logger.debug(`>>> Entering unitFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},unitProperties=${unitProperties})`);
 	var compoundUnitPattern = unitProperties.compoundUnitPattern, dividend, dividendProperties,
 		formattedValue, divisor, divisorProperties, message, pluralValue, oneProperty;
 
@@ -92,6 +95,7 @@ var unitFormat = function( value, numberFormatter, pluralGenerator, unitProperti
 
 	message = unitProperties[ pluralValue ];
 
+	logger.debug(`<<< Exiting unitFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},unitProperties=${unitProperties})`);
 	return formatMessage( message, [ formattedValue ] );
 };
 
@@ -99,10 +103,14 @@ var unitFormat = function( value, numberFormatter, pluralGenerator, unitProperti
 
 
 var unitFormatterFn = function( numberFormatter, pluralGenerator, unitProperties ) {
+	logger.debug(`>>> Entering unitFormatterFn(numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},unitProperties=${unitProperties})`);
 	return function unitFormatter( value ) {
+	logger.debug(`>>> Entering unitFormatter(value=${value})`);
 		validateParameterPresence( value, "value" );
 		validateParameterTypeNumber( value, "value" );
+		logger.debug(`<<< Exiting unitFormatterFn(numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},unitProperties=${unitProperties})`);
 
+		logger.debug(`<<< Exiting unitFormatter(value=${value})`);
 		return unitFormat( value, numberFormatter, pluralGenerator, unitProperties );
 	};
 
@@ -112,6 +120,7 @@ var unitFormatterFn = function( numberFormatter, pluralGenerator, unitProperties
 
 
 Globalize._unitFormatterFn = unitFormatterFn;
+logger.debug(`function(): Globalize._unitFormatterFn → ${Globalize._unitFormatterFn}`);
 
 Globalize.formatUnit =
 Globalize.prototype.formatUnit = function( value, unit, options ) {

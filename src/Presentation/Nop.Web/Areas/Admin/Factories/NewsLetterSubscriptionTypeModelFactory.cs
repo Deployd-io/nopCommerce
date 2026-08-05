@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscriptionTypeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -49,11 +51,13 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     /// </returns>
     public virtual Task<NewsLetterSubscriptionTypeSearchModel> PrepareNewsLetterSubscriptionTypeSearchModelAsync(NewsLetterSubscriptionTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -67,11 +71,13 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionTypeListModel> PrepareNewsLetterSubscriptionTypeListModelAsync(NewsLetterSubscriptionTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get newsletter subscription type
         var subscriptionTypes = (await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel}): subscriptionTypes → {SubscriptionTypes}", searchModel, subscriptionTypes);
         //prepare list model
         var model = new NewsLetterSubscriptionTypeListModel().PrepareToGrid(searchModel, subscriptionTypes, () =>
         {
@@ -79,6 +85,7 @@ public partial class NewsLetterSubscriptionTypeModelFactory : INewsLetterSubscri
             return subscriptionTypes.Select(subscriptionType => subscriptionType.ToModel<NewsLetterSubscriptionTypeModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareNewsLetterSubscriptionTypeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

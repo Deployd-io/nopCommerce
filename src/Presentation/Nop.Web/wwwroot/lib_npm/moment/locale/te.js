@@ -3,6 +3,7 @@
 //! author : Krishna Chaitanya Thota : https://github.com/kcthota
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('te', {
     months: 'జనవరి_ఫిబ్రవరి_మార్చి_ఏప్రిల్_మే_జూన్_జులై_ఆగస్టు_సెప్టెంబర్_అక్టోబర్_నవంబర్_డిసెంబర్'.split(
@@ -55,6 +56,7 @@ export default moment.defineLocale('te', {
     ordinal: '%dవ',
     meridiemParse: /రాత్రి|ఉదయం|మధ్యాహ్నం|సాయంత్రం/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -65,6 +67,9 @@ export default moment.defineLocale('te', {
         } else if (meridiem === 'మధ్యాహ్నం') {
             return hour >= 10 ? hour : hour + 12;
         } else if (meridiem === 'సాయంత్రం') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },

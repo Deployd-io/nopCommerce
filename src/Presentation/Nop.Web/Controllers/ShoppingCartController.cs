@@ -38,12 +38,14 @@ using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class ShoppingCartController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -468,8 +470,10 @@ public partial class ShoppingCartController : BasePublicController
         if (model == null)
             model = new EstimateShippingModel();
 
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): model → {Model1}", name, model, form, model);
         var errors = new List<string>();
         if (string.IsNullOrEmpty(model.ZipPostalCode) && !_shippingSettings.EstimateShippingCityNameEnabled)
+			_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): errors → {Errors}", name, model, form, errors);
             errors.Add(await _localizationService.GetResourceAsync("Shipping.EstimateShipping.ZipPostalCode.Required"));
 
         if (model.CountryId == null || model.CountryId == 0)
@@ -480,16 +484,22 @@ public partial class ShoppingCartController : BasePublicController
             {
                 success = false,
                 errors = errors
+				_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): success → {Success}", name, model, form, success);
             });
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): customer → {Customer}", name, model, form, customer);
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): store → {Store}", name, model, form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
         //parse and save checkout attributes
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): cart → {Cart}", name, model, form, cart);
         await ParseAndSaveCheckoutAttributesAsync(cart, form);
 
         var shippingOptions = new List<ShippingOption>();
         ShippingOption selectedShippingOption = null;
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): shippingOptions → {ShippingOptions}", name, model, form, shippingOptions);
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): selectedShippingOption → {SelectedShippingOption}", name, model, form, selectedShippingOption);
 
         if (!string.IsNullOrWhiteSpace(name))
         {
@@ -540,6 +550,8 @@ public partial class ShoppingCartController : BasePublicController
 
         var orderTotalsSectionHtml = await RenderViewComponentToStringAsync(typeof(OrderTotalsViewComponent), new { isEditable = true });
 
+		_logger.LogDebug("SelectShippingOption(name={Name},model={Model},form={Form}): orderTotalsSectionHtml → {OrderTotalsSectionHtml}", name, model, form, orderTotalsSectionHtml);
+		_logger.LogDebug("<<< Exiting SelectShippingOption(name={Name},model={Model},form={Form})", name, model, form);
         return Json(new
         {
             success = true,
@@ -750,13 +762,16 @@ public partial class ShoppingCartController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> AddProductToCart_Details(int productId, int shoppingCartTypeId, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form})", productId, shoppingCartTypeId, form);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null)
+		_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): product → {Product}", productId, shoppingCartTypeId, form, product);
         {
             return Json(new
             {
                 redirect = Url.RouteUrl(NopRouteNames.General.HOMEPAGE)
             });
+				_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): redirect → {Redirect}", productId, shoppingCartTypeId, form, redirect);
         }
 
         //we can add only simple products
@@ -766,6 +781,8 @@ public partial class ShoppingCartController : BasePublicController
             {
                 success = false,
                 message = "Only simple products could be added to the cart"
+				_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): success → {Success}", productId, shoppingCartTypeId, form, success);
+				_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): message → {Message}", productId, shoppingCartTypeId, form, message);
             });
         }
 
@@ -780,11 +797,14 @@ public partial class ShoppingCartController : BasePublicController
 
         ShoppingCartItem updatecartitem = null;
         if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
+		_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): updatecartitem → {Updatecartitem}", productId, shoppingCartTypeId, form, updatecartitem);
         {
             var store = await _storeContext.GetCurrentStoreAsync();
             //search with the same cart type as specified
+			_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): store → {Store}", productId, shoppingCartTypeId, form, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), (ShoppingCartType)shoppingCartTypeId, store.Id);
 
+			_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): cart → {Cart}", productId, shoppingCartTypeId, form, cart);
             updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
             //not found? let's ignore it. in this case we'll add a new item
             //if (updatecartitem == null)
@@ -808,15 +828,19 @@ public partial class ShoppingCartController : BasePublicController
 
         var addToCartWarnings = new List<string>();
 
+		_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): addToCartWarnings → {AddToCartWarnings}", productId, shoppingCartTypeId, form, addToCartWarnings);
         //customer entered price
         var customerEnteredPriceConverted = await _productAttributeParser.ParseCustomerEnteredPriceAsync(product, form);
 
+		_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): customerEnteredPriceConverted → {CustomerEnteredPriceConverted}", productId, shoppingCartTypeId, form, customerEnteredPriceConverted);
         //entered quantity
         var quantity = _productAttributeParser.ParseEnteredQuantity(product, form);
 
+		_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): quantity → {Quantity}", productId, shoppingCartTypeId, form, quantity);
         //product and gift card attributes
         var attributes = await _productAttributeParser.ParseProductAttributesAsync(product, form, addToCartWarnings);
 
+		_logger.LogDebug("AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form}): attributes → {Attributes}", productId, shoppingCartTypeId, form, attributes);
         //rental attributes
         _productAttributeParser.ParseRentalDates(product, form, out var rentalStartDate, out var rentalEndDate);
 
@@ -827,6 +851,7 @@ public partial class ShoppingCartController : BasePublicController
         await SaveItemAsync(updatecartitem, addToCartWarnings, product, cartType, attributes, customerEnteredPriceConverted, rentalStartDate, rentalEndDate, quantity);
 
         //return result
+		_logger.LogDebug("<<< Exiting AddProductToCart_Details(productId={ProductId},shoppingCartTypeId={ShoppingCartTypeId},form={Form})", productId, shoppingCartTypeId, form);
         return await GetProductToCartDetailsAsync(addToCartWarnings, cartType, product);
     }
 
@@ -1001,10 +1026,14 @@ public partial class ShoppingCartController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> CheckoutAttributeChange(IFormCollection form, bool isEditable)
     {
+		_logger.LogDebug(">>> Entering CheckoutAttributeChange(form={Form},isEditable={IsEditable})", form, isEditable);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): customer → {Customer}", form, isEditable, customer);
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): store → {Store}", form, isEditable, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): cart → {Cart}", form, isEditable, cart);
         //save selected attributes
         await ParseAndSaveCheckoutAttributesAsync(cart, form);
         var attributeXml = await _genericAttributeService.GetAttributeAsync<string>(customer,
@@ -1013,12 +1042,17 @@ public partial class ShoppingCartController : BasePublicController
         //conditions
         var enabledAttributeIds = new List<int>();
         var disabledAttributeIds = new List<int>();
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): enabledAttributeIds → {EnabledAttributeIds}", form, isEditable, enabledAttributeIds);
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): disabledAttributeIds → {DisabledAttributeIds}", form, isEditable, disabledAttributeIds);
         var excludeShippableAttributes = !await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
         var attributes = await _checkoutAttributeService.GetAllAttributesAsync(_staticCacheManager, _storeMappingService, store.Id, excludeShippableAttributes);
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): excludeShippableAttributes → {ExcludeShippableAttributes}", form, isEditable, excludeShippableAttributes);
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): attributes → {Attributes}", form, isEditable, attributes);
         foreach (var attribute in attributes)
         {
             var conditionMet = await _checkoutAttributeParser.IsConditionMetAsync(attribute.ConditionAttributeXml, attributeXml);
             if (conditionMet.HasValue)
+			_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): conditionMet → {ConditionMet}", form, isEditable, conditionMet);
             {
                 if (conditionMet.Value)
                     enabledAttributeIds.Add(attribute.Id);
@@ -1030,7 +1064,10 @@ public partial class ShoppingCartController : BasePublicController
         //update blocks
         var ordetotalssectionhtml = await RenderViewComponentToStringAsync(typeof(OrderTotalsViewComponent), new { isEditable });
         var selectedcheckoutattributesssectionhtml = await RenderViewComponentToStringAsync(typeof(SelectedCheckoutAttributesViewComponent));
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): ordetotalssectionhtml → {Ordetotalssectionhtml}", form, isEditable, ordetotalssectionhtml);
+		_logger.LogDebug("CheckoutAttributeChange(form={Form},isEditable={IsEditable}): selectedcheckoutattributesssectionhtml → {Selectedcheckoutattributesssectionhtml}", form, isEditable, selectedcheckoutattributesssectionhtml);
 
+		_logger.LogDebug("<<< Exiting CheckoutAttributeChange(form={Form},isEditable={IsEditable})", form, isEditable);
         return Json(new
         {
             ordetotalssectionhtml,
@@ -1044,31 +1081,39 @@ public partial class ShoppingCartController : BasePublicController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> UploadFileProductAttribute(int attributeId)
     {
+		_logger.LogDebug(">>> Entering UploadFileProductAttribute(attributeId={AttributeId})", attributeId);
         var attribute = await _productAttributeService.GetProductAttributeMappingByIdAsync(attributeId);
         if (attribute == null || attribute.AttributeControlType != AttributeControlType.FileUpload)
+		_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): attribute → {Attribute}", attributeId, attribute);
         {
             return Json(new
             {
                 success = false,
                 downloadGuid = Guid.Empty
+				_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): success → {Success}", attributeId, success);
+				_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): downloadGuid → {DownloadGuid}", attributeId, downloadGuid);
             });
         }
 
         var httpPostedFile = await Request.GetFirstOrDefaultFileAsync();
         if (httpPostedFile == null)
+		_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): httpPostedFile → {HttpPostedFile}", attributeId, httpPostedFile);
         {
             return Json(new
             {
                 success = false,
                 message = "No file uploaded",
                 downloadGuid = Guid.Empty
+				_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): message → {Message}", attributeId, message);
             });
         }
 
         var fileBinary = await _downloadService.GetDownloadBitsAsync(httpPostedFile);
 
+		_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): fileBinary → {FileBinary}", attributeId, fileBinary);
         var fileName = httpPostedFile.FileName;
 
+		_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): fileName → {FileName}", attributeId, fileName);
         //remove path (passed in IE)
         fileName = _fileProvider.GetFileName(fileName);
 
@@ -1076,6 +1121,7 @@ public partial class ShoppingCartController : BasePublicController
 
         var fileExtension = _fileProvider.GetFileExtension(fileName);
         if (!string.IsNullOrEmpty(fileExtension))
+			_logger.LogDebug("UploadFileProductAttribute(attributeId={AttributeId}): fileExtension → {FileExtension}", attributeId, fileExtension);
             fileExtension = fileExtension.ToLowerInvariant();
 
         if (attribute.ValidationFileMaximumSize.HasValue)
@@ -1111,6 +1157,7 @@ public partial class ShoppingCartController : BasePublicController
 
         //when returning JSON the mime-type must be set to text/plain
         //otherwise some browsers will pop-up a "Save As" dialog.
+		_logger.LogDebug("<<< Exiting UploadFileProductAttribute(attributeId={AttributeId})", attributeId);
         return Json(new
         {
             success = true,
@@ -1124,31 +1171,39 @@ public partial class ShoppingCartController : BasePublicController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> UploadFileCheckoutAttribute(int attributeId)
     {
+		_logger.LogDebug(">>> Entering UploadFileCheckoutAttribute(attributeId={AttributeId})", attributeId);
         var attribute = await _checkoutAttributeService.GetAttributeByIdAsync(attributeId);
         if (attribute == null || attribute.AttributeControlType != AttributeControlType.FileUpload)
+		_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): attribute → {Attribute}", attributeId, attribute);
         {
             return Json(new
             {
                 success = false,
                 downloadGuid = Guid.Empty
+				_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): success → {Success}", attributeId, success);
+				_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): downloadGuid → {DownloadGuid}", attributeId, downloadGuid);
             });
         }
 
         var httpPostedFile = await Request.GetFirstOrDefaultFileAsync();
         if (httpPostedFile == null)
+		_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): httpPostedFile → {HttpPostedFile}", attributeId, httpPostedFile);
         {
             return Json(new
             {
                 success = false,
                 message = "No file uploaded",
                 downloadGuid = Guid.Empty
+				_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): message → {Message}", attributeId, message);
             });
         }
 
         var fileBinary = await _downloadService.GetDownloadBitsAsync(httpPostedFile);
 
+		_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): fileBinary → {FileBinary}", attributeId, fileBinary);
         var fileName = httpPostedFile.FileName;
 
+		_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): fileName → {FileName}", attributeId, fileName);
         //remove path (passed in IE)
         fileName = _fileProvider.GetFileName(fileName);
 
@@ -1156,6 +1211,7 @@ public partial class ShoppingCartController : BasePublicController
 
         var fileExtension = _fileProvider.GetFileExtension(fileName);
         if (!string.IsNullOrEmpty(fileExtension))
+			_logger.LogDebug("UploadFileCheckoutAttribute(attributeId={AttributeId}): fileExtension → {FileExtension}", attributeId, fileExtension);
             fileExtension = fileExtension.ToLowerInvariant();
 
         if (attribute.ValidationFileMaximumSize.HasValue)
@@ -1191,6 +1247,7 @@ public partial class ShoppingCartController : BasePublicController
 
         //when returning JSON the mime-type must be set to text/plain
         //otherwise some browsers will pop-up a "Save As" dialog.
+		_logger.LogDebug("<<< Exiting UploadFileCheckoutAttribute(attributeId={AttributeId})", attributeId);
         return Json(new
         {
             success = true,
@@ -1202,13 +1259,18 @@ public partial class ShoppingCartController : BasePublicController
 
     public virtual async Task<IActionResult> Cart()
     {
+		_logger.LogDebug(">>> Entering Cart()");
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART))
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("Cart(): store → {Store}", store);
+		_logger.LogDebug("Cart(): cart → {Cart}", cart);
         var model = new ShoppingCartModel();
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
+		_logger.LogDebug("Cart(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Cart()");
         return View(model);
     }
 
@@ -1216,13 +1278,18 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("updatecart")]
     public virtual async Task<IActionResult> UpdateCart(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering UpdateCart(form={Form})", form);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART))
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("UpdateCart(form={Form}): customer → {Customer}", form, customer);
+		_logger.LogDebug("UpdateCart(form={Form}): store → {Store}", form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
+		_logger.LogDebug("UpdateCart(form={Form}): cart → {Cart}", form, cart);
         //get identifiers of items to remove
         var itemIdsToRemove = form["removefromcart"]
             .SelectMany(value => value.Split(_separator, StringSplitOptions.RemoveEmptyEntries))
@@ -1239,6 +1306,9 @@ public partial class ShoppingCartController : BasePublicController
             NewQuantity = itemIdsToRemove.Contains(item.Id) ? 0 : int.TryParse(form[$"itemquantity{item.Id}"], out var quantity) ? quantity : item.Quantity,
             Item = item,
             Product = products.TryGetValue(item.ProductId, out var value) ? value : null
+			_logger.LogDebug("UpdateCart(form={Form}): NewQuantity → {NewQuantity}", form, NewQuantity);
+			_logger.LogDebug("UpdateCart(form={Form}): Item → {Item}", form, Item);
+			_logger.LogDebug("UpdateCart(form={Form}): Product → {Product}", form, Product);
         }).Where(item => item.NewQuantity != item.Item.Quantity);
 
         //order cart items
@@ -1250,6 +1320,7 @@ public partial class ShoppingCartController : BasePublicController
                 (cartItem.NewQuantity > cartItem.Item.Quantity && cartItem.Product != null && (await _shoppingCartService
                     .GetProductsRequiringProductAsync(cart, cartItem.Product)).Any()))
             .ToListAsync();
+			_logger.LogInformation("UpdateCart(form)={Form}: database query executed in {Arg1} ms", form, __logStart.ElapsedMilliseconds);
 
         //try to update cart items with new quantities and get warnings
         var warnings = await orderedCart.SelectAwait(async cartItem => new
@@ -1259,6 +1330,8 @@ public partial class ShoppingCartController : BasePublicController
                 cartItem.Item.Id, cartItem.Item.AttributesXml, cartItem.Item.CustomerEnteredPrice,
                 cartItem.Item.RentalStartDateUtc, cartItem.Item.RentalEndDateUtc, cartItem.NewQuantity, true)
         }).ToListAsync();
+			_logger.LogDebug("UpdateCart(form={Form}): ItemId → {ItemId}", form, ItemId);
+			_logger.LogDebug("UpdateCart(form={Form}): Warnings → {Warnings}", form, Warnings);
 
         //updated cart
         cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
@@ -1269,6 +1342,7 @@ public partial class ShoppingCartController : BasePublicController
         //prepare model
         var model = new ShoppingCartModel();
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
+		_logger.LogDebug("UpdateCart(form={Form}): model → {Model}", form, model);
 
         //update current warnings
         foreach (var warningItem in warnings.Where(warningItem => warningItem.Warnings.Any()))
@@ -1276,9 +1350,11 @@ public partial class ShoppingCartController : BasePublicController
             //find shopping cart item model to display appropriate warnings
             var itemModel = model.Items.FirstOrDefault(item => item.Id == warningItem.ItemId);
             if (itemModel != null)
+				_logger.LogDebug("UpdateCart(form={Form}): itemModel → {ItemModel}", form, itemModel);
                 itemModel.Warnings = warningItem.Warnings.Concat(itemModel.Warnings).Distinct().ToList();
         }
 
+		_logger.LogDebug("<<< Exiting UpdateCart(form={Form})", form);
         return View(model);
     }
 
@@ -1286,10 +1362,14 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("continueshopping")]
     public virtual async Task<IActionResult> ContinueShopping()
     {
+		_logger.LogDebug(">>> Entering ContinueShopping()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var returnUrl = await _genericAttributeService.GetAttributeAsync<string>(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.LastContinueShoppingPageAttribute, store.Id);
+		_logger.LogDebug("ContinueShopping(): store → {Store}", store);
+		_logger.LogDebug("ContinueShopping(): returnUrl → {ReturnUrl}", returnUrl);
 
         if (!string.IsNullOrEmpty(returnUrl))
+		_logger.LogDebug("<<< Exiting ContinueShopping()");
             return Redirect(returnUrl);
 
         return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
@@ -1299,10 +1379,14 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("checkout")]
     public virtual async Task<IActionResult> StartCheckout(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering StartCheckout(form={Form})", form);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("StartCheckout(form={Form}): customer → {Customer}", form, customer);
+		_logger.LogDebug("StartCheckout(form={Form}): store → {Store}", form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
+		_logger.LogDebug("StartCheckout(form={Form}): cart → {Cart}", form, cart);
         //parse and save checkout attributes
         await ParseAndSaveCheckoutAttributesAsync(cart, form);
 
@@ -1311,10 +1395,12 @@ public partial class ShoppingCartController : BasePublicController
             NopCustomerDefaults.CheckoutAttributes, store.Id);
         var checkoutAttributeWarnings = await _shoppingCartService.GetShoppingCartWarningsAsync(cart, checkoutAttributes, true);
         if (checkoutAttributeWarnings.Any())
+		_logger.LogDebug("StartCheckout(form={Form}): checkoutAttributeWarnings → {CheckoutAttributeWarnings}", form, checkoutAttributeWarnings);
         {
             //something wrong, redisplay the page with warnings
             var model = new ShoppingCartModel();
             model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart, validateCheckoutAttributes: true);
+			_logger.LogDebug("StartCheckout(form={Form}): model → {Model}", form, model);
             return View(model);
         }
 
@@ -1327,6 +1413,7 @@ public partial class ShoppingCartController : BasePublicController
         var cartProductIds = cart.Select(ci => ci.ProductId).ToArray();
         var downloadableProductsRequireRegistration =
             _customerSettings.RequireRegistrationForDownloadableProducts && await _productService.HasAnyDownloadableProductAsync(cartProductIds);
+			_logger.LogDebug("StartCheckout(form={Form}): cartProductIds → {CartProductIds}", form, cartProductIds);
 
         if (!_orderSettings.AnonymousCheckoutAllowed || downloadableProductsRequireRegistration)
         {
@@ -1334,6 +1421,7 @@ public partial class ShoppingCartController : BasePublicController
             return Challenge();
         }
 
+		_logger.LogDebug("<<< Exiting StartCheckout(form={Form})", form);
         return RedirectToRoute(NopRouteNames.Standard.LOGIN_CHECKOUT_AS_GUEST, new { returnUrl = Url.RouteUrl(NopRouteNames.General.CART) });
     }
 
@@ -1341,20 +1429,26 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("applydiscountcouponcode")]
     public virtual async Task<IActionResult> ApplyDiscountCoupon(string discountcouponcode, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form})", discountcouponcode, form);
         //trim
         if (discountcouponcode != null)
             discountcouponcode = discountcouponcode.Trim();
 
+		_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): discountcouponcode → {Discountcouponcode1}", discountcouponcode, form, discountcouponcode);
         //cart
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): customer → {Customer}", discountcouponcode, form, customer);
+		_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): store → {Store}", discountcouponcode, form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
+		_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): cart → {Cart}", discountcouponcode, form, cart);
         //parse and save checkout attributes
         await ParseAndSaveCheckoutAttributesAsync(cart, form);
 
         var model = new ShoppingCartModel();
         if (!string.IsNullOrWhiteSpace(discountcouponcode))
+		_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): model → {Model}", discountcouponcode, form, model);
         {
             //we find even hidden records here. this way we can display a user-friendly message if it's expired
             var discounts = (await _discountService.GetAllDiscountsAsync(couponCode: discountcouponcode, showHidden: true))
@@ -1365,8 +1459,10 @@ public partial class ShoppingCartController : BasePublicController
                 var userErrors = new List<string>();
                 var anyValidDiscount = await discounts.AnyAwaitAsync(async discount =>
                 {
+				_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): userErrors → {UserErrors}", discountcouponcode, form, userErrors);
                     var validationResult = await _discountService.ValidateDiscountAsync(discount, customer, [discountcouponcode]);
                     userErrors.AddRange(validationResult.Errors);
+					_logger.LogDebug("ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form}): validationResult → {ValidationResult}", discountcouponcode, form, validationResult);
 
                     return validationResult.IsValid;
                 });
@@ -1398,6 +1494,7 @@ public partial class ShoppingCartController : BasePublicController
 
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
 
+		_logger.LogDebug("<<< Exiting ApplyDiscountCoupon(discountcouponcode={Discountcouponcode},form={Form})", discountcouponcode, form);
         return View(model);
     }
 
@@ -1405,22 +1502,29 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("applygiftcardcouponcode")]
     public virtual async Task<IActionResult> ApplyGiftCard(string giftcardcouponcode, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form})", giftcardcouponcode, form);
         //trim
         if (giftcardcouponcode != null)
             giftcardcouponcode = giftcardcouponcode.Trim();
 
+		_logger.LogDebug("ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form}): giftcardcouponcode → {Giftcardcouponcode1}", giftcardcouponcode, form, giftcardcouponcode);
         //cart
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form}): customer → {Customer}", giftcardcouponcode, form, customer);
+		_logger.LogDebug("ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form}): store → {Store}", giftcardcouponcode, form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
+		_logger.LogDebug("ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form}): cart → {Cart}", giftcardcouponcode, form, cart);
         //parse and save checkout attributes
         await ParseAndSaveCheckoutAttributesAsync(cart, form);
 
         var model = new ShoppingCartModel();
 
+		_logger.LogDebug("ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form}): model → {Model}", giftcardcouponcode, form, model);
         var validationError = await GetGiftCardValidationErrorAsync(cart, giftcardcouponcode);
 
+		_logger.LogDebug("ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form}): validationError → {ValidationError}", giftcardcouponcode, form, validationError);
         if (string.IsNullOrEmpty(validationError))
         {
             await _customerService.ApplyGiftCardCouponCodeAsync(customer, giftcardcouponcode);
@@ -1434,6 +1538,7 @@ public partial class ShoppingCartController : BasePublicController
         }
 
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
+		_logger.LogDebug("<<< Exiting ApplyGiftCard(giftcardcouponcode={Giftcardcouponcode},form={Form})", giftcardcouponcode, form);
         return View(model);
     }
 
@@ -1443,8 +1548,10 @@ public partial class ShoppingCartController : BasePublicController
         if (model == null)
             model = new EstimateShippingModel();
 
+		_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): model → {Model1}", model, form, model);
         var errors = new List<string>();
 
+		_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): errors → {Errors}", model, form, errors);
         if (!_shippingSettings.EstimateShippingCityNameEnabled && string.IsNullOrEmpty(model.ZipPostalCode))
             errors.Add(await _localizationService.GetResourceAsync("Shipping.EstimateShipping.ZipPostalCode.Required"));
 
@@ -1459,15 +1566,21 @@ public partial class ShoppingCartController : BasePublicController
             {
                 Success = false,
                 Errors = errors
+				_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): Success → {Success}", model, form, Success);
+				_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): Errors → {Errors}", model, form, Errors);
             });
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): store → {Store}", model, form, store);
+		_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): cart → {Cart}", model, form, cart);
         //parse and save checkout attributes
         await ParseAndSaveCheckoutAttributesAsync(cart, form);
 
         var result = await _shoppingCartModelFactory.PrepareEstimateShippingResultModelAsync(cart, model, true);
 
+		_logger.LogDebug("GetEstimateShipping(model={Model},form={Form}): result → {Result}", model, form, result);
+		_logger.LogDebug("<<< Exiting GetEstimateShipping(model={Model},form={Form})", model, form);
         return Json(result);
     }
 
@@ -1475,22 +1588,30 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired(FormValueRequirement.StartsWith, "removediscount-")]
     public virtual async Task<IActionResult> RemoveDiscountCoupon(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering RemoveDiscountCoupon(form={Form})", form);
         var model = new ShoppingCartModel();
 
+		_logger.LogDebug("RemoveDiscountCoupon(form={Form}): model → {Model}", form, model);
         //get discount identifier
         var discountId = 0;
         foreach (var formValue in form.Keys)
             if (formValue.StartsWith("removediscount-", StringComparison.InvariantCultureIgnoreCase))
+			_logger.LogDebug("RemoveDiscountCoupon(form={Form}): discountId → {DiscountId}", form, discountId);
                 discountId = Convert.ToInt32(formValue["removediscount-".Length..]);
         var discount = await _discountService.GetDiscountByIdAsync(discountId);
+		_logger.LogDebug("RemoveDiscountCoupon(form={Form}): discount → {Discount}", form, discount);
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (discount != null)
+			_logger.LogDebug("RemoveDiscountCoupon(form={Form}): customer → {Customer}", form, customer);
             await _customerService.RemoveDiscountCouponCodeAsync(customer, discount.CouponCode);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("RemoveDiscountCoupon(form={Form}): store → {Store}", form, store);
+		_logger.LogDebug("RemoveDiscountCoupon(form={Form}): cart → {Cart}", form, cart);
 
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
+		_logger.LogDebug("<<< Exiting RemoveDiscountCoupon(form={Form})", form);
         return View(model);
     }
 
@@ -1498,22 +1619,30 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired(FormValueRequirement.StartsWith, "removegiftcard-")]
     public virtual async Task<IActionResult> RemoveGiftCardCode(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering RemoveGiftCardCode(form={Form})", form);
         var model = new ShoppingCartModel();
 
+		_logger.LogDebug("RemoveGiftCardCode(form={Form}): model → {Model}", form, model);
         //get gift card identifier
         var giftCardId = 0;
         foreach (var formValue in form.Keys)
             if (formValue.StartsWith("removegiftcard-", StringComparison.InvariantCultureIgnoreCase))
+			_logger.LogDebug("RemoveGiftCardCode(form={Form}): giftCardId → {GiftCardId}", form, giftCardId);
                 giftCardId = Convert.ToInt32(formValue["removegiftcard-".Length..]);
         var gc = await _giftCardService.GetGiftCardByIdAsync(giftCardId);
+		_logger.LogDebug("RemoveGiftCardCode(form={Form}): gc → {Gc}", form, gc);
         var customer = await _workContext.GetCurrentCustomerAsync();
         if (gc != null)
+			_logger.LogDebug("RemoveGiftCardCode(form={Form}): customer → {Customer}", form, customer);
             await _customerService.RemoveGiftCardCouponCodeAsync(customer, gc.GiftCardCouponCode);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("RemoveGiftCardCode(form={Form}): store → {Store}", form, store);
+		_logger.LogDebug("RemoveGiftCardCode(form={Form}): cart → {Cart}", form, cart);
 
         model = await _shoppingCartModelFactory.PrepareShoppingCartModelAsync(model, cart);
+		_logger.LogDebug("<<< Exiting RemoveGiftCardCode(form={Form})", form);
         return View(model);
     }
 
@@ -1523,6 +1652,7 @@ public partial class ShoppingCartController : BasePublicController
 
     public virtual async Task<IActionResult> Wishlist(Guid? customerGuid, int? list)
     {
+		_logger.LogDebug(">>> Entering Wishlist(customerGuid={CustomerGuid},list={List})", customerGuid, list);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_WISHLIST))
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -1534,9 +1664,13 @@ public partial class ShoppingCartController : BasePublicController
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, store.Id, customWishlistId: list);
+		_logger.LogDebug("Wishlist(customerGuid={CustomerGuid},list={List}): store → {Store}", customerGuid, list, store);
+		_logger.LogDebug("Wishlist(customerGuid={CustomerGuid},list={List}): cart → {Cart}", customerGuid, list, cart);
 
         var model = new WishlistModel();
         model = await _shoppingCartModelFactory.PrepareWishlistModelAsync(model, cart, !customerGuid.HasValue, list);
+		_logger.LogDebug("Wishlist(customerGuid={CustomerGuid},list={List}): model → {Model}", customerGuid, list, model);
+		_logger.LogDebug("<<< Exiting Wishlist(customerGuid={CustomerGuid},list={List})", customerGuid, list);
         return View(model);
     }
 
@@ -1544,13 +1678,17 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("updatecart")]
     public virtual async Task<IActionResult> UpdateWishlist(WishlistModel wishlistModel, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering UpdateWishlist(wishlistModel={WishlistModel},form={Form})", wishlistModel, form);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_WISHLIST))
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): customer → {Customer}", wishlistModel, form, customer);
+		_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): store → {Store}", wishlistModel, form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, store.Id, customWishlistId: wishlistModel.ListId);
 
+		_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): cart → {Cart}", wishlistModel, form, cart);
         var allIdsToRemove = form.ContainsKey("removefromcart")
             ? form["removefromcart"].ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(int.Parse)
@@ -1561,8 +1699,10 @@ public partial class ShoppingCartController : BasePublicController
         var innerWarnings = new Dictionary<int, IList<string>>();
         foreach (var sci in cart)
         {
+		_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): innerWarnings → {InnerWarnings}", wishlistModel, form, innerWarnings);
             var remove = allIdsToRemove.Contains(sci.Id);
             if (remove)
+				_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): remove → {Remove}", wishlistModel, form, remove);
                 await _shoppingCartService.DeleteShoppingCartItemAsync(sci);
             else
             {
@@ -1587,6 +1727,7 @@ public partial class ShoppingCartController : BasePublicController
         cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, store.Id, customWishlistId: wishlistModel.ListId);
         var model = new WishlistModel();
         model = await _shoppingCartModelFactory.PrepareWishlistModelAsync(model, cart, list: wishlistModel.ListId);
+		_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): model → {Model}", wishlistModel, form, model);
         //update current warnings
         foreach (var kvp in innerWarnings)
         {
@@ -1596,11 +1737,13 @@ public partial class ShoppingCartController : BasePublicController
             //find model
             var sciModel = model.Items.FirstOrDefault(x => x.Id == sciId);
             if (sciModel != null)
+				_logger.LogDebug("UpdateWishlist(wishlistModel={WishlistModel},form={Form}): sciModel → {SciModel}", wishlistModel, form, sciModel);
                 foreach (var w in warnings)
                     if (!sciModel.Warnings.Contains(w))
                         sciModel.Warnings.Add(w);
         }
 
+		_logger.LogDebug("<<< Exiting UpdateWishlist(wishlistModel={WishlistModel},form={Form})", wishlistModel, form);
         return View(model);
     }
 
@@ -1608,6 +1751,7 @@ public partial class ShoppingCartController : BasePublicController
     [FormValueRequired("addtocartbutton")]
     public virtual async Task<IActionResult> AddItemsToCartFromWishlist(Guid? customerGuid, WishlistModel wishlistModel, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form})", customerGuid, wishlistModel, form);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART))
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -1616,6 +1760,7 @@ public partial class ShoppingCartController : BasePublicController
 
         var customer = await _workContext.GetCurrentCustomerAsync();
         var pageCustomer = customerGuid.HasValue
+			_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): customer → {Customer}", customerGuid, wishlistModel, form, customer);
             ? await _customerService.GetCustomerByGuidAsync(customerGuid.Value)
             : customer;
         if (pageCustomer == null)
@@ -1623,9 +1768,12 @@ public partial class ShoppingCartController : BasePublicController
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var pageCart = await _shoppingCartService.GetShoppingCartAsync(pageCustomer, ShoppingCartType.Wishlist, store.Id, customWishlistId: wishlistModel.ListId);
+		_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): store → {Store}", customerGuid, wishlistModel, form, store);
+		_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): pageCart → {PageCart}", customerGuid, wishlistModel, form, pageCart);
 
         var allWarnings = new List<string>();
         var countOfAddedItems = 0;
+		_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): allWarnings → {AllWarnings}", customerGuid, wishlistModel, form, allWarnings);
         var allIdsToAdd = form.ContainsKey("addtocart")
             ? form["addtocart"].ToString().Split(_separator, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
             : [];
@@ -1635,6 +1783,7 @@ public partial class ShoppingCartController : BasePublicController
             {
                 var product = await _productService.GetProductByIdAsync(sci.ProductId);
 
+				_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): product → {Product}", customerGuid, wishlistModel, form, product);
                 var warnings = await _shoppingCartService.AddToCartAsync(customer,
                     product, ShoppingCartType.ShoppingCart,
                     store.Id,
@@ -1678,24 +1827,32 @@ public partial class ShoppingCartController : BasePublicController
 
         var cart = await _shoppingCartService.GetShoppingCartAsync(pageCustomer, ShoppingCartType.Wishlist, store.Id, customWishlistId: wishlistModel.ListId);
 
+		_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): cart → {Cart}", customerGuid, wishlistModel, form, cart);
         var model = new WishlistModel();
         model = await _shoppingCartModelFactory.PrepareWishlistModelAsync(model, cart, !customerGuid.HasValue, list: wishlistModel.ListId);
+		_logger.LogDebug("AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form}): model → {Model}", customerGuid, wishlistModel, form, model);
+		_logger.LogDebug("<<< Exiting AddItemsToCartFromWishlist(customerGuid={CustomerGuid},wishlistModel={WishlistModel},form={Form})", customerGuid, wishlistModel, form);
         return View(model);
     }
 
     public virtual async Task<IActionResult> EmailWishlist(int? wishlistId = null)
     {
+		_logger.LogDebug(">>> Entering EmailWishlist(wishlistId={WishlistId})", wishlistId);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_WISHLIST) || !_shoppingCartSettings.EmailWishlistEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), ShoppingCartType.Wishlist, store.Id, customWishlistId: wishlistId);
+		_logger.LogDebug("EmailWishlist(wishlistId={WishlistId}): store → {Store}", wishlistId, store);
+		_logger.LogDebug("EmailWishlist(wishlistId={WishlistId}): cart → {Cart}", wishlistId, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = new WishlistEmailAFriendModel();
         model = await _shoppingCartModelFactory.PrepareWishlistEmailAFriendModelAsync(model, false, wishlistId);
+		_logger.LogDebug("EmailWishlist(wishlistId={WishlistId}): model → {Model}", wishlistId, model);
+		_logger.LogDebug("<<< Exiting EmailWishlist(wishlistId={WishlistId})", wishlistId);
         return View(model);
     }
 
@@ -1747,14 +1904,19 @@ public partial class ShoppingCartController : BasePublicController
         //If we got this far, something failed, redisplay form
         model = await _shoppingCartModelFactory.PrepareWishlistEmailAFriendModelAsync(model, true);
 
+		_logger.LogDebug("EmailWishlistSend(model={Model},captchaValid={CaptchaValid}): model → {Model1}", model, captchaValid, model);
+		_logger.LogDebug("<<< Exiting EmailWishlistSend(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> AddWishlist(string name, int productId)
     {
+		_logger.LogDebug(">>> Entering AddWishlist(name={Name},productId={ProductId})", name, productId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var isGuest = await _customerService.IsGuestAsync(customer);
+		_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): customer → {Customer}", name, productId, customer);
+		_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): isGuest → {IsGuest}", name, productId, isGuest);
 
         if (isGuest)
         {
@@ -1763,6 +1925,8 @@ public partial class ShoppingCartController : BasePublicController
                 success = false,
                 message = await _localizationService.GetResourceAsync("Wishlist.MultipleWishlistNotForGuest")
             });
+				_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): success → {Success}", name, productId, success);
+				_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): message → {Message}", name, productId, message);
         }
 
         if (!_shoppingCartSettings.AllowMultipleWishlist)
@@ -1777,6 +1941,7 @@ public partial class ShoppingCartController : BasePublicController
         // Check if customer has reached the maximum number of custom wishlists allowed
         var currentWishlists = await _customWishlistService.GetAllCustomWishlistsAsync(customer.Id);
         var maximumNumberOfCustomWishlist = _shoppingCartSettings.MaximumNumberOfCustomWishlist;
+		_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): currentWishlists → {CurrentWishlists}", name, productId, currentWishlists);
         if (currentWishlists.Count >= maximumNumberOfCustomWishlist)
         {
             return Json(new
@@ -1798,10 +1963,13 @@ public partial class ShoppingCartController : BasePublicController
 
         var product = await _productService.GetProductByIdAsync(productId);
         if (product != null)
+		_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): product → {Product}", name, productId, product);
         {
             await MoveProductToCustomWishlist(product.Id, customWishlist.Id);
         }
 
+		_logger.LogDebug("AddWishlist(name={Name},productId={ProductId}): redirect → {Redirect}", name, productId, redirect);
+		_logger.LogDebug("<<< Exiting AddWishlist(name={Name},productId={ProductId})", name, productId);
         return Json(new
         {
             success = true,
@@ -1812,8 +1980,11 @@ public partial class ShoppingCartController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> MoveProductToCustomWishlist(int productId, int wishlistId)
     {
+		_logger.LogDebug(">>> Entering MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId})", productId, wishlistId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var isGuest = await _customerService.IsGuestAsync(customer);
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): customer → {Customer}", productId, wishlistId, customer);
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): isGuest → {IsGuest}", productId, wishlistId, isGuest);
 
         if (isGuest)
         {
@@ -1822,6 +1993,8 @@ public partial class ShoppingCartController : BasePublicController
                 success = false,
                 message = await _localizationService.GetResourceAsync("Wishlist.MultipleWishlistNotForGuest")
             });
+				_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): success → {Success}", productId, wishlistId, success);
+				_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): message → {Message}", productId, wishlistId, message);
         }
 
         if (!_shoppingCartSettings.AllowMultipleWishlist)
@@ -1835,9 +2008,12 @@ public partial class ShoppingCartController : BasePublicController
 
         var store = await _storeContext.GetCurrentStoreAsync();
         var shoppingCarts = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, store.Id);
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): store → {Store}", productId, wishlistId, store);
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): shoppingCarts → {ShoppingCarts}", productId, wishlistId, shoppingCarts);
 
         var product = await _productService.GetProductByIdAsync(productId);
         if (product != null)
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): product → {Product}", productId, wishlistId, product);
         {
             var shoppingCartItem = shoppingCarts
                 .Where(sci => sci.ProductId == product.Id
@@ -1851,7 +2027,10 @@ public partial class ShoppingCartController : BasePublicController
         }
         var redirectUrl = Url.RouteUrl(NopRouteNames.General.WISHLIST, new { list = wishlistId });
         var customWishlist = await _customWishlistService.GetCustomWishlistByIdAsync(wishlistId);
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): redirectUrl → {RedirectUrl}", productId, wishlistId, redirectUrl);
+		_logger.LogDebug("MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId}): customWishlist → {CustomWishlist}", productId, wishlistId, customWishlist);
 
+		_logger.LogDebug("<<< Exiting MoveProductToCustomWishlist(productId={ProductId},wishlistId={WishlistId})", productId, wishlistId);
         return Json(new
         {
             success = true,
@@ -1862,18 +2041,24 @@ public partial class ShoppingCartController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> MoveToCustomWishlist(int shoppingCartItemId, int customWishlistId)
     {
+		_logger.LogDebug(">>> Entering MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId})", shoppingCartItemId, customWishlistId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var redirectUrl = Url.RouteUrl(NopRouteNames.General.WISHLIST, new { list = customWishlistId });
+		_logger.LogDebug("MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId}): customer → {Customer}", shoppingCartItemId, customWishlistId, customer);
+		_logger.LogDebug("MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId}): redirectUrl → {RedirectUrl}", shoppingCartItemId, customWishlistId, redirectUrl);
         if (customWishlistId > 0)
         {
             var wishlist = await _customWishlistService.GetCustomWishlistByIdAsync(customWishlistId);
 
+			_logger.LogDebug("MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId}): wishlist → {Wishlist}", shoppingCartItemId, customWishlistId, wishlist);
             if (wishlist == null || wishlist.CustomerId != customer.Id)
                 return Json(new
                 {
                     success = false,
                     message = await _localizationService.GetResourceAsync("Wishlist.NotFound")
                 });
+					_logger.LogDebug("MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId}): success → {Success}", shoppingCartItemId, customWishlistId, success);
+					_logger.LogDebug("MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId}): message → {Message}", shoppingCartItemId, customWishlistId, message);
 
             await _shoppingCartService.MoveItemToCustomWishlistAsync(shoppingCartItemId, wishlist.Id);
         }
@@ -1882,6 +2067,8 @@ public partial class ShoppingCartController : BasePublicController
             await _shoppingCartService.MoveItemToCustomWishlistAsync(shoppingCartItemId);
             redirectUrl = Url.RouteUrl(NopRouteNames.General.WISHLIST);
         }
+		_logger.LogDebug("MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId}): redirect → {Redirect}", shoppingCartItemId, customWishlistId, redirect);
+		_logger.LogDebug("<<< Exiting MoveToCustomWishlist(shoppingCartItemId={ShoppingCartItemId},customWishlistId={CustomWishlistId})", shoppingCartItemId, customWishlistId);
         return Json(new
         {
             redirect = redirectUrl
@@ -1891,8 +2078,11 @@ public partial class ShoppingCartController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> DeleteWishlist(int wishlistId)
     {
+		_logger.LogDebug(">>> Entering DeleteWishlist(wishlistId={WishlistId})", wishlistId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var wishlist = await _customWishlistService.GetCustomWishlistByIdAsync(wishlistId);
+		_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): customer → {Customer}", wishlistId, customer);
+		_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): wishlist → {Wishlist}", wishlistId, wishlist);
 
         if (wishlist == null || wishlist.CustomerId != customer.Id)
         {
@@ -1901,11 +2091,15 @@ public partial class ShoppingCartController : BasePublicController
                 success = false,
                 message = await _localizationService.GetResourceAsync("Wishlist.NotFound")
             });
+				_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): success → {Success}", wishlistId, success);
+				_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): message → {Message}", wishlistId, message);
         }
 
         // Delete all shopping cart items associated with this wishlist
         var store = await _storeContext.GetCurrentStoreAsync();
         var cartItems = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.Wishlist, store.Id, customWishlistId: wishlist.Id);
+		_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): store → {Store}", wishlistId, store);
+		_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): cartItems → {CartItems}", wishlistId, cartItems);
         foreach (var item in cartItems)
         {
             await _shoppingCartService.DeleteShoppingCartItemAsync(item);
@@ -1914,6 +2108,8 @@ public partial class ShoppingCartController : BasePublicController
         // Delete the wishlist itself
         await _customWishlistService.RemoveCustomWishlistAsync(wishlist.Id);
 
+		_logger.LogDebug("DeleteWishlist(wishlistId={WishlistId}): redirect → {Redirect}", wishlistId, redirect);
+		_logger.LogDebug("<<< Exiting DeleteWishlist(wishlistId={WishlistId})", wishlistId);
         return Json(new
         {
             redirect = Url.RouteUrl(NopRouteNames.General.WISHLIST)

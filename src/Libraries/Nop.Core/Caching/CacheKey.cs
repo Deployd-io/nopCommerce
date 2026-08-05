@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Core.Caching;
 /// </summary>
 public partial class CacheKey
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -16,7 +18,10 @@ public partial class CacheKey
     /// <param name="key">Key</param>
     public CacheKey(string key)
     {
+		_logger.LogDebug(">>> Entering CacheKey(key={Key})", key);
         Key = key;
+		_logger.LogDebug("<<< Exiting CacheKey(key={Key})", key);
+		_logger.LogWarning("CacheKey(key={Key}): Key → {Key1}", key, Key);
     }
 
     #endregion

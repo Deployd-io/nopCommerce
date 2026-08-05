@@ -70,11 +70,15 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetAllLocalizedPropertiesAsync()
     {
+		logger.LogDebug(">>> Entering GetAllLocalizedPropertiesAsync()");
         return await _localizedPropertyRepository.GetAllAsync(query =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return from lp in query
                 select lp;
+				logger.LogInformation("GetAllLocalizedPropertiesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
+		logger.LogDebug("<<< Exiting GetAllLocalizedPropertiesAsync()");
     }
 
     /// <summary>
@@ -86,6 +90,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetAllLocalizedPropertiesAsync(int languageId)
     {
+		logger.LogDebug(">>> Entering GetAllLocalizedPropertiesAsync(languageId={LanguageId})", languageId);
         // do not cache here
         return await _localizedPropertyRepository.GetAllAsync(query => query.Where(lp => lp.LanguageId == languageId));
     }
@@ -97,9 +102,19 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task DeleteLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		logger.LogDebug(">>> Entering DeleteLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _localizedPropertyRepository.DeleteAsync(localizedProperty);
+		logger.LogDebug("<<< Exiting DeleteLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: external service call took {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: delete query executed in {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: external service call took {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
+	var __logStart = System.Diagnostics.Stopwatch.StartNew();
+	logger.LogInformation("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: delete query executed in {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a localized property
     /// </summary>
@@ -107,9 +122,15 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		logger.LogDebug(">>> Entering InsertLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _localizedPropertyRepository.InsertAsync(localizedProperty);
+		logger.LogDebug("<<< Exiting InsertLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: save query executed in {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: save query executed in {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Updates the localized property
     /// </summary>
@@ -117,9 +138,15 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		logger.LogDebug(">>> Entering UpdateLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _localizedPropertyRepository.UpdateAsync(localizedProperty);
+		logger.LogDebug("<<< Exiting UpdateLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("UpdateLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: update query executed in {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("UpdateLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: update query executed in {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Methods
@@ -136,8 +163,10 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     public virtual async Task<IList<LocalizedProperty>> GetEntityLocalizedPropertiesAsync(int entityId, string localeKeyGroup, string localeKey)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LocalizedPropertiesCacheKey,
             entityId, localeKeyGroup, localeKey);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         return await _staticCacheManager.GetAsync(key, async () =>
         {
@@ -155,6 +184,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
 
             return await query.ToListAsync();
         });
+		logger.LogDebug("<<< Exiting GetEntityLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", entityId, localeKeyGroup, localeKey);
     }
 
     /// <summary>
@@ -174,6 +204,9 @@ public partial class LocalizedEntityService : ILocalizedEntityService
         {
             //value tuples aren't json-serializable by default, so we use a string key
             static string formatKey(string keyGroup, string key, int id) => $"{keyGroup}:{key}:{id}";
+			logger.LogDebug(">>> Entering formatKey(keyGroup={KeyGroup},key={Key},id={Id})", keyGroup, key, id);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			logger.LogInformation("formatKey(keyGroup,key,id)={KeyGroup},{Key},{Id}: external service call took {Arg3} ms", keyGroup, key, id, __logStart.ElapsedMilliseconds);
 
             var localizedValues = await _staticCacheManager.GetAsync(
                 _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LocalizedPropertyLookupCacheKey, languageId),
@@ -183,6 +216,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
 
             return localizedValues.TryGetValue(formatKey(localeKeyGroup, localeKey, entityId), out var localeValue)
                 ? localeValue
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 : string.Empty;
         }
 
@@ -202,9 +236,13 @@ public partial class LocalizedEntityService : ILocalizedEntityService
             //little hack here. nulls aren't cacheable so set it to ""
             return await query.FirstOrDefaultAsync() ?? string.Empty;
         });
+		logger.LogDebug("<<< Exiting async()");
+		logger.LogDebug("<<< Exiting GetLocalizedValueAsync(languageId={LanguageId},entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", languageId, entityId, localeKeyGroup, localeKey);
     }
 
     /// <summary>
+	logger.LogInformation("async(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+	logger.LogInformation("async(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
     /// Save localized value
     /// </summary>
     /// <typeparam name="T">Type</typeparam>

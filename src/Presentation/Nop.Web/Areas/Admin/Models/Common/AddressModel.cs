@@ -3,16 +3,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
 public partial record AddressModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AddressModel()
     {
+		_logger.LogDebug(">>> Entering AddressModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		_logger.LogDebug("AddressModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		_logger.LogDebug("AddressModel(): AvailableStates → {AvailableStates}", AvailableStates);
         CustomAddressAttributes = new List<AddressAttributeModel>();
+		_logger.LogDebug("<<< Exiting AddressModel()");
+		_logger.LogDebug("AddressModel(): CustomAddressAttributes → {CustomAddressAttributes}", CustomAddressAttributes);
     }
 
     [NopResourceDisplayName("Admin.Address.Fields.FirstName")]
@@ -93,7 +100,10 @@ public partial record AddressModel : BaseNopEntityModel
     {
         public AddressAttributeModel()
         {
+			_logger.LogDebug(">>> Entering AddressAttributeModel()");
             Values = new List<AddressAttributeValueModel>();
+			_logger.LogDebug("<<< Exiting AddressAttributeModel()");
+			_logger.LogDebug("AddressAttributeModel(): Values → {Values}", Values);
         }
 
         public string Name { get; set; }

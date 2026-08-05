@@ -18,7 +18,10 @@ public partial class MaintenanceService : IMaintenanceService
 
     public MaintenanceService(INopFileProvider fileProvider)
     {
+		logger.LogDebug(">>> Entering MaintenanceService(fileProvider={FileProvider})", fileProvider);
         _fileProvider = fileProvider;
+		logger.LogDebug("<<< Exiting MaintenanceService(fileProvider={FileProvider})", fileProvider);
+		logger.LogDebug("MaintenanceService(fileProvider={FileProvider}): _fileProvider → {_fileProvider}", fileProvider, _fileProvider);
     }
 
     #endregion
@@ -32,9 +35,12 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns></returns>
     protected virtual string GetBackupDirectoryPath(bool ensureFolderCreated = true)
     {
+		logger.LogDebug(">>> Entering GetBackupDirectoryPath(ensureFolderCreated={EnsureFolderCreated})", ensureFolderCreated);
         var path = _fileProvider.GetAbsolutePath(NopCommonDefaults.DbBackupsPath);
         if (ensureFolderCreated)
+			logger.LogDebug("GetBackupDirectoryPath(ensureFolderCreated={EnsureFolderCreated}): path → {Path}", ensureFolderCreated, path);
             _fileProvider.CreateDirectory(path);
+		logger.LogDebug("<<< Exiting GetBackupDirectoryPath(ensureFolderCreated={EnsureFolderCreated})", ensureFolderCreated);
         return path;
     }
 
@@ -48,9 +54,12 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns>Backup file collection</returns>
     public virtual IList<string> GetAllBackupFiles()
     {
+		logger.LogDebug(">>> Entering GetAllBackupFiles()");
         var path = GetBackupDirectoryPath();
 
+		logger.LogDebug("GetAllBackupFiles(): path → {Path}", path);
         if (!_fileProvider.DirectoryExists(path))
+		logger.LogDebug("<<< Exiting GetAllBackupFiles()");
             throw new NopException("Backup directory not exists");
 
         return _fileProvider.GetFiles(path, $"*.{NopCommonDefaults.DbBackupFileExtension}")
@@ -64,6 +73,8 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns>The path to the backup file</returns>
     public virtual string GetBackupPath(string backupFileName)
     {
+		logger.LogDebug(">>> Entering GetBackupPath(backupFileName={BackupFileName})", backupFileName);
+		logger.LogDebug("<<< Exiting GetBackupPath(backupFileName={BackupFileName})", backupFileName);
         return _fileProvider.Combine(GetBackupDirectoryPath(), backupFileName);
     }
 
@@ -73,6 +84,8 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns>Path to a new database backup file</returns>
     public virtual string CreateNewBackupFilePath()
     {
+		logger.LogDebug(">>> Entering CreateNewBackupFilePath()");
+		logger.LogDebug("<<< Exiting CreateNewBackupFilePath()");
         return _fileProvider.Combine(GetBackupDirectoryPath(), $"database_{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_{CommonHelper.GenerateRandomDigitCode(10)}.{NopCommonDefaults.DbBackupFileExtension}");
     }
 

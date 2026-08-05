@@ -80,6 +80,8 @@ public partial class PropertyByName<T>
                 return default;
             return rez;
         }
+		logger.LogDebug(">>> Entering GetItemId(name={Name})", name);
+		logger.LogDebug("<<< Exiting GetItemId(name={Name})", name);
     }
 
     /// <summary>
@@ -177,6 +179,8 @@ public partial class PropertyByName<T>
     /// <returns>String</returns>
     public override string ToString()
     {
+		logger.LogDebug(">>> Entering ToString()");
+		logger.LogDebug("<<< Exiting ToString()");
         return PropertyName;
     }
 
@@ -196,6 +200,8 @@ public partial class PropertyByName<T>
     /// <returns>Result</returns>
     public string[] GetDropDownElements()
     {
+		logger.LogDebug(">>> Entering GetDropDownElements()");
+		logger.LogDebug("<<< Exiting GetDropDownElements()");
         return IsDropDownCell ? DropDownElements.Select(ev => ev.Text).ToArray() : Array.Empty<string>();
     }
 
@@ -206,6 +212,8 @@ public partial class PropertyByName<T>
     /// <returns>Text</returns>
     public string GetItemText(object id)
     {
+		logger.LogDebug(">>> Entering GetItemText(id={Id})", id);
+		logger.LogDebug("<<< Exiting GetItemText(id={Id})", id);
         return DropDownElements.FirstOrDefault(ev => ev.Value == id.ToString())?.Text ?? string.Empty;
     }
 
@@ -222,6 +230,7 @@ public partial class PropertyByName<T>
         if (!int.TryParse(name.ToString(), out var id))
             id = 0;
 
+		logger.LogDebug("GetItemId(name={Name}): id → {Id}", name, id);
         return Convert.ToInt32(DropDownElements.FirstOrDefault(ev => ev.Text.Trim() == name.ToString().Trim())?.Value ?? id.ToString());
     }
 

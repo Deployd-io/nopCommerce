@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Blogs;
 
@@ -10,11 +11,15 @@ namespace Nop.Web.Areas.Admin.Models.Blogs;
 /// </summary>
 public partial record BlogCommentSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public BlogCommentSearchModel()
     {
+		_logger.LogDebug(">>> Entering BlogCommentSearchModel()");
         AvailableApprovedOptions = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting BlogCommentSearchModel()");
+		_logger.LogDebug("BlogCommentSearchModel(): AvailableApprovedOptions → {AvailableApprovedOptions}", AvailableApprovedOptions);
     }
 
     #endregion

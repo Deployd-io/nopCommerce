@@ -9,11 +9,13 @@ using Nop.Web.Areas.Admin.Models.Tax;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class TaxController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPermissionService _permissionService;
@@ -50,15 +52,20 @@ public partial class TaxController : BaseAdminController
 
     public virtual IActionResult List()
     {
+		_logger.LogDebug(">>> Entering List()");
+		_logger.LogDebug("<<< Exiting List()");
         return RedirectToAction("Providers");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> Providers()
     {
+		_logger.LogDebug(">>> Entering Providers()");
         //prepare model
         var model = await _taxModelFactory.PrepareTaxProviderSearchModelAsync(new TaxProviderSearchModel());
 
+		_logger.LogDebug("Providers(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Providers()");
         return View(model);
     }
 
@@ -69,22 +76,27 @@ public partial class TaxController : BaseAdminController
         //prepare model
         var model = await _taxModelFactory.PrepareTaxProviderListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting Providers(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> MarkAsPrimaryProvider(string systemName)
     {
+		_logger.LogDebug(">>> Entering MarkAsPrimaryProvider(systemName={SystemName})", systemName);
         if (string.IsNullOrEmpty(systemName))
             return RedirectToAction("Providers");
 
         var taxProvider = await _taxPluginManager.LoadPluginBySystemNameAsync(systemName);
         if (taxProvider == null)
+			_logger.LogDebug("MarkAsPrimaryProvider(systemName={SystemName}): taxProvider → {TaxProvider}", systemName, taxProvider);
             return RedirectToAction("Providers");
 
         _taxSettings.ActiveTaxProviderSystemName = systemName;
+		_logger.LogDebug("MarkAsPrimaryProvider(systemName={SystemName}): _taxSettings.ActiveTaxProviderSystemName → {Arg1}", systemName, _taxSettings.ActiveTaxProviderSystemName);
         await _settingService.SaveSettingAsync(_taxSettings);
 
+		_logger.LogDebug("<<< Exiting MarkAsPrimaryProvider(systemName={SystemName})", systemName);
         return RedirectToAction("Providers");
     }
 
@@ -95,9 +107,12 @@ public partial class TaxController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> Categories()
     {
+		_logger.LogDebug(">>> Entering Categories()");
         //prepare model
         var model = await _taxModelFactory.PrepareTaxCategorySearchModelAsync(new TaxCategorySearchModel());
 
+		_logger.LogDebug("Categories(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Categories()");
         return View(model);
     }
 
@@ -108,6 +123,7 @@ public partial class TaxController : BaseAdminController
         //prepare model
         var model = await _taxModelFactory.PrepareTaxCategoryListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting Categories(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -143,12 +159,14 @@ public partial class TaxController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public virtual async Task<IActionResult> CategoryDelete(int id)
     {
+		_logger.LogDebug(">>> Entering CategoryDelete(id={Id})", id);
         //try to get a tax category with the specified id
         var taxCategory = await _taxCategoryService.GetTaxCategoryByIdAsync(id)
             ?? throw new ArgumentException("No tax category found with the specified id", nameof(id));
 
         await _taxCategoryService.DeleteTaxCategoryAsync(taxCategory);
 
+		_logger.LogDebug("<<< Exiting CategoryDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

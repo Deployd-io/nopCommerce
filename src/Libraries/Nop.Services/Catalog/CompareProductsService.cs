@@ -47,6 +47,7 @@ public partial class CompareProductsService : ICompareProductsService
     /// <returns>List of identifier</returns>
     protected virtual List<int> GetComparedProductIds()
     {
+		logger.LogDebug(">>> Entering GetComparedProductIds()");
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext?.Request == null)
             return new List<int>();
@@ -54,12 +55,15 @@ public partial class CompareProductsService : ICompareProductsService
         //try to get cookie
         var cookieName = $"{NopCookieDefaults.Prefix}{NopCookieDefaults.ComparedProductsCookie}";
         if (!httpContext.Request.Cookies.TryGetValue(cookieName, out var productIdsCookie) || string.IsNullOrEmpty(productIdsCookie))
+			logger.LogDebug("GetComparedProductIds(): cookieName → {CookieName}", cookieName);
             return new List<int>();
 
         //get array of string product identifiers from cookie
         var productIds = productIdsCookie.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
 
+		logger.LogDebug("GetComparedProductIds(): productIds → {ProductIds}", productIds);
         //return list of int product identifiers
+		logger.LogDebug("<<< Exiting GetComparedProductIds()");
         return productIds.Select(int.Parse).Distinct().ToList();
     }
 
@@ -98,12 +102,15 @@ public partial class CompareProductsService : ICompareProductsService
     /// </summary>
     public virtual void ClearCompareProducts()
     {
+		logger.LogDebug(">>> Entering ClearCompareProducts()");
         if (_httpContextAccessor.HttpContext?.Response == null)
             return;
 
         //sets an expired cookie
         var cookieName = $"{NopCookieDefaults.Prefix}{NopCookieDefaults.ComparedProductsCookie}";
         _httpContextAccessor.HttpContext.Response.Cookies.Delete(cookieName);
+		logger.LogDebug("ClearCompareProducts(): cookieName → {CookieName}", cookieName);
+		logger.LogDebug("<<< Exiting ClearCompareProducts()");
     }
 
     /// <summary>
@@ -115,10 +122,13 @@ public partial class CompareProductsService : ICompareProductsService
     /// </returns>
     public virtual async Task<IList<Product>> GetComparedProductsAsync()
     {
+		logger.LogDebug(">>> Entering GetComparedProductsAsync()");
         //get list of compared product identifiers
         var productIds = GetComparedProductIds();
 
+		logger.LogDebug("GetComparedProductsAsync(): productIds → {ProductIds}", productIds);
         //return list of product
+		logger.LogDebug("<<< Exiting GetComparedProductsAsync()");
         return (await _productService.GetProductsByIdsAsync(productIds.ToArray()))
             .Where(product => product.Published && !product.Deleted).ToList();
     }
@@ -130,12 +140,14 @@ public partial class CompareProductsService : ICompareProductsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task RemoveProductFromCompareListAsync(int productId)
     {
+		logger.LogDebug(">>> Entering RemoveProductFromCompareListAsync(productId={ProductId})", productId);
         if (_httpContextAccessor.HttpContext?.Response == null)
             return Task.CompletedTask;
 
         //get list of compared product identifiers
         var comparedProductIds = GetComparedProductIds();
 
+		logger.LogDebug("RemoveProductFromCompareListAsync(productId={ProductId}): comparedProductIds → {ComparedProductIds}", productId, comparedProductIds);
         //whether product identifier to remove exists
         if (!comparedProductIds.Contains(productId))
             return Task.CompletedTask;
@@ -146,6 +158,7 @@ public partial class CompareProductsService : ICompareProductsService
         //set cookie
         AddCompareProductsCookie(comparedProductIds);
 
+		logger.LogDebug("<<< Exiting RemoveProductFromCompareListAsync(productId={ProductId})", productId);
         return Task.CompletedTask;
     }
 
@@ -156,12 +169,14 @@ public partial class CompareProductsService : ICompareProductsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task AddProductToCompareListAsync(int productId)
     {
+		logger.LogDebug(">>> Entering AddProductToCompareListAsync(productId={ProductId})", productId);
         if (_httpContextAccessor.HttpContext?.Response == null)
             return Task.CompletedTask;
 
         //get list of compared product identifiers
         var comparedProductIds = GetComparedProductIds();
 
+		logger.LogDebug("AddProductToCompareListAsync(productId={ProductId}): comparedProductIds → {ComparedProductIds}", productId, comparedProductIds);
         //whether product identifier to add already exist
         if (!comparedProductIds.Contains(productId))
             comparedProductIds.Insert(0, productId);
@@ -172,6 +187,7 @@ public partial class CompareProductsService : ICompareProductsService
         //set cookie
         AddCompareProductsCookie(comparedProductIds);
 
+		logger.LogDebug("<<< Exiting AddProductToCompareListAsync(productId={ProductId})", productId);
         return Task.CompletedTask;
     }
 

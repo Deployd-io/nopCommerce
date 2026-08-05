@@ -9,7 +9,10 @@ public partial class GetShippingOptionResponse : BaseNopResult
 {
     public GetShippingOptionResponse()
     {
+		logger.LogDebug(">>> Entering GetShippingOptionResponse()");
         ShippingOptions = new List<ShippingOption>();
+		logger.LogDebug("<<< Exiting GetShippingOptionResponse()");
+		logger.LogDebug("GetShippingOptionResponse(): ShippingOptions → {ShippingOptions}", ShippingOptions);
     }
 
     /// <summary>

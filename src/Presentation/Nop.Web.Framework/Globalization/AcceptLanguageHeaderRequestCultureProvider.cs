@@ -10,15 +10,18 @@ public partial class NopAcceptLanguageHeaderRequestCultureProvider : RequestCult
 {
     public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
     {
+		logger.LogDebug(">>> Entering DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
         ArgumentNullException.ThrowIfNull(httpContext);
 
         var acceptLanguageHeader = httpContext.Request.GetTypedHeaders().AcceptLanguage;
 
+		logger.LogDebug("DetermineProviderCultureResult(httpContext={HttpContext}): acceptLanguageHeader → {AcceptLanguageHeader}", httpContext, acceptLanguageHeader);
         if (acceptLanguageHeader == null || acceptLanguageHeader.Count == 0)
             return NullProviderCultureResult;
 
         var languageHeader = acceptLanguageHeader.FirstOrDefault();
 
+		logger.LogDebug("DetermineProviderCultureResult(httpContext={HttpContext}): languageHeader → {LanguageHeader}", httpContext, languageHeader);
         if (string.IsNullOrEmpty(languageHeader.Value.Value))
             return NullProviderCultureResult;
 
@@ -26,8 +29,10 @@ public partial class NopAcceptLanguageHeaderRequestCultureProvider : RequestCult
         {
             var requestedCulture = new CultureInfo(languageHeader.Value.Value);
 
+			logger.LogDebug("DetermineProviderCultureResult(httpContext={HttpContext}): requestedCulture → {RequestedCulture}", httpContext, requestedCulture);
             var languageService = EngineContext.Current.Resolve<ILanguageService>();
             var language = languageService
+				logger.LogDebug("DetermineProviderCultureResult(httpContext={HttpContext}): languageService → {LanguageService}", httpContext, languageService);
                 .GetAllLanguages()
                 .FirstOrDefault(urlLanguage =>
                 {
@@ -42,6 +47,8 @@ public partial class NopAcceptLanguageHeaderRequestCultureProvider : RequestCult
         }
         catch (CultureNotFoundException)
         {
+			logger.LogError("Exception in DetermineProviderCultureResult(httpContext={HttpContext}): {Arg1}", httpContext, ex.Message);
+			logger.LogDebug("<<< Exiting DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
             return NullProviderCultureResult;
         }
     }

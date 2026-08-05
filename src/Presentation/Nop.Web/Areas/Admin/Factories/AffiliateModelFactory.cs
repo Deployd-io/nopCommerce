@@ -11,6 +11,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Affiliates;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -19,6 +20,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class AffiliateModelFactory : IAffiliateModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressModelFactory _addressModelFactory;
@@ -77,11 +79,13 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     protected virtual async Task<AffiliatedOrderSearchModel> PrepareAffiliatedOrderSearchModelAsync(AffiliatedOrderSearchModel searchModel, Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedOrderSearchModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
 
         searchModel.AffliateId = affiliate.Id;
+		_logger.LogDebug("PrepareAffiliatedOrderSearchModelAsync(searchModel={SearchModel},affiliate={Affiliate}): searchModel.AffliateId → {Arg2}", searchModel, affiliate, searchModel.AffliateId);
 
         //prepare available order, payment and shipping statuses
         await _baseAdminModelFactory.PrepareOrderStatusesAsync(searchModel.AvailableOrderStatuses);
@@ -91,6 +95,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedOrderSearchModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return searchModel;
     }
 
@@ -102,15 +107,18 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// <returns>Affiliated customer search model</returns>
     protected virtual AffiliatedCustomerSearchModel PrepareAffiliatedCustomerSearchModel(AffiliatedCustomerSearchModel searchModel, Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedCustomerSearchModel(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
 
         searchModel.AffliateId = affiliate.Id;
+		_logger.LogDebug("PrepareAffiliatedCustomerSearchModel(searchModel={SearchModel},affiliate={Affiliate}): searchModel.AffliateId → {Arg2}", searchModel, affiliate, searchModel.AffliateId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedCustomerSearchModel(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return searchModel;
     }
 
@@ -128,11 +136,13 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     public virtual Task<AffiliateSearchModel> PrepareAffiliateSearchModelAsync(AffiliateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliateSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliateSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -146,6 +156,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     public virtual async Task<AffiliateListModel> PrepareAffiliateListModelAsync(AffiliateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliateListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get affiliates
@@ -165,8 +176,10 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             {
                 var address = await _addressService.GetAddressByIdAsync(affiliate.AddressId);
 
+				_logger.LogDebug("PrepareAffiliateListModelAsync(searchModel={SearchModel}): address → {Address}", searchModel, address);
                 var affiliateModel = affiliate.ToModel<AffiliateModel>();
                 affiliateModel.Address = address.ToModel<AddressModel>();
+				_logger.LogDebug("PrepareAffiliateListModelAsync(searchModel={SearchModel}): affiliateModel → {AffiliateModel}", searchModel, affiliateModel);
                 affiliateModel.Address.CountryName = (await _countryService.GetCountryByAddressAsync(address))?.Name;
                 affiliateModel.Address.StateProvinceName = (await _stateProvinceService.GetStateProvinceByAddressAsync(address))?.Name;
 
@@ -174,6 +187,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliateListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -237,6 +251,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     public virtual async Task<AffiliatedOrderListModel> PrepareAffiliatedOrderListModelAsync(AffiliatedOrderSearchModel searchModel, Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedOrderListModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
@@ -267,6 +282,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             {
                 var affiliatedOrderModel = order.ToModel<AffiliatedOrderModel>();
 
+				_logger.LogDebug("PrepareAffiliatedOrderListModelAsync(searchModel={SearchModel},affiliate={Affiliate}): affiliatedOrderModel → {AffiliatedOrderModel}", searchModel, affiliate, affiliatedOrderModel);
                 //fill in additional values (not existing in the entity)
                 affiliatedOrderModel.OrderStatus = await _localizationService.GetLocalizedEnumAsync(order.OrderStatus);
                 affiliatedOrderModel.PaymentStatus = await _localizationService.GetLocalizedEnumAsync(order.PaymentStatus);
@@ -279,6 +295,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedOrderListModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return model;
     }
 

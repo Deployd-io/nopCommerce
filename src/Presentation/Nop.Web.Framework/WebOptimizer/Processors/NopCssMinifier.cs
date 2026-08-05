@@ -20,8 +20,10 @@ public partial class NopCssMinifier : Processor
     /// <param name="context">The context used to perform processing to WebOptimizer.IAsset instances</param>
     public override async Task ExecuteAsync(IAssetContext context)
     {
+		logger.LogDebug(">>> Entering ExecuteAsync(context={Context})", context);
         var content = new Dictionary<string, byte[]>();
 
+		logger.LogDebug("ExecuteAsync(context={Context}): content → {Content}", context, content);
         foreach (var key in context.Content.Keys)
         {
             if (key.EndsWith(".min.css", StringComparison.InvariantCultureIgnoreCase))
@@ -32,6 +34,8 @@ public partial class NopCssMinifier : Processor
 
             var input = context.Content[key].AsString();
             var result = Uglify.Css(input, new CssSettings());
+			logger.LogDebug("ExecuteAsync(context={Context}): input → {Input}", context, input);
+			logger.LogDebug("ExecuteAsync(context={Context}): result → {Result}", context, result);
 
             var minified = result.Code;
 
@@ -45,7 +49,9 @@ public partial class NopCssMinifier : Processor
         }
 
         context.Content = content;
+		logger.LogDebug("ExecuteAsync(context={Context}): context.Content → {Arg1}", context, context.Content);
 
+		logger.LogDebug("<<< Exiting ExecuteAsync(context={Context})", context);
         return;
     }
 

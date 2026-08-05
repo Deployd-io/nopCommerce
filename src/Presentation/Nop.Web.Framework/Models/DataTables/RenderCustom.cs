@@ -13,7 +13,10 @@ public partial class RenderCustom : IRender
     /// <param name="functionName">Custom render function name that is used in js</param>
     public RenderCustom(string functionName)
     {
+		logger.LogDebug(">>> Entering RenderCustom(functionName={FunctionName})", functionName);
         FunctionName = functionName;
+		logger.LogDebug("<<< Exiting RenderCustom(functionName={FunctionName})", functionName);
+		logger.LogDebug("RenderCustom(functionName={FunctionName}): FunctionName → {FunctionName1}", functionName, FunctionName);
     }
 
     #endregion

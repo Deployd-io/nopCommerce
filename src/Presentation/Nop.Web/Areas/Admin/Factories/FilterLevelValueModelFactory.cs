@@ -8,6 +8,7 @@ using Nop.Services.Seo;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -16,6 +17,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -53,14 +55,17 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// <returns>Filter level value product search model</returns>
     protected virtual FilterLevelValueProductSearchModel PrepareFilterLevelValueProductSearchModel(FilterLevelValueProductSearchModel searchModel, FilterLevelValue filterLevelValue)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelValueProductSearchModel(searchModel={SearchModel},filterLevelValue={FilterLevelValue})", searchModel, filterLevelValue);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(filterLevelValue);
 
         searchModel.FilterLevelValueId = filterLevelValue.Id;
+		_logger.LogDebug("PrepareFilterLevelValueProductSearchModel(searchModel={SearchModel},filterLevelValue={FilterLevelValue}): searchModel.FilterLevelValueId → {Arg2}", searchModel, filterLevelValue, searchModel.FilterLevelValueId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelValueProductSearchModel(searchModel={SearchModel},filterLevelValue={FilterLevelValue})", searchModel, filterLevelValue);
         return searchModel;
     }    
 
@@ -78,6 +83,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<FilterLevelValueSearchModel> PrepareFilterLevelValueSearchModelAsync(FilterLevelValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
@@ -85,8 +91,12 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
         // Get all filter level values once
         var allFilterLevelValues = await _filterLevelValueService.GetAllFilterLevelValuesAsync();
 
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): allFilterLevelValues → {AllFilterLevelValues}", searchModel, allFilterLevelValues);
         //prepare filter (0 - all;)
         searchModel.HideSearchFilterValue1 = filterLevel1Disabled;
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue1 → {Arg1}", searchModel, searchModel.HideSearchFilterValue1);
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue2 → {Arg1}", searchModel, searchModel.HideSearchFilterValue2);
+		_logger.LogDebug("PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel}): searchModel.HideSearchFilterValue3 → {Arg1}", searchModel, searchModel.HideSearchFilterValue3);
         searchModel.HideSearchFilterValue2 = filterLevel2Disabled;
         searchModel.HideSearchFilterValue3 = filterLevel3Disabled;
 
@@ -124,6 +134,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.All");
             items.Insert(0, new SelectListItem { Text = defaultItemText, Value = "0" });
         }
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     /// <summary>
@@ -136,6 +147,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<FilterLevelValueListModel> PrepareFilterLevelValueListModelAsync(FilterLevelValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelValueListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
         //get filter level values
         var filterLevelValues = await _filterLevelValueService.GetAllFilterLevelValuesAsync(searchModel.SearchFilterValue1Id, searchModel.SearchFilterValue2Id, searchModel.SearchFilterValue3Id,
@@ -149,10 +161,12 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
                 //fill in model values from the entity
                 var filterLevelValueModel = filterLevelValue.ToModel<FilterLevelValueModel>();
 
+				_logger.LogDebug("PrepareFilterLevelValueListModelAsync(searchModel={SearchModel}): filterLevelValueModel → {FilterLevelValueModel}", searchModel, filterLevelValueModel);
                 return filterLevelValueModel;
             }).ToAsyncEnumerable();
         });
 
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelValueListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -173,6 +187,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             {
                 model = filterLevelValue.ToModel<FilterLevelValueModel>();
             }
+			_logger.LogDebug("PrepareFilterLevelValueModel(model={Model},filterLevelValue={FilterLevelValue}): model → {Model1}", model, filterLevelValue, model);
 
             //prepare nested search model
             PrepareFilterLevelValueProductSearchModel(model.FilterLevelValueProductSearchModel, filterLevelValue);
@@ -181,9 +196,13 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
         var (filterLevel1Disabled, filterLevel2Disabled, filterLevel3Disabled) = _filterLevelValueService.IsFilterLevelDisabled();
 
         model.FilterLevel1ValueEnabled = !filterLevel1Disabled;
+		_logger.LogDebug("PrepareFilterLevelValueModel(model={Model},filterLevelValue={FilterLevelValue}): model.FilterLevel1ValueEnabled → {Arg2}", model, filterLevelValue, model.FilterLevel1ValueEnabled);
+		_logger.LogDebug("PrepareFilterLevelValueModel(model={Model},filterLevelValue={FilterLevelValue}): model.FilterLevel2ValueEnabled → {Arg2}", model, filterLevelValue, model.FilterLevel2ValueEnabled);
+		_logger.LogDebug("PrepareFilterLevelValueModel(model={Model},filterLevelValue={FilterLevelValue}): model.FilterLevel3ValueEnabled → {Arg2}", model, filterLevelValue, model.FilterLevel3ValueEnabled);
         model.FilterLevel2ValueEnabled = !filterLevel2Disabled;
         model.FilterLevel3ValueEnabled = !filterLevel3Disabled;
 
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelValueModel(model={Model},filterLevelValue={FilterLevelValue})", model, filterLevelValue);
         return model;
     }
 
@@ -198,6 +217,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<FilterLevelValueProductListModel> PrepareFilterLevelValueProductListModelAsync(FilterLevelValueProductSearchModel searchModel, FilterLevelValue filterLevelValue)
     {
+		_logger.LogDebug(">>> Entering PrepareFilterLevelValueProductListModelAsync(searchModel={SearchModel},filterLevelValue={FilterLevelValue})", searchModel, filterLevelValue);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(filterLevelValue);
 
@@ -206,8 +226,11 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
 
         var productIds = filterLevelValueProducts.Select(p => p.ProductId).Distinct().ToArray();
         var products = await _productService.GetProductsByIdsAsync(productIds);
+		_logger.LogDebug("PrepareFilterLevelValueProductListModelAsync(searchModel={SearchModel},filterLevelValue={FilterLevelValue}): productIds → {ProductIds}", searchModel, filterLevelValue, productIds);
+		_logger.LogDebug("PrepareFilterLevelValueProductListModelAsync(searchModel={SearchModel},filterLevelValue={FilterLevelValue}): products → {Products}", searchModel, filterLevelValue, products);
         var productNames = products.ToDictionary(p => p.Id, p => p.Name);
 
+		_logger.LogDebug("PrepareFilterLevelValueProductListModelAsync(searchModel={SearchModel},filterLevelValue={FilterLevelValue}): productNames → {ProductNames}", searchModel, filterLevelValue, productNames);
         //prepare grid model
         var model = new FilterLevelValueProductListModel().PrepareToGrid(searchModel, filterLevelValueProducts, () =>
         {
@@ -216,6 +239,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
                 //fill in model values from the entity
                 var filterLevelValueProductModel = filterLevelValueProduct.ToModel<FilterLevelValueProductModel>();
 
+				_logger.LogDebug("PrepareFilterLevelValueProductListModelAsync(searchModel={SearchModel},filterLevelValue={FilterLevelValue}): filterLevelValueProductModel → {FilterLevelValueProductModel}", searchModel, filterLevelValue, filterLevelValueProductModel);
                 filterLevelValueProductModel.ProductName = productNames.TryGetValue(filterLevelValueProduct.ProductId, out var productName)
                     ? productName
                     : null; 
@@ -224,6 +248,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareFilterLevelValueProductListModelAsync(searchModel={SearchModel},filterLevelValue={FilterLevelValue})", searchModel, filterLevelValue);
         return model;
     }
 
@@ -237,6 +262,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<AddProductToFilterLevelValueSearchModel> PrepareAddProductToFilterLevelValueSearchModelAsync(AddProductToFilterLevelValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddProductToFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available categories
@@ -257,6 +283,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAddProductToFilterLevelValueSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -270,6 +297,7 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
     /// </returns>
     public virtual async Task<AddProductToFilterLevelValueListModel> PrepareAddProductToFilterLevelValueListModelAsync(AddProductToFilterLevelValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAddProductToFilterLevelValueListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get products
@@ -289,12 +317,14 @@ public partial class FilterLevelValueModelFactory : IFilterLevelValueModelFactor
             {
                 var productModel = product.ToModel<ProductModel>();
 
+				_logger.LogDebug("PrepareAddProductToFilterLevelValueListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
                 return productModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAddProductToFilterLevelValueListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }    
 

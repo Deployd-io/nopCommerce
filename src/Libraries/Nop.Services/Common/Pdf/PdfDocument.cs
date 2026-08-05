@@ -247,6 +247,7 @@ public abstract class PdfDocument<TItem>
                 });
             });
         });
+		logger.LogDebug("<<< Exiting ConfigureProductColumn(column={Column},Expression<Func<TItem={Arg1},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes})", column, Expression<Func<TItem, propertyExpression, width, printProductAttributes);
     }
 
     /// <summary>
@@ -255,13 +256,19 @@ public abstract class PdfDocument<TItem>
     /// <returns>PDF document builder</returns>
     protected virtual PdfReport DefaultDocument()
     {
+		logger.LogDebug(">>> Entering DefaultDocument()");
         var pdfSettings = EngineContext.Current.Resolve<PdfSettings>();
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
+		logger.LogDebug("DefaultDocument(): pdfSettings → {PdfSettings}", pdfSettings);
+		logger.LogDebug("DefaultDocument(): fileProvider → {FileProvider}", fileProvider);
         var fontSize = pdfSettings.BaseFontSize >= 0 ? (int)pdfSettings.BaseFontSize : 10;
         var fontFileName = Language.Rtl ? pdfSettings.RtlFontName : pdfSettings.LtrFontName;
+		logger.LogDebug("DefaultDocument(): fontSize → {FontSize}", fontSize);
 
         var mainFontPath = fileProvider.Combine(fileProvider.MapPath("~/App_Data/Pdf/"), $"{fontFileName}.ttf");
 
+		logger.LogDebug("DefaultDocument(): mainFontPath → {MainFontPath}", mainFontPath);
+		logger.LogDebug("<<< Exiting DefaultDocument()");
         return new PdfReport()
             .DocumentPreferences(doc =>
             {

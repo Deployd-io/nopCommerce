@@ -67,9 +67,15 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task PingAsync()
     {
+		logger.LogDebug(">>> Entering PingAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _httpClient.GetStringAsync("/");
+		logger.LogDebug("<<< Exiting PingAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("PingAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("PingAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Check the current store for any recommendations/warnings
     /// </summary>
@@ -79,8 +85,12 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<string> GetRecommendationsAsync()
     {
+		logger.LogDebug(">>> Entering GetRecommendationsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var isLocal = _webHelper.IsLocalRequest(_httpContextAccessor.HttpContext.Request);
         var storeUrl = _webHelper.GetStoreLocation();
+		logger.LogDebug("GetRecommendationsAsync(): isLocal → {IsLocal}", isLocal);
+		logger.LogDebug("GetRecommendationsAsync(): storeUrl → {StoreUrl}", storeUrl);
         if (isLocal || storeUrl.Contains("localhost"))
             return string.Empty;
 
@@ -92,7 +102,10 @@ public partial class NopHttpClient
             NopVersion.FULL_VERSION,
             WebUtility.UrlEncode(emailAccount.Email),
             language).ToLowerInvariant();
+			logger.LogDebug("GetRecommendationsAsync(): language → {Language}", language);
 
+		logger.LogInformation("GetRecommendationsAsync(): external service call {StoreUrl} took {Arg1} ms", storeUrl, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetRecommendationsAsync()");
         return await _httpClient.GetStringAsync(url);
     }
 
@@ -106,8 +119,12 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<string> CheckLicenseTermsAsync(bool accepted = false)
     {
+		logger.LogDebug(">>> Entering CheckLicenseTermsAsync(accepted={Accepted})", accepted);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var isLocal = _webHelper.IsLocalRequest(_httpContextAccessor.HttpContext.Request);
         var storeUrl = _webHelper.GetStoreLocation();
+		logger.LogDebug("CheckLicenseTermsAsync(accepted={Accepted}): isLocal → {IsLocal}", accepted, isLocal);
+		logger.LogDebug("CheckLicenseTermsAsync(accepted={Accepted}): storeUrl → {StoreUrl}", accepted, storeUrl);
         if (isLocal || storeUrl.Contains("localhost"))
             return string.Empty;
 
@@ -120,7 +137,10 @@ public partial class NopHttpClient
             WebUtility.UrlEncode(emailAccount.Email),
             language,
             accepted).ToLowerInvariant();
+			logger.LogDebug("CheckLicenseTermsAsync(accepted={Accepted}): language → {Language}", accepted, language);
 
+		logger.LogInformation("CheckLicenseTermsAsync(accepted)={Accepted}: external service call {StoreUrl} took {Arg2} ms", accepted, storeUrl, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting CheckLicenseTermsAsync(accepted={Accepted})", accepted);
         return await _httpClient.GetStringAsync(url);
     }
 
@@ -133,8 +153,12 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<string> GetLicenseCheckDetailsAsync()
     {
+		logger.LogDebug(">>> Entering GetLicenseCheckDetailsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var isLocal = _webHelper.IsLocalRequest(_httpContextAccessor.HttpContext.Request);
         var storeUrl = _webHelper.GetStoreLocation();
+		logger.LogDebug("GetLicenseCheckDetailsAsync(): isLocal → {IsLocal}", isLocal);
+		logger.LogDebug("GetLicenseCheckDetailsAsync(): storeUrl → {StoreUrl}", storeUrl);
         if (!_adminAreaSettings.CheckLicense || isLocal || storeUrl.Contains("localhost"))
             return string.Empty;
 
@@ -146,7 +170,10 @@ public partial class NopHttpClient
             NopVersion.FULL_VERSION,
             WebUtility.UrlEncode(emailAccount.Email),
             language).ToLowerInvariant();
+			logger.LogDebug("GetLicenseCheckDetailsAsync(): language → {Language}", language);
 
+		logger.LogInformation("GetLicenseCheckDetailsAsync(): external service call {StoreUrl} took {Arg1} ms", storeUrl, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetLicenseCheckDetailsAsync()");
         return await _httpClient.GetStringAsync(url);
     }
 
@@ -159,6 +186,8 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<RssFeed> GetNewsRssAsync()
     {
+		logger.LogDebug(">>> Entering GetNewsRssAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare URL to request
         var language = _languageService.GetTwoLetterIsoLanguageName(await _workContext.GetWorkingLanguageAsync());
         var url = string.Format(NopCommonDefaults.NopNewsRssPath,
@@ -167,9 +196,13 @@ public partial class NopHttpClient
             _adminAreaSettings.HideAdvertisementsOnAdminArea,
             _webHelper.GetStoreLocation(),
             language).ToLowerInvariant();
+			logger.LogDebug("GetNewsRssAsync(): language → {Language}", language);
 
         //get news feed
         await using var stream = await _httpClient.GetStreamAsync(url);
+		logger.LogInformation("GetNewsRssAsync(): external service call {Url} took {Arg1} ms", url, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("GetNewsRssAsync(): stream → {Stream}", stream);
+		logger.LogDebug("<<< Exiting GetNewsRssAsync()");
         return await RssFeed.LoadAsync(stream);
     }
 
@@ -185,6 +218,7 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<string> InstallationCompletedAsync(string email, string languageCode, string culture)
     {
+		logger.LogDebug(">>> Entering InstallationCompletedAsync(email={Email},languageCode={LanguageCode},culture={Culture})", email, languageCode, culture);
         //prepare URL to request
         var url = string.Format(NopCommonDefaults.NopInstallationCompletedPath,
             NopVersion.FULL_VERSION,
@@ -202,6 +236,8 @@ public partial class NopHttpClient
         }
         catch { }
 
+		logger.LogError("Exception in InstallationCompletedAsync(email={Email},languageCode={LanguageCode},culture={Culture}): {Arg3}", email, languageCode, culture, ex.Message);
+		logger.LogDebug("<<< Exiting InstallationCompletedAsync(email={Email},languageCode={LanguageCode},culture={Culture})", email, languageCode, culture);
         return await _httpClient.GetStringAsync(url);
     }
 
@@ -215,11 +251,15 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<HttpResponseMessage> SubscribeNewsLettersAsync(string email)
     {
+		logger.LogDebug(">>> Entering SubscribeNewsLettersAsync(email={Email})", email);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare URL to request
         var url = string.Format(NopCommonDefaults.NopSubscribeNewsLettersPath,
                 WebUtility.UrlEncode(email))
             .ToLowerInvariant();
 
+		logger.LogInformation("SubscribeNewsLettersAsync(email)={Email}: external service call {Url} took {Arg2} ms", email, url, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting SubscribeNewsLettersAsync(email={Email})", email);
         return await _httpClient.GetAsync(url);
     }
 
@@ -232,11 +272,17 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<string> GetExtensionsCategoriesAsync()
     {
+		logger.LogDebug(">>> Entering GetExtensionsCategoriesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare URL to request
         var language = _languageService.GetTwoLetterIsoLanguageName(await _workContext.GetWorkingLanguageAsync());
         var url = string.Format(NopCommonDefaults.NopExtensionsCategoriesPath, language).ToLowerInvariant();
+		logger.LogDebug("GetExtensionsCategoriesAsync(): language → {Language}", language);
+		logger.LogDebug("GetExtensionsCategoriesAsync(): url → {Url}", url);
 
         //get XML response
+		logger.LogInformation("GetExtensionsCategoriesAsync(): external service call {Url} took {Arg1} ms", url, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetExtensionsCategoriesAsync()");
         return await _httpClient.GetStringAsync(url);
     }
 
@@ -249,11 +295,17 @@ public partial class NopHttpClient
     /// </returns>
     public virtual async Task<string> GetExtensionsVersionsAsync()
     {
+		logger.LogDebug(">>> Entering GetExtensionsVersionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //prepare URL to request
         var language = _languageService.GetTwoLetterIsoLanguageName(await _workContext.GetWorkingLanguageAsync());
         var url = string.Format(NopCommonDefaults.NopExtensionsVersionsPath, language).ToLowerInvariant();
+		logger.LogDebug("GetExtensionsVersionsAsync(): language → {Language}", language);
+		logger.LogDebug("GetExtensionsVersionsAsync(): url → {Url}", url);
 
         //get XML response
+		logger.LogInformation("GetExtensionsVersionsAsync(): external service call {Url} took {Arg1} ms", url, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetExtensionsVersionsAsync()");
         return await _httpClient.GetStringAsync(url);
     }
 

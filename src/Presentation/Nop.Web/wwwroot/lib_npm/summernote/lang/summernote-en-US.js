@@ -1,3 +1,4 @@
+const logger = console;
 /*!
  * 
  * Super simple WYSIWYG editor v0.9.1
@@ -10,12 +11,14 @@
  *
  */
 (function webpackUniversalModuleDefinition(root, factory) {
+	logger.debug(`>>> Entering webpackUniversalModuleDefinition(exports=${exports})`);
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("jquery"));
 	else if(typeof define === 'function' && define.amd)
 		define(["jquery"], factory);
 	else {
 		var a = typeof exports === 'object' ? factory(require("jquery")) : factory(root["jQuery"]);
+		logger.debug(`webpackUniversalModuleDefinition(exports=${exports}): a → ${a}`);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
 })(self, (__WEBPACK_EXTERNAL_MODULE__8938__) => {
@@ -27,6 +30,7 @@ return /******/ (() => { // webpackBootstrap
 /***/ ((module) => {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE__8938__;
+logger.debug(`webpackUniversalModuleDefinition(exports=${exports}): module.exports → ${module.exports}`);
 
 /***/ })
 
@@ -37,6 +41,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__8938__;
 /******/ 	
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
+logger.debug(`>>> Entering __webpack_require__(moduleId=${moduleId})`);
 /******/ 		// Check if module is in cache
 /******/ 		var cachedModule = __webpack_module_cache__[moduleId];
 /******/ 		if (cachedModule !== undefined) {
@@ -54,6 +59,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__8938__;
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
+logger.debug(`<<< Exiting __webpack_require__(moduleId=${moduleId})`);
 /******/ 	}
 /******/ 	
 /************************************************************************/

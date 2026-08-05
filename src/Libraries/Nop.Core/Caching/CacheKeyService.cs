@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 using Nop.Core.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Caching;
 
@@ -9,6 +10,7 @@ namespace Nop.Core.Caching;
 /// </summary>
 public abstract partial class CacheKeyService : ICacheKeyService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AppSettings _appSettings;
@@ -19,7 +21,10 @@ public abstract partial class CacheKeyService : ICacheKeyService
 
     protected CacheKeyService(AppSettings appSettings)
     {
+		_logger.LogDebug(">>> Entering CacheKeyService(appSettings={AppSettings})", appSettings);
         _appSettings = appSettings;
+		_logger.LogDebug("<<< Exiting CacheKeyService(appSettings={AppSettings})", appSettings);
+		_logger.LogDebug("CacheKeyService(appSettings={AppSettings}): _appSettings → {_appSettings}", appSettings, _appSettings);
     }
 
     #endregion
@@ -33,6 +38,8 @@ public abstract partial class CacheKeyService : ICacheKeyService
     /// <param name="prefixParameters">Parameters to create cache key prefix</param>
     protected virtual string PrepareKeyPrefix(string prefix, params object[] prefixParameters)
     {
+		_logger.LogDebug(">>> Entering PrepareKeyPrefix(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
+		_logger.LogDebug("<<< Exiting PrepareKeyPrefix(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         return prefixParameters?.Any() ?? false
             ? string.Format(prefix, prefixParameters.Select(CreateCacheKeyParameters).ToArray())
             : prefix;
@@ -61,6 +68,8 @@ public abstract partial class CacheKeyService : ICacheKeyService
     /// <returns>Cache parameter</returns>
     protected virtual object CreateCacheKeyParameters(object parameter)
     {
+		_logger.LogDebug(">>> Entering CreateCacheKeyParameters(parameter={Parameter})", parameter);
+		_logger.LogDebug("<<< Exiting CreateCacheKeyParameters(parameter={Parameter})", parameter);
         return parameter switch
         {
             null => "null",
@@ -84,6 +93,8 @@ public abstract partial class CacheKeyService : ICacheKeyService
     /// <returns>Cache key</returns>
     public virtual CacheKey PrepareKey(CacheKey cacheKey, params object[] cacheKeyParameters)
     {
+		_logger.LogDebug(">>> Entering PrepareKey(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
+		_logger.LogDebug("<<< Exiting PrepareKey(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         return cacheKey.Create(CreateCacheKeyParameters, cacheKeyParameters);
     }
 
@@ -95,10 +106,13 @@ public abstract partial class CacheKeyService : ICacheKeyService
     /// <returns>Cache key</returns>
     public virtual CacheKey PrepareKeyForDefaultCache(CacheKey cacheKey, params object[] cacheKeyParameters)
     {
+		_logger.LogDebug(">>> Entering PrepareKeyForDefaultCache(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         var key = cacheKey.Create(CreateCacheKeyParameters, cacheKeyParameters);
 
+		_logger.LogWarning("PrepareKeyForDefaultCache(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters}): key → {Key}", cacheKey, cacheKeyParameters, key);
         key.CacheTime = _appSettings.Get<CacheConfig>().DefaultCacheTime;
 
+		_logger.LogDebug("<<< Exiting PrepareKeyForDefaultCache(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         return key;
     }
 

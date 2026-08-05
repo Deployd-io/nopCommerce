@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize Runtime v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	"use strict";
 
@@ -43,6 +45,8 @@
  * Ref: http://jsperf.com/my-stringify
  */
 var toString = function( variable ) {
+	logger.debug(`>>> Entering toString(variable=${variable})`);
+	logger.debug(`<<< Exiting toString(variable=${variable})`);
 	return typeof variable === "string" ? variable : ( typeof variable === "number" ? "" +
 		variable : JSON.stringify( variable ) );
 };
@@ -69,30 +73,37 @@ var toString = function( variable ) {
  *   }); // Foo <bar@baz.qux>
  */
 var formatMessage = function( message, data ) {
+logger.debug(`>>> Entering formatMessage(message=${message},data=${data})`);
 
 	// Replace {attribute}'s
 	message = message.replace( /{[0-9a-zA-Z-_. ]+}/g, function( name ) {
 		name = name.replace( /^{([^}]*)}$/, "$1" );
+		logger.debug(`>>> Entering replace(name=${name})`);
 		return toString( data[ name ] );
 	});
 
+	logger.debug(`replace(name=${name}): error.code → ${error.code}`);
 	return message;
 };
 
+logger.debug(`<<< Exiting formatMessage(message=${message},data=${data})`);
 
 
 
 var objectExtend = function() {
+	logger.debug('>>> Entering objectExtend()');
 	var destination = arguments[ 0 ],
 		sources = [].slice.call( arguments, 1 );
 
 	sources.forEach(function( source ) {
+		logger.debug(`>>> Entering forEach(prop=${prop})`);
 		var prop;
 		for ( prop in source ) {
 			destination[ prop ] = source[ prop ];
 		}
 	});
 
+	logger.debug(`<<< Exiting forEach(prop=${prop})`);
 	return destination;
 };
 
@@ -100,14 +111,19 @@ var objectExtend = function() {
 
 
 var createError = function( code, message, attributes ) {
+	logger.debug(`>>> Entering createError(code=${code},message=${message},attributes=${attributes})`);
 	var error;
 
 	message = code + ( message ? ": " + formatMessage( message, attributes ) : "" );
 	error = new Error( message );
+	logger.debug(`createError(code=${code},message=${message},attributes=${attributes}): message → ${message}`);
+	logger.debug(`createError(code=${code},message=${message},attributes=${attributes}): error → ${error}`);
 	error.code = code;
 
 	objectExtend( error, attributes );
 
+	logger.debug(`createError(code=${code},message=${message},attributes=${attributes}): error.code → ${error.code}`);
+	logger.debug(`<<< Exiting createError(code=${code},message=${message},attributes=${attributes})`);
 	return error;
 };
 
@@ -118,6 +134,7 @@ var createError = function( code, message, attributes ) {
  * Pushes part to parts array, concat two consecutive parts of the same type.
  */
 var partsPush = function( parts, type, value ) {
+logger.debug(`>>> Entering partsPush(parts=${parts},type=${type},value=${value})`);
 
 		// Concat two consecutive parts of same type
 		if ( parts.length && parts[ parts.length - 1 ].type === type ) {
@@ -126,6 +143,7 @@ var partsPush = function( parts, type, value ) {
 		}
 
 		parts.push( { type: type, value: value } );
+		logger.debug(`<<< Exiting partsPush(parts=${parts},type=${type},value=${value})`);
 };
 
 
@@ -151,6 +169,7 @@ var partsPush = function( parts, type, value ) {
  *   ]
  */
 var formatMessageToParts = function( message, data ) {
+logger.debug(`>>> Entering formatMessageToParts(message=${message},data=${data})`);
 
 	var lastOffset = 0,
 		parts = [];
@@ -166,8 +185,10 @@ var formatMessageToParts = function( message, data ) {
 
 	// Skip empty ones such as `{ type: 'literal', value: '' }`.
 	return parts.filter(function( part ) {
+	logger.debug('>>> Entering filter()');
 		return part.value !== "";
 	});
+	logger.debug(`<<< Exiting formatMessageToParts(message=${message},data=${data})`);
 };
 
 
@@ -177,21 +198,25 @@ var formatMessageToParts = function( message, data ) {
  * Returns joined parts values.
  */
 var partsJoin = function( parts ) {
+	logger.debug(`>>> Entering partsJoin(parts=${parts})`);
 	return parts.map( function( part ) {
 		return part.value;
 	}).join( "" );
+	logger.debug(`<<< Exiting partsJoin(parts=${parts})`);
 };
 
 
 
 
 var runtimeStringify = function( args ) {
+	logger.debug(`>>> Entering runtimeStringify(args=${args})`);
 	return JSON.stringify( args, function( _key, value ) {
 		if ( value && value.runtimeKey ) {
 			return value.runtimeKey;
 		}
 		return value;
 	} );
+	logger.debug(`<<< Exiting runtimeStringify(args=${args})`);
 };
 
 
@@ -199,20 +224,26 @@ var runtimeStringify = function( args ) {
 
 // Based on http://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
 var stringHash = function( str ) {
+	logger.debug(`>>> Entering stringHash(str=${str})`);
 	return [].reduce.call( str, function( hash, i ) {
 		var chr = i.charCodeAt( 0 );
 		hash = ( ( hash << 5 ) - hash ) + chr;
 		return hash | 0;
 	}, 0 );
+	logger.debug(`<<< Exiting stringHash(str=${str})`);
 };
 
 
 
 
 var runtimeKey = function( fnName, locale, args, argsStr ) {
+	logger.debug(`>>> Entering runtimeKey(fnName=${fnName},locale=${locale},args=${args},argsStr=${argsStr})`);
 	var hash;
 	argsStr = argsStr || runtimeStringify( args );
 	hash = stringHash( fnName + locale + argsStr );
+	logger.debug(`runtimeKey(fnName=${fnName},locale=${locale},args=${args},argsStr=${argsStr}): argsStr → ${argsStr}`);
+	logger.debug(`runtimeKey(fnName=${fnName},locale=${locale},args=${args},argsStr=${argsStr}): hash → ${hash}`);
+	logger.debug(`<<< Exiting runtimeKey(fnName=${fnName},locale=${locale},args=${args},argsStr=${argsStr})`);
 	return hash > 0 ? "a" + hash : "b" + Math.abs( hash );
 };
 
@@ -229,14 +260,17 @@ var validate = function( code, message, check, attributes ) {
 
 
 var validateParameterPresence = function( value, name ) {
+	logger.debug(`>>> Entering validateParameterPresence(value=${value},name=${name})`);
 	validate( "E_MISSING_PARAMETER", "Missing required parameter `{name}`.",
 		value !== undefined, { name: name });
+		logger.debug(`<<< Exiting validateParameterPresence(value=${value},name=${name})`);
 };
 
 
 
 
 var validateParameterType = function( value, name, check, expected ) {
+	logger.debug(`>>> Entering validateParameterType(value=${value},name=${name},check=${check},expected=${expected})`);
 	validate(
 		"E_INVALID_PAR_TYPE",
 		"Invalid `{name}` parameter ({value}). {expected} expected.",
@@ -247,18 +281,21 @@ var validateParameterType = function( value, name, check, expected ) {
 			value: value
 		}
 	);
+	logger.debug(`<<< Exiting validateParameterType(value=${value},name=${name},check=${check},expected=${expected})`);
 };
 
 
 
 
 var validateParameterTypeString = function( value, name ) {
+	logger.debug(`>>> Entering validateParameterTypeString(value=${value},name=${name})`);
 	validateParameterType(
 		value,
 		name,
 		value === undefined || typeof value === "string",
 		"a string"
 	);
+	logger.debug(`<<< Exiting validateParameterTypeString(value=${value},name=${name})`);
 };
 
 
@@ -266,6 +303,8 @@ var validateParameterTypeString = function( value, name ) {
 
 // ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions?redirectlocale=en-US&redirectslug=JavaScript%2FGuide%2FRegular_Expressions
 var regexpEscape = function( string ) {
+	logger.debug(`>>> Entering regexpEscape(string=${string})`);
+	logger.debug(`<<< Exiting regexpEscape(string=${string})`);
 	return string.replace( /([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1" );
 };
 
@@ -273,6 +312,7 @@ var regexpEscape = function( string ) {
 
 
 var stringPad = function( str, count, right ) {
+	logger.debug(`>>> Entering stringPad(str=${str},count=${count},right=${right})`);
 	var length;
 	if ( typeof str !== "string" ) {
 		str = String( str );
@@ -280,6 +320,8 @@ var stringPad = function( str, count, right ) {
 	for ( length = str.length; length < count; length += 1 ) {
 		str = ( right ? ( str + "0" ) : ( "0" + str ) );
 	}
+	logger.debug(`stringPad(str=${str},count=${count},right=${right}): str → ${str}`);
+	logger.debug(`<<< Exiting stringPad(str=${str},count=${count},right=${right})`);
 	return str;
 };
 
@@ -287,6 +329,7 @@ var stringPad = function( str, count, right ) {
 
 
 function Globalize( locale ) {
+	logger.debug(`>>> Entering Globalize(locale=${locale})`);
 	if ( !( this instanceof Globalize ) ) {
 		return new Globalize( locale );
 	}
@@ -295,6 +338,8 @@ function Globalize( locale ) {
 	validateParameterTypeString( locale, "locale" );
 
 	this._locale = locale;
+	logger.debug(`Globalize(locale=${locale}): this._locale → ${this._locale}`);
+	logger.debug(`<<< Exiting Globalize(locale=${locale})`);
 }
 
 Globalize.locale = function( locale ) {
@@ -305,6 +350,7 @@ Globalize.locale = function( locale ) {
 	}
 	return this._locale;
 };
+logger.debug(`function(locale=${locale}): this._locale → ${this._locale}`);
 
 Globalize._createError = createError;
 Globalize._formatMessage = formatMessage;

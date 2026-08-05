@@ -12,6 +12,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ProductReviewModelFactory : IProductReviewModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -77,6 +79,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
     /// </returns>
     public virtual async Task<ProductReviewSearchModel> PrepareProductReviewSearchModelAsync(ProductReviewSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareProductReviewSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -106,6 +109,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareProductReviewSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -119,6 +123,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
     /// </returns>
     public virtual async Task<ProductReviewListModel> PrepareProductReviewListModelAsync(ProductReviewSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareProductReviewListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter reviews
@@ -128,6 +133,8 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnTo.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var isApprovedOnly = searchModel.SearchApprovedId == 0 ? null : searchModel.SearchApprovedId == 1 ? true : (bool?)false;
         var vendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("PrepareProductReviewListModelAsync(searchModel={SearchModel}): isApprovedOnly → {IsApprovedOnly}", searchModel, isApprovedOnly);
+		_logger.LogDebug("PrepareProductReviewListModelAsync(searchModel={SearchModel}): vendor → {Vendor}", searchModel, vendor);
         var vendorId = vendor?.Id ?? 0;
 
         //get product reviews
@@ -150,6 +157,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
                 //fill in model values from the entity
                 var productReviewModel = productReview.ToModel<ProductReviewModel>();
 
+				_logger.LogDebug("PrepareProductReviewListModelAsync(searchModel={SearchModel}): productReviewModel → {ProductReviewModel}", searchModel, productReviewModel);
                 //convert dates to the user time
                 productReviewModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(productReview.CreatedOnUtc, DateTimeKind.Utc);
 
@@ -167,6 +175,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareProductReviewListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -259,6 +268,7 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
     /// </returns>
     public virtual async Task<ProductReviewReviewTypeMappingListModel> PrepareProductReviewReviewTypeMappingListModelAsync(ProductReviewReviewTypeMappingSearchModel searchModel, ProductReview productReview)
     {
+		_logger.LogDebug(">>> Entering PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview})", searchModel, productReview);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(productReview);
@@ -279,14 +289,17 @@ public partial class ProductReviewModelFactory : IProductReviewModelFactory
                 //fill in additional values (not existing in the entity)
                 var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(productReviewReviewTypeMapping.ReviewTypeId);
 
+				_logger.LogDebug("PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview}): reviewType → {ReviewType}", searchModel, productReview, reviewType);
                 productReviewReviewTypeMappingModel.Name = await _localizationService.GetLocalizedAsync(reviewType, entity => entity.Name);
                 productReviewReviewTypeMappingModel.Description = await _localizationService.GetLocalizedAsync(reviewType, entity => entity.Description);
                 productReviewReviewTypeMappingModel.VisibleToAllCustomers = reviewType.VisibleToAllCustomers;
+				_logger.LogDebug("PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview}): productReviewReviewTypeMappingModel.VisibleToAllCustomers → {Arg2}", searchModel, productReview, productReviewReviewTypeMappingModel.VisibleToAllCustomers);
 
                 return productReviewReviewTypeMappingModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareProductReviewReviewTypeMappingListModelAsync(searchModel={SearchModel},productReview={ProductReview})", searchModel, productReview);
         return model;
     }
 

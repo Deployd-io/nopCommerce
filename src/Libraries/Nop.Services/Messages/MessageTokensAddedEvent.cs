@@ -14,8 +14,12 @@ public partial class MessageTokensAddedEvent
     /// <param name="tokens">Tokens</param>
     public MessageTokensAddedEvent(MessageTemplate message, IList<Token> tokens)
     {
+		logger.LogDebug(">>> Entering MessageTokensAddedEvent(message={Message},tokens={Tokens})", message, tokens);
         Message = message;
         Tokens = tokens;
+		logger.LogDebug("<<< Exiting MessageTokensAddedEvent(message={Message},tokens={Tokens})", message, tokens);
+		logger.LogDebug("MessageTokensAddedEvent(message={Message},tokens={Tokens}): Tokens → {Tokens1}", message, tokens, Tokens);
+		logger.LogDebug("MessageTokensAddedEvent(message={Message},tokens={Tokens}): Message → {Message1}", message, tokens, Message);
     }
 
     /// <summary>

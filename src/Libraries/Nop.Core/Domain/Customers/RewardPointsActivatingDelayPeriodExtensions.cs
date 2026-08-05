@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Customers;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public static class RewardPointsActivatingDelayPeriodExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Returns a delay period before activating points in hours
     /// </summary>
@@ -13,6 +15,10 @@ public static class RewardPointsActivatingDelayPeriodExtensions
     /// <returns>Value of delay in hours</returns>
     public static int ToHours(this RewardPointsActivatingDelayPeriod period, int value)
     {
+		_logger.LogDebug(">>> Entering ToHours(period={Period},value={Value})", period, value);
+		_logger.LogDebug("ToHours(period={Period},value={Value}): RewardPointsActivatingDelayPeriod.Hours → {Arg2}", period, value, RewardPointsActivatingDelayPeriod.Hours);
+		_logger.LogDebug("ToHours(period={Period},value={Value}): RewardPointsActivatingDelayPeriod.Days → {Arg2}", period, value, RewardPointsActivatingDelayPeriod.Days);
+		_logger.LogDebug("<<< Exiting ToHours(period={Period},value={Value})", period, value);
         return period switch
         {
             RewardPointsActivatingDelayPeriod.Hours => value,

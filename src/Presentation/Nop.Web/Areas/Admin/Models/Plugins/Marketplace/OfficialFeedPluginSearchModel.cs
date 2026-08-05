@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Plugins.Marketplace;
 
@@ -9,13 +10,19 @@ namespace Nop.Web.Areas.Admin.Models.Plugins.Marketplace;
 /// </summary>
 public partial record OfficialFeedPluginSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OfficialFeedPluginSearchModel()
     {
+		_logger.LogDebug(">>> Entering OfficialFeedPluginSearchModel()");
         AvailableVersions = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogDebug("OfficialFeedPluginSearchModel(): AvailableVersions → {AvailableVersions}", AvailableVersions);
+		_logger.LogDebug("OfficialFeedPluginSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailablePrices = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting OfficialFeedPluginSearchModel()");
+		_logger.LogDebug("OfficialFeedPluginSearchModel(): AvailablePrices → {AvailablePrices}", AvailablePrices);
     }
 
     #endregion

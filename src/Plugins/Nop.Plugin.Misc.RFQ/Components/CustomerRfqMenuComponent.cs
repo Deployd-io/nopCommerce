@@ -3,6 +3,7 @@ using Nop.Core;
 using Nop.Services.Customers;
 using Nop.Web.Framework.Components;
 using Nop.Web.Models.Customer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Components;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Misc.RFQ.Components;
 /// </summary>
 public class CustomerRfqMenuComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICustomerService _customerService;
@@ -45,6 +47,7 @@ public class CustomerRfqMenuComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         if (additionalData is not CustomerNavigationModel model)
             return Content(string.Empty);
 
@@ -52,6 +55,7 @@ public class CustomerRfqMenuComponent : NopViewComponent
             return Content(string.Empty);
 
         if (!_rfqSettings.Enabled)
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return Content(string.Empty);
 
         return View("~/Plugins/Misc.RFQ/Views/Components/CustomerRfqMenu.cshtml", model);

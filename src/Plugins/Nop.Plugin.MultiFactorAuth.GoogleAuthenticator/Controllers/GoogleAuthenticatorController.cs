@@ -15,6 +15,7 @@ using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Controllers;
 
@@ -23,6 +24,7 @@ namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Controllers;
 [Area(AreaNames.ADMIN)]
 public class GoogleAuthenticatorController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly GoogleAuthenticatorService _googleAuthenticatorService;
@@ -68,6 +70,7 @@ public class GoogleAuthenticatorController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //prepare model
         var model = new ConfigurationModel
         {
@@ -77,6 +80,7 @@ public class GoogleAuthenticatorController : BasePluginController
         model.GoogleAuthenticatorSearchModel.HideSearchBlock = await _genericAttributeService
             .GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), GoogleAuthenticatorDefaults.HideSearchBlockAttribute);
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/MultiFactorAuth.GoogleAuthenticator/Views/Configure.cshtml", model);
     }
 
@@ -101,6 +105,7 @@ public class GoogleAuthenticatorController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public async Task<IActionResult> GoogleAuthenticatorList(GoogleAuthenticatorSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering GoogleAuthenticatorList(searchModel={SearchModel})", searchModel);
         //get GoogleAuthenticator configuration records
         var configurations = await _googleAuthenticatorService.GetPagedConfigurationsAsync(searchModel.SearchEmail,
             searchModel.Page - 1, searchModel.PageSize);
@@ -115,6 +120,7 @@ public class GoogleAuthenticatorController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting GoogleAuthenticatorList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

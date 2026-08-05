@@ -3,13 +3,17 @@ using Nop.Core;
 using Nop.Core.Configuration;
 using Nop.Services.ScheduleTasks;
 using TaskScheduler = Nop.Services.ScheduleTasks.TaskScheduler;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.ScheduleTasks;
 
 public class TestTaskScheduler : TaskScheduler
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public TestTaskScheduler(AppSettings appSettings, IHttpClientFactory httpClientFactory, IScheduleTaskService scheduleTaskService, IServiceScopeFactory serviceScopeFactory, IStoreContext storeContext) : base(appSettings, httpClientFactory, serviceScopeFactory)
     {
+	_logger.LogDebug(">>> Entering TestTaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},scheduleTaskService={ScheduleTaskService},serviceScopeFactory={ServiceScopeFactory},storeContext={StoreContext})", appSettings, httpClientFactory, scheduleTaskService, serviceScopeFactory, storeContext);
+	_logger.LogDebug("<<< Exiting TestTaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},scheduleTaskService={ScheduleTaskService},serviceScopeFactory={ServiceScopeFactory},storeContext={StoreContext})", appSettings, httpClientFactory, scheduleTaskService, serviceScopeFactory, storeContext);
     }
 
     public bool IsInit => _taskThreads.Any();

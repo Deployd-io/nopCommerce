@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class SpecificationAttributeModelFactory : ISpecificationAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -95,11 +97,13 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual Task<SpecificationAttributeSearchModel> PrepareSpecificationAttributeSearchModelAsync(SpecificationAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -113,6 +117,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual async Task<SpecificationAttributeGroupListModel> PrepareSpecificationAttributeGroupListModelAsync(SpecificationAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeGroupListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get specification attribute groups
@@ -135,6 +140,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             return specificationAttributeGroups.Select(attribute => attribute.ToModel<SpecificationAttributeGroupModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeGroupListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -183,6 +189,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual async Task<SpecificationAttributeListModel> PrepareSpecificationAttributeListModelAsync(SpecificationAttributeSearchModel searchModel, SpecificationAttributeGroup group = null)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeListModelAsync(searchModel={SearchModel},group={Group})", searchModel, group);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get specification attributes
@@ -198,6 +205,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             return specificationAttributes.Select(attribute => attribute.ToModel<SpecificationAttributeModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeListModelAsync(searchModel={SearchModel},group={Group})", searchModel, group);
         return model;
     }
 

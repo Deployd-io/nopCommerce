@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Customer;
@@ -6,7 +7,10 @@ public partial record CustomerNavigationModel : BaseNopModel
 {
     public CustomerNavigationModel()
     {
+		_logger.LogDebug(">>> Entering CustomerNavigationModel()");
         CustomerNavigationItems = new List<CustomerNavigationItemModel>();
+		_logger.LogDebug("<<< Exiting CustomerNavigationModel()");
+		_logger.LogDebug("CustomerNavigationModel(): CustomerNavigationItems → {CustomerNavigationItems}", CustomerNavigationItems);
     }
 
     public IList<CustomerNavigationItemModel> CustomerNavigationItems { get; set; }
@@ -24,6 +28,7 @@ public partial record CustomerNavigationItemModel : BaseNopModel
 
 public enum CustomerNavigationEnum
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     Info = 0,
     Addresses = 10,
     Orders = 20,

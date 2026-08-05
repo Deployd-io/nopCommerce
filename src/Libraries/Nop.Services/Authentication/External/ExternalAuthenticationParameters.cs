@@ -8,7 +8,10 @@ public partial class ExternalAuthenticationParameters
 {
     public ExternalAuthenticationParameters()
     {
+		logger.LogDebug(">>> Entering ExternalAuthenticationParameters()");
         Claims = new List<ExternalAuthenticationClaim>();
+		logger.LogDebug("<<< Exiting ExternalAuthenticationParameters()");
+		logger.LogDebug("ExternalAuthenticationParameters(): Claims → {Claims}", Claims);
     }
 
     /// <summary>

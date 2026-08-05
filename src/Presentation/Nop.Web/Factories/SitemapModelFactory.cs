@@ -129,8 +129,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<string> GetHttpProtocolAsync()
     {
+		_logger.LogDebug(">>> Entering GetHttpProtocolAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		_logger.LogDebug("GetHttpProtocolAsync(): store → {Store}", store);
+		_logger.LogDebug("<<< Exiting GetHttpProtocolAsync()");
         return store.SslEnabled ? Uri.UriSchemeHttps : Uri.UriSchemeHttp;
     }
 
@@ -143,6 +146,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IList<SitemapUrlModel>> GenerateUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GenerateUrlsAsync()");
         var sitemapUrls = new List<SitemapUrlModel>
         {
             //home page
@@ -202,6 +206,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
         //event notification
         await _eventPublisher.PublishAsync(new SitemapCreatedEvent(sitemapUrls));
 
+		_logger.LogDebug("<<< Exiting GenerateUrlsAsync()");
         return sitemapUrls;
     }
 
@@ -214,9 +219,13 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetNewsItemUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetNewsItemUrlsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var newsList = await _newsService.GetAllNewsAsync(storeId: store.Id);
+		_logger.LogDebug("GetNewsItemUrlsAsync(): store → {Store}", store);
+		_logger.LogDebug("GetNewsItemUrlsAsync(): newsList → {NewsList}", newsList);
 
+		_logger.LogDebug("<<< Exiting GetNewsItemUrlsAsync()");
         return await newsList
             .SelectAwait(async news => await PrepareLocalizedSitemapUrlAsync(news, news.CreatedOnUtc))
             .ToListAsync();
@@ -231,9 +240,13 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetCategoryUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetCategoryUrlsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var categories = await _categoryService.GetAllCategoriesAsync(storeId: store.Id);
+		_logger.LogDebug("GetCategoryUrlsAsync(): store → {Store}", store);
+		_logger.LogDebug("GetCategoryUrlsAsync(): categories → {Categories}", categories);
 
+		_logger.LogDebug("<<< Exiting GetCategoryUrlsAsync()");
         return await categories
             .SelectAwait(async category => await PrepareLocalizedSitemapUrlAsync(category, category.UpdatedOnUtc))
             .ToListAsync();
@@ -248,9 +261,13 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetManufacturerUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetManufacturerUrlsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var manufacturers = await _manufacturerService.GetAllManufacturersAsync(storeId: store.Id);
+		_logger.LogDebug("GetManufacturerUrlsAsync(): store → {Store}", store);
+		_logger.LogDebug("GetManufacturerUrlsAsync(): manufacturers → {Manufacturers}", manufacturers);
 
+		_logger.LogDebug("<<< Exiting GetManufacturerUrlsAsync()");
         return await manufacturers
             .SelectAwait(async manufacturer => await PrepareLocalizedSitemapUrlAsync(manufacturer, manufacturer.UpdatedOnUtc))
             .ToListAsync();
@@ -265,10 +282,13 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetProductUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetProductUrlsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var products = await _productService
+			_logger.LogDebug("GetProductUrlsAsync(): store → {Store}", store);
             .SearchProductsAsync(0, storeId: store.Id, visibleIndividuallyOnly: true, orderBy: ProductSortingEnum.CreatedOn);
 
+		_logger.LogDebug("<<< Exiting GetProductUrlsAsync()");
         return await products
             .SelectAwait(async product => await PrepareLocalizedSitemapUrlAsync(product, product.UpdatedOnUtc))
             .ToListAsync();
@@ -283,8 +303,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetProductTagUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetProductTagUrlsAsync()");
         var productTags = await _productTagService.GetAllProductTagsAsync();
 
+		_logger.LogDebug("GetProductTagUrlsAsync(): productTags → {ProductTags}", productTags);
+		_logger.LogDebug("<<< Exiting GetProductTagUrlsAsync()");
         return await productTags
             .SelectAwait(async productTag => await PrepareLocalizedSitemapUrlAsync(productTag))
             .ToListAsync();
@@ -299,9 +322,13 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetTopicUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetTopicUrlsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var topics = await _topicService.GetAllTopicsAsync(store.Id);
+		_logger.LogDebug("GetTopicUrlsAsync(): store → {Store}", store);
+		_logger.LogDebug("GetTopicUrlsAsync(): topics → {Topics}", topics);
 
+		_logger.LogDebug("<<< Exiting GetTopicUrlsAsync()");
         return await topics
             .Where(t => t.IncludeInSitemap)
             .SelectAwait(async topic => await PrepareLocalizedSitemapUrlAsync(topic))
@@ -317,9 +344,13 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     protected virtual async Task<IEnumerable<SitemapUrlModel>> GetBlogPostUrlsAsync()
     {
+		_logger.LogDebug(">>> Entering GetBlogPostUrlsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var blogPosts = await _blogService.GetAllBlogPostsAsync(store.Id);
+		_logger.LogDebug("GetBlogPostUrlsAsync(): store → {Store}", store);
+		_logger.LogDebug("GetBlogPostUrlsAsync(): blogPosts → {BlogPosts}", blogPosts);
 
+		_logger.LogDebug("<<< Exiting GetBlogPostUrlsAsync()");
         return await blogPosts
             .Where(p => p.IncludeInSitemap)
             .SelectAwait(async post => await PrepareLocalizedSitemapUrlAsync(post, post.CreatedOnUtc))
@@ -332,8 +363,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// <returns>Sitemap URLs</returns>
     protected virtual IEnumerable<SitemapUrlModel> GetCustomUrls()
     {
+		_logger.LogDebug(">>> Entering GetCustomUrls()");
         var storeLocation = _webHelper.GetStoreLocation();
 
+		_logger.LogDebug("GetCustomUrls(): storeLocation → {StoreLocation}", storeLocation);
+		_logger.LogDebug("<<< Exiting GetCustomUrls()");
         return _sitemapXmlSettings.SitemapCustomUrls.Select(customUrl =>
             new SitemapUrlModel(string.Concat(storeLocation, customUrl), new List<string>(), UpdateFrequency.Weekly, DateTime.UtcNow));
     }
@@ -346,6 +380,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task WriteSitemapIndexAsync(MemoryStream stream, int sitemapNumber)
     {
+		_logger.LogDebug(">>> Entering WriteSitemapIndexAsync(stream={Stream},sitemapNumber={SitemapNumber})", stream, sitemapNumber);
         await using var writer = XmlWriter.Create(stream, new XmlWriterSettings
         {
             Async = true,
@@ -360,8 +395,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
         //write URLs of all available sitemaps
         for (var id = 1; id <= sitemapNumber; id++)
         {
+			_logger.LogDebug("WriteSitemapIndexAsync(stream={Stream},sitemapNumber={SitemapNumber}): id → {Id}", stream, sitemapNumber, id);
             var url = _nopUrlHelper.RouteUrl(NopRouteNames.Standard.SITEMAP_INDEXED_XML, new { Id = id }, await GetHttpProtocolAsync());
             var location = await XmlHelper.XmlEncodeAsync(url);
+			_logger.LogDebug("WriteSitemapIndexAsync(stream={Stream},sitemapNumber={SitemapNumber}): url → {Url}", stream, sitemapNumber, url);
+			_logger.LogDebug("WriteSitemapIndexAsync(stream={Stream},sitemapNumber={SitemapNumber}): location → {Location}", stream, sitemapNumber, location);
 
             await writer.WriteStartElementAsync(null, "sitemap", null);
             await writer.WriteElementStringAsync(null, "loc", null, location);
@@ -370,6 +408,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
         }
 
         await writer.WriteEndElementAsync();
+		_logger.LogDebug("<<< Exiting WriteSitemapIndexAsync(stream={Stream},sitemapNumber={SitemapNumber})", stream, sitemapNumber);
     }
 
     /// <summary>
@@ -406,6 +445,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
                          .Where(p => !p.Equals(sitemapUrl.Location, StringComparison.InvariantCultureIgnoreCase)))
             {
                 await WriteSitemapUrlAsync(writer, new SitemapUrlModel(alternate, sitemapUrl));
+				_logger.LogDebug(">>> Entering WriteSitemapUrlAsync(writer={Writer},sitemapUrl={SitemapUrl})", writer, sitemapUrl);
+				_logger.LogDebug("<<< Exiting WriteSitemapUrlAsync(writer={Writer},sitemapUrl={SitemapUrl})", writer, sitemapUrl);
             }
         }
 
@@ -420,6 +461,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task WriteSitemapUrlAsync(XmlWriter writer, SitemapUrlModel sitemapUrl)
     {
+		_logger.LogDebug(">>> Entering WriteSitemapUrlAsync(writer={Writer},sitemapUrl={SitemapUrl})", writer, sitemapUrl);
         if (string.IsNullOrEmpty(sitemapUrl.Location))
             return;
 
@@ -427,6 +469,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
 
         var loc = await XmlHelper.XmlEncodeAsync(sitemapUrl.Location);
         await writer.WriteElementStringAsync(null, "loc", null, loc);
+		_logger.LogDebug("WriteSitemapUrlAsync(writer={Writer},sitemapUrl={SitemapUrl}): loc → {Loc}", writer, sitemapUrl, loc);
 
         //write all related url
         foreach (var alternate in sitemapUrl.AlternateLocations)
@@ -437,6 +480,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
             //extract seo code
             var altLoc = await XmlHelper.XmlEncodeAsync(alternate);
             var altLocPath = new Uri(altLoc).PathAndQuery;
+			_logger.LogDebug("WriteSitemapUrlAsync(writer={Writer},sitemapUrl={SitemapUrl}): altLoc → {AltLoc}", writer, sitemapUrl, altLoc);
+			_logger.LogDebug("WriteSitemapUrlAsync(writer={Writer},sitemapUrl={SitemapUrl}): altLocPath → {AltLocPath}", writer, sitemapUrl, altLocPath);
             var (_, lang) = await altLocPath.IsLocalizedUrlAsync(_httpContextAccessor.HttpContext.Request.PathBase, true);
 
             if (string.IsNullOrEmpty(lang?.UniqueSeoCode))
@@ -510,8 +555,10 @@ public partial class SitemapModelFactory : ISitemapModelFactory
 
 
         using var fileStream = _nopFileProvider.GetOrCreateFile(fullPath);
+		using Microsoft.Extensions.Logging;
         stream.Position = 0;
         await stream.CopyToAsync(fileStream, 81920);
+		_logger.LogDebug("<<< Exiting GenerateAsync(fullPath={FullPath},id={Id})", fullPath, id);
     }
 
     /// <summary>
@@ -522,6 +569,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// <returns>Localized URL with SEO code</returns>
     protected virtual string GetLocalizedUrl(string currentUrl, Language lang)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         if (string.IsNullOrEmpty(currentUrl))
             return null;
 
@@ -635,12 +683,19 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     public virtual async Task<SitemapModel> PrepareSitemapModelAsync(SitemapPageModel pageModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSitemapModelAsync(pageModel={PageModel})", pageModel);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(pageModel);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var language = await _workContext.GetWorkingLanguageAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): language → {Language}", pageModel, language);
+		_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): customer → {Customer}", pageModel, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): customerRoleIds → {CustomerRoleIds}", pageModel, customerRoleIds);
+		_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): store → {Store}", pageModel, store);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.SitemapPageModelKey,
             language, customerRoleIds, store);
 
@@ -648,9 +703,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
         {
             var model = new SitemapModel();
 
+			_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): model → {Model}", pageModel, model);
             //prepare common items
             var commonGroupTitle = await _localizationService.GetResourceAsync("Sitemap.General");
 
+			_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): commonGroupTitle → {CommonGroupTitle}", pageModel, commonGroupTitle);
             //home page
             model.Items.Add(new SitemapModel.SitemapItemModel
             {
@@ -728,6 +785,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
                     Name = await _localizationService.GetLocalizedAsync(topic, x => x.Title),
                     Url = await _nopUrlHelper.RouteGenericUrlAsync(topic)
                 }).ToListAsync());
+				_logger.LogInformation("PrepareSitemapModelAsync(pageModel)={PageModel}: database query executed in {Arg1} ms", pageModel, __logStart.ElapsedMilliseconds);
             }
 
             //blog posts
@@ -736,6 +794,7 @@ public partial class SitemapModelFactory : ISitemapModelFactory
                 var blogPostsGroupTitle = await _localizationService.GetResourceAsync("Sitemap.BlogPosts");
                 var blogPosts = (await _blogService.GetAllBlogPostsAsync(storeId: store.Id))
                     .Where(p => p.IncludeInSitemap);
+					_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): blogPostsGroupTitle → {BlogPostsGroupTitle}", pageModel, blogPostsGroupTitle);
 
                 model.Items.AddRange(await blogPosts.SelectAwait(async post => new SitemapModel.SitemapItemModel
                 {
@@ -750,6 +809,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
             {
                 var newsGroupTitle = await _localizationService.GetResourceAsync("Sitemap.News");
                 var news = await _newsService.GetAllNewsAsync(storeId: store.Id);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): newsGroupTitle → {NewsGroupTitle}", pageModel, newsGroupTitle);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): news → {News}", pageModel, news);
                 model.Items.AddRange(await news.SelectAwait(async newsItem => new SitemapModel.SitemapItemModel
                 {
                     GroupTitle = newsGroupTitle,
@@ -763,6 +824,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
             {
                 var categoriesGroupTitle = await _localizationService.GetResourceAsync("Sitemap.Categories");
                 var categories = await _categoryService.GetAllCategoriesAsync(storeId: store.Id);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): categoriesGroupTitle → {CategoriesGroupTitle}", pageModel, categoriesGroupTitle);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): categories → {Categories}", pageModel, categories);
                 model.Items.AddRange(await categories.SelectAwait(async category => new SitemapModel.SitemapItemModel
                 {
                     GroupTitle = categoriesGroupTitle,
@@ -776,6 +839,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
             {
                 var manufacturersGroupTitle = await _localizationService.GetResourceAsync("Sitemap.Manufacturers");
                 var manufacturers = await _manufacturerService.GetAllManufacturersAsync(storeId: store.Id);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): manufacturersGroupTitle → {ManufacturersGroupTitle}", pageModel, manufacturersGroupTitle);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): manufacturers → {Manufacturers}", pageModel, manufacturers);
                 model.Items.AddRange(await manufacturers.SelectAwait(async manufacturer => new SitemapModel.SitemapItemModel
                 {
                     GroupTitle = manufacturersGroupTitle,
@@ -789,6 +854,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
             {
                 var productsGroupTitle = await _localizationService.GetResourceAsync("Sitemap.Products");
                 var products = await _productService.SearchProductsAsync(0, storeId: store.Id, visibleIndividuallyOnly: true);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): productsGroupTitle → {ProductsGroupTitle}", pageModel, productsGroupTitle);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): products → {Products}", pageModel, products);
                 model.Items.AddRange(await products.SelectAwait(async product => new SitemapModel.SitemapItemModel
                 {
                     GroupTitle = productsGroupTitle,
@@ -802,6 +869,8 @@ public partial class SitemapModelFactory : ISitemapModelFactory
             {
                 var productTagsGroupTitle = await _localizationService.GetResourceAsync("Sitemap.ProductTags");
                 var productTags = await _productTagService.GetAllProductTagsAsync();
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): productTagsGroupTitle → {ProductTagsGroupTitle}", pageModel, productTagsGroupTitle);
+				_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): productTags → {ProductTags}", pageModel, productTags);
                 model.Items.AddRange(await productTags.SelectAwait(async productTag => new SitemapModel.SitemapItemModel
                 {
                     GroupTitle = productTagsGroupTitle,
@@ -819,8 +888,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
 
         var pagedItems = new PagedList<SitemapModel.SitemapItemModel>(cachedModel.Items, pageModel.PageNumber - 1, pageModel.PageSize);
         var sitemapModel = new SitemapModel { Items = pagedItems };
+		_logger.LogDebug("PrepareSitemapModelAsync(pageModel={PageModel}): pagedItems → {PagedItems}", pageModel, pagedItems);
         sitemapModel.PageModel.LoadPagedList(pagedItems);
 
+		_logger.LogInformation("PrepareSitemapModelAsync(pageModel)={PageModel}: external service call took {Arg1} ms", pageModel, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareSitemapModelAsync(pageModel={PageModel})", pageModel);
         return sitemapModel;
     }
 
@@ -836,11 +908,16 @@ public partial class SitemapModelFactory : ISitemapModelFactory
     /// </returns>
     public virtual async Task<SitemapXmlModel> PrepareSitemapXmlModelAsync(int id = 0)
     {
+		_logger.LogDebug(">>> Entering PrepareSitemapXmlModelAsync(id={Id})", id);
         var language = await _workContext.GetWorkingLanguageAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareSitemapXmlModelAsync(id={Id}): language → {Language}", id, language);
+		_logger.LogDebug("PrepareSitemapXmlModelAsync(id={Id}): store → {Store}", id, store);
 
         var fileName = string.Format(NopSeoDefaults.SitemapXmlFilePattern, store.Id, language.Id, id);
         var fullPath = _nopFileProvider.GetAbsolutePath(NopSeoDefaults.SitemapXmlDirectory, fileName);
+		_logger.LogDebug("PrepareSitemapXmlModelAsync(id={Id}): fileName → {FileName}", id, fileName);
+		_logger.LogDebug("PrepareSitemapXmlModelAsync(id={Id}): fullPath → {FullPath}", id, fullPath);
 
         if (_nopFileProvider.FileExists(fullPath) && _nopFileProvider.GetLastWriteTimeUtc(fullPath) > DateTime.UtcNow.AddHours(-_sitemapXmlSettings.RebuildSitemapXmlAfterHours))
         {
@@ -853,9 +930,11 @@ public partial class SitemapModelFactory : ISitemapModelFactory
                 TimeSpan.FromSeconds(_sitemapXmlSettings.SitemapBuildOperationDelay),
                 async () => await GenerateAsync(fullPath, id)))
         {
+			_logger.LogDebug(">>> Entering async()");
             throw new InvalidOperationException();
         }
 
+		_logger.LogDebug("<<< Exiting PrepareSitemapXmlModelAsync(id={Id})", id);
         return new SitemapXmlModel { SitemapXmlPath = fullPath };
     }
 

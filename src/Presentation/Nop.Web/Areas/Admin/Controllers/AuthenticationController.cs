@@ -11,11 +11,13 @@ using Nop.Web.Areas.Admin.Models.ExternalAuthentication;
 using Nop.Web.Areas.Admin.Models.MultiFactorAuthentication;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class AuthenticationController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
@@ -60,10 +62,12 @@ public partial class AuthenticationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EXTERNAL_AUTHENTICATION_METHODS)]
     public virtual IActionResult ExternalMethods()
     {
+		_logger.LogDebug(">>> Entering ExternalMethods()");
         //prepare model
         var model = _externalAuthenticationMethodModelFactory
             .PrepareExternalAuthenticationMethodSearchModel(new ExternalAuthenticationMethodSearchModel());
 
+		_logger.LogDebug("<<< Exiting ExternalMethods()");
         return View(model);
     }
 
@@ -74,6 +78,7 @@ public partial class AuthenticationController : BaseAdminController
         //prepare model
         var model = await _externalAuthenticationMethodModelFactory.PrepareExternalAuthenticationMethodListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting ExternalMethods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -120,10 +125,12 @@ public partial class AuthenticationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public virtual IActionResult MultiFactorMethods()
     {
+		_logger.LogDebug(">>> Entering MultiFactorMethods()");
         //prepare model
         var model = _multiFactorAuthenticationMethodModelFactory
             .PrepareMultiFactorAuthenticationMethodSearchModel(new MultiFactorAuthenticationMethodSearchModel());
 
+		_logger.LogDebug("<<< Exiting MultiFactorMethods()");
         return View(model);
     }
 
@@ -134,6 +141,7 @@ public partial class AuthenticationController : BaseAdminController
         //prepare model
         var model = await _multiFactorAuthenticationMethodModelFactory.PrepareMultiFactorAuthenticationMethodListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting MultiFactorMethods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

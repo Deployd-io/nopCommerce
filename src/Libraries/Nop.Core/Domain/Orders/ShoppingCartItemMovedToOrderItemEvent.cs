@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Orders;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class ShoppingCartItemMovedToOrderItemEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -12,8 +14,12 @@ public partial class ShoppingCartItemMovedToOrderItemEvent
     /// <param name="shoppingCartItem">Shopping cart item</param>
     public ShoppingCartItemMovedToOrderItemEvent(ShoppingCartItem shoppingCartItem, OrderItem orderItem)
     {
+		_logger.LogDebug(">>> Entering ShoppingCartItemMovedToOrderItemEvent(shoppingCartItem={ShoppingCartItem},orderItem={OrderItem})", shoppingCartItem, orderItem);
         ShoppingCartItem = shoppingCartItem;
         OrderItem = orderItem;
+		_logger.LogDebug("<<< Exiting ShoppingCartItemMovedToOrderItemEvent(shoppingCartItem={ShoppingCartItem},orderItem={OrderItem})", shoppingCartItem, orderItem);
+		_logger.LogDebug("ShoppingCartItemMovedToOrderItemEvent(shoppingCartItem={ShoppingCartItem},orderItem={OrderItem}): OrderItem → {OrderItem1}", shoppingCartItem, orderItem, OrderItem);
+		_logger.LogDebug("ShoppingCartItemMovedToOrderItemEvent(shoppingCartItem={ShoppingCartItem},orderItem={OrderItem}): ShoppingCartItem → {ShoppingCartItem1}", shoppingCartItem, orderItem, ShoppingCartItem);
     }
 
     /// <summary>

@@ -3,6 +3,7 @@
 //! author : Kruy Vanna : https://github.com/kruyvanna
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '១',
@@ -54,9 +55,11 @@ export default moment.defineLocale('km', {
         return input === 'ល្ងាច';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ព្រឹក';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'ល្ងាច';
         }
     },
@@ -87,14 +90,18 @@ export default moment.defineLocale('km', {
     dayOfMonthOrdinalParse: /ទី\d{1,2}/,
     ordinal: 'ទី%d',
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[១២៣៤៥៦៧៨៩០]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     week: {
         dow: 1, // Monday is the first day of the week.

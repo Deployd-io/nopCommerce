@@ -3,6 +3,7 @@
 //! author : Shahram Mebashar : https://github.com/ShahramMebashar
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '١',
@@ -64,12 +65,15 @@ export default moment.defineLocale('ku', {
     },
     meridiemParse: /ئێواره‌|به‌یانی/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
         return /ئێواره‌/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'به‌یانی';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'ئێواره‌';
         }
     },
@@ -98,6 +102,7 @@ export default moment.defineLocale('ku', {
         yy: '%d ساڵ',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string
             .replace(/[١٢٣٤٥٦٧٨٩٠]/g, function (match) {
                 return numberMap[match];
@@ -105,6 +110,7 @@ export default moment.defineLocale('ku', {
             .replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
         return string
             .replace(/\d/g, function (match) {
                 return symbolMap[match];

@@ -1,16 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.Manual.Models;
 
 public record PaymentInfoModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public PaymentInfoModel()
     {
+		_logger.LogDebug(">>> Entering PaymentInfoModel()");
         CreditCardTypes = new List<SelectListItem>();
         ExpireMonths = new List<SelectListItem>();
+		_logger.LogDebug("PaymentInfoModel(): CreditCardTypes → {CreditCardTypes}", CreditCardTypes);
+		_logger.LogDebug("PaymentInfoModel(): ExpireMonths → {ExpireMonths}", ExpireMonths);
         ExpireYears = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting PaymentInfoModel()");
+		_logger.LogDebug("PaymentInfoModel(): ExpireYears → {ExpireYears}", ExpireYears);
     }
 
     [NopResourceDisplayName("Payment.SelectCreditCard")]

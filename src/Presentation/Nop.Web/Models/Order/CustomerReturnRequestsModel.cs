@@ -1,12 +1,17 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Order;
 
 public partial record CustomerReturnRequestsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerReturnRequestsModel()
     {
+		_logger.LogDebug(">>> Entering CustomerReturnRequestsModel()");
         Items = new List<ReturnRequestModel>();
+		_logger.LogDebug("<<< Exiting CustomerReturnRequestsModel()");
+		_logger.LogDebug("CustomerReturnRequestsModel(): Items → {Items}", Items);
     }
 
     public IList<ReturnRequestModel> Items { get; set; }

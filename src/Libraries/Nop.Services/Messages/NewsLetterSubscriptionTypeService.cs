@@ -37,9 +37,13 @@ public partial class NewsLetterSubscriptionTypeService : INewsLetterSubscription
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertNewsLetterSubscriptionTypeAsync(NewsLetterSubscriptionType newsLetterSubscriptionType)
     {
+		logger.LogDebug(">>> Entering InsertNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType={NewsLetterSubscriptionType})", newsLetterSubscriptionType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(newsLetterSubscriptionType);
 
         await _newsLetterSubscriptionTypeRepository.InsertAsync(newsLetterSubscriptionType);
+		logger.LogDebug("<<< Exiting InsertNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType={NewsLetterSubscriptionType})", newsLetterSubscriptionType);
+		logger.LogInformation("InsertNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType)={NewsLetterSubscriptionType}: save query executed in {Arg1} ms", newsLetterSubscriptionType, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -49,9 +53,13 @@ public partial class NewsLetterSubscriptionTypeService : INewsLetterSubscription
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateNewsLetterSubscriptionTypeAsync(NewsLetterSubscriptionType newsLetterSubscriptionType)
     {
+		logger.LogDebug(">>> Entering UpdateNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType={NewsLetterSubscriptionType})", newsLetterSubscriptionType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(newsLetterSubscriptionType);
 
         await _newsLetterSubscriptionTypeRepository.UpdateAsync(newsLetterSubscriptionType);
+		logger.LogDebug("<<< Exiting UpdateNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType={NewsLetterSubscriptionType})", newsLetterSubscriptionType);
+		logger.LogInformation("UpdateNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType)={NewsLetterSubscriptionType}: update query executed in {Arg1} ms", newsLetterSubscriptionType, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -61,9 +69,15 @@ public partial class NewsLetterSubscriptionTypeService : INewsLetterSubscription
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsLetterSubscriptionTypeAsync(NewsLetterSubscriptionType newsLetterSubscriptionType)
     {
+		logger.LogDebug(">>> Entering DeleteNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType={NewsLetterSubscriptionType})", newsLetterSubscriptionType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(newsLetterSubscriptionType);        
 
         await _newsLetterSubscriptionTypeRepository.DeleteAsync(newsLetterSubscriptionType);
+		logger.LogDebug("<<< Exiting DeleteNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType={NewsLetterSubscriptionType})", newsLetterSubscriptionType);
+		logger.LogInformation("DeleteNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType)={NewsLetterSubscriptionType}: external service call took {Arg1} ms", newsLetterSubscriptionType, __logStart.ElapsedMilliseconds);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("DeleteNewsLetterSubscriptionTypeAsync(newsLetterSubscriptionType)={NewsLetterSubscriptionType}: delete query executed in {Arg1} ms", newsLetterSubscriptionType, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -76,6 +90,8 @@ public partial class NewsLetterSubscriptionTypeService : INewsLetterSubscription
     /// </returns>
     public virtual async Task<NewsLetterSubscriptionType> GetNewsLetterSubscriptionTypeByIdAsync(int newsLetterSubscriptionTypeId)
     {
+		logger.LogDebug(">>> Entering GetNewsLetterSubscriptionTypeByIdAsync(newsLetterSubscriptionTypeId={NewsLetterSubscriptionTypeId})", newsLetterSubscriptionTypeId);
+		logger.LogDebug("<<< Exiting GetNewsLetterSubscriptionTypeByIdAsync(newsLetterSubscriptionTypeId={NewsLetterSubscriptionTypeId})", newsLetterSubscriptionTypeId);
         return await _newsLetterSubscriptionTypeRepository.GetByIdAsync(newsLetterSubscriptionTypeId, cache => default);
     }
 
@@ -89,17 +105,22 @@ public partial class NewsLetterSubscriptionTypeService : INewsLetterSubscription
     /// </returns>
     public virtual async Task<IList<NewsLetterSubscriptionType>> GetAllNewsLetterSubscriptionTypesAsync(int storeId = 0)
     {
+		logger.LogDebug(">>> Entering GetAllNewsLetterSubscriptionTypesAsync(storeId={StoreId})", storeId);
         return await _newsLetterSubscriptionTypeRepository.GetAllAsync(async query =>
         {
             if (storeId > 0)
+				logger.LogDebug("GetAllNewsLetterSubscriptionTypesAsync(storeId={StoreId}): query → {Query}", storeId, query);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 query = await _storeMappingService.ApplyStoreMapping(query, storeId);
 
+			logger.LogInformation("GetAllNewsLetterSubscriptionTypesAsync(storeId)={StoreId}: find query executed in {Arg1} ms", storeId, __logStart.ElapsedMilliseconds);
             query = query
                 .OrderBy(subscriptionType => subscriptionType.DisplayOrder)
                 .ThenBy(subscriptionType => subscriptionType.Id);
 
             return query;
         });
+		logger.LogDebug("<<< Exiting GetAllNewsLetterSubscriptionTypesAsync(storeId={StoreId})", storeId);
     }
 
     #endregion

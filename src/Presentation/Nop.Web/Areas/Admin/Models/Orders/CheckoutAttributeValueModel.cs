@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record CheckoutAttributeValueModel : BaseNopEntityModel, ILocalizedModel<CheckoutAttributeValueLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CheckoutAttributeValueModel()
     {
+		_logger.LogDebug(">>> Entering CheckoutAttributeValueModel()");
         Locales = new List<CheckoutAttributeValueLocalizedModel>();
+		_logger.LogDebug("<<< Exiting CheckoutAttributeValueModel()");
+		_logger.LogDebug("CheckoutAttributeValueModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	// UMD returnExports
 	if ( typeof define === "function" && define.amd ) {
@@ -47,11 +49,16 @@ var MakePlural;
 MakePlural = (function() {
 'use strict';
 
+logger.debug(`>>> Entering _toArray(arr=${arr})`);
 var _toArray = function (arr) { return Array.isArray(arr) ? arr : Array.from(arr); };
+logger.debug(`<<< Exiting _toArray(arr=${arr})`);
 
+logger.debug(`>>> Entering _toConsumableArray(arr=${arr})`);
 var _toConsumableArray = function (arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } };
 
+logger.debug(`>>> Entering _classCallCheck(instance=${instance},Constructor=${Constructor})`);
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
+logger.debug(`<<< Exiting _classCallCheck(instance=${instance},Constructor=${Constructor})`);
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -73,9 +80,12 @@ var _createClass = (function () { function defineProperties(target, props) { for
  * or in connection with the use or performance of this software.
  */
 
+logger.debug('<<< Exiting function()');
 var Parser = (function () {
     function Parser() {
+		logger.debug('>>> Entering Parser()');
         _classCallCheck(this, Parser);
+		logger.debug('<<< Exiting Parser()');
     }
 
     _createClass(Parser, [{
@@ -89,6 +99,8 @@ var Parser = (function () {
                 return 'n >= 0 && n < 2';
             }if (cond === 'i = 1 and v = 0') {
                 this.v0 = 1;
+				logger.debug(`parse(cond=${cond}): this.v0 → ${this.v0}`);
+				logger.debug(`<<< Exiting cond(str=${str})`);
                 return 'n == 1 && v0';
             }
             return cond.replace(/([tv]) (!?)= 0/g, function (m, sym, noteq) {
@@ -117,11 +129,13 @@ var Parser = (function () {
                 }
                 return '(' + sym + ' >= ' + x0 + ' && ' + sym + ' <= ' + x1 + ')';
             }).replace(/ and /g, ' && ').replace(/ or /g, ' || ').replace(/ = /g, ' == ');
+			logger.debug(`<<< Exiting parse(cond=${cond})`);
         }
     }, {
         key: 'vars',
         value: (function (_vars) {
             function vars() {
+				logger.debug(`<<< Exiting vars(str=${str})`);
                 return _vars.apply(this, arguments);
             }
 
@@ -155,6 +169,7 @@ var Parser = (function () {
 
 var MakePlural = (function () {
     function MakePlural(lc) {
+		logger.debug(`>>> Entering MakePlural(lc=${lc})`);
         var _ref = arguments[1] === undefined ? MakePlural : arguments[1];
 
         var cardinals = _ref.cardinals;
@@ -165,9 +180,12 @@ var MakePlural = (function () {
         if (!cardinals && !ordinals) throw new Error('At least one type of plural is required');
         this.lc = lc;
         this.categories = { cardinal: [], ordinal: [] };
+		logger.debug(`MakePlural(lc=${lc}): lc → ${lc}`);
+		logger.debug(`MakePlural(lc=${lc}): this.lc → ${this.lc}`);
         this.parser = new Parser();
         
         this.fn = this.buildFunction(cardinals, ordinals);
+		logger.debug(`MakePlural(lc=${lc}): this.categories → ${this.categories}`);
         this.fn._obj = this;
         this.fn.categories = this.categories;
         
@@ -178,6 +196,7 @@ var MakePlural = (function () {
     _createClass(MakePlural, [{
         key: 'compile',
         value: function compile(type, req) {
+			logger.debug(`>>> Entering compile(type=${type},req=${req})`);
             var cases = [];
             var rules = MakePlural.rules[type][this.lc];
             if (!rules) {
@@ -192,7 +211,9 @@ var MakePlural = (function () {
 
                 var cond = _rules$r$trim$split2[0];
                 var examples = _rules$r$trim$split2.slice(1);
+				logger.debug(`compile(type=${type},req=${req}): examples → ${examples}`);
                 var cat = r.replace('pluralRule-count-', '');
+				logger.debug(`compile(type=${type},req=${req}): cat → ${cat}`);
                 if (cond) cases.push([this.parser.parse(cond), cat]);
                 
             }
@@ -203,6 +224,7 @@ var MakePlural = (function () {
                 return '(' + cases[0][0] + ') ? \'' + cases[0][1] + '\' : \'other\'';
             } else {
                 return [].concat(_toConsumableArray(cases.map(function (c) {
+				logger.debug('>>> Entering concat()');
                     return '(' + c[0] + ') ? \'' + c[1] + '\'';
                 })), ['\'other\'']).join('\n      : ');
             }
@@ -229,23 +251,31 @@ var MakePlural = (function () {
     }, {
         key: 'fnToString',
         value: function fnToString(name) {
+			logger.debug(`>>> Entering fnToString(name=${name})`);
+			logger.debug(`<<< Exiting fnToString(name=${name})`);
             return Function.prototype.toString.call(this.fn).replace(/^function( \w+)?/, name ? 'function ' + name : 'function').replace('\n/**/', '');
         }
     }], [{
         key: 'load',
         value: function load() {
+			logger.debug('>>> Entering load()');
             for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
                 args[_key] = arguments[_key];
             }
 
+			logger.debug(`load(): _len → ${_len}`);
             args.forEach(function (cldr) {
+				logger.debug('<<< Exiting load()');
                 var data = cldr && cldr.supplemental || null;
+				logger.debug(`>>> Entering forEach(data=${data})`);
+				logger.debug(`forEach(data=${data}): data → ${data}`);
                 if (!data) throw new Error('Data does not appear to be CLDR data');
                 MakePlural.rules = {
                     cardinal: data['plurals-type-cardinal'] || MakePlural.rules.cardinal,
                     ordinal: data['plurals-type-ordinal'] || MakePlural.rules.ordinal
                 };
             });
+			logger.debug(`<<< Exiting forEach(data=${data})`);
             return MakePlural;
         }
     }]);
@@ -266,34 +296,42 @@ return MakePlural;
 
 
 var validateParameterTypeNumber = function( value, name ) {
+	logger.debug(`>>> Entering validateParameterTypeNumber(value=${value},name=${name})`);
 	validateParameterType(
 		value,
 		name,
 		value === undefined || typeof value === "number",
 		"Number"
 	);
+	logger.debug(`<<< Exiting validateParameterTypeNumber(value=${value},name=${name})`);
 };
 
 
 
 
 var validateParameterTypePluralType = function( value, name ) {
+	logger.debug(`>>> Entering validateParameterTypePluralType(value=${value},name=${name})`);
 	validateParameterType(
 		value,
 		name,
 		value === undefined || value === "cardinal" || value === "ordinal",
 		"String \"cardinal\" or \"ordinal\""
 	);
+	logger.debug(`<<< Exiting validateParameterTypePluralType(value=${value},name=${name})`);
 };
 
 
 
 
 var pluralGeneratorFn = function( plural ) {
+	logger.debug(`>>> Entering pluralGeneratorFn(plural=${plural})`);
 	return function pluralGenerator( value ) {
+	logger.debug(`>>> Entering pluralGenerator(value=${value})`);
 		validateParameterPresence( value, "value" );
+		logger.debug(`<<< Exiting pluralGeneratorFn(plural=${plural})`);
 		validateParameterTypeNumber( value, "value" );
 
+		logger.debug(`<<< Exiting pluralGenerator(value=${value})`);
 		return plural( value );
 	};
 };
@@ -332,6 +370,7 @@ Globalize.pluralGenerator =
 Globalize.prototype.pluralGenerator = function( options ) {
 	var args, cldr, isOrdinal, plural, returnFn, type;
 
+	logger.debug(`function(options=${options}): args → ${args}`);
 	validateParameterTypePlainObject( options, "options" );
 
 	options = options || {};

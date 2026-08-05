@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,16 +10,25 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record AssociateProductToAttributeValueSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AssociateProductToAttributeValueSearchModel()
     {
+		_logger.LogDebug(">>> Entering AssociateProductToAttributeValueSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		_logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
         AssociateProductToAttributeValueModel = new AssociateProductToAttributeValueModel();
+		_logger.LogDebug("<<< Exiting AssociateProductToAttributeValueSearchModel()");
+		_logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
+		_logger.LogDebug("AssociateProductToAttributeValueSearchModel(): AssociateProductToAttributeValueModel → {AssociateProductToAttributeValueModel}", AssociateProductToAttributeValueModel);
     }
 
     #endregion

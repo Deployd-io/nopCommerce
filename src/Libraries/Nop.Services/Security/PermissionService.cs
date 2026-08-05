@@ -62,15 +62,21 @@ public partial class PermissionService : IPermissionService
     /// </returns>
     protected virtual async Task<IList<PermissionRecord>> GetPermissionRecordsByCustomerRoleIdAsync(int customerRoleId)
     {
+		logger.LogDebug(">>> Entering GetPermissionRecordsByCustomerRoleIdAsync(customerRoleId={CustomerRoleId})", customerRoleId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopSecurityDefaults.PermissionRecordsAllCacheKey, customerRoleId);
 
         var query = from pr in _permissionRecordRepository.Table
+					logger.LogWarning("GetPermissionRecordsByCustomerRoleIdAsync(customerRoleId={CustomerRoleId}): key → {Key}", customerRoleId, key);
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
                     join prcrm in _permissionRecordCustomerRoleMappingRepository.Table on pr.Id equals prcrm
                         .PermissionRecordId
                     where prcrm.CustomerRoleId == customerRoleId
                     orderby pr.Id
                     select pr;
 
+		logger.LogInformation("GetPermissionRecordsByCustomerRoleIdAsync(customerRoleId)={CustomerRoleId}: external service call took {Arg1} ms", customerRoleId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting GetPermissionRecordsByCustomerRoleIdAsync(customerRoleId={CustomerRoleId})", customerRoleId);
         return await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
     }
 
@@ -84,6 +90,8 @@ public partial class PermissionService : IPermissionService
     /// </returns>
     protected virtual async Task<PermissionRecord> GetPermissionRecordBySystemNameAsync(string systemName)
     {
+		logger.LogDebug(">>> Entering GetPermissionRecordBySystemNameAsync(systemName={SystemName})", systemName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(systemName))
             return null;
 
@@ -93,6 +101,8 @@ public partial class PermissionService : IPermissionService
                     select pr;
 
         var permissionRecord = await query.FirstOrDefaultAsync();
+		logger.LogDebug("GetPermissionRecordBySystemNameAsync(systemName={SystemName}): permissionRecord → {PermissionRecord}", systemName, permissionRecord);
+		logger.LogDebug("<<< Exiting GetPermissionRecordBySystemNameAsync(systemName={SystemName})", systemName);
         return permissionRecord;
     }
 
@@ -163,6 +173,7 @@ public partial class PermissionService : IPermissionService
             //save localization
             await _localizationService.SaveLocalizedPermissionNameAsync(permission);
         }
+		logger.LogDebug("<<< Exiting InstallPermissionsAsync(configs={Configs})", configs);
     }
 
     #endregion
@@ -178,10 +189,14 @@ public partial class PermissionService : IPermissionService
     /// </returns>
     public virtual async Task<IList<PermissionRecord>> GetAllPermissionRecordsAsync()
     {
+		logger.LogDebug(">>> Entering GetAllPermissionRecordsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var permissions = await _permissionRecordRepository.GetAllAsync(query => from pr in query
                                                                                  orderby pr.Name
                                                                                  select pr);
+																				logger.LogInformation("GetAllPermissionRecordsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
+		logger.LogDebug("<<< Exiting GetAllPermissionRecordsAsync()");
         return permissions;
     }
 
@@ -192,6 +207,7 @@ public partial class PermissionService : IPermissionService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPermissionRecordAsync(PermissionRecord permission)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _permissionRecordRepository.InsertAsync(permission);
     }
 
@@ -205,6 +221,8 @@ public partial class PermissionService : IPermissionService
     /// </returns>
     public virtual async Task<PermissionRecord> GetPermissionRecordByIdAsync(int permissionId)
     {
+		logger.LogDebug(">>> Entering GetPermissionRecordByIdAsync(permissionId={PermissionId})", permissionId);
+		logger.LogDebug("<<< Exiting GetPermissionRecordByIdAsync(permissionId={PermissionId})", permissionId);
         return await _permissionRecordRepository.GetByIdAsync(permissionId);
     }
 
@@ -215,6 +233,8 @@ public partial class PermissionService : IPermissionService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePermissionRecordAsync(PermissionRecord permission)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _permissionRecordRepository.UpdateAsync(permission);
     }
 
@@ -225,6 +245,9 @@ public partial class PermissionService : IPermissionService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePermissionRecordAsync(PermissionRecord permission)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _permissionRecordRepository.DeleteAsync(permission);
     }
 
@@ -235,16 +258,24 @@ public partial class PermissionService : IPermissionService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePermissionAsync(string permissionSystemName)
     {
+		logger.LogDebug(">>> Entering DeletePermissionAsync(permissionSystemName={PermissionSystemName})", permissionSystemName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var permission = await GetPermissionRecordBySystemNameAsync(permissionSystemName);
 
         if (permission == null)
+			logger.LogWarning("DeletePermissionAsync(permissionSystemName={PermissionSystemName}): permission → {Permission}", permissionSystemName, permission);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return;
 
         var mapping = await GetMappingByPermissionRecordIdAsync(permission.Id);
 
+		logger.LogDebug("DeletePermissionAsync(permissionSystemName={PermissionSystemName}): mapping → {Mapping}", permissionSystemName, mapping);
+		logger.LogInformation("DeletePermissionAsync(permissionSystemName)={PermissionSystemName}: delete query executed in {Arg1} ms", permissionSystemName, __logStart.ElapsedMilliseconds);
         await _permissionRecordCustomerRoleMappingRepository.DeleteAsync(mapping);
         await _localizationService.DeleteLocalizedPermissionNameAsync(permission);
         await _permissionRecordRepository.DeleteAsync(permission);
+		logger.LogInformation("DeletePermissionAsync(permissionSystemName)={PermissionSystemName}: external service call took {Arg1} ms", permissionSystemName, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting DeletePermissionAsync(permissionSystemName={PermissionSystemName})", permissionSystemName);
     }
 
     /// <summary>
@@ -342,6 +373,7 @@ public partial class PermissionService : IPermissionService
 
             return false;
         });
+		logger.LogDebug("<<< Exiting AuthorizeAsync(permission={Permission})", permission);
     }
 
     /// <summary>
@@ -354,10 +386,13 @@ public partial class PermissionService : IPermissionService
     /// </returns>
     public virtual async Task<IList<PermissionRecordCustomerRoleMapping>> GetMappingByPermissionRecordIdAsync(int permissionId)
     {
+		logger.LogDebug(">>> Entering GetMappingByPermissionRecordIdAsync(permissionId={PermissionId})", permissionId);
         var query = _permissionRecordCustomerRoleMappingRepository.Table;
 
+		logger.LogDebug("GetMappingByPermissionRecordIdAsync(permissionId={PermissionId}): query → {Query}", permissionId, query);
         query = query.Where(x => x.PermissionRecordId == permissionId);
 
+		logger.LogDebug("<<< Exiting GetMappingByPermissionRecordIdAsync(permissionId={PermissionId})", permissionId);
         return await query.ToListAsync();
     }
 
@@ -369,12 +404,20 @@ public partial class PermissionService : IPermissionService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePermissionRecordCustomerRoleMappingAsync(int permissionId, int customerRoleId)
     {
+		logger.LogDebug(">>> Entering DeletePermissionRecordCustomerRoleMappingAsync(permissionId={PermissionId},customerRoleId={CustomerRoleId})", permissionId, customerRoleId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var mapping = await _permissionRecordCustomerRoleMappingRepository.Table
             .FirstOrDefaultAsync(prcm => prcm.CustomerRoleId == customerRoleId && prcm.PermissionRecordId == permissionId);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (mapping is null)
             return;
+			logger.LogInformation("DeletePermissionRecordCustomerRoleMappingAsync(permissionId,customerRoleId)={PermissionId},{CustomerRoleId}: database query executed in {Arg2} ms", permissionId, customerRoleId, __logStart.ElapsedMilliseconds);
+			logger.LogInformation("DeletePermissionRecordCustomerRoleMappingAsync(permissionId,customerRoleId)={PermissionId},{CustomerRoleId}: external service call took {Arg2} ms", permissionId, customerRoleId, __logStart.ElapsedMilliseconds);
+			logger.LogInformation("DeletePermissionRecordCustomerRoleMappingAsync(permissionId,customerRoleId)={PermissionId},{CustomerRoleId}: delete query executed in {Arg2} ms", permissionId, customerRoleId, __logStart.ElapsedMilliseconds);
 
         await _permissionRecordCustomerRoleMappingRepository.DeleteAsync(mapping);
+		logger.LogInformation("DeletePermissionRecordCustomerRoleMappingAsync(permissionId,customerRoleId)={PermissionId},{CustomerRoleId}: delete query executed in {Arg2} ms", permissionId, customerRoleId, __logStart.ElapsedMilliseconds);
+		logger.LogDebug("<<< Exiting DeletePermissionRecordCustomerRoleMappingAsync(permissionId={PermissionId},customerRoleId={CustomerRoleId})", permissionId, customerRoleId);
     }
 
     /// <summary>
@@ -384,18 +427,29 @@ public partial class PermissionService : IPermissionService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPermissionRecordCustomerRoleMappingAsync(PermissionRecordCustomerRoleMapping permissionRecordCustomerRoleMapping)
     {
+		logger.LogDebug(">>> Entering InsertPermissionRecordCustomerRoleMappingAsync(permissionRecordCustomerRoleMapping={PermissionRecordCustomerRoleMapping})", permissionRecordCustomerRoleMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _permissionRecordCustomerRoleMappingRepository.InsertAsync(permissionRecordCustomerRoleMapping);
+		logger.LogDebug("<<< Exiting InsertPermissionRecordCustomerRoleMappingAsync(permissionRecordCustomerRoleMapping={PermissionRecordCustomerRoleMapping})", permissionRecordCustomerRoleMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		logger.LogInformation("InsertPermissionRecordCustomerRoleMappingAsync(permissionRecordCustomerRoleMapping)={PermissionRecordCustomerRoleMapping}: save query executed in {Arg1} ms", permissionRecordCustomerRoleMapping, __logStart.ElapsedMilliseconds);
     }
 
+	logger.LogInformation("InsertPermissionRecordCustomerRoleMappingAsync(permissionRecordCustomerRoleMapping)={PermissionRecordCustomerRoleMapping}: save query executed in {Arg1} ms", permissionRecordCustomerRoleMapping, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Configure permission manager
     /// </summary>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPermissionsAsync()
     {
+		logger.LogDebug(">>> Entering InsertPermissionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var permissionRecords = (await _permissionRecordRepository.GetAllAsync(query => query, getCacheKey: _ => null)).Distinct().ToHashSet();
         var exists = permissionRecords.Select(p => p.SystemName).ToHashSet();
 
+		logger.LogDebug("InsertPermissionsAsync(): permissionRecords → {PermissionRecords}", permissionRecords);
+		logger.LogDebug("InsertPermissionsAsync(): exists → {Exists}", exists);
+		logger.LogInformation("InsertPermissionsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         var configs = _typeFinder.FindClassesOfType<IPermissionConfigManager>()
             .Select(configType => (IPermissionConfigManager)Activator.CreateInstance(configType))
             .SelectMany(config => config?.AllConfigs ?? new List<PermissionConfig>())
@@ -403,6 +457,7 @@ public partial class PermissionService : IPermissionService
             .ToList();
 
         await InstallPermissionsAsync(configs);
+		logger.LogDebug("<<< Exiting InsertPermissionsAsync()");
     }
 
     /// <summary>

@@ -2,6 +2,7 @@
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.ExternalAuthentication;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthenticationMethodModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAuthenticationPluginManager _authenticationPluginManager;
@@ -20,7 +22,10 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
 
     public ExternalAuthenticationMethodModelFactory(IAuthenticationPluginManager authenticationPluginManager)
     {
+		_logger.LogDebug(">>> Entering ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager})", authenticationPluginManager);
         _authenticationPluginManager = authenticationPluginManager;
+		_logger.LogDebug("<<< Exiting ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager})", authenticationPluginManager);
+		_logger.LogDebug("ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager}): _authenticationPluginManager → {_authenticationPluginManager}", authenticationPluginManager, _authenticationPluginManager);
     }
 
     #endregion

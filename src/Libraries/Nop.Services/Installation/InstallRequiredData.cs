@@ -59,8 +59,11 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task InstallStoresAsync()
     {
+		logger.LogDebug(">>> Entering InstallStoresAsync()");
         var storeUrl = _webHelper.GetStoreLocation();
         var stores = new List<Store>
+		logger.LogDebug("<<< Exiting InstallStoresAsync()");
+		logger.LogDebug("InstallStoresAsync(): storeUrl → {StoreUrl}", storeUrl);
         {
             new() {
                 Name = "Your store name",
@@ -92,9 +95,11 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task InstallMeasuresAsync()
     {
+		logger.LogDebug(">>> Entering InstallMeasuresAsync()");
         var isMetric = _installationSettings.RegionInfo?.IsMetric ?? false;
 
         var measureDimensions = new List<MeasureDimension>
+		logger.LogDebug("<<< Exiting InstallMeasuresAsync()");
         {
             new() {
                 Name = "inch(es)",
@@ -163,7 +168,9 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task InstallTaxCategoriesAsync()
     {
+		logger.LogDebug(">>> Entering InstallTaxCategoriesAsync()");
         var taxCategories = new List<TaxCategory>
+		logger.LogDebug("<<< Exiting InstallTaxCategoriesAsync()");
         {
             new() {Name = "Books", DisplayOrder = 1},
             new() {Name = "Electronics & Software", DisplayOrder = 5},
@@ -240,6 +247,7 @@ public partial class InstallationService
 
         await _dataProvider.UpdateEntitiesAsync(lrsToUpdateList);
         await _dataProvider.BulkInsertEntitiesAsync(lrsToInsertList.Values);
+		logger.LogDebug("<<< Exiting ImportResourcesFromXmlAsync(language={Language},xmlStreamReader={XmlStreamReader},updateExistingResources={UpdateExistingResources})", language, xmlStreamReader, updateExistingResources);
     }
 
     /// <summary>
@@ -252,12 +260,17 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task<int> ImportStatesFromTxtAsync(Stream stream)
     {
+		logger.LogDebug(">>> Entering ImportStatesFromTxtAsync(stream={Stream})", stream);
         var count = 0;
         using var reader = new StreamReader(stream);
+		logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): count → {Count}", stream, count);
+		logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): reader → {Reader}", stream, reader);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         while (!reader.EndOfStream)
         {
             var line = await reader.ReadLineAsync();
             if (string.IsNullOrWhiteSpace(line))
+				logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): line → {Line}", stream, line);
                 continue;
             var tmp = line.Split(',');
 
@@ -267,12 +280,19 @@ public partial class InstallationService
             //parse
             var countryTwoLetterIsoCode = tmp[0].Trim();
             var name = tmp[1].Trim();
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): countryTwoLetterIsoCode → {CountryTwoLetterIsoCode}", stream, countryTwoLetterIsoCode);
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): name → {Name}", stream, name);
             var abbreviation = tmp[2].Trim();
             var published = bool.Parse(tmp[3].Trim());
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): abbreviation → {Abbreviation}", stream, abbreviation);
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): published → {Published}", stream, published);
             var displayOrder = int.Parse(tmp[4].Trim());
 
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): displayOrder → {DisplayOrder}", stream, displayOrder);
             var country = await Table<Country>().Where(c => c.TwoLetterIsoCode == countryTwoLetterIsoCode).FirstOrDefaultAsync();
             //country cannot be loaded. skip
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): country → {Country}", stream, country);
+			logger.LogInformation("ImportStatesFromTxtAsync(stream)={Stream}: database query executed in {Arg1} ms", stream, __logStart.ElapsedMilliseconds);
             if (country == null)
                 continue;
 
@@ -284,9 +304,13 @@ public partial class InstallationService
                 .ToListAsync();
             var state = states.FirstOrDefault(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
 
+			logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): state → {State}", stream, state);
             if (state != null)
             {
                 state.Abbreviation = abbreviation;
+				logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): state.Abbreviation → {Arg1}", stream, state.Abbreviation);
+				logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): state.Published → {Arg1}", stream, state.Published);
+				logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream}): state.DisplayOrder → {Arg1}", stream, state.DisplayOrder);
                 state.Published = published;
                 state.DisplayOrder = displayOrder;
 
@@ -309,6 +333,7 @@ public partial class InstallationService
             count++;
         }
 
+		logger.LogDebug("<<< Exiting ImportStatesFromTxtAsync(stream={Stream})", stream);
         return count;
     }
 
@@ -318,10 +343,15 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallLanguagesAsync()
     {
+		logger.LogDebug(">>> Entering InstallLanguagesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var defaultCulture = new CultureInfo(NopCommonDefaults.DefaultLanguageCulture);
         var re = new Regex(" \\(.*\\)", RegexOptions.Compiled);
+		logger.LogDebug("InstallLanguagesAsync(): defaultCulture → {DefaultCulture}", defaultCulture);
+		logger.LogDebug("InstallLanguagesAsync(): re → {Re}", re);
         var languageName = re.Replace(defaultCulture.NativeName, string.Empty);
         languageName = languageName[0].ToString().ToUpper() + languageName[1..];
+		logger.LogDebug("InstallLanguagesAsync(): languageName → {LanguageName}", languageName);
 
         var defaultLanguage = new Language
         {
@@ -338,10 +368,13 @@ public partial class InstallationService
         //Install locale resources for default culture
         var directoryPath = _fileProvider.MapPath(NopInstallationDefaults.LocalizationResourcesPath);
         var pattern = $"*.{NopInstallationDefaults.LocalizationResourcesFileExtension}";
+		logger.LogDebug("InstallLanguagesAsync(): directoryPath → {DirectoryPath}", directoryPath);
+		logger.LogDebug("InstallLanguagesAsync(): pattern → {Pattern}", pattern);
         foreach (var filePath in _fileProvider.EnumerateFiles(directoryPath, pattern))
         {
             using var streamReader = new StreamReader(filePath);
             await ImportResourcesFromXmlAsync(defaultLanguage, streamReader);
+			logger.LogDebug("InstallLanguagesAsync(): streamReader → {StreamReader}", streamReader);
         }
 
         var cultureInfo = _installationSettings.CultureInfo;
@@ -373,11 +406,15 @@ public partial class InstallationService
         {
             var httpClient = _httpClientFactory.CreateClient(NopHttpDefaults.DefaultHttpClient);
             await using var stream = await httpClient.GetStreamAsync(_installationSettings.LanguagePackDownloadLink);
+			logger.LogDebug("InstallLanguagesAsync(): httpClient → {HttpClient}", httpClient);
+			logger.LogInformation("InstallLanguagesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+			logger.LogDebug("InstallLanguagesAsync(): stream → {Stream}", stream);
             using var streamReader = new StreamReader(stream);
             await ImportResourcesFromXmlAsync(language, streamReader);
 
             //set this language as default
             language.DisplayOrder = 0;
+			logger.LogDebug("InstallLanguagesAsync(): language.DisplayOrder → {Arg0}", language.DisplayOrder);
             await _dataProvider.UpdateEntityAsync(language);
 
             //save progress for showing in admin panel (only for first start)
@@ -393,8 +430,10 @@ public partial class InstallationService
         }
         catch
         {
+			logger.LogError("Exception in InstallLanguagesAsync(): {Arg0}", ex.Message);
             // ignored
         }
+		logger.LogDebug("<<< Exiting InstallLanguagesAsync()");
     }
 
     /// <summary>
@@ -403,9 +442,12 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallCurrenciesAsync()
     {
+		logger.LogDebug(">>> Entering InstallCurrenciesAsync()");
         //set some currencies with a rate against the USD
         var defaultCurrencies = new List<string> { "USD", "AUD", "GBP", "CAD", "CNY", "EUR", "HKD", "JPY", "RUB", "SEK", "INR" };
         var currencies = new List<Currency>
+			logger.LogDebug("<<< Exiting InstallCurrenciesAsync()");
+			logger.LogDebug("InstallCurrenciesAsync(): defaultCurrencies → {DefaultCurrencies}", defaultCurrencies);
             {
                 new() {
                     Name = "US Dollar",
@@ -582,6 +624,7 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task InstallCountriesAndStatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallCountriesAndStatesAsync()");
         var countries = ISO3166.GetCollection().Select(country => new Country
         {
             Name = country.Name,
@@ -600,12 +643,16 @@ public partial class InstallationService
         //import states for all countries
         var directoryPath = _fileProvider.MapPath(NopInstallationDefaults.LocalizationResourcesPath);
         var pattern = "*.txt";
+		logger.LogDebug("InstallCountriesAndStatesAsync(): directoryPath → {DirectoryPath}", directoryPath);
+		logger.LogDebug("InstallCountriesAndStatesAsync(): pattern → {Pattern}", pattern);
 
         foreach (var filePath in _fileProvider.EnumerateFiles(directoryPath, pattern))
         {
             await using var stream = new FileStream(filePath, FileMode.Open);
             await ImportStatesFromTxtAsync(stream);
+			logger.LogDebug("InstallCountriesAndStatesAsync(): stream → {Stream}", stream);
         }
+		logger.LogDebug("<<< Exiting InstallCountriesAndStatesAsync()");
     }
 
     /// <summary>
@@ -614,7 +661,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallShippingMethodsAsync()
     {
+		logger.LogDebug(">>> Entering InstallShippingMethodsAsync()");
         var shippingMethods = new List<ShippingMethod>
+			logger.LogDebug("<<< Exiting InstallShippingMethodsAsync()");
             {
                 new() {
                     Name = "Ground",
@@ -643,7 +692,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallDeliveryDatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallDeliveryDatesAsync()");
         var deliveryDates = new List<DeliveryDate>
+		logger.LogDebug("<<< Exiting InstallDeliveryDatesAsync()");
         {
             new() {
                 Name = "1-2 days",
@@ -668,7 +719,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallProductAvailabilityRangesAsync()
     {
+		logger.LogDebug(">>> Entering InstallProductAvailabilityRangesAsync()");
         var productAvailabilityRanges = new List<ProductAvailabilityRange>
+		logger.LogDebug("<<< Exiting InstallProductAvailabilityRangesAsync()");
         {
             new() {
                 Name = "2-4 days",
@@ -693,7 +746,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallEmailAccountsAsync()
     {
+		logger.LogDebug(">>> Entering InstallEmailAccountsAsync()");
         var emailAccounts = new List<EmailAccount>
+			logger.LogDebug("<<< Exiting InstallEmailAccountsAsync()");
             {
                 new() {
                     Email = "test@mail.com",
@@ -715,9 +770,14 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallMessageTemplatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallMessageTemplatesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var eaGeneral = await Table<EmailAccount>().FirstOrDefaultAsync() ?? throw new Exception("Default email account cannot be loaded");
 
         var messageTemplates = new List<MessageTemplate>
+			logger.LogDebug("<<< Exiting InstallMessageTemplatesAsync()");
+			logger.LogDebug("InstallMessageTemplatesAsync(): eaGeneral → {EaGeneral}", eaGeneral);
+			logger.LogInformation("InstallMessageTemplatesAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             {
                 new() {
                     Name = MessageTemplateSystemNames.BLOG_COMMENT_STORE_OWNER_NOTIFICATION,
@@ -1124,7 +1184,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallNewsLetterSubscriptionTypeAsync()
     {
+		logger.LogDebug(">>> Entering InstallNewsLetterSubscriptionTypeAsync()");
         var newsLetterSubscriptionType = new List<NewsLetterSubscriptionType>
+		logger.LogDebug("<<< Exiting InstallNewsLetterSubscriptionTypeAsync()");
         {
             new() {
                 Name = NopMessageDefaults.DefaultSubscriptionType,
@@ -1142,7 +1204,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallTopicTemplatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallTopicTemplatesAsync()");
         var topicTemplates = new List<TopicTemplate>
+		logger.LogDebug("<<< Exiting InstallTopicTemplatesAsync()");
         {
             new() {
                 Name = "Default template",
@@ -1227,21 +1291,28 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallSettingsAsync()
     {
+		logger.LogDebug(">>> Entering InstallSettingsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var isMetric = _installationSettings.RegionInfo?.IsMetric ?? false;
         var country = _installationSettings.RegionInfo?.TwoLetterISORegionName ?? string.Empty;
         var isGermany = country == "DE";
         var isEurope = ISO3166.FromCountryCode(country)?.SubjectToVat ?? false;
+		logger.LogDebug("InstallSettingsAsync(): isGermany → {IsGermany}", isGermany);
+		logger.LogDebug("InstallSettingsAsync(): isEurope → {IsEurope}", isEurope);
 
         var settings = await Table<Setting>()
             .OrderBy(s => s.Name)
             .ThenBy(s => s.StoreId)
             .ToListAsync();
+			logger.LogInformation("InstallSettingsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         var dictionary = new Dictionary<string, IList<Setting>>();
         foreach (var s in settings)
         {
+		logger.LogDebug("InstallSettingsAsync(): dictionary → {Dictionary}", dictionary);
             var resourceName = s.Name.ToLowerInvariant();
             var settingForCaching = new Setting
+			logger.LogDebug("InstallSettingsAsync(): resourceName → {ResourceName}", resourceName);
             {
                 Id = s.Id,
                 Name = s.Name,
@@ -1699,6 +1770,7 @@ public partial class InstallationService
         var primaryCurrency = "USD";
         await SaveSettingAsync(dictionary, new CurrencySettings
         {
+		logger.LogDebug("InstallSettingsAsync(): primaryCurrency → {PrimaryCurrency}", primaryCurrency);
             DisplayCurrencyLabel = false,
             PrimaryStoreCurrencyId = (await Table<Currency>().SingleAsync(c => c.CurrencyCode == primaryCurrency)).Id,
             PrimaryExchangeRateCurrencyId = (await Table<Currency>().SingleAsync(c => c.CurrencyCode == primaryCurrency)).Id,
@@ -1709,6 +1781,8 @@ public partial class InstallationService
 
         var baseDimension = isMetric ? "meters" : "inches";
         var baseWeight = isMetric ? "kg" : "lb";
+		logger.LogDebug("InstallSettingsAsync(): baseDimension → {BaseDimension}", baseDimension);
+		logger.LogDebug("InstallSettingsAsync(): baseWeight → {BaseWeight}", baseWeight);
 
         await SaveSettingAsync(dictionary, new MeasureSettings
         {
@@ -1963,6 +2037,7 @@ public partial class InstallationService
 
         var eaGeneral = await Table<EmailAccount>().FirstOrDefaultAsync() ?? throw new Exception("Default email account cannot be loaded");
         await SaveSettingAsync(dictionary, new EmailAccountSettings { DefaultEmailAccountId = eaGeneral.Id });
+		logger.LogDebug("InstallSettingsAsync(): eaGeneral → {EaGeneral}", eaGeneral);
 
         await SaveSettingAsync(dictionary, new CaptchaSettings
         {
@@ -2136,6 +2211,7 @@ public partial class InstallationService
             GridThumbPictureSize = 220,
             MaximumMainMenuLevels = 2
         });
+		logger.LogDebug("<<< Exiting InstallSettingsAsync()");
     }
 
     /// <summary>
@@ -2144,6 +2220,8 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallCustomersAndUsersAsync()
     {
+		logger.LogDebug(">>> Entering InstallCustomersAndUsersAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var crAdministrators = new CustomerRole
         {
             Name = "Administrators",
@@ -2193,6 +2271,8 @@ public partial class InstallationService
         //default store 
         var defaultStore = await Table<Store>().FirstOrDefaultAsync() ?? throw new Exception("No default store could be loaded");
 
+		logger.LogDebug("InstallCustomersAndUsersAsync(): defaultStore → {DefaultStore}", defaultStore);
+		logger.LogInformation("InstallCustomersAndUsersAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         var storeId = defaultStore.Id;
 
         //admin user
@@ -2226,6 +2306,10 @@ public partial class InstallationService
             });
 
         adminUser.BillingAddressId = defaultAdminUserAddress.Id;
+		logger.LogDebug("InstallCustomersAndUsersAsync(): adminUser.BillingAddressId → {Arg0}", adminUser.BillingAddressId);
+		logger.LogDebug("InstallCustomersAndUsersAsync(): adminUser.ShippingAddressId → {Arg0}", adminUser.ShippingAddressId);
+		logger.LogDebug("InstallCustomersAndUsersAsync(): adminUser.FirstName → {Arg0}", adminUser.FirstName);
+		logger.LogDebug("InstallCustomersAndUsersAsync(): adminUser.LastName → {Arg0}", adminUser.LastName);
         adminUser.ShippingAddressId = defaultAdminUserAddress.Id;
         adminUser.FirstName = defaultAdminUserAddress.FirstName;
         adminUser.LastName = defaultAdminUserAddress.LastName;
@@ -2250,9 +2334,13 @@ public partial class InstallationService
         //generate a cryptographic random number
         using var provider = RandomNumberGenerator.Create();
         var buff = new byte[NopCustomerServicesDefaults.PasswordSaltKeySize];
+		logger.LogDebug("InstallCustomersAndUsersAsync(): provider → {Provider}", provider);
+		logger.LogDebug("InstallCustomersAndUsersAsync(): buff → {Buff}", buff);
         provider.GetBytes(buff);
         var saltKey = Convert.ToBase64String(buff);
 
+		logger.LogDebug("InstallCustomersAndUsersAsync(): saltKey → {SaltKey}", saltKey);
+		logger.LogDebug("InstallCustomersAndUsersAsync(): customerPassword.PasswordSalt → {Arg0}", customerPassword.PasswordSalt);
         customerPassword.PasswordSalt = saltKey;
         customerPassword.Password = HashHelper.CreateHash(Encoding.UTF8.GetBytes(string.Concat(_installationSettings.AdminPassword, saltKey)), NopCustomerServicesDefaults.DefaultHashedPasswordFormat);
 
@@ -2293,6 +2381,7 @@ public partial class InstallationService
         await _dataProvider.InsertEntityAsync(backgroundTaskUser);
 
         await _dataProvider.InsertEntityAsync(new CustomerCustomerRoleMapping { CustomerId = backgroundTaskUser.Id, CustomerRoleId = crGuests.Id });
+		logger.LogDebug("<<< Exiting InstallCustomersAndUsersAsync()");
     }
 
     /// <summary>
@@ -2301,9 +2390,14 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallTopicsAsync()
     {
+		logger.LogDebug(">>> Entering InstallTopicsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var defaultTopicTemplate = await Table<TopicTemplate>().FirstOrDefaultAsync(tt => tt.Name == "Default template") ?? throw new Exception("Topic template cannot be loaded");
 
         var topics = new List<Topic>
+			logger.LogDebug("<<< Exiting InstallTopicsAsync()");
+			logger.LogDebug("InstallTopicsAsync(): defaultTopicTemplate → {DefaultTopicTemplate}", defaultTopicTemplate);
+			logger.LogInformation("InstallTopicsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             {
                 new() {
                     SystemName = "AboutUs",
@@ -2455,8 +2549,10 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallActivityLogTypesAsync()
     {
+		logger.LogDebug(">>> Entering InstallActivityLogTypesAsync()");
         var activityLogTypes = new List<ActivityLogType>
             {
+				logger.LogDebug("<<< Exiting InstallActivityLogTypesAsync()");
                 //admin area activities
                 new() {
                     SystemKeyword = "AddNewAddressAttribute",
@@ -3360,7 +3456,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallProductTemplatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallProductTemplatesAsync()");
         var productTemplates = new List<ProductTemplate>
+		logger.LogDebug("<<< Exiting InstallProductTemplatesAsync()");
         {
             new() {
                 Name = "Simple product",
@@ -3385,7 +3483,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallCategoryTemplatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallCategoryTemplatesAsync()");
         var categoryTemplates = new List<CategoryTemplate>
+		logger.LogDebug("<<< Exiting InstallCategoryTemplatesAsync()");
         {
             new() {
                 Name = "Products in Grid or Lines",
@@ -3403,7 +3503,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallManufacturerTemplatesAsync()
     {
+		logger.LogDebug(">>> Entering InstallManufacturerTemplatesAsync()");
         var manufacturerTemplates = new List<ManufacturerTemplate>
+		logger.LogDebug("<<< Exiting InstallManufacturerTemplatesAsync()");
         {
             new() {
                 Name = "Products in Grid or Lines",
@@ -3421,8 +3523,10 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallScheduleTasksAsync()
     {
+		logger.LogDebug(">>> Entering InstallScheduleTasksAsync()");
         var lastEnabledUtc = DateTime.UtcNow;
         var tasks = new List<ScheduleTask>
+			logger.LogDebug("<<< Exiting InstallScheduleTasksAsync()");
             {
                 new() {
                     Name = "Send emails",
@@ -3499,7 +3603,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallReturnRequestReasonsAsync()
     {
+		logger.LogDebug(">>> Entering InstallReturnRequestReasonsAsync()");
         var returnRequestReasons = new List<ReturnRequestReason>
+		logger.LogDebug("<<< Exiting InstallReturnRequestReasonsAsync()");
         {
             new() {
                 Name = "Received Wrong Product",
@@ -3524,7 +3630,9 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallReturnRequestActionsAsync()
     {
+		logger.LogDebug(">>> Entering InstallReturnRequestActionsAsync()");
         var returnRequestActions = new List<ReturnRequestAction>
+		logger.LogDebug("<<< Exiting InstallReturnRequestActionsAsync()");
         {
             new() {
                 Name = "Repair",
@@ -3549,6 +3657,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallMenusAsync()
     {
+		logger.LogDebug(">>> Entering InstallMenusAsync()");
         await _dataProvider.InsertEntityAsync(new Menu
         {
             Name = "Categories",
@@ -3793,6 +3902,7 @@ public partial class InstallationService
                 Published = true
             },
         ]);
+		logger.LogDebug("<<< Exiting InstallMenusAsync()");
     }
 
     #endregion
