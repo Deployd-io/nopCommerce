@@ -4,6 +4,7 @@
 //! author : https://github.com/ryangreaves
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('cy', {
     months: 'Ionawr_Chwefror_Mawrth_Ebrill_Mai_Mehefin_Gorffennaf_Awst_Medi_Hydref_Tachwedd_Rhagfyr'.split(
@@ -55,6 +56,7 @@ export default moment.defineLocale('cy', {
     dayOfMonthOrdinalParse: /\d{1,2}(fed|ain|af|il|ydd|ed|eg)/,
     // traditional ordinal numbers above 31 are not commonly used in colloquial Welsh
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var b = number,
             output = '',
             lookup = [
@@ -88,6 +90,7 @@ export default moment.defineLocale('cy', {
             }
         } else if (b > 0) {
             output = lookup[b];
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
         }
         return number + output;
     },

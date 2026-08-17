@@ -82,31 +82,58 @@ public partial class CustomerService : ICustomerService
         ShoppingCartSettings shoppingCartSettings,
         TaxSettings taxSettings)
     {
+		_logger.LogDebug(">>> Entering CustomerService()");
         _customerSettings = customerSettings;
+		_logger.LogDebug("CustomerService(): _customerSettings → {_customerSettings}", _customerSettings);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("CustomerService(): _eventPublisher → {_eventPublisher}", _eventPublisher);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("CustomerService(): _genericAttributeService → {_genericAttributeService}", _genericAttributeService);
         _dataProvider = dataProvider;
+		_logger.LogDebug("CustomerService(): _dataProvider → {_dataProvider}", _dataProvider);
         _customerAddressRepository = customerAddressRepository;
+		_logger.LogDebug("CustomerService(): _customerAddressRepository → {_customerAddressRepository}", _customerAddressRepository);
         _blogCommentRepository = blogCommentRepository;
         _customerRepository = customerRepository;
+		_logger.LogDebug("CustomerService(): _blogCommentRepository → {_blogCommentRepository}", _blogCommentRepository);
+		_logger.LogDebug("CustomerService(): _customerRepository → {_customerRepository}", _customerRepository);
         _customerAddressMappingRepository = customerAddressMappingRepository;
         _customerCustomerRoleMappingRepository = customerCustomerRoleMappingRepository;
+		_logger.LogDebug("CustomerService(): _customerAddressMappingRepository → {_customerAddressMappingRepository}", _customerAddressMappingRepository);
+		_logger.LogDebug("CustomerService(): _customerCustomerRoleMappingRepository → {_customerCustomerRoleMappingRepository}", _customerCustomerRoleMappingRepository);
         _customerPasswordRepository = customerPasswordRepository;
         _customerRoleRepository = customerRoleRepository;
+		_logger.LogDebug("CustomerService(): _customerPasswordRepository → {_customerPasswordRepository}", _customerPasswordRepository);
+		_logger.LogDebug("CustomerService(): _customerRoleRepository → {_customerRoleRepository}", _customerRoleRepository);
         _forumPostRepository = forumPostRepository;
         _forumTopicRepository = forumTopicRepository;
+		_logger.LogDebug("CustomerService(): _forumPostRepository → {_forumPostRepository}", _forumPostRepository);
+		_logger.LogDebug("CustomerService(): _forumTopicRepository → {_forumTopicRepository}", _forumTopicRepository);
         _gaRepository = gaRepository;
         _newsCommentRepository = newsCommentRepository;
+		_logger.LogDebug("CustomerService(): _gaRepository → {_gaRepository}", _gaRepository);
+		_logger.LogDebug("CustomerService(): _newsCommentRepository → {_newsCommentRepository}", _newsCommentRepository);
         _orderRepository = orderRepository;
         _productReviewRepository = productReviewRepository;
+		_logger.LogDebug("CustomerService(): _orderRepository → {_orderRepository}", _orderRepository);
+		_logger.LogDebug("CustomerService(): _productReviewRepository → {_productReviewRepository}", _productReviewRepository);
         _productReviewHelpfulnessRepository = productReviewHelpfulnessRepository;
         _pollVotingRecordRepository = pollVotingRecordRepository;
+		_logger.LogDebug("CustomerService(): _productReviewHelpfulnessRepository → {_productReviewHelpfulnessRepository}", _productReviewHelpfulnessRepository);
+		_logger.LogDebug("CustomerService(): _pollVotingRecordRepository → {_pollVotingRecordRepository}", _pollVotingRecordRepository);
         _shoppingCartRepository = shoppingCartRepository;
         _shortTermCacheManager = shortTermCacheManager;
+		_logger.LogDebug("CustomerService(): _shoppingCartRepository → {_shoppingCartRepository}", _shoppingCartRepository);
+		_logger.LogDebug("CustomerService(): _shortTermCacheManager → {_shortTermCacheManager}", _shortTermCacheManager);
         _staticCacheManager = staticCacheManager;
         _storeContext = storeContext;
+		_logger.LogDebug("CustomerService(): _staticCacheManager → {_staticCacheManager}", _staticCacheManager);
+		_logger.LogDebug("CustomerService(): _storeContext → {_storeContext}", _storeContext);
         _shoppingCartSettings = shoppingCartSettings;
         _taxSettings = taxSettings;
+		_logger.LogDebug("<<< Exiting CustomerService()");
+		_logger.LogDebug("CustomerService(): _shoppingCartSettings → {_shoppingCartSettings}", _shoppingCartSettings);
+		_logger.LogDebug("CustomerService(): _taxSettings → {_taxSettings}", _taxSettings);
     }
 
     #endregion
@@ -168,11 +195,14 @@ public partial class CustomerService : ICustomerService
         string company = null, string phone = null, string zipPostalCode = null, string ipAddress = null,
         bool? isActive = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
     {
+		_logger.LogDebug(">>> Entering GetAllCustomersAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},lastActivityFromUtc={LastActivityFromUtc},lastActivityToUtc={LastActivityToUtc},affiliateId={AffiliateId},vendorId={VendorId},customerRoleIds={CustomerRoleIds},email={Email},username={Username},firstName={FirstName},lastName={LastName},dayOfBirth={DayOfBirth},monthOfBirth={MonthOfBirth},company={Company},phone={Phone},zipPostalCode={ZipPostalCode},ipAddress={IpAddress},isActive={IsActive},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", createdFromUtc, createdToUtc, lastActivityFromUtc, lastActivityToUtc, affiliateId, vendorId, customerRoleIds, email, username, firstName, lastName, dayOfBirth, monthOfBirth, company, phone, zipPostalCode, ipAddress, isActive, pageIndex, pageSize, getOnlyTotalCount);
         var customers = await _customerRepository.GetAllPagedAsync(query =>
         {
             if (createdFromUtc.HasValue)
                 query = query.Where(c => createdFromUtc.Value <= c.CreatedOnUtc);
             if (createdToUtc.HasValue)
+				_logger.LogDebug("GetAllCustomersAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},lastActivityFromUtc={LastActivityFromUtc},lastActivityToUtc={LastActivityToUtc},affiliateId={AffiliateId},vendorId={VendorId},customerRoleIds={CustomerRoleIds},email={Email},username={Username},firstName={FirstName},lastName={LastName},dayOfBirth={DayOfBirth},monthOfBirth={MonthOfBirth},company={Company},phone={Phone},zipPostalCode={ZipPostalCode},ipAddress={IpAddress},isActive={IsActive},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): query → {Query}", createdFromUtc, createdToUtc, lastActivityFromUtc, lastActivityToUtc, affiliateId, vendorId, customerRoleIds, email, username, firstName, lastName, dayOfBirth, monthOfBirth, company, phone, zipPostalCode, ipAddress, isActive, pageIndex, pageSize, getOnlyTotalCount, query);
+				_logger.LogInformation("GetAllCustomersAsync(createdFromUtc,createdToUtc,lastActivityFromUtc,lastActivityToUtc,affiliateId,vendorId,customerRoleIds,email,username,firstName,lastName,dayOfBirth,monthOfBirth,company,phone,zipPostalCode,ipAddress,isActive,pageIndex,pageSize,getOnlyTotalCount)={CreatedFromUtc},{CreatedToUtc},{LastActivityFromUtc},{LastActivityToUtc},{AffiliateId},{VendorId},{CustomerRoleIds},{Email},{Username},{FirstName},{LastName},{DayOfBirth},{MonthOfBirth},{Company},{Phone},{ZipPostalCode},{IpAddress},{IsActive},{PageIndex},{PageSize},{GetOnlyTotalCount}: find query executed in {Arg21} ms", createdFromUtc, createdToUtc, lastActivityFromUtc, lastActivityToUtc, affiliateId, vendorId, customerRoleIds, email, username, firstName, lastName, dayOfBirth, monthOfBirth, company, phone, zipPostalCode, ipAddress, isActive, pageIndex, pageSize, getOnlyTotalCount, __logStart.ElapsedMilliseconds);
                 query = query.Where(c => createdToUtc.Value >= c.CreatedOnUtc);
             if (lastActivityFromUtc.HasValue)
                 query = query.Where(c => lastActivityFromUtc.Value <= c.LastActivityDateUtc);
@@ -230,6 +260,7 @@ public partial class CustomerService : ICustomerService
             return query;
         }, pageIndex, pageSize, getOnlyTotalCount);
 
+		_logger.LogDebug("<<< Exiting GetAllCustomersAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},lastActivityFromUtc={LastActivityFromUtc},lastActivityToUtc={LastActivityToUtc},affiliateId={AffiliateId},vendorId={VendorId},customerRoleIds={CustomerRoleIds},email={Email},username={Username},firstName={FirstName},lastName={LastName},dayOfBirth={DayOfBirth},monthOfBirth={MonthOfBirth},company={Company},phone={Phone},zipPostalCode={ZipPostalCode},ipAddress={IpAddress},isActive={IsActive},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", createdFromUtc, createdToUtc, lastActivityFromUtc, lastActivityToUtc, affiliateId, vendorId, customerRoleIds, email, username, firstName, lastName, dayOfBirth, monthOfBirth, company, phone, zipPostalCode, ipAddress, isActive, pageIndex, pageSize, getOnlyTotalCount);
         return customers;
     }
 
@@ -247,8 +278,10 @@ public partial class CustomerService : ICustomerService
     public virtual async Task<IPagedList<Customer>> GetOnlineCustomersAsync(DateTime lastActivityFromUtc,
         int[] customerRoleIds, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetOnlineCustomersAsync(lastActivityFromUtc={LastActivityFromUtc},customerRoleIds={CustomerRoleIds},pageIndex={PageIndex},pageSize={PageSize})", lastActivityFromUtc, customerRoleIds, pageIndex, pageSize);
         var query = _customerRepository.Table;
         query = query.Where(c => lastActivityFromUtc <= c.LastActivityDateUtc);
+		_logger.LogDebug("GetOnlineCustomersAsync(lastActivityFromUtc={LastActivityFromUtc},customerRoleIds={CustomerRoleIds},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", lastActivityFromUtc, customerRoleIds, pageIndex, pageSize, query);
         query = query.Where(c => !c.Deleted);
 
         if (customerRoleIds != null && customerRoleIds.Length > 0)
@@ -256,7 +289,9 @@ public partial class CustomerService : ICustomerService
 
         query = query.OrderByDescending(c => c.LastActivityDateUtc);
         var customers = await query.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogDebug("GetOnlineCustomersAsync(lastActivityFromUtc={LastActivityFromUtc},customerRoleIds={CustomerRoleIds},pageIndex={PageIndex},pageSize={PageSize}): customers → {Customers}", lastActivityFromUtc, customerRoleIds, pageIndex, pageSize, customers);
 
+		_logger.LogDebug("<<< Exiting GetOnlineCustomersAsync(lastActivityFromUtc={LastActivityFromUtc},customerRoleIds={CustomerRoleIds},pageIndex={PageIndex},pageSize={PageSize})", lastActivityFromUtc, customerRoleIds, pageIndex, pageSize);
         return customers;
     }
 
@@ -317,6 +352,7 @@ public partial class CustomerService : ICustomerService
             orderby _dataProvider.ConfigurationName == "MySql" ? c.CreatedOnUtc : item.CreatedOnUtc descending
             select c;
 
+		_logger.LogDebug("<<< Exiting GetCustomersWithShoppingCartsAsync(shoppingCartType=<redacted>,storeId={StoreId},productId={ProductId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},countryId={CountryId},pageIndex={PageIndex},pageSize={PageSize})", storeId, productId, createdFromUtc, createdToUtc, countryId, pageIndex, pageSize);
         return await customersWithCarts.Distinct().ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -342,6 +378,7 @@ public partial class CustomerService : ICustomerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCustomerAsync(Customer customer)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         if (customer.IsSystemAccount)
@@ -357,6 +394,7 @@ public partial class CustomerService : ICustomerService
                 customer.Username += NopCustomerServicesDefaults.CustomerDeletedSuffix;
         }
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _customerRepository.UpdateAsync(customer, false);
         await _customerRepository.DeleteAsync(customer);
     }
@@ -384,6 +422,8 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<IList<Customer>> GetCustomersByIdsAsync(int[] customerIds)
     {
+		_logger.LogDebug(">>> Entering GetCustomersByIdsAsync(customerIds={CustomerIds})", customerIds);
+		_logger.LogDebug("<<< Exiting GetCustomersByIdsAsync(customerIds={CustomerIds})", customerIds);
         return await _customerRepository.GetByIdsAsync(customerIds, includeDeleted: false);
     }
 
@@ -397,14 +437,19 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<IList<Customer>> GetCustomersByGuidsAsync(Guid[] customerGuids)
     {
+		_logger.LogDebug(">>> Entering GetCustomersByGuidsAsync(customerGuids={CustomerGuids})", customerGuids);
         if (customerGuids == null)
             return null;
 
         var query = from c in _customerRepository.Table
             where customerGuids.Contains(c.CustomerGuid)
             select c;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customers = await query.ToListAsync();
 
+		_logger.LogDebug("GetCustomersByGuidsAsync(customerGuids={CustomerGuids}): customers → {Customers}", customerGuids, customers);
+		_logger.LogInformation("GetCustomersByGuidsAsync(customerGuids)={CustomerGuids}: database query executed in {Arg1} ms", customerGuids, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCustomersByGuidsAsync(customerGuids={CustomerGuids})", customerGuids);
         return customers;
     }
 
@@ -418,6 +463,8 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> GetCustomerByGuidAsync(Guid customerGuid)
     {
+		_logger.LogDebug(">>> Entering GetCustomerByGuidAsync(customerGuid={CustomerGuid})", customerGuid);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (customerGuid == Guid.Empty)
             return null;
 
@@ -426,6 +473,8 @@ public partial class CustomerService : ICustomerService
             orderby c.Id
             select c;
 
+		_logger.LogInformation("GetCustomerByGuidAsync(customerGuid)={CustomerGuid}: external service call took {Arg1} ms", customerGuid, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCustomerByGuidAsync(customerGuid={CustomerGuid})", customerGuid);
         return await _shortTermCacheManager.GetAsync(async () => await query.FirstOrDefaultAsync(), NopCustomerServicesDefaults.CustomerByGuidCacheKey, customerGuid);
     }
 
@@ -439,6 +488,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> GetCustomerByEmailAsync(string email)
     {
+		_logger.LogDebug(">>> Entering GetCustomerByEmailAsync(email={Email})", email);
         if (string.IsNullOrWhiteSpace(email))
             return null;
 
@@ -446,8 +496,12 @@ public partial class CustomerService : ICustomerService
             orderby c.Id
             where c.Email == email
             select c;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await query.FirstOrDefaultAsync();
 
+		_logger.LogDebug("GetCustomerByEmailAsync(email={Email}): customer → {Customer}", email, customer);
+		_logger.LogInformation("GetCustomerByEmailAsync(email)={Email}: database query executed in {Arg1} ms", email, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCustomerByEmailAsync(email={Email})", email);
         return customer;
     }
 
@@ -461,6 +515,8 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> GetCustomerBySystemNameAsync(string systemName)
     {
+		_logger.LogDebug(">>> Entering GetCustomerBySystemNameAsync(systemName={SystemName})", systemName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(systemName))
             return null;
 
@@ -469,8 +525,12 @@ public partial class CustomerService : ICustomerService
             where c.SystemName == systemName
             select c;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _shortTermCacheManager.GetAsync(async () => await query.FirstOrDefaultAsync(), NopCustomerServicesDefaults.CustomerBySystemNameCacheKey, systemName);
 
+		_logger.LogDebug("GetCustomerBySystemNameAsync(systemName={SystemName}): customer → {Customer}", systemName, customer);
+		_logger.LogInformation("GetCustomerBySystemNameAsync(systemName)={SystemName}: external service call took {Arg1} ms", systemName, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCustomerBySystemNameAsync(systemName={SystemName})", systemName);
         return customer;
     }
 
@@ -483,11 +543,14 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> GetOrCreateBackgroundTaskUserAsync()
     {
+		_logger.LogDebug(">>> Entering GetOrCreateBackgroundTaskUserAsync()");
         var backgroundTaskUser = await GetCustomerBySystemNameAsync(NopCustomerDefaults.BackgroundTaskCustomerName);
 
+		_logger.LogDebug("GetOrCreateBackgroundTaskUserAsync(): backgroundTaskUser → {BackgroundTaskUser}", backgroundTaskUser);
         if (backgroundTaskUser is null)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("GetOrCreateBackgroundTaskUserAsync(): store → {Store}", store);
             //If for any reason the system user isn't in the database, then we add it
             backgroundTaskUser = new Customer
             {
@@ -505,10 +568,12 @@ public partial class CustomerService : ICustomerService
             await InsertCustomerAsync(backgroundTaskUser);
 
             var guestRole = await GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName) ?? throw new NopException("'Guests' role could not be loaded");
+			_logger.LogDebug("GetOrCreateBackgroundTaskUserAsync(): guestRole → {GuestRole}", guestRole);
 
             await AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerRoleId = guestRole.Id, CustomerId = backgroundTaskUser.Id });
         }
 
+		_logger.LogDebug("<<< Exiting GetOrCreateBackgroundTaskUserAsync()");
         return backgroundTaskUser;
     }
 
@@ -521,11 +586,14 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> GetOrCreateSearchEngineUserAsync()
     {
+		_logger.LogDebug(">>> Entering GetOrCreateSearchEngineUserAsync()");
         var searchEngineUser = await GetCustomerBySystemNameAsync(NopCustomerDefaults.SearchEngineCustomerName);
 
+		_logger.LogDebug("GetOrCreateSearchEngineUserAsync(): searchEngineUser → {SearchEngineUser}", searchEngineUser);
         if (searchEngineUser is null)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("GetOrCreateSearchEngineUserAsync(): store → {Store}", store);
             //If for any reason the system user isn't in the database, then we add it
             searchEngineUser = new Customer
             {
@@ -543,10 +611,12 @@ public partial class CustomerService : ICustomerService
             await InsertCustomerAsync(searchEngineUser);
 
             var guestRole = await GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName) ?? throw new NopException("'Guests' role could not be loaded");
+			_logger.LogDebug("GetOrCreateSearchEngineUserAsync(): guestRole → {GuestRole}", guestRole);
 
             await AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerRoleId = guestRole.Id, CustomerId = searchEngineUser.Id });
         }
 
+		_logger.LogDebug("<<< Exiting GetOrCreateSearchEngineUserAsync()");
         return searchEngineUser;
     }
 
@@ -560,6 +630,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> GetCustomerByUsernameAsync(string username)
     {
+		_logger.LogDebug(">>> Entering GetCustomerByUsernameAsync(username={Username})", username);
         if (string.IsNullOrWhiteSpace(username))
             return null;
 
@@ -567,8 +638,12 @@ public partial class CustomerService : ICustomerService
             orderby c.Id
             where c.Username == username
             select c;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await query.FirstOrDefaultAsync();
 
+		_logger.LogDebug("GetCustomerByUsernameAsync(username={Username}): customer → {Customer}", username, customer);
+		_logger.LogInformation("GetCustomerByUsernameAsync(username)={Username}: database query executed in {Arg1} ms", username, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCustomerByUsernameAsync(username={Username})", username);
         return customer;
     }
 
@@ -581,6 +656,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Customer> InsertGuestCustomerAsync()
     {
+		_logger.LogDebug(">>> Entering InsertGuestCustomerAsync()");
         var customer = new Customer
         {
             CustomerGuid = Guid.NewGuid(),
@@ -591,11 +667,17 @@ public partial class CustomerService : ICustomerService
 
         //add to 'Guests' role
         var guestRole = await GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName) ?? throw new NopException("'Guests' role could not be loaded");
+		_logger.LogDebug("InsertGuestCustomerAsync(): guestRole → {GuestRole}", guestRole);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         await _customerRepository.InsertAsync(customer);
+		_logger.LogInformation("InsertGuestCustomerAsync(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         await AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = customer.Id, CustomerRoleId = guestRole.Id });
 
+		_logger.LogDebug("<<< Exiting InsertGuestCustomerAsync()");
+		_logger.LogDebug(">>> Entering GetCustomerRoleBySystemNameAsync(systemName={SystemName})", systemName);
+		_logger.LogDebug("<<< Exiting GetCustomerRoleBySystemNameAsync(systemName={SystemName})", systemName);
         return customer;
     }
 
@@ -679,6 +761,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<int> DeleteGuestCustomersAsync(DateTime? createdFromUtc, DateTime? createdToUtc, bool onlyWithoutShoppingCart)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var guestRole = await GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
 
         var allGuestCustomers = from guest in _customerRepository.Table
@@ -697,6 +780,7 @@ public partial class CustomerService : ICustomerService
             from pollVotingRecord in _pollVotingRecordRepository.Table.Where(o => o.CustomerId == guest.Id).DefaultIfEmpty()
             from forumTopic in _forumTopicRepository.Table.Where(o => o.CustomerId == guest.Id).DefaultIfEmpty()
             from forumPost in _forumPostRepository.Table.Where(o => o.CustomerId == guest.Id).DefaultIfEmpty()
+			using Microsoft.Extensions.Logging;
             where (!onlyWithoutShoppingCart || sCart == null) &&
                   order == null && blogComment == null && newsComment == null && productReview == null && productReviewHelpfulness == null &&
                   pollVotingRecord == null && forumTopic == null && forumPost == null &&
@@ -712,14 +796,17 @@ public partial class CustomerService : ICustomerService
                 .Select(ca => new { AddressId = ca.AddressId }));
 
         //delete guests
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var totalRecordsDeleted = await _customerRepository.DeleteAsync(c => tmpGuests.Any(tmp => tmp.CustomerId == c.Id));
 
+		_logger.LogInformation("DeleteGuestCustomersAsync(createdFromUtc,createdToUtc,onlyWithoutShoppingCart)={CreatedFromUtc},{CreatedToUtc},{OnlyWithoutShoppingCart}: delete query executed in {Arg3} ms", createdFromUtc, createdToUtc, onlyWithoutShoppingCart, __logStart.ElapsedMilliseconds);
         //delete attributes
         await _gaRepository.DeleteAsync(ga => tmpGuests.Any(c => c.CustomerId == ga.EntityId) && ga.KeyGroup == nameof(Customer));
 
         //delete m -> m addresses
         await _customerAddressRepository.DeleteAsync(a => tmpAddresses.Any(tmp => tmp.AddressId == a.Id));
 
+		_logger.LogInformation("DeleteGuestCustomersAsync(createdFromUtc,createdToUtc,onlyWithoutShoppingCart)={CreatedFromUtc},{CreatedToUtc},{OnlyWithoutShoppingCart}: external service call took {Arg3} ms", createdFromUtc, createdToUtc, onlyWithoutShoppingCart, __logStart.ElapsedMilliseconds);
         return totalRecordsDeleted;
     }
 
@@ -733,6 +820,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<TaxDisplayType> GetCustomerTaxDisplayTypeAsync(Customer customer)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         ArgumentNullException.ThrowIfNull(customer);
 
         //default tax display type
@@ -847,6 +935,7 @@ public partial class CustomerService : ICustomerService
         if (stripTooLong && maxLength > 0)
             result = CommonHelper.EnsureMaximumLength(result, maxLength);
 
+		_logger.LogDebug("<<< Exiting FormatUsernameAsync(customer={Customer},stripTooLong={StripTooLong},maxLength={MaxLength})", customer, stripTooLong, maxLength);
         return result ?? string.Empty;
     }
 
@@ -1124,15 +1213,21 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Guid[]> GetNotExistingCustomersAsync(Guid[] guids)
     {
+		_logger.LogDebug(">>> Entering GetNotExistingCustomersAsync(guids={Guids})", guids);
         ArgumentNullException.ThrowIfNull(guids);
 
         var query = _customerRepository.Table;
+		_logger.LogDebug("GetNotExistingCustomersAsync(guids={Guids}): query → {Query}", guids, query);
         var queryFilter = guids.Distinct().ToArray();
+		_logger.LogDebug("GetNotExistingCustomersAsync(guids={Guids}): queryFilter → {QueryFilter}", guids, queryFilter);
         //filtering by guid
         var filter = await query.Select(c => c.CustomerGuid)
             .Where(c => queryFilter.Contains(c))
             .ToListAsync();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetNotExistingCustomersAsync(guids)={Guids}: database query executed in {Arg1} ms", guids, __logStart.ElapsedMilliseconds);
 
+		_logger.LogDebug("<<< Exiting GetNotExistingCustomersAsync(guids={Guids})", guids);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -1158,11 +1253,15 @@ public partial class CustomerService : ICustomerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveCustomerRoleMappingAsync(Customer customer, CustomerRole role)
     {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         ArgumentNullException.ThrowIfNull(role);
 
         var mapping = await _customerCustomerRoleMappingRepository.Table
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             .SingleOrDefaultAsync(ccrm => ccrm.CustomerId == customer.Id && ccrm.CustomerRoleId == role.Id);
 
         if (mapping != null)
@@ -1176,6 +1275,7 @@ public partial class CustomerService : ICustomerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCustomerRoleAsync(CustomerRole customerRole)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customerRole);
 
         if (customerRole.IsSystemRole)
@@ -1194,8 +1294,11 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<CustomerRole> GetCustomerRoleByIdAsync(int customerRoleId)
     {
+		_logger.LogDebug(">>> Entering GetCustomerRoleByIdAsync(customerRoleId={CustomerRoleId})", customerRoleId);
         var allRolesById = await GetAllCustomerRolesDictionaryAsync();
 
+		_logger.LogDebug("GetCustomerRoleByIdAsync(customerRoleId={CustomerRoleId}): allRolesById → {AllRolesById}", customerRoleId, allRolesById);
+		_logger.LogDebug("<<< Exiting GetCustomerRoleByIdAsync(customerRoleId={CustomerRoleId})", customerRoleId);
         return allRolesById.TryGetValue(customerRoleId, out var role) ? role : null;
     }
 
@@ -1209,18 +1312,23 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<CustomerRole> GetCustomerRoleBySystemNameAsync(string systemName)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(systemName))
             return null;
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCustomerServicesDefaults.CustomerRolesBySystemNameCacheKey, systemName);
+		_logger.LogWarning("GetCustomerRoleBySystemNameAsync(systemName={SystemName}): key → {Key}", systemName, key);
 
         var query = from cr in _customerRoleRepository.Table
             orderby cr.Id
             where cr.SystemName == systemName
             select cr;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customerRole = await _staticCacheManager.GetAsync(key, async () => await query.FirstOrDefaultAsync());
 
+		_logger.LogDebug("GetCustomerRoleBySystemNameAsync(systemName={SystemName}): customerRole → {CustomerRole}", systemName, customerRole);
+		_logger.LogInformation("GetCustomerRoleBySystemNameAsync(systemName)={SystemName}: external service call took {Arg1} ms", systemName, __logStart.ElapsedMilliseconds);
         return customerRole;
     }
 
@@ -1275,8 +1383,11 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<IList<CustomerRole>> GetAllCustomerRolesAsync(bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering GetAllCustomerRolesAsync(showHidden={ShowHidden})", showHidden);
         var allRolesById = await GetAllCustomerRolesDictionaryAsync();
 
+		_logger.LogDebug("GetAllCustomerRolesAsync(showHidden={ShowHidden}): allRolesById → {AllRolesById}", showHidden, allRolesById);
+		_logger.LogDebug("<<< Exiting GetAllCustomerRolesAsync(showHidden={ShowHidden})", showHidden);
         return allRolesById.Values
             .Where(cr => showHidden || cr.Active)
             .ToList();
@@ -1438,6 +1549,7 @@ public partial class CustomerService : ICustomerService
     public virtual async Task<CustomerPassword> GetCurrentPasswordAsync(int customerId)
     {
         if (customerId == 0)
+		_logger.LogDebug("<<< Exiting GetCurrentPasswordAsync(customerId={CustomerId})", customerId);
             return null;
 
         //return the latest password
@@ -1523,6 +1635,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<bool> IsPasswordExpiredAsync(Customer customer)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         //the guests don't have a password
@@ -1563,15 +1676,18 @@ public partial class CustomerService : ICustomerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveCustomerAddressAsync(Customer customer, Address address)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(customer);
 
         if (await _customerAddressMappingRepository.Table
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 .FirstOrDefaultAsync(m => m.AddressId == address.Id && m.CustomerId == customer.Id)
             is CustomerAddressMapping mapping)
         {
             if (customer.BillingAddressId == address.Id)
                 customer.BillingAddressId = null;
             if (customer.ShippingAddressId == address.Id)
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 customer.ShippingAddressId = null;
 
             await _customerAddressMappingRepository.DeleteAsync(mapping);
@@ -1591,6 +1707,7 @@ public partial class CustomerService : ICustomerService
         ArgumentNullException.ThrowIfNull(address);
 
         if (await _customerAddressMappingRepository.Table
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 .FirstOrDefaultAsync(m => m.AddressId == address.Id && m.CustomerId == customer.Id)
             is null)
         {
@@ -1599,6 +1716,7 @@ public partial class CustomerService : ICustomerService
                 AddressId = address.Id,
                 CustomerId = customer.Id
             };
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
             await _customerAddressMappingRepository.InsertAsync(mapping);
         }
@@ -1614,6 +1732,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<IList<Address>> GetAddressesByCustomerIdAsync(int customerId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from address in _customerAddressRepository.Table
             join cam in _customerAddressMappingRepository.Table on address.Id equals cam.AddressId
             where cam.CustomerId == customerId
@@ -1633,6 +1752,7 @@ public partial class CustomerService : ICustomerService
     /// </returns>
     public virtual async Task<Address> GetCustomerAddressAsync(int customerId, int addressId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (customerId == 0 || addressId == 0)
             return null;
 
@@ -1641,6 +1761,8 @@ public partial class CustomerService : ICustomerService
             where cam.CustomerId == customerId && address.Id == addressId
             select address;
 
+		_logger.LogInformation("GetCustomerAddressAsync(customerId,addressId)={CustomerId},{AddressId}: external service call took {Arg2} ms", customerId, addressId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCustomerAddressAsync(customerId={CustomerId},addressId={AddressId})", customerId, addressId);
         return await _shortTermCacheManager.GetAsync(async () => await query.FirstOrDefaultAsync(), NopCustomerServicesDefaults.CustomerAddressCacheKey, customerId, addressId);
     }
 

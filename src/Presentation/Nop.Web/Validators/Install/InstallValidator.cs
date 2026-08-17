@@ -3,13 +3,16 @@ using Nop.Data;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Infrastructure.Installation;
 using Nop.Web.Models.Install;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Validators.Install;
 
 public partial class InstallValidator : BaseNopValidator<InstallModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public InstallValidator(IInstallationLocalizationService locService)
     {
+		_logger.LogDebug(">>> Entering InstallValidator(locService={LocService})", locService);
         RuleFor(x => x.AdminEmail).NotEmpty().WithMessage(locService.GetResource("AdminEmailRequired"));
         RuleFor(x => x.AdminEmail)
             .IsEmailAddress();
@@ -39,5 +42,6 @@ public partial class InstallValidator : BaseNopValidator<InstallModel>
             .NotEmpty()
             .When(x => x.UseCustomCollation)
             .WithMessage(locService.GetResource("CollationRequired"));
+			_logger.LogDebug("<<< Exiting InstallValidator(locService={LocService})", locService);
     }
 }

@@ -7,12 +7,14 @@ using Nop.Web.Factories;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Models.Topics;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class TopicController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -47,8 +49,10 @@ public partial class TopicController : BasePublicController
 
     public virtual async Task<IActionResult> TopicDetails(int topicId)
     {
+		_logger.LogDebug(">>> Entering TopicDetails(topicId={TopicId})", topicId);
         var topic = await _topicService.GetTopicByIdAsync(topicId);
 
+		_logger.LogDebug("TopicDetails(topicId={TopicId}): topic → {Topic}", topicId, topic);
         if (topic == null)
             return InvokeHttp404();
 
@@ -62,11 +66,13 @@ public partial class TopicController : BasePublicController
 
         //allow administrators to preview any topic
         var hasAdminAccess = await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL) && await _permissionService.AuthorizeAsync(StandardPermission.ContentManagement.TOPICS_VIEW);
+		_logger.LogDebug("TopicDetails(topicId={TopicId}): hasAdminAccess → {HasAdminAccess}", topicId, hasAdminAccess);
 
         if (notAvailable && !hasAdminAccess)
             return InvokeHttp404();
 
         var model = await _topicModelFactory.PrepareTopicModelAsync(topic);
+		_logger.LogDebug("TopicDetails(topicId={TopicId}): model → {Model}", topicId, model);
 
         //display "edit" (manage) link
         if (hasAdminAccess)
@@ -74,20 +80,27 @@ public partial class TopicController : BasePublicController
 
         //template
         var templateViewPath = await _topicModelFactory.PrepareTemplateViewPathAsync(model.TopicTemplateId);
+		_logger.LogDebug("TopicDetails(topicId={TopicId}): templateViewPath → {TemplateViewPath}", topicId, templateViewPath);
+		_logger.LogDebug("<<< Exiting TopicDetails(topicId={TopicId})", topicId);
         return View(templateViewPath, model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> TopicDetailsPopup(string systemName)
     {
+		_logger.LogDebug(">>> Entering TopicDetailsPopup(systemName={SystemName})", systemName);
         var model = await _topicModelFactory.PrepareTopicModelBySystemNameAsync(systemName);
         if (model == null)
+			_logger.LogDebug("TopicDetailsPopup(systemName={SystemName}): model → {Model}", systemName, model);
             return InvokeHttp404();
 
         ViewBag.IsPopup = true;
+		_logger.LogDebug("TopicDetailsPopup(systemName={SystemName}): ViewBag.IsPopup → {Arg1}", systemName, ViewBag.IsPopup);
 
         //template
         var templateViewPath = await _topicModelFactory.PrepareTemplateViewPathAsync(model.TopicTemplateId);
+		_logger.LogDebug("TopicDetailsPopup(systemName={SystemName}): templateViewPath → {TemplateViewPath}", systemName, templateViewPath);
+		_logger.LogDebug("<<< Exiting TopicDetailsPopup(systemName={SystemName})", systemName);
         return PartialView(templateViewPath, model);
     }
 

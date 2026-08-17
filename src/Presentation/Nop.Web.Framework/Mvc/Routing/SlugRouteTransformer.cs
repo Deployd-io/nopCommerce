@@ -15,6 +15,7 @@ using Nop.Services.Catalog;
 using Nop.Services.Localization;
 using Nop.Services.Seo;
 using Nop.Web.Framework.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Routing;
 
@@ -23,6 +24,7 @@ namespace Nop.Web.Framework.Mvc.Routing;
 /// </summary>
 public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -47,14 +49,24 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         IUrlRecordService urlRecordService,
         LocalizationSettings localizationSettings)
     {
+		_logger.LogDebug(">>> Entering SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings})", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _catalogSettings → {_catalogSettings}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _catalogSettings);
         _categoryService = categoryService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _categoryService → {_categoryService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _categoryService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _eventPublisher → {_eventPublisher}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _eventPublisher);
         _languageService = languageService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _languageService → {_languageService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _languageService);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _manufacturerService → {_manufacturerService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _manufacturerService);
         _storeContext = storeContext;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _storeContext → {_storeContext}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _storeContext);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _urlRecordService → {_urlRecordService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _urlRecordService);
         _localizationSettings = localizationSettings;
+		_logger.LogDebug("<<< Exiting SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings})", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings);
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _localizationSettings);
     }
 
     #endregion
@@ -287,8 +299,10 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// </returns>
     public override async ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary routeValues)
     {
+		_logger.LogDebug(">>> Entering TransformAsync(httpContext={HttpContext},routeValues={RouteValues})", httpContext, routeValues);
         //get values to transform for action selection
         var values = new RouteValueDictionary(routeValues);
+		_logger.LogDebug("TransformAsync(httpContext={HttpContext},routeValues={RouteValues}): values → {Values}", httpContext, routeValues, values);
 
         if (!values.TryGetValue(NopRoutingDefaults.RouteValue.SeName, out var slug) || slug is null)
             return values;
@@ -299,6 +313,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 
         //allow third-party handlers to select an action by the found URL record
         var routingEvent = new GenericRoutingEvent(httpContext, values, urlRecord);
+		_logger.LogDebug("TransformAsync(httpContext={HttpContext},routeValues={RouteValues}): routingEvent → {RoutingEvent}", httpContext, routeValues, routingEvent);
         await _eventPublisher.PublishAsync(routingEvent);
         if (routingEvent.StopProcessing)
             return values;
@@ -313,6 +328,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         //finally, select an action by the URL record only
         await SingleSlugRoutingAsync(httpContext, values, urlRecord, catalogPath);
 
+		_logger.LogDebug("<<< Exiting TransformAsync(httpContext={HttpContext},routeValues={RouteValues})", httpContext, routeValues);
         return values;
     }
 

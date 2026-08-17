@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize Runtime v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	"use strict";
 
@@ -63,6 +65,7 @@ var formatMessage = Globalize._formatMessage,
  * Format relative time.
  */
 var relativeTimeFormat = function( value, numberFormatter, pluralGenerator, properties ) {
+logger.debug(`>>> Entering relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 
 	var relativeTime,
 		message = properties[ "relative-type-" + value ];
@@ -76,7 +79,10 @@ var relativeTimeFormat = function( value, numberFormatter, pluralGenerator, prop
 
 	value = Math.abs( value );
 
+	logger.debug(`relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties}): value → ${value}`);
 	message = relativeTime[ "relativeTimePattern-count-" + pluralGenerator( value ) ];
+	logger.debug(`relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties}): message → ${message}`);
+	logger.debug(`<<< Exiting relativeTimeFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 	return formatMessage( message, [ numberFormatter( value ) ] );
 };
 
@@ -84,10 +90,14 @@ var relativeTimeFormat = function( value, numberFormatter, pluralGenerator, prop
 
 
 var relativeTimeFormatterFn = function( numberFormatter, pluralGenerator, properties ) {
+	logger.debug(`>>> Entering relativeTimeFormatterFn(numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 	return function relativeTimeFormatter( value ) {
+	logger.debug(`>>> Entering relativeTimeFormatter(value=${value})`);
 		validateParameterPresence( value, "value" );
 		validateParameterTypeNumber( value, "value" );
+		logger.debug(`<<< Exiting relativeTimeFormatterFn(numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},properties=${properties})`);
 
+		logger.debug(`<<< Exiting relativeTimeFormatter(value=${value})`);
 		return relativeTimeFormat( value, numberFormatter, pluralGenerator, properties );
 	};
 
@@ -97,6 +107,7 @@ var relativeTimeFormatterFn = function( numberFormatter, pluralGenerator, proper
 
 
 Globalize._relativeTimeFormatterFn = relativeTimeFormatterFn;
+logger.debug(`function(): Globalize._relativeTimeFormatterFn → ${Globalize._relativeTimeFormatterFn}`);
 
 Globalize.formatRelativeTime =
 Globalize.prototype.formatRelativeTime = function( value, unit, options ) {
@@ -112,6 +123,7 @@ Globalize.prototype.relativeTimeFormatter = function( unit, options ) {
 	return Globalize[ runtimeKey( "relativeTimeFormatter", this._locale, [ unit, options ] ) ];
 };
 
+logger.debug(`<<< Exiting function(value=${value},unit=${unit},options=${options})`);
 return Globalize;
 
 

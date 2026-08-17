@@ -10,11 +10,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CustomerAttributeController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
@@ -78,16 +80,20 @@ public partial class CustomerAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //select an appropriate card
         SaveSelectedCardName("customersettings-customerformfields");
 
         //we just redirect a user to the customer settings page
+		_logger.LogDebug("<<< Exiting List()");
         return RedirectToAction("CustomerUser", "Setting");
     }
 
@@ -98,15 +104,19 @@ public partial class CustomerAttributeController : BaseAdminController
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeModelAsync(new CustomerAttributeModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -139,20 +149,25 @@ public partial class CustomerAttributeController : BaseAdminController
         model = await _customerAttributeModelFactory.PrepareCustomerAttributeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): customerAttribute → {CustomerAttribute}", id, customerAttribute);
         if (customerAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeModelAsync(null, customerAttribute);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -192,8 +207,10 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(id);
         await _customerAttributeService.DeleteAttributeAsync(customerAttribute);
+		_logger.LogDebug("Delete(id={Id}): customerAttribute → {CustomerAttribute}", id, customerAttribute);
 
         //activity log
         await _customerActivityService.InsertActivityAsync("DeleteCustomerAttribute",
@@ -201,6 +218,7 @@ public partial class CustomerAttributeController : BaseAdminController
             customerAttribute);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.CustomerAttributes.Deleted"));
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -212,21 +230,26 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueList(CustomerAttributeValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ValueList(searchModel={SearchModel})", searchModel);
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(searchModel.CustomerAttributeId)
             ?? throw new ArgumentException("No customer attribute found with the specified id");
 
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeValueListModelAsync(searchModel, customerAttribute);
+		_logger.LogDebug("ValueList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ValueList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueCreatePopup(int customerAttributeId)
     {
+		_logger.LogDebug(">>> Entering ValueCreatePopup(customerAttributeId={CustomerAttributeId})", customerAttributeId);
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeId);
+		_logger.LogDebug("ValueCreatePopup(customerAttributeId={CustomerAttributeId}): customerAttribute → {CustomerAttribute}", customerAttributeId, customerAttribute);
         if (customerAttribute == null)
             return RedirectToAction("List");
 
@@ -234,6 +257,7 @@ public partial class CustomerAttributeController : BaseAdminController
         var model = await _customerAttributeModelFactory
             .PrepareCustomerAttributeValueModelAsync(new CustomerAttributeValueModel(), customerAttribute, null);
 
+		_logger.LogDebug("<<< Exiting ValueCreatePopup(customerAttributeId={CustomerAttributeId})", customerAttributeId);
         return View(model);
     }
 
@@ -266,25 +290,31 @@ public partial class CustomerAttributeController : BaseAdminController
         model = await _customerAttributeModelFactory.PrepareCustomerAttributeValueModelAsync(model, customerAttribute, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting ValueCreatePopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueEditPopup(int id)
     {
+		_logger.LogDebug(">>> Entering ValueEditPopup(id={Id})", id);
         //try to get a customer attribute value with the specified id
         var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(id);
+		_logger.LogDebug("ValueEditPopup(id={Id}): customerAttributeValue → {CustomerAttributeValue}", id, customerAttributeValue);
         if (customerAttributeValue == null)
             return RedirectToAction("List");
 
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeValue.AttributeId);
+		_logger.LogDebug("ValueEditPopup(id={Id}): customerAttribute → {CustomerAttribute}", id, customerAttribute);
         if (customerAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeValueModelAsync(null, customerAttribute, customerAttributeValue);
+		_logger.LogDebug("ValueEditPopup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting ValueEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -323,6 +353,7 @@ public partial class CustomerAttributeController : BaseAdminController
         model = await _customerAttributeModelFactory.PrepareCustomerAttributeValueModelAsync(model, customerAttribute, customerAttributeValue, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting ValueEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -330,6 +361,7 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueDelete(int id)
     {
+		_logger.LogDebug(">>> Entering ValueDelete(id={Id})", id);
         //try to get a customer attribute value with the specified id
         var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No customer attribute value found with the specified id", nameof(id));
@@ -341,6 +373,7 @@ public partial class CustomerAttributeController : BaseAdminController
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteCustomerAttributeValue"), customerAttributeValue.Id),
             customerAttributeValue);
 
+		_logger.LogDebug("<<< Exiting ValueDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

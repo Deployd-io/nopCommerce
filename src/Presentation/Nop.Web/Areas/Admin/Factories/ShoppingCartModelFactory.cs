@@ -14,6 +14,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.ShoppingCart;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -22,6 +23,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -82,11 +84,13 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// <returns>Shopping cart item search model</returns>
     protected virtual ShoppingCartItemSearchModel PrepareShoppingCartItemSearchModel(ShoppingCartItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShoppingCartItemSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareShoppingCartItemSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -104,6 +108,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<ShoppingCartSearchModel> PrepareShoppingCartSearchModelAsync(ShoppingCartSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShoppingCartSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available shopping cart types
@@ -111,6 +116,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
         //set default search values
         searchModel.ShoppingCartType = ShoppingCartType.ShoppingCart;
+		_logger.LogDebug("PrepareShoppingCartSearchModelAsync(searchModel={SearchModel}): searchModel.ShoppingCartType → {Arg1}", searchModel, searchModel.ShoppingCartType);
 
         //prepare available billing countries
         searchModel.AvailableCountries = (await _countryService.GetAllCountriesForBillingAsync(showHidden: true))
@@ -128,6 +134,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareShoppingCartSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -141,6 +148,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<ShoppingCartListModel> PrepareShoppingCartListModelAsync(ShoppingCartSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShoppingCartListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customers with shopping carts
@@ -176,6 +184,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareShoppingCartListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -190,6 +199,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
     /// </returns>
     public virtual async Task<ShoppingCartItemListModel> PrepareShoppingCartItemListModelAsync(ShoppingCartItemSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
         ArgumentNullException.ThrowIfNull(customer);
 
@@ -201,6 +211,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         var isSearchProduct = searchModel.ProductId > 0;
 
         Product product = null;
+		_logger.LogDebug("PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer}): product → {Product}", searchModel, customer, product);
 
         if (isSearchProduct)
         {
@@ -209,6 +220,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
         }
 
         var store = await _storeService.GetStoreByIdAsync(searchModel.StoreId);
+		_logger.LogDebug("PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer}): store → {Store}", searchModel, customer, store);
         var customWishlists = items.Any(item => item.ShoppingCartType == ShoppingCartType.Wishlist)
             ? await _customWishlistService.GetAllCustomWishlistsAsync(customer.Id)
             : new List<CustomWishlist>();
@@ -222,6 +234,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 {
                     //fill in model values from the entity
                     var itemModel = item.ToModel<ShoppingCartItemModel>();
+					_logger.LogDebug("PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer}): itemModel → {ItemModel}", searchModel, customer, itemModel);
 
                     if (!isSearchProduct)
                         product = await _productService.GetProductByIdAsync(item.ProductId);
@@ -241,10 +254,12 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
 
                     //set product name since it does not survive mapping
                     itemModel.ProductName = product.Name;
+					_logger.LogDebug("PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer}): itemModel.ProductName → {Arg2}", searchModel, customer, itemModel.ProductName);
 
                     if (item.ShoppingCartType == ShoppingCartType.Wishlist)
                     {
                         itemModel.CustomWishlistName = customWishlists
+							_logger.LogDebug("PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer}): itemModel.CustomWishlistName → {Arg2}", searchModel, customer, itemModel.CustomWishlistName);
                             .FirstOrDefault(wishlist => wishlist.Id == item.CustomWishlistId) is CustomWishlist customWishlist
                             ? customWishlist.Name
                             : await _localizationService.GetResourceAsync("Wishlist.Default");
@@ -254,6 +269,7 @@ public partial class ShoppingCartModelFactory : IShoppingCartModelFactory
                 });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareShoppingCartItemListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return model;
     }
 

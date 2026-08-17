@@ -2,6 +2,7 @@
 using Nop.Core.Events;
 using Nop.Services.Configuration;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.DiscountRules.CustomerRoles.Infrastructure.Cache;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.DiscountRules.CustomerRoles.Infrastructure.Cache;
 /// </summary>
 public class DiscountRequirementEventConsumer : IConsumer<EntityDeletedEvent<DiscountRequirement>>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ISettingService _settingService;
@@ -20,7 +22,10 @@ public class DiscountRequirementEventConsumer : IConsumer<EntityDeletedEvent<Dis
 
     public DiscountRequirementEventConsumer(ISettingService settingService)
     {
+		_logger.LogDebug(">>> Entering DiscountRequirementEventConsumer(settingService={SettingService})", settingService);
         _settingService = settingService;
+		_logger.LogDebug("<<< Exiting DiscountRequirementEventConsumer(settingService={SettingService})", settingService);
+		_logger.LogDebug("DiscountRequirementEventConsumer(settingService={SettingService}): _settingService → {_settingService}", settingService, _settingService);
     }
 
     #endregion
@@ -34,14 +39,17 @@ public class DiscountRequirementEventConsumer : IConsumer<EntityDeletedEvent<Dis
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(EntityDeletedEvent<DiscountRequirement> eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         var discountRequirement = eventMessage?.Entity;
         if (discountRequirement == null)
             return;
 
         //delete saved restricted customer role identifier if exists
         var setting = await _settingService.GetSettingAsync(string.Format(DiscountRequirementDefaults.SettingsKey, discountRequirement.Id));
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): setting → {Setting}", eventMessage, setting);
         if (setting != null)
             await _settingService.DeleteSettingAsync(setting);
+			_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

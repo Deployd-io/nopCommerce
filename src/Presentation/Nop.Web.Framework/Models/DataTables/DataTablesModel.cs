@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial record DataTablesModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Const
 
     protected const string DEFAULT_PAGING_TYPE = "simple_numbers";
@@ -18,17 +20,28 @@ public partial record DataTablesModel : BaseNopModel
     /// </summary>
     public DataTablesModel()
     {
+		_logger.LogDebug(">>> Entering DataTablesModel()");
         //set default values
         Info = true;
+		_logger.LogDebug("DataTablesModel(): Info → {Info}", Info);
         RefreshButton = true;
+		_logger.LogDebug("DataTablesModel(): RefreshButton → {RefreshButton}", RefreshButton);
         ServerSide = true;
+		_logger.LogDebug("DataTablesModel(): ServerSide → {ServerSide}", ServerSide);
         Processing = true;
+		_logger.LogDebug("DataTablesModel(): Processing → {Processing}", Processing);
         Paging = true;
+		_logger.LogDebug("DataTablesModel(): Paging → {Paging}", Paging);
         PagingType = DEFAULT_PAGING_TYPE;
+		_logger.LogDebug("DataTablesModel(): PagingType → {PagingType}", PagingType);
 
         Filters = new List<FilterParameter>();
+		_logger.LogDebug("DataTablesModel(): Filters → {Filters}", Filters);
         ColumnCollection = new List<ColumnProperty>();
+		_logger.LogDebug("DataTablesModel(): ColumnCollection → {ColumnCollection}", ColumnCollection);
         LayoutCollection = new List<LayoutOption>();
+		_logger.LogDebug("<<< Exiting DataTablesModel()");
+		_logger.LogDebug("DataTablesModel(): LayoutCollection → {LayoutCollection}", LayoutCollection);
     }
 
     #endregion

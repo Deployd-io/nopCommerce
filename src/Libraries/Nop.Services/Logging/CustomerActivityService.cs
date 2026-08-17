@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Logging;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Logging;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Logging;
 /// </summary>
 public partial class CustomerActivityService : ICustomerActivityService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -28,11 +30,18 @@ public partial class CustomerActivityService : ICustomerActivityService
         IWebHelper webHelper,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext})", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext);
         _customerSettings = customerSettings;
+		_logger.LogDebug("CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext}): _customerSettings → {_customerSettings}", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext, _customerSettings);
         _activityLogRepository = activityLogRepository;
+		_logger.LogDebug("CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext}): _activityLogRepository → {_activityLogRepository}", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext, _activityLogRepository);
         _activityLogTypeRepository = activityLogTypeRepository;
+		_logger.LogDebug("CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext}): _activityLogTypeRepository → {_activityLogTypeRepository}", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext, _activityLogTypeRepository);
         _webHelper = webHelper;
+		_logger.LogDebug("CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext, _webHelper);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext})", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext);
+		_logger.LogDebug("CustomerActivityService(customerSettings={CustomerSettings},activityLogRepository={ActivityLogRepository},activityLogTypeRepository={ActivityLogTypeRepository},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", customerSettings, activityLogRepository, activityLogTypeRepository, webHelper, workContext, _workContext);
     }
 
     #endregion
@@ -58,13 +67,17 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<IList<ActivityLogType>> GetAllActivityTypesAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllActivityTypesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var activityLogTypes = await _activityLogTypeRepository.GetAllAsync(query =>
         {
             return from alt in query
                 orderby alt.Name
                 select alt;
+				_logger.LogInformation("GetAllActivityTypesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		_logger.LogDebug("<<< Exiting GetAllActivityTypesAsync()");
         return activityLogTypes;
     }
 
@@ -78,6 +91,8 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<ActivityLogType> GetActivityTypeByIdAsync(int activityLogTypeId)
     {
+		_logger.LogDebug(">>> Entering GetActivityTypeByIdAsync(activityLogTypeId={ActivityLogTypeId})", activityLogTypeId);
+		_logger.LogDebug("<<< Exiting GetActivityTypeByIdAsync(activityLogTypeId={ActivityLogTypeId})", activityLogTypeId);
         return await _activityLogTypeRepository.GetByIdAsync(activityLogTypeId, cache => default);
     }
 
@@ -93,6 +108,7 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<ActivityLog> InsertActivityAsync(string systemKeyword, string comment, BaseEntity entity = null)
     {
+		_logger.LogDebug(">>> Entering InsertActivityAsync(systemKeyword={SystemKeyword},comment={Comment},entity={Entity})", systemKeyword, comment, entity);
         return await InsertActivityAsync(await _workContext.GetCurrentCustomerAsync(), systemKeyword, comment, entity);
     }
 
@@ -145,6 +161,7 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<IList<ActivityLog>> InsertActivitiesAsync<TEntity>(string systemKeyword, IList<TEntity> entities, Func<TEntity, string> comment)
     {
+		_logger.LogDebug("<<< Exiting InsertActivitiesAsync(systemKeyword={SystemKeyword},entities={Entities},Func<TEntity={Arg2},comment={Comment})", systemKeyword, entities, Func<TEntity, comment);
         return await InsertActivitiesAsync(await _workContext.GetCurrentCustomerAsync(), systemKeyword, entities, comment);
     }
 
@@ -182,6 +199,7 @@ public partial class CustomerActivityService : ICustomerActivityService
 
         await _activityLogRepository.InsertAsync(logItems);
 
+		_logger.LogDebug("<<< Exiting InsertActivitiesAsync(customer={Customer},systemKeyword={SystemKeyword},entities={Entities},Func<TEntity={Arg3},comment={Comment})", customer, systemKeyword, entities, Func<TEntity, comment);
         return logItems;
     }
 
@@ -192,9 +210,15 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteActivityAsync(ActivityLog activityLog)
     {
+		_logger.LogDebug(">>> Entering DeleteActivityAsync(activityLog={ActivityLog})", activityLog);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _activityLogRepository.DeleteAsync(activityLog);
+		_logger.LogDebug("<<< Exiting DeleteActivityAsync(activityLog={ActivityLog})", activityLog);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteActivityAsync(activityLog)={ActivityLog}: external service call took {Arg1} ms", activityLog, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteActivityAsync(activityLog)={ActivityLog}: external service call took {Arg1} ms", activityLog, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets all activity log items
     /// </summary>
@@ -215,12 +239,16 @@ public partial class CustomerActivityService : ICustomerActivityService
         int? customerId = null, int? activityLogTypeId = null, string ipAddress = null, string entityName = null, int? entityId = null,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetAllActivitiesAsync(createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerId={CustomerId},activityLogTypeId={ActivityLogTypeId},ipAddress={IpAddress},entityName={EntityName},entityId={EntityId},pageIndex={PageIndex},pageSize={PageSize})", createdOnFrom, createdOnTo, customerId, activityLogTypeId, ipAddress, entityName, entityId, pageIndex, pageSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await _activityLogRepository.GetAllPagedAsync(query =>
         {
+		_logger.LogDebug("<<< Exiting GetAllActivitiesAsync(createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerId={CustomerId},activityLogTypeId={ActivityLogTypeId},ipAddress={IpAddress},entityName={EntityName},entityId={EntityId},pageIndex={PageIndex},pageSize={PageSize})", createdOnFrom, createdOnTo, customerId, activityLogTypeId, ipAddress, entityName, entityId, pageIndex, pageSize);
             //filter by IP
             if (!string.IsNullOrEmpty(ipAddress))
                 query = query.Where(logItem => logItem.IpAddress.Contains(ipAddress));
 
+			_logger.LogInformation("GetAllActivitiesAsync(createdOnFrom,createdOnTo,customerId,activityLogTypeId,ipAddress,entityName,entityId,pageIndex,pageSize)={CreatedOnFrom},{CreatedOnTo},{CustomerId},{ActivityLogTypeId},{IpAddress},{EntityName},{EntityId},{PageIndex},{PageSize}: find query executed in {Arg9} ms", createdOnFrom, createdOnTo, customerId, activityLogTypeId, ipAddress, entityName, entityId, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
             //filter by creation date
             if (createdOnFrom.HasValue)
                 query = query.Where(logItem => createdOnFrom.Value <= logItem.CreatedOnUtc);
@@ -257,6 +285,8 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// </returns>
     public virtual async Task<ActivityLog> GetActivityByIdAsync(int activityLogId)
     {
+		_logger.LogDebug(">>> Entering GetActivityByIdAsync(activityLogId={ActivityLogId})", activityLogId);
+		_logger.LogDebug("<<< Exiting GetActivityByIdAsync(activityLogId={ActivityLogId})", activityLogId);
         return await _activityLogRepository.GetByIdAsync(activityLogId);
     }
 
@@ -266,7 +296,9 @@ public partial class CustomerActivityService : ICustomerActivityService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearAllActivitiesAsync()
     {
+		_logger.LogDebug(">>> Entering ClearAllActivitiesAsync()");
         await _activityLogRepository.TruncateAsync();
+		_logger.LogDebug("<<< Exiting ClearAllActivitiesAsync()");
     }
 
     #endregion

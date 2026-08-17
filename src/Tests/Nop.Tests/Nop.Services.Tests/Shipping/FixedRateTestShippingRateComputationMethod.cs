@@ -2,14 +2,18 @@
 using Nop.Services.Plugins;
 using Nop.Services.Shipping;
 using Nop.Services.Shipping.Tracking;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Shipping;
 
 public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingRateComputationMethod
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private decimal GetRate()
     {
+		_logger.LogDebug(">>> Entering GetRate()");
         var rate = 10M;
+		_logger.LogDebug("<<< Exiting GetRate()");
         return rate;
     }
 
@@ -60,6 +64,8 @@ public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingR
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		_logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		_logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 }

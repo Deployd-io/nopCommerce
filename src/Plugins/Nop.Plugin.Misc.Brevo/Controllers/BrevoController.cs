@@ -215,6 +215,7 @@ public class BrevoController : BasePluginController
                 _settingService.ClearCache();
             }
         }
+		_logger.LogDebug("<<< Exiting PrepareModelAsync(model={Model})", model);
     }
 
     #endregion
@@ -225,9 +226,12 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel();
         await PrepareModelAsync(model);
+		_logger.LogDebug("Configure(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.Brevo/Views/Configure.cshtml", model);
     }
 
@@ -311,9 +315,14 @@ public class BrevoController : BasePluginController
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetSynchronizationInfo()
     {
+		_logger.LogDebug(">>> Entering GetSynchronizationInfo()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var res = await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(BrevoDefaults.SyncKeyCache), () => string.Empty);
         await _staticCacheManager.RemoveAsync(BrevoDefaults.SyncKeyCache);
+		_logger.LogDebug("GetSynchronizationInfo(): res → {Res}", res);
 
+		_logger.LogInformation("GetSynchronizationInfo(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetSynchronizationInfo()");
         return res;
     }
 
@@ -381,8 +390,11 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> MessageList(BrevoMessageTemplateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering MessageList(searchModel={SearchModel})", searchModel);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var messageTemplates = (await _messageTemplateService.GetAllMessageTemplatesAsync(storeId)).ToPagedList(searchModel);
+		_logger.LogDebug("MessageList(searchModel={SearchModel}): messageTemplates → {MessageTemplates}", searchModel, messageTemplates);
+		_logger.LogDebug("MessageList(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
 
         //prepare list model
         var model = await new BrevoMessageTemplateListModel().PrepareToGridAsync(searchModel, messageTemplates, () =>
@@ -391,6 +403,7 @@ public class BrevoController : BasePluginController
             {
                 //standard template of message is edited in the admin area, Brevo template is edited in the Brevo account
                 var templateId = await _genericAttributeService.GetAttributeAsync<int?>(messageTemplate, BrevoDefaults.TemplateIdAttribute);
+				_logger.LogDebug("MessageList(searchModel={SearchModel}): templateId → {TemplateId}", searchModel, templateId);
                 var stores = (await (await _storeService.GetAllStoresAsync())
                         .WhereAwait(async store => !messageTemplate.LimitedToStores
                                                    || (await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate)).Contains(store.Id))
@@ -411,6 +424,7 @@ public class BrevoController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting MessageList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -486,10 +500,13 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> SMSList(SmsSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering SMSList(searchModel={SearchModel})", searchModel);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
 
+		_logger.LogDebug("SMSList(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
         //get message templates which are sending in SMS
         var allMessageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(storeId);
+		_logger.LogDebug("SMSList(searchModel={SearchModel}): allMessageTemplates → {AllMessageTemplates}", searchModel, allMessageTemplates);
         var messageTemplates = await allMessageTemplates
 
             .WhereAwait(async messageTemplate => await _genericAttributeService.GetAttributeAsync<bool>(messageTemplate, BrevoDefaults.UseSmsAttribute))
@@ -501,6 +518,7 @@ public class BrevoController : BasePluginController
             return messageTemplates.SelectAwait(async messageTemplate =>
             {
                 var phoneTypeID = await _genericAttributeService.GetAttributeAsync<int>(messageTemplate, BrevoDefaults.PhoneTypeAttribute);
+				_logger.LogDebug("SMSList(searchModel={SearchModel}): phoneTypeID → {PhoneTypeID}", searchModel, phoneTypeID);
 
                 var smsModel = new SmsModel
                 {
@@ -517,7 +535,9 @@ public class BrevoController : BasePluginController
                     if (storeId == 0 && messageTemplate.LimitedToStores)
                     {
                         var storeIds = await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate);
+						_logger.LogDebug("SMSList(searchModel={SearchModel}): storeIds → {StoreIds}", searchModel, storeIds);
                         var storeNames = (await _storeService.GetAllStoresAsync()).Where(store => storeIds.Contains(store.Id)).Select(store => store.Name);
+						_logger.LogDebug("SMSList(searchModel={SearchModel}): storeNames → {StoreNames}", searchModel, storeNames);
 
                         smsModel.Name = $"{smsModel.Name} ({string.Join(',', storeNames)})";
                     }
@@ -544,6 +564,7 @@ public class BrevoController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting SMSList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

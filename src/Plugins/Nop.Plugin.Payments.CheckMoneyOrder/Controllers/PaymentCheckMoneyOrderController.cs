@@ -8,6 +8,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.CheckMoneyOrder.Controllers;
 
@@ -16,6 +17,7 @@ namespace Nop.Plugin.Payments.CheckMoneyOrder.Controllers;
 [AutoValidateAntiforgeryToken]
 public class PaymentCheckMoneyOrderController : BasePaymentController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILanguageService _languageService;
@@ -36,12 +38,20 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
         ISettingService settingService,
         IStoreContext storeContext)
     {
+		_logger.LogDebug(">>> Entering PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext})", languageService, localizationService, notificationService, permissionService, settingService, storeContext);
         _languageService = languageService;
+		_logger.LogDebug("PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _languageService → {_languageService}", languageService, localizationService, notificationService, permissionService, settingService, storeContext, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _localizationService → {_localizationService}", languageService, localizationService, notificationService, permissionService, settingService, storeContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _notificationService → {_notificationService}", languageService, localizationService, notificationService, permissionService, settingService, storeContext, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _permissionService → {_permissionService}", languageService, localizationService, notificationService, permissionService, settingService, storeContext, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _settingService → {_settingService}", languageService, localizationService, notificationService, permissionService, settingService, storeContext, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("<<< Exiting PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext})", languageService, localizationService, notificationService, permissionService, settingService, storeContext);
+		_logger.LogDebug("PaymentCheckMoneyOrderController(languageService={LanguageService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _storeContext → {_storeContext}", languageService, localizationService, notificationService, permissionService, settingService, storeContext, _storeContext);
     }
 
     #endregion
@@ -51,9 +61,12 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
         var checkMoneyOrderPaymentSettings = await _settingService.LoadSettingAsync<CheckMoneyOrderPaymentSettings>(storeScope);
+		_logger.LogDebug("Configure(): checkMoneyOrderPaymentSettings → {CheckMoneyOrderPaymentSettings}", checkMoneyOrderPaymentSettings);
 
         var model = new ConfigurationModel
         {
@@ -64,13 +77,18 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
         await AddLocalesAsync(_languageService, model.Locales, async (locale, languageId) =>
         {
             locale.DescriptionText = await _localizationService
+				_logger.LogDebug("Configure(): locale.DescriptionText → {Arg0}", locale.DescriptionText);
                 .GetLocalizedSettingAsync(checkMoneyOrderPaymentSettings, x => x.DescriptionText, languageId, 0, false, false);
         });
         model.AdditionalFee = checkMoneyOrderPaymentSettings.AdditionalFee;
+		_logger.LogDebug("Configure(): model.AdditionalFee → {Arg0}", model.AdditionalFee);
+		_logger.LogDebug("Configure(): model.AdditionalFeePercentage → {Arg0}", model.AdditionalFeePercentage);
+		_logger.LogDebug("Configure(): model.ShippableProductRequired → {Arg0}", model.ShippableProductRequired);
         model.AdditionalFeePercentage = checkMoneyOrderPaymentSettings.AdditionalFeePercentage;
         model.ShippableProductRequired = checkMoneyOrderPaymentSettings.ShippableProductRequired;
 
         model.ActiveStoreScopeConfiguration = storeScope;
+		_logger.LogDebug("Configure(): model.ActiveStoreScopeConfiguration → {Arg0}", model.ActiveStoreScopeConfiguration);
         if (storeScope > 0)
         {
             model.DescriptionText_OverrideForStore = await _settingService.SettingExistsAsync(checkMoneyOrderPaymentSettings, x => x.DescriptionText, storeScope);
@@ -79,6 +97,7 @@ public class PaymentCheckMoneyOrderController : BasePaymentController
             model.ShippableProductRequired_OverrideForStore = await _settingService.SettingExistsAsync(checkMoneyOrderPaymentSettings, x => x.ShippableProductRequired, storeScope);
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Payments.CheckMoneyOrder/Views/Configure.cshtml", model);
     }
 

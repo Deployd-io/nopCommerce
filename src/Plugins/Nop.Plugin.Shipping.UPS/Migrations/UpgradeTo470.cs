@@ -15,12 +15,17 @@ public class UpgradeTo470 : Migration
     public UpgradeTo470(ILocalizationService localizationService,
         ISettingService settingService)
     {
+		logger.LogDebug(">>> Entering UpgradeTo470(localizationService={LocalizationService},settingService={SettingService})", localizationService, settingService);
         _localizationService = localizationService;
         _settingService = settingService;
+		logger.LogDebug("<<< Exiting UpgradeTo470(localizationService={LocalizationService},settingService={SettingService})", localizationService, settingService);
+		logger.LogDebug("UpgradeTo470(localizationService={LocalizationService},settingService={SettingService}): _settingService → {_settingService}", localizationService, settingService, _settingService);
+		logger.LogDebug("UpgradeTo470(localizationService={LocalizationService},settingService={SettingService}): _localizationService → {_localizationService}", localizationService, settingService, _localizationService);
     }
 
     public override void Up()
     {
+		logger.LogDebug(">>> Entering Up()");
         _localizationService.DeleteLocaleResources(new[]
         {
             "Plugins.Shipping.UPS.Fields.Password",
@@ -39,27 +44,35 @@ public class UpgradeTo470 : Migration
         });
 
         var setting = _settingService.LoadSetting<UPSSettings>();
+		logger.LogDebug("Up(): setting → {Setting}", setting);
         if (!_settingService.SettingExists(setting, settings => settings.RequestTimeout))
         {
             setting.RequestTimeout = UPSDefaults.RequestTimeout;
+			logger.LogDebug("Up(): setting.RequestTimeout → {Arg0}", setting.RequestTimeout);
             _settingService.SaveSetting(setting, settings => settings.RequestTimeout);
         }
             
         var accessKey = _settingService.GetSetting("upssettings.accesskey");
+		logger.LogDebug("Up(): accessKey → {AccessKey}", accessKey);
         if (accessKey is not null) 
             _settingService.DeleteSetting(accessKey);
 
         var username = _settingService.GetSetting("upssettings.username");
+		logger.LogDebug("Up(): username → {Username}", username);
         if (username is not null)
             _settingService.DeleteSetting(username);
 
         var password = _settingService.GetSetting("upssettings.password");
+		logger.LogWarning("Up(): password → {Password}", password);
         if (password is not null)
             _settingService.DeleteSetting(password);
+			logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		logger.LogDebug("<<< Exiting Down()");
     }
 }

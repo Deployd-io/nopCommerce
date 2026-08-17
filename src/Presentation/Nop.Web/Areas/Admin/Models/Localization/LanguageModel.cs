@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Localization;
 
@@ -9,15 +10,23 @@ namespace Nop.Web.Areas.Admin.Models.Localization;
 /// </summary>
 public partial record LanguageModel : BaseNopEntityModel, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public LanguageModel()
     {
+		_logger.LogDebug(">>> Entering LanguageModel()");
         AvailableCurrencies = new List<SelectListItem>();
         AvailableFlagImages = new List<SelectListItem>();
+		_logger.LogDebug("LanguageModel(): AvailableFlagImages → {AvailableFlagImages}", AvailableFlagImages);
+		_logger.LogDebug("LanguageModel(): AvailableCurrencies → {AvailableCurrencies}", AvailableCurrencies);
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("LanguageModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("LanguageModel(): AvailableStores → {AvailableStores}", AvailableStores);
         LocaleResourceSearchModel = new LocaleResourceSearchModel();
+		_logger.LogDebug("<<< Exiting LanguageModel()");
+		_logger.LogDebug("LanguageModel(): LocaleResourceSearchModel → {LocaleResourceSearchModel}", LocaleResourceSearchModel);
     }
 
     #endregion

@@ -104,15 +104,19 @@ public partial class OrderReportService : IOrderReportService
         int billingCountryId = 0,
         bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering SearchOrderItems(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden})", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden);
         int? orderStatusId = null;
+		_logger.LogDebug("SearchOrderItems(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden}): orderStatusId → {OrderStatusId}", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden, orderStatusId);
         if (os.HasValue)
             orderStatusId = (int)os.Value;
 
         int? paymentStatusId = null;
+		_logger.LogDebug("SearchOrderItems(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden}): paymentStatusId → {PaymentStatusId}", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden, paymentStatusId);
         if (ps.HasValue)
             paymentStatusId = (int)ps.Value;
 
         int? shippingStatusId = null;
+		_logger.LogDebug("SearchOrderItems(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden}): shippingStatusId → {ShippingStatusId}", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden, shippingStatusId);
         if (ss.HasValue)
             shippingStatusId = (int)ss.Value;
 
@@ -154,6 +158,7 @@ public partial class OrderReportService : IOrderReportService
                 select orderItem;
         }
 
+		_logger.LogDebug("<<< Exiting SearchOrderItems(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden})", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden);
         return orderItems;
     }
 
@@ -256,7 +261,9 @@ public partial class OrderReportService : IOrderReportService
         DateTime? startTimeUtc = null, DateTime? endTimeUtc = null,
         string billingPhone = null, string billingEmail = null, string billingLastName = "", string orderNotes = null)
     {
+		_logger.LogDebug(">>> Entering GetOrderAverageReportLineAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes})", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes);
         var query = _orderRepository.Table;
+		_logger.LogDebug("GetOrderAverageReportLineAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): query → {Query}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, query);
 
         query = query.Where(o => !o.Deleted);
         if (storeId > 0)
@@ -288,6 +295,7 @@ public partial class OrderReportService : IOrderReportService
         if (warehouseId > 0)
         {
             var manageStockInventoryMethodId = (int)ManageInventoryMethod.ManageStock;
+			_logger.LogDebug("GetOrderAverageReportLineAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): manageStockInventoryMethodId → {ManageStockInventoryMethodId}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, manageStockInventoryMethodId);
 
             query = from o in query
                 join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
@@ -354,6 +362,8 @@ public partial class OrderReportService : IOrderReportService
                     OrderTotalSum = result.Sum(o => o.OrderTotal),
                     OrederRefundedAmountSum = result.Sum(o => o.RefundedAmount),
                 }).Select(r => new OrderAverageReportLine
+					_logger.LogDebug("GetOrderAverageReportLineAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): OrderCount → {OrderCount}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, OrderCount);
+					_logger.LogDebug("GetOrderAverageReportLineAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): OrderPaymentFeeExclTaxSum → {OrderPaymentFeeExclTaxSum}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, OrderPaymentFeeExclTaxSum);
             {
                 CountOrders = r.OrderCount,
                 SumShippingExclTax = r.OrderShippingExclTaxSum,
@@ -363,6 +373,8 @@ public partial class OrderReportService : IOrderReportService
                 SumRefundedAmount = r.OrederRefundedAmountSum
             })
             .FirstOrDefaultAsync();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetOrderAverageReportLineAsync(storeId,vendorId,productId,warehouseId,billingCountryId,orderId,paymentMethodSystemName,osIds,psIds,ssIds,startTimeUtc,endTimeUtc,billingPhone,billingEmail,billingLastName,orderNotes)={StoreId},{VendorId},{ProductId},{WarehouseId},{BillingCountryId},{OrderId},{PaymentMethodSystemName},{OsIds},{PsIds},{SsIds},{StartTimeUtc},{EndTimeUtc},{BillingPhone},{BillingEmail},{BillingLastName},{OrderNotes}: database query executed in {Arg16} ms", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, __logStart.ElapsedMilliseconds);
 
         item ??= new OrderAverageReportLine
         {
@@ -372,6 +384,7 @@ public partial class OrderReportService : IOrderReportService
             SumTax = decimal.Zero,
             SumOrders = decimal.Zero
         };
+		_logger.LogDebug("<<< Exiting GetOrderAverageReportLineAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes})", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes);
         return item;
     }
 
@@ -476,9 +489,11 @@ public partial class OrderReportService : IOrderReportService
         int pageIndex = 0,
         int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize})", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize);
         //var orderItems = SearchOrderItems(categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, null, billingCountryId);
 
         var query = _orderRepository.Table;
+		_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, query);
         query = query.Where(o => !o.Deleted);
 
         //filter by date
@@ -561,12 +576,15 @@ public partial class OrderReportService : IOrderReportService
         }
 
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): primaryStoreCurrency → {PrimaryStoreCurrency}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, primaryStoreCurrency);
         var userTimeZone = await _dateTimeHelper.GetCurrentTimeZoneAsync();
+		_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): userTimeZone → {UserTimeZone}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, userTimeZone);
         var utcOffsetInMinutes = userTimeZone.BaseUtcOffset.TotalMinutes;
 
         var items = groupBy switch
         {
             GroupByOptions.Day => from oq in query
+				_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): GroupByOptions.Day → {Arg13}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, GroupByOptions.Day);
                 group oq by oq.CreatedOnUtc.AddMinutes(utcOffsetInMinutes).Date into result
                 let orderItems = _orderItemRepository.Table.Where(oi => result.Any(x => x.Id == oi.OrderId))
                 select new
@@ -582,6 +600,10 @@ public partial class OrderReportService : IOrderReportService
                     OrderTotalCost = orderItems.Sum(oi => (decimal?)oi.OriginalProductCost * oi.Quantity)
                 },
             GroupByOptions.Week => from oq in query
+					_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): SummaryDate → {SummaryDate}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, SummaryDate);
+					_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): OrderSummaryType → {OrderSummaryType}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, OrderSummaryType);
+					_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): OrderCount → {OrderCount}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, OrderCount);
+					_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): OrderPaymentFeeExclTaxSum → {OrderPaymentFeeExclTaxSum}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, OrderPaymentFeeExclTaxSum);
                 group oq by oq.CreatedOnUtc.AddMinutes(utcOffsetInMinutes).AddDays(-(int)oq.CreatedOnUtc.AddMinutes(utcOffsetInMinutes).DayOfWeek).Date into result
                 let orderItems = _orderItemRepository.Table.Where(oi => result.Any(x => x.Id == oi.OrderId))
                 select new
@@ -616,9 +638,11 @@ public partial class OrderReportService : IOrderReportService
 
         var ssReport =
             from orderItem in items
+			using Microsoft.Extensions.Logging;
             orderby orderItem.SummaryDate descending
             select new SalesSummaryReportLine
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 SummaryDate = orderItem.SummaryDate,
                 SummaryType = (int)orderItem.OrderSummaryType,
                 NumberOfOrders = orderItem.OrderCount,
@@ -634,11 +658,15 @@ public partial class OrderReportService : IOrderReportService
             };
 
         var report = await ssReport.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogDebug("<<< Exiting SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize})", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize);
+		_logger.LogDebug("SalesSummaryReportAsync(categoryId={CategoryId},productId={ProductId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},billingCountryId={BillingCountryId},groupBy={GroupBy},pageIndex={PageIndex},pageSize={PageSize}): report → {Report}", categoryId, productId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, osIds, psIds, billingCountryId, groupBy, pageIndex, pageSize, report);
 
         static string formatSummary(DateTime dt, GroupByOptions groupByOption)
         {
+			_logger.LogDebug(">>> Entering formatSummary(dt={Dt},groupByOption={GroupByOption})", dt, groupByOption);
             const string dayFormat = "MMM dd, yyyy";
 
+			_logger.LogDebug("<<< Exiting formatSummary(dt={Dt},groupByOption={GroupByOption})", dt, groupByOption);
             return groupByOption switch
             {
                 GroupByOptions.Week => $"{dt.ToString(dayFormat)} - {dt.AddDays(6).ToString(dayFormat)}",
@@ -699,7 +727,9 @@ public partial class OrderReportService : IOrderReportService
         int pageSize = int.MaxValue,
         bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering BestSellersReportAsync(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, orderBy, pageIndex, pageSize, showHidden);
         var bestSellers = SearchOrderItems(categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden);
+		_logger.LogDebug("BestSellersReportAsync(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): bestSellers → {BestSellers}", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, orderBy, pageIndex, pageSize, showHidden, bestSellers);
 
         var bsReport =
             //group by products
@@ -730,7 +760,9 @@ public partial class OrderReportService : IOrderReportService
         };
 
         var result = await bsReport.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogDebug("BestSellersReportAsync(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): result → {Result}", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, orderBy, pageIndex, pageSize, showHidden, result);
 
+		_logger.LogDebug("<<< Exiting BestSellersReportAsync(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},orderBy={OrderBy},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, orderBy, pageIndex, pageSize, showHidden);
         return result;
     }
 
@@ -765,8 +797,10 @@ public partial class OrderReportService : IOrderReportService
         int billingCountryId = 0,
         bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering BestSellersReportTotalAmountAsync(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden})", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden);
         return await SearchOrderItems(categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden: showHidden)
             .SumAsync(bestseller => bestseller.PriceExclTax);
+		_logger.LogDebug("<<< Exiting BestSellersReportTotalAmountAsync(categoryId={CategoryId},manufacturerId={ManufacturerId},storeId={StoreId},vendorId={VendorId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},os={Os},ps={Ps},ss={Ss},billingCountryId={BillingCountryId},showHidden={ShowHidden})", categoryId, manufacturerId, storeId, vendorId, createdFromUtc, createdToUtc, os, ps, ss, billingCountryId, showHidden);
     }
 
     /// <summary>
@@ -805,23 +839,30 @@ public partial class OrderReportService : IOrderReportService
             select new { orderItem, p };
 
         var query3 = from orderItem_p in query2
+			_logger.LogDebug("GetAlsoPurchasedProductsIdsAsync(storeId={StoreId},productId={ProductId},recordsToReturn={RecordsToReturn},visibleIndividuallyOnly={VisibleIndividuallyOnly},showHidden={ShowHidden}): query3 → {Query3}", storeId, productId, recordsToReturn, visibleIndividuallyOnly, showHidden, query3);
             group orderItem_p by orderItem_p.p.Id into g
             select new
             {
                 ProductId = g.Key,
                 ProductsPurchased = g.Sum(x => x.orderItem.Quantity)
             };
+				_logger.LogDebug("GetAlsoPurchasedProductsIdsAsync(storeId={StoreId},productId={ProductId},recordsToReturn={RecordsToReturn},visibleIndividuallyOnly={VisibleIndividuallyOnly},showHidden={ShowHidden}): ProductId → {ProductId1}", storeId, productId, recordsToReturn, visibleIndividuallyOnly, showHidden, ProductId);
         query3 = query3.OrderByDescending(x => x.ProductsPurchased);
 
         if (recordsToReturn > 0)
             query3 = query3.Take(recordsToReturn);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var report = await query3.ToListAsync();
 
+		_logger.LogDebug("GetAlsoPurchasedProductsIdsAsync(storeId={StoreId},productId={ProductId},recordsToReturn={RecordsToReturn},visibleIndividuallyOnly={VisibleIndividuallyOnly},showHidden={ShowHidden}): report → {Report}", storeId, productId, recordsToReturn, visibleIndividuallyOnly, showHidden, report);
+		_logger.LogInformation("GetAlsoPurchasedProductsIdsAsync(storeId,productId,recordsToReturn,visibleIndividuallyOnly,showHidden)={StoreId},{ProductId},{RecordsToReturn},{VisibleIndividuallyOnly},{ShowHidden}: database query executed in {Arg5} ms", storeId, productId, recordsToReturn, visibleIndividuallyOnly, showHidden, __logStart.ElapsedMilliseconds);
         var ids = new List<int>();
+		_logger.LogDebug("GetAlsoPurchasedProductsIdsAsync(storeId={StoreId},productId={ProductId},recordsToReturn={RecordsToReturn},visibleIndividuallyOnly={VisibleIndividuallyOnly},showHidden={ShowHidden}): ids → {Ids}", storeId, productId, recordsToReturn, visibleIndividuallyOnly, showHidden, ids);
         foreach (var reportLine in report)
             ids.Add(reportLine.ProductId);
 
+		_logger.LogDebug("<<< Exiting GetAlsoPurchasedProductsIdsAsync(storeId={StoreId},productId={ProductId},recordsToReturn={RecordsToReturn},visibleIndividuallyOnly={VisibleIndividuallyOnly},showHidden={ShowHidden})", storeId, productId, recordsToReturn, visibleIndividuallyOnly, showHidden);
         return ids.ToArray();
     }
 
@@ -846,8 +887,10 @@ public partial class OrderReportService : IOrderReportService
         DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering ProductsNeverSoldAsync(vendorId={VendorId},storeId={StoreId},categoryId={CategoryId},manufacturerId={ManufacturerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", vendorId, storeId, categoryId, manufacturerId, createdFromUtc, createdToUtc, pageIndex, pageSize, showHidden);
         var simpleProductTypeId = (int)ProductType.SimpleProduct;
 
+		_logger.LogDebug("ProductsNeverSoldAsync(vendorId={VendorId},storeId={StoreId},categoryId={CategoryId},manufacturerId={ManufacturerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): simpleProductTypeId → {SimpleProductTypeId}", vendorId, storeId, categoryId, manufacturerId, createdFromUtc, createdToUtc, pageIndex, pageSize, showHidden, simpleProductTypeId);
         var availableProductsQuery =
             from oi in _orderItemRepository.Table
             join o in _orderRepository.Table on oi.OrderId equals o.Id
@@ -858,6 +901,7 @@ public partial class OrderReportService : IOrderReportService
 
         var query =
             from p in _productRepository.Table
+			_logger.LogDebug("ProductsNeverSoldAsync(vendorId={VendorId},storeId={StoreId},categoryId={CategoryId},manufacturerId={ManufacturerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): query → {Query}", vendorId, storeId, categoryId, manufacturerId, createdFromUtc, createdToUtc, pageIndex, pageSize, showHidden, query);
             join oi in availableProductsQuery on p.Id equals oi.ProductId
                 into p_oi
             from oi in p_oi.DefaultIfEmpty()
@@ -894,6 +938,8 @@ public partial class OrderReportService : IOrderReportService
         query = query.OrderBy(p => p.Name);
 
         var products = await query.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogDebug("ProductsNeverSoldAsync(vendorId={VendorId},storeId={StoreId},categoryId={CategoryId},manufacturerId={ManufacturerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): products → {Products}", vendorId, storeId, categoryId, manufacturerId, createdFromUtc, createdToUtc, pageIndex, pageSize, showHidden, products);
+		_logger.LogDebug("<<< Exiting ProductsNeverSoldAsync(vendorId={VendorId},storeId={StoreId},categoryId={CategoryId},manufacturerId={ManufacturerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", vendorId, storeId, categoryId, manufacturerId, createdFromUtc, createdToUtc, pageIndex, pageSize, showHidden);
         return products;
     }
 
@@ -926,13 +972,20 @@ public partial class OrderReportService : IOrderReportService
         DateTime? startTimeUtc = null, DateTime? endTimeUtc = null,
         string billingPhone = null, string billingEmail = null, string billingLastName = "", string orderNotes = null)
     {
+		_logger.LogDebug(">>> Entering ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes})", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes);
         var dontSearchPhone = string.IsNullOrEmpty(billingPhone);
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): dontSearchPhone → {DontSearchPhone}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, dontSearchPhone);
         var dontSearchEmail = string.IsNullOrEmpty(billingEmail);
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): dontSearchEmail → {DontSearchEmail}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, dontSearchEmail);
         var dontSearchLastName = string.IsNullOrEmpty(billingLastName);
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): dontSearchLastName → {DontSearchLastName}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, dontSearchLastName);
         var dontSearchOrderNotes = string.IsNullOrEmpty(orderNotes);
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): dontSearchOrderNotes → {DontSearchOrderNotes}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, dontSearchOrderNotes);
         var dontSearchPaymentMethods = string.IsNullOrEmpty(paymentMethodSystemName);
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): dontSearchPaymentMethods → {DontSearchPaymentMethods}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, dontSearchPaymentMethods);
 
         var orders = _orderRepository.Table;
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): orders → {Orders}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, orders);
         if (osIds != null && osIds.Any())
             orders = orders.Where(o => osIds.Contains(o.OrderStatusId));
         if (psIds != null && psIds.Any())
@@ -941,6 +994,7 @@ public partial class OrderReportService : IOrderReportService
             orders = orders.Where(o => ssIds.Contains(o.ShippingStatusId));
 
         var manageStockInventoryMethodId = (int)ManageInventoryMethod.ManageStock;
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): manageStockInventoryMethodId → {ManageStockInventoryMethodId}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, manageStockInventoryMethodId);
 
         var query = from orderItem in _orderItemRepository.Table
             join o in orders on orderItem.OrderId equals o.Id
@@ -979,8 +1033,11 @@ public partial class OrderReportService : IOrderReportService
                       oNote.OrderId == o.Id && oNote.Note.Contains(orderNotes)))
             select orderItem;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productCost = Convert.ToDecimal(await query.SumAsync(orderItem => (decimal?)orderItem.OriginalProductCost * orderItem.Quantity));
 
+		_logger.LogDebug("ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes}): productCost → {ProductCost}", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, productCost);
+		_logger.LogInformation("ProfitReportAsync(storeId,vendorId,productId,warehouseId,billingCountryId,orderId,paymentMethodSystemName,osIds,psIds,ssIds,startTimeUtc,endTimeUtc,billingPhone,billingEmail,billingLastName,orderNotes)={StoreId},{VendorId},{ProductId},{WarehouseId},{BillingCountryId},{OrderId},{PaymentMethodSystemName},{OsIds},{PsIds},{SsIds},{StartTimeUtc},{EndTimeUtc},{BillingPhone},{BillingEmail},{BillingLastName},{OrderNotes}: database query executed in {Arg16} ms", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes, __logStart.ElapsedMilliseconds);
         var reportSummary = await GetOrderAverageReportLineAsync(
             storeId,
             vendorId,
@@ -1005,6 +1062,7 @@ public partial class OrderReportService : IOrderReportService
                      - reportSummary.SumTax
                      - reportSummary.SumRefundedAmount
                      - productCost;
+		_logger.LogDebug("<<< Exiting ProfitReportAsync(storeId={StoreId},vendorId={VendorId},productId={ProductId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},orderId={OrderId},paymentMethodSystemName={PaymentMethodSystemName},osIds={OsIds},psIds={PsIds},ssIds={SsIds},startTimeUtc={StartTimeUtc},endTimeUtc={EndTimeUtc},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes})", storeId, vendorId, productId, warehouseId, billingCountryId, orderId, paymentMethodSystemName, osIds, psIds, ssIds, startTimeUtc, endTimeUtc, billingPhone, billingEmail, billingLastName, orderNotes);
         return profit;
     }
 

@@ -1,5 +1,6 @@
 ﻿using Nop.Data;
 using Nop.Plugin.Payments.PayPalCommerce.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Services;
 
@@ -8,6 +9,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Services;
 /// </summary>
 public class PayPalTokenService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IRepository<PayPalToken> _tokenRepository;
@@ -40,9 +42,12 @@ public class PayPalTokenService
     public async Task<IList<PayPalToken>> GetAllTokensAsync(string clientId, int customerId = 0,
         string vaultId = null, string vaultCustomerId = null, string type = null)
     {
+		_logger.LogDebug(">>> Entering GetAllTokensAsync(clientId={ClientId},customerId={CustomerId},vaultId={VaultId},vaultCustomerId={VaultCustomerId},type={Type})", clientId, customerId, vaultId, vaultCustomerId, type);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await _tokenRepository.GetAllAsync(query =>
         {
             query = query.Where(token => token.ClientId == clientId);
+			_logger.LogInformation("GetAllTokensAsync(clientId,customerId,vaultId,vaultCustomerId,type)={ClientId},{CustomerId},{VaultId},{VaultCustomerId},{Type}: find query executed in {Arg5} ms", clientId, customerId, vaultId, vaultCustomerId, type, __logStart.ElapsedMilliseconds);
 
             if (customerId > 0)
                 query = query.Where(token => token.CustomerId == customerId);
@@ -58,6 +63,7 @@ public class PayPalTokenService
 
             return query;
         }, null);
+		_logger.LogDebug("<<< Exiting GetAllTokensAsync(clientId={ClientId},customerId={CustomerId},vaultId={VaultId},vaultCustomerId={VaultCustomerId},type={Type})", clientId, customerId, vaultId, vaultCustomerId, type);
     }
 
     /// <summary>
@@ -72,7 +78,10 @@ public class PayPalTokenService
     /// </returns>
     public async Task<PayPalToken> GetTokenAsync(string clientId, int customerId = 0, string vaultId = null)
     {
+		_logger.LogDebug(">>> Entering GetTokenAsync(clientId={ClientId},customerId={CustomerId},vaultId={VaultId})", clientId, customerId, vaultId);
         var tokens = await GetAllTokensAsync(clientId, customerId, vaultId);
+		_logger.LogDebug("GetTokenAsync(clientId={ClientId},customerId={CustomerId},vaultId={VaultId}): tokens → {Tokens}", clientId, customerId, vaultId, tokens);
+		_logger.LogDebug("<<< Exiting GetTokenAsync(clientId={ClientId},customerId={CustomerId},vaultId={VaultId})", clientId, customerId, vaultId);
         return tokens.FirstOrDefault();
     }
 
@@ -86,6 +95,8 @@ public class PayPalTokenService
     /// </returns>
     public async Task<PayPalToken> GetByIdAsync(int id)
     {
+		_logger.LogDebug(">>> Entering GetByIdAsync(id={Id})", id);
+		_logger.LogDebug("<<< Exiting GetByIdAsync(id={Id})", id);
         return await _tokenRepository.GetByIdAsync(id, null);
     }
 
@@ -120,6 +131,8 @@ public class PayPalTokenService
             token.IsPrimaryMethod = true;
 
         //or insert a new one
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("InsertAsync(token)={Token}: save query executed in {Arg1} ms", token, __logStart.ElapsedMilliseconds);
         await _tokenRepository.InsertAsync(token, false);
     }
 
@@ -140,10 +153,13 @@ public class PayPalTokenService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteAsync(PayPalToken token)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _tokenRepository.DeleteAsync(token, false);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //mark one of the remaining tokens as default
         var tokens = await GetAllTokensAsync(token.ClientId, token.CustomerId);
+		_logger.LogInformation("DeleteAsync(token)={Token}: delete query executed in {Arg1} ms", token, __logStart.ElapsedMilliseconds);
         if (tokens.Any(existing => existing.IsPrimaryMethod))
             return;
 
@@ -152,6 +168,7 @@ public class PayPalTokenService
             return;
 
         existingToken.IsPrimaryMethod = true;
+		_logger.LogInformation("DeleteAsync(token)={Token}: external service call took {Arg1} ms", token, __logStart.ElapsedMilliseconds);
         await UpdateAsync(existingToken);
     }
 
@@ -162,6 +179,7 @@ public class PayPalTokenService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteAsync(IList<PayPalToken> tokens)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _tokenRepository.DeleteAsync(tokens, false);
     }
 

@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ReviewTypeService : IReviewTypeService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<ProductReviewReviewTypeMapping> _productReviewReviewTypeMappingRepository;
@@ -43,6 +45,9 @@ public partial class ReviewTypeService : IReviewTypeService
     /// </returns>
     public virtual async Task<IList<ReviewType>> GetAllReviewTypesAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllReviewTypesAsync()");
+		_logger.LogDebug("GetAllReviewTypesAsync(): query → {Query}");
+		_logger.LogDebug("<<< Exiting GetAllReviewTypesAsync()");
         return await _reviewTypeRepository.GetAllAsync(
             query => query.OrderBy(reviewType => reviewType.DisplayOrder).ThenBy(reviewType => reviewType.Id),
             cache => default);
@@ -58,6 +63,8 @@ public partial class ReviewTypeService : IReviewTypeService
     /// </returns>
     public virtual async Task<ReviewType> GetReviewTypeByIdAsync(int reviewTypeId)
     {
+		_logger.LogDebug(">>> Entering GetReviewTypeByIdAsync(reviewTypeId={ReviewTypeId})", reviewTypeId);
+		_logger.LogDebug("<<< Exiting GetReviewTypeByIdAsync(reviewTypeId={ReviewTypeId})", reviewTypeId);
         return await _reviewTypeRepository.GetByIdAsync(reviewTypeId, cache => default);
     }
 
@@ -68,7 +75,9 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReviewTypeAsync(ReviewType reviewType)
     {
+		_logger.LogDebug(">>> Entering InsertReviewTypeAsync(reviewType={ReviewType})", reviewType);
         await _reviewTypeRepository.InsertAsync(reviewType);
+		_logger.LogDebug("<<< Exiting InsertReviewTypeAsync(reviewType={ReviewType})", reviewType);
     }
 
     /// <summary>
@@ -78,7 +87,9 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReviewTypeAsync(ReviewType reviewType)
     {
+		_logger.LogDebug(">>> Entering UpdateReviewTypeAsync(reviewType={ReviewType})", reviewType);
         await _reviewTypeRepository.UpdateAsync(reviewType);
+		_logger.LogDebug("<<< Exiting UpdateReviewTypeAsync(reviewType={ReviewType})", reviewType);
     }
 
     /// <summary>
@@ -88,9 +99,15 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReviewTypeAsync(ReviewType reviewType)
     {
+		_logger.LogDebug(">>> Entering DeleteReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _reviewTypeRepository.DeleteAsync(reviewType);
+		_logger.LogDebug("<<< Exiting DeleteReviewTypeAsync(reviewType={ReviewType})", reviewType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteReviewTypeAsync(reviewType)={ReviewType}: external service call took {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteReviewTypeAsync(reviewType)={ReviewType}: external service call took {Arg1} ms", reviewType, __logStart.ElapsedMilliseconds);
     #endregion
 
     #region Product review type mapping
@@ -106,15 +123,21 @@ public partial class ReviewTypeService : IReviewTypeService
     public virtual async Task<IList<ProductReviewReviewTypeMapping>> GetProductReviewReviewTypeMappingsByProductReviewIdAsync(
         int productReviewId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductReviewTypeMappingByReviewIdCacheKey, productReviewId);
 
+		_logger.LogWarning("GetProductReviewReviewTypeMappingsByProductReviewIdAsync(productReviewId={ProductReviewId}): key → {Key}", productReviewId, key);
         var query = from pam in _productReviewReviewTypeMappingRepository.Table
             orderby pam.Id
             where pam.ProductReviewId == productReviewId
             select pam;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productReviewReviewTypeMappings = await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
 
+		_logger.LogDebug("GetProductReviewReviewTypeMappingsByProductReviewIdAsync(productReviewId={ProductReviewId}): productReviewReviewTypeMappings → {ProductReviewReviewTypeMappings}", productReviewId, productReviewReviewTypeMappings);
+		_logger.LogInformation("GetProductReviewReviewTypeMappingsByProductReviewIdAsync(productReviewId)={ProductReviewId}: external service call took {Arg1} ms", productReviewId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductReviewReviewTypeMappingsByProductReviewIdAsync(productReviewId={ProductReviewId})", productReviewId);
         return productReviewReviewTypeMappings;
     }
 
@@ -125,7 +148,9 @@ public partial class ReviewTypeService : IReviewTypeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductReviewReviewTypeMappingsAsync(ProductReviewReviewTypeMapping productReviewReviewType)
     {
+		_logger.LogDebug(">>> Entering InsertProductReviewReviewTypeMappingsAsync(productReviewReviewType={ProductReviewReviewType})", productReviewReviewType);
         await _productReviewReviewTypeMappingRepository.InsertAsync(productReviewReviewType);
+		_logger.LogDebug("<<< Exiting InsertProductReviewReviewTypeMappingsAsync(productReviewReviewType={ProductReviewReviewType})", productReviewReviewType);
     }
 
     #endregion

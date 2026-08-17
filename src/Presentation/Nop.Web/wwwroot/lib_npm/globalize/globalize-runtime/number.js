@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize Runtime v1.7.0
  *
@@ -409,6 +410,8 @@ var numberFormat = function( number, properties, pluralGenerator ) {
 				partsPush( parts, "literal", etc );
 			});
 		});
+		logger.debug('>>> Entering replace()');
+		logger.debug('<<< Exiting replace()');
 		return parts;
 	};
 
@@ -631,8 +634,11 @@ var numberParse = function( value, properties ) {
 	value = looseMatching( value );
 
 	function parse( type ) {
+		logger.debug(`>>> Entering parse(type=${type})`);
 		return function( lexeme ) {
+		logger.debug(`>>> Entering function(lexeme=${lexeme})`);
 
+			logger.debug(`<<< Exiting function(lexeme=${lexeme})`);
 			// Reverse localized symbols and numbering system.
 			lexeme = lexeme.split( "" ).map(function( character ) {
 				return invertedSymbolMap[ character ] ||
@@ -673,6 +679,7 @@ var numberParse = function( value, properties ) {
 
 				// This should never be reached.
 				default:
+			logger.debug(`<<< Exiting parse(type=${type})`);
 					throw new Error( "Internal error" );
 			}
 			return "";
@@ -680,6 +687,7 @@ var numberParse = function( value, properties ) {
 	}
 
 	function tokenizeNParse( _value, grammar ) {
+		logger.debug(`>>> Entering tokenizeNParse(_value=${_value},grammar=${grammar})`);
 		return grammar.some(function( statement ) {
 			var value = _value;
 
@@ -695,6 +703,7 @@ var numberParse = function( value, properties ) {
 				return true;
 			}) && !value.length;
 		});
+		logger.debug(`<<< Exiting tokenizeNParse(_value=${_value},grammar=${grammar})`);
 	}
 
 	valid = tokenizeNParse( value, grammar );
@@ -865,7 +874,9 @@ Globalize._validateParameterTypeString = validateParameterTypeString;
 // only used (at the moment) for numberFormatter used by unitFormatter.
 // TODO: Move this function into a common place when this is used by different formatters.
 function cached( runtimeKey ) {
+	logger.debug(`>>> Entering cached(runtimeKey=${runtimeKey})`);
 	Globalize[ runtimeKey ].runtimeKey = runtimeKey;
+	logger.debug(`<<< Exiting cached(runtimeKey=${runtimeKey})`);
 	return Globalize[ runtimeKey ];
 }
 

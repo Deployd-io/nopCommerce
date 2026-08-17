@@ -3,6 +3,7 @@
 //! author : Armendarabyan : https://github.com/armendarabyan
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('hy-am', {
     months: {
@@ -34,9 +35,13 @@ export default moment.defineLocale('hy-am', {
         nextDay: '[վաղը] LT',
         lastDay: '[երեկ] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
+			logger.debug('<<< Exiting nextWeek()');
             return 'dddd [օրը ժամը] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
+			logger.debug('<<< Exiting lastWeek()');
             return '[անցած] dddd [օրը ժամը] LT';
         },
         sameElse: 'L',
@@ -59,9 +64,12 @@ export default moment.defineLocale('hy-am', {
     },
     meridiemParse: /գիշերվա|առավոտվա|ցերեկվա|երեկոյան/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return /^(ցերեկվա|երեկոյան)$/.test(input);
     },
     meridiem: function (hour) {
+		logger.debug(`>>> Entering meridiem(hour=${hour})`);
         if (hour < 4) {
             return 'գիշերվա';
         } else if (hour < 12) {
@@ -69,11 +77,13 @@ export default moment.defineLocale('hy-am', {
         } else if (hour < 17) {
             return 'ցերեկվա';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour})`);
             return 'երեկոյան';
         }
     },
     dayOfMonthOrdinalParse: /\d{1,2}|\d{1,2}-(ին|րդ)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'DDD':
             case 'w':
@@ -84,6 +94,7 @@ export default moment.defineLocale('hy-am', {
                 }
                 return number + '-րդ';
             default:
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },

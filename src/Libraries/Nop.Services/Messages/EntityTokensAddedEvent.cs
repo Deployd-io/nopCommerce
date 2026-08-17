@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core;
 
 namespace Nop.Services.Messages;
@@ -8,6 +9,7 @@ namespace Nop.Services.Messages;
 /// <typeparam name="T">Entity type</typeparam>
 public partial class EntityTokensAddedEvent<T> where T : BaseEntity
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>

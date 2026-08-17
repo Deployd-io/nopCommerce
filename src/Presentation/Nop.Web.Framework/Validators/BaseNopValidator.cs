@@ -4,6 +4,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Data.Mapping;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.Validators;
 /// <typeparam name="TModel">Type of model being validated</typeparam>
 public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TModel> where TModel : class
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     /// <summary>
@@ -23,10 +25,13 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
     protected virtual void SetDatabaseValidationRules<TEntity>(params string[] filterStringPropertyNames)
         where TEntity : BaseEntity
     {
+		_logger.LogDebug(">>> Entering SetDatabaseValidationRules(filterStringPropertyNames={FilterStringPropertyNames})", filterStringPropertyNames);
         var entityDescriptor = NopMappingSchema.GetEntityDescriptor(typeof(TEntity));
 
+		_logger.LogDebug("SetDatabaseValidationRules(filterStringPropertyNames={FilterStringPropertyNames}): entityDescriptor → {EntityDescriptor}", filterStringPropertyNames, entityDescriptor);
         SetStringPropertiesMaxLength(entityDescriptor, filterStringPropertyNames);
         SetDecimalMaxValue(entityDescriptor);
+		_logger.LogDebug("<<< Exiting SetDatabaseValidationRules(filterStringPropertyNames={FilterStringPropertyNames})", filterStringPropertyNames);
     }
 
     /// <summary>
@@ -59,6 +64,7 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
         //define string length validation rules
         foreach (var expression in maxLengthExpressions) 
             RuleFor(expression.Expression).Length(0, expression.MaxLength);
+			_logger.LogDebug("<<< Exiting SetStringPropertiesMaxLength(entityDescriptor={EntityDescriptor},filterPropertyNames={FilterPropertyNames})", entityDescriptor, filterPropertyNames);
     }
 
     /// <summary>
@@ -96,6 +102,7 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
         foreach (var expression in maxValueExpressions)
             RuleFor(expression.Expression).IsDecimal(expression.MaxValue)
                 .WithMessageAwait(localizationService.GetResourceAsync("Admin.Common.Validation.Decimal.Max"), expression.MaxValue - 1);
+				_logger.LogDebug("<<< Exiting SetDecimalMaxValue(entityDescriptor={EntityDescriptor})", entityDescriptor);
     }
 
     #endregion

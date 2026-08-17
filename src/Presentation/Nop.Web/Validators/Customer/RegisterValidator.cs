@@ -6,16 +6,19 @@ using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Models.Customer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Validators.Customer;
 
 public partial class RegisterValidator : BaseNopValidator<RegisterModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public RegisterValidator(ILocalizationService localizationService,
         IStateProvinceService stateProvinceService,
         CustomerSettings customerSettings,
         TaxSettings taxSettings)
     {
+		_logger.LogDebug(">>> Entering RegisterValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},customerSettings={CustomerSettings},taxSettings={TaxSettings})", localizationService, stateProvinceService, customerSettings, taxSettings);
         RuleFor(x => x.Email).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Account.Fields.Email.Required"));
         RuleFor(x => x.Email)
             .IsEmailAddress()
@@ -66,6 +69,7 @@ public partial class RegisterValidator : BaseNopValidator<RegisterModel>
             {
                 //does selected country have states?
                 var hasStates = (await stateProvinceService.GetStateProvincesByCountryIdAsync(x.CountryId)).Any();
+				_logger.LogDebug("RegisterValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},customerSettings={CustomerSettings},taxSettings={TaxSettings}): hasStates → {HasStates}", localizationService, stateProvinceService, customerSettings, taxSettings, hasStates);
                 if (hasStates)
                 {
                     //if yes, then ensure that a state is selected
@@ -82,6 +86,7 @@ public partial class RegisterValidator : BaseNopValidator<RegisterModel>
             RuleFor(x => x.DateOfBirthDay).Must((x, context) =>
             {
                 var dateOfBirth = x.ParseDateOfBirth();
+				_logger.LogDebug("RegisterValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},customerSettings={CustomerSettings},taxSettings={TaxSettings}): dateOfBirth → {DateOfBirth}", localizationService, stateProvinceService, customerSettings, taxSettings, dateOfBirth);
                 if (!dateOfBirth.HasValue)
                     return false;
 
@@ -143,5 +148,6 @@ public partial class RegisterValidator : BaseNopValidator<RegisterModel>
             RuleFor(x => x.VatNumber).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Account.Fields.VatNumber.Required"));
         }
 
+	_logger.LogDebug("<<< Exiting RegisterValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},customerSettings={CustomerSettings},taxSettings={TaxSettings})", localizationService, stateProvinceService, customerSettings, taxSettings);
     }
 }

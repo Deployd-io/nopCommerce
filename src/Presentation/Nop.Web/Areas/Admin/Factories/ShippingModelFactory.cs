@@ -10,6 +10,7 @@ using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Areas.Admin.Models.Shipping;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -18,6 +19,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ShippingModelFactory : IShippingModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressModelFactory _addressModelFactory;
@@ -72,11 +74,13 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// <returns>Delivery date search model</returns>
     protected virtual DeliveryDateSearchModel PrepareDeliveryDateSearchModel(DeliveryDateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareDeliveryDateSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareDeliveryDateSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -87,11 +91,13 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// <returns>Product availability range search model</returns>
     protected virtual ProductAvailabilityRangeSearchModel PrepareProductAvailabilityRangeSearchModel(ProductAvailabilityRangeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareProductAvailabilityRangeSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareProductAvailabilityRangeSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -109,11 +115,13 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual Task<ShippingProviderSearchModel> PrepareShippingProviderSearchModelAsync(ShippingProviderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingProviderSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareShippingProviderSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -127,10 +135,12 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual async Task<ShippingProviderListModel> PrepareShippingProviderListModelAsync(ShippingProviderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingProviderListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get shipping providers
         var shippingProviders = (await _shippingPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareShippingProviderListModelAsync(searchModel={SearchModel}): shippingProviders → {ShippingProviders}", searchModel, shippingProviders);
 
         //prepare grid model
         var model = await new ShippingProviderListModel().PrepareToGridAsync(searchModel, shippingProviders, () =>
@@ -139,6 +149,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             {
                 //fill in model values from the entity
                 var shippingProviderModel = provider.ToPluginModel<ShippingProviderModel>();
+				_logger.LogDebug("PrepareShippingProviderListModelAsync(searchModel={SearchModel}): shippingProviderModel → {ShippingProviderModel}", searchModel, shippingProviderModel);
 
                 //fill in additional values (not existing in the entity)
                 shippingProviderModel.IsActive = _shippingPluginManager.IsPluginActive(provider);
@@ -150,6 +161,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareShippingProviderListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -163,11 +175,13 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual Task<PickupPointProviderSearchModel> PreparePickupPointProviderSearchModelAsync(PickupPointProviderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePickupPointProviderSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PreparePickupPointProviderSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -181,10 +195,12 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual async Task<PickupPointProviderListModel> PreparePickupPointProviderListModelAsync(PickupPointProviderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePickupPointProviderListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get pickup point providers
         var pickupPointProviders = (await _pickupPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PreparePickupPointProviderListModelAsync(searchModel={SearchModel}): pickupPointProviders → {PickupPointProviders}", searchModel, pickupPointProviders);
 
         //prepare grid model
         var model = await new PickupPointProviderListModel().PrepareToGridAsync(searchModel, pickupPointProviders, () =>
@@ -193,6 +209,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             {
                 //fill in model values from the entity
                 var pickupPointProviderModel = provider.ToPluginModel<PickupPointProviderModel>();
+				_logger.LogDebug("PreparePickupPointProviderListModelAsync(searchModel={SearchModel}): pickupPointProviderModel → {PickupPointProviderModel}", searchModel, pickupPointProviderModel);
 
                 //fill in additional values (not existing in the entity)
                 pickupPointProviderModel.IsActive = _pickupPluginManager.IsPluginActive(provider);
@@ -204,6 +221,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PreparePickupPointProviderListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -217,11 +235,13 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual Task<ShippingMethodSearchModel> PrepareShippingMethodSearchModelAsync(ShippingMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareShippingMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -235,10 +255,12 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual async Task<ShippingMethodListModel> PrepareShippingMethodListModelAsync(ShippingMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingMethodListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get shipping methods
         var shippingMethods = (await _shippingMethodsService.GetAllShippingMethodsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareShippingMethodListModelAsync(searchModel={SearchModel}): shippingMethods → {ShippingMethods}", searchModel, shippingMethods);
 
         //prepare grid model
         var model = new ShippingMethodListModel().PrepareToGrid(searchModel, shippingMethods, () =>
@@ -246,6 +268,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             return shippingMethods.Select(method => method.ToModel<ShippingMethodModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareShippingMethodListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -294,12 +317,14 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual Task<DatesRangesSearchModel> PrepareDatesRangesSearchModelAsync(DatesRangesSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareDatesRangesSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare nested search models
         PrepareDeliveryDateSearchModel(searchModel.DeliveryDateSearchModel);
         PrepareProductAvailabilityRangeSearchModel(searchModel.ProductAvailabilityRangeSearchModel);
 
+		_logger.LogDebug("<<< Exiting PrepareDatesRangesSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -313,10 +338,12 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual async Task<DeliveryDateListModel> PrepareDeliveryDateListModelAsync(DeliveryDateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareDeliveryDateListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get delivery dates
         var deliveryDates = (await _dateRangeService.GetAllDeliveryDatesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareDeliveryDateListModelAsync(searchModel={SearchModel}): deliveryDates → {DeliveryDates}", searchModel, deliveryDates);
 
         //prepare grid model
         var model = new DeliveryDateListModel().PrepareToGrid(searchModel, deliveryDates, () =>
@@ -325,6 +352,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             return deliveryDates.Select(date => date.ToModel<DeliveryDateModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareDeliveryDateListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -371,10 +399,12 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual async Task<ProductAvailabilityRangeListModel> PrepareProductAvailabilityRangeListModelAsync(ProductAvailabilityRangeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareProductAvailabilityRangeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get product availability ranges
         var productAvailabilityRanges = (await _dateRangeService.GetAllProductAvailabilityRangesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareProductAvailabilityRangeListModelAsync(searchModel={SearchModel}): productAvailabilityRanges → {ProductAvailabilityRanges}", searchModel, productAvailabilityRanges);
 
         //prepare grid model
         var model = new ProductAvailabilityRangeListModel().PrepareToGrid(searchModel, productAvailabilityRanges, () =>
@@ -383,6 +413,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             return productAvailabilityRanges.Select(range => range.ToModel<ProductAvailabilityRangeModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareProductAvailabilityRangeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -430,11 +461,13 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual Task<WarehouseSearchModel> PrepareWarehouseSearchModelAsync(WarehouseSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareWarehouseSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareWarehouseSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -448,6 +481,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
     /// </returns>
     public virtual async Task<WarehouseListModel> PrepareWarehouseListModelAsync(WarehouseSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareWarehouseListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get warehouses
@@ -462,6 +496,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             return warehouses.Select(warehouse => warehouse.ToModel<WarehouseModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareWarehouseListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -483,6 +518,7 @@ public partial class ShippingModelFactory : IShippingModelFactory
             if (model == null)
             {
                 model = warehouse.ToModel<WarehouseModel>();
+				_logger.LogDebug("PrepareWarehouseModelAsync(model={Model},warehouse={Warehouse},excludeProperties={ExcludeProperties}): model → {Model1}", model, warehouse, excludeProperties, model);
             }
         }
 

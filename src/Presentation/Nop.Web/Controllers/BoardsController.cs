@@ -12,12 +12,14 @@ using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Models.Boards;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class BoardsController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -46,16 +48,28 @@ public partial class BoardsController : BasePublicController
         IWebHelper webHelper,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext})", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext);
         _captchaSettings = captchaSettings;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _captchaSettings → {_captchaSettings}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _captchaSettings);
         _customerSettings = customerSettings;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _customerSettings → {_customerSettings}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _customerSettings);
         _forumSettings = forumSettings;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _forumSettings → {_forumSettings}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _forumSettings);
         _customerService = customerService;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _customerService → {_customerService}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _customerService);
         _forumModelFactory = forumModelFactory;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _forumModelFactory → {_forumModelFactory}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _forumModelFactory);
         _forumService = forumService;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _forumService → {_forumService}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _forumService);
         _localizationService = localizationService;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _localizationService → {_localizationService}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _localizationService);
         _storeContext = storeContext;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _storeContext → {_storeContext}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _storeContext);
         _webHelper = webHelper;
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _webHelper);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext})", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext);
+		_logger.LogDebug("BoardsController(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", captchaSettings, customerSettings, forumSettings, customerService, forumModelFactory, forumService, localizationService, storeContext, webHelper, workContext, _workContext);
     }
 
     #endregion
@@ -64,27 +78,34 @@ public partial class BoardsController : BasePublicController
 
     public virtual async Task<IActionResult> Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         if (!_forumSettings.ForumsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _forumModelFactory.PrepareBoardsIndexModelAsync();
+		_logger.LogDebug("Index(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Index()");
         return View(model);
     }
 
     public virtual async Task<IActionResult> ActiveDiscussions(int forumId = 0, int pageNumber = 1)
     {
+		_logger.LogDebug(">>> Entering ActiveDiscussions(forumId={ForumId},pageNumber={PageNumber})", forumId, pageNumber);
         if (!_forumSettings.ForumsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = await _forumModelFactory.PrepareActiveDiscussionsModelAsync(forumId, pageNumber);
+		_logger.LogDebug("ActiveDiscussions(forumId={ForumId},pageNumber={PageNumber}): model → {Model}", forumId, pageNumber, model);
 
+		_logger.LogDebug("<<< Exiting ActiveDiscussions(forumId={ForumId},pageNumber={PageNumber})", forumId, pageNumber);
         return View(model);
     }
 
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> ActiveDiscussionsRss(int forumId = 0)
     {
+		_logger.LogDebug(">>> Entering ActiveDiscussionsRss(forumId={ForumId})", forumId);
         if (!_forumSettings.ForumsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -92,12 +113,17 @@ public partial class BoardsController : BasePublicController
             return RedirectToRoute(NopRouteNames.General.BOARDS);
 
         var topics = await _forumService.GetActiveTopicsAsync(forumId, 0, _forumSettings.ActiveDiscussionsFeedCount);
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): topics → {Topics}", forumId, topics);
         var url = Url.RouteUrl(NopRouteNames.Standard.ACTIVE_DISCUSSIONS_RSS, null, _webHelper.GetCurrentRequestProtocol());
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): url → {Url}", forumId, url);
 
         var feedTitle = await _localizationService.GetResourceAsync("Forum.ActiveDiscussionsFeedTitle");
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): feedTitle → {FeedTitle}", forumId, feedTitle);
         var feedDescription = await _localizationService.GetResourceAsync("Forum.ActiveDiscussionsFeedDescription");
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): feedDescription → {FeedDescription}", forumId, feedDescription);
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): store → {Store}", forumId, store);
         var feed = new RssFeed(
             string.Format(feedTitle, await _localizationService.GetLocalizedAsync(store, x => x.Name)),
             feedDescription,
@@ -105,20 +131,27 @@ public partial class BoardsController : BasePublicController
             DateTime.UtcNow);
 
         var items = new List<RssItem>();
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): items → {Items}", forumId, items);
 
         var viewsText = await _localizationService.GetResourceAsync("Forum.Views");
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): viewsText → {ViewsText}", forumId, viewsText);
         var repliesText = await _localizationService.GetResourceAsync("Forum.Replies");
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): repliesText → {RepliesText}", forumId, repliesText);
 
         foreach (var topic in topics)
         {
             var topicUrl = Url.RouteUrl(NopRouteNames.Standard.TOPIC_SLUG, new { id = topic.Id, slug = await _forumService.GetTopicSeNameAsync(topic) }, _webHelper.GetCurrentRequestProtocol());
+			_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): topicUrl → {TopicUrl}", forumId, topicUrl);
             var content = $"{repliesText}: {(topic.NumPosts > 0 ? topic.NumPosts - 1 : 0)}, {viewsText}: {topic.Views}";
+			_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): content → {Content}", forumId, content);
 
             items.Add(new RssItem(topic.Subject, content, new Uri(topicUrl),
                 $"urn:store:{store.Id}:activeDiscussions:topic:{topic.Id}", topic.LastPostTime ?? topic.UpdatedOnUtc));
         }
         feed.Items = items;
+		_logger.LogDebug("ActiveDiscussionsRss(forumId={ForumId}): feed.Items → {Arg1}", forumId, feed.Items);
 
+		_logger.LogDebug("<<< Exiting ActiveDiscussionsRss(forumId={ForumId})", forumId);
         return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
     }
 
@@ -168,11 +201,15 @@ public partial class BoardsController : BasePublicController
                 ForumSearchType.All, 0, 0, topicLimit);
 
             var url = Url.RouteUrl(NopRouteNames.Standard.FORUM_RSS, new { id = forum.Id }, _webHelper.GetCurrentRequestProtocol());
+			_logger.LogDebug("ForumRss(id={Id}): url → {Url}", id, url);
 
             var feedTitle = await _localizationService.GetResourceAsync("Forum.ForumFeedTitle");
+			_logger.LogDebug("ForumRss(id={Id}): feedTitle → {FeedTitle}", id, feedTitle);
             var feedDescription = await _localizationService.GetResourceAsync("Forum.ForumFeedDescription");
+			_logger.LogDebug("ForumRss(id={Id}): feedDescription → {FeedDescription}", id, feedDescription);
 
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("ForumRss(id={Id}): store → {Store}", id, store);
             var feed = new RssFeed(
                 string.Format(feedTitle, await _localizationService.GetLocalizedAsync(store, x => x.Name), forum.Name),
                 feedDescription,
@@ -180,20 +217,27 @@ public partial class BoardsController : BasePublicController
                 DateTime.UtcNow);
 
             var items = new List<RssItem>();
+			_logger.LogDebug("ForumRss(id={Id}): items → {Items}", id, items);
 
             var viewsText = await _localizationService.GetResourceAsync("Forum.Views");
+			_logger.LogDebug("ForumRss(id={Id}): viewsText → {ViewsText}", id, viewsText);
             var repliesText = await _localizationService.GetResourceAsync("Forum.Replies");
+			_logger.LogDebug("ForumRss(id={Id}): repliesText → {RepliesText}", id, repliesText);
 
             foreach (var topic in topics)
             {
                 var topicUrl = Url.RouteUrl(NopRouteNames.Standard.TOPIC_SLUG, new { id = topic.Id, slug = await _forumService.GetTopicSeNameAsync(topic) }, _webHelper.GetCurrentRequestProtocol());
+				_logger.LogDebug("ForumRss(id={Id}): topicUrl → {TopicUrl}", id, topicUrl);
                 var content = $"{repliesText}: {(topic.NumPosts > 0 ? topic.NumPosts - 1 : 0)}, {viewsText}: {topic.Views}";
+				_logger.LogDebug("ForumRss(id={Id}): content → {Content}", id, content);
 
                 items.Add(new RssItem(topic.Subject, content, new Uri(topicUrl), $"urn:store:{store.Id}:forum:topic:{topic.Id}", topic.LastPostTime ?? topic.UpdatedOnUtc));
             }
 
             feed.Items = items;
+			_logger.LogDebug("ForumRss(id={Id}): feed.Items → {Arg1}", id, feed.Items);
 
+		_logger.LogDebug("<<< Exiting ForumRss(id={Id})", id);
             return new RssActionResult(feed, _webHelper.GetThisPageUrl(false));
         }
 
@@ -257,12 +301,14 @@ public partial class BoardsController : BasePublicController
 
         //update view count
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("Topic(id={Id},pageNumber={PageNumber}): customer → {Customer}", id, pageNumber, customer);
         if (!customer.IsSearchEngineAccount())
         {
             forumTopic.Views += 1;
             await _forumService.UpdateTopicAsync(forumTopic);
         }
 
+		_logger.LogDebug("<<< Exiting Topic(id={Id},pageNumber={PageNumber})", id, pageNumber);
         return View(model);
     }
 
@@ -787,6 +833,7 @@ public partial class BoardsController : BasePublicController
         //redisplay form
         model = await _forumModelFactory.PreparePostCreateModelAsync(forumTopic, 0, true);
 
+		_logger.LogDebug("<<< Exiting PostCreate(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
@@ -903,6 +950,7 @@ public partial class BoardsController : BasePublicController
         //redisplay form
         model = await _forumModelFactory.PreparePostEditModelAsync(forumPost, true);
 
+		_logger.LogDebug("<<< Exiting PostEdit(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
@@ -919,17 +967,21 @@ public partial class BoardsController : BasePublicController
 
     public virtual async Task<IActionResult> CustomerForumSubscriptions(int? pageNumber)
     {
+		_logger.LogDebug(">>> Entering CustomerForumSubscriptions(pageNumber={PageNumber})", pageNumber);
         if (!_forumSettings.AllowCustomersToManageSubscriptions)
             return RedirectToRoute(NopRouteNames.General.CUSTOMER_INFO);
 
         var model = await _forumModelFactory.PrepareCustomerForumSubscriptionsModelAsync(pageNumber);
+		_logger.LogDebug("CustomerForumSubscriptions(pageNumber={PageNumber}): model → {Model}", pageNumber, model);
 
+		_logger.LogDebug("<<< Exiting CustomerForumSubscriptions(pageNumber={PageNumber})", pageNumber);
         return View(model);
     }
 
     [HttpPost, ActionName("CustomerForumSubscriptions")]
     public virtual async Task<IActionResult> CustomerForumSubscriptionsPOST(IFormCollection formCollection)
     {
+		_logger.LogDebug(">>> Entering CustomerForumSubscriptionsPOST(formCollection={FormCollection})", formCollection);
         foreach (var key in formCollection.Keys)
         {
             var value = formCollection[key];
@@ -937,10 +989,13 @@ public partial class BoardsController : BasePublicController
             if (value.Equals("on") && key.StartsWith("fs", StringComparison.InvariantCultureIgnoreCase))
             {
                 var id = key.Replace("fs", "").Trim();
+				_logger.LogDebug("CustomerForumSubscriptionsPOST(formCollection={FormCollection}): id → {Id}", formCollection, id);
                 if (int.TryParse(id, out var forumSubscriptionId))
                 {
                     var forumSubscription = await _forumService.GetSubscriptionByIdAsync(forumSubscriptionId);
+					_logger.LogDebug("CustomerForumSubscriptionsPOST(formCollection={FormCollection}): forumSubscription → {ForumSubscription}", formCollection, forumSubscription);
                     var customer = await _workContext.GetCurrentCustomerAsync();
+					_logger.LogDebug("CustomerForumSubscriptionsPOST(formCollection={FormCollection}): customer → {Customer}", formCollection, customer);
 
                     if (forumSubscription != null && forumSubscription.CustomerId == customer.Id)
                     {
@@ -950,25 +1005,31 @@ public partial class BoardsController : BasePublicController
             }
         }
 
+		_logger.LogDebug("<<< Exiting CustomerForumSubscriptionsPOST(formCollection={FormCollection})", formCollection);
         return RedirectToRoute(NopRouteNames.Standard.CUSTOMER_FORUM_SUBSCRIPTIONS);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> PostVote(int postId, bool isUp)
     {
+		_logger.LogDebug(">>> Entering PostVote(postId={PostId},isUp={IsUp})", postId, isUp);
         if (!_forumSettings.AllowPostVoting)
             return new NullJsonResult();
 
         var forumPost = await _forumService.GetPostByIdAsync(postId);
+		_logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): forumPost → {ForumPost}", postId, isUp, forumPost);
         if (forumPost == null)
             return new NullJsonResult();
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): customer → {Customer}", postId, isUp, customer);
         if (!await _customerService.IsRegisteredAsync(customer))
             return Json(new
             {
                 Error = await _localizationService.GetResourceAsync("Forum.Votes.Login"),
                 VoteCount = forumPost.VoteCount
+				_logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): Error → {Error}", postId, isUp, Error);
+				_logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): VoteCount → {VoteCount}", postId, isUp, VoteCount);
             });
 
         if (customer.Id == forumPost.CustomerId)
@@ -979,6 +1040,7 @@ public partial class BoardsController : BasePublicController
             });
 
         var forumPostVote = await _forumService.GetPostVoteAsync(postId, customer);
+		_logger.LogDebug("PostVote(postId={PostId},isUp={IsUp}): forumPostVote → {ForumPostVote}", postId, isUp, forumPostVote);
         if (forumPostVote != null)
         {
             if ((forumPostVote.IsUp && isUp) || (!forumPostVote.IsUp && !isUp))
@@ -1007,6 +1069,7 @@ public partial class BoardsController : BasePublicController
             CreatedOnUtc = DateTime.UtcNow
         });
 
+		_logger.LogDebug("<<< Exiting PostVote(postId={PostId},isUp={IsUp})", postId, isUp);
         return Json(new { VoteCount = forumPost.VoteCount, IsUp = isUp });
     }
 

@@ -11,6 +11,7 @@ using Nop.Core;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Infrastructure;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -19,6 +20,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class SmtpBuilder : ISmtpBuilder
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly EmailAccountSettings _emailAccountSettings;
@@ -35,10 +37,16 @@ public partial class SmtpBuilder : ISmtpBuilder
         ILocalizationService localizationService,
         INopFileProvider fileProvider)
     {
+		_logger.LogDebug(">>> Entering SmtpBuilder(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},fileProvider={FileProvider})", emailAccountSettings, emailAccountService, localizationService, fileProvider);
         _emailAccountSettings = emailAccountSettings;
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("SmtpBuilder(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},fileProvider={FileProvider}): _emailAccountService → {_emailAccountService}", emailAccountSettings, emailAccountService, localizationService, fileProvider, _emailAccountService);
+		_logger.LogDebug("SmtpBuilder(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},fileProvider={FileProvider}): _emailAccountSettings → {_emailAccountSettings}", emailAccountSettings, emailAccountService, localizationService, fileProvider, _emailAccountSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("SmtpBuilder(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},fileProvider={FileProvider}): _localizationService → {_localizationService}", emailAccountSettings, emailAccountService, localizationService, fileProvider, _localizationService);
         _fileProvider = fileProvider;
+		_logger.LogDebug("<<< Exiting SmtpBuilder(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},fileProvider={FileProvider})", emailAccountSettings, emailAccountService, localizationService, fileProvider);
+		_logger.LogDebug("SmtpBuilder(emailAccountSettings={EmailAccountSettings},emailAccountService={EmailAccountService},localizationService={LocalizationService},fileProvider={FileProvider}): _fileProvider → {_fileProvider}", emailAccountSettings, emailAccountService, localizationService, fileProvider, _fileProvider);
     }
 
     #endregion
@@ -47,6 +55,7 @@ public partial class SmtpBuilder : ISmtpBuilder
 
     protected virtual async Task<SaslMechanism> GetGmailCredentialsAsync(EmailAccount emailAccount)
     {
+		_logger.LogDebug(">>> Entering GetGmailCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         if (string.IsNullOrEmpty(emailAccount.ClientId))
@@ -56,7 +65,9 @@ public partial class SmtpBuilder : ISmtpBuilder
             throw new NopException(await _localizationService.GetResourceAsync("Admin.Configuration.EmailAccounts.Fields.ClientSecret.Required"));
 
         var tokenFilePath = _fileProvider.MapPath(NopMessageDefaults.GmailAuthStorePath);
+		_logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): tokenFilePath → {TokenFilePath}", emailAccount, tokenFilePath);
         var credentialRoot = _fileProvider.Combine(tokenFilePath, emailAccount.Email);
+		_logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): credentialRoot → {CredentialRoot}", emailAccount, credentialRoot);
 
         var codeFlow = new GoogleAuthorizationCodeFlow(new GoogleAuthorizationCodeFlow.Initializer
         {
@@ -70,8 +81,10 @@ public partial class SmtpBuilder : ISmtpBuilder
         });
 
         var authCode = new AuthorizationCodeWebApp(codeFlow, null, null);
+		_logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): authCode → {AuthCode}", emailAccount, authCode);
 
         var authResult = await authCode.AuthorizeAsync(emailAccount.Email, CancellationToken.None);
+		_logger.LogDebug("GetGmailCredentialsAsync(emailAccount={EmailAccount}): authResult → {AuthResult}", emailAccount, authResult);
 
         if (authResult.Credential is null)
             throw new NopException("Failed to obtain user credentials for the authorization server. Check the client secrets and allow the application to perform required operations.");
@@ -79,11 +92,13 @@ public partial class SmtpBuilder : ISmtpBuilder
         if (authResult.Credential.Token?.IsStale == true)
             await authResult.Credential.RefreshTokenAsync(CancellationToken.None);
 
+		_logger.LogDebug("<<< Exiting GetGmailCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         return new SaslMechanismOAuth2(authResult.Credential.UserId, authResult.Credential.Token.AccessToken);
     }
 
     protected virtual async Task<SaslMechanism> GetExchangeCredentialsAsync(EmailAccount emailAccount)
     {
+		_logger.LogDebug(">>> Entering GetExchangeCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         ArgumentNullException.ThrowIfNull(emailAccount);
 
         if (string.IsNullOrEmpty(emailAccount.ClientId))
@@ -101,7 +116,9 @@ public partial class SmtpBuilder : ISmtpBuilder
             .Build();
 
         var authToken = await confidentialClientApplication.AcquireTokenForClient(NopMessageDefaults.MSALScopes).ExecuteAsync();
+		_logger.LogDebug("GetExchangeCredentialsAsync(emailAccount={EmailAccount}): authToken → {AuthToken}", emailAccount, authToken);
 
+		_logger.LogDebug("<<< Exiting GetExchangeCredentialsAsync(emailAccount={EmailAccount})", emailAccount);
         return new SaslMechanismOAuth2(emailAccount.Email, authToken.AccessToken);
     }
 
@@ -119,6 +136,7 @@ public partial class SmtpBuilder : ISmtpBuilder
     /// </returns>
     public virtual async Task<SmtpClient> BuildAsync(EmailAccount emailAccount = null)
     {
+		_logger.LogDebug(">>> Entering BuildAsync(emailAccount={EmailAccount})", emailAccount);
         emailAccount ??= await _emailAccountService.GetEmailAccountByIdAsync(_emailAccountSettings.DefaultEmailAccountId)
                          ?? throw new NopException("Email account could not be loaded");
 
@@ -150,6 +168,7 @@ public partial class SmtpBuilder : ISmtpBuilder
                     break;
             }
 
+			_logger.LogDebug("<<< Exiting BuildAsync(emailAccount={EmailAccount})", emailAccount);
             return client;
         }
         catch (Exception ex)
@@ -169,7 +188,9 @@ public partial class SmtpBuilder : ISmtpBuilder
     /// <returns>A System.Boolean value that determines whether the specified certificate is accepted for authentication</returns>
     public virtual bool ValidateServerCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
     {
+		_logger.LogDebug(">>> Entering ValidateServerCertificate(sender={Sender},certificate={Certificate},chain={Chain},sslPolicyErrors={SslPolicyErrors})", sender, certificate, chain, sslPolicyErrors);
         //By default, server certificate verification is disabled.
+		_logger.LogDebug("<<< Exiting ValidateServerCertificate(sender={Sender},certificate={Certificate},chain={Chain},sslPolicyErrors={SslPolicyErrors})", sender, certificate, chain, sslPolicyErrors);
         return true;
     }
 

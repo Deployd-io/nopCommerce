@@ -2,6 +2,7 @@
 using iTextSharp.text.pdf;
 using PdfRpt.Core.Contracts;
 using PdfRpt.Core.Helper;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public partial class CatalogDocument : PdfDocument<CatalogItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     protected virtual PdfPCell BuildProductImages(IList<CellData> rowData)
@@ -70,8 +72,10 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
     protected virtual PdfPCell ConfigureCatalogItemTemplate(InlineFieldData data)
     {
+		_logger.LogDebug(">>> Entering ConfigureCatalogItemTemplate(data={Data})", data);
         var font16Bold = PdfDocumentHelper.GetFont(Font, Font.Size * 1.6f, DocumentFontStyle.Bold);
 
+		_logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): font16Bold → {Font16Bold}", data, font16Bold);
         var table = new PdfGrid(numColumns: 1)
         {
             WidthPercentage = 100,
@@ -80,6 +84,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
         };
         var rowData = data.Attributes.RowData.TableRowData;
         var name = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Name);
+		_logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): name → {Name}", data, name);
         table.AddCell(new PdfPCell(new Phrase(name, font16Bold))
         {
             RunDirection = DocumentRunDirection,
@@ -90,6 +95,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
         });
 
         var description = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Description);
+		_logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): description → {Description}", data, description);
 
         var cell = new PdfPCell(new Paragraph(description, Font))
         {
@@ -119,6 +125,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
             Border = 0,
         });
 
+		_logger.LogDebug("<<< Exiting ConfigureCatalogItemTemplate(data={Data})", data);
         return new PdfPCell(tableContainer)
         {
             RunDirection = DocumentRunDirection,
@@ -138,6 +145,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
     /// <param name="pdfStreamOutput">Stream for PDF output</param>
     public override void Generate(Stream pdfStreamOutput)
     {
+		_logger.LogDebug(">>> Entering Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
         Document
             .MainTablePreferences(table =>
             {
@@ -162,6 +170,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
             })
             .Generate(builder => builder.AsPdfStream(pdfStreamOutput, closeStream: false));
+			_logger.LogDebug("<<< Exiting Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
     }
 
     #endregion

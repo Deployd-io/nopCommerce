@@ -23,7 +23,11 @@ public partial class OfficialFeedManager
         NopHttpClient nopHttpClient)
     {
         _logger = logger;
+		_logger.LogDebug(">>> Entering OfficialFeedManager(logger={Logger},nopHttpClient={NopHttpClient})", logger, nopHttpClient);
+		_logger.LogDebug("OfficialFeedManager(logger={Logger},nopHttpClient={NopHttpClient}): _logger → {_logger}", logger, nopHttpClient, _logger);
         _nopHttpClient = nopHttpClient;
+		_logger.LogDebug("<<< Exiting OfficialFeedManager(logger={Logger},nopHttpClient={NopHttpClient})", logger, nopHttpClient);
+		_logger.LogDebug("OfficialFeedManager(logger={Logger},nopHttpClient={NopHttpClient}): _nopHttpClient → {_nopHttpClient}", logger, nopHttpClient, _nopHttpClient);
     }
 
     #endregion
@@ -38,6 +42,8 @@ public partial class OfficialFeedManager
     /// <returns>Value (text)</returns>
     protected virtual string GetElementValue(XmlNode node, string elementName)
     {
+		_logger.LogDebug(">>> Entering GetElementValue(node={Node},elementName={ElementName})", node, elementName);
+		_logger.LogDebug("<<< Exiting GetElementValue(node={Node},elementName={ElementName})", node, elementName);
         return node?.SelectSingleNode(elementName)?.InnerText;
     }
 
@@ -54,8 +60,11 @@ public partial class OfficialFeedManager
     /// </returns>
     public virtual async Task<IList<OfficialFeedCategory>> GetCategoriesAsync()
     {
+		_logger.LogDebug(">>> Entering GetCategoriesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load XML
         var xml = new XmlDocument();
+		_logger.LogDebug("GetCategoriesAsync(): xml → {Xml}", xml);
         try
         {
             xml.LoadXml(await _nopHttpClient.GetExtensionsCategoriesAsync());
@@ -66,6 +75,8 @@ public partial class OfficialFeedManager
         }
 
         //get list of categories from the XML
+		_logger.LogInformation("GetCategoriesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetCategoriesAsync()");
         return xml.SelectNodes(@"//categories/category").Cast<XmlNode>().Select(node => new OfficialFeedCategory
         {
             Id = int.Parse(GetElementValue(node, @"id")),
@@ -83,8 +94,11 @@ public partial class OfficialFeedManager
     /// </returns>
     public virtual async Task<IList<OfficialFeedVersion>> GetVersionsAsync()
     {
+		_logger.LogDebug(">>> Entering GetVersionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load XML
         var xml = new XmlDocument();
+		_logger.LogDebug("GetVersionsAsync(): xml → {Xml}", xml);
         try
         {
             xml.LoadXml(await _nopHttpClient.GetExtensionsVersionsAsync());
@@ -95,6 +109,8 @@ public partial class OfficialFeedManager
         }
 
         //get list of versions from the XML
+		_logger.LogInformation("GetVersionsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetVersionsAsync()");
         return xml.SelectNodes(@"//versions/version").Cast<XmlNode>().Select(node => new OfficialFeedVersion
         {
             Id = int.Parse(GetElementValue(node, @"id")),
@@ -119,8 +135,10 @@ public partial class OfficialFeedManager
         int versionId = 0, int price = 0, string searchTerm = "",
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //load XML
         var xml = new XmlDocument();
+		_logger.LogDebug("GetAllPluginsAsync(categoryId={CategoryId},versionId={VersionId},price={Price},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize}): xml → {Xml}", categoryId, versionId, price, searchTerm, pageIndex, pageSize, xml);
         try
         {
             xml.LoadXml(await _nopHttpClient.GetExtensionsAsync(categoryId, versionId, price, searchTerm, pageIndex, pageSize));
@@ -142,9 +160,13 @@ public partial class OfficialFeedManager
         }).ToList();
 
         _ = int.TryParse(GetElementValue(xml.SelectNodes(@"//totalRecords")?[0], @"value"), out var totalRecords);
+		_logger.LogDebug("GetAllPluginsAsync(categoryId={CategoryId},versionId={VersionId},price={Price},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize}): _ → {_}", categoryId, versionId, price, searchTerm, pageIndex, pageSize, _);
 
+		_logger.LogDebug("<<< Exiting GetAllPluginsAsync(categoryId={CategoryId},versionId={VersionId},price={Price},searchTerm={SearchTerm},pageIndex={PageIndex},pageSize={PageSize})", categoryId, versionId, price, searchTerm, pageIndex, pageSize);
+		_logger.LogInformation("GetAllPluginsAsync(categoryId,versionId,price,searchTerm,pageIndex,pageSize)={CategoryId},{VersionId},{Price},{SearchTerm},{PageIndex},{PageSize}: external service call took {Arg6} ms", categoryId, versionId, price, searchTerm, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
         return new PagedList<OfficialFeedPlugin>(list, pageIndex, pageSize, totalRecords);
     }
+	_logger.LogInformation("GetAllPluginsAsync(categoryId,versionId,price,searchTerm,pageIndex,pageSize)={CategoryId},{VersionId},{Price},{SearchTerm},{PageIndex},{PageSize}: external service call took {Arg6} ms", categoryId, versionId, price, searchTerm, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
     #endregion
 }

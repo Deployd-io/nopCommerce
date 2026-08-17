@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderCheckBox : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -14,8 +16,12 @@ public partial class RenderCheckBox : IRender
     /// <param name="propertyKeyName">Property key name ("Id" by default). This property must be defined in the row dataset.</param>
     public RenderCheckBox(string name, string propertyKeyName = "Id")
     {
+		_logger.LogDebug(">>> Entering RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName})", name, propertyKeyName);
         Name = name;
         PropertyKeyName = propertyKeyName;
+		_logger.LogDebug("<<< Exiting RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName})", name, propertyKeyName);
+		_logger.LogDebug("RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName}): Name → {Name1}", name, propertyKeyName, Name);
+		_logger.LogDebug("RenderCheckBox(name={Name},propertyKeyName={PropertyKeyName}): PropertyKeyName → {PropertyKeyName1}", name, propertyKeyName, PropertyKeyName);
     }
 
     #endregion

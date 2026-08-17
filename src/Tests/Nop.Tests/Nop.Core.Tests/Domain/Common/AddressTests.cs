@@ -2,23 +2,29 @@
 using Nop.Core.Domain.Common;
 using Nop.Services.Common;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Core.Tests.Domain.Common;
 
 [TestFixture]
 public class AddressTests : BaseNopTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private IAddressService _addressService;
 
     [OneTimeSetUp]
     public void SetUp()
     {
+		_logger.LogDebug(">>> Entering SetUp()");
         _addressService = GetService<IAddressService>();
+		_logger.LogDebug("<<< Exiting SetUp()");
+		_logger.LogDebug("SetUp(): _addressService → {_addressService}", _addressService);
     }
 
     [Test]
     public void CanCloneAddress()
     {
+		_logger.LogDebug(">>> Entering CanCloneAddress()");
         var address = new Address
         {
             Id = 1,
@@ -39,6 +45,7 @@ public class AddressTests : BaseNopTest
         };
 
         var newAddress = _addressService.CloneAddress(address);
+		_logger.LogDebug("CanCloneAddress(): newAddress → {NewAddress}", newAddress);
         newAddress.Should().NotBeNull();
         newAddress.Id.Should().Be(0);
         newAddress.FirstName.Should().Be("FirstName 1");
@@ -55,11 +62,13 @@ public class AddressTests : BaseNopTest
         newAddress.CreatedOnUtc.Should().Be(new DateTime(2010, 01, 01));
         newAddress.CountryId.Should().Be(3);
         newAddress.StateProvinceId.Should().Be(4);
+		_logger.LogDebug("<<< Exiting CanCloneAddress()");
     }
 
     [Test]
     public async Task CanValidateAddressAsync()
     {
+		_logger.LogDebug(">>> Entering CanValidateAddressAsync()");
         //Valid address
         var validAddress = new Address
         {
@@ -81,6 +90,7 @@ public class AddressTests : BaseNopTest
         };
 
         var isAddressValid = await _addressService.IsAddressValidAsync(validAddress);
+		_logger.LogDebug("CanValidateAddressAsync(): isAddressValid → {IsAddressValid}", isAddressValid);
         isAddressValid.Should().BeTrue();
 
         //InValid address 1 - empty FirstName
@@ -151,5 +161,6 @@ public class AddressTests : BaseNopTest
 
         isAddressValid = await _addressService.IsAddressValidAsync(invalidAddress3);
         isAddressValid.Should().BeFalse();
+		_logger.LogDebug("<<< Exiting CanValidateAddressAsync()");
     }
 }

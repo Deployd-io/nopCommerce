@@ -9,6 +9,7 @@ using Nop.Services.Media;
 using Nop.Services.Orders;
 using Nop.Services.Seo;
 using Nop.Web.Models.Order;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICurrencyService _currencyService;
@@ -49,18 +51,32 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
         IWorkContext workContext,
         OrderSettings orderSettings)
     {
+		_logger.LogDebug(">>> Entering ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings})", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings);
         _currencyService = currencyService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _currencyService → {_currencyService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _currencyService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _dateTimeHelper → {_dateTimeHelper}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _dateTimeHelper);
         _downloadService = downloadService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _downloadService → {_downloadService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _downloadService);
         _localizationService = localizationService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _localizationService → {_localizationService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _localizationService);
         _orderService = orderService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _orderService → {_orderService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _orderService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _priceFormatter → {_priceFormatter}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _priceFormatter);
         _productService = productService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _productService → {_productService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _productService);
         _returnRequestService = returnRequestService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _returnRequestService → {_returnRequestService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _returnRequestService);
         _storeContext = storeContext;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _storeContext → {_storeContext}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _storeContext);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _urlRecordService → {_urlRecordService}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _urlRecordService);
         _workContext = workContext;
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _workContext → {_workContext}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _workContext);
         _orderSettings = orderSettings;
+		_logger.LogDebug("<<< Exiting ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings})", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings);
+		_logger.LogDebug("ReturnRequestModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},productService={ProductService},returnRequestService={ReturnRequestService},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},orderSettings={OrderSettings}): _orderSettings → {_orderSettings}", currencyService, dateTimeHelper, downloadService, localizationService, orderService, priceFormatter, productService, returnRequestService, storeContext, urlRecordService, workContext, orderSettings, _orderSettings);
     }
 
     #endregion
@@ -119,19 +135,27 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<CustomerReturnRequestsModel> PrepareCustomerReturnRequestsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerReturnRequestsModelAsync()");
         var model = new CustomerReturnRequestsModel();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): store → {Store}", store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): customer → {Customer}", customer);
         var returnRequests = await _returnRequestService.SearchReturnRequestsAsync(store.Id, customer.Id);
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): returnRequests → {ReturnRequests}", returnRequests);
+		_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): model → {Model}", model);
 
         foreach (var returnRequest in returnRequests)
         {
             var orderItem = await _orderService.GetOrderItemByIdAsync(returnRequest.OrderItemId);
+			_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): orderItem → {OrderItem}", orderItem);
             if (orderItem != null)
             {
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+				_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): product → {Product}", product);
 
                 var download = await _downloadService.GetDownloadByIdAsync(returnRequest.UploadedFileId);
+				_logger.LogDebug("PrepareCustomerReturnRequestsModelAsync(): download → {Download}", download);
 
                 var itemModel = new CustomerReturnRequestsModel.ReturnRequestModel
                 {
@@ -152,6 +176,9 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerReturnRequestsModelAsync()");
+		_logger.LogDebug(">>> Entering PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order})", order);
+		_logger.LogDebug("<<< Exiting PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order})", order);
         return model;
     }
 
@@ -167,8 +194,10 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
         ArgumentNullException.ThrowIfNull(order);
 
         var models = new List<SubmitReturnRequestModel.OrderItemModel>();
+		_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): models → {Models}", order, models);
 
         var returnRequestAvailability = await _returnRequestService.GetReturnRequestAvailabilityAsync(order.Id);
+		_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): returnRequestAvailability → {ReturnRequestAvailability}", order, returnRequestAvailability);
         if (returnRequestAvailability?.IsAllowed == true)
         {
             foreach (var returnableOrderItem in returnRequestAvailability.ReturnableOrderItems)
@@ -178,6 +207,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 
                 var orderItem = returnableOrderItem.OrderItem;
                 var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+				_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): product → {Product}", order, product);
 
                 var model = new SubmitReturnRequestModel.OrderItemModel
                 {
@@ -190,18 +220,21 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
                 };
 
                 var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
+				_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): languageId → {LanguageId}", order, languageId);
 
                 //unit price
                 if (order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax)
                 {
                     //including tax
                     var unitPriceInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceInclTax, order.CurrencyRate);
+					_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): unitPriceInclTaxInCustomerCurrency → {UnitPriceInclTaxInCustomerCurrency}", order, unitPriceInclTaxInCustomerCurrency);
                     model.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
                 }
                 else
                 {
                     //excluding tax
                     var unitPriceExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceExclTax, order.CurrencyRate);
+					_logger.LogDebug("PrepareSubmitReturnRequestOrderItemModelsAsync(order={Order}): unitPriceExclTaxInCustomerCurrency → {UnitPriceExclTaxInCustomerCurrency}", order, unitPriceExclTaxInCustomerCurrency);
                     model.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
                 }
 

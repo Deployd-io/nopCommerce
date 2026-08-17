@@ -14,11 +14,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CheckoutAttributeController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -166,15 +168,20 @@ public partial class CheckoutAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeSearchModelAsync(new CheckoutAttributeSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -185,15 +192,19 @@ public partial class CheckoutAttributeController : BaseAdminController
         //prepare model
         var model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeModelAsync(new CheckoutAttributeModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -228,20 +239,25 @@ public partial class CheckoutAttributeController : BaseAdminController
         model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a checkout attribute with the specified id
         var checkoutAttribute = await _checkoutAttributeService.GetAttributeByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): checkoutAttribute → {CheckoutAttribute}", id, checkoutAttribute);
         if (checkoutAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeModelAsync(null, checkoutAttribute);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -282,6 +298,7 @@ public partial class CheckoutAttributeController : BaseAdminController
         model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeModelAsync(model, checkoutAttribute, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -289,8 +306,10 @@ public partial class CheckoutAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a checkout attribute with the specified id
         var checkoutAttribute = await _checkoutAttributeService.GetAttributeByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): checkoutAttribute → {CheckoutAttribute}", id, checkoutAttribute);
         if (checkoutAttribute == null)
             return RedirectToAction("List");
 
@@ -302,6 +321,7 @@ public partial class CheckoutAttributeController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Attributes.CheckoutAttributes.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -309,16 +329,20 @@ public partial class CheckoutAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var checkoutAttributes = await _checkoutAttributeService.GetAttributeByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): checkoutAttributes → {CheckoutAttributes}", selectedIds, checkoutAttributes);
         await _checkoutAttributeService.DeleteAttributesAsync(checkoutAttributes);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteCheckoutAttribute");
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
         await _customerActivityService.InsertActivitiesAsync("DeleteCheckoutAttribute", checkoutAttributes, checkoutAttribute => string.Format(activityLogFormat, checkoutAttribute.Name));
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -330,21 +354,26 @@ public partial class CheckoutAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> ValueList(CheckoutAttributeValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ValueList(searchModel={SearchModel})", searchModel);
         //try to get a checkout attribute with the specified id
         var checkoutAttribute = await _checkoutAttributeService.GetAttributeByIdAsync(searchModel.CheckoutAttributeId)
             ?? throw new ArgumentException("No checkout attribute found with the specified id");
 
         //prepare model
         var model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeValueListModelAsync(searchModel, checkoutAttribute);
+		_logger.LogDebug("ValueList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ValueList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ValueCreatePopup(int checkoutAttributeId)
     {
+		_logger.LogDebug(">>> Entering ValueCreatePopup(checkoutAttributeId={CheckoutAttributeId})", checkoutAttributeId);
         //try to get a checkout attribute with the specified id
         var checkoutAttribute = await _checkoutAttributeService.GetAttributeByIdAsync(checkoutAttributeId);
+		_logger.LogDebug("ValueCreatePopup(checkoutAttributeId={CheckoutAttributeId}): checkoutAttribute → {CheckoutAttribute}", checkoutAttributeId, checkoutAttribute);
         if (checkoutAttribute == null)
             return RedirectToAction("List");
 
@@ -352,6 +381,7 @@ public partial class CheckoutAttributeController : BaseAdminController
         var model = await _checkoutAttributeModelFactory
             .PrepareCheckoutAttributeValueModelAsync(new CheckoutAttributeValueModel(), checkoutAttribute, null);
 
+		_logger.LogDebug("<<< Exiting ValueCreatePopup(checkoutAttributeId={CheckoutAttributeId})", checkoutAttributeId);
         return View(model);
     }
 
@@ -400,25 +430,31 @@ public partial class CheckoutAttributeController : BaseAdminController
         model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeValueModelAsync(model, checkoutAttribute, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting ValueCreatePopup(model={Model})", model);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_VIEW)]
     public virtual async Task<IActionResult> ValueEditPopup(int id)
     {
+		_logger.LogDebug(">>> Entering ValueEditPopup(id={Id})", id);
         //try to get a checkout attribute value with the specified id
         var checkoutAttributeValue = await _checkoutAttributeService.GetAttributeValueByIdAsync(id);
+		_logger.LogDebug("ValueEditPopup(id={Id}): checkoutAttributeValue → {CheckoutAttributeValue}", id, checkoutAttributeValue);
         if (checkoutAttributeValue == null)
             return RedirectToAction("List");
 
         //try to get a checkout attribute with the specified id
         var checkoutAttribute = await _checkoutAttributeService.GetAttributeByIdAsync(checkoutAttributeValue.AttributeId);
+		_logger.LogDebug("ValueEditPopup(id={Id}): checkoutAttribute → {CheckoutAttribute}", id, checkoutAttribute);
         if (checkoutAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeValueModelAsync(null, checkoutAttribute, checkoutAttributeValue);
+		_logger.LogDebug("ValueEditPopup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting ValueEditPopup(id={Id})", id);
         return View(model);
     }
 
@@ -472,6 +508,7 @@ public partial class CheckoutAttributeController : BaseAdminController
         model = await _checkoutAttributeModelFactory.PrepareCheckoutAttributeValueModelAsync(model, checkoutAttribute, checkoutAttributeValue, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting ValueEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -479,12 +516,14 @@ public partial class CheckoutAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.CHECKOUT_ATTRIBUTES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ValueDelete(int id)
     {
+		_logger.LogDebug(">>> Entering ValueDelete(id={Id})", id);
         //try to get a checkout attribute value with the specified id
         var checkoutAttributeValue = await _checkoutAttributeService.GetAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No checkout attribute value found with the specified id", nameof(id));
 
         await _checkoutAttributeService.DeleteAttributeValueAsync(checkoutAttributeValue);
 
+		_logger.LogDebug("<<< Exiting ValueDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

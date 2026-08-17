@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderButtonsInlineEdit : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -12,7 +14,10 @@ public partial class RenderButtonsInlineEdit : IRender
     /// </summary>
     public RenderButtonsInlineEdit()
     {
+		_logger.LogDebug(">>> Entering RenderButtonsInlineEdit()");
         ClassName = NopButtonClassDefaults.Default;
+		_logger.LogDebug("<<< Exiting RenderButtonsInlineEdit()");
+		_logger.LogDebug("RenderButtonsInlineEdit(): ClassName → {ClassName}", ClassName);
     }
 
     #endregion

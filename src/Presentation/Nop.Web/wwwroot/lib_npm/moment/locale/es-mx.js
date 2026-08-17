@@ -3,6 +3,7 @@
 //! author : JC Franco : https://github.com/jcfranco
 
 import moment from '../moment';
+const logger = console;
 
 var monthsShortDot =
         'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split(
@@ -31,11 +32,13 @@ export default moment.defineLocale('es-mx', {
         '_'
     ),
     monthsShort: function (m, format) {
+		logger.debug(`>>> Entering monthsShort(m=${m},format=${format})`);
         if (!m) {
             return monthsShortDot;
         } else if (/-MMM-/.test(format)) {
             return monthsShort[m.month()];
         } else {
+			logger.debug(`<<< Exiting monthsShort(m=${m},format=${format})`);
             return monthsShortDot[m.month()];
         }
     },
@@ -62,23 +65,33 @@ export default moment.defineLocale('es-mx', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
+			logger.debug('<<< Exiting sameDay()');
             return '[hoy a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
+			logger.debug('<<< Exiting nextDay()');
             return '[mañana a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
+			logger.debug('<<< Exiting nextWeek()');
             return 'dddd [a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
+			logger.debug('<<< Exiting lastDay()');
             return '[ayer a la' + (this.hours() !== 1 ? 's' : '') + '] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return (
                 '[el] dddd [pasado a la' +
                 (this.hours() !== 1 ? 's' : '') +
                 '] LT'
             );
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },

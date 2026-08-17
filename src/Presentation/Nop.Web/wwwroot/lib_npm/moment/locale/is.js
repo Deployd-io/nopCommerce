@@ -3,16 +3,20 @@
 //! author : Hinrik Örn Sigurðsson : https://github.com/hinrik
 
 import moment from '../moment';
+const logger = console;
 
 function plural(n) {
+	logger.debug(`>>> Entering plural(n=${n})`);
     if (n % 100 === 11) {
         return true;
     } else if (n % 10 === 1) {
+	logger.debug(`<<< Exiting plural(n=${n})`);
         return false;
     }
     return true;
 }
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     switch (key) {
         case 's':
@@ -21,6 +25,7 @@ function translate(number, withoutSuffix, key, isFuture) {
                 : 'nokkrum sekúndum';
         case 'ss':
             if (plural(number)) {
+				logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture}): result → ${result}`);
                 return (
                     result +
                     (withoutSuffix || isFuture ? 'sekúndur' : 'sekúndum')
@@ -82,6 +87,7 @@ function translate(number, withoutSuffix, key, isFuture) {
             return withoutSuffix || isFuture ? 'ár' : 'ári';
         case 'yy':
             if (plural(number)) {
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
                 return result + (withoutSuffix || isFuture ? 'ár' : 'árum');
             }
             return result + (withoutSuffix || isFuture ? 'ár' : 'ári');

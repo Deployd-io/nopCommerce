@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	// UMD returnExports
 	if ( typeof define === "function" && define.amd ) {
@@ -87,6 +89,8 @@ var unitFormat = function( value, numberFormatter, pluralGenerator, unitProperti
 
 	message = unitProperties[ pluralValue ];
 
+	logger.debug(`<<< Exiting unitFormat(value=${value},numberFormatter=${numberFormatter},pluralGenerator=${pluralGenerator},unitProperties=${unitProperties})`);
+logger.debug('<<< Exiting function()');
 	return formatMessage( message, [ formattedValue ] );
 };
 
@@ -95,9 +99,11 @@ var unitFormat = function( value, numberFormatter, pluralGenerator, unitProperti
 
 var unitFormatterFn = function( numberFormatter, pluralGenerator, unitProperties ) {
 	return function unitFormatter( value ) {
+	logger.debug(`>>> Entering unitFormatter(value=${value})`);
 		validateParameterPresence( value, "value" );
 		validateParameterTypeNumber( value, "value" );
 
+		logger.debug(`<<< Exiting unitFormatter(value=${value})`);
 		return unitFormat( value, numberFormatter, pluralGenerator, unitProperties );
 	};
 
@@ -114,10 +120,12 @@ var unitFormatterFn = function( numberFormatter, pluralGenerator, unitProperties
 var unitCategories = [ "acceleration", "angle", "area", "digital", "duration", "length", "mass", "power",
 "pressure", "speed", "temperature", "volume" ];
 
+logger.debug(`function(): unitCategories → ${unitCategories}`);
 
 
 
 function stripPluralGarbage( data ) {
+	logger.debug(`>>> Entering stripPluralGarbage(data=${data})`);
 	var aux, pluralCount;
 
 	if ( data ) {
@@ -127,6 +135,7 @@ function stripPluralGarbage( data ) {
 		}
 	}
 
+	logger.debug(`<<< Exiting stripPluralGarbage(data=${data})`);
 	return aux;
 }
 
@@ -170,6 +179,7 @@ function stripPluralGarbage( data ) {
  * Or undefined in case the unit (or a unit of the compound-unit) doesn't exist.
  */
 var get = function( unit, form, cldr ) {
+	logger.debug(`>>> Entering get(unit=${unit},form=${form},cldr=${cldr})`);
 	var ret;
 
 	// Ensure that we get the 'precomputed' form, if present.
@@ -177,6 +187,7 @@ var get = function( unit, form, cldr ) {
 
 	// Get unit or <category>-unit (eg. "duration-second").
 	[ "" ].concat( unitCategories ).some(function( category ) {
+		logger.debug(`>>> Entering some(unitCategories=${unitCategories})`);
 		return ret = cldr.main([
 			"units",
 			form,
@@ -197,13 +208,16 @@ var get = function( unit, form, cldr ) {
 		// Get both recursively.
 		unit = unit.split( "-per-" );
 		ret = unit.map(function( unit ) {
+			logger.debug('>>> Entering map()');
 			return get( unit, form, cldr );
 		});
 		if ( !ret[ 0 ] || !ret[ 1 ] ) {
+			logger.debug('<<< Exiting map()');
 			return;
 		}
 	}
 
+	logger.debug(`get(unit=${unit},form=${form},cldr=${cldr}): unit → ${unit}`);
 	return ret;
 };
 
@@ -224,11 +238,14 @@ var unitGet = get;
  * @cldr [Cldr instance].
  */
 var unitProperties = function( unit, form, cldr ) {
+	logger.debug(`>>> Entering unitProperties(unit=${unit},form=${form},cldr=${cldr})`);
 	var compoundUnitPattern, unitProperties;
 
 	compoundUnitPattern = cldr.main( [ "units", form, "per/compoundUnitPattern" ] );
+	logger.debug(`unitProperties(unit=${unit},form=${form},cldr=${cldr}): compoundUnitPattern → ${compoundUnitPattern}`);
 	unitProperties = unitGet( unit, form, cldr );
 
+	logger.debug(`<<< Exiting unitProperties(unit=${unit},form=${form},cldr=${cldr})`);
 	return {
 		compoundUnitPattern: compoundUnitPattern,
 		unitProperties: unitProperties
@@ -255,6 +272,7 @@ Globalize.prototype.formatUnit = function( value, unit, options ) {
 	validateParameterPresence( value, "value" );
 	validateParameterTypeNumber( value, "value" );
 
+	logger.debug(`<<< Exiting function(value=${value},unit=${unit},options=${options})`);
 	return this.unitFormatter( unit, options )( value );
 };
 

@@ -7,6 +7,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Data.Extensions;
 using Nop.Data.Migrations;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping;
 
@@ -15,6 +16,7 @@ namespace Nop.Data.Mapping;
 /// </summary>
 public static class NopMappingSchema
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private static ConcurrentDictionary<Type, NopEntityDescriptor> EntityDescriptors { get; } = new();
@@ -28,6 +30,7 @@ public static class NopMappingSchema
     /// <returns>Mapped entity descriptor</returns>
     public static NopEntityDescriptor GetEntityDescriptor(Type entityType)
     {
+		_logger.LogDebug(">>> Entering GetEntityDescriptor(entityType={EntityType})", entityType);
         if (!typeof(BaseEntity).IsAssignableFrom(entityType))
             return null;
 
@@ -54,6 +57,7 @@ public static class NopMappingSchema
                 }).ToList()
             };
         });
+		_logger.LogDebug("<<< Exiting GetEntityDescriptor(entityType={EntityType})", entityType);
     }
 
     /// <summary>

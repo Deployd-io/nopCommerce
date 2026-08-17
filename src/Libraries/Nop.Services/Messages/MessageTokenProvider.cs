@@ -601,6 +601,8 @@ public partial class MessageTokenProvider : IMessageTokenProvider
                 var licenseLink = $"<a class=\"link\" href=\"{licenseUrl}\">{await _localizationService.GetResourceAsync("Messages.Order.Product(s).License", languageId)}</a>";
                 sb.AppendLine("<br />");
                 sb.AppendLine(licenseLink);
+				_logger.LogDebug(">>> Entering RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues})", storeId, routeName, routeValues);
+				_logger.LogDebug("<<< Exiting RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues})", storeId, routeName, routeValues);
             }
             //attributes
             if (!string.IsNullOrEmpty(orderItem.AttributeDescription))
@@ -977,6 +979,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// </returns>
     protected virtual async Task<string> RouteUrlAsync(int storeId = 0, string routeName = null, object routeValues = null)
     {
+		_logger.LogDebug(">>> Entering RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues})", storeId, routeName, routeValues);
         try
         {
             //try to get a store by the passed identifier
@@ -989,7 +992,9 @@ public partial class MessageTokenProvider : IMessageTokenProvider
 
             //generate the relative URL
             var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
+			_logger.LogDebug("RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues}): urlHelper → {UrlHelper}", storeId, routeName, routeValues, urlHelper);
             var url = urlHelper.RouteUrl(routeName, routeValues);
+			_logger.LogDebug("RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues}): url → {Url}", storeId, routeName, routeValues, url);
 
             //compose the result
             return new Uri(new Uri(store.Url), url).AbsoluteUri;
@@ -997,6 +1002,7 @@ public partial class MessageTokenProvider : IMessageTokenProvider
         catch (Exception exception)
         {
             var warning = $"When sending a notification, an error occurred while creating a link for '{routeName}', ensure that URL of the store #{storeId} is correct.";
+			_logger.LogDebug("RouteUrlAsync(storeId={StoreId},routeName={RouteName},routeValues={RouteValues}): warning → {Warning}", storeId, routeName, routeValues, warning);
             await _logger.WarningAsync(warning, exception);
 
             return string.Empty;
@@ -1586,12 +1592,18 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// </returns>
     public virtual async Task<IEnumerable<string>> GetListOfCampaignAllowedTokensAsync()
     {
+		_logger.LogDebug(">>> Entering GetListOfCampaignAllowedTokensAsync()");
         var additionalTokens = new CampaignAdditionalTokensAddedEvent();
         await _eventPublisher.PublishAsync(additionalTokens);
+		_logger.LogDebug("GetListOfCampaignAllowedTokensAsync(): additionalTokens → {AdditionalTokens}", additionalTokens);
 
         var allowedTokens = (await GetListOfAllowedTokensAsync(new[] { TokenGroupNames.StoreTokens, TokenGroupNames.SubscriptionTokens })).ToList();
+		_logger.LogDebug("GetListOfCampaignAllowedTokensAsync(): allowedTokens → {AllowedTokens}", allowedTokens);
         allowedTokens.AddRange(additionalTokens.AdditionalTokens);
 
+		_logger.LogDebug("<<< Exiting GetListOfCampaignAllowedTokensAsync()");
+		_logger.LogDebug(">>> Entering GetListOfAllowedTokensAsync(tokenGroups=<redacted>)");
+		_logger.LogDebug("<<< Exiting GetListOfAllowedTokensAsync(tokenGroups=<redacted>)");
         return allowedTokens.Distinct();
     }
 
@@ -1626,7 +1638,36 @@ public partial class MessageTokenProvider : IMessageTokenProvider
     /// <returns>Collection of token group names</returns>
     public virtual IEnumerable<string> GetTokenGroups(MessageTemplate messageTemplate)
     {
+		_logger.LogDebug(">>> Entering GetTokenGroups(messageTemplate={MessageTemplate})", messageTemplate);
         //groups depend on which tokens are added at the appropriate methods in IWorkflowMessageService
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.DELETE_CUSTOMER_REQUEST_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.DELETE_CUSTOMER_REQUEST_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.ORDER_CANCELLED_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.ORDER_CANCELLED_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.SHIPMENT_DELIVERED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.SHIPMENT_DELIVERED_CUSTOMER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.ORDER_REFUNDED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.ORDER_REFUNDED_CUSTOMER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_ORDER_NOTE_ADDED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_ORDER_NOTE_ADDED_CUSTOMER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.RECURRING_PAYMENT_FAILED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.RECURRING_PAYMENT_FAILED_CUSTOMER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEWSLETTER_SUBSCRIPTION_DEACTIVATION_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEWSLETTER_SUBSCRIPTION_DEACTIVATION_MESSAGE);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.EMAIL_A_FRIEND_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.EMAIL_A_FRIEND_MESSAGE);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.WISHLIST_TO_FRIEND_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.WISHLIST_TO_FRIEND_MESSAGE);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.RETURN_REQUEST_STATUS_CHANGED_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.RETURN_REQUEST_STATUS_CHANGED_CUSTOMER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_FORUM_TOPIC_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_FORUM_TOPIC_MESSAGE);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_FORUM_POST_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_FORUM_POST_MESSAGE);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.PRIVATE_MESSAGE_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.PRIVATE_MESSAGE_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_VENDOR_ACCOUNT_APPLY_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_VENDOR_ACCOUNT_APPLY_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.VENDOR_INFORMATION_CHANGE_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.VENDOR_INFORMATION_CHANGE_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.GIFT_CARD_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.GIFT_CARD_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.PRODUCT_REVIEW_REPLY_CUSTOMER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.PRODUCT_REVIEW_REPLY_CUSTOMER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_VENDOR_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_VENDOR_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_VENDOR_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.QUANTITY_BELOW_ATTRIBUTE_COMBINATION_VENDOR_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEW_VAT_SUBMITTED_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEW_VAT_SUBMITTED_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.BLOG_COMMENT_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.BLOG_COMMENT_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.NEWS_COMMENT_STORE_OWNER_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.NEWS_COMMENT_STORE_OWNER_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.BACK_IN_STOCK_NOTIFICATION → {Arg1}", messageTemplate, MessageTemplateSystemNames.BACK_IN_STOCK_NOTIFICATION);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.CONTACT_US_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.CONTACT_US_MESSAGE);
+		_logger.LogDebug("GetTokenGroups(messageTemplate={MessageTemplate}): MessageTemplateSystemNames.CONTACT_VENDOR_MESSAGE → {Arg1}", messageTemplate, MessageTemplateSystemNames.CONTACT_VENDOR_MESSAGE);
+		_logger.LogDebug("<<< Exiting GetTokenGroups(messageTemplate={MessageTemplate})", messageTemplate);
         return messageTemplate.Name switch
         {
             MessageTemplateSystemNames.CUSTOMER_REGISTERED_STORE_OWNER_NOTIFICATION or

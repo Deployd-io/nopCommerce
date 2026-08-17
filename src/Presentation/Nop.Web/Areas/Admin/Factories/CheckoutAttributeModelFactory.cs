@@ -9,6 +9,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -110,15 +112,18 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     protected virtual CheckoutAttributeValueSearchModel PrepareCheckoutAttributeValueSearchModel(CheckoutAttributeValueSearchModel searchModel,
         CheckoutAttribute checkoutAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeValueSearchModel(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
 
         searchModel.CheckoutAttributeId = checkoutAttribute.Id;
+		_logger.LogDebug("PrepareCheckoutAttributeValueSearchModel(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute}): searchModel.CheckoutAttributeId → {Arg2}", searchModel, checkoutAttribute, searchModel.CheckoutAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeValueSearchModel(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         return searchModel;
     }
 
@@ -136,11 +141,13 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// </returns>
     public virtual Task<CheckoutAttributeSearchModel> PrepareCheckoutAttributeSearchModelAsync(CheckoutAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -154,10 +161,12 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// </returns>
     public virtual async Task<CheckoutAttributeListModel> PrepareCheckoutAttributeListModelAsync(CheckoutAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get checkout attributes
         var checkoutAttributes = (await _checkoutAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel}): checkoutAttributes → {CheckoutAttributes}", searchModel, checkoutAttributes);
 
         //prepare list model
         var model = await new CheckoutAttributeListModel().PrepareToGridAsync(searchModel, checkoutAttributes, () =>
@@ -166,6 +175,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             {
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<CheckoutAttributeModel>();
+				_logger.LogDebug("PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
 
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
@@ -174,6 +184,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -244,6 +255,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     public virtual async Task<CheckoutAttributeValueListModel> PrepareCheckoutAttributeValueListModelAsync(CheckoutAttributeValueSearchModel searchModel,
         CheckoutAttribute checkoutAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeValueListModelAsync(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
@@ -259,6 +271,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             {
                 //fill in model values from the entity
                 var checkoutAttributeValueModel = value.ToModel<CheckoutAttributeValueModel>();
+				_logger.LogDebug("PrepareCheckoutAttributeValueListModelAsync(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute}): checkoutAttributeValueModel → {CheckoutAttributeValueModel}", searchModel, checkoutAttribute, checkoutAttributeValueModel);
 
                 //fill in additional values (not existing in the entity)
                 checkoutAttributeValueModel.Name =
@@ -270,6 +283,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeValueListModelAsync(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         return model;
     }
 

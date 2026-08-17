@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-delete-confirmation", Attributes = MODEL_ID_ATTRIBUTE_NAME + "," + BUTTON_ID_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopDeleteConfirmationTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string MODEL_ID_ATTRIBUTE_NAME = "asp-model-id";
@@ -31,8 +33,12 @@ public partial class NopDeleteConfirmationTagHelper : TagHelper
 
     public NopDeleteConfirmationTagHelper(IHtmlGenerator generator, IHtmlHelper htmlHelper)
     {
+		_logger.LogDebug(">>> Entering NopDeleteConfirmationTagHelper(generator={Generator},htmlHelper={HtmlHelper})", generator, htmlHelper);
         Generator = generator;
         _htmlHelper = htmlHelper;
+		_logger.LogDebug("<<< Exiting NopDeleteConfirmationTagHelper(generator={Generator},htmlHelper={HtmlHelper})", generator, htmlHelper);
+		_logger.LogDebug("NopDeleteConfirmationTagHelper(generator={Generator},htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", generator, htmlHelper, _htmlHelper);
+		_logger.LogDebug("NopDeleteConfirmationTagHelper(generator={Generator},htmlHelper={HtmlHelper}): Generator → {Generator1}", generator, htmlHelper, Generator);
     }
 
     #endregion
@@ -47,6 +53,7 @@ public partial class NopDeleteConfirmationTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -57,11 +64,14 @@ public partial class NopDeleteConfirmationTagHelper : TagHelper
 
         if (string.IsNullOrEmpty(Action))
             Action = "Delete";
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): Action → {Action}", context, output, Action);
 
         var modelName = _htmlHelper.ViewData.ModelMetadata.ModelType.Name.ToLowerInvariant();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): modelName → {ModelName}", context, output, modelName);
         if (!string.IsNullOrEmpty(Action))
             modelName += "-" + Action;
         var modalId = await new HtmlString(modelName + "-delete-confirmation").RenderHtmlContentAsync();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): modalId → {ModalId}", context, output, modalId);
 
         var deleteConfirmationModel = new DeleteConfirmationModel
         {
@@ -73,6 +83,8 @@ public partial class NopDeleteConfirmationTagHelper : TagHelper
 
         //tag details
         output.TagName = "div";
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
 
         output.Attributes.Add("id", modalId);
@@ -82,16 +94,20 @@ public partial class NopDeleteConfirmationTagHelper : TagHelper
         output.Attributes.Add("aria-labelledby", $"{modalId}-title");
 
         var partialView = await _htmlHelper.PartialAsync("Delete", deleteConfirmationModel);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): partialView → {PartialView}", context, output, partialView);
         output.Content.SetHtmlContent(partialView);
 
         //modal script
         var script = new TagBuilder("script");
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): script → {Script}", context, output, script);
         script.InnerHtml.AppendHtml(
             "$(function() {" +
             $"$('#{ButtonId}').attr(\"data-toggle\", \"modal\").attr(\"data-target\", \"#{modalId}\")" +
             "});");
         var scriptTag = await script.RenderHtmlContentAsync();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): scriptTag → {ScriptTag}", context, output, scriptTag);
         output.PostContent.SetHtmlContent(scriptTag);
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

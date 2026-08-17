@@ -10,14 +10,24 @@ public record UPSShippingModel : BaseNopModel
 
     public UPSShippingModel()
     {
+		logger.LogDebug(">>> Entering UPSShippingModel()");
         CarrierServices = new List<string>();
         AvailableCarrierServices = new List<SelectListItem>();
+		logger.LogDebug("UPSShippingModel(): AvailableCarrierServices → {AvailableCarrierServices}", AvailableCarrierServices);
+		logger.LogDebug("UPSShippingModel(): CarrierServices → {CarrierServices}", CarrierServices);
         AvailableCustomerClassifications = new List<SelectListItem>();
+		logger.LogDebug("UPSShippingModel(): AvailableCustomerClassifications → {AvailableCustomerClassifications}", AvailableCustomerClassifications);
         AvailablePickupTypes = new List<SelectListItem>();
+		logger.LogDebug("UPSShippingModel(): AvailablePickupTypes → {AvailablePickupTypes}", AvailablePickupTypes);
         AvailablePackagingTypes = new List<SelectListItem>();
+		logger.LogDebug("UPSShippingModel(): AvailablePackagingTypes → {AvailablePackagingTypes}", AvailablePackagingTypes);
         AvaliablePackingTypes = new List<SelectListItem>();
+		logger.LogDebug("UPSShippingModel(): AvaliablePackingTypes → {AvaliablePackingTypes}", AvaliablePackingTypes);
         AvaliableWeightTypes = new List<SelectListItem>();
+		logger.LogDebug("UPSShippingModel(): AvaliableWeightTypes → {AvaliableWeightTypes}", AvaliableWeightTypes);
         AvaliableDimensionsTypes = new List<SelectListItem>();
+		logger.LogDebug("<<< Exiting UPSShippingModel()");
+		logger.LogDebug("UPSShippingModel(): AvaliableDimensionsTypes → {AvaliableDimensionsTypes}", AvaliableDimensionsTypes);
     }
 
     #endregion

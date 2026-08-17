@@ -3,6 +3,7 @@ using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Media;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ProductAttributeService : IProductAttributeService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<Picture> _pictureRepository;
@@ -67,9 +69,15 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributeAsync(ProductAttribute productAttribute)
     {
+		_logger.LogDebug(">>> Entering DeleteProductAttributeAsync(productAttribute={ProductAttribute})", productAttribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productAttributeRepository.DeleteAsync(productAttribute);
+		_logger.LogDebug("<<< Exiting DeleteProductAttributeAsync(productAttribute={ProductAttribute})", productAttribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductAttributeAsync(productAttribute)={ProductAttribute}: external service call took {Arg1} ms", productAttribute, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductAttributeAsync(productAttribute)={ProductAttribute}: external service call took {Arg1} ms", productAttribute, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes product attributes
     /// </summary>
@@ -77,9 +85,14 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributesAsync(IList<ProductAttribute> productAttributes)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogDebug(">>> Entering DeleteProductAttributesAsync(productAttributes={ProductAttributes})", productAttributes);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(productAttributes);
 
         await _productAttributeRepository.DeleteAsync(productAttributes);
+		_logger.LogDebug("<<< Exiting DeleteProductAttributesAsync(productAttributes={ProductAttributes})", productAttributes);
+		_logger.LogInformation("DeleteProductAttributesAsync(productAttributes)={ProductAttributes}: external service call took {Arg1} ms", productAttributes, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -94,11 +107,14 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IPagedList<ProductAttribute>> GetAllProductAttributesAsync(string name = null, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetAllProductAttributesAsync(name={Name},pageIndex={PageIndex},pageSize={PageSize})", name, pageIndex, pageSize);
         var query = _productAttributeRepository.Table;
 
+		_logger.LogDebug("GetAllProductAttributesAsync(name={Name},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", name, pageIndex, pageSize, query);
         if (!string.IsNullOrWhiteSpace(name))
             query = query.Where(pa => pa.Name.Contains(name));
 
+		_logger.LogDebug("<<< Exiting GetAllProductAttributesAsync(name={Name},pageIndex={PageIndex},pageSize={PageSize})", name, pageIndex, pageSize);
         return await query.OrderBy(x => x.Name).ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -112,6 +128,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<ProductAttribute> GetProductAttributeByIdAsync(int productAttributeId)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeByIdAsync(productAttributeId={ProductAttributeId})", productAttributeId);
+		_logger.LogDebug("<<< Exiting GetProductAttributeByIdAsync(productAttributeId={ProductAttributeId})", productAttributeId);
         return await _productAttributeRepository.GetByIdAsync(productAttributeId, cache => default);
     }
 
@@ -125,6 +143,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<ProductAttribute>> GetProductAttributeByIdsAsync(int[] productAttributeIds)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeByIdsAsync(productAttributeIds={ProductAttributeIds})", productAttributeIds);
+		_logger.LogDebug("<<< Exiting GetProductAttributeByIdsAsync(productAttributeIds={ProductAttributeIds})", productAttributeIds);
         return await _productAttributeRepository.GetByIdsAsync(productAttributeIds);
     }
 
@@ -135,7 +155,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductAttributeAsync(ProductAttribute productAttribute)
     {
+		_logger.LogDebug(">>> Entering InsertProductAttributeAsync(productAttribute={ProductAttribute})", productAttribute);
         await _productAttributeRepository.InsertAsync(productAttribute);
+		_logger.LogDebug("<<< Exiting InsertProductAttributeAsync(productAttribute={ProductAttribute})", productAttribute);
     }
 
     /// <summary>
@@ -145,7 +167,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductAttributeAsync(ProductAttribute productAttribute)
     {
+		_logger.LogDebug(">>> Entering UpdateProductAttributeAsync(productAttribute={ProductAttribute})", productAttribute);
         await _productAttributeRepository.UpdateAsync(productAttribute);
+		_logger.LogDebug("<<< Exiting UpdateProductAttributeAsync(productAttribute={ProductAttribute})", productAttribute);
     }
 
     /// <summary>
@@ -158,14 +182,20 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<int[]> GetNotExistingAttributesAsync(int[] attributeId)
     {
+		_logger.LogDebug(">>> Entering GetNotExistingAttributesAsync(attributeId={AttributeId})", attributeId);
         ArgumentNullException.ThrowIfNull(attributeId);
 
         var query = _productAttributeRepository.Table;
+		_logger.LogDebug("GetNotExistingAttributesAsync(attributeId={AttributeId}): query → {Query}", attributeId, query);
         var queryFilter = attributeId.Distinct().ToArray();
+		_logger.LogDebug("GetNotExistingAttributesAsync(attributeId={AttributeId}): queryFilter → {QueryFilter}", attributeId, queryFilter);
         var filter = await query.Select(a => a.Id)
             .Where(m => queryFilter.Contains(m))
             .ToListAsync();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetNotExistingAttributesAsync(attributeId)={AttributeId}: database query executed in {Arg1} ms", attributeId, __logStart.ElapsedMilliseconds);
 
+		_logger.LogDebug("<<< Exiting GetNotExistingAttributesAsync(attributeId={AttributeId})", attributeId);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -180,9 +210,13 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributeMappingAsync(ProductAttributeMapping productAttributeMapping)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productAttributeMappingRepository.DeleteAsync(productAttributeMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductAttributeMappingAsync(productAttributeMapping)={ProductAttributeMapping}: external service call took {Arg1} ms", productAttributeMapping, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductAttributeMappingAsync(productAttributeMapping)={ProductAttributeMapping}: external service call took {Arg1} ms", productAttributeMapping, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets product attribute mappings by product identifier
     /// </summary>
@@ -193,15 +227,22 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<ProductAttributeMapping>> GetProductAttributeMappingsByProductIdAsync(int productId)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeMappingsByProductIdAsync(productId={ProductId})", productId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var allCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductAttributeMappingsByProductCacheKey, productId);
 
+		_logger.LogDebug("GetProductAttributeMappingsByProductIdAsync(productId={ProductId}): allCacheKey → {AllCacheKey}", productId, allCacheKey);
         var query = from pam in _productAttributeMappingRepository.Table
             orderby pam.DisplayOrder, pam.Id
             where pam.ProductId == productId
             select pam;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var attributes = await _staticCacheManager.GetAsync(allCacheKey, async () => await query.ToListAsync()) ?? new List<ProductAttributeMapping>();
 
+		_logger.LogDebug("GetProductAttributeMappingsByProductIdAsync(productId={ProductId}): attributes → {Attributes}", productId, attributes);
+		_logger.LogInformation("GetProductAttributeMappingsByProductIdAsync(productId)={ProductId}: external service call took {Arg1} ms", productId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductAttributeMappingsByProductIdAsync(productId={ProductId})", productId);
         return attributes;
     }
 
@@ -249,9 +290,15 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributeValueAsync(ProductAttributeValue productAttributeValue)
     {
+		_logger.LogDebug(">>> Entering DeleteProductAttributeValueAsync(productAttributeValue={ProductAttributeValue})", productAttributeValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productAttributeValueRepository.DeleteAsync(productAttributeValue);
+		_logger.LogDebug("<<< Exiting DeleteProductAttributeValueAsync(productAttributeValue={ProductAttributeValue})", productAttributeValue);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductAttributeValueAsync(productAttributeValue)={ProductAttributeValue}: external service call took {Arg1} ms", productAttributeValue, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductAttributeValueAsync(productAttributeValue)={ProductAttributeValue}: external service call took {Arg1} ms", productAttributeValue, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets product attribute values by product attribute mapping identifier
     /// </summary>
@@ -262,14 +309,17 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<ProductAttributeValue>> GetProductAttributeValuesAsync(int productAttributeMappingId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductAttributeValuesByAttributeCacheKey, productAttributeMappingId);
 
         var query = from pav in _productAttributeValueRepository.Table
             orderby pav.DisplayOrder, pav.Id
             where pav.ProductAttributeMappingId == productAttributeMappingId
             select pav;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productAttributeValues = await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
 
+		_logger.LogInformation("GetProductAttributeValuesAsync(productAttributeMappingId)={ProductAttributeMappingId}: external service call took {Arg1} ms", productAttributeMappingId, __logStart.ElapsedMilliseconds);
         return productAttributeValues;
     }
 
@@ -283,6 +333,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<ProductAttributeValue> GetProductAttributeValueByIdAsync(int productAttributeValueId)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeValueByIdAsync(productAttributeValueId={ProductAttributeValueId})", productAttributeValueId);
+		_logger.LogDebug("<<< Exiting GetProductAttributeValueByIdAsync(productAttributeValueId={ProductAttributeValueId})", productAttributeValueId);
         return await _productAttributeValueRepository.GetByIdAsync(productAttributeValueId, cache => default);
     }
 
@@ -293,7 +345,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductAttributeValueAsync(ProductAttributeValue productAttributeValue)
     {
+		_logger.LogDebug(">>> Entering InsertProductAttributeValueAsync(productAttributeValue={ProductAttributeValue})", productAttributeValue);
         await _productAttributeValueRepository.InsertAsync(productAttributeValue);
+		_logger.LogDebug("<<< Exiting InsertProductAttributeValueAsync(productAttributeValue={ProductAttributeValue})", productAttributeValue);
     }
 
     /// <summary>
@@ -303,7 +357,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductAttributeValueAsync(ProductAttributeValue productAttributeValue)
     {
+		_logger.LogDebug(">>> Entering UpdateProductAttributeValueAsync(productAttributeValue={ProductAttributeValue})", productAttributeValue);
         await _productAttributeValueRepository.UpdateAsync(productAttributeValue);
+		_logger.LogDebug("<<< Exiting UpdateProductAttributeValueAsync(productAttributeValue={ProductAttributeValue})", productAttributeValue);
     }
 
     #endregion
@@ -317,6 +373,7 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributeValuePicturesAsync(IList<ProductAttributeValuePicture> valuePictures)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productAttributeValuePictureRepository.DeleteAsync(valuePictures);
     }
 
@@ -327,7 +384,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductAttributeValuePictureAsync(ProductAttributeValuePicture valuePicture)
     {
+		_logger.LogDebug(">>> Entering InsertProductAttributeValuePictureAsync(valuePicture={ValuePicture})", valuePicture);
         await _productAttributeValuePictureRepository.InsertAsync(valuePicture);
+		_logger.LogDebug("<<< Exiting InsertProductAttributeValuePictureAsync(valuePicture={ValuePicture})", valuePicture);
     }
 
     /// <summary>
@@ -337,7 +396,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductAttributeValuePictureAsync(ProductAttributeValuePicture valuePicture)
     {
+		_logger.LogDebug(">>> Entering UpdateProductAttributeValuePictureAsync(valuePicture={ValuePicture})", valuePicture);
         await _productAttributeValuePictureRepository.UpdateAsync(valuePicture);
+		_logger.LogDebug("<<< Exiting UpdateProductAttributeValuePictureAsync(valuePicture={ValuePicture})", valuePicture);
     }
 
     /// <summary>
@@ -350,8 +411,11 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<ProductAttributeValuePicture>> GetProductAttributeValuePicturesAsync(int valueId)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeValuePicturesAsync(valueId={ValueId})", valueId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var allCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductAttributeValuePicturesByValueCacheKey, valueId);
 
+		_logger.LogDebug("GetProductAttributeValuePicturesAsync(valueId={ValueId}): allCacheKey → {AllCacheKey}", valueId, allCacheKey);
         var query = from pacp in _productAttributeValuePictureRepository.Table
             join p in _pictureRepository.Table on pacp.PictureId equals p.Id
             join pp in _productPictureRepository.Table on p.Id equals pp.PictureId
@@ -359,9 +423,13 @@ public partial class ProductAttributeService : IProductAttributeService
             orderby pp.DisplayOrder, pacp.PictureId
             select pacp;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var valuePictures = await _staticCacheManager.GetAsync(allCacheKey, async () => await query.ToListAsync())
                             ?? new List<ProductAttributeValuePicture>();
+							_logger.LogInformation("GetProductAttributeValuePicturesAsync(valueId)={ValueId}: find query executed in {Arg1} ms", valueId, __logStart.ElapsedMilliseconds);
 
+		_logger.LogInformation("GetProductAttributeValuePicturesAsync(valueId)={ValueId}: external service call took {Arg1} ms", valueId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductAttributeValuePicturesAsync(valueId={ValueId})", valueId);
         return valuePictures;
     }
 
@@ -374,6 +442,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A ProductAttributeValuePicture that has the specified values; otherwise null</returns>
     public virtual ProductAttributeValuePicture FindProductAttributeValuePicture(IList<ProductAttributeValuePicture> source, int valueId, int pictureId)
     {
+		_logger.LogDebug(">>> Entering FindProductAttributeValuePicture(source={Source},valueId={ValueId},pictureId={PictureId})", source, valueId, pictureId);
+		_logger.LogDebug("<<< Exiting FindProductAttributeValuePicture(source={Source},valueId={ValueId},pictureId={PictureId})", source, valueId, pictureId);
         return source.FirstOrDefault(vp => vp.ProductAttributeValueId == valueId && vp.PictureId == pictureId);
     }
 
@@ -388,9 +458,15 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePredefinedProductAttributeValueAsync(PredefinedProductAttributeValue ppav)
     {
+		_logger.LogDebug(">>> Entering DeletePredefinedProductAttributeValueAsync(ppav={Ppav})", ppav);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _predefinedProductAttributeValueRepository.DeleteAsync(ppav);
+		_logger.LogDebug("<<< Exiting DeletePredefinedProductAttributeValueAsync(ppav={Ppav})", ppav);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeletePredefinedProductAttributeValueAsync(ppav)={Ppav}: external service call took {Arg1} ms", ppav, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeletePredefinedProductAttributeValueAsync(ppav)={Ppav}: external service call took {Arg1} ms", ppav, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets predefined product attribute values by product attribute identifier
     /// </summary>
@@ -401,15 +477,22 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<PredefinedProductAttributeValue>> GetPredefinedProductAttributeValuesAsync(int productAttributeId)
     {
+		_logger.LogDebug(">>> Entering GetPredefinedProductAttributeValuesAsync(productAttributeId={ProductAttributeId})", productAttributeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.PredefinedProductAttributeValuesByAttributeCacheKey, productAttributeId);
 
+		_logger.LogWarning("GetPredefinedProductAttributeValuesAsync(productAttributeId={ProductAttributeId}): key → {Key}", productAttributeId, key);
         var query = from ppav in _predefinedProductAttributeValueRepository.Table
             orderby ppav.DisplayOrder, ppav.Id
             where ppav.ProductAttributeId == productAttributeId
             select ppav;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var values = await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
 
+		_logger.LogDebug("GetPredefinedProductAttributeValuesAsync(productAttributeId={ProductAttributeId}): values → {Values}", productAttributeId, values);
+		_logger.LogInformation("GetPredefinedProductAttributeValuesAsync(productAttributeId)={ProductAttributeId}: external service call took {Arg1} ms", productAttributeId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetPredefinedProductAttributeValuesAsync(productAttributeId={ProductAttributeId})", productAttributeId);
         return values;
     }
 
@@ -423,6 +506,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<PredefinedProductAttributeValue> GetPredefinedProductAttributeValueByIdAsync(int id)
     {
+		_logger.LogDebug(">>> Entering GetPredefinedProductAttributeValueByIdAsync(id={Id})", id);
+		_logger.LogDebug("<<< Exiting GetPredefinedProductAttributeValueByIdAsync(id={Id})", id);
         return await _predefinedProductAttributeValueRepository.GetByIdAsync(id, cache => default);
     }
 
@@ -433,7 +518,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPredefinedProductAttributeValueAsync(PredefinedProductAttributeValue ppav)
     {
+		_logger.LogDebug(">>> Entering InsertPredefinedProductAttributeValueAsync(ppav={Ppav})", ppav);
         await _predefinedProductAttributeValueRepository.InsertAsync(ppav);
+		_logger.LogDebug("<<< Exiting InsertPredefinedProductAttributeValueAsync(ppav={Ppav})", ppav);
     }
 
     /// <summary>
@@ -443,7 +530,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePredefinedProductAttributeValueAsync(PredefinedProductAttributeValue ppav)
     {
+		_logger.LogDebug(">>> Entering UpdatePredefinedProductAttributeValueAsync(ppav={Ppav})", ppav);
         await _predefinedProductAttributeValueRepository.UpdateAsync(ppav);
+		_logger.LogDebug("<<< Exiting UpdatePredefinedProductAttributeValueAsync(ppav={Ppav})", ppav);
     }
 
     #endregion
@@ -457,6 +546,7 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributeCombinationAsync(ProductAttributeCombination combination)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productAttributeCombinationRepository.DeleteAsync(combination);
     }
 
@@ -470,17 +560,21 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<ProductAttributeCombination>> GetAllProductAttributeCombinationsAsync(int productId)
     {
+		_logger.LogDebug(">>> Entering GetAllProductAttributeCombinationsAsync(productId={ProductId})", productId);
         if (productId == 0)
             return new List<ProductAttributeCombination>();
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var combinations = await _productAttributeCombinationRepository.GetAllAsync(query =>
         {
             return from c in query
                 orderby c.Id
                 where c.ProductId == productId
                 select c;
+				_logger.LogInformation("GetAllProductAttributeCombinationsAsync(productId)={ProductId}: find query executed in {Arg1} ms", productId, __logStart.ElapsedMilliseconds);
         }, cache => cache.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductAttributeCombinationsByProductCacheKey, productId));
 
+		_logger.LogDebug("<<< Exiting GetAllProductAttributeCombinationsAsync(productId={ProductId})", productId);
         return combinations;
     }
 
@@ -494,6 +588,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<ProductAttributeCombination> GetProductAttributeCombinationByIdAsync(int productAttributeCombinationId)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeCombinationByIdAsync(productAttributeCombinationId={ProductAttributeCombinationId})", productAttributeCombinationId);
+		_logger.LogDebug("<<< Exiting GetProductAttributeCombinationByIdAsync(productAttributeCombinationId={ProductAttributeCombinationId})", productAttributeCombinationId);
         return await _productAttributeCombinationRepository.GetByIdAsync(productAttributeCombinationId, cache => default);
     }
 
@@ -507,18 +603,24 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<ProductAttributeCombination> GetProductAttributeCombinationBySkuAsync(string sku)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeCombinationBySkuAsync(sku={Sku})", sku);
         if (string.IsNullOrEmpty(sku))
             return null;
 
         sku = sku.Trim();
+		_logger.LogDebug("GetProductAttributeCombinationBySkuAsync(sku={Sku}): sku → {Sku1}", sku, sku);
 
         var query = from pac in _productAttributeCombinationRepository.Table
             join p in _productRepository.Table on pac.ProductId equals p.Id
             orderby pac.Id
             where !p.Deleted && pac.Sku == sku
             select pac;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var combination = await query.FirstOrDefaultAsync();
 
+		_logger.LogDebug("GetProductAttributeCombinationBySkuAsync(sku={Sku}): combination → {Combination}", sku, combination);
+		_logger.LogInformation("GetProductAttributeCombinationBySkuAsync(sku)={Sku}: database query executed in {Arg1} ms", sku, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductAttributeCombinationBySkuAsync(sku={Sku})", sku);
         return combination;
     }
 
@@ -553,9 +655,15 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductAttributeCombinationPictureAsync(ProductAttributeCombinationPicture combinationPicture)
     {
+		_logger.LogDebug(">>> Entering DeleteProductAttributeCombinationPictureAsync(combinationPicture={CombinationPicture})", combinationPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productAttributeCombinationPictureRepository.DeleteAsync(combinationPicture);
+		_logger.LogDebug("<<< Exiting DeleteProductAttributeCombinationPictureAsync(combinationPicture={CombinationPicture})", combinationPicture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductAttributeCombinationPictureAsync(combinationPicture)={CombinationPicture}: external service call took {Arg1} ms", combinationPicture, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductAttributeCombinationPictureAsync(combinationPicture)={CombinationPicture}: external service call took {Arg1} ms", combinationPicture, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a product attribute combination picture
     /// </summary>
@@ -563,7 +671,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductAttributeCombinationPictureAsync(ProductAttributeCombinationPicture combinationPicture)
     {
+		_logger.LogDebug(">>> Entering InsertProductAttributeCombinationPictureAsync(combinationPicture={CombinationPicture})", combinationPicture);
         await _productAttributeCombinationPictureRepository.InsertAsync(combinationPicture);
+		_logger.LogDebug("<<< Exiting InsertProductAttributeCombinationPictureAsync(combinationPicture={CombinationPicture})", combinationPicture);
     }
 
     /// <summary>
@@ -573,7 +683,9 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductAttributeCombinationPictureAsync(ProductAttributeCombinationPicture combinationPicture)
     {
+		_logger.LogDebug(">>> Entering UpdateProductAttributeCombinationPictureAsync(combinationPicture={CombinationPicture})", combinationPicture);
         await _productAttributeCombinationPictureRepository.UpdateAsync(combinationPicture);
+		_logger.LogDebug("<<< Exiting UpdateProductAttributeCombinationPictureAsync(combinationPicture={CombinationPicture})", combinationPicture);
     }
 
     /// <summary>
@@ -586,8 +698,11 @@ public partial class ProductAttributeService : IProductAttributeService
     /// </returns>
     public virtual async Task<IList<ProductAttributeCombinationPicture>> GetProductAttributeCombinationPicturesAsync(int combinationId)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeCombinationPicturesAsync(combinationId={CombinationId})", combinationId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var allCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductAttributeCombinationPicturesByCombinationCacheKey, combinationId);
 
+		_logger.LogDebug("GetProductAttributeCombinationPicturesAsync(combinationId={CombinationId}): allCacheKey → {AllCacheKey}", combinationId, allCacheKey);
         var query = from pacp in _productAttributeCombinationPictureRepository.Table
             join p in _pictureRepository.Table on pacp.PictureId equals p.Id
             join pp in _productPictureRepository.Table on p.Id equals pp.PictureId
@@ -595,9 +710,13 @@ public partial class ProductAttributeService : IProductAttributeService
             orderby pp.DisplayOrder, pacp.PictureId
             select pacp;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var combinationPictures = await _staticCacheManager.GetAsync(allCacheKey, async () => await query.ToListAsync()) 
                                   ?? new List<ProductAttributeCombinationPicture>();
+								_logger.LogInformation("GetProductAttributeCombinationPicturesAsync(combinationId)={CombinationId}: find query executed in {Arg1} ms", combinationId, __logStart.ElapsedMilliseconds);
 
+		_logger.LogInformation("GetProductAttributeCombinationPicturesAsync(combinationId)={CombinationId}: external service call took {Arg1} ms", combinationId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductAttributeCombinationPicturesAsync(combinationId={CombinationId})", combinationId);
         return combinationPictures;
     }
 
@@ -610,6 +729,8 @@ public partial class ProductAttributeService : IProductAttributeService
     /// <returns>A ProductAttributeCombinationPicture that has the specified values; otherwise null</returns>
     public virtual ProductAttributeCombinationPicture FindProductAttributeCombinationPicture(IList<ProductAttributeCombinationPicture> source, int combinationId, int pictureId)
     {
+		_logger.LogDebug(">>> Entering FindProductAttributeCombinationPicture(source={Source},combinationId={CombinationId},pictureId={PictureId})", source, combinationId, pictureId);
+		_logger.LogDebug("<<< Exiting FindProductAttributeCombinationPicture(source={Source},combinationId={CombinationId},pictureId={PictureId})", source, combinationId, pictureId);
         return source.FirstOrDefault(pacp => pacp.ProductAttributeCombinationId == combinationId && pacp.PictureId == pictureId);
     }
 

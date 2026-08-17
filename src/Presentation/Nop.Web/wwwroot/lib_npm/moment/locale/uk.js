@@ -4,9 +4,13 @@
 //! Author : Menelion Elensúle : https://github.com/Oire
 
 import moment from '../moment';
+const logger = console;
 
 function plural(word, num) {
+	logger.debug(`>>> Entering plural(word=${word},num=${num})`);
     var forms = word.split('_');
+	logger.debug(`plural(word=${word},num=${num}): forms → ${forms}`);
+	logger.debug(`<<< Exiting plural(word=${word},num=${num})`);
     return num % 10 === 1 && num % 100 !== 11
         ? forms[0]
         : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
@@ -14,6 +18,7 @@ function plural(word, num) {
           : forms[2];
 }
 function relativeTimeWithPlural(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var format = {
         ss: withoutSuffix ? 'секунда_секунди_секунд' : 'секунду_секунди_секунд',
         mm: withoutSuffix ? 'хвилина_хвилини_хвилин' : 'хвилину_хвилини_хвилин',
@@ -27,6 +32,7 @@ function relativeTimeWithPlural(number, withoutSuffix, key) {
     } else if (key === 'h') {
         return withoutSuffix ? 'година' : 'годину';
     } else {
+		logger.debug(`<<< Exiting relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
         return number + ' ' + plural(format[key], +number);
     }
 }
@@ -64,7 +70,10 @@ function weekdaysCaseReplace(m, format) {
     return weekdays[nounCase][m.day()];
 }
 function processHoursFunction(str) {
+	logger.debug(`>>> Entering processHoursFunction(str=${str})`);
     return function () {
+	logger.debug('>>> Entering function()');
+		logger.debug(`<<< Exiting processHoursFunction(str=${str})`);
         return str + 'о' + (this.hours() === 11 ? 'б' : '') + '] LT';
     };
 }
@@ -99,6 +108,7 @@ export default moment.defineLocale('uk', {
         lastDay: processHoursFunction('[Вчора '),
         nextWeek: processHoursFunction('[У] dddd ['),
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                 case 3:
@@ -108,6 +118,7 @@ export default moment.defineLocale('uk', {
                 case 1:
                 case 2:
                 case 4:
+			logger.debug('<<< Exiting lastWeek()');
                     return processHoursFunction('[Минулого] dddd [').call(this);
             }
         },
@@ -132,9 +143,12 @@ export default moment.defineLocale('uk', {
     // M. E.: those two are virtually unused but a user might want to implement them for his/her website for some reason
     meridiemParse: /ночі|ранку|дня|вечора/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return /^(дня|вечора)$/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 4) {
             return 'ночі';
         } else if (hour < 12) {
@@ -142,11 +156,13 @@ export default moment.defineLocale('uk', {
         } else if (hour < 17) {
             return 'дня';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'вечора';
         }
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(й|го)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'M':
             case 'd':
@@ -157,6 +173,7 @@ export default moment.defineLocale('uk', {
             case 'D':
                 return number + '-го';
             default:
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },

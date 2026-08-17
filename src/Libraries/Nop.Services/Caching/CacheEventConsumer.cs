@@ -3,6 +3,7 @@ using Nop.Core.Caching;
 using Nop.Core.Events;
 using Nop.Core.Infrastructure;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Caching;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Caching;
 /// </summary>
 /// <typeparam name="TEntity">Entity type</typeparam>
 public abstract partial class CacheEventConsumer<TEntity> :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<EntityInsertedEvent<TEntity>>,
     IConsumer<EntityUpdatedEvent<TEntity>>,
     IConsumer<EntityDeletedEvent<TEntity>>
@@ -27,8 +29,12 @@ public abstract partial class CacheEventConsumer<TEntity> :
 
     protected CacheEventConsumer()
     {
+		_logger.LogDebug(">>> Entering CacheEventConsumer()");
         _shortTermCacheManager = EngineContext.Current.Resolve<IShortTermCacheManager>();
         _staticCacheManager = EngineContext.Current.Resolve<IStaticCacheManager>();
+		_logger.LogDebug("<<< Exiting CacheEventConsumer()");
+		_logger.LogDebug("CacheEventConsumer(): _staticCacheManager → {_staticCacheManager}", _staticCacheManager);
+		_logger.LogDebug("CacheEventConsumer(): _shortTermCacheManager → {_shortTermCacheManager}", _shortTermCacheManager);
     }
 
     #endregion
@@ -43,6 +49,7 @@ public abstract partial class CacheEventConsumer<TEntity> :
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ClearCacheAsync(TEntity entity, EntityEventType entityEventType)
     {
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveByPrefixAsync(NopEntityCacheDefaults<TEntity>.ByIdsPrefix);
         await RemoveByPrefixAsync(NopEntityCacheDefaults<TEntity>.AllPrefix);
 
@@ -50,6 +57,9 @@ public abstract partial class CacheEventConsumer<TEntity> :
             await RemoveAsync(NopEntityCacheDefaults<TEntity>.ByIdCacheKey, entity);
 
         await ClearCacheAsync(entity);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 
     /// <summary>
@@ -70,8 +80,10 @@ public abstract partial class CacheEventConsumer<TEntity> :
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task RemoveByPrefixAsync(string prefix, params object[] prefixParameters)
     {
+		_logger.LogDebug(">>> Entering RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         _shortTermCacheManager.RemoveByPrefix(prefix, prefixParameters);
         await _staticCacheManager.RemoveByPrefixAsync(prefix, prefixParameters);
+		_logger.LogDebug("<<< Exiting RemoveByPrefixAsync(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
     }
 
     /// <summary>
@@ -82,8 +94,10 @@ public abstract partial class CacheEventConsumer<TEntity> :
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveAsync(CacheKey cacheKey, params object[] cacheKeyParameters)
     {
+		_logger.LogDebug(">>> Entering RemoveAsync(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         _shortTermCacheManager.Remove(cacheKey.Key, cacheKeyParameters);
         await _staticCacheManager.RemoveAsync(cacheKey, cacheKeyParameters);
+		_logger.LogDebug("<<< Exiting RemoveAsync(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
     }
 
     #endregion
@@ -97,7 +111,9 @@ public abstract partial class CacheEventConsumer<TEntity> :
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(EntityInsertedEvent<TEntity> eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await ClearCacheAsync(eventMessage.Entity, EntityEventType.Insert);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

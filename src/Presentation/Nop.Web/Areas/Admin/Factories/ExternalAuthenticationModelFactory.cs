@@ -2,6 +2,7 @@
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.ExternalAuthentication;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthenticationMethodModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAuthenticationPluginManager _authenticationPluginManager;
@@ -20,7 +22,10 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
 
     public ExternalAuthenticationMethodModelFactory(IAuthenticationPluginManager authenticationPluginManager)
     {
+		_logger.LogDebug(">>> Entering ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager})", authenticationPluginManager);
         _authenticationPluginManager = authenticationPluginManager;
+		_logger.LogDebug("<<< Exiting ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager})", authenticationPluginManager);
+		_logger.LogDebug("ExternalAuthenticationMethodModelFactory(authenticationPluginManager={AuthenticationPluginManager}): _authenticationPluginManager → {_authenticationPluginManager}", authenticationPluginManager, _authenticationPluginManager);
     }
 
     #endregion
@@ -35,11 +40,13 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
     public virtual ExternalAuthenticationMethodSearchModel PrepareExternalAuthenticationMethodSearchModel(
         ExternalAuthenticationMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareExternalAuthenticationMethodSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareExternalAuthenticationMethodSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -54,10 +61,12 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
     public virtual async Task<ExternalAuthenticationMethodListModel> PrepareExternalAuthenticationMethodListModelAsync(
         ExternalAuthenticationMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareExternalAuthenticationMethodListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get external authentication methods
         var externalAuthenticationMethods = (await _authenticationPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareExternalAuthenticationMethodListModelAsync(searchModel={SearchModel}): externalAuthenticationMethods → {ExternalAuthenticationMethods}", searchModel, externalAuthenticationMethods);
 
         //prepare grid model
         var model = new ExternalAuthenticationMethodListModel().PrepareToGrid(searchModel, externalAuthenticationMethods, () =>
@@ -67,6 +76,7 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
             {
                 //fill in model values from the entity
                 var externalAuthenticationMethodModel = method.ToPluginModel<ExternalAuthenticationMethodModel>();
+				_logger.LogDebug("PrepareExternalAuthenticationMethodListModelAsync(searchModel={SearchModel}): externalAuthenticationMethodModel → {ExternalAuthenticationMethodModel}", searchModel, externalAuthenticationMethodModel);
 
                 //fill in additional values (not existing in the entity)
                 externalAuthenticationMethodModel.IsActive = _authenticationPluginManager.IsPluginActive(method);
@@ -76,6 +86,7 @@ public partial class ExternalAuthenticationMethodModelFactory : IExternalAuthent
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareExternalAuthenticationMethodListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

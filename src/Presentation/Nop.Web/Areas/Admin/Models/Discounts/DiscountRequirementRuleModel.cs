@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Discounts;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Discounts;
 /// </summary>
 public partial record DiscountRequirementRuleModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public DiscountRequirementRuleModel()
     {
+		_logger.LogDebug(">>> Entering DiscountRequirementRuleModel()");
         ChildRequirements = new List<DiscountRequirementRuleModel>();
+		_logger.LogDebug("<<< Exiting DiscountRequirementRuleModel()");
+		_logger.LogDebug("DiscountRequirementRuleModel(): ChildRequirements → {ChildRequirements}", ChildRequirements);
     }
 
     #endregion

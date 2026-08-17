@@ -1,4 +1,5 @@
 using Nop.Core.Domain.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -7,6 +8,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public static class ProductAttributeExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// A value indicating whether this product attribute should have values
     /// </summary>

@@ -11,6 +11,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Affiliates;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -19,6 +20,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class AffiliateModelFactory : IAffiliateModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressModelFactory _addressModelFactory;
@@ -49,17 +51,30 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
         IPriceFormatter priceFormatter,
         IStateProvinceService stateProvinceService)
     {
+		_logger.LogDebug(">>> Entering AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService})", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService);
         _addressModelFactory = addressModelFactory;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _addressModelFactory → {_addressModelFactory}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _addressModelFactory);
         _addressService = addressService;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _addressService → {_addressService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _addressService);
         _affiliateService = affiliateService;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _affiliateService → {_affiliateService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _affiliateService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _baseAdminModelFactory → {_baseAdminModelFactory}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _baseAdminModelFactory);
         _countryService = countryService;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _countryService → {_countryService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _countryService);
         _customerService = customerService;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _customerService → {_customerService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _dateTimeHelper → {_dateTimeHelper}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _localizationService → {_localizationService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _localizationService);
         _orderService = orderService;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _orderService → {_orderService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _orderService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _priceFormatter → {_priceFormatter}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _priceFormatter);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("<<< Exiting AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService})", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService);
+		_logger.LogDebug("AffiliateModelFactory(addressModelFactory={AddressModelFactory},addressService={AddressService},affiliateService={AffiliateService},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter},stateProvinceService={StateProvinceService}): _stateProvinceService → {_stateProvinceService}", addressModelFactory, addressService, affiliateService, baseAdminModelFactory, countryService, customerService, dateTimeHelper, localizationService, orderService, priceFormatter, stateProvinceService, _stateProvinceService);
     }
 
     #endregion
@@ -77,11 +92,13 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     protected virtual async Task<AffiliatedOrderSearchModel> PrepareAffiliatedOrderSearchModelAsync(AffiliatedOrderSearchModel searchModel, Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedOrderSearchModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
 
         searchModel.AffliateId = affiliate.Id;
+		_logger.LogDebug("PrepareAffiliatedOrderSearchModelAsync(searchModel={SearchModel},affiliate={Affiliate}): searchModel.AffliateId → {Arg2}", searchModel, affiliate, searchModel.AffliateId);
 
         //prepare available order, payment and shipping statuses
         await _baseAdminModelFactory.PrepareOrderStatusesAsync(searchModel.AvailableOrderStatuses);
@@ -91,6 +108,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedOrderSearchModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return searchModel;
     }
 
@@ -102,15 +120,18 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// <returns>Affiliated customer search model</returns>
     protected virtual AffiliatedCustomerSearchModel PrepareAffiliatedCustomerSearchModel(AffiliatedCustomerSearchModel searchModel, Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedCustomerSearchModel(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
 
         searchModel.AffliateId = affiliate.Id;
+		_logger.LogDebug("PrepareAffiliatedCustomerSearchModel(searchModel={SearchModel},affiliate={Affiliate}): searchModel.AffliateId → {Arg2}", searchModel, affiliate, searchModel.AffliateId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedCustomerSearchModel(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return searchModel;
     }
 
@@ -128,11 +149,13 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     public virtual Task<AffiliateSearchModel> PrepareAffiliateSearchModelAsync(AffiliateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliateSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliateSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -146,6 +169,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     public virtual async Task<AffiliateListModel> PrepareAffiliateListModelAsync(AffiliateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliateListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get affiliates
@@ -164,8 +188,10 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             return affiliates.SelectAwait(async affiliate =>
             {
                 var address = await _addressService.GetAddressByIdAsync(affiliate.AddressId);
+				_logger.LogDebug("PrepareAffiliateListModelAsync(searchModel={SearchModel}): address → {Address}", searchModel, address);
 
                 var affiliateModel = affiliate.ToModel<AffiliateModel>();
+				_logger.LogDebug("PrepareAffiliateListModelAsync(searchModel={SearchModel}): affiliateModel → {AffiliateModel}", searchModel, affiliateModel);
                 affiliateModel.Address = address.ToModel<AddressModel>();
                 affiliateModel.Address.CountryName = (await _countryService.GetCountryByAddressAsync(address))?.Name;
                 affiliateModel.Address.StateProvinceName = (await _stateProvinceService.GetStateProvinceByAddressAsync(address))?.Name;
@@ -174,6 +200,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliateListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -237,6 +264,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     /// </returns>
     public virtual async Task<AffiliatedOrderListModel> PrepareAffiliatedOrderListModelAsync(AffiliatedOrderSearchModel searchModel, Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedOrderListModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
@@ -266,6 +294,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             return orders.SelectAwait(async order =>
             {
                 var affiliatedOrderModel = order.ToModel<AffiliatedOrderModel>();
+				_logger.LogDebug("PrepareAffiliatedOrderListModelAsync(searchModel={SearchModel},affiliate={Affiliate}): affiliatedOrderModel → {AffiliatedOrderModel}", searchModel, affiliate, affiliatedOrderModel);
 
                 //fill in additional values (not existing in the entity)
                 affiliatedOrderModel.OrderStatus = await _localizationService.GetLocalizedEnumAsync(order.OrderStatus);
@@ -279,6 +308,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedOrderListModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return model;
     }
 
@@ -294,6 +324,7 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
     public virtual async Task<AffiliatedCustomerListModel> PrepareAffiliatedCustomerListModelAsync(AffiliatedCustomerSearchModel searchModel,
         Affiliate affiliate)
     {
+		_logger.LogDebug(">>> Entering PrepareAffiliatedCustomerListModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(affiliate);
@@ -309,12 +340,15 @@ public partial class AffiliateModelFactory : IAffiliateModelFactory
             return customers.Select(customer =>
             {
                 var affiliatedCustomerModel = customer.ToModel<AffiliatedCustomerModel>();
+				_logger.LogDebug("PrepareAffiliatedCustomerListModelAsync(searchModel={SearchModel},affiliate={Affiliate}): affiliatedCustomerModel → {AffiliatedCustomerModel}", searchModel, affiliate, affiliatedCustomerModel);
+				_logger.LogDebug("PrepareAffiliatedCustomerListModelAsync(searchModel={SearchModel},affiliate={Affiliate}): affiliatedCustomerModel.Name → {Arg2}", searchModel, affiliate, affiliatedCustomerModel.Name);
                 affiliatedCustomerModel.Name = customer.Email;
 
                 return affiliatedCustomerModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareAffiliatedCustomerListModelAsync(searchModel={SearchModel},affiliate={Affiliate})", searchModel, affiliate);
         return model;
     }
 

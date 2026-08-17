@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Reports;
 
@@ -10,13 +11,19 @@ namespace Nop.Web.Areas.Admin.Models.Reports;
 /// </summary>
 public partial record CountryReportSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CountryReportSearchModel()
     {
+		_logger.LogDebug(">>> Entering CountryReportSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		_logger.LogDebug("CountryReportSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
+		_logger.LogDebug("CountryReportSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting CountryReportSearchModel()");
+		_logger.LogDebug("CountryReportSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

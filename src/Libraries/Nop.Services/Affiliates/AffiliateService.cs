@@ -6,6 +6,7 @@ using Nop.Core.Domain.Seo;
 using Nop.Data;
 using Nop.Services.Common;
 using Nop.Services.Seo;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Affiliates;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Affiliates;
 /// </summary>
 public partial class AffiliateService : IAffiliateService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -36,13 +38,22 @@ public partial class AffiliateService : IAffiliateService
         IWebHelper webHelper,
         SeoSettings seoSettings)
     {
+		_logger.LogDebug(">>> Entering AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings})", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings);
         _addressService = addressService;
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _addressService → {_addressService}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _addressService);
         _addressRepository = addressRepository;
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _addressRepository → {_addressRepository}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _addressRepository);
         _affiliateRepository = affiliateRepository;
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _affiliateRepository → {_affiliateRepository}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _affiliateRepository);
         _orderRepository = orderRepository;
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _orderRepository → {_orderRepository}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _orderRepository);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _urlRecordService → {_urlRecordService}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _urlRecordService);
         _webHelper = webHelper;
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _webHelper → {_webHelper}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _webHelper);
         _seoSettings = seoSettings;
+		_logger.LogDebug("<<< Exiting AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings})", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings);
+		_logger.LogDebug("AffiliateService(addressService={AddressService},addressRepository={AddressRepository},affiliateRepository={AffiliateRepository},orderRepository={OrderRepository},urlRecordService={UrlRecordService},webHelper={WebHelper},seoSettings={SeoSettings}): _seoSettings → {_seoSettings}", addressService, addressRepository, affiliateRepository, orderRepository, urlRecordService, webHelper, seoSettings, _seoSettings);
     }
 
     #endregion
@@ -59,6 +70,8 @@ public partial class AffiliateService : IAffiliateService
     /// </returns>
     public virtual async Task<Affiliate> GetAffiliateByIdAsync(int affiliateId)
     {
+		_logger.LogDebug(">>> Entering GetAffiliateByIdAsync(affiliateId={AffiliateId})", affiliateId);
+		_logger.LogDebug("<<< Exiting GetAffiliateByIdAsync(affiliateId={AffiliateId})", affiliateId);
         return await _affiliateRepository.GetByIdAsync(affiliateId, cache => default, useShortTermCache: true);
     }
 
@@ -72,6 +85,7 @@ public partial class AffiliateService : IAffiliateService
     /// </returns>
     public virtual async Task<Affiliate> GetAffiliateByFriendlyUrlNameAsync(string friendlyUrlName)
     {
+		_logger.LogDebug(">>> Entering GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName={FriendlyUrlName})", friendlyUrlName);
         if (string.IsNullOrWhiteSpace(friendlyUrlName))
             return null;
 
@@ -79,8 +93,12 @@ public partial class AffiliateService : IAffiliateService
             orderby a.Id
             where a.FriendlyUrlName == friendlyUrlName
             select a;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var affiliate = await query.FirstOrDefaultAsync();
 
+		_logger.LogDebug("GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName={FriendlyUrlName}): affiliate → {Affiliate}", friendlyUrlName, affiliate);
+		_logger.LogInformation("GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName)={FriendlyUrlName}: database query executed in {Arg1} ms", friendlyUrlName, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetAffiliateByFriendlyUrlNameAsync(friendlyUrlName={FriendlyUrlName})", friendlyUrlName);
         return affiliate;
     }
 
@@ -91,6 +109,7 @@ public partial class AffiliateService : IAffiliateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAffiliateAsync(Affiliate affiliate)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _affiliateRepository.DeleteAsync(affiliate);
     }
 
@@ -117,11 +136,15 @@ public partial class AffiliateService : IAffiliateService
         int pageIndex = 0, int pageSize = int.MaxValue,
         bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering GetAllAffiliatesAsync(friendlyUrlName={FriendlyUrlName},firstName={FirstName},lastName={LastName},loadOnlyWithOrders={LoadOnlyWithOrders},ordersCreatedFromUtc={OrdersCreatedFromUtc},ordersCreatedToUtc={OrdersCreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", friendlyUrlName, firstName, lastName, loadOnlyWithOrders, ordersCreatedFromUtc, ordersCreatedToUtc, pageIndex, pageSize, showHidden);
         return await _affiliateRepository.GetAllPagedAsync(query =>
         {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!string.IsNullOrWhiteSpace(friendlyUrlName))
                 query = query.Where(a => a.FriendlyUrlName.Contains(friendlyUrlName));
 
+			_logger.LogDebug("GetAllAffiliatesAsync(friendlyUrlName={FriendlyUrlName},firstName={FirstName},lastName={LastName},loadOnlyWithOrders={LoadOnlyWithOrders},ordersCreatedFromUtc={OrdersCreatedFromUtc},ordersCreatedToUtc={OrdersCreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): query → {Query}", friendlyUrlName, firstName, lastName, loadOnlyWithOrders, ordersCreatedFromUtc, ordersCreatedToUtc, pageIndex, pageSize, showHidden, query);
+			_logger.LogInformation("GetAllAffiliatesAsync(friendlyUrlName,firstName,lastName,loadOnlyWithOrders,ordersCreatedFromUtc,ordersCreatedToUtc,pageIndex,pageSize,showHidden)={FriendlyUrlName},{FirstName},{LastName},{LoadOnlyWithOrders},{OrdersCreatedFromUtc},{OrdersCreatedToUtc},{PageIndex},{PageSize},{ShowHidden}: find query executed in {Arg9} ms", friendlyUrlName, firstName, lastName, loadOnlyWithOrders, ordersCreatedFromUtc, ordersCreatedToUtc, pageIndex, pageSize, showHidden, __logStart.ElapsedMilliseconds);
             if (!string.IsNullOrWhiteSpace(firstName))
                 query = from aff in query
                     join addr in _addressRepository.Table on aff.AddressId equals addr.Id

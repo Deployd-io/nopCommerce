@@ -3,6 +3,7 @@
 //! author : Ryan Hart : https://github.com/ryanhart2
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('lo', {
     months: 'ມັງກອນ_ກຸມພາ_ມີນາ_ເມສາ_ພຶດສະພາ_ມິຖຸນາ_ກໍລະກົດ_ສິງຫາ_ກັນຍາ_ຕຸລາ_ພະຈິກ_ທັນວາ'.split(
@@ -26,12 +27,15 @@ export default moment.defineLocale('lo', {
     },
     meridiemParse: /ຕອນເຊົ້າ|ຕອນແລງ/,
     isPM: function (input) {
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return input === 'ຕອນແລງ';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ຕອນເຊົ້າ';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'ຕອນແລງ';
         }
     },
@@ -61,6 +65,8 @@ export default moment.defineLocale('lo', {
     },
     dayOfMonthOrdinalParse: /(ທີ່)\d{1,2}/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
         return 'ທີ່' + number;
     },
 });

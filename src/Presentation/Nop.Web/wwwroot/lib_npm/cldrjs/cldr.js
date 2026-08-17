@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * CLDR JavaScript Library v0.5.4
  * http://jquery.com/
@@ -13,6 +14,7 @@
  * http://git.io/h4lmVg
  */
 (function( root, factory ) {
+logger.debug(`>>> Entering function(define=${define})`);
 
 	if ( typeof define === "function" && define.amd ) {
 		// AMD.
@@ -36,6 +38,7 @@
 
 
 	var pathNormalize = function( path, attributes ) {
+		logger.debug(`>>> Entering pathNormalize(path=${path},attributes=${attributes})`);
 		if ( arrayIsArray( path ) ) {
 			path = path.join( "/" );
 		}
@@ -50,10 +53,15 @@
 
 		// Replace {attribute}'s
 		path = path.replace( /{[a-zA-Z]+}/g, function( name ) {
+			logger.debug(`>>> Entering replace(name=${name})`);
 			name = name.replace( /^{([^}]*)}$/, "$1" );
+			logger.debug(`pathNormalize(path=${path},attributes=${attributes}): path → ${path}`);
 			return attributes[ name ];
 		});
+		logger.debug(`replace(name=${name}): name → ${name}`);
 
+		logger.debug(`<<< Exiting replace(name=${name})`);
+		logger.debug(`<<< Exiting pathNormalize(path=${path},attributes=${attributes})`);
 		return path.split( "/" );
 	};
 
@@ -61,6 +69,7 @@
 
 
 	var arraySome = function( array, callback ) {
+		logger.debug(`>>> Entering arraySome(array=${array},callback=${callback})`);
 		var i, length;
 		if ( array.some ) {
 			return array.some( callback );
@@ -70,6 +79,7 @@
 				return true;
 			}
 		}
+		logger.debug(`<<< Exiting arraySome(array=${array},callback=${callback})`);
 		return false;
 	};
 
@@ -152,6 +162,7 @@
 		if ( matchFound ) {
 			// [3.2 .. 3.4]
 			match = match.split( sep );
+			logger.debug(`function(test=${test}): match → ${match}`);
 			return [
 				language !== "und" ? language : match[ 0 ],
 				script !== "Zzzz" ? script : match[ 1 ],
@@ -220,6 +231,7 @@
 	 * @locale [String]
 	 */
 	var coreSubtags = function( locale ) {
+		logger.debug(`>>> Entering coreSubtags(locale=${locale})`);
 		var aux, unicodeLanguageId,
 			subtags = [];
 
@@ -231,6 +243,7 @@
 			aux[ 1 ] = aux[ 1 ].split( "-t-" );
 			locale = aux[ 0 ] + ( aux[ 1 ][ 1 ] ? "-t-" + aux[ 1 ][ 1 ] : "");
 			subtags[ 4 /* unicodeLocaleExtensions */ ] = aux[ 1 ][ 0 ];
+			logger.debug(`coreSubtags(locale=${locale}): locale → ${locale}`);
 		}
 
 		// TODO normalize transformed extensions. Currently, skipped.
@@ -260,6 +273,7 @@
 		// 2: territory (aka region)
 		// 3: variant
 		// 4: unicodeLocaleExtensions
+		logger.debug(`<<< Exiting coreSubtags(locale=${locale})`);
 		return subtags;
 	};
 
@@ -267,13 +281,16 @@
 
 
 	var arrayForEach = function( array, callback ) {
+		logger.debug(`>>> Entering arrayForEach(array=${array},callback=${callback})`);
 		var i, length;
 		if ( array.forEach ) {
+			logger.debug(`<<< Exiting arrayForEach(array=${array},callback=${callback})`);
 			return array.forEach( callback );
 		}
 		for ( i = 0, length = array.length; i < length; i++ ) {
 			callback( array[ i ], i, array );
 		}
+		logger.debug(`arrayForEach(availableBundleMapQueue=${availableBundleMapQueue},subtags=${subtags}): subtags → ${subtags}`);
 	};
 
 
@@ -303,6 +320,7 @@
 				}
 				minBundle = coreRemoveLikelySubtags( Cldr, cldr, maxBundle );
 				minBundle = minBundle.join( Cldr.localeSep );
+				logger.debug(`arrayForEach(availableBundleMapQueue=${availableBundleMapQueue},subtags=${subtags}): minBundle → ${minBundle}`);
 				existing = availableBundleMap[ minBundle ];
 				if ( existing && existing.length < bundle.length ) {
 					return;
@@ -319,6 +337,7 @@
 
 
 	var objectKeys = function( object ) {
+		logger.debug(`>>> Entering objectKeys(object=${object})`);
 		var i,
 			result = [];
 
@@ -330,6 +349,7 @@
 			result.push( i );
 		}
 
+		logger.debug(`<<< Exiting objectKeys(object=${object})`);
 		return result;
 	};
 
@@ -337,6 +357,7 @@
 
 
 	var createError = function( code, attributes ) {
+		logger.debug(`>>> Entering createError(code=${code},attributes=${attributes})`);
 		var error, message;
 
 		message = code + ( attributes && JSON ? ": " + JSON.stringify( attributes ) : "" );
@@ -347,7 +368,9 @@
 		arrayForEach( objectKeys( attributes ), function( attribute ) {
 			error[ attribute ] = attributes[ attribute ];
 		});
+		logger.debug(`createError(code=${code},attributes=${attributes}): error.code → ${error.code}`);
 
+		logger.debug(`<<< Exiting createError(code=${code},attributes=${attributes})`);
 		return error;
 	};
 
@@ -364,27 +387,33 @@
 
 
 	var validatePresence = function( value, name ) {
+		logger.debug(`>>> Entering validatePresence(value=${value},name=${name})`);
 		validate( "E_MISSING_PARAMETER", typeof value !== "undefined", {
 			name: name
 		});
+		logger.debug(`<<< Exiting validatePresence(value=${value},name=${name})`);
 	};
 
 
 
 
 	var validateType = function( value, name, check, expected ) {
+		logger.debug(`>>> Entering validateType(value=${value},name=${name},check=${check},expected=${expected})`);
 		validate( "E_INVALID_PAR_TYPE", check, {
 			expected: expected,
 			name: name,
 			value: value
 		});
+		logger.debug(`<<< Exiting validateType(value=${value},name=${name},check=${check},expected=${expected})`);
 	};
 
 
 
 
 	var validateTypePath = function( value, name ) {
+		logger.debug(`>>> Entering validateTypePath(value=${value},name=${name})`);
 		validateType( value, name, typeof value === "string" || arrayIsArray( value ), "String or Array" );
+		logger.debug(`<<< Exiting validateTypePath(value=${value},name=${name})`);
 	};
 
 
@@ -394,6 +423,8 @@
 	 * Function inspired by jQuery Core, but reduced to our use case.
 	 */
 	var isPlainObject = function( obj ) {
+		logger.debug(`>>> Entering isPlainObject(obj=${obj})`);
+		logger.debug(`<<< Exiting isPlainObject(obj=${obj})`);
 		return obj !== null && "" + obj === "[object Object]";
 	};
 
@@ -401,14 +432,18 @@
 
 
 	var validateTypePlainObject = function( value, name ) {
+		logger.debug(`>>> Entering validateTypePlainObject(value=${value},name=${name})`);
 		validateType( value, name, typeof value === "undefined" || isPlainObject( value ), "Plain Object" );
+		logger.debug(`<<< Exiting validateTypePlainObject(value=${value},name=${name})`);
 	};
 
 
 
 
 	var validateTypeString = function( value, name ) {
+		logger.debug(`>>> Entering validateTypeString(value=${value},name=${name})`);
 		validateType( value, name, typeof value === "string", "a string" );
+		logger.debug(`<<< Exiting validateTypeString(value=${value},name=${name})`);
 	};
 
 
@@ -416,6 +451,7 @@
 
 	// @path: normalized path
 	var resourceGet = function( data, path ) {
+		logger.debug(`>>> Entering resourceGet(data=${data},path=${path})`);
 		var i,
 			node = data,
 			length = path.length;
@@ -426,6 +462,8 @@
 				return undefined;
 			}
 		}
+		logger.debug(`resourceGet(data=${data},path=${path}): node → ${node}`);
+		logger.debug(`<<< Exiting resourceGet(data=${data},path=${path})`);
 		return node[ path[ i ] ];
 	};
 
@@ -459,6 +497,8 @@
 
 
 	var alwaysArray = function( somethingOrArray ) {
+		logger.debug(`>>> Entering alwaysArray(somethingOrArray=${somethingOrArray})`);
+		logger.debug(`<<< Exiting alwaysArray(somethingOrArray=${somethingOrArray})`);
 		return arrayIsArray( somethingOrArray ) ?  somethingOrArray : [ somethingOrArray ];
 	};
 
@@ -474,6 +514,7 @@
 	// @arguments JSON's
 	// 
 	var merge = function() {
+		logger.debug('>>> Entering merge()');
 		var destination = {},
 			sources = [].slice.call( arguments, 0 );
 		arrayForEach( sources, function( source ) {
@@ -492,6 +533,8 @@
 				}
 			}
 		});
+		logger.debug(`merge(): sources → ${sources}`);
+		logger.debug('<<< Exiting merge()');
 		return destination;
 	};
 
@@ -546,7 +589,9 @@
 	 * new Cldr()
 	 */
 	var Cldr = function( locale ) {
+		logger.debug(`>>> Entering Cldr(locale=${locale})`);
 		this.init( locale );
+		logger.debug(`<<< Exiting Cldr(locale=${locale})`);
 	};
 
 	// Build optimization hack to avoid duplicating functions across modules.
@@ -596,6 +641,7 @@
 		if ( subtags.length === 5 ) {
 			unicodeLocaleExtensions = subtags.pop();
 			unicodeLocaleExtensionsRaw = sep + "u" + sep + unicodeLocaleExtensions;
+			logger.debug(`function(locale=${locale}): unicodeLocaleExtensionsRaw → ${unicodeLocaleExtensionsRaw}`);
 			// Remove trailing null when there is unicodeLocaleExtensions but no variants.
 			if ( !subtags[ 3 ] ) {
 				subtags.pop();
@@ -635,6 +681,7 @@
 			variant: variant
 		};
 
+		logger.debug(`function(locale=${locale}): this.attributes → ${this.attributes}`);
 		// Unicode locale extensions.
 		unicodeLocaleExtensions && ( "-" + unicodeLocaleExtensions ).replace( /-[a-z]{3,8}|(-[a-z]{2})-([a-z]{3,8})/g, function( attribute, key, type ) {
 
@@ -650,6 +697,7 @@
 		});
 
 		this.locale = locale;
+		logger.debug(`function(locale=${locale}): this.locale → ${this.locale}`);
 	};
 
 	/**
@@ -675,6 +723,8 @@
 		});
 
 		path = alwaysArray( path );
+		logger.debug(`function(path=${path}): path → ${path}`);
+		logger.debug(`function(define=${define}): path → ${path}`);
 		return this.get( [ "main/{bundle}" ].concat( path ) );
 	};
 

@@ -50,16 +50,28 @@ public partial class InstallController : Controller
         Lazy<IWebHelper> webHelper,
         Lazy<NopHttpClient> nopHttpClient)
     {
+		_logger.LogDebug(">>> Entering InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient})", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient);
         _appSettings = appSettings;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _appSettings → {_appSettings}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _appSettings);
         _locService = locService;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _locService → {_locService}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _locService);
         _installationService = installationService;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _installationService → {_installationService}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _installationService);
         _fileProvider = fileProvider;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _fileProvider → {_fileProvider}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _fileProvider);
         _permissionService = permissionService;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _permissionService → {_permissionService}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _permissionService);
         _pluginService = pluginService;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _pluginService → {_pluginService}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _pluginService);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _staticCacheManager → {_staticCacheManager}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _staticCacheManager);
         _uploadService = uploadService;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _uploadService → {_uploadService}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _uploadService);
         _webHelper = webHelper;
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _webHelper → {_webHelper}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _webHelper);
         _nopHttpClient = nopHttpClient;
+		_logger.LogDebug("<<< Exiting InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient})", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient);
+		_logger.LogDebug("InstallController(appSettings={AppSettings},locService={LocService},installationService={InstallationService},fileProvider={FileProvider},permissionService={PermissionService},pluginService={PluginService},staticCacheManager={StaticCacheManager},uploadService={UploadService},webHelper={WebHelper},nopHttpClient={NopHttpClient}): _nopHttpClient → {_nopHttpClient}", appSettings, locService, installationService, fileProvider, permissionService, pluginService, staticCacheManager, uploadService, webHelper, nopHttpClient, _nopHttpClient);
     }
 
     #endregion
@@ -79,9 +91,11 @@ public partial class InstallController : Controller
         };
         countries.AddRange(from country in ISO3166.GetCollection()
             from localization in ISO3166.GetLocalizationInfo(country.Alpha2)
+			using Microsoft.Extensions.Logging;
             let lang = ISO3166.GetLocalizationInfo(country.Alpha2).Count() > 1 ? $" [{localization.Language} language]" : string.Empty
             let item = new SelectListItem
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 Value = $"{country.Alpha2}-{localization.Culture}",
                 Text = $"{country.Name}{lang}",
                 Selected = (localization.Culture == browserCulture) && browserCulture[^2..] == country.Alpha2
@@ -127,6 +141,7 @@ public partial class InstallController : Controller
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -146,6 +161,7 @@ public partial class InstallController : Controller
         PrepareLanguageList(model);
         PrepareCountryList(model);
 
+		_logger.LogDebug("<<< Exiting Index()");
         return View(model);
     }
 
@@ -335,19 +351,23 @@ public partial class InstallController : Controller
 
     public virtual IActionResult ChangeLanguage(string language)
     {
+		_logger.LogDebug(">>> Entering ChangeLanguage(language={Language})", language);
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         _locService.Value.SaveCurrentLanguage(language);
 
         //Reload the page
+		_logger.LogDebug("<<< Exiting ChangeLanguage(language={Language})", language);
         return RedirectToAction("Index", "Install");
     }
 
     [HttpPost]
     public virtual IActionResult RestartInstall()
     {
+		_logger.LogDebug(">>> Entering RestartInstall()");
         if (DataSettingsManager.IsDatabaseInstalled())
+		_logger.LogDebug("<<< Exiting RestartInstall()");
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         return View("Index", new InstallModel { RestartUrl = Url.RouteUrl(NopRouteNames.Standard.INSTALLATION) });
@@ -355,12 +375,14 @@ public partial class InstallController : Controller
 
     public virtual IActionResult RestartApplication()
     {
+		_logger.LogDebug(">>> Entering RestartApplication()");
         if (DataSettingsManager.IsDatabaseInstalled())
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         //restart application
         _webHelper.Value.RestartAppDomain();
 
+		_logger.LogDebug("<<< Exiting RestartApplication()");
         return new EmptyResult();
     }
 

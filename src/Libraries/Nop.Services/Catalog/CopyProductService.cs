@@ -6,6 +6,7 @@ using Nop.Services.Media;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class CopyProductService : ICopyProductService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -113,6 +115,7 @@ public partial class CopyProductService : ICopyProductService
             associatedProductCopy.ParentGroupedProductId = productCopy.Id;
             await _productService.UpdateProductAsync(associatedProductCopy);
         }
+		_logger.LogDebug("<<< Exiting CopyAssociatedProductsAsync(product={Product},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts},productCopy={ProductCopy})", product, isPublished, copyMultimedia, copyAssociatedProducts, productCopy);
     }
 
     /// <summary>
@@ -134,6 +137,8 @@ public partial class CopyProductService : ICopyProductService
                 StartDateTimeUtc = tierPrice.StartDateTimeUtc,
                 EndDateTimeUtc = tierPrice.EndDateTimeUtc
             });
+			_logger.LogDebug(">>> Entering CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
+			_logger.LogDebug("<<< Exiting CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
     }
 
     /// <summary>
@@ -630,12 +635,16 @@ public partial class CopyProductService : ICopyProductService
     /// </returns>
     protected virtual async Task<Product> CopyBaseProductDataAsync(Product product, string newName, bool isPublished)
     {
+		_logger.LogDebug(">>> Entering CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished})", product, newName, isPublished);
         //product download & sample download
         var downloadId = product.DownloadId;
+		_logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): downloadId → {DownloadId}", product, newName, isPublished, downloadId);
         var sampleDownloadId = product.SampleDownloadId;
+		_logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): sampleDownloadId → {SampleDownloadId}", product, newName, isPublished, sampleDownloadId);
         if (product.IsDownload)
         {
             var download = await _downloadService.GetDownloadByIdAsync(product.DownloadId);
+			_logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): download → {Download}", product, newName, isPublished, download);
             if (download != null)
             {
                 var downloadCopy = new Download
@@ -656,6 +665,7 @@ public partial class CopyProductService : ICopyProductService
             if (product.HasSampleDownload)
             {
                 var sampleDownload = await _downloadService.GetDownloadByIdAsync(product.SampleDownloadId);
+				_logger.LogDebug("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): sampleDownload → {SampleDownload}", product, newName, isPublished, sampleDownload);
                 if (sampleDownload != null)
                 {
                     var sampleDownloadCopy = new Download
@@ -786,6 +796,7 @@ public partial class CopyProductService : ICopyProductService
 
         //search engine name
         await _urlRecordService.SaveSlugAsync(productCopy, await _urlRecordService.ValidateSeNameAsync(productCopy, string.Empty, productCopy.Name, true), 0);
+		_logger.LogDebug("<<< Exiting CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished})", product, newName, isPublished);
         return productCopy;
     }
 
@@ -808,12 +819,14 @@ public partial class CopyProductService : ICopyProductService
     public virtual async Task<Product> CopyProductAsync(Product product, string newName,
         bool isPublished = true, bool copyMultimedia = true, bool copyAssociatedProducts = true)
     {
+		_logger.LogDebug(">>> Entering CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
         ArgumentNullException.ThrowIfNull(product);
 
         if (string.IsNullOrEmpty(newName))
             throw new ArgumentException("Product name is required");
 
         var productCopy = await CopyBaseProductDataAsync(product, newName, isPublished);
+		_logger.LogDebug("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): productCopy → {ProductCopy}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, productCopy);
 
         //localization
         await CopyLocalizationDataAsync(product, productCopy);
@@ -824,6 +837,7 @@ public partial class CopyProductService : ICopyProductService
 
         //copy product pictures
         var originalNewPictureIdentifiers = await CopyProductPicturesAsync(product, newName, copyMultimedia, productCopy);
+		_logger.LogDebug("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): originalNewPictureIdentifiers → {OriginalNewPictureIdentifiers}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, originalNewPictureIdentifiers);
 
         //copy product videos
         await CopyProductVideosAsync(product, copyMultimedia, productCopy);
@@ -852,11 +866,13 @@ public partial class CopyProductService : ICopyProductService
 
         //store mapping
         var selectedStoreIds = await _storeMappingService.GetStoresIdsWithAccessAsync(product);
+		_logger.LogDebug("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): selectedStoreIds → {SelectedStoreIds}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, selectedStoreIds);
         foreach (var id in selectedStoreIds)
             await _storeMappingService.InsertStoreMappingAsync(productCopy, id);
 
         //customer role mapping
         var customerRoleIds = await _aclService.GetCustomerRoleIdsWithAccessAsync(product.Id, nameof(Product));
+		_logger.LogDebug("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): customerRoleIds → {CustomerRoleIds}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, customerRoleIds);
 
         foreach (var id in customerRoleIds)
             await _aclService.InsertAclRecordAsync(productCopy, id);

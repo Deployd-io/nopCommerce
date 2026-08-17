@@ -21,6 +21,7 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Controllers;
 
@@ -29,6 +30,7 @@ namespace Nop.Plugin.Misc.Zettle.Controllers;
 [AutoValidateAntiforgeryToken]
 public class ZettleAdminController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -67,21 +69,38 @@ public class ZettleAdminController : BasePluginController
         ZettleService zettleService,
         ZettleSettings zettleSettings)
     {
+		_logger.LogDebug(">>> Entering ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings})", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings);
         _currencySettings = currencySettings;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _currencySettings → {_currencySettings}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _currencySettings);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _baseAdminModelFactory → {_baseAdminModelFactory}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _baseAdminModelFactory);
         _currencyService = currencyService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _currencyService → {_currencyService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _currencyService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _dateTimeHelper → {_dateTimeHelper}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _localizationService → {_localizationService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _notificationService → {_notificationService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _permissionService → {_permissionService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _permissionService);
         _productService = productService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _productService → {_productService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _productService);
         _scheduleTaskService = scheduleTaskService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _scheduleTaskService → {_scheduleTaskService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _scheduleTaskService);
         _settingService = settingService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _settingService → {_settingService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _storeContext → {_storeContext}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _storeContext);
         _taxSettings = taxSettings;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _taxSettings → {_taxSettings}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _taxSettings);
         _zettleRecordService = zettleRecordService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _zettleRecordService → {_zettleRecordService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _zettleRecordService);
         _zettleService = zettleService;
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _zettleService → {_zettleService}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _zettleService);
         _zettleSettings = zettleSettings;
+		_logger.LogDebug("<<< Exiting ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings})", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings);
+		_logger.LogDebug("ZettleAdminController(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},scheduleTaskService={ScheduleTaskService},settingService={SettingService},storeContext={StoreContext},taxSettings={TaxSettings},zettleRecordService={ZettleRecordService},zettleService={ZettleService},zettleSettings={ZettleSettings}): _zettleSettings → {_zettleSettings}", currencySettings, baseAdminModelFactory, currencyService, dateTimeHelper, localizationService, notificationService, permissionService, productService, scheduleTaskService, settingService, storeContext, taxSettings, zettleRecordService, zettleService, zettleSettings, _zettleSettings);
     }
 
     #endregion
@@ -93,6 +112,7 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             ClientId = _zettleSettings.ClientId,
@@ -116,32 +136,40 @@ public class ZettleAdminController : BasePluginController
             if (!string.IsNullOrEmpty(error) || accountInfo is null)
             {
                 var locale = await _localizationService.GetResourceAsync("Plugins.Misc.Zettle.Configuration.Error");
+				_logger.LogDebug("Configure(): locale → {Locale}", locale);
                 var errorMessage = string.Format(locale, error, Url.Action("List", "Log"));
+				_logger.LogDebug("Configure(): errorMessage → {ErrorMessage}", errorMessage);
                 _notificationService.ErrorNotification(errorMessage, false);
 
                 return View("~/Plugins/Misc.Zettle/Views/Configure.cshtml", model);
             }
 
             model.Connected = true;
+			_logger.LogDebug("Configure(): model.Connected → {Arg0}", model.Connected);
             model.Account.Name = accountInfo.Name;
             model.Account.CustomerStatus = accountInfo.CustomerStatus?.ToLower() ?? "undefined";
             model.Account.Accepted = string.Equals(accountInfo.CustomerStatus, "ACCEPTED", StringComparison.InvariantCultureIgnoreCase);
 
             //ensure the same currencies are used
             var storeCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+			_logger.LogDebug("Configure(): storeCurrency → {StoreCurrency}", storeCurrency);
             if (string.IsNullOrEmpty(accountInfo.Currency) ||
                 !accountInfo.Currency.Equals(storeCurrency.CurrencyCode, StringComparison.InvariantCultureIgnoreCase))
             {
                 var locale = await _localizationService.GetResourceAsync("Plugins.Misc.Zettle.Account.Fields.Currency.Warning");
                 var warning = string.Format(locale, storeCurrency.CurrencyCode, accountInfo.Currency, Url.Action("List", "Currency"));
+				_logger.LogDebug("Configure(): warning → {Warning}", warning);
                 _notificationService.WarningNotification(warning, false);
             }
             model.Account.Currency = accountInfo.Currency;
 
             //ensure the same tax types are used
             var taxNone = string.Equals(accountInfo.TaxationType, "NONE", StringComparison.InvariantCultureIgnoreCase);
+			_logger.LogDebug("Configure(): taxNone → {TaxNone}", taxNone);
             var taxVat = string.Equals(accountInfo.TaxationType, "VAT", StringComparison.InvariantCultureIgnoreCase);
+			_logger.LogDebug("Configure(): taxVat → {TaxVat}", taxVat);
             var taxRates = string.Equals(accountInfo.TaxationType, "SALES_TAX", StringComparison.InvariantCultureIgnoreCase);
+			_logger.LogDebug("Configure(): taxRates → {TaxRates}", taxRates);
             if (_taxSettings.EuVatEnabled != taxVat)
             {
                 var locale = await _localizationService.GetResourceAsync("Plugins.Misc.Zettle.Account.Fields.TaxationType.Vat.Warning");
@@ -152,6 +180,7 @@ public class ZettleAdminController : BasePluginController
             if (taxVat)
             {
                 _zettleSettings.DefaultTaxEnabled = true;
+				_logger.LogDebug("Configure(): _zettleSettings.DefaultTaxEnabled → {Arg0}", _zettleSettings.DefaultTaxEnabled);
                 if (accountInfo.VatPercentage.HasValue)
                     model.Account.TaxationType = $"{model.Account.TaxationType} ({accountInfo.VatPercentage}%)";
             }
@@ -169,6 +198,7 @@ public class ZettleAdminController : BasePluginController
 
             //ensure the same price types are used
             var pricesIncludeTax = string.Equals(accountInfo.TaxationMode, "INCLUSIVE", StringComparison.InvariantCultureIgnoreCase);
+			_logger.LogDebug("Configure(): pricesIncludeTax → {PricesIncludeTax}", pricesIncludeTax);
             if (_taxSettings.PricesIncludeTax != pricesIncludeTax || (_taxSettings.PricesIncludeTax && taxNone))
             {
                 var locale = await _localizationService.GetResourceAsync("Plugins.Misc.Zettle.Account.Fields.TaxationMode.Warning");
@@ -179,10 +209,14 @@ public class ZettleAdminController : BasePluginController
 
             //ensure the webhook is created
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("Configure(): store → {Store}", store);
             var webhookUrl = $"{store.Url.TrimEnd('/')}{Url.RouteUrl(ZettleDefaults.WebhookRouteName)}".ToLowerInvariant();
+			_logger.LogDebug("Configure(): webhookUrl → {WebhookUrl}", webhookUrl);
             var (webhook, _) = await _zettleService.CreateWebhookAsync(webhookUrl);
 
             _zettleSettings.WebhookUrl = webhook?.Destination;
+			_logger.LogDebug("Configure(): _zettleSettings.WebhookUrl → {Arg0}", _zettleSettings.WebhookUrl);
+			_logger.LogDebug("Configure(): _zettleSettings.WebhookKey → {Arg0}", _zettleSettings.WebhookKey);
             _zettleSettings.WebhookKey = webhook?.SigningKey;
             await _settingService.SaveSettingAsync(_zettleSettings);
 
@@ -209,12 +243,16 @@ public class ZettleAdminController : BasePluginController
         }
 
         var scheduleTask = await _scheduleTaskService.GetTaskByTypeAsync(ZettleDefaults.SynchronizationTask.Type);
+		_logger.LogDebug("Configure(): scheduleTask → {ScheduleTask}", scheduleTask);
         if (scheduleTask is not null)
         {
             model.AutoSyncEnabled = scheduleTask.Enabled;
+			_logger.LogDebug("Configure(): model.AutoSyncEnabled → {Arg0}", model.AutoSyncEnabled);
+			_logger.LogDebug("Configure(): model.AutoSyncPeriod → {Arg0}", model.AutoSyncPeriod);
             model.AutoSyncPeriod = scheduleTask.Seconds / 60;
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.Zettle/Views/Configure.cshtml", model);
     }
 
@@ -293,6 +331,7 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> RevokeAccess()
     {
+		_logger.LogDebug(">>> Entering RevokeAccess()");
         if (!ZettleService.IsConfigured(_zettleSettings))
             return await Configure();
 
@@ -303,7 +342,9 @@ public class ZettleAdminController : BasePluginController
         if (!string.IsNullOrEmpty(error))
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Misc.Zettle.Configuration.Error");
+			_logger.LogDebug("RevokeAccess(): locale → {Locale}", locale);
             var errorMessage = string.Format(locale, error, Url.Action("List", "Log"));
+			_logger.LogDebug("RevokeAccess(): errorMessage → {ErrorMessage}", errorMessage);
             _notificationService.ErrorNotification(errorMessage, false);
             return await Configure();
         }
@@ -311,6 +352,11 @@ public class ZettleAdminController : BasePluginController
         await _zettleRecordService.ClearRecordsAsync();
 
         _zettleSettings.ClientId = string.Empty;
+		_logger.LogDebug("RevokeAccess(): _zettleSettings.ClientId → {Arg0}", _zettleSettings.ClientId);
+		_logger.LogDebug("RevokeAccess(): _zettleSettings.ApiKey → {Arg0}", _zettleSettings.ApiKey);
+		_logger.LogDebug("RevokeAccess(): _zettleSettings.WebhookUrl → {Arg0}", _zettleSettings.WebhookUrl);
+		_logger.LogDebug("RevokeAccess(): _zettleSettings.WebhookKey → {Arg0}", _zettleSettings.WebhookKey);
+		_logger.LogDebug("RevokeAccess(): _zettleSettings.ImportId → {Arg0}", _zettleSettings.ImportId);
         _zettleSettings.ApiKey = string.Empty;
         _zettleSettings.WebhookUrl = string.Empty;
         _zettleSettings.WebhookKey = string.Empty;
@@ -319,6 +365,7 @@ public class ZettleAdminController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.Zettle.Credentials.AccessRevoked"));
 
+		_logger.LogDebug("<<< Exiting RevokeAccess()");
         return await Configure();
     }
 
@@ -330,9 +377,11 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> SyncRecordList(SyncRecordSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering SyncRecordList(searchModel={SearchModel})", searchModel);
         var records = await _zettleRecordService.GetAllRecordsAsync(productOnly: true,
             pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
         var products = await _productService.GetProductsByIdsAsync(records.Select(record => record.ProductId).Distinct().ToArray());
+		_logger.LogDebug("SyncRecordList(searchModel={SearchModel}): products → {Products}", searchModel, products);
         var model = await new SyncRecordListModel().PrepareToGridAsync(searchModel, records, () =>
         {
             return records.SelectAwait(async record => new SyncRecordModel
@@ -350,6 +399,7 @@ public class ZettleAdminController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting SyncRecordList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -378,19 +428,23 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> SyncRecordDelete(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering SyncRecordDelete(selectedIds={SelectedIds})", selectedIds);
         if (!selectedIds?.Any() ?? true)
             return NoContent();
 
         foreach (var id in selectedIds)
         {
             var productRecord = await _zettleRecordService.GetRecordByIdAsync(id);
+			_logger.LogDebug("SyncRecordDelete(selectedIds={SelectedIds}): productRecord → {ProductRecord}", selectedIds, productRecord);
             if (productRecord is null)
                 continue;
 
             var records = (await _zettleRecordService.GetAllRecordsAsync(productUuid: productRecord.Uuid)).ToList();
+			_logger.LogDebug("SyncRecordDelete(selectedIds={SelectedIds}): records → {Records}", selectedIds, records);
             await _zettleRecordService.DeleteRecordsAsync(records.Select(record => record.Id).ToList());
         }
 
+		_logger.LogDebug("<<< Exiting SyncRecordDelete(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
@@ -398,14 +452,17 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> ProductToSync()
     {
+		_logger.LogDebug(">>> Entering ProductToSync()");
         var model = new AddProductToSyncSearchModel();
         await _baseAdminModelFactory.PrepareProductTypesAsync(model.AvailableProductTypes);
+		_logger.LogDebug("ProductToSync(): model → {Model}", model);
         await _baseAdminModelFactory.PrepareCategoriesAsync(model.AvailableCategories);
         await _baseAdminModelFactory.PrepareManufacturersAsync(model.AvailableManufacturers);
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores);
         await _baseAdminModelFactory.PrepareVendorsAsync(model.AvailableVendors);
         model.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting ProductToSync()");
         return View("~/Plugins/Misc.Zettle/Views/ProductToSync.cshtml", model);
     }
 
@@ -414,6 +471,7 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> ProductListToSync(AddProductToSyncSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductListToSync(searchModel={SearchModel})", searchModel);
         var products = await _productService.SearchProductsAsync(showHidden: true,
             keywords: searchModel.SearchProductName,
             productType: searchModel.SearchProductTypeId > 0 ? (ProductType?)searchModel.SearchProductTypeId : null,
@@ -435,6 +493,7 @@ public class ZettleAdminController : BasePluginController
             }).ToList();
         });
 
+		_logger.LogDebug("<<< Exiting ProductListToSync(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -461,14 +520,17 @@ public class ZettleAdminController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> SyncStart()
     {
+		_logger.LogDebug(">>> Entering SyncStart()");
         await _zettleService.ImportAsync();
 
+		_logger.LogDebug("<<< Exiting SyncStart()");
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public async Task<IActionResult> SyncUpdate()
     {
+		_logger.LogDebug(">>> Entering SyncUpdate()");
         if (string.IsNullOrEmpty(_zettleSettings.ImportId))
             return ErrorJson("Synchronization not found");
 
@@ -477,6 +539,7 @@ public class ZettleAdminController : BasePluginController
             return ErrorJson("Synchronization error");
 
         if (string.Equals(import.State, "IMPORTING", StringComparison.InvariantCultureIgnoreCase))
+		_logger.LogDebug("<<< Exiting SyncUpdate()");
             return Json(new { StartDate = import.Created, Items = import.Items?.ToString(), State = import.State });
 
         return Json(new { Completed = true });

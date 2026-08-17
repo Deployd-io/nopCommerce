@@ -12,6 +12,7 @@ using Nop.Services.News;
 using Nop.Services.Seo;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.News;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class NewsModelFactory : INewsModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -54,19 +56,34 @@ public partial class NewsModelFactory : INewsModelFactory
         MediaSettings mediaSettings,
         NewsSettings newsSettings)
     {
+		_logger.LogDebug(">>> Entering NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings})", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings);
         _captchaSettings = captchaSettings;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _captchaSettings → {_captchaSettings}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _captchaSettings);
         _customerSettings = customerSettings;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _customerSettings → {_customerSettings}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _customerSettings);
         _customerService = customerService;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _customerService → {_customerService}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _dateTimeHelper → {_dateTimeHelper}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _dateTimeHelper);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _genericAttributeService → {_genericAttributeService}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _genericAttributeService);
         _newsService = newsService;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _newsService → {_newsService}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _newsService);
         _pictureService = pictureService;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _pictureService → {_pictureService}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _pictureService);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _staticCacheManager → {_staticCacheManager}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _staticCacheManager);
         _storeContext = storeContext;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _storeContext → {_storeContext}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _storeContext);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _urlRecordService → {_urlRecordService}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _urlRecordService);
         _workContext = workContext;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _workContext → {_workContext}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _workContext);
         _mediaSettings = mediaSettings;
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _mediaSettings → {_mediaSettings}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _mediaSettings);
         _newsSettings = newsSettings;
+		_logger.LogDebug("<<< Exiting NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings})", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings);
+		_logger.LogDebug("NewsModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},genericAttributeService={GenericAttributeService},newsService={NewsService},pictureService={PictureService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},newsSettings={NewsSettings}): _newsSettings → {_newsSettings}", captchaSettings, customerSettings, customerService, dateTimeHelper, genericAttributeService, newsService, pictureService, staticCacheManager, storeContext, urlRecordService, workContext, mediaSettings, newsSettings, _newsSettings);
     }
 
     #endregion
@@ -138,12 +155,18 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<HomepageNewsItemsModel> PrepareHomepageNewsItemsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareHomepageNewsItemsModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var language = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): store → {Store}", store);
+		_logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): language → {Language}", language);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.HomepageNewsModelKey, language, store);
         var cachedModel = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
+		_logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): cacheKey → {CacheKey}", cacheKey);
             var newsItems = await _newsService.GetAllNewsAsync(language.Id, store.Id, 0, _newsSettings.MainPageNewsCount);
+			_logger.LogDebug("PrepareHomepageNewsItemsModelAsync(): newsItems → {NewsItems}", newsItems);
 
             return new HomepageNewsItemsModel
             {
@@ -155,6 +178,7 @@ public partial class NewsModelFactory : INewsModelFactory
                     return newsModel;
                 }).ToListAsync()
             };
+			_logger.LogInformation("PrepareHomepageNewsItemsModelAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         });
 
         //"Comments" property of "NewsItemModel" object depends on the current customer.
@@ -164,6 +188,10 @@ public partial class NewsModelFactory : INewsModelFactory
         foreach (var newsItemModel in model.NewsItems)
             newsItemModel.Comments.Clear();
 
+		_logger.LogInformation("PrepareHomepageNewsItemsModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareHomepageNewsItemsModelAsync()");
+		_logger.LogDebug(">>> Entering PrepareNewsCommentModelAsync(newsComment={NewsComment})", newsComment);
+		_logger.LogDebug("<<< Exiting PrepareNewsCommentModelAsync(newsComment={NewsComment})", newsComment);
         return model;
     }
 
@@ -177,14 +205,20 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsItemListModel> PrepareNewsItemListModelAsync(NewsPagingFilteringModel command)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsItemListModelAsync(command={Command})", command);
         if (command.PageSize <= 0)
             command.PageSize = _newsSettings.NewsArchivePageSize;
+			_logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): command.PageSize → {Arg1}", command, command.PageSize);
         if (command.PageNumber <= 0)
             command.PageNumber = 1;
+			_logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): command.PageNumber → {Arg1}", command, command.PageNumber);
 
         var language = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): language → {Language}", command, language);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): store → {Store}", command, store);
         var newsItems = await _newsService.GetAllNewsAsync(language.Id, store.Id, command.PageNumber - 1, command.PageSize);
+		_logger.LogDebug("PrepareNewsItemListModelAsync(command={Command}): newsItems → {NewsItems}", command, newsItems);
 
         var model = new NewsItemListModel
         {
@@ -196,8 +230,10 @@ public partial class NewsModelFactory : INewsModelFactory
                 return newsModel;
             }).ToListAsync()
         };
+		_logger.LogInformation("PrepareNewsItemListModelAsync(command)={Command}: database query executed in {Arg1} ms", command, __logStart.ElapsedMilliseconds);
         model.PagingFilteringContext.LoadPagedList(newsItems);
 
+		_logger.LogDebug("<<< Exiting PrepareNewsItemListModelAsync(command={Command})", command);
         return model;
     }
 
@@ -214,6 +250,7 @@ public partial class NewsModelFactory : INewsModelFactory
         ArgumentNullException.ThrowIfNull(newsComment);
 
         var customer = await _customerService.GetCustomerByIdAsync(newsComment.CustomerId);
+		_logger.LogDebug("PrepareNewsCommentModelAsync(newsComment={NewsComment}): customer → {Customer}", newsComment, customer);
 
         var model = new NewsCommentModel
         {

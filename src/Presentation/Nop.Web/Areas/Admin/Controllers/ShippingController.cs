@@ -19,11 +19,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Shipping;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ShippingController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -116,9 +118,12 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Providers()
     {
+		_logger.LogDebug(">>> Entering Providers()");
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingProviderSearchModelAsync(new ShippingProviderSearchModel());
+		_logger.LogDebug("Providers(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Providers()");
         return View(model);
     }
 
@@ -129,6 +134,7 @@ public partial class ShippingController : BaseAdminController
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingProviderListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting Providers(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -177,9 +183,12 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> PickupPointProviders()
     {
+		_logger.LogDebug(">>> Entering PickupPointProviders()");
         //prepare model
         var model = await _shippingModelFactory.PreparePickupPointProviderSearchModelAsync(new PickupPointProviderSearchModel());
+		_logger.LogDebug("PickupPointProviders(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting PickupPointProviders()");
         return View(model);
     }
 
@@ -190,6 +199,7 @@ public partial class ShippingController : BaseAdminController
         //prepare model
         var model = await _shippingModelFactory.PreparePickupPointProviderListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting PickupPointProviders(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -236,9 +246,12 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Methods()
     {
+		_logger.LogDebug(">>> Entering Methods()");
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingMethodSearchModelAsync(new ShippingMethodSearchModel());
+		_logger.LogDebug("Methods(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Methods()");
         return View(model);
     }
 
@@ -249,15 +262,19 @@ public partial class ShippingController : BaseAdminController
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingMethodListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting Methods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> CreateMethod()
     {
+		_logger.LogDebug(">>> Entering CreateMethod()");
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingMethodModelAsync(new ShippingMethodModel(), null);
+		_logger.LogDebug("CreateMethod(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting CreateMethod()");
         return View(model);
     }
 
@@ -281,20 +298,25 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareShippingMethodModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting CreateMethod(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> EditMethod(int id)
     {
+		_logger.LogDebug(">>> Entering EditMethod(id={Id})", id);
         //try to get a shipping method with the specified id
         var shippingMethod = await _shippingMethodsService.GetShippingMethodByIdAsync(id);
+		_logger.LogDebug("EditMethod(id={Id}): shippingMethod → {ShippingMethod}", id, shippingMethod);
         if (shippingMethod == null)
             return RedirectToAction("Methods");
 
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingMethodModelAsync(null, shippingMethod);
+		_logger.LogDebug("EditMethod(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting EditMethod(id={Id})", id);
         return View(model);
     }
 
@@ -324,6 +346,7 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareShippingMethodModelAsync(model, shippingMethod, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting EditMethod(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -331,8 +354,10 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DeleteMethod(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteMethod(id={Id})", id);
         //try to get a shipping method with the specified id
         var shippingMethod = await _shippingMethodsService.GetShippingMethodByIdAsync(id);
+		_logger.LogDebug("DeleteMethod(id={Id}): shippingMethod → {ShippingMethod}", id, shippingMethod);
         if (shippingMethod == null)
             return RedirectToAction("Methods");
 
@@ -340,6 +365,7 @@ public partial class ShippingController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Shipping.Methods.Deleted"));
 
+		_logger.LogDebug("<<< Exiting DeleteMethod(id={Id})", id);
         return RedirectToAction("Methods");
     }
 
@@ -350,9 +376,12 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DatesAndRanges()
     {
+		_logger.LogDebug(">>> Entering DatesAndRanges()");
         //prepare model
         var model = await _shippingModelFactory.PrepareDatesRangesSearchModelAsync(new DatesRangesSearchModel());
+		_logger.LogDebug("DatesAndRanges(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting DatesAndRanges()");
         return View(model);
     }
 
@@ -364,18 +393,24 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DeliveryDates(DeliveryDateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering DeliveryDates(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _shippingModelFactory.PrepareDeliveryDateListModelAsync(searchModel);
+		_logger.LogDebug("DeliveryDates(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting DeliveryDates(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> CreateDeliveryDate()
     {
+		_logger.LogDebug(">>> Entering CreateDeliveryDate()");
         //prepare model
         var model = await _shippingModelFactory.PrepareDeliveryDateModelAsync(new DeliveryDateModel(), null);
+		_logger.LogDebug("CreateDeliveryDate(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting CreateDeliveryDate()");
         return View(model);
     }
 
@@ -400,20 +435,25 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareDeliveryDateModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting CreateDeliveryDate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> EditDeliveryDate(int id)
     {
+		_logger.LogDebug(">>> Entering EditDeliveryDate(id={Id})", id);
         //try to get a delivery date with the specified id
         var deliveryDate = await _dateRangeService.GetDeliveryDateByIdAsync(id);
+		_logger.LogDebug("EditDeliveryDate(id={Id}): deliveryDate → {DeliveryDate}", id, deliveryDate);
         if (deliveryDate == null)
             return RedirectToAction("DatesAndRanges");
 
         //prepare model
         var model = await _shippingModelFactory.PrepareDeliveryDateModelAsync(null, deliveryDate);
+		_logger.LogDebug("EditDeliveryDate(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting EditDeliveryDate(id={Id})", id);
         return View(model);
     }
 
@@ -443,6 +483,7 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareDeliveryDateModelAsync(model, deliveryDate, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting EditDeliveryDate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -450,8 +491,10 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DeleteDeliveryDate(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteDeliveryDate(id={Id})", id);
         //try to get a delivery date with the specified id
         var deliveryDate = await _dateRangeService.GetDeliveryDateByIdAsync(id);
+		_logger.LogDebug("DeleteDeliveryDate(id={Id}): deliveryDate → {DeliveryDate}", id, deliveryDate);
         if (deliveryDate == null)
             return RedirectToAction("DatesAndRanges");
 
@@ -459,6 +502,7 @@ public partial class ShippingController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Shipping.DeliveryDates.Deleted"));
 
+		_logger.LogDebug("<<< Exiting DeleteDeliveryDate(id={Id})", id);
         return RedirectToAction("DatesAndRanges");
     }
 
@@ -470,18 +514,24 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> ProductAvailabilityRanges(ProductAvailabilityRangeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductAvailabilityRanges(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _shippingModelFactory.PrepareProductAvailabilityRangeListModelAsync(searchModel);
+		_logger.LogDebug("ProductAvailabilityRanges(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ProductAvailabilityRanges(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> CreateProductAvailabilityRange()
     {
+		_logger.LogDebug(">>> Entering CreateProductAvailabilityRange()");
         //prepare model
         var model = await _shippingModelFactory.PrepareProductAvailabilityRangeModelAsync(new ProductAvailabilityRangeModel(), null);
+		_logger.LogDebug("CreateProductAvailabilityRange(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting CreateProductAvailabilityRange()");
         return View(model);
     }
 
@@ -506,20 +556,25 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareProductAvailabilityRangeModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting CreateProductAvailabilityRange(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> EditProductAvailabilityRange(int id)
     {
+		_logger.LogDebug(">>> Entering EditProductAvailabilityRange(id={Id})", id);
         //try to get a product availability range with the specified id
         var productAvailabilityRange = await _dateRangeService.GetProductAvailabilityRangeByIdAsync(id);
+		_logger.LogDebug("EditProductAvailabilityRange(id={Id}): productAvailabilityRange → {ProductAvailabilityRange}", id, productAvailabilityRange);
         if (productAvailabilityRange == null)
             return RedirectToAction("DatesAndRanges");
 
         //prepare model
         var model = await _shippingModelFactory.PrepareProductAvailabilityRangeModelAsync(null, productAvailabilityRange);
+		_logger.LogDebug("EditProductAvailabilityRange(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting EditProductAvailabilityRange(id={Id})", id);
         return View(model);
     }
 
@@ -549,6 +604,7 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareProductAvailabilityRangeModelAsync(model, productAvailabilityRange, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting EditProductAvailabilityRange(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -556,8 +612,10 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DeleteProductAvailabilityRange(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteProductAvailabilityRange(id={Id})", id);
         //try to get a product availability range with the specified id
         var productAvailabilityRange = await _dateRangeService.GetProductAvailabilityRangeByIdAsync(id);
+		_logger.LogDebug("DeleteProductAvailabilityRange(id={Id}): productAvailabilityRange → {ProductAvailabilityRange}", id, productAvailabilityRange);
         if (productAvailabilityRange == null)
             return RedirectToAction("DatesAndRanges");
 
@@ -565,6 +623,7 @@ public partial class ShippingController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Shipping.ProductAvailabilityRanges.Deleted"));
 
+		_logger.LogDebug("<<< Exiting DeleteProductAvailabilityRange(id={Id})", id);
         return RedirectToAction("DatesAndRanges");
     }
 
@@ -575,9 +634,12 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Warehouses()
     {
+		_logger.LogDebug(">>> Entering Warehouses()");
         //prepare model
         var model = await _shippingModelFactory.PrepareWarehouseSearchModelAsync(new WarehouseSearchModel());
+		_logger.LogDebug("Warehouses(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Warehouses()");
         return View(model);
     }
 
@@ -588,15 +650,19 @@ public partial class ShippingController : BaseAdminController
         //prepare model
         var model = await _shippingModelFactory.PrepareWarehouseListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting Warehouses(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> CreateWarehouse()
     {
+		_logger.LogDebug(">>> Entering CreateWarehouse()");
         //prepare model
         var model = await _shippingModelFactory.PrepareWarehouseModelAsync(new WarehouseModel(), null);
+		_logger.LogDebug("CreateWarehouse(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting CreateWarehouse()");
         return View(model);
     }
 
@@ -629,20 +695,25 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareWarehouseModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting CreateWarehouse(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> EditWarehouse(int id)
     {
+		_logger.LogDebug(">>> Entering EditWarehouse(id={Id})", id);
         //try to get a warehouse with the specified id
         var warehouse = await _warehouseService.GetWarehouseByIdAsync(id);
+		_logger.LogDebug("EditWarehouse(id={Id}): warehouse → {Warehouse}", id, warehouse);
         if (warehouse == null)
             return RedirectToAction("Warehouses");
 
         //prepare model
         var model = await _shippingModelFactory.PrepareWarehouseModelAsync(null, warehouse);
+		_logger.LogDebug("EditWarehouse(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting EditWarehouse(id={Id})", id);
         return View(model);
     }
 
@@ -688,6 +759,7 @@ public partial class ShippingController : BaseAdminController
         model = await _shippingModelFactory.PrepareWarehouseModelAsync(model, warehouse, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting EditWarehouse(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -695,8 +767,10 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> DeleteWarehouse(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteWarehouse(id={Id})", id);
         //try to get a warehouse with the specified id
         var warehouse = await _warehouseService.GetWarehouseByIdAsync(id);
+		_logger.LogDebug("DeleteWarehouse(id={Id}): warehouse → {Warehouse}", id, warehouse);
         if (warehouse == null)
             return RedirectToAction("Warehouses");
 
@@ -708,6 +782,7 @@ public partial class ShippingController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Shipping.warehouses.Deleted"));
 
+		_logger.LogDebug("<<< Exiting DeleteWarehouse(id={Id})", id);
         return RedirectToAction("Warehouses");
     }
 
@@ -718,9 +793,12 @@ public partial class ShippingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public virtual async Task<IActionResult> Restrictions()
     {
+		_logger.LogDebug(">>> Entering Restrictions()");
         //prepare model
         var model = await _shippingModelFactory.PrepareShippingMethodRestrictionModelAsync(new ShippingMethodRestrictionModel());
+		_logger.LogDebug("Restrictions(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Restrictions()");
         return View(model);
     }
 

@@ -4,6 +4,7 @@ using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Core.Domain.Localization;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 
 namespace Nop.Services.Localization;
@@ -13,6 +14,7 @@ namespace Nop.Services.Localization;
 /// </summary>
 public partial class LocalizedEntityService : ILocalizedEntityService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<LocalizedProperty> _localizedPropertyRepository;
@@ -27,9 +29,14 @@ public partial class LocalizedEntityService : ILocalizedEntityService
         IStaticCacheManager staticCacheManager,
         LocalizationSettings localizationSettings)
     {
+		_logger.LogDebug(">>> Entering LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings})", localizedPropertyRepository, staticCacheManager, localizationSettings);
         _localizedPropertyRepository = localizedPropertyRepository;
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings}): _staticCacheManager → {_staticCacheManager}", localizedPropertyRepository, staticCacheManager, localizationSettings, _staticCacheManager);
+		_logger.LogDebug("LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings}): _localizedPropertyRepository → {_localizedPropertyRepository}", localizedPropertyRepository, staticCacheManager, localizationSettings, _localizedPropertyRepository);
         _localizationSettings = localizationSettings;
+		_logger.LogDebug("<<< Exiting LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings})", localizedPropertyRepository, staticCacheManager, localizationSettings);
+		_logger.LogDebug("LocalizedEntityService(localizedPropertyRepository={LocalizedPropertyRepository},staticCacheManager={StaticCacheManager},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", localizedPropertyRepository, staticCacheManager, localizationSettings, _localizationSettings);
     }
 
     #endregion
@@ -70,11 +77,15 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetAllLocalizedPropertiesAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllLocalizedPropertiesAsync()");
         return await _localizedPropertyRepository.GetAllAsync(query =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return from lp in query
                 select lp;
+				_logger.LogInformation("GetAllLocalizedPropertiesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
+		_logger.LogDebug("<<< Exiting GetAllLocalizedPropertiesAsync()");
     }
 
     /// <summary>
@@ -86,6 +97,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     protected virtual async Task<IList<LocalizedProperty>> GetAllLocalizedPropertiesAsync(int languageId)
     {
+		_logger.LogDebug(">>> Entering GetAllLocalizedPropertiesAsync(languageId={LanguageId})", languageId);
         // do not cache here
         return await _localizedPropertyRepository.GetAllAsync(query => query.Where(lp => lp.LanguageId == languageId));
     }
@@ -97,9 +109,15 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task DeleteLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		_logger.LogDebug(">>> Entering DeleteLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _localizedPropertyRepository.DeleteAsync(localizedProperty);
+		_logger.LogDebug("<<< Exiting DeleteLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: external service call took {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteLocalizedPropertyAsync(localizedProperty)={LocalizedProperty}: external service call took {Arg1} ms", localizedProperty, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Inserts a localized property
     /// </summary>
@@ -107,7 +125,9 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		_logger.LogDebug(">>> Entering InsertLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
         await _localizedPropertyRepository.InsertAsync(localizedProperty);
+		_logger.LogDebug("<<< Exiting InsertLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
     }
 
     /// <summary>
@@ -117,7 +137,9 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateLocalizedPropertyAsync(LocalizedProperty localizedProperty)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
         await _localizedPropertyRepository.UpdateAsync(localizedProperty);
+		_logger.LogDebug("<<< Exiting UpdateLocalizedPropertyAsync(localizedProperty={LocalizedProperty})", localizedProperty);
     }
 
     #endregion
@@ -136,6 +158,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
     /// </returns>
     public virtual async Task<IList<LocalizedProperty>> GetEntityLocalizedPropertiesAsync(int entityId, string localeKeyGroup, string localeKey)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LocalizedPropertiesCacheKey,
             entityId, localeKeyGroup, localeKey);
 
@@ -155,6 +178,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
 
             return await query.ToListAsync();
         });
+		_logger.LogDebug("<<< Exiting GetEntityLocalizedPropertiesAsync(entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", entityId, localeKeyGroup, localeKey);
     }
 
     /// <summary>
@@ -174,6 +198,7 @@ public partial class LocalizedEntityService : ILocalizedEntityService
         {
             //value tuples aren't json-serializable by default, so we use a string key
             static string formatKey(string keyGroup, string key, int id) => $"{keyGroup}:{key}:{id}";
+			_logger.LogDebug(">>> Entering formatKey(keyGroup={KeyGroup},key={Key},id={Id})", keyGroup, key, id);
 
             var localizedValues = await _staticCacheManager.GetAsync(
                 _staticCacheManager.PrepareKeyForDefaultCache(NopLocalizationDefaults.LocalizedPropertyLookupCacheKey, languageId),
@@ -202,10 +227,12 @@ public partial class LocalizedEntityService : ILocalizedEntityService
             //little hack here. nulls aren't cacheable so set it to ""
             return await query.FirstOrDefaultAsync() ?? string.Empty;
         });
+		_logger.LogDebug("<<< Exiting GetLocalizedValueAsync(languageId={LanguageId},entityId={EntityId},localeKeyGroup={LocaleKeyGroup},localeKey={LocaleKey})", languageId, entityId, localeKeyGroup, localeKey);
     }
 
     /// <summary>
     /// Save localized value
+	_logger.LogDebug("<<< Exiting async()");
     /// </summary>
     /// <typeparam name="T">Type</typeparam>
     /// <param name="entity">Entity</param>

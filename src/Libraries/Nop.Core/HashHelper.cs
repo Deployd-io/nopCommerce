@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using System.Security.Cryptography;
 
 namespace Nop.Core;
@@ -7,6 +8,7 @@ namespace Nop.Core;
 /// </summary>
 public partial class HashHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Create a data hash
     /// </summary>

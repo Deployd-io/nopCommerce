@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Nop.Plugin.Payments.PayPalCommerce.Services.Api.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Services.Api.Orders;
 
@@ -9,10 +10,13 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Services.Api.Orders;
 /// </summary>
 public class UpdateOrderRequest<TValue> : List<Patch<TValue>>, IAuthorizedRequest where TValue : class
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public UpdateOrderRequest(IEnumerable<Patch<TValue>> collection) : base(collection)
     {
+	_logger.LogDebug(">>> Entering UpdateOrderRequest(collection={Collection})", collection);
+	_logger.LogDebug("<<< Exiting UpdateOrderRequest(collection={Collection})", collection);
     }
 
     #endregion

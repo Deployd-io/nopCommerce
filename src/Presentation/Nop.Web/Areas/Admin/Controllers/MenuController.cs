@@ -11,11 +11,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Menus;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class MenuController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -57,9 +59,14 @@ public partial class MenuController : BaseAdminController
 
     protected virtual void DefinePopupViewBagData(int entityId, string entityInfo)
     {
+		_logger.LogDebug(">>> Entering DefinePopupViewBagData(entityId={EntityId},entityInfo={EntityInfo})", entityId, entityInfo);
         ViewBag.RefreshPage = true;
         ViewBag.entityId = entityId;
+		_logger.LogDebug("DefinePopupViewBagData(entityId={EntityId},entityInfo={EntityInfo}): ViewBag.entityId → {Arg2}", entityId, entityInfo, ViewBag.entityId);
+		_logger.LogDebug("DefinePopupViewBagData(entityId={EntityId},entityInfo={EntityInfo}): ViewBag.entityInfo → {Arg2}", entityId, entityInfo, ViewBag.entityInfo);
+		_logger.LogDebug("DefinePopupViewBagData(entityId={EntityId},entityInfo={EntityInfo}): ViewBag.RefreshPage → {Arg2}", entityId, entityInfo, ViewBag.RefreshPage);
         ViewBag.entityInfo = entityInfo;
+		_logger.LogDebug("<<< Exiting DefinePopupViewBagData(entityId={EntityId},entityInfo={EntityInfo})", entityId, entityInfo);
     }
 
     protected virtual async Task<MenuItem> SaveMenuItemAsync(Menu menu, MenuItemModel model, MenuItem menuItem, Func<MenuItem, Task> serviceAction)
@@ -126,15 +133,20 @@ public partial class MenuController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction(nameof(List));
     }
 
     [CheckPermission(StandardPermission.ContentManagement.MENU_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _menuModelFactory.PrepareMenuSearchModelAsync(new MenuSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -142,9 +154,12 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MENU_VIEW)]
     public virtual async Task<IActionResult> MenuList(MenuSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering MenuList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _menuModelFactory.PrepareMenuListModelAsync(searchModel);
+		_logger.LogDebug("MenuList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting MenuList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -152,9 +167,12 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MENU_VIEW)]
     public virtual async Task<IActionResult> MenuItemList(MenuItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering MenuItemList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _menuModelFactory.PrepareMenuItemListModelAsync(searchModel);
+		_logger.LogDebug("MenuItemList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting MenuItemList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -162,9 +180,12 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MENU_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _menuModelFactory.PrepareMenuModelAsync(new MenuModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -198,19 +219,24 @@ public partial class MenuController : BaseAdminController
         model = await _menuModelFactory.PrepareMenuModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.MENU_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         var menu = await _menuService.GetMenuByIdAsync(id);
         if (menu == null)
+			_logger.LogDebug("Edit(id={Id}): menu → {Menu}", id, menu);
             return RedirectToAction(nameof(List));
 
         //prepare model
         var model = await _menuModelFactory.PrepareMenuModelAsync(null, menu);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -248,6 +274,7 @@ public partial class MenuController : BaseAdminController
         model = await _menuModelFactory.PrepareMenuModelAsync(model, menu, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -255,8 +282,10 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MENU_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var menu = await _menuService.GetMenuByIdAsync(id);
         if (menu is null)
+			_logger.LogDebug("Delete(id={Id}): menu → {Menu}", id, menu);
             return RedirectToAction(nameof(List));
 
         await _menuService.DeleteMenuAsync(menu);
@@ -267,6 +296,7 @@ public partial class MenuController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteMenu",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteMenu"), menu.Name), menu);
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction(nameof(List));
     }
 
@@ -277,13 +307,17 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MENU_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> MenuItemCreate(int menuId)
     {
+		_logger.LogDebug(">>> Entering MenuItemCreate(menuId={MenuId})", menuId);
         var menu = await _menuService.GetMenuByIdAsync(menuId);
         if (menu == null)
+			_logger.LogDebug("MenuItemCreate(menuId={MenuId}): menu → {Menu}", menuId, menu);
             return RedirectToAction(nameof(List));
 
         //prepare model
         var model = await _menuModelFactory.PrepareMenuItemModelAsync(menu, new MenuItemModel(), null);
+		_logger.LogDebug("MenuItemCreate(menuId={MenuId}): model → {Model}", menuId, model);
 
+		_logger.LogDebug("<<< Exiting MenuItemCreate(menuId={MenuId})", menuId);
         return View(model);
     }
 
@@ -315,23 +349,29 @@ public partial class MenuController : BaseAdminController
         model = await _menuModelFactory.PrepareMenuItemModelAsync(menu, model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting MenuItemCreate(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.ContentManagement.MENU_VIEW)]
     public virtual async Task<IActionResult> MenuItemEdit(int id)
     {
+		_logger.LogDebug(">>> Entering MenuItemEdit(id={Id})", id);
         var menuItem = await _menuService.GetMenuItemByIdAsync(id);
         if (menuItem == null)
+			_logger.LogDebug("MenuItemEdit(id={Id}): menuItem → {MenuItem}", id, menuItem);
             return RedirectToAction(nameof(List));
 
         var menu = await _menuService.GetMenuByIdAsync(menuItem.MenuId);
+		_logger.LogDebug("MenuItemEdit(id={Id}): menu → {Menu}", id, menu);
         if (menu == null)
             return RedirectToAction(nameof(List));
 
         //prepare model
         var model = await _menuModelFactory.PrepareMenuItemModelAsync(menu, null, menuItem);
+		_logger.LogDebug("MenuItemEdit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting MenuItemEdit(id={Id})", id);
         return View(model);
     }
 
@@ -367,6 +407,7 @@ public partial class MenuController : BaseAdminController
         model = await _menuModelFactory.PrepareMenuItemModelAsync(menu, model, menuItem, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting MenuItemEdit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -374,8 +415,10 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MENU_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> MenuItemDelete(int id)
     {
+		_logger.LogDebug(">>> Entering MenuItemDelete(id={Id})", id);
         var menuItem = await _menuService.GetMenuItemByIdAsync(id);
         if (menuItem is null)
+			_logger.LogDebug("MenuItemDelete(id={Id}): menuItem → {MenuItem}", id, menuItem);
             return RedirectToAction(nameof(List));
 
         await _menuService.DeleteMenuItemAsync(menuItem);
@@ -386,6 +429,7 @@ public partial class MenuController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteMenuItem",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteMenuItem"), menuItem.Title), menuItem);
 
+		_logger.LogDebug("<<< Exiting MenuItemDelete(id={Id})", id);
         return RedirectToAction(nameof(Edit), new { id = menuItem.MenuId });
     }
 
@@ -398,9 +442,12 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public virtual async Task<IActionResult> MenuItemSelectProductPopup(int menuItemId)
     {
+		_logger.LogDebug(">>> Entering MenuItemSelectProductPopup(menuItemId={MenuItemId})", menuItemId);
         //prepare model
         var model = await _menuModelFactory.PrepareMenuItemSelectProductSearchModelAsync(new SelectMenuItemProductSearchModel());
+		_logger.LogDebug("MenuItemSelectProductPopup(menuItemId={MenuItemId}): model → {Model}", menuItemId, model);
 
+		_logger.LogDebug("<<< Exiting MenuItemSelectProductPopup(menuItemId={MenuItemId})", menuItemId);
         return View(model);
     }
 
@@ -408,9 +455,12 @@ public partial class MenuController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.PRODUCTS_VIEW)]
     public virtual async Task<IActionResult> MenuItemSelectProductPopupList(SelectMenuItemProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering MenuItemSelectProductPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _menuModelFactory.PrepareMenuItemSelectProductListModelAsync(searchModel);
+		_logger.LogDebug("MenuItemSelectProductPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting MenuItemSelectProductPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

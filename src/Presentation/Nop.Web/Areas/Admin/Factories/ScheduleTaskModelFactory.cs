@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Tasks;
 using Nop.Web.Framework.Models.Extensions;
 using Task = System.Threading.Tasks.Task;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDateTimeHelper _dateTimeHelper;
@@ -25,8 +27,12 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
     public ScheduleTaskModelFactory(IDateTimeHelper dateTimeHelper,
         IScheduleTaskService scheduleTaskService)
     {
+		_logger.LogDebug(">>> Entering ScheduleTaskModelFactory(dateTimeHelper={DateTimeHelper},scheduleTaskService={ScheduleTaskService})", dateTimeHelper, scheduleTaskService);
         _dateTimeHelper = dateTimeHelper;
         _scheduleTaskService = scheduleTaskService;
+		_logger.LogDebug("<<< Exiting ScheduleTaskModelFactory(dateTimeHelper={DateTimeHelper},scheduleTaskService={ScheduleTaskService})", dateTimeHelper, scheduleTaskService);
+		_logger.LogDebug("ScheduleTaskModelFactory(dateTimeHelper={DateTimeHelper},scheduleTaskService={ScheduleTaskService}): _scheduleTaskService → {_scheduleTaskService}", dateTimeHelper, scheduleTaskService, _scheduleTaskService);
+		_logger.LogDebug("ScheduleTaskModelFactory(dateTimeHelper={DateTimeHelper},scheduleTaskService={ScheduleTaskService}): _dateTimeHelper → {_dateTimeHelper}", dateTimeHelper, scheduleTaskService, _dateTimeHelper);
     }
 
     #endregion
@@ -43,11 +49,13 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
     /// </returns>
     public virtual Task<ScheduleTaskSearchModel> PrepareScheduleTaskSearchModelAsync(ScheduleTaskSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareScheduleTaskSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareScheduleTaskSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -61,6 +69,7 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
     /// </returns>
     public virtual async Task<ScheduleTaskListModel> PrepareScheduleTaskListModelAsync(ScheduleTaskSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareScheduleTaskListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get schedule tasks
@@ -76,6 +85,7 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
             {
                 //fill in model values from the entity
                 var scheduleTaskModel = scheduleTask.ToModel<ScheduleTaskModel>();
+				_logger.LogDebug("PrepareScheduleTaskListModelAsync(searchModel={SearchModel}): scheduleTaskModel → {ScheduleTaskModel}", searchModel, scheduleTaskModel);
 
                 //convert dates to the user time
                 if (scheduleTask.LastStartUtc.HasValue)
@@ -99,6 +109,7 @@ public partial class ScheduleTaskModelFactory : IScheduleTaskModelFactory
                 return scheduleTaskModel;
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareScheduleTaskListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

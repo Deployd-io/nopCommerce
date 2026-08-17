@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Plugin.Misc.Zettle.Services;
 
 /// <summary>
@@ -44,9 +45,14 @@ public static class GuidGenerator
 
     static GuidGenerator()
     {
+		_logger.LogDebug(">>> Entering GuidGenerator()");
         _random = new Random();
         _nodeBytes = GenerateNodeBytes();
+		_logger.LogDebug("GuidGenerator(): _nodeBytes → {_nodeBytes}", _nodeBytes);
+		_logger.LogDebug("GuidGenerator(): _random → {_random}", _random);
         _clockSequenceBytes = GenerateClockSequenceBytes();
+		_logger.LogDebug("<<< Exiting GuidGenerator()");
+		_logger.LogDebug("GuidGenerator(): _clockSequenceBytes → {_clockSequenceBytes}", _clockSequenceBytes);
     }
 
     #endregion
@@ -59,9 +65,11 @@ public static class GuidGenerator
     /// <returns></returns>
     private static byte[] GenerateNodeBytes()
     {
+		_logger.LogDebug(">>> Entering GenerateNodeBytes()");
         var node = new byte[6];
 
         _random.NextBytes(node);
+		_logger.LogDebug("<<< Exiting GenerateNodeBytes()");
         return node;
     }
 
@@ -70,8 +78,10 @@ public static class GuidGenerator
     /// </summary>
     private static byte[] GenerateClockSequenceBytes()
     {
+		_logger.LogDebug(">>> Entering GenerateClockSequenceBytes()");
         var bytes = new byte[2];
         _random.NextBytes(bytes);
+		_logger.LogDebug("<<< Exiting GenerateClockSequenceBytes()");
         return bytes;
     }
 
@@ -87,6 +97,7 @@ public static class GuidGenerator
             return [0x0, 0x0];
 
         if (bytes.Length == 1)
+		_logger.LogDebug("<<< Exiting GenerateClockSequenceBytes(dt={Dt})", dt);
             return [0x0, bytes[0]];
 
         return [bytes[0], bytes[1]];
@@ -124,6 +135,7 @@ public static class GuidGenerator
         guid[VERSION_BYTE] &= (byte)VERSION_BYTE_MASK;
         guid[VERSION_BYTE] |= (byte)((byte)GuidVersion.TimeBased << VERSION_BYTE_SHIFT);
 
+		_logger.LogDebug("<<< Exiting GenerateTimeBasedGuid(dateTime={DateTime})", dateTime);
         return new Guid(guid);
     }
     #endregion
@@ -149,6 +161,7 @@ public static class GuidGenerator
 
     public enum GuidVersion
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         TimeBased = 0x01,
         Reserved = 0x02,
         NameBased = 0x03,

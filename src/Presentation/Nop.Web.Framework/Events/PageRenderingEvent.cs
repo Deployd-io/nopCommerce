@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.UI;
 
 namespace Nop.Web.Framework.Events;
@@ -7,6 +8,7 @@ namespace Nop.Web.Framework.Events;
 /// </summary>
 public partial class PageRenderingEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -16,8 +18,12 @@ public partial class PageRenderingEvent
     /// <param name="overriddenRouteName">Overridden route name</param>
     public PageRenderingEvent(INopHtmlHelper helper, string overriddenRouteName = null)
     {
+		_logger.LogDebug(">>> Entering PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName})", helper, overriddenRouteName);
         Helper = helper;
         OverriddenRouteName = overriddenRouteName;
+		_logger.LogDebug("<<< Exiting PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName})", helper, overriddenRouteName);
+		_logger.LogDebug("PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName}): OverriddenRouteName → {OverriddenRouteName1}", helper, overriddenRouteName, OverriddenRouteName);
+		_logger.LogDebug("PageRenderingEvent(helper={Helper},overriddenRouteName={OverriddenRouteName}): Helper → {Helper1}", helper, overriddenRouteName, Helper);
     }
 
     #endregion
@@ -45,9 +51,11 @@ public partial class PageRenderingEvent
     /// <returns>Route name</returns>
     public string GetRouteName(bool handleDefaultRoutes = false)
     {
+		_logger.LogDebug(">>> Entering GetRouteName(handleDefaultRoutes={HandleDefaultRoutes})", handleDefaultRoutes);
         //if an overridden route name is specified, then use it
         //we use it to specify a custom route name when some custom page uses a custom route. But we still need this event to be invoked
         if (!string.IsNullOrEmpty(OverriddenRouteName))
+		_logger.LogDebug("<<< Exiting GetRouteName(handleDefaultRoutes={HandleDefaultRoutes})", handleDefaultRoutes);
             return OverriddenRouteName;
 
         //or try to get a registered endpoint route name

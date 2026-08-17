@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core;
 
 namespace Nop.Web.Framework.Models.Extensions;
@@ -7,6 +8,7 @@ namespace Nop.Web.Framework.Models.Extensions;
 /// </summary>
 public static class ModelExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Convert list to paged list according to paging request
     /// </summary>
@@ -31,7 +33,10 @@ public static class ModelExtensions
     /// </returns>
     public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IAsyncEnumerable<T> collection, IPagingRequestModel pagingRequestModel)
     {
+		_logger.LogDebug(">>> Entering ToPagedListAsync(collection={Collection},pagingRequestModel={PagingRequestModel})", collection, pagingRequestModel);
         var list = await collection.ToListAsync();
+		_logger.LogDebug("<<< Exiting ToPagedListAsync(collection={Collection},pagingRequestModel={PagingRequestModel})", collection, pagingRequestModel);
+	_logger.LogDebug("ToPagedListAsync(collection={Collection},pagingRequestModel={PagingRequestModel}): list → {List}", collection, pagingRequestModel, list);
         return list.ToPagedList(pagingRequestModel);
     }
 
@@ -51,13 +56,18 @@ public static class ModelExtensions
         where TListModel : BasePagedListModel<TModel>
         where TModel : BaseNopModel
     {
+		_logger.LogDebug(">>> Entering PrepareToGrid(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction})", listModel, searchModel, objectList, dataFillFunction);
         ArgumentNullException.ThrowIfNull(listModel);
 
         listModel.Data = dataFillFunction?.Invoke();
         listModel.Draw = searchModel?.Draw;
+		_logger.LogDebug("PrepareToGrid(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction}): listModel.Draw → {Arg4}", listModel, searchModel, objectList, dataFillFunction, listModel.Draw);
+		_logger.LogDebug("PrepareToGrid(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction}): listModel.RecordsTotal → {Arg4}", listModel, searchModel, objectList, dataFillFunction, listModel.RecordsTotal);
+		_logger.LogDebug("PrepareToGrid(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction}): listModel.RecordsFiltered → {Arg4}", listModel, searchModel, objectList, dataFillFunction, listModel.RecordsFiltered);
         listModel.RecordsTotal = objectList?.TotalCount ?? 0;
         listModel.RecordsFiltered = objectList?.TotalCount ?? 0;
 
+		_logger.LogDebug("<<< Exiting PrepareToGrid(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction})", listModel, searchModel, objectList, dataFillFunction);
         return listModel;
     }
 
@@ -80,13 +90,20 @@ public static class ModelExtensions
         where TListModel : BasePagedListModel<TModel>
         where TModel : BaseNopModel
     {
+		_logger.LogDebug(">>> Entering PrepareToGridAsync(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction})", listModel, searchModel, objectList, dataFillFunction);
         ArgumentNullException.ThrowIfNull(listModel);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         listModel.Data = await (dataFillFunction?.Invoke()).ToListAsync();
         listModel.Draw = searchModel?.Draw;
+		_logger.LogDebug("PrepareToGridAsync(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction}): listModel.Draw → {Arg4}", listModel, searchModel, objectList, dataFillFunction, listModel.Draw);
+		_logger.LogDebug("PrepareToGridAsync(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction}): listModel.RecordsTotal → {Arg4}", listModel, searchModel, objectList, dataFillFunction, listModel.RecordsTotal);
+		_logger.LogDebug("PrepareToGridAsync(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction}): listModel.RecordsFiltered → {Arg4}", listModel, searchModel, objectList, dataFillFunction, listModel.RecordsFiltered);
+		_logger.LogInformation("PrepareToGridAsync(listModel,searchModel,objectList,dataFillFunction)={ListModel},{SearchModel},{ObjectList},{DataFillFunction}: database query executed in {Arg4} ms", listModel, searchModel, objectList, dataFillFunction, __logStart.ElapsedMilliseconds);
         listModel.RecordsTotal = objectList?.TotalCount ?? 0;
         listModel.RecordsFiltered = objectList?.TotalCount ?? 0;
 
+		_logger.LogDebug("<<< Exiting PrepareToGridAsync(listModel={ListModel},searchModel={SearchModel},objectList={ObjectList},dataFillFunction={DataFillFunction})", listModel, searchModel, objectList, dataFillFunction);
         return listModel;
     }
 }

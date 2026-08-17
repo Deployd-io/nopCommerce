@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderButtonView : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -13,8 +15,12 @@ public partial class RenderButtonView : IRender
     /// <param name="url">URL to the edit action</param>
     public RenderButtonView(DataUrl url)
     {
+		_logger.LogDebug(">>> Entering RenderButtonView(url={Url})", url);
         Url = url;
         ClassName = NopButtonClassDefaults.Default;
+		_logger.LogDebug("<<< Exiting RenderButtonView(url={Url})", url);
+		_logger.LogDebug("RenderButtonView(url={Url}): ClassName → {ClassName}", url, ClassName);
+		_logger.LogInformation("RenderButtonView(url={Url}): Url → {Url1}", url, Url);
     }
 
     #endregion

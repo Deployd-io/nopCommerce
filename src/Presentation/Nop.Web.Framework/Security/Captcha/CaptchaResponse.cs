@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Newtonsoft.Json;
 
 namespace Nop.Web.Framework.Security.Captcha;
@@ -7,11 +8,15 @@ namespace Nop.Web.Framework.Security.Captcha;
 /// </summary>
 public partial class CaptchaResponse
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CaptchaResponse()
     {
+		_logger.LogDebug(">>> Entering CaptchaResponse()");
         Errors = new List<string>();
+		_logger.LogDebug("<<< Exiting CaptchaResponse()");
+		_logger.LogDebug("CaptchaResponse(): Errors → {Errors}", Errors);
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using Nop.Services.Events;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Menu;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Events;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.Events;
 /// </summary>
 public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCreatedEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPluginManager<IPlugin> _pluginManager;
@@ -22,7 +24,10 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
     /// </summary>
     protected BaseAdminMenuCreatedEventConsumer(IPluginManager<IPlugin> pluginManager)
     {
+		_logger.LogDebug(">>> Entering BaseAdminMenuCreatedEventConsumer(pluginManager={PluginManager})", pluginManager);
         _pluginManager = pluginManager;
+		_logger.LogDebug("<<< Exiting BaseAdminMenuCreatedEventConsumer(pluginManager={PluginManager})", pluginManager);
+		_logger.LogDebug("BaseAdminMenuCreatedEventConsumer(pluginManager={PluginManager}): _pluginManager → {_pluginManager}", pluginManager, _pluginManager);
     }
 
     #endregion
@@ -39,6 +44,8 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
     /// </returns>
     protected virtual Task<bool> CheckAccessAsync()
     {
+		_logger.LogDebug(">>> Entering CheckAccessAsync()");
+		_logger.LogDebug("<<< Exiting CheckAccessAsync()");
         return Task.FromResult(true);
     }
 
@@ -68,10 +75,12 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(AdminMenuCreatedEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!await CheckAccessAsync())
             return;
 
         var plugin = await _pluginManager.LoadPluginBySystemNameAsync(PluginSystemName);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): plugin → {Plugin}", eventMessage, plugin);
 
         //the LoadPluginBySystemNameAsync method returns only plugins that are already fully installed,
         //while the IConsumer<AdminMenuCreatedEvent> event can be called before the installation is complete
@@ -79,6 +88,7 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
             return;
 
         var newItem = await GetAdminMenuItemAsync(plugin);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): newItem → {NewItem}", eventMessage, newItem);
 
         if (newItem == null)
             return;
@@ -100,6 +110,7 @@ public abstract class BaseAdminMenuCreatedEventConsumer : IConsumer<AdminMenuCre
                     eventMessage.RootMenuItem.InsertAfter(AfterMenuSystemName, newItem);
                 break;
             default:
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
                 throw new ArgumentOutOfRangeException();
         }
     }

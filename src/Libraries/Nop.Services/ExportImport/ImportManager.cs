@@ -326,13 +326,19 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task LogPictureInsertErrorAsync(string picturePath, Exception ex)
     {
+		_logger.LogDebug(">>> Entering LogPictureInsertErrorAsync(picturePath={PicturePath},ex={Ex})", picturePath, ex);
         var extension = _fileProvider.GetFileExtension(picturePath);
         var name = _fileProvider.GetFileNameWithoutExtension(picturePath);
+		_logger.LogDebug("LogPictureInsertErrorAsync(picturePath={PicturePath},ex={Ex}): name → {Name}", picturePath, ex, name);
+		_logger.LogDebug("LogPictureInsertErrorAsync(picturePath={PicturePath},ex={Ex}): extension → {Extension}", picturePath, ex, extension);
 
         var point = string.IsNullOrEmpty(extension) ? string.Empty : ".";
+		_logger.LogDebug("LogPictureInsertErrorAsync(picturePath={PicturePath},ex={Ex}): point → {Point}", picturePath, ex, point);
         var fileName = _fileProvider.FileExists(picturePath) ? $"{name}{point}{extension}" : string.Empty;
+		_logger.LogDebug("LogPictureInsertErrorAsync(picturePath={PicturePath},ex={Ex}): fileName → {FileName}", picturePath, ex, fileName);
 
         await _logger.ErrorAsync($"Insert picture failed (file name: {fileName})", ex);
+		_logger.LogDebug("<<< Exiting LogPictureInsertErrorAsync(picturePath={PicturePath},ex={Ex})", picturePath, ex);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -705,6 +711,7 @@ public partial class ImportManager : IImportManager
                 }
             }
         }
+		_logger.LogDebug("<<< Exiting ImportCategoryLocalizedAsync(category={Category},metadata={Metadata},manager={Manager},iRow={IRow},languages={Languages})", category, metadata, manager, iRow, languages);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -756,6 +763,7 @@ public partial class ImportManager : IImportManager
                 }
             }
         }
+		_logger.LogDebug("<<< Exiting ImportManufaturerLocalizedAsync(manufacturer={Manufacturer},metadata={Metadata},manager={Manager},iRow={IRow},languages={Languages})", manufacturer, metadata, manager, iRow, languages);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -975,6 +983,7 @@ public partial class ImportManager : IImportManager
             await _productAttributeService.UpdateProductAttributeValueAsync(pav);
             await saveAttributeValuePicturesAsync(lastLoadedProduct, pav);
         }
+		_logger.LogDebug("<<< Exiting ImportProductAttributeAsync(metadata={Metadata},lastLoadedProduct={LastLoadedProduct},languages={Languages},iRow={IRow})", metadata, lastLoadedProduct, languages, iRow);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -1050,6 +1059,7 @@ public partial class ImportManager : IImportManager
             customValue = specificationAttributeManager.GetLocalizedProperty("CustomValue").StringValue;
             await _localizedEntityService.SaveLocalizedValueAsync(productSpecificationAttribute, p => p.CustomValue, customValue, language.Id);
         }
+		_logger.LogDebug("<<< Exiting ImportSpecificationAttributeAsync(metadata={Metadata},lastLoadedProduct={LastLoadedProduct},languages={Languages},iRow={IRow})", metadata, lastLoadedProduct, languages, iRow);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -1097,6 +1107,7 @@ public partial class ImportManager : IImportManager
 
             await _productService.UpdateTierPriceAsync(tierPrice);
         }
+		_logger.LogDebug("<<< Exiting ImportTierPriceAsync(metadata={Metadata},lastLoadedProduct={LastLoadedProduct},languages={Languages},iRow={IRow})", metadata, lastLoadedProduct, languages, iRow);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -1665,6 +1676,7 @@ public partial class ImportManager : IImportManager
             orderItem.UnitPriceInclTax = priceInclTax;
             await _orderService.UpdateOrderItemAsync(orderItem);
         }
+		_logger.LogDebug("<<< Exiting ImportOrderItemAsync(orderItemManager={OrderItemManager},lastLoadedOrder={LastLoadedOrder})", orderItemManager, lastLoadedOrder);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -1731,20 +1743,26 @@ public partial class ImportManager : IImportManager
     /// <returns>Workbook metadata</returns>
     public static WorkbookMetadata<T> GetWorkbookMetadata<T>(IXLWorkbook workbook, IList<Language> languages)
     {
+		_logger.LogDebug(">>> Entering GetWorkbookMetadata(workbook={Workbook},languages={Languages})", workbook, languages);
         // get the first worksheet in the workbook
         var worksheet = workbook.Worksheets.FirstOrDefault()
                         ?? throw new NopException("No worksheet found");
 
         var properties = new List<PropertyByName<T>>();
+		_logger.LogDebug("GetWorkbookMetadata(workbook={Workbook},languages={Languages}): properties → {Properties}", workbook, languages, properties);
         var localizedProperties = new List<PropertyByName<T>>();
+		_logger.LogDebug("GetWorkbookMetadata(workbook={Workbook},languages={Languages}): localizedProperties → {LocalizedProperties}", workbook, languages, localizedProperties);
         var localizedWorksheets = new List<IXLWorksheet>();
+		_logger.LogDebug("GetWorkbookMetadata(workbook={Workbook},languages={Languages}): localizedWorksheets → {LocalizedWorksheets}", workbook, languages, localizedWorksheets);
 
         var poz = 1;
+		_logger.LogDebug("GetWorkbookMetadata(workbook={Workbook},languages={Languages}): poz → {Poz}", workbook, languages, poz);
         while (true)
         {
             try
             {
                 var cell = worksheet.Row(1).Cell(poz);
+				_logger.LogDebug("GetWorkbookMetadata(workbook={Workbook},languages={Languages}): cell → {Cell}", workbook, languages, cell);
 
                 if (string.IsNullOrEmpty(cell?.Value.ToString()))
                     break;
@@ -1754,6 +1772,7 @@ public partial class ImportManager : IImportManager
             }
             catch
             {
+				_logger.LogError("Exception in GetWorkbookMetadata(workbook={Workbook},languages={Languages}): {Arg2}", workbook, languages, ex.Message);
                 break;
             }
         }
@@ -1766,6 +1785,7 @@ public partial class ImportManager : IImportManager
         {
             // get the first worksheet in the workbook
             var localizedWorksheet = localizedWorksheets.First();
+			_logger.LogDebug("GetWorkbookMetadata(workbook={Workbook},languages={Languages}): localizedWorksheet → {LocalizedWorksheet}", workbook, languages, localizedWorksheet);
 
             poz = 1;
             while (true)
@@ -1782,11 +1802,13 @@ public partial class ImportManager : IImportManager
                 }
                 catch
                 {
+					_logger.LogError("Exception in GetWorkbookMetadata(workbook={Workbook},languages={Languages}): {Arg2}", workbook, languages, ex.Message);
                     break;
                 }
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetWorkbookMetadata(workbook={Workbook},languages={Languages})", workbook, languages);
         return new WorkbookMetadata<T>
         {
             DefaultProperties = properties,
@@ -1803,16 +1825,21 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportCustomersFromXlsxAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportCustomersFromXlsxAsync(stream={Stream})", stream);
         using var workbook = new XLWorkbook(stream);
 
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): workbook → {Workbook}", stream, workbook);
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): languages → {Languages}", stream, languages);
 
         //the columns
         var metadata = GetWorkbookMetadata<Customer>(workbook, languages);
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): metadata → {Metadata}", stream, metadata);
         var defaultWorksheet = metadata.DefaultWorksheet;
         var defaultProperties = metadata.DefaultProperties;
 
         var manager = new PropertyManager<Customer>(defaultProperties, _catalogSettings);
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): manager → {Manager}", stream, manager);
 
         if (_catalogSettings.ExportImportUseDropdownlistsForAssociatedEntities)
         {
@@ -1822,8 +1849,11 @@ public partial class ImportManager : IImportManager
 
         var iRow = 2;
         var allRoles = await _customerService.GetAllCustomerRolesAsync();
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): allRoles → {AllRoles}", stream, allRoles);
         var countries = await _countryService.GetAllCountriesAsync();
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): countries → {Countries}", stream, countries);
         var states = await _stateProvinceService.GetStateProvincesAsync();
+		_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): states → {States}", stream, states);
 
         while (true)
         {
@@ -1837,13 +1867,17 @@ public partial class ImportManager : IImportManager
             manager.ReadDefaultFromXlsx(defaultWorksheet, iRow);
 
             var customerGuid = manager.GetDefaultProperty("CustomerGuid").GuidValue;
+			_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customerGuid → {CustomerGuid}", stream, customerGuid);
             var customer = await _customerService.GetCustomerByGuidAsync(customerGuid) ??
                            await _customerService.GetCustomerByEmailAsync(manager.GetDefaultProperty("Email").StringValue);
 
             int? avatarPictureId = null;
             string signature = null;
+			_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): signature → {Signature}", stream, signature);
             string password = null;
+			_logger.LogWarning("ImportCustomersFromXlsxAsync(stream={Stream}): password → {Password}", stream, password);
             string passwordSalt = null;
+			_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): passwordSalt → {PasswordSalt}", stream, passwordSalt);
 
             var isNew = customer == null;
 
@@ -1855,6 +1889,7 @@ public partial class ImportManager : IImportManager
                 };
 
             var rolesToSave = new List<int>();
+			_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): rolesToSave → {RolesToSave}", stream, rolesToSave);
 
             foreach (var property in manager.GetDefaultProperties)
             {
@@ -1862,23 +1897,29 @@ public partial class ImportManager : IImportManager
                 {
                     case "Email":
                         customer.Email = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Email → {Arg1}", stream, customer.Email);
                         break;
                     case "Username":
                         customer.Username = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Username → {Arg1}", stream, customer.Username);
                         break;
                     case "IsTaxExempt":
                         customer.IsTaxExempt = property.BooleanValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.IsTaxExempt → {Arg1}", stream, customer.IsTaxExempt);
                         break;
                     case "AffiliateId":
                         customer.AffiliateId = property.IntValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.AffiliateId → {Arg1}", stream, customer.AffiliateId);
                         break;
                     case "Vendor":
                         if (!string.IsNullOrEmpty(property.StringValue))
                             if (int.TryParse(property.StringValue, out var vendorId))
                                 customer.VendorId = vendorId;
+								_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.VendorId → {Arg1}", stream, customer.VendorId);
                             else
                             {
                                 var vendors = await _vendorService.GetAllVendorsAsync(property.StringValue);
+								_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): vendors → {Vendors}", stream, vendors);
                                 customer.VendorId = vendors.FirstOrDefault()?.Id ?? 0;
                             }
                         else
@@ -1886,9 +1927,11 @@ public partial class ImportManager : IImportManager
                         break;
                     case "Active":
                         customer.Active = property.BooleanValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Active → {Arg1}", stream, customer.Active);
                         break;
                     case "CustomerRoles":
                         var roles = property.StringValue.Split(", ");
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): roles → {Roles}", stream, roles);
 
                         foreach (var role in roles)
                             if (int.TryParse(role, out var roleId))
@@ -1905,37 +1948,48 @@ public partial class ImportManager : IImportManager
                     case "CreatedOnUtc":
                         if (DateTime.TryParse(property.StringValue, out var date))
                             customer.CreatedOnUtc = date;
+							_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.CreatedOnUtc → {Arg1}", stream, customer.CreatedOnUtc);
                         break;
                     case "FirstName":
                         customer.FirstName = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.FirstName → {Arg1}", stream, customer.FirstName);
                         break;
                     case "LastName":
                         customer.LastName = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.LastName → {Arg1}", stream, customer.LastName);
                         break;
                     case "Gender":
                         customer.Gender = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Gender → {Arg1}", stream, customer.Gender);
                         break;
                     case "Company":
                         customer.Company = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Company → {Arg1}", stream, customer.Company);
                         break;
                     case "StreetAddress":
                         customer.StreetAddress = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.StreetAddress → {Arg1}", stream, customer.StreetAddress);
                         break;
                     case "StreetAddress2":
                         customer.StreetAddress2 = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.StreetAddress2 → {Arg1}", stream, customer.StreetAddress2);
                         break;
                     case "ZipPostalCode":
                         customer.ZipPostalCode = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.ZipPostalCode → {Arg1}", stream, customer.ZipPostalCode);
                         break;
                     case "City":
                         customer.City = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.City → {Arg1}", stream, customer.City);
                         break;
                     case "County":
                         customer.County = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.County → {Arg1}", stream, customer.County);
                         break;
                     case "Country":
                         if (int.TryParse(property.StringValue, out var countryId))
                             customer.CountryId = countryId;
+							_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.CountryId → {Arg1}", stream, customer.CountryId);
                         else
                         {
                             var country = countries.FirstOrDefault(c =>
@@ -1948,6 +2002,7 @@ public partial class ImportManager : IImportManager
                     case "StateProvince":
                         if (int.TryParse(property.StringValue, out var stateId))
                             customer.StateProvinceId = stateId;
+							_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.StateProvinceId → {Arg1}", stream, customer.StateProvinceId);
                         else
                         {
                             var state = states.FirstOrDefault(s =>
@@ -1959,27 +2014,34 @@ public partial class ImportManager : IImportManager
                         break;
                     case "Phone":
                         customer.Phone = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Phone → {Arg1}", stream, customer.Phone);
                         break;
                     case "Fax":
                         customer.Fax = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.Fax → {Arg1}", stream, customer.Fax);
                         break;
                     case "VatNumber":
                         customer.VatNumber = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.VatNumber → {Arg1}", stream, customer.VatNumber);
                         break;
                     case "VatNumberStatus":
                         customer.VatNumberStatusId = property.IntValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.VatNumberStatusId → {Arg1}", stream, customer.VatNumberStatusId);
                         break;
                     case "TimeZone":
                         customer.TimeZoneId = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.TimeZoneId → {Arg1}", stream, customer.TimeZoneId);
                         break;
                     case "AvatarPictureId":
                         avatarPictureId = property.IntValueNullable;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): avatarPictureId → {AvatarPictureId}", stream, avatarPictureId);
                         break;
                     case "Signature":
                         signature = property.StringValue;
                         break;
                     case "CustomCustomerAttributesXML":
                         customer.CustomCustomerAttributesXML = property.StringValue;
+						_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customer.CustomCustomerAttributesXML → {Arg1}", stream, customer.CustomCustomerAttributesXML);
                         break;
                     case "Password":
                         password = property.StringValue;
@@ -1996,10 +2058,12 @@ public partial class ImportManager : IImportManager
                 await _customerService.UpdateCustomerAsync(customer);
 
             var customerRoles = await _customerService.GetCustomerRolesAsync(customer);
+			_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): customerRoles → {CustomerRoles}", stream, customerRoles);
 
             foreach (var roleId in rolesToSave)
             {
                 var role = allRoles.FirstOrDefault(r => r.Id == roleId);
+				_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): role → {Role}", stream, role);
 
                 if (role == null || customerRoles.Any(cr => cr.Id == roleId))
                     continue;
@@ -2024,6 +2088,7 @@ public partial class ImportManager : IImportManager
                 !string.IsNullOrEmpty(password) && !string.IsNullOrEmpty(passwordSalt))
             {
                 var lastPassword = isNew ? null : await _customerService.GetCurrentPasswordAsync(customer.Id);
+				_logger.LogDebug("ImportCustomersFromXlsxAsync(stream={Stream}): lastPassword → {LastPassword}", stream, lastPassword);
 
                 if (lastPassword == null || !(lastPassword.Password.Equals(password) && lastPassword.PasswordSalt.Equals(passwordSalt)))
                     await _customerService.InsertCustomerPasswordAsync(new CustomerPassword
@@ -2042,6 +2107,7 @@ public partial class ImportManager : IImportManager
         //activity log
         await _customerActivityService.InsertActivityAsync("ImportCustomers",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportCustomers"), iRow - 2));
+			_logger.LogDebug("<<< Exiting ImportCustomersFromXlsxAsync(stream={Stream})", stream);
     }
 
     /// <summary>
@@ -2051,12 +2117,17 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportProductsFromXlsxAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportProductsFromXlsxAsync(stream={Stream})", stream);
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
 
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): languages → {Languages}", stream, languages);
         using var workbook = new XLWorkbook(stream);
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): workbook → {Workbook}", stream, workbook);
         var downloadedFiles = new List<string>();
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): downloadedFiles → {DownloadedFiles}", stream, downloadedFiles);
 
         var metadata = await PrepareImportProductDataAsync(workbook, languages);
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): metadata → {Metadata}", stream, metadata);
         var defaultWorksheet = metadata.DefaultWorksheet;
 
         if (_catalogSettings.ExportImportSplitProductsFile && metadata.CountProductsInFile > _catalogSettings.ExportImportProductsCountInOneFile)
@@ -2067,7 +2138,9 @@ public partial class ImportManager : IImportManager
 
         //performance optimization, load all products by SKU in one SQL request
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): currentVendor → {CurrentVendor}", stream, currentVendor);
         var allProductsBySku = await _productService.GetProductsBySkuAsync(metadata.AllSku.ToArray(), currentVendor?.Id ?? 0);
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allProductsBySku → {AllProductsBySku}", stream, allProductsBySku);
 
         //validate maximum number of products per vendor
         if (_vendorSettings.MaximumProductNumber > 0 &&
@@ -2080,18 +2153,22 @@ public partial class ImportManager : IImportManager
 
         //performance optimization, load all categories IDs for products in one SQL request
         var allProductsCategoryIds = await _categoryService.GetProductCategoryIdsAsync(allProductsBySku.Select(p => p.Id).ToArray());
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allProductsCategoryIds → {AllProductsCategoryIds}", stream, allProductsCategoryIds);
 
         //performance optimization, load all categories in one SQL request
         Dictionary<CategoryKey, Category> allCategories = new();
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allCategories → {AllCategories}", stream, allCategories);
         try
         {
             var allCategoryList = await _categoryService.GetAllCategoriesAsync(showHidden: true);
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allCategoryList → {AllCategoryList}", stream, allCategoryList);
 
             allCategories = await allCategoryList
                 .WhereAwait(async c => await _categoryService.CanVendorAddProductsAsync(c, allCategoryList))
                 .ToDictionaryAwaitAsync(async c =>
                 {
                     var keyName = await _categoryService.GetFormattedBreadCrumbAsync(c, allCategoryList);
+					_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): keyName → {KeyName}", stream, keyName);
                     return new CategoryKey(keyName, c, c.LimitedToStores ? (await _storeMappingService.GetStoresIdsWithAccessAsync(c)).ToList() : new List<int>());
                 });
         }
@@ -2103,18 +2180,24 @@ public partial class ImportManager : IImportManager
 
         //performance optimization, load all manufacturers IDs for products in one SQL request
         var allProductsManufacturerIds = await _manufacturerService.GetProductManufacturerIdsAsync(allProductsBySku.Select(p => p.Id).ToArray());
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allProductsManufacturerIds → {AllProductsManufacturerIds}", stream, allProductsManufacturerIds);
 
         //performance optimization, load all manufacturers in one SQL request
         var allManufacturers = await _manufacturerService.GetAllManufacturersAsync(showHidden: true);
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allManufacturers → {AllManufacturers}", stream, allManufacturers);
 
         //performance optimization, load all stores in one SQL request
         var allStores = await _storeService.GetAllStoresAsync();
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): allStores → {AllStores}", stream, allStores);
 
         //product to import images
         var productPictureMetadata = new List<ProductPictureMetadata>();
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): productPictureMetadata → {ProductPictureMetadata}", stream, productPictureMetadata);
 
         Product lastLoadedProduct = null;
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): lastLoadedProduct → {LastLoadedProduct}", stream, lastLoadedProduct);
         var typeOfExportedAttribute = ExportedAdditionalProductInfoType.NotSpecified;
+		_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): typeOfExportedAttribute → {TypeOfExportedAttribute}", stream, typeOfExportedAttribute);
 
         for (var iRow = 2; iRow < metadata.EndRow; iRow++)
         {
@@ -2124,6 +2207,7 @@ public partial class ImportManager : IImportManager
                     continue;
 
                 var newTypeOfExportedAttribute = GetTypeOfExportedAdditionalProductInfo(defaultWorksheet, metadata.LocalizedWorksheets, metadata.ProductAttributeManager, metadata.SpecificationAttributeManager, metadata.TierPriceManager, iRow);
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): newTypeOfExportedAttribute → {NewTypeOfExportedAttribute}", stream, newTypeOfExportedAttribute);
 
                 //skip caption row
                 if (newTypeOfExportedAttribute != ExportedAdditionalProductInfoType.NotSpecified &&
@@ -2155,6 +2239,7 @@ public partial class ImportManager : IImportManager
             metadata.Manager.ReadDefaultFromXlsx(defaultWorksheet, iRow);
 
             var product = metadata.SkuCellNum > 0 ? allProductsBySku.FirstOrDefault(p => p.Sku == metadata.Manager.GetDefaultProperty("SKU").StringValue) : null;
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product → {Product}", stream, product);
 
             var isNew = product == null;
 
@@ -2164,9 +2249,11 @@ public partial class ImportManager : IImportManager
             var previousStockQuantity = product.StockQuantity;
             var previousWarehouseId = product.WarehouseId;
             var prevTotalStockQuantity = await _productService.GetTotalStockQuantityAsync(product);
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): prevTotalStockQuantity → {PrevTotalStockQuantity}", stream, prevTotalStockQuantity);
 
             if (isNew)
                 product.CreatedOnUtc = DateTime.UtcNow;
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.CreatedOnUtc → {Arg1}", stream, product.CreatedOnUtc);
 
             foreach (var property in metadata.Manager.GetDefaultProperties)
             {
@@ -2174,282 +2261,373 @@ public partial class ImportManager : IImportManager
                 {
                     case "ProductType":
                         product.ProductTypeId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ProductTypeId → {Arg1}", stream, product.ProductTypeId);
                         break;
                     case "ParentGroupedProductId":
                         product.ParentGroupedProductId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ParentGroupedProductId → {Arg1}", stream, product.ParentGroupedProductId);
                         break;
                     case "VisibleIndividually":
                         product.VisibleIndividually = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.VisibleIndividually → {Arg1}", stream, product.VisibleIndividually);
                         break;
                     case "Name":
                         product.Name = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Name → {Arg1}", stream, product.Name);
                         break;
                     case "ShortDescription":
                         product.ShortDescription = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ShortDescription → {Arg1}", stream, product.ShortDescription);
                         break;
                     case "FullDescription":
                         product.FullDescription = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.FullDescription → {Arg1}", stream, product.FullDescription);
                         break;
                     case "Vendor":
                         //vendor can't change this field
                         if (currentVendor == null)
                             product.VendorId = property.IntValue;
+							_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.VendorId → {Arg1}", stream, product.VendorId);
                         break;
                     case "ProductTemplate":
                         product.ProductTemplateId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ProductTemplateId → {Arg1}", stream, product.ProductTemplateId);
                         break;
                     case "ShowOnHomepage":
                         //vendor can't change this field
                         if (currentVendor == null)
                             product.ShowOnHomepage = property.BooleanValue;
+							_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ShowOnHomepage → {Arg1}", stream, product.ShowOnHomepage);
                         break;
                     case "DisplayOrder":
                         //vendor can't change this field
                         if (currentVendor == null)
                             product.DisplayOrder = property.IntValue;
+							_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DisplayOrder → {Arg1}", stream, product.DisplayOrder);
                         break;
                     case "MetaKeywords":
                         product.MetaKeywords = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MetaKeywords → {Arg1}", stream, product.MetaKeywords);
                         break;
                     case "MetaDescription":
                         product.MetaDescription = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MetaDescription → {Arg1}", stream, product.MetaDescription);
                         break;
                     case "MetaTitle":
                         product.MetaTitle = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MetaTitle → {Arg1}", stream, product.MetaTitle);
                         break;
                     case "AllowCustomerReviews":
                         product.AllowCustomerReviews = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AllowCustomerReviews → {Arg1}", stream, product.AllowCustomerReviews);
                         break;
                     case "Published":
                         product.Published = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Published → {Arg1}", stream, product.Published);
                         break;
                     case "SKU":
                         product.Sku = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Sku → {Arg1}", stream, product.Sku);
                         break;
                     case "ManufacturerPartNumber":
                         product.ManufacturerPartNumber = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ManufacturerPartNumber → {Arg1}", stream, product.ManufacturerPartNumber);
                         break;
                     case "Gtin":
                         product.Gtin = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Gtin → {Arg1}", stream, product.Gtin);
                         break;
                     case "IsGiftCard":
                         product.IsGiftCard = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsGiftCard → {Arg1}", stream, product.IsGiftCard);
                         break;
                     case "GiftCardType":
                         product.GiftCardTypeId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.GiftCardTypeId → {Arg1}", stream, product.GiftCardTypeId);
                         break;
                     case "OverriddenGiftCardAmount":
                         product.OverriddenGiftCardAmount = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.OverriddenGiftCardAmount → {Arg1}", stream, product.OverriddenGiftCardAmount);
                         break;
                     case "RequireOtherProducts":
                         product.RequireOtherProducts = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RequireOtherProducts → {Arg1}", stream, product.RequireOtherProducts);
                         break;
                     case "RequiredProductIds":
                         product.RequiredProductIds = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RequiredProductIds → {Arg1}", stream, product.RequiredProductIds);
                         break;
                     case "AutomaticallyAddRequiredProducts":
                         product.AutomaticallyAddRequiredProducts = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AutomaticallyAddRequiredProducts → {Arg1}", stream, product.AutomaticallyAddRequiredProducts);
                         break;
                     case "IsDownload":
                         product.IsDownload = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsDownload → {Arg1}", stream, product.IsDownload);
                         break;
                     case "DownloadId":
                         product.DownloadId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DownloadId → {Arg1}", stream, product.DownloadId);
                         break;
                     case "UnlimitedDownloads":
                         product.UnlimitedDownloads = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.UnlimitedDownloads → {Arg1}", stream, product.UnlimitedDownloads);
                         break;
                     case "MaxNumberOfDownloads":
                         product.MaxNumberOfDownloads = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MaxNumberOfDownloads → {Arg1}", stream, product.MaxNumberOfDownloads);
                         break;
                     case "DownloadActivationType":
                         product.DownloadActivationTypeId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DownloadActivationTypeId → {Arg1}", stream, product.DownloadActivationTypeId);
                         break;
                     case "HasSampleDownload":
                         product.HasSampleDownload = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.HasSampleDownload → {Arg1}", stream, product.HasSampleDownload);
                         break;
                     case "SampleDownloadId":
                         product.SampleDownloadId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.SampleDownloadId → {Arg1}", stream, product.SampleDownloadId);
                         break;
                     case "HasUserAgreement":
                         product.HasUserAgreement = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.HasUserAgreement → {Arg1}", stream, product.HasUserAgreement);
                         break;
                     case "UserAgreementText":
                         product.UserAgreementText = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.UserAgreementText → {Arg1}", stream, product.UserAgreementText);
                         break;
                     case "IsRecurring":
                         product.IsRecurring = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsRecurring → {Arg1}", stream, product.IsRecurring);
                         break;
                     case "RecurringCycleLength":
                         product.RecurringCycleLength = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RecurringCycleLength → {Arg1}", stream, product.RecurringCycleLength);
                         break;
                     case "RecurringCyclePeriod":
                         product.RecurringCyclePeriodId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RecurringCyclePeriodId → {Arg1}", stream, product.RecurringCyclePeriodId);
                         break;
                     case "RecurringTotalCycles":
                         product.RecurringTotalCycles = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RecurringTotalCycles → {Arg1}", stream, product.RecurringTotalCycles);
                         break;
                     case "IsRental":
                         product.IsRental = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsRental → {Arg1}", stream, product.IsRental);
                         break;
                     case "RentalPriceLength":
                         product.RentalPriceLength = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RentalPriceLength → {Arg1}", stream, product.RentalPriceLength);
                         break;
                     case "RentalPricePeriod":
                         product.RentalPricePeriodId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.RentalPricePeriodId → {Arg1}", stream, product.RentalPricePeriodId);
                         break;
                     case "IsShipEnabled":
                         product.IsShipEnabled = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsShipEnabled → {Arg1}", stream, product.IsShipEnabled);
                         break;
                     case "IsFreeShipping":
                         product.IsFreeShipping = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsFreeShipping → {Arg1}", stream, product.IsFreeShipping);
                         break;
                     case "ShipSeparately":
                         product.ShipSeparately = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ShipSeparately → {Arg1}", stream, product.ShipSeparately);
                         break;
                     case "AdditionalShippingCharge":
                         product.AdditionalShippingCharge = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AdditionalShippingCharge → {Arg1}", stream, product.AdditionalShippingCharge);
                         break;
                     case "DeliveryDate":
                         product.DeliveryDateId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DeliveryDateId → {Arg1}", stream, product.DeliveryDateId);
                         break;
                     case "IsTaxExempt":
                         product.IsTaxExempt = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.IsTaxExempt → {Arg1}", stream, product.IsTaxExempt);
                         break;
                     case "TaxCategory":
                         product.TaxCategoryId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.TaxCategoryId → {Arg1}", stream, product.TaxCategoryId);
                         break;
                     case "ManageInventoryMethod":
                         product.ManageInventoryMethodId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ManageInventoryMethodId → {Arg1}", stream, product.ManageInventoryMethodId);
                         break;
                     case "ProductAvailabilityRange":
                         product.ProductAvailabilityRangeId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ProductAvailabilityRangeId → {Arg1}", stream, product.ProductAvailabilityRangeId);
                         break;
                     case "UseMultipleWarehouses":
                         product.UseMultipleWarehouses = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.UseMultipleWarehouses → {Arg1}", stream, product.UseMultipleWarehouses);
                         break;
                     case "WarehouseId":
                         product.WarehouseId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.WarehouseId → {Arg1}", stream, product.WarehouseId);
                         break;
                     case "StockQuantity":
                         product.StockQuantity = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.StockQuantity → {Arg1}", stream, product.StockQuantity);
                         break;
                     case "DisplayStockAvailability":
                         product.DisplayStockAvailability = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DisplayStockAvailability → {Arg1}", stream, product.DisplayStockAvailability);
                         break;
                     case "DisplayStockQuantity":
                         product.DisplayStockQuantity = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DisplayStockQuantity → {Arg1}", stream, product.DisplayStockQuantity);
                         break;
                     case "MinStockQuantity":
                         product.MinStockQuantity = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MinStockQuantity → {Arg1}", stream, product.MinStockQuantity);
                         break;
                     case "LowStockActivity":
                         product.LowStockActivityId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.LowStockActivityId → {Arg1}", stream, product.LowStockActivityId);
                         break;
                     case "NotifyAdminForQuantityBelow":
                         product.NotifyAdminForQuantityBelow = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.NotifyAdminForQuantityBelow → {Arg1}", stream, product.NotifyAdminForQuantityBelow);
                         break;
                     case "BackorderMode":
                         product.BackorderModeId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.BackorderModeId → {Arg1}", stream, product.BackorderModeId);
                         break;
                     case "AllowBackInStockSubscriptions":
                         product.AllowBackInStockSubscriptions = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AllowBackInStockSubscriptions → {Arg1}", stream, product.AllowBackInStockSubscriptions);
                         break;
                     case "OrderMinimumQuantity":
                         product.OrderMinimumQuantity = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.OrderMinimumQuantity → {Arg1}", stream, product.OrderMinimumQuantity);
                         break;
                     case "OrderMaximumQuantity":
                         product.OrderMaximumQuantity = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.OrderMaximumQuantity → {Arg1}", stream, product.OrderMaximumQuantity);
                         break;
                     case "AllowedQuantities":
                         product.AllowedQuantities = property.StringValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AllowedQuantities → {Arg1}", stream, product.AllowedQuantities);
                         break;
                     case "AllowAddingOnlyExistingAttributeCombinations":
                         product.AllowAddingOnlyExistingAttributeCombinations = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AllowAddingOnlyExistingAttributeCombinations → {Arg1}", stream, product.AllowAddingOnlyExistingAttributeCombinations);
                         break;
                     case "NotReturnable":
                         product.NotReturnable = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.NotReturnable → {Arg1}", stream, product.NotReturnable);
                         break;
                     case "DisableBuyButton":
                         product.DisableBuyButton = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DisableBuyButton → {Arg1}", stream, product.DisableBuyButton);
                         break;
                     case "DisableWishlistButton":
                         product.DisableWishlistButton = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DisableWishlistButton → {Arg1}", stream, product.DisableWishlistButton);
                         break;
                     case "AvailableForPreOrder":
                         product.AvailableForPreOrder = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AvailableForPreOrder → {Arg1}", stream, product.AvailableForPreOrder);
                         break;
                     case "PreOrderAvailabilityStartDateTimeUtc":
                         product.PreOrderAvailabilityStartDateTimeUtc = property.DateTimeNullable;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.PreOrderAvailabilityStartDateTimeUtc → {Arg1}", stream, product.PreOrderAvailabilityStartDateTimeUtc);
                         break;
                     case "CallForPrice":
                         product.CallForPrice = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.CallForPrice → {Arg1}", stream, product.CallForPrice);
                         break;
                     case "Price":
                         product.Price = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Price → {Arg1}", stream, product.Price);
                         break;
                     case "OldPrice":
                         product.OldPrice = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.OldPrice → {Arg1}", stream, product.OldPrice);
                         break;
                     case "ProductCost":
                         product.ProductCost = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ProductCost → {Arg1}", stream, product.ProductCost);
                         break;
                     case "CustomerEntersPrice":
                         product.CustomerEntersPrice = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.CustomerEntersPrice → {Arg1}", stream, product.CustomerEntersPrice);
                         break;
                     case "MinimumCustomerEnteredPrice":
                         product.MinimumCustomerEnteredPrice = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MinimumCustomerEnteredPrice → {Arg1}", stream, product.MinimumCustomerEnteredPrice);
                         break;
                     case "MaximumCustomerEnteredPrice":
                         product.MaximumCustomerEnteredPrice = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MaximumCustomerEnteredPrice → {Arg1}", stream, product.MaximumCustomerEnteredPrice);
                         break;
                     case "BasepriceEnabled":
                         product.BasepriceEnabled = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.BasepriceEnabled → {Arg1}", stream, product.BasepriceEnabled);
                         break;
                     case "BasepriceAmount":
                         product.BasepriceAmount = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.BasepriceAmount → {Arg1}", stream, product.BasepriceAmount);
                         break;
                     case "BasepriceUnit":
                         product.BasepriceUnitId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.BasepriceUnitId → {Arg1}", stream, product.BasepriceUnitId);
                         break;
                     case "BasepriceBaseAmount":
                         product.BasepriceBaseAmount = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.BasepriceBaseAmount → {Arg1}", stream, product.BasepriceBaseAmount);
                         break;
                     case "BasepriceBaseUnit":
                         product.BasepriceBaseUnitId = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.BasepriceBaseUnitId → {Arg1}", stream, product.BasepriceBaseUnitId);
                         break;
                     case "MarkAsNew":
                         product.MarkAsNew = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MarkAsNew → {Arg1}", stream, product.MarkAsNew);
                         break;
                     case "MarkAsNewStartDateTimeUtc":
                         product.MarkAsNewStartDateTimeUtc = property.DateTimeNullable;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MarkAsNewStartDateTimeUtc → {Arg1}", stream, product.MarkAsNewStartDateTimeUtc);
                         break;
                     case "MarkAsNewEndDateTimeUtc":
                         product.MarkAsNewEndDateTimeUtc = property.DateTimeNullable;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MarkAsNewEndDateTimeUtc → {Arg1}", stream, product.MarkAsNewEndDateTimeUtc);
                         break;
                     case "Weight":
                         product.Weight = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Weight → {Arg1}", stream, product.Weight);
                         break;
                     case "Length":
                         product.Length = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Length → {Arg1}", stream, product.Length);
                         break;
                     case "Width":
                         product.Width = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Width → {Arg1}", stream, product.Width);
                         break;
                     case "Height":
                         product.Height = property.DecimalValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.Height → {Arg1}", stream, product.Height);
                         break;
                     case "IsLimitedToStores":
                         product.LimitedToStores = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.LimitedToStores → {Arg1}", stream, product.LimitedToStores);
                         break;
                     case "DisplayAttributeCombinationImagesOnly":
                         product.DisplayAttributeCombinationImagesOnly = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.DisplayAttributeCombinationImagesOnly → {Arg1}", stream, product.DisplayAttributeCombinationImagesOnly);
                         break;
                     case "AgeVerification":
                         product.AgeVerification = property.BooleanValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.AgeVerification → {Arg1}", stream, product.AgeVerification);
                         break;
                     case "MinimumAgeToPurchase":
                         product.MinimumAgeToPurchase = property.IntValue;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.MinimumAgeToPurchase → {Arg1}", stream, product.MinimumAgeToPurchase);
                         break;
                 }
             }
@@ -2457,6 +2635,7 @@ public partial class ImportManager : IImportManager
             //set some default values if not specified
             if (isNew && metadata.Properties.All(p => p.PropertyName != "ProductType"))
                 product.ProductType = ProductType.SimpleProduct;
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.ProductType → {Arg1}", stream, product.ProductType);
             if (isNew && metadata.Properties.All(p => p.PropertyName != "VisibleIndividually"))
                 product.VisibleIndividually = true;
             if (isNew && metadata.Properties.All(p => p.PropertyName != "Published"))
@@ -2467,6 +2646,7 @@ public partial class ImportManager : IImportManager
                 product.VendorId = currentVendor.Id;
 
             product.UpdatedOnUtc = DateTime.UtcNow;
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): product.UpdatedOnUtc → {Arg1}", stream, product.UpdatedOnUtc);
 
             if (isNew)
                 await _productService.InsertProductAsync(product);
@@ -2484,22 +2664,27 @@ public partial class ImportManager : IImportManager
             {
                 //compose a message
                 var oldWarehouseMessage = string.Empty;
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): oldWarehouseMessage → {OldWarehouseMessage}", stream, oldWarehouseMessage);
                 if (previousWarehouseId > 0)
                 {
                     var oldWarehouse = await _warehouseService.GetWarehouseByIdAsync(previousWarehouseId);
+					_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): oldWarehouse → {OldWarehouse}", stream, oldWarehouse);
                     if (oldWarehouse != null)
                         oldWarehouseMessage = string.Format(await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.EditWarehouse.Old"), oldWarehouse.Name);
                 }
 
                 var newWarehouseMessage = string.Empty;
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): newWarehouseMessage → {NewWarehouseMessage}", stream, newWarehouseMessage);
                 if (product.WarehouseId > 0)
                 {
                     var newWarehouse = await _warehouseService.GetWarehouseByIdAsync(product.WarehouseId);
+					_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): newWarehouse → {NewWarehouse}", stream, newWarehouse);
                     if (newWarehouse != null)
                         newWarehouseMessage = string.Format(await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.EditWarehouse.New"), newWarehouse.Name);
                 }
 
                 var message = string.Format(await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.ImportProduct.EditWarehouse"), oldWarehouseMessage, newWarehouseMessage);
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): message → {Message}", stream, message);
 
                 //record history
                 await _productService.AddStockQuantityHistoryEntryAsync(product, -previousStockQuantity, 0, previousWarehouseId, message);
@@ -2519,9 +2704,11 @@ public partial class ImportManager : IImportManager
             }
 
             var tempProperty = metadata.Manager.GetDefaultProperty("SeName");
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): tempProperty → {TempProperty}", stream, tempProperty);
 
             //search engine name
             var seName = tempProperty?.StringValue ?? (isNew ? string.Empty : await _urlRecordService.GetSeNameAsync(product, 0));
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): seName → {SeName}", stream, seName);
             await _urlRecordService.SaveSlugAsync(product, await _urlRecordService.ValidateSeNameAsync(product, seName, product.Name, true), 0);
 
             //save product localized data
@@ -2535,6 +2722,7 @@ public partial class ImportManager : IImportManager
 
                 //category mappings
                 var categories = isNew || !allProductsCategoryIds.ContainsKey(product.Id) ? Array.Empty<int>() : allProductsCategoryIds[product.Id];
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): categories → {Categories}", stream, categories);
 
                 var storesIds = product.LimitedToStores
                     ? (await _storeMappingService.GetStoresIdsWithAccessAsync(product)).ToList()
@@ -2560,6 +2748,7 @@ public partial class ImportManager : IImportManager
                         return rez;
                     }).Where(id => id != null).ToListAsync();
 
+				_logger.LogInformation("ImportProductsFromXlsxAsync(stream)={Stream}: database query executed in {Arg1} ms", stream, __logStart.ElapsedMilliseconds);
                 foreach (var categoryId in importedCategories)
                 {
                     if (categories.Any(c => c == categoryId))
@@ -2589,12 +2778,14 @@ public partial class ImportManager : IImportManager
 
                 //manufacturer mappings
                 var manufacturers = isNew || !allProductsManufacturerIds.ContainsKey(product.Id) ? Array.Empty<int>() : allProductsManufacturerIds[product.Id];
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): manufacturers → {Manufacturers}", stream, manufacturers);
 
                 var importedManufacturers = await manufacturerList
                     .Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
                     .SelectAwait(async x =>
                     {
                         var id = allManufacturers.FirstOrDefault(m => m.Name == x.Trim())?.Id;
+						_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): id → {Id}", stream, id);
 
                         if (id != null)
                             return id;
@@ -2627,6 +2818,7 @@ public partial class ImportManager : IImportManager
                 //delete product manufacturers
                 var deletedProductsManufacturers = await manufacturers.Where(manufacturerId => !importedManufacturers.Contains(manufacturerId))
                     .SelectAwait(async manufacturerId => (await _manufacturerService.GetProductManufacturersByProductIdAsync(product.Id)).FirstOrDefault(pc => pc.ManufacturerId == manufacturerId)).ToListAsync();
+					_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): deletedProductsManufacturers → {DeletedProductsManufacturers}", stream, deletedProductsManufacturers);
 
                 deletedProductsManufacturers = deletedProductsManufacturers.Where(m => m != null).ToList();
                 await _manufacturerService.DeleteProductManufacturersAsync(deletedProductsManufacturers);
@@ -2636,14 +2828,18 @@ public partial class ImportManager : IImportManager
             if (tempProperty != null)
             {
                 var productTags = tempProperty.StringValue.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()).ToList();
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): productTags → {ProductTags}", stream, productTags);
 
                 //searching existing product tags by their id
                 var productTagIds = productTags.Where(pt => int.TryParse(pt, out var _)).Select(int.Parse);
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): productTagIds → {ProductTagIds}", stream, productTagIds);
 
                 var productTagsByIds = (await _productTagService.GetAllProductTagsByProductIdAsync(product.Id)).Where(pt => productTagIds.Contains(pt.Id)).ToList();
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): productTagsByIds → {ProductTagsByIds}", stream, productTagsByIds);
 
                 productTags.AddRange(productTagsByIds.Select(pt => pt.Name));
                 var filter = productTagsByIds.Select(pt => pt.Id.ToString()).ToList();
+				_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): filter → {Filter}", stream, filter);
 
                 //product tag mappings
                 await _productTagService.UpdateProductTagsAsync(product, productTags.Where(pt => !filter.Contains(pt)).ToArray());
@@ -2667,6 +2863,7 @@ public partial class ImportManager : IImportManager
             };
 
             var pictureProperties = new List<string> { "Picture1", "Picture2", "Picture3" };
+			_logger.LogDebug("ImportProductsFromXlsxAsync(stream={Stream}): pictureProperties → {PictureProperties}", stream, pictureProperties);
 
             if (currentVendor != null)
                 pictureProperties = pictureProperties.Take(_vendorSettings.MaximumProductPicturesNumber).ToList();
@@ -2701,6 +2898,7 @@ public partial class ImportManager : IImportManager
 
         //activity log
         await _customerActivityService.InsertActivityAsync("ImportProducts", string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportProducts"), metadata.CountProductsInFile));
+		_logger.LogDebug("<<< Exiting ImportProductsFromXlsxAsync(stream={Stream})", stream);
     }
 
     /// <summary>
@@ -2713,14 +2911,19 @@ public partial class ImportManager : IImportManager
     /// </returns>
     public virtual async Task<int> ImportNewsLetterSubscribersFromTxtAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportNewsLetterSubscribersFromTxtAsync(stream={Stream})", stream);
         var store = await _storeContext.GetCurrentStoreAsync();
         var defaultLanguageId = store.DefaultLanguageId > 0 ? store.DefaultLanguageId : (await _workContext.GetWorkingLanguageAsync()).Id;
+		_logger.LogDebug("ImportNewsLetterSubscribersFromTxtAsync(stream={Stream}): defaultLanguageId → {DefaultLanguageId}", stream, defaultLanguageId);
+		_logger.LogDebug("ImportNewsLetterSubscribersFromTxtAsync(stream={Stream}): store → {Store}", stream, store);
         var defaultTypeId = ((await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync(store.Id)).FirstOrDefault()
             ?? (await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync()).FirstOrDefault())
             .Id;
         var allSubscriptions = (await _newsLetterSubscriptionService.GetAllNewsLetterSubscriptionsAsync()).ToList();
+		_logger.LogDebug("ImportNewsLetterSubscribersFromTxtAsync(stream={Stream}): allSubscriptions → {AllSubscriptions}", stream, allSubscriptions);
 
         var count = 0;
+		_logger.LogDebug("ImportNewsLetterSubscribersFromTxtAsync(stream={Stream}): count → {Count}", stream, count);
         using (var reader = new StreamReader(stream))
         {
             while (!reader.EndOfStream)
@@ -2791,6 +2994,7 @@ public partial class ImportManager : IImportManager
         await _customerActivityService.InsertActivityAsync("ImportNewsLetterSubscriptions",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportNewsLetterSubscriptions"), count));
 
+		_logger.LogDebug("<<< Exiting ImportNewsLetterSubscribersFromTxtAsync(stream={Stream})", stream);
         return count;
     }
 
@@ -2805,9 +3009,11 @@ public partial class ImportManager : IImportManager
     /// </returns>
     public virtual async Task<int> ImportStatesFromTxtAsync(Stream stream, bool writeLog = true)
     {
+		_logger.LogDebug(">>> Entering ImportStatesFromTxtAsync(stream={Stream},writeLog={WriteLog})", stream, writeLog);
         var count = 0;
         using (var reader = new StreamReader(stream))
         {
+		_logger.LogDebug("ImportStatesFromTxtAsync(stream={Stream},writeLog={WriteLog}): count → {Count}", stream, writeLog, count);
             while (!reader.EndOfStream)
             {
                 var line = await reader.ReadLineAsync();
@@ -2867,6 +3073,7 @@ public partial class ImportManager : IImportManager
                 string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportStates"), count));
         }
 
+		_logger.LogDebug("<<< Exiting ImportStatesFromTxtAsync(stream={Stream},writeLog={WriteLog})", stream, writeLog);
         return count;
     }
 
@@ -2877,20 +3084,26 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportManufacturersFromXlsxAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportManufacturersFromXlsxAsync(stream={Stream})", stream);
         using var workbook = new XLWorkbook(stream);
 
+		_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): workbook → {Workbook}", stream, workbook);
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): languages → {Languages}", stream, languages);
 
         //the columns
         var metadata = GetWorkbookMetadata<Manufacturer>(workbook, languages);
+		_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): metadata → {Metadata}", stream, metadata);
         var defaultWorksheet = metadata.DefaultWorksheet;
         var defaultProperties = metadata.DefaultProperties;
         var localizedProperties = metadata.LocalizedProperties;
 
         var manager = new PropertyManager<Manufacturer>(defaultProperties, _catalogSettings, localizedProperties, languages);
+		_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manager → {Manager}", stream, manager);
 
         var iRow = 2;
         var setSeName = defaultProperties.Any(p => p.PropertyName == "SeName");
+		_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): setSeName → {SetSeName}", stream, setSeName);
 
         while (true)
         {
@@ -2904,6 +3117,7 @@ public partial class ImportManager : IImportManager
             manager.ReadDefaultFromXlsx(defaultWorksheet, iRow);
 
             var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(manager.GetDefaultProperty("Id").IntValue);
+			_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer → {Manufacturer}", stream, manufacturer);
 
             var isNew = manufacturer == null;
 
@@ -2912,15 +3126,21 @@ public partial class ImportManager : IImportManager
             if (isNew)
             {
                 manufacturer.CreatedOnUtc = DateTime.UtcNow;
+				_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.CreatedOnUtc → {Arg1}", stream, manufacturer.CreatedOnUtc);
 
                 //default values
                 manufacturer.PageSize = _catalogSettings.DefaultManufacturerPageSize;
+				_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.PageSize → {Arg1}", stream, manufacturer.PageSize);
+				_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.PageSizeOptions → {Arg1}", stream, manufacturer.PageSizeOptions);
+				_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.Published → {Arg1}", stream, manufacturer.Published);
+				_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.AllowCustomersToSelectPageSize → {Arg1}", stream, manufacturer.AllowCustomersToSelectPageSize);
                 manufacturer.PageSizeOptions = _catalogSettings.DefaultManufacturerPageSizeOptions;
                 manufacturer.Published = true;
                 manufacturer.AllowCustomersToSelectPageSize = true;
             }
 
             var seName = string.Empty;
+			_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): seName → {SeName}", stream, seName);
 
             foreach (var property in manager.GetDefaultProperties)
             {
@@ -2928,27 +3148,35 @@ public partial class ImportManager : IImportManager
                 {
                     case "Name":
                         manufacturer.Name = property.StringValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.Name → {Arg1}", stream, manufacturer.Name);
                         break;
                     case "Description":
                         manufacturer.Description = property.StringValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.Description → {Arg1}", stream, manufacturer.Description);
                         break;
                     case "ManufacturerTemplateId":
                         manufacturer.ManufacturerTemplateId = property.IntValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.ManufacturerTemplateId → {Arg1}", stream, manufacturer.ManufacturerTemplateId);
                         break;
                     case "MetaKeywords":
                         manufacturer.MetaKeywords = property.StringValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.MetaKeywords → {Arg1}", stream, manufacturer.MetaKeywords);
                         break;
                     case "MetaDescription":
                         manufacturer.MetaDescription = property.StringValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.MetaDescription → {Arg1}", stream, manufacturer.MetaDescription);
                         break;
                     case "MetaTitle":
                         manufacturer.MetaTitle = property.StringValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.MetaTitle → {Arg1}", stream, manufacturer.MetaTitle);
                         break;
                     case "Picture":
                         var picture = await LoadPictureAsync(manager.GetDefaultProperty("Picture").StringValue, manufacturer.Name, isNew ? null : (int?)manufacturer.PictureId);
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): picture → {Picture}", stream, picture);
 
                         if (picture != null)
                             manufacturer.PictureId = picture.Id;
+							_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.PictureId → {Arg1}", stream, manufacturer.PictureId);
 
                         break;
                     case "PageSize":
@@ -2962,21 +3190,26 @@ public partial class ImportManager : IImportManager
                         break;
                     case "PriceRangeFiltering":
                         manufacturer.PriceRangeFiltering = property.BooleanValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.PriceRangeFiltering → {Arg1}", stream, manufacturer.PriceRangeFiltering);
                         break;
                     case "PriceFrom":
                         manufacturer.PriceFrom = property.DecimalValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.PriceFrom → {Arg1}", stream, manufacturer.PriceFrom);
                         break;
                     case "PriceTo":
                         manufacturer.PriceTo = property.DecimalValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.PriceTo → {Arg1}", stream, manufacturer.PriceTo);
                         break;
                     case "AutomaticallyCalculatePriceRange":
                         manufacturer.ManuallyPriceRange = property.BooleanValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.ManuallyPriceRange → {Arg1}", stream, manufacturer.ManuallyPriceRange);
                         break;
                     case "Published":
                         manufacturer.Published = property.BooleanValue;
                         break;
                     case "DisplayOrder":
                         manufacturer.DisplayOrder = property.IntValue;
+						_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.DisplayOrder → {Arg1}", stream, manufacturer.DisplayOrder);
                         break;
                     case "SeName":
                         seName = property.StringValue;
@@ -2985,6 +3218,7 @@ public partial class ImportManager : IImportManager
             }
 
             manufacturer.UpdatedOnUtc = DateTime.UtcNow;
+			_logger.LogDebug("ImportManufacturersFromXlsxAsync(stream={Stream}): manufacturer.UpdatedOnUtc → {Arg1}", stream, manufacturer.UpdatedOnUtc);
 
             if (isNew)
                 await _manufacturerService.InsertManufacturerAsync(manufacturer);
@@ -3004,6 +3238,7 @@ public partial class ImportManager : IImportManager
         //activity log
         await _customerActivityService.InsertActivityAsync("ImportManufacturers",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportManufacturers"), iRow - 2));
+			_logger.LogDebug("<<< Exiting ImportManufacturersFromXlsxAsync(stream={Stream})", stream);
     }
 
     /// <summary>
@@ -3013,31 +3248,41 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportCategoriesFromXlsxAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportCategoriesFromXlsxAsync(stream={Stream})", stream);
         using var workbook = new XLWorkbook(stream);
 
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): workbook → {Workbook}", stream, workbook);
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): languages → {Languages}", stream, languages);
 
         //the columns
         var metadata = GetWorkbookMetadata<Category>(workbook, languages);
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): metadata → {Metadata}", stream, metadata);
         var defaultWorksheet = metadata.DefaultWorksheet;
         var defaultProperties = metadata.DefaultProperties;
         var localizedProperties = metadata.LocalizedProperties;
 
         var manager = new PropertyManager<Category>(defaultProperties, _catalogSettings, localizedProperties, languages);
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): manager → {Manager}", stream, manager);
 
         var iRow = 2;
         var setSeName = defaultProperties.Any(p => p.PropertyName == "SeName");
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): setSeName → {SetSeName}", stream, setSeName);
 
         //performance optimization, load all categories in one SQL request
         var allCategories = await (await _categoryService
                 .GetAllCategoriesAsync(showHidden: true))
             .GroupByAwait(async c => await _categoryService.GetFormattedBreadCrumbAsync(c))
             .ToDictionaryAsync(c => c.Key, c => c.FirstAsync());
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("ImportCategoriesFromXlsxAsync(stream)={Stream}: database query executed in {Arg1} ms", stream, __logStart.ElapsedMilliseconds);
 
         var saveNextTime = new List<int>();
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): saveNextTime → {SaveNextTime}", stream, saveNextTime);
 
         //performance optimization, load all stores in one SQL request
         var allStores = await _storeService.GetAllStoresAsync();
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): allStores → {AllStores}", stream, allStores);
 
         while (true)
         {
@@ -3072,10 +3317,12 @@ public partial class ImportManager : IImportManager
         }
 
         var needSave = saveNextTime.Any();
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): needSave → {NeedSave}", stream, needSave);
 
         while (needSave)
         {
             var remove = new List<int>();
+			_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): remove → {Remove}", stream, remove);
 
             //try to save unsaved categories
             foreach (var rowId in saveNextTime)
@@ -3110,6 +3357,7 @@ public partial class ImportManager : IImportManager
             return;
 
         var categoriesName = new List<string>();
+		_logger.LogDebug("ImportCategoriesFromXlsxAsync(stream={Stream}): categoriesName → {CategoriesName}", stream, categoriesName);
 
         foreach (var rowId in saveNextTime)
         {
@@ -3117,6 +3365,7 @@ public partial class ImportManager : IImportManager
             categoriesName.Add(manager.GetDefaultProperty("Name").StringValue);
         }
 
+		_logger.LogDebug("<<< Exiting ImportCategoriesFromXlsxAsync(stream={Stream})", stream);
         throw new ArgumentException(string.Format(await _localizationService.GetResourceAsync("Admin.Catalog.Categories.Import.CategoriesArentImported"), string.Join(", ", categoriesName)));
     }
 
@@ -3127,17 +3376,22 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportOrdersFromXlsxAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportOrdersFromXlsxAsync(stream={Stream})", stream);
         using var workbook = new XLWorkbook(stream);
 
+		_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): workbook → {Workbook}", stream, workbook);
         var (metadata, worksheet) = await PrepareImportOrderDataAsync(workbook);
 
         //performance optimization, load all orders by guid in one SQL request
         var allOrdersByGuids = await _orderService.GetOrdersByGuidsAsync(metadata.AllOrderGuids.ToArray());
+		_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): allOrdersByGuids → {AllOrdersByGuids}", stream, allOrdersByGuids);
 
         //performance optimization, load all customers by guid in one SQL request
         var allCustomersByGuids = await _customerService.GetCustomersByGuidsAsync(metadata.AllCustomerGuids.ToArray());
+		_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): allCustomersByGuids → {AllCustomersByGuids}", stream, allCustomersByGuids);
 
         Order lastLoadedOrder = null;
+		_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): lastLoadedOrder → {LastLoadedOrder}", stream, lastLoadedOrder);
 
         for (var iRow = 2; iRow < metadata.EndRow; iRow++)
         {
@@ -3159,16 +3413,20 @@ public partial class ImportManager : IImportManager
             metadata.Manager.ReadDefaultFromXlsx(worksheet, iRow);
 
             var order = allOrdersByGuids.FirstOrDefault(p => p.OrderGuid == metadata.Manager.GetDefaultProperty("OrderGuid").GuidValue);
+			_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order → {Order}", stream, order);
 
             var isNew = order == null;
 
             order ??= new Order();
 
             Address orderBillingAddress = null;
+			_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress → {OrderBillingAddress}", stream, orderBillingAddress);
             Address orderAddress = null;
+			_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress → {OrderAddress}", stream, orderAddress);
 
             if (isNew)
                 order.CreatedOnUtc = DateTime.UtcNow;
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CreatedOnUtc → {Arg1}", stream, order.CreatedOnUtc);
             else
             {
                 orderBillingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
@@ -3179,9 +3437,12 @@ public partial class ImportManager : IImportManager
             orderAddress ??= new Address();
 
             var customer = allCustomersByGuids.FirstOrDefault(p => p.CustomerGuid.ToString() == metadata.Manager.GetDefaultProperty("CustomerGuid").StringValue);
+			_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): customer → {Customer}", stream, customer);
 
             var billingStateProvinceAbbreviation = string.Empty;
+			_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): billingStateProvinceAbbreviation → {BillingStateProvinceAbbreviation}", stream, billingStateProvinceAbbreviation);
             var shippingStateProvinceAbbreviation = string.Empty;
+			_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): shippingStateProvinceAbbreviation → {ShippingStateProvinceAbbreviation}", stream, shippingStateProvinceAbbreviation);
 
             foreach (var property in metadata.Manager.GetDefaultProperties)
                 switch (property.PropertyName)
@@ -3189,14 +3450,17 @@ public partial class ImportManager : IImportManager
                     case "StoreId":
                         if (await _storeService.GetStoreByIdAsync(property.IntValue) is { })
                             order.StoreId = property.IntValue;
+							_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.StoreId → {Arg1}", stream, order.StoreId);
                         else
                             order.StoreId = (await _storeContext.GetCurrentStoreAsync())?.Id ?? 0;
                         break;
                     case "OrderGuid":
                         order.OrderGuid = property.GuidValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderGuid → {Arg1}", stream, order.OrderGuid);
                         break;
                     case "CustomerId":
                         order.CustomerId = customer?.Id ?? 0;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomerId → {Arg1}", stream, order.CustomerId);
                         break;
                     case "OrderStatus":
                         order.OrderStatus = (OrderStatus)property.PropertyValue;
@@ -3209,102 +3473,134 @@ public partial class ImportManager : IImportManager
                         break;
                     case "OrderSubtotalInclTax":
                         order.OrderSubtotalInclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderSubtotalInclTax → {Arg1}", stream, order.OrderSubtotalInclTax);
                         break;
                     case "OrderSubtotalExclTax":
                         order.OrderSubtotalExclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderSubtotalExclTax → {Arg1}", stream, order.OrderSubtotalExclTax);
                         break;
                     case "OrderSubTotalDiscountInclTax":
                         order.OrderSubTotalDiscountInclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderSubTotalDiscountInclTax → {Arg1}", stream, order.OrderSubTotalDiscountInclTax);
                         break;
                     case "OrderSubTotalDiscountExclTax":
                         order.OrderSubTotalDiscountExclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderSubTotalDiscountExclTax → {Arg1}", stream, order.OrderSubTotalDiscountExclTax);
                         break;
                     case "OrderShippingInclTax":
                         order.OrderShippingInclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderShippingInclTax → {Arg1}", stream, order.OrderShippingInclTax);
                         break;
                     case "OrderShippingExclTax":
                         order.OrderShippingExclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderShippingExclTax → {Arg1}", stream, order.OrderShippingExclTax);
                         break;
                     case "PaymentMethodAdditionalFeeInclTax":
                         order.PaymentMethodAdditionalFeeInclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.PaymentMethodAdditionalFeeInclTax → {Arg1}", stream, order.PaymentMethodAdditionalFeeInclTax);
                         break;
                     case "PaymentMethodAdditionalFeeExclTax":
                         order.PaymentMethodAdditionalFeeExclTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.PaymentMethodAdditionalFeeExclTax → {Arg1}", stream, order.PaymentMethodAdditionalFeeExclTax);
                         break;
                     case "TaxRates":
                         order.TaxRates = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.TaxRates → {Arg1}", stream, order.TaxRates);
                         break;
                     case "OrderTax":
                         order.OrderTax = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderTax → {Arg1}", stream, order.OrderTax);
                         break;
                     case "OrderTotal":
                         order.OrderTotal = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderTotal → {Arg1}", stream, order.OrderTotal);
                         break;
                     case "RefundedAmount":
                         order.RefundedAmount = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.RefundedAmount → {Arg1}", stream, order.RefundedAmount);
                         break;
                     case "OrderDiscount":
                         order.OrderDiscount = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.OrderDiscount → {Arg1}", stream, order.OrderDiscount);
                         break;
                     case "CurrencyRate":
                         order.CurrencyRate = property.DecimalValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CurrencyRate → {Arg1}", stream, order.CurrencyRate);
                         break;
                     case "CustomerCurrencyCode":
                         order.CustomerCurrencyCode = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomerCurrencyCode → {Arg1}", stream, order.CustomerCurrencyCode);
                         break;
                     case "AffiliateId":
                         order.AffiliateId = property.IntValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.AffiliateId → {Arg1}", stream, order.AffiliateId);
                         break;
                     case "PaymentMethodSystemName":
                         order.PaymentMethodSystemName = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.PaymentMethodSystemName → {Arg1}", stream, order.PaymentMethodSystemName);
                         break;
                     case "ShippingPickupInStore":
                         order.PickupInStore = property.BooleanValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.PickupInStore → {Arg1}", stream, order.PickupInStore);
                         break;
                     case "ShippingMethod":
                         order.ShippingMethod = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.ShippingMethod → {Arg1}", stream, order.ShippingMethod);
                         break;
                     case "ShippingRateComputationMethodSystemName":
                         order.ShippingRateComputationMethodSystemName = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.ShippingRateComputationMethodSystemName → {Arg1}", stream, order.ShippingRateComputationMethodSystemName);
                         break;
                     case "CustomValuesXml":
                         order.CustomValuesXml = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomValuesXml → {Arg1}", stream, order.CustomValuesXml);
                         break;
                     case "VatNumber":
                         order.VatNumber = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.VatNumber → {Arg1}", stream, order.VatNumber);
                         break;
                     case "CreatedOnUtc":
                         order.CreatedOnUtc = DateTime.TryParse(property.StringValue, out var createdOnUtc) ? createdOnUtc : DateTime.UtcNow;
                         break;
                     case "BillingFirstName":
                         orderBillingAddress.FirstName = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.FirstName → {Arg1}", stream, orderBillingAddress.FirstName);
                         break;
                     case "BillingLastName":
                         orderBillingAddress.LastName = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.LastName → {Arg1}", stream, orderBillingAddress.LastName);
                         break;
                     case "BillingPhoneNumber":
                         orderBillingAddress.PhoneNumber = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.PhoneNumber → {Arg1}", stream, orderBillingAddress.PhoneNumber);
                         break;
                     case "BillingEmail":
                         orderBillingAddress.Email = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.Email → {Arg1}", stream, orderBillingAddress.Email);
                         break;
                     case "BillingFaxNumber":
                         orderBillingAddress.FaxNumber = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.FaxNumber → {Arg1}", stream, orderBillingAddress.FaxNumber);
                         break;
                     case "BillingCompany":
                         orderBillingAddress.Company = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.Company → {Arg1}", stream, orderBillingAddress.Company);
                         break;
                     case "BillingAddress1":
                         orderBillingAddress.Address1 = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.Address1 → {Arg1}", stream, orderBillingAddress.Address1);
                         break;
                     case "BillingAddress2":
                         orderBillingAddress.Address2 = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.Address2 → {Arg1}", stream, orderBillingAddress.Address2);
                         break;
                     case "BillingCity":
                         orderBillingAddress.City = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.City → {Arg1}", stream, orderBillingAddress.City);
                         break;
                     case "BillingCounty":
                         orderBillingAddress.County = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.County → {Arg1}", stream, orderBillingAddress.County);
                         break;
                     case "BillingStateProvinceAbbreviation":
                         billingStateProvinceAbbreviation = property.StringValue;
@@ -3312,58 +3608,74 @@ public partial class ImportManager : IImportManager
                         break;
                     case "BillingZipPostalCode":
                         orderBillingAddress.ZipPostalCode = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.ZipPostalCode → {Arg1}", stream, orderBillingAddress.ZipPostalCode);
                         break;
                     case "BillingCountryCode":
                         if (await _countryService.GetCountryByTwoLetterIsoCodeAsync(property.StringValue) is { } billingCountry)
                             orderBillingAddress.CountryId = billingCountry.Id;
+							_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.CountryId → {Arg1}", stream, orderBillingAddress.CountryId);
                         break;
                     case "ShippingFirstName":
                         orderAddress.FirstName = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.FirstName → {Arg1}", stream, orderAddress.FirstName);
                         break;
                     case "ShippingLastName":
                         orderAddress.LastName = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.LastName → {Arg1}", stream, orderAddress.LastName);
                         break;
                     case "ShippingPhoneNumber":
                         orderAddress.PhoneNumber = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.PhoneNumber → {Arg1}", stream, orderAddress.PhoneNumber);
                         break;
                     case "ShippingEmail":
                         orderAddress.Email = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.Email → {Arg1}", stream, orderAddress.Email);
                         break;
                     case "ShippingFaxNumber":
                         orderAddress.FaxNumber = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.FaxNumber → {Arg1}", stream, orderAddress.FaxNumber);
                         break;
                     case "ShippingCompany":
                         orderAddress.Company = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.Company → {Arg1}", stream, orderAddress.Company);
                         break;
                     case "ShippingAddress1":
                         orderAddress.Address1 = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.Address1 → {Arg1}", stream, orderAddress.Address1);
                         break;
                     case "ShippingAddress2":
                         orderAddress.Address2 = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.Address2 → {Arg1}", stream, orderAddress.Address2);
                         break;
                     case "ShippingCity":
                         orderAddress.City = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.City → {Arg1}", stream, orderAddress.City);
                         break;
                     case "ShippingCounty":
                         orderAddress.County = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.County → {Arg1}", stream, orderAddress.County);
                         break;
                     case "ShippingStateProvinceAbbreviation":
                         shippingStateProvinceAbbreviation = property.StringValue;
                         break;
                     case "ShippingZipPostalCode":
                         orderAddress.ZipPostalCode = property.StringValue;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.ZipPostalCode → {Arg1}", stream, orderAddress.ZipPostalCode);
                         break;
                     case "ShippingCountryCode":
                         if (await _countryService.GetCountryByTwoLetterIsoCodeAsync(property.StringValue) is { } shippingCountry)
                             orderAddress.CountryId = shippingCountry.Id;
+							_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.CountryId → {Arg1}", stream, orderAddress.CountryId);
                         break;
                 }
 
             if (await _stateProvinceService.GetStateProvinceByAbbreviationAsync(billingStateProvinceAbbreviation, orderBillingAddress.CountryId) is { } billingState)
                 orderBillingAddress.StateProvinceId = billingState.Id;
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderBillingAddress.StateProvinceId → {Arg1}", stream, orderBillingAddress.StateProvinceId);
 
             if (await _stateProvinceService.GetStateProvinceByAbbreviationAsync(shippingStateProvinceAbbreviation, orderAddress.CountryId) is { } shippingState)
                 orderAddress.StateProvinceId = shippingState.Id;
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): orderAddress.StateProvinceId → {Arg1}", stream, orderAddress.StateProvinceId);
 
             //check order address field values from excel
             if (string.IsNullOrWhiteSpace(orderAddress.FirstName) && string.IsNullOrWhiteSpace(orderAddress.LastName) && string.IsNullOrWhiteSpace(orderAddress.Email))
@@ -3374,6 +3686,7 @@ public partial class ImportManager : IImportManager
             {
                 await _addressService.InsertAddressAsync(orderBillingAddress);
                 order.BillingAddressId = orderBillingAddress.Id;
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.BillingAddressId → {Arg1}", stream, order.BillingAddressId);
             }
             else
                 await _addressService.UpdateAddressAsync(orderBillingAddress);
@@ -3387,8 +3700,10 @@ public partial class ImportManager : IImportManager
 
                     if (order.PickupInStore)
                         order.PickupAddressId = orderAddress.Id;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.PickupAddressId → {Arg1}", stream, order.PickupAddressId);
                     else
                         order.ShippingAddressId = orderAddress.Id;
+						_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.ShippingAddressId → {Arg1}", stream, order.ShippingAddressId);
                 }
                 else
                     await _addressService.UpdateAddressAsync(orderAddress);
@@ -3401,15 +3716,34 @@ public partial class ImportManager : IImportManager
             {
                 //customer language
                 var customerLanguage = await _languageService.GetLanguageByIdAsync(customer?.LanguageId ?? 0);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): customerLanguage → {CustomerLanguage}", stream, customerLanguage);
                 if (customerLanguage == null || !customerLanguage.Published)
                     customerLanguage = await _workContext.GetWorkingLanguageAsync();
+					_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomerLanguageId → {Arg1}", stream, order.CustomerLanguageId);
                 order.CustomerLanguageId = customerLanguage.Id;
 
                 //tax display type
                 order.CustomerTaxDisplayType = _taxSettings.TaxDisplayType;
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomerTaxDisplayType → {Arg1}", stream, order.CustomerTaxDisplayType);
 
                 //set other default values
                 order.AllowStoringCreditCardNumber = false;
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.AllowStoringCreditCardNumber → {Arg1}", stream, order.AllowStoringCreditCardNumber);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.AuthorizationTransactionCode → {Arg1}", stream, order.AuthorizationTransactionCode);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.AuthorizationTransactionId → {Arg1}", stream, order.AuthorizationTransactionId);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.AuthorizationTransactionResult → {Arg1}", stream, order.AuthorizationTransactionResult);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CaptureTransactionId → {Arg1}", stream, order.CaptureTransactionId);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CaptureTransactionResult → {Arg1}", stream, order.CaptureTransactionResult);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CardCvv2 → {Arg1}", stream, order.CardCvv2);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CardExpirationMonth → {Arg1}", stream, order.CardExpirationMonth);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CardExpirationYear → {Arg1}", stream, order.CardExpirationYear);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CardName → {Arg1}", stream, order.CardName);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CardNumber → {Arg1}", stream, order.CardNumber);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CardType → {Arg1}", stream, order.CardType);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomerIp → {Arg1}", stream, order.CustomerIp);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.CustomOrderNumber → {Arg1}", stream, order.CustomOrderNumber);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.MaskedCreditCardNumber → {Arg1}", stream, order.MaskedCreditCardNumber);
+				_logger.LogDebug("ImportOrdersFromXlsxAsync(stream={Stream}): order.SubscriptionTransactionId → {Arg1}", stream, order.SubscriptionTransactionId);
                 order.AuthorizationTransactionCode = string.Empty;
                 order.AuthorizationTransactionId = string.Empty;
                 order.AuthorizationTransactionResult = string.Empty;
@@ -3441,6 +3775,7 @@ public partial class ImportManager : IImportManager
 
         //activity log
         await _customerActivityService.InsertActivityAsync("ImportOrders", string.Format(await _localizationService.GetResourceAsync("ActivityLog.ImportOrders"), metadata.CountOrdersInFile));
+		_logger.LogDebug("<<< Exiting ImportOrdersFromXlsxAsync(stream={Stream})", stream);
     }
 
     /// <summary>
@@ -3450,23 +3785,29 @@ public partial class ImportManager : IImportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ImportFilterLevelValuesFromXlsxAsync(Stream stream)
     {
+		_logger.LogDebug(">>> Entering ImportFilterLevelValuesFromXlsxAsync(stream={Stream})", stream);
         ArgumentNullException.ThrowIfNull(stream);
         using var workbook = new XLWorkbook(stream);
+		_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): workbook → {Workbook}", stream, workbook);
 
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): languages → {Languages}", stream, languages);
 
         //the columns
         var metadata = GetWorkbookMetadata<FilterLevelValue>(workbook, languages);
+		_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): metadata → {Metadata}", stream, metadata);
         var defaultWorksheet = metadata.DefaultWorksheet;
         var defaultProperties = metadata.DefaultProperties;
         var localizedProperties = metadata.LocalizedProperties;
 
         var manager = new PropertyManager<FilterLevelValue>(defaultProperties, _catalogSettings, localizedProperties, languages);
+		_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): manager → {Manager}", stream, manager);
         var iRow = 2;
 
         try
         {
             var filterLevelValues = await _filterLevelValueService.GetAllFilterLevelValuesAsync();
+			_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): filterLevelValues → {FilterLevelValues}", stream, filterLevelValues);
 
             while (true)
             {
@@ -3479,6 +3820,7 @@ public partial class ImportManager : IImportManager
 
                 manager.ReadDefaultFromXlsx(defaultWorksheet, iRow);
                 var filterLevelValue = filterLevelValues.FirstOrDefault(f => f.Id == manager.GetDefaultProperty("Id").IntValue);
+				_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): filterLevelValue → {FilterLevelValue}", stream, filterLevelValue);
 
                 var isNew = filterLevelValue == null;
                 filterLevelValue ??= new FilterLevelValue
@@ -3492,17 +3834,21 @@ public partial class ImportManager : IImportManager
                     {
                         case nameof(FilterLevelValue.FilterLevel1Value):
                             filterLevelValue.FilterLevel1Value = property.StringValue;
+							_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): filterLevelValue.FilterLevel1Value → {Arg1}", stream, filterLevelValue.FilterLevel1Value);
                             break;
                         case nameof(FilterLevelValue.FilterLevel2Value):
                             filterLevelValue.FilterLevel2Value = property.StringValue;
+							_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): filterLevelValue.FilterLevel2Value → {Arg1}", stream, filterLevelValue.FilterLevel2Value);
                             break;
                         case nameof(FilterLevelValue.FilterLevel3Value):
                             filterLevelValue.FilterLevel3Value = property.StringValue;
+							_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): filterLevelValue.FilterLevel3Value → {Arg1}", stream, filterLevelValue.FilterLevel3Value);
                             break;
                     }
                 }
 
                 filterLevelValue.UpdatedOnUtc = DateTime.UtcNow;
+				_logger.LogDebug("ImportFilterLevelValuesFromXlsxAsync(stream={Stream}): filterLevelValue.UpdatedOnUtc → {Arg1}", stream, filterLevelValue.UpdatedOnUtc);
 
                 await (isNew
                     ? _filterLevelValueService.InsertFilterLevelValueAsync(filterLevelValue)
@@ -3518,6 +3864,7 @@ public partial class ImportManager : IImportManager
         catch (Exception ex)
         {
             await _logger.ErrorAsync("Error while importing filter level values", ex);
+		_logger.LogDebug("<<< Exiting ImportFilterLevelValuesFromXlsxAsync(stream={Stream})", stream);
             throw;
         }
     }
@@ -3539,9 +3886,13 @@ public partial class ImportManager : IImportManager
     {
         public CategoryKey(string key, Category category = null, List<int> storesIds = null)
         {
+			_logger.LogDebug(">>> Entering CategoryKey(key={Key},category={Category},storesIds={StoresIds})", key, category, storesIds);
             Key = key.Trim();
             StoresIds = storesIds ?? new List<int>();
+			_logger.LogDebug("CategoryKey(key={Key},category={Category},storesIds={StoresIds}): StoresIds → {StoresIds1}", key, category, storesIds, StoresIds);
+			_logger.LogWarning("CategoryKey(key={Key},category={Category},storesIds={StoresIds}): Key → {Key1}", key, category, storesIds, Key);
             Category = category;
+			_logger.LogDebug("<<< Exiting CategoryKey(key={Key},category={Category},storesIds={StoresIds})", key, category, storesIds);
         }
 
         public List<int> StoresIds { get; }
@@ -3552,6 +3903,7 @@ public partial class ImportManager : IImportManager
 
         public bool Equals(CategoryKey y)
         {
+			_logger.LogDebug(">>> Entering Equals(y={Y})", y);
             if (y == null)
                 return false;
 
@@ -3567,17 +3919,20 @@ public partial class ImportManager : IImportManager
 
         public override int GetHashCode()
         {
+			_logger.LogDebug(">>> Entering GetHashCode()");
             if (!StoresIds.Any())
                 return Key.GetHashCode();
 
             var storesIds = StoresIds.Select(id => id.ToString())
                 .Aggregate(string.Empty, (all, current) => all + current);
 
+			_logger.LogDebug("<<< Exiting GetHashCode()");
             return $"{storesIds}_{Key}".GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
+			_logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
             return obj is CategoryKey other && other.Equals(this);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.Versioning;
 using System.Security.Principal;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Security;
 
@@ -9,13 +10,17 @@ namespace Nop.Web.Framework.Security;
 /// </summary>
 public static class CurrentOSUser
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     static CurrentOSUser()
     {
+		_logger.LogDebug(">>> Entering CurrentOSUser()");
         Name = Environment.UserName;
 
+		_logger.LogDebug("CurrentOSUser(): Name → {Name}", Name);
         DomainName = Environment.UserDomainName;
+		_logger.LogDebug("CurrentOSUser(): DomainName → {DomainName}", DomainName);
 
         switch (Environment.OSVersion.Platform)
         {
@@ -28,9 +33,12 @@ public static class CurrentOSUser
                 break;
             default:
                 UserId = Name;
+				_logger.LogDebug("CurrentOSUser(): UserId → {UserId}", UserId);
                 Groups = new List<string>();
+				_logger.LogDebug("CurrentOSUser(): Groups → {Groups}", Groups);
                 break;
         }
+		_logger.LogDebug("<<< Exiting CurrentOSUser()");
     }
 
     #endregion
@@ -43,8 +51,12 @@ public static class CurrentOSUser
     [SupportedOSPlatform("windows")]
     public static void PopulateWindowsUser()
     {
+		_logger.LogDebug(">>> Entering PopulateWindowsUser()");
         Groups = WindowsIdentity.GetCurrent().Groups?.Select(p => p.Value).ToList();
         UserId = Name;
+		_logger.LogDebug("<<< Exiting PopulateWindowsUser()");
+		_logger.LogDebug("PopulateWindowsUser(): UserId → {UserId}", UserId);
+		_logger.LogDebug("PopulateWindowsUser(): Groups → {Groups}", Groups);
     }
 
     /// <summary>
@@ -52,6 +64,7 @@ public static class CurrentOSUser
     /// </summary>
     public static void PopulateLinuxUser()
     {
+		_logger.LogDebug(">>> Entering PopulateLinuxUser()");
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
@@ -68,11 +81,16 @@ public static class CurrentOSUser
         process.WaitForExit();
 
         var res = process.StandardOutput.ReadToEnd();
+		_logger.LogDebug("PopulateLinuxUser(): res → {Res}", res);
 
         var respars = res.Split("\n");
+		_logger.LogDebug("PopulateLinuxUser(): respars → {Respars}", respars);
 
         UserId = respars[0];
+		_logger.LogDebug("PopulateLinuxUser(): UserId → {UserId}", UserId);
         Groups = respars[1].Split(" ").ToList();
+		_logger.LogDebug("<<< Exiting PopulateLinuxUser()");
+		_logger.LogDebug("PopulateLinuxUser(): Groups → {Groups}", Groups);
     }
 
     #endregion

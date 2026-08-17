@@ -3,6 +3,7 @@
 //! author : LI Long : https://github.com/baryon
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('ja', {
     eras: [
@@ -87,12 +88,15 @@ export default moment.defineLocale('ja', {
     },
     meridiemParse: /午前|午後/i,
     isPM: function (input) {
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return input === '午後';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return '午前';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return '午後';
         }
     },
@@ -100,17 +104,21 @@ export default moment.defineLocale('ja', {
         sameDay: '[今日] LT',
         nextDay: '[明日] LT',
         nextWeek: function (now) {
+			logger.debug(`>>> Entering nextWeek(now=${now})`);
             if (now.week() !== this.week()) {
                 return '[来週]dddd LT';
             } else {
+				logger.debug(`<<< Exiting nextWeek(now=${now})`);
                 return 'dddd LT';
             }
         },
         lastDay: '[昨日] LT',
         lastWeek: function (now) {
+			logger.debug(`>>> Entering lastWeek(now=${now})`);
             if (this.week() !== now.week()) {
                 return '[先週]dddd LT';
             } else {
+				logger.debug(`<<< Exiting lastWeek(now=${now})`);
                 return 'dddd LT';
             }
         },

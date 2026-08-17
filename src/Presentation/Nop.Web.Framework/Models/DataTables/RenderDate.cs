@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderDate : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     /// <summary>
@@ -19,8 +21,11 @@ public partial class RenderDate : IRender
 
     public RenderDate()
     {
+		_logger.LogDebug(">>> Entering RenderDate()");
         //set default values
         Format = DEFAULT_DATE_FORMAT;
+		_logger.LogDebug("<<< Exiting RenderDate()");
+		_logger.LogDebug("RenderDate(): Format → {Format}", Format);
     }
 
     #endregion

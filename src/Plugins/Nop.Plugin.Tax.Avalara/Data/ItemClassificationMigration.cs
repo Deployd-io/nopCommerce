@@ -7,12 +7,14 @@ using Nop.Plugin.Tax.Avalara.Domain;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Data;
 
 [NopMigration("2023-05-01 00:00:02", "Tax.Avalara 4.70.2. Add Item classification feature", MigrationProcessType.Update)]
 public class ItemClassificationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxSettings _avalaraTaxSettings;
@@ -29,10 +31,16 @@ public class ItemClassificationMigration : MigrationBase
         ILocalizationService localizationService,
         ISettingService settingService)
     {
+		_logger.LogDebug(">>> Entering ItemClassificationMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService})", avalaraTaxSettings, languageService, localizationService, settingService);
         _avalaraTaxSettings = avalaraTaxSettings;
         _languageService = languageService;
+		_logger.LogDebug("ItemClassificationMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _languageService → {_languageService}", avalaraTaxSettings, languageService, localizationService, settingService, _languageService);
+		_logger.LogDebug("ItemClassificationMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _avalaraTaxSettings → {_avalaraTaxSettings}", avalaraTaxSettings, languageService, localizationService, settingService, _avalaraTaxSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("ItemClassificationMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _localizationService → {_localizationService}", avalaraTaxSettings, languageService, localizationService, settingService, _localizationService);
         _settingService = settingService;
+		_logger.LogDebug("<<< Exiting ItemClassificationMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService})", avalaraTaxSettings, languageService, localizationService, settingService);
+		_logger.LogDebug("ItemClassificationMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _settingService → {_settingService}", avalaraTaxSettings, languageService, localizationService, settingService, _settingService);
     }
 
     #endregion
@@ -44,6 +52,7 @@ public class ItemClassificationMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -85,11 +94,14 @@ public class ItemClassificationMigration : MigrationBase
         //settings
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.UseItemClassification))
             _avalaraTaxSettings.UseItemClassification = false;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.UseItemClassification → {Arg0}", _avalaraTaxSettings.UseItemClassification);
 
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.SelectedCountryIds))
             _avalaraTaxSettings.SelectedCountryIds = null;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.SelectedCountryIds → {Arg0}", _avalaraTaxSettings.SelectedCountryIds);
 
         _settingService.SaveSetting(_avalaraTaxSettings);
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -97,7 +109,9 @@ public class ItemClassificationMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //nothing
+		_logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

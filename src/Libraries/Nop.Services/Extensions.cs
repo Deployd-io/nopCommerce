@@ -5,6 +5,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Services.Catalog;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services;
 
@@ -13,6 +14,7 @@ namespace Nop.Services;
 /// </summary>
 public static class Extensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Convert to select list
     /// </summary>
@@ -28,10 +30,12 @@ public static class Extensions
     public static async Task<SelectList> ToSelectListAsync<TEnum>(this TEnum enumObj,
         bool markCurrentAsSelected = true, int[] valuesToExclude = null, bool useLocalization = true) where TEnum : struct
     {
+		_logger.LogDebug(">>> Entering ToSelectListAsync(enumObj={EnumObj},markCurrentAsSelected={MarkCurrentAsSelected},valuesToExclude={ValuesToExclude},useLocalization={UseLocalization})", enumObj, markCurrentAsSelected, valuesToExclude, useLocalization);
         if (!typeof(TEnum).IsEnum)
             throw new ArgumentException("An Enumeration type is required.", nameof(enumObj));
 
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("ToSelectListAsync(enumObj={EnumObj},markCurrentAsSelected={MarkCurrentAsSelected},valuesToExclude={ValuesToExclude},useLocalization={UseLocalization}): localizationService → {LocalizationService}", enumObj, markCurrentAsSelected, valuesToExclude, useLocalization, localizationService);
 
         var values = await Enum.GetValues(typeof(TEnum)).OfType<TEnum>().Where(enumValue =>
                 valuesToExclude == null || !valuesToExclude.Contains(Convert.ToInt32(enumValue)))
@@ -39,13 +43,18 @@ public static class Extensions
             {
                 ID = Convert.ToInt32(enumValue),
                 Name = useLocalization
+					_logger.LogDebug("ToSelectListAsync(enumObj={EnumObj},markCurrentAsSelected={MarkCurrentAsSelected},valuesToExclude={ValuesToExclude},useLocalization={UseLocalization}): Name → {Name}", enumObj, markCurrentAsSelected, valuesToExclude, useLocalization, Name);
                     ? await localizationService.GetLocalizedEnumAsync(enumValue)
                     : CommonHelper.SplitCamelCaseWord(enumValue.ToString())
             }).ToListAsync();
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
+					_logger.LogInformation("ToSelectListAsync(enumObj,markCurrentAsSelected,valuesToExclude,useLocalization)={EnumObj},{MarkCurrentAsSelected},{ValuesToExclude},{UseLocalization}: database query executed in {Arg4} ms", enumObj, markCurrentAsSelected, valuesToExclude, useLocalization, __logStart.ElapsedMilliseconds);
 
         object selectedValue = null;
+		_logger.LogDebug("ToSelectListAsync(enumObj={EnumObj},markCurrentAsSelected={MarkCurrentAsSelected},valuesToExclude={ValuesToExclude},useLocalization={UseLocalization}): selectedValue → {SelectedValue}", enumObj, markCurrentAsSelected, valuesToExclude, useLocalization, selectedValue);
         if (markCurrentAsSelected)
             selectedValue = Convert.ToInt32(enumObj);
+		_logger.LogDebug("<<< Exiting ToSelectListAsync(enumObj={EnumObj},markCurrentAsSelected={MarkCurrentAsSelected},valuesToExclude={ValuesToExclude},useLocalization={UseLocalization})", enumObj, markCurrentAsSelected, valuesToExclude, useLocalization);
         return new SelectList(values, "ID", "Name", selectedValue);
     }
 
@@ -58,6 +67,7 @@ public static class Extensions
     /// <returns>SelectList</returns>
     public static SelectList ToSelectList<T>(this T objList, Func<BaseEntity, string> selector) where T : IEnumerable<BaseEntity>
     {
+		_logger.LogDebug("<<< Exiting ToSelectList(objList={ObjList},Func<BaseEntity={Arg1},selector={Selector})", objList, Func<BaseEntity, selector);
         return new SelectList(objList.Select(p => new { ID = p.Id, Name = selector(p) }), "ID", "Name");
     }
 
@@ -75,27 +85,35 @@ public static class Extensions
     public static async Task<List<SelectListItem>> ConstantsToSelectListAsync(this IList<SelectListItem> items,
         Type type, bool useLocalization = true, bool sortItems = false)
     {
+		_logger.LogDebug(">>> Entering ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems})", items, type, useLocalization, sortItems);
         ArgumentNullException.ThrowIfNull(items);
         ArgumentNullException.ThrowIfNull(type);
 
         var result = new List<SelectListItem>();
+		_logger.LogDebug("ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems}): result → {Result}", items, type, useLocalization, sortItems, result);
         var fields = type
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(f => f.IsLiteral && !f.IsInitOnly);
 
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems}): localizationService → {LocalizationService}", items, type, useLocalization, sortItems, localizationService);
 
         foreach (var prop in fields)
         {
             var resourceTypeName = Regex.Replace(type.FullName, "\\W+", ".");
+			_logger.LogDebug("ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems}): resourceTypeName → {ResourceTypeName}", items, type, useLocalization, sortItems, resourceTypeName);
             var resourceConstantName = CommonHelper.SnakeCaseToPascalCase(prop.Name);
+			_logger.LogDebug("ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems}): resourceConstantName → {ResourceConstantName}", items, type, useLocalization, sortItems, resourceConstantName);
 
             var resourceName = $"{NopLocalizationDefaults.LiteralLocaleStringResourcesPrefix}{resourceTypeName}.{resourceConstantName}";
+			_logger.LogDebug("ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems}): resourceName → {ResourceName}", items, type, useLocalization, sortItems, resourceName);
             var resourceValue = useLocalization ? await localizationService.GetResourceAsync(resourceName) : resourceConstantName;
+			_logger.LogDebug("ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems}): resourceValue → {ResourceValue}", items, type, useLocalization, sortItems, resourceValue);
 
             result.Add(new SelectListItem { Value = (string)prop.GetRawConstantValue(), Text = resourceValue });
         }
 
+		_logger.LogDebug("<<< Exiting ConstantsToSelectListAsync(items={Items},type={Type},useLocalization={UseLocalization},sortItems={SortItems})", items, type, useLocalization, sortItems);
         return sortItems ? result.OrderBy(item => item.Text).ToList() : result;
     }
 

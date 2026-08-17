@@ -6,6 +6,7 @@ using Nop.Services.Shipping;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Components.Admin;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components.Admin;
 /// </summary>
 public class ShipmentCarrierViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IGenericAttributeService _genericAttributeService;
@@ -30,10 +32,16 @@ public class ShipmentCarrierViewComponent : NopViewComponent
         PayPalCommerceServiceManager serviceManager,
         PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering ShipmentCarrierViewComponent(genericAttributeService={GenericAttributeService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings})", genericAttributeService, shipmentService, serviceManager, settings);
         _genericAttributeService = genericAttributeService;
         _shipmentService = shipmentService;
+		_logger.LogDebug("ShipmentCarrierViewComponent(genericAttributeService={GenericAttributeService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings}): _shipmentService → {_shipmentService}", genericAttributeService, shipmentService, serviceManager, settings, _shipmentService);
+		_logger.LogDebug("ShipmentCarrierViewComponent(genericAttributeService={GenericAttributeService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings}): _genericAttributeService → {_genericAttributeService}", genericAttributeService, shipmentService, serviceManager, settings, _genericAttributeService);
         _serviceManager = serviceManager;
+		_logger.LogDebug("ShipmentCarrierViewComponent(genericAttributeService={GenericAttributeService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings}): _serviceManager → {_serviceManager}", genericAttributeService, shipmentService, serviceManager, settings, _serviceManager);
         _settings = settings;
+		_logger.LogDebug("<<< Exiting ShipmentCarrierViewComponent(genericAttributeService={GenericAttributeService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings})", genericAttributeService, shipmentService, serviceManager, settings);
+		_logger.LogDebug("ShipmentCarrierViewComponent(genericAttributeService={GenericAttributeService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings}): _settings → {_settings}", genericAttributeService, shipmentService, serviceManager, settings, _settings);
     }
 
     #endregion
@@ -51,6 +59,7 @@ public class ShipmentCarrierViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
@@ -65,6 +74,7 @@ public class ShipmentCarrierViewComponent : NopViewComponent
             return Content(string.Empty);
 
         var shipment = await _shipmentService.GetShipmentByIdAsync(shipmentModel.Id);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): shipment → {Shipment}", widgetZone, additionalData, shipment);
         var model = new ShipmentCarrierModel
         {
             TrackingNumber = shipmentModel.TrackingNumber,
@@ -73,6 +83,7 @@ public class ShipmentCarrierViewComponent : NopViewComponent
                 : null
         };
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Admin/_ShipmentCarrier.cshtml", model);
     }
 

@@ -10,6 +10,7 @@ using Nop.Services.Html;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -18,6 +19,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ProductAttributeFormatter : IProductAttributeFormatter
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICurrencyService _currencyService;
@@ -82,9 +84,13 @@ public partial class ProductAttributeFormatter : IProductAttributeFormatter
     /// </returns>
     public virtual async Task<string> FormatAttributesAsync(Product product, string attributesXml)
     {
+		_logger.LogDebug(">>> Entering FormatAttributesAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("FormatAttributesAsync(product={Product},attributesXml={AttributesXml}): currentStore → {CurrentStore}", product, attributesXml, currentStore);
+		_logger.LogDebug("FormatAttributesAsync(product={Product},attributesXml={AttributesXml}): customer → {Customer}", product, attributesXml, customer);
 
+		_logger.LogDebug("<<< Exiting FormatAttributesAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         return await FormatAttributesAsync(product, attributesXml, customer, currentStore);
     }
 

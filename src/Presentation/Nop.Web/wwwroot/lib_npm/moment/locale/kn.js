@@ -3,6 +3,7 @@
 //! author : Rajeev Naik : https://github.com/rajeevnaikte
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '೧',
@@ -76,17 +77,22 @@ export default moment.defineLocale('kn', {
         yy: '%d ವರ್ಷ',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[೧೨೩೪೫೬೭೮೯೦]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     meridiemParse: /ರಾತ್ರಿ|ಬೆಳಿಗ್ಗೆ|ಮಧ್ಯಾಹ್ನ|ಸಂಜೆ/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -97,6 +103,9 @@ export default moment.defineLocale('kn', {
         } else if (meridiem === 'ಮಧ್ಯಾಹ್ನ') {
             return hour >= 10 ? hour : hour + 12;
         } else if (meridiem === 'ಸಂಜೆ') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },
@@ -115,6 +124,8 @@ export default moment.defineLocale('kn', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(ನೇ)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + 'ನೇ';
     },
     week: {

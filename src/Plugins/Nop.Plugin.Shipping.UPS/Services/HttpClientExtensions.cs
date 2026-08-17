@@ -11,12 +11,14 @@ public static class HttpClientExtensions
     public static void PrepareRequest(this HttpClient httpClient,
         HttpRequestMessage request, UPSSettings upsSettings, string accessToken = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(upsSettings);
 
         httpClient.Timeout = FromSeconds(upsSettings.RequestTimeout ?? UPSDefaults.RequestTimeout);
         httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, UPSDefaults.UserAgent);
+		logger.LogInformation("PrepareRequest(httpClient,request,upsSettings,accessToken)={HttpClient},{Request},{UpsSettings},{AccessToken}: external service call took {Arg4} ms", httpClient, request, upsSettings, accessToken, __logStart.ElapsedMilliseconds);
 
         if (!string.IsNullOrEmpty(accessToken))
             request.Headers.Add(HeaderNames.Authorization, $"Bearer {accessToken}");
@@ -36,6 +38,7 @@ public static class HttpClientExtensions
 
     public static void ProcessResponse(this HttpClient httpClient, HttpResponseMessage response, UPSSettings upsSettings)
     {
+		logger.LogDebug(">>> Entering ProcessResponse(httpClient={HttpClient},response={Response},upsSettings={UpsSettings})", httpClient, response, upsSettings);
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(response);
         ArgumentNullException.ThrowIfNull(upsSettings);
@@ -46,5 +49,6 @@ public static class HttpClientExtensions
 
         var logger = EngineContext.Current.Resolve<ILogger>();
         logger.Information($"UPS rates. Response: {response}{Environment.NewLine}Content: {response.Content.ReadAsStringAsync().Result}");
+		logger.LogDebug("<<< Exiting ProcessResponse(httpClient={HttpClient},response={Response},upsSettings={UpsSettings})", httpClient, response, upsSettings);
     }
 }

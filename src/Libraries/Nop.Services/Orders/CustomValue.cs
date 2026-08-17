@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Services.Orders;
 
 /// <summary>
@@ -5,17 +6,25 @@
 /// </summary>
 public partial class CustomValue
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomValue(string name, string value, CustomValueDisplayLocation displayLocation = CustomValueDisplayLocation.Payment, bool displayToCustomer = true, DateTime? createdOnUtc = null)
     {
+		_logger.LogDebug(">>> Entering CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc})", name, value, displayLocation, displayToCustomer, createdOnUtc);
         Name = name;
         Value = value;
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): Name → {Name1}", name, value, displayLocation, displayToCustomer, createdOnUtc, Name);
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): Value → {Value1}", name, value, displayLocation, displayToCustomer, createdOnUtc, Value);
         DisplayLocation = displayLocation;
         DisplayToCustomer = displayToCustomer;
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): DisplayLocation → {DisplayLocation1}", name, value, displayLocation, displayToCustomer, createdOnUtc, DisplayLocation);
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): DisplayToCustomer → {DisplayToCustomer1}", name, value, displayLocation, displayToCustomer, createdOnUtc, DisplayToCustomer);
         CreatedOnUtc = createdOnUtc;
+		_logger.LogDebug("<<< Exiting CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc})", name, value, displayLocation, displayToCustomer, createdOnUtc);
     }
 
+	_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): CreatedOnUtc → {CreatedOnUtc1}", name, value, displayLocation, displayToCustomer, createdOnUtc, CreatedOnUtc);
     #endregion
 
     #region Properties
@@ -55,6 +64,8 @@ public partial class CustomValue
     /// <returns>A string that represents the current object</returns>
     public override string ToString()
     {
+		_logger.LogDebug(">>> Entering ToString()");
+		_logger.LogDebug("<<< Exiting ToString()");
         return Value;
     }
 

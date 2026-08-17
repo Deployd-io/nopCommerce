@@ -11,11 +11,13 @@ using Nop.Web.Areas.Admin.Models.ExternalAuthentication;
 using Nop.Web.Areas.Admin.Models.MultiFactorAuthentication;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class AuthenticationController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
@@ -42,15 +44,26 @@ public partial class AuthenticationController : BaseAdminController
         ISettingService settingService,
         MultiFactorAuthenticationSettings multiFactorAuthenticationSettings)
     {
+		_logger.LogDebug(">>> Entering AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings})", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings);
         _externalAuthenticationSettings = externalAuthenticationSettings;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _externalAuthenticationSettings → {_externalAuthenticationSettings}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _externalAuthenticationSettings);
         _authenticationPluginManager = authenticationPluginManager;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _authenticationPluginManager → {_authenticationPluginManager}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _authenticationPluginManager);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _eventPublisher → {_eventPublisher}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _eventPublisher);
         _externalAuthenticationMethodModelFactory = externalAuthenticationMethodModelFactory;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _externalAuthenticationMethodModelFactory → {_externalAuthenticationMethodModelFactory}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _externalAuthenticationMethodModelFactory);
         _multiFactorAuthenticationMethodModelFactory = multiFactorAuthenticationMethodModelFactory;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _multiFactorAuthenticationMethodModelFactory → {_multiFactorAuthenticationMethodModelFactory}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _multiFactorAuthenticationMethodModelFactory);
         _multiFactorAuthenticationPluginManager = multiFactorAuthenticationPluginManager;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _multiFactorAuthenticationPluginManager → {_multiFactorAuthenticationPluginManager}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _multiFactorAuthenticationPluginManager);
         _permissionService = permissionService;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _permissionService → {_permissionService}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _settingService → {_settingService}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _settingService);
         _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
+		_logger.LogDebug("<<< Exiting AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings})", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings);
+		_logger.LogDebug("AuthenticationController(externalAuthenticationSettings={ExternalAuthenticationSettings},authenticationPluginManager={AuthenticationPluginManager},eventPublisher={EventPublisher},externalAuthenticationMethodModelFactory={ExternalAuthenticationMethodModelFactory},multiFactorAuthenticationMethodModelFactory={MultiFactorAuthenticationMethodModelFactory},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},settingService={SettingService},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _multiFactorAuthenticationSettings → {_multiFactorAuthenticationSettings}", externalAuthenticationSettings, authenticationPluginManager, eventPublisher, externalAuthenticationMethodModelFactory, multiFactorAuthenticationMethodModelFactory, multiFactorAuthenticationPluginManager, permissionService, settingService, multiFactorAuthenticationSettings, _multiFactorAuthenticationSettings);
     }
 
     #endregion
@@ -60,10 +73,12 @@ public partial class AuthenticationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EXTERNAL_AUTHENTICATION_METHODS)]
     public virtual IActionResult ExternalMethods()
     {
+		_logger.LogDebug(">>> Entering ExternalMethods()");
         //prepare model
         var model = _externalAuthenticationMethodModelFactory
             .PrepareExternalAuthenticationMethodSearchModel(new ExternalAuthenticationMethodSearchModel());
 
+		_logger.LogDebug("<<< Exiting ExternalMethods()");
         return View(model);
     }
 
@@ -74,6 +89,7 @@ public partial class AuthenticationController : BaseAdminController
         //prepare model
         var model = await _externalAuthenticationMethodModelFactory.PrepareExternalAuthenticationMethodListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting ExternalMethods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -120,10 +136,12 @@ public partial class AuthenticationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public virtual IActionResult MultiFactorMethods()
     {
+		_logger.LogDebug(">>> Entering MultiFactorMethods()");
         //prepare model
         var model = _multiFactorAuthenticationMethodModelFactory
             .PrepareMultiFactorAuthenticationMethodSearchModel(new MultiFactorAuthenticationMethodSearchModel());
 
+		_logger.LogDebug("<<< Exiting MultiFactorMethods()");
         return View(model);
     }
 
@@ -134,6 +152,7 @@ public partial class AuthenticationController : BaseAdminController
         //prepare model
         var model = await _multiFactorAuthenticationMethodModelFactory.PrepareMultiFactorAuthenticationMethodListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting MultiFactorMethods(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

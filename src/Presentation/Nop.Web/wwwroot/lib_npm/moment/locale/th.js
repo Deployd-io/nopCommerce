@@ -3,6 +3,7 @@
 //! author : Kridsada Thanabulpong : https://github.com/sirn
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('th', {
     months: 'มกราคม_กุมภาพันธ์_มีนาคม_เมษายน_พฤษภาคม_มิถุนายน_กรกฎาคม_สิงหาคม_กันยายน_ตุลาคม_พฤศจิกายน_ธันวาคม'.split(
@@ -27,12 +28,15 @@ export default moment.defineLocale('th', {
     },
     meridiemParse: /ก่อนเที่ยง|หลังเที่ยง/,
     isPM: function (input) {
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return input === 'หลังเที่ยง';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 12) {
             return 'ก่อนเที่ยง';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'หลังเที่ยง';
         }
     },

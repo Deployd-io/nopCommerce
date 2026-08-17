@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Messages;
 
 /// <summary>
@@ -5,9 +6,13 @@
 /// </summary>
 public partial class AdditionalTokensAddedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AdditionalTokensAddedEvent()
     {
+		_logger.LogDebug(">>> Entering AdditionalTokensAddedEvent()");
         AdditionalTokens = new List<string>();
+		_logger.LogDebug("<<< Exiting AdditionalTokensAddedEvent()");
+		_logger.LogDebug("AdditionalTokensAddedEvent(): AdditionalTokens → {AdditionalTokens}", AdditionalTokens);
     }
 
     /// <summary>

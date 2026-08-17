@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -10,13 +11,19 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record AddProductToOrderModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToOrderModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToOrderModel()");
         ProductAttributes = new List<ProductAttributeModel>();
         GiftCard = new GiftCardModel();
+		_logger.LogDebug("AddProductToOrderModel(): GiftCard → {GiftCard}", GiftCard);
+		_logger.LogDebug("AddProductToOrderModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
         Warnings = new List<string>();
+		_logger.LogDebug("<<< Exiting AddProductToOrderModel()");
+		_logger.LogDebug("AddProductToOrderModel(): Warnings → {Warnings}", Warnings);
     }
 
     #endregion
@@ -68,8 +75,12 @@ public partial record AddProductToOrderModel : BaseNopModel
     {
         public ProductAttributeModel()
         {
+			_logger.LogDebug(">>> Entering ProductAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<ProductAttributeValueModel>();
+			_logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			_logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
+			_logger.LogDebug("ProductAttributeModel(): AllowedFileExtensions → {AllowedFileExtensions}", AllowedFileExtensions);
         }
 
         public int ProductAttributeId { get; set; }

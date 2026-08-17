@@ -3,6 +3,7 @@
 //! author : Anatoly Mironov : https://github.com/mirontoli
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('cv', {
     months: 'кӑрлач_нарӑс_пуш_ака_май_ҫӗртме_утӑ_ҫурла_авӑн_юпа_чӳк_раштав'.split(
@@ -33,11 +34,13 @@ export default moment.defineLocale('cv', {
     },
     relativeTime: {
         future: function (output) {
+			logger.debug(`>>> Entering future(output=${output})`);
             var affix = /сехет$/i.exec(output)
                 ? 'рен'
                 : /ҫул$/i.exec(output)
                   ? 'тан'
                   : 'ран';
+			logger.debug(`<<< Exiting future(output=${output})`);
             return output + affix;
         },
         past: '%s каялла',

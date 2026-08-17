@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Orders;
 using Nop.Core.Infrastructure;
 using Nop.Services.Attributes;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public static partial class CheckoutAttributeParserExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Removes checkout attributes which cannot be applied to the current cart and returns an update attributes in XML format
     /// </summary>
