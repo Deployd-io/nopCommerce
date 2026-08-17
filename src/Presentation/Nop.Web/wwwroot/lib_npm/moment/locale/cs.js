@@ -3,6 +3,7 @@
 //! author : petrbela : https://github.com/petrbela
 
 import moment from '../moment';
+const logger = console;
 
 var months = {
         standalone:
@@ -35,14 +36,18 @@ var months = {
         /^(leden|únor|březen|duben|květen|červenec|července|červen|června|srpen|září|říjen|listopad|prosinec|led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i;
 
 function plural(n) {
+	logger.debug(`>>> Entering plural(n=${n})`);
+	logger.debug(`<<< Exiting plural(n=${n})`);
     return n > 1 && n < 5 && ~~(n / 10) !== 1;
 }
 function translate(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var result = number + ' ';
     switch (key) {
         case 's': // a few seconds / in a few seconds / a few seconds ago
             return withoutSuffix || isFuture ? 'pár sekund' : 'pár sekundami';
         case 'ss': // 9 seconds / in 9 seconds / 9 seconds ago
+			logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture}): result → ${result}`);
             if (withoutSuffix || isFuture) {
                 return result + (plural(number) ? 'sekundy' : 'sekund');
             } else {
@@ -86,6 +91,7 @@ function translate(number, withoutSuffix, key, isFuture) {
             if (withoutSuffix || isFuture) {
                 return result + (plural(number) ? 'roky' : 'let');
             } else {
+				logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
                 return result + 'lety';
             }
     }
@@ -121,6 +127,7 @@ export default moment.defineLocale('cs', {
         sameDay: '[dnes v] LT',
         nextDay: '[zítra v] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[v neděli v] LT';
@@ -134,11 +141,13 @@ export default moment.defineLocale('cs', {
                 case 5:
                     return '[v pátek v] LT';
                 case 6:
+			logger.debug('<<< Exiting nextWeek()');
                     return '[v sobotu v] LT';
             }
         },
         lastDay: '[včera v] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[minulou neděli v] LT';
@@ -151,6 +160,7 @@ export default moment.defineLocale('cs', {
                 case 5:
                     return '[minulý] dddd [v] LT';
                 case 6:
+			logger.debug('<<< Exiting lastWeek()');
                     return '[minulou sobotu v] LT';
             }
         },

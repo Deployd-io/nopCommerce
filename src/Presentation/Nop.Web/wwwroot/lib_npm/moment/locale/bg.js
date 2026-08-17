@@ -3,6 +3,7 @@
 //! author : Krasen Borisov : https://github.com/kraz
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('bg', {
     months: 'януари_февруари_март_април_май_юни_юли_август_септември_октомври_ноември_декември'.split(
@@ -28,6 +29,7 @@ export default moment.defineLocale('bg', {
         nextWeek: 'dddd [в] LT',
         lastDay: '[Вчера в] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                 case 3:
@@ -37,6 +39,7 @@ export default moment.defineLocale('bg', {
                 case 2:
                 case 4:
                 case 5:
+			logger.debug('<<< Exiting lastWeek()');
                     return '[Миналия] dddd [в] LT';
             }
         },
@@ -62,6 +65,7 @@ export default moment.defineLocale('bg', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(ев|ен|ти|ви|ри|ми)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var lastDigit = number % 10,
             last2Digits = number % 100;
         if (number === 0) {
@@ -77,6 +81,7 @@ export default moment.defineLocale('bg', {
         } else if (lastDigit === 7 || lastDigit === 8) {
             return number + '-ми';
         } else {
+			logger.debug(`<<< Exiting ordinal(number=${number})`);
             return number + '-ти';
         }
     },

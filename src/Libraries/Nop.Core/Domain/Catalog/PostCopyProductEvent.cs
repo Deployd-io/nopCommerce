@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Catalog;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class PostCopyProductEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -12,8 +14,12 @@ public partial class PostCopyProductEvent
     /// <param name="copyProduct">Copy product</param>
     public PostCopyProductEvent(Product originalProduct, Product copyProduct)
     {
+		_logger.LogDebug(">>> Entering PostCopyProductEvent(originalProduct={OriginalProduct},copyProduct={CopyProduct})", originalProduct, copyProduct);
         OriginalProduct = originalProduct;
         CopyProduct = copyProduct;
+		_logger.LogDebug("<<< Exiting PostCopyProductEvent(originalProduct={OriginalProduct},copyProduct={CopyProduct})", originalProduct, copyProduct);
+		_logger.LogDebug("PostCopyProductEvent(originalProduct={OriginalProduct},copyProduct={CopyProduct}): CopyProduct → {CopyProduct1}", originalProduct, copyProduct, CopyProduct);
+		_logger.LogDebug("PostCopyProductEvent(originalProduct={OriginalProduct},copyProduct={CopyProduct}): OriginalProduct → {OriginalProduct1}", originalProduct, copyProduct, OriginalProduct);
     }
 
     /// <summary>

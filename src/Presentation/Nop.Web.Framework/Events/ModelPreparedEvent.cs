@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿
 namespace Nop.Web.Framework.Events;
 
@@ -7,6 +8,7 @@ namespace Nop.Web.Framework.Events;
 /// <typeparam name="T">Type of the model</typeparam>
 public partial class ModelPreparedEvent<T>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -15,7 +17,10 @@ public partial class ModelPreparedEvent<T>
     /// <param name="model">Model</param>
     public ModelPreparedEvent(T model)
     {
+		_logger.LogDebug(">>> Entering ModelPreparedEvent(model={Model})", model);
         Model = model;
+		_logger.LogDebug("<<< Exiting ModelPreparedEvent(model={Model})", model);
+		_logger.LogDebug("ModelPreparedEvent(model={Model}): Model → {Model1}", model, Model);
     }
 
     #endregion

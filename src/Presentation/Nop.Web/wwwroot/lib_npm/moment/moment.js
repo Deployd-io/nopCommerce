@@ -1,3 +1,4 @@
+const logger = console;
 //! moment.js
 //! version : 2.30.1
 //! authors : Tim Wood, Iskren Chernev, Moment.js contributors
@@ -7,13 +8,17 @@
 var hookCallback;
 
 function hooks() {
+	logger.debug('>>> Entering hooks()');
+	logger.debug('<<< Exiting hooks()');
     return hookCallback.apply(null, arguments);
 }
 
 // This is done to register the method called with moment()
 // without creating circular dependencies.
 function setHookCallback(callback) {
+	logger.debug(`>>> Entering setHookCallback(callback=${callback})`);
     hookCallback = callback;
+	logger.debug(`<<< Exiting setHookCallback(callback=${callback})`);
 }
 
 function isArray(input) {
@@ -37,6 +42,7 @@ function hasOwnProp(a, b) {
 }
 
 function isObjectEmpty(obj) {
+	logger.debug(`>>> Entering isObjectEmpty(obj=${obj})`);
     if (Object.getOwnPropertyNames) {
         return Object.getOwnPropertyNames(obj).length === 0;
     } else {
@@ -46,6 +52,7 @@ function isObjectEmpty(obj) {
                 return false;
             }
         }
+		logger.debug(`<<< Exiting isObjectEmpty(obj=${obj})`);
         return true;
     }
 }
@@ -69,6 +76,7 @@ function isDate(input) {
 }
 
 function map(arr, fn) {
+	logger.debug(`>>> Entering map(arr=${arr},fn=${fn})`);
     var res = [],
         i,
         arrLen = arr.length;
@@ -101,7 +109,9 @@ function createUTC(input, format, locale, strict) {
 }
 
 function defaultParsingFlags() {
+	logger.debug('>>> Entering defaultParsingFlags()');
     // We need to deep clone this object.
+	logger.debug('<<< Exiting defaultParsingFlags()');
     return {
         empty: false,
         unusedTokens: [],
@@ -155,6 +165,7 @@ function isValid(m) {
     if (isNowValid) {
         flags = getParsingFlags(m);
         parsedParts = some.call(flags.parsedDateParts, function (i) {
+			logger.debug('>>> Entering call()');
             return i != null;
         });
         isNowValid =
@@ -201,6 +212,7 @@ var momentProperties = (hooks.momentProperties = []),
     updateInProgress = false;
 
 function copyConfig(to, from) {
+	logger.debug(`>>> Entering copyConfig(to=${to},from=${from})`);
     var i,
         prop,
         val,
@@ -247,11 +259,13 @@ function copyConfig(to, from) {
         }
     }
 
+	logger.debug(`<<< Exiting copyConfig(to=${to},from=${from})`);
     return to;
 }
 
 // Moment prototype object
 function Moment(config) {
+	logger.debug(`>>> Entering Moment(config=${config})`);
     copyConfig(this, config);
     this._d = new Date(config._d != null ? config._d.getTime() : NaN);
     if (!this.isValid()) {
@@ -263,26 +277,32 @@ function Moment(config) {
         updateInProgress = true;
         hooks.updateOffset(this);
         updateInProgress = false;
+		logger.debug(`<<< Exiting Moment(config=${config})`);
     }
 }
 
 function isMoment(obj) {
+	logger.debug(`>>> Entering isMoment(obj=${obj})`);
+	logger.debug(`<<< Exiting isMoment(obj=${obj})`);
     return (
         obj instanceof Moment || (obj != null && obj._isAMomentObject != null)
     );
 }
 
 function warn(msg) {
+	logger.debug(`>>> Entering warn(msg=${msg})`);
     if (
         hooks.suppressDeprecationWarnings === false &&
         typeof console !== 'undefined' &&
         console.warn
     ) {
         console.warn('Deprecation warning: ' + msg);
+		logger.debug(`<<< Exiting warn(msg=${msg})`);
     }
 }
 
 function deprecate(msg, fn) {
+	logger.debug(`>>> Entering deprecate(msg=${msg},fn=${fn})`);
     var firstTime = true;
 
     return extend(function () {
@@ -321,17 +341,20 @@ function deprecate(msg, fn) {
         }
         return fn.apply(this, arguments);
     }, fn);
+	logger.debug(`<<< Exiting deprecate(msg=${msg},fn=${fn})`);
 }
 
 var deprecations = {};
 
 function deprecateSimple(name, msg) {
+	logger.debug(`>>> Entering deprecateSimple(name=${name},msg=${msg})`);
     if (hooks.deprecationHandler != null) {
         hooks.deprecationHandler(name, msg);
     }
     if (!deprecations[name]) {
         warn(msg);
         deprecations[name] = true;
+		logger.debug(`<<< Exiting deprecateSimple(name=${name},msg=${msg})`);
     }
 }
 
@@ -346,8 +369,10 @@ function isFunction(input) {
 }
 
 function set(config) {
+	logger.debug(`>>> Entering set(config=${config})`);
     var prop, i;
     for (i in config) {
+		logger.debug(`set(config=${config}): prop → ${prop}`);
         if (hasOwnProp(config, i)) {
             prop = config[i];
             if (isFunction(prop)) {
@@ -366,11 +391,14 @@ function set(config) {
             '|' +
             /\d{1,2}/.source
     );
+	logger.debug(`<<< Exiting set(config=${config})`);
 }
 
 function mergeConfigs(parentConfig, childConfig) {
+	logger.debug(`>>> Entering mergeConfigs(parentConfig=${parentConfig},childConfig=${childConfig})`);
     var res = extend({}, parentConfig),
         prop;
+		logger.debug(`mergeConfigs(parentConfig=${parentConfig},childConfig=${childConfig}): res → ${res}`);
     for (prop in childConfig) {
         if (hasOwnProp(childConfig, prop)) {
             if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
@@ -394,10 +422,12 @@ function mergeConfigs(parentConfig, childConfig) {
             res[prop] = extend({}, res[prop]);
         }
     }
+	logger.debug(`<<< Exiting mergeConfigs(parentConfig=${parentConfig},childConfig=${childConfig})`);
     return res;
 }
 
 function Locale(config) {
+	logger.debug(`>>> Entering Locale(config=${config})`);
     if (config != null) {
         this.set(config);
     }
@@ -435,9 +465,12 @@ function calendar(key, mom, now) {
 }
 
 function zeroFill(number, targetLength, forceSign) {
+	logger.debug(`>>> Entering zeroFill(number=${number},targetLength=${targetLength},forceSign=${forceSign})`);
     var absNumber = '' + Math.abs(number),
         zerosToFill = targetLength - absNumber.length,
         sign = number >= 0;
+		logger.debug(`zeroFill(number=${number},targetLength=${targetLength},forceSign=${forceSign}): absNumber → ${absNumber}`);
+	logger.debug(`<<< Exiting zeroFill(number=${number},targetLength=${targetLength},forceSign=${forceSign})`);
     return (
         (sign ? (forceSign ? '+' : '') : '-') +
         Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) +
@@ -459,6 +492,8 @@ function addFormatToken(token, padded, ordinal, callback) {
     var func = callback;
     if (typeof callback === 'string') {
         func = function () {
+			logger.debug('>>> Entering function()');
+			logger.debug('<<< Exiting function()');
             return this[callback]();
         };
     }
@@ -472,6 +507,7 @@ function addFormatToken(token, padded, ordinal, callback) {
     }
     if (ordinal) {
         formatTokenFunctions[ordinal] = function () {
+			logger.debug('<<< Exiting addFormatToken()');
             return this.localeData().ordinal(
                 func.apply(this, arguments),
                 token
@@ -555,10 +591,12 @@ var defaultLongDateFormat = {
 };
 
 function longDateFormat(key) {
+	logger.debug(`>>> Entering longDateFormat(key=${key})`);
     var format = this._longDateFormat[key],
         formatUpper = this._longDateFormat[key.toUpperCase()];
 
     if (format || !formatUpper) {
+		logger.debug(`>>> Entering format(inputString=${inputString})`);
         return format;
     }
 
@@ -577,12 +615,15 @@ function longDateFormat(key) {
         })
         .join('');
 
+	logger.debug(`<<< Exiting longDateFormat(key=${key})`);
     return this._longDateFormat[key];
 }
 
 var defaultInvalidDate = 'Invalid date';
 
 function invalidDate() {
+	logger.debug('>>> Entering invalidDate()');
+	logger.debug('<<< Exiting invalidDate()');
     return this._invalidDate;
 }
 
@@ -590,6 +631,8 @@ var defaultOrdinal = '%d',
     defaultDayOfMonthOrdinalParse = /\d{1,2}/;
 
 function ordinal(number) {
+	logger.debug(`>>> Entering ordinal(number=${number})`);
+	logger.debug(`<<< Exiting ordinal(number=${number})`);
     return this._ordinal.replace('%d', number);
 }
 
@@ -682,6 +725,7 @@ function normalizeUnits(units) {
 }
 
 function normalizeObjectUnits(inputObject) {
+	logger.debug(`>>> Entering normalizeObjectUnits(inputObject=${inputObject})`);
     var normalizedInput = {},
         normalizedProp,
         prop;
@@ -695,6 +739,7 @@ function normalizeObjectUnits(inputObject) {
         }
     }
 
+	logger.debug(`<<< Exiting normalizeObjectUnits(inputObject=${inputObject})`);
     return normalizedInput;
 }
 
@@ -718,6 +763,7 @@ var priorities = {
 };
 
 function getPrioritizedUnits(unitsObj) {
+	logger.debug(`>>> Entering getPrioritizedUnits(unitsObj=${unitsObj})`);
     var units = [],
         u;
     for (u in unitsObj) {
@@ -726,8 +772,10 @@ function getPrioritizedUnits(unitsObj) {
         }
     }
     units.sort(function (a, b) {
+		logger.debug('>>> Entering sort()');
         return a.priority - b.priority;
     });
+	logger.debug('<<< Exiting sort()');
     return units;
 }
 
@@ -761,6 +809,7 @@ function addRegexToken(token, regex, strictRegex) {
     regexes[token] = isFunction(regex)
         ? regex
         : function (isStrict, localeData) {
+			logger.debug('<<< Exiting addRegexToken()');
               return isStrict && strictRegex ? strictRegex : regex;
           };
 }
@@ -775,6 +824,7 @@ function getParseRegexForToken(token, config) {
 
 // Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
 function unescapeFormat(s) {
+	logger.debug(`>>> Entering unescapeFormat(s=${s})`);
     return regexEscape(
         s
             .replace('\\', '')
@@ -788,19 +838,24 @@ function unescapeFormat(s) {
 }
 
 function regexEscape(s) {
+	logger.debug(`>>> Entering regexEscape(s=${s})`);
+	logger.debug(`<<< Exiting regexEscape(s=${s})`);
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 function absFloor(number) {
+	logger.debug(`>>> Entering absFloor(number=${number})`);
     if (number < 0) {
         // -0 -> 0
         return Math.ceil(number) || 0;
     } else {
+		logger.debug(`<<< Exiting absFloor(number=${number})`);
         return Math.floor(number);
     }
 }
 
 function toInt(argumentForCoercion) {
+	logger.debug(`>>> Entering toInt(argumentForCoercion=${argumentForCoercion})`);
     var coercedNumber = +argumentForCoercion,
         value = 0;
 
@@ -808,6 +863,7 @@ function toInt(argumentForCoercion) {
         value = absFloor(coercedNumber);
     }
 
+	logger.debug(`<<< Exiting toInt(argumentForCoercion=${argumentForCoercion})`);
     return value;
 }
 
@@ -829,6 +885,8 @@ function addParseToken(token, callback) {
     for (i = 0; i < tokenLen; i++) {
         tokens[token[i]] = func;
     }
+	logger.debug('>>> Entering addParseToken()');
+	logger.debug('<<< Exiting addParseToken()');
 }
 
 function addWeekParseToken(token, callback) {
@@ -836,6 +894,8 @@ function addWeekParseToken(token, callback) {
         config._w = config._w || {};
         callback(input, config._w, config, token);
     });
+	logger.debug('>>> Entering addWeekParseToken()');
+	logger.debug('<<< Exiting addWeekParseToken()');
 }
 
 function addTimeToArrayFromToken(token, input, config) {
@@ -910,22 +970,27 @@ hooks.parseTwoDigitYear = function (input) {
 var getSetYear = makeGetSet('FullYear', true);
 
 function getIsLeapYear() {
+	logger.debug('>>> Entering getIsLeapYear()');
+	logger.debug('<<< Exiting getIsLeapYear()');
     return isLeapYear(this.year());
 }
 
 function makeGetSet(unit, keepTime) {
+	logger.debug(`>>> Entering makeGetSet(unit=${unit},keepTime=${keepTime})`);
     return function (value) {
         if (value != null) {
             set$1(this, unit, value);
             hooks.updateOffset(this, keepTime);
             return this;
         } else {
+			logger.debug(`<<< Exiting makeGetSet(unit=${unit},keepTime=${keepTime})`);
             return get(this, unit);
         }
     };
 }
 
 function get(mom, unit) {
+	logger.debug(`>>> Entering get(mom=${mom},unit=${unit})`);
     if (!mom.isValid()) {
         return NaN;
     }
@@ -951,6 +1016,7 @@ function get(mom, unit) {
         case 'FullYear':
             return isUTC ? d.getUTCFullYear() : d.getFullYear();
         default:
+			logger.debug(`<<< Exiting get(mom=${mom},unit=${unit})`);
             return NaN; // Just in case
     }
 }
@@ -1002,6 +1068,8 @@ function set$1(mom, unit, value) {
 function stringGet(units) {
     units = normalizeUnits(units);
     if (isFunction(this[units])) {
+	logger.debug(`stringGet(units=${units}): units → ${units}`);
+	logger.debug(`<<< Exiting stringGet(units=${units})`);
         return this[units]();
     }
     return this;
@@ -1013,6 +1081,7 @@ function stringSet(units, value) {
         var prioritized = getPrioritizedUnits(units),
             i,
             prioritizedLen = prioritized.length;
+			logger.debug(`stringSet(units=${units},value=${value}): prioritized → ${prioritized}`);
         for (i = 0; i < prioritizedLen; i++) {
             this[prioritized[i].unit](units[prioritized[i].unit]);
         }
@@ -1022,10 +1091,14 @@ function stringSet(units, value) {
             return this[units](value);
         }
     }
+	logger.debug(`stringSet(units=${units},value=${value}): units → ${units}`);
+	logger.debug(`<<< Exiting stringSet(units=${units},value=${value})`);
     return this;
 }
 
 function mod(n, x) {
+	logger.debug(`>>> Entering mod(n=${n},x=${x})`);
+	logger.debug(`<<< Exiting mod(n=${n},x=${x})`);
     return ((n % x) + x) % x;
 }
 
@@ -1180,6 +1253,8 @@ function handleStrictParse(monthName, format, strict) {
                 return ii;
             }
             ii = indexOf.call(this._shortMonthsParse, llc);
+			logger.debug(`handleStrictParse(monthName=${monthName},format=${format},strict=${strict}): ii → ${ii}`);
+			logger.debug(`<<< Exiting handleStrictParse(monthName=${monthName},format=${format},strict=${strict})`);
             return ii !== -1 ? ii : null;
         }
     }
@@ -1233,6 +1308,8 @@ function localeMonthsParse(monthName, format, strict) {
         ) {
             return i;
         } else if (!strict && this._monthsParse[i].test(monthName)) {
+			logger.debug(`>>> Entering format(inputString=${inputString})`);
+			logger.debug(`<<< Exiting format(inputString=${inputString})`);
             return i;
         }
     }
@@ -1241,6 +1318,7 @@ function localeMonthsParse(monthName, format, strict) {
 // MOMENTS
 
 function setMonth(mom, value) {
+	logger.debug(`>>> Entering setMonth(mom=${mom},value=${value})`);
     if (!mom.isValid()) {
         // No op
         return mom;
@@ -1253,6 +1331,7 @@ function setMonth(mom, value) {
             value = mom.localeData().monthsParse(value);
             // TODO: Another silent failure?
             if (!isNumber(value)) {
+				logger.debug(`setMonth(mom=${mom},value=${value}): value → ${value}`);
                 return mom;
             }
         }
@@ -1265,24 +1344,31 @@ function setMonth(mom, value) {
     void (mom._isUTC
         ? mom._d.setUTCMonth(month, date)
         : mom._d.setMonth(month, date));
+	logger.debug(`setMonth(mom=${mom},value=${value}): date → ${date}`);
+	logger.debug(`<<< Exiting setMonth(mom=${mom},value=${value})`);
     return mom;
 }
 
 function getSetMonth(value) {
+	logger.debug(`>>> Entering getSetMonth(value=${value})`);
     if (value != null) {
         setMonth(this, value);
         hooks.updateOffset(this, true);
         return this;
     } else {
+		logger.debug(`<<< Exiting getSetMonth(value=${value})`);
         return get(this, 'Month');
     }
 }
 
 function getDaysInMonth() {
+	logger.debug('>>> Entering getDaysInMonth()');
+	logger.debug('<<< Exiting getDaysInMonth()');
     return daysInMonth(this.year(), this.month());
 }
 
 function monthsShortRegex(isStrict) {
+	logger.debug(`>>> Entering monthsShortRegex(isStrict=${isStrict})`);
     if (this._monthsParseExact) {
         if (!hasOwnProp(this, '_monthsRegex')) {
             computeMonthsParse.call(this);
@@ -1296,6 +1382,7 @@ function monthsShortRegex(isStrict) {
         if (!hasOwnProp(this, '_monthsShortRegex')) {
             this._monthsShortRegex = defaultMonthsShortRegex;
         }
+		logger.debug(`<<< Exiting monthsShortRegex(isStrict=${isStrict})`);
         return this._monthsShortStrictRegex && isStrict
             ? this._monthsShortStrictRegex
             : this._monthsShortRegex;
@@ -1303,6 +1390,7 @@ function monthsShortRegex(isStrict) {
 }
 
 function monthsRegex(isStrict) {
+	logger.debug(`>>> Entering monthsRegex(isStrict=${isStrict})`);
     if (this._monthsParseExact) {
         if (!hasOwnProp(this, '_monthsRegex')) {
             computeMonthsParse.call(this);
@@ -1316,6 +1404,7 @@ function monthsRegex(isStrict) {
         if (!hasOwnProp(this, '_monthsRegex')) {
             this._monthsRegex = defaultMonthsRegex;
         }
+		logger.debug(`<<< Exiting monthsRegex(isStrict=${isStrict})`);
         return this._monthsStrictRegex && isStrict
             ? this._monthsStrictRegex
             : this._monthsRegex;
@@ -1434,10 +1523,12 @@ function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
 }
 
 function weekOfYear(mom, dow, doy) {
+	logger.debug(`>>> Entering weekOfYear(mom=${mom},dow=${dow},doy=${doy})`);
     var weekOffset = firstWeekOffset(mom.year(), dow, doy),
         week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
         resWeek,
         resYear;
+		logger.debug(`weekOfYear(mom=${mom},dow=${dow},doy=${doy}): weekOffset → ${weekOffset}`);
 
     if (week < 1) {
         resYear = mom.year() - 1;
@@ -1450,6 +1541,7 @@ function weekOfYear(mom, dow, doy) {
         resWeek = week;
     }
 
+	logger.debug(`<<< Exiting weekOfYear(mom=${mom},dow=${dow},doy=${doy})`);
     return {
         week: resWeek,
         year: resYear,
@@ -1486,6 +1578,8 @@ addWeekParseToken(
 // LOCALES
 
 function localeWeek(mom) {
+	logger.debug(`>>> Entering localeWeek(mom=${mom})`);
+	logger.debug(`<<< Exiting localeWeek(mom=${mom})`);
     return weekOfYear(mom, this._week.dow, this._week.doy).week;
 }
 
@@ -1495,10 +1589,14 @@ var defaultLocaleWeek = {
 };
 
 function localeFirstDayOfWeek() {
+	logger.debug('>>> Entering localeFirstDayOfWeek()');
+	logger.debug('<<< Exiting localeFirstDayOfWeek()');
     return this._week.dow;
 }
 
 function localeFirstDayOfYear() {
+	logger.debug('>>> Entering localeFirstDayOfYear()');
+	logger.debug('<<< Exiting localeFirstDayOfYear()');
     return this._week.doy;
 }
 
@@ -1590,6 +1688,8 @@ function parseIsoWeekday(input, locale) {
 
 // LOCALES
 function shiftWeekdays(ws, n) {
+	logger.debug(`>>> Entering shiftWeekdays(ws=${ws},n=${n})`);
+	logger.debug(`<<< Exiting shiftWeekdays(ws=${ws},n=${n})`);
     return ws.slice(n, 7).concat(ws.slice(0, n));
 }
 
@@ -1767,6 +1867,7 @@ function localeWeekdaysParse(weekdayName, format, strict) {
         ) {
             return i;
         } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+			logger.debug(`<<< Exiting localeWeekdaysParse(weekdayName=${weekdayName},format=${format},strict=${strict})`);
             return i;
         }
     }
@@ -1782,8 +1883,10 @@ function getSetDayOfWeek(input) {
     var day = get(this, 'Day');
     if (input != null) {
         input = parseWeekday(input, this.localeData());
+		logger.debug(`getSetDayOfWeek(input=${input}): input → ${input}`);
         return this.add(input - day, 'd');
     } else {
+		logger.debug(`<<< Exiting getSetDayOfWeek(input=${input})`);
         return day;
     }
 }
@@ -1814,6 +1917,7 @@ function getSetISODayOfWeek(input) {
 }
 
 function weekdaysRegex(isStrict) {
+	logger.debug(`>>> Entering weekdaysRegex(isStrict=${isStrict})`);
     if (this._weekdaysParseExact) {
         if (!hasOwnProp(this, '_weekdaysRegex')) {
             computeWeekdaysParse.call(this);
@@ -1827,6 +1931,7 @@ function weekdaysRegex(isStrict) {
         if (!hasOwnProp(this, '_weekdaysRegex')) {
             this._weekdaysRegex = defaultWeekdaysRegex;
         }
+		logger.debug(`<<< Exiting weekdaysRegex(isStrict=${isStrict})`);
         return this._weekdaysStrictRegex && isStrict
             ? this._weekdaysStrictRegex
             : this._weekdaysRegex;
@@ -1834,6 +1939,7 @@ function weekdaysRegex(isStrict) {
 }
 
 function weekdaysShortRegex(isStrict) {
+	logger.debug(`>>> Entering weekdaysShortRegex(isStrict=${isStrict})`);
     if (this._weekdaysParseExact) {
         if (!hasOwnProp(this, '_weekdaysRegex')) {
             computeWeekdaysParse.call(this);
@@ -1847,6 +1953,7 @@ function weekdaysShortRegex(isStrict) {
         if (!hasOwnProp(this, '_weekdaysShortRegex')) {
             this._weekdaysShortRegex = defaultWeekdaysShortRegex;
         }
+		logger.debug(`<<< Exiting weekdaysShortRegex(isStrict=${isStrict})`);
         return this._weekdaysShortStrictRegex && isStrict
             ? this._weekdaysShortStrictRegex
             : this._weekdaysShortRegex;
@@ -1854,6 +1961,7 @@ function weekdaysShortRegex(isStrict) {
 }
 
 function weekdaysMinRegex(isStrict) {
+	logger.debug(`>>> Entering weekdaysMinRegex(isStrict=${isStrict})`);
     if (this._weekdaysParseExact) {
         if (!hasOwnProp(this, '_weekdaysRegex')) {
             computeWeekdaysParse.call(this);
@@ -1867,6 +1975,7 @@ function weekdaysMinRegex(isStrict) {
         if (!hasOwnProp(this, '_weekdaysMinRegex')) {
             this._weekdaysMinRegex = defaultWeekdaysMinRegex;
         }
+		logger.debug(`<<< Exiting weekdaysMinRegex(isStrict=${isStrict})`);
         return this._weekdaysMinStrictRegex && isStrict
             ? this._weekdaysMinStrictRegex
             : this._weekdaysMinRegex;
@@ -1928,10 +2037,14 @@ function computeWeekdaysParse() {
 // FORMATTING
 
 function hFormat() {
+	logger.debug('>>> Entering hFormat()');
+	logger.debug('<<< Exiting hFormat()');
     return this.hours() % 12 || 12;
 }
 
 function kFormat() {
+	logger.debug('>>> Entering kFormat()');
+	logger.debug('<<< Exiting kFormat()');
     return this.hours() || 24;
 }
 
@@ -2087,6 +2200,7 @@ var locales = {},
     globalLocale;
 
 function commonPrefix(arr1, arr2) {
+	logger.debug(`>>> Entering commonPrefix(arr1=${arr1},arr2=${arr2})`);
     var i,
         minl = Math.min(arr1.length, arr2.length);
     for (i = 0; i < minl; i += 1) {
@@ -2094,10 +2208,14 @@ function commonPrefix(arr1, arr2) {
             return i;
         }
     }
+	logger.debug(`commonPrefix(arr1=${arr1},arr2=${arr2}): minl → ${minl}`);
+	logger.debug(`<<< Exiting commonPrefix(arr1=${arr1},arr2=${arr2})`);
     return minl;
 }
 
 function normalizeLocale(key) {
+	logger.debug(`>>> Entering normalizeLocale(key=${key})`);
+	logger.debug(`<<< Exiting normalizeLocale(key=${key})`);
     return key ? key.toLowerCase().replace('_', '-') : key;
 }
 
@@ -2105,6 +2223,7 @@ function normalizeLocale(key) {
 // try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
 // substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
 function chooseLocale(names) {
+	logger.debug(`>>> Entering chooseLocale(names=${names})`);
     var i = 0,
         j,
         next,
@@ -2133,16 +2252,20 @@ function chooseLocale(names) {
         }
         i++;
     }
+	logger.debug(`<<< Exiting chooseLocale(names=${names})`);
     return globalLocale;
 }
 
 function isLocaleNameSane(name) {
+	logger.debug(`>>> Entering isLocaleNameSane(name=${name})`);
     // Prevent names that look like filesystem paths, i.e contain '/' or '\'
     // Ensure name is available and function returns boolean
+	logger.debug(`<<< Exiting isLocaleNameSane(name=${name})`);
     return !!(name && name.match('^[^/\\\\]*$'));
 }
 
 function loadLocale(name) {
+	logger.debug(`>>> Entering loadLocale(name=${name})`);
     var oldLocale = null,
         aliasedRequire;
     // TODO: Find a better way to register and load all the locales in Node
@@ -2164,6 +2287,7 @@ function loadLocale(name) {
             locales[name] = null; // null means not found
         }
     }
+	logger.debug(`<<< Exiting loadLocale(name=${name})`);
     return locales[name];
 }
 
@@ -2171,6 +2295,7 @@ function loadLocale(name) {
 // no arguments are passed in, it will simply return the current global
 // locale key.
 function getSetGlobalLocale(key, values) {
+	logger.debug(`>>> Entering getSetGlobalLocale(key=${key},values=${values})`);
     var data;
     if (key) {
         if (isUndefined(values)) {
@@ -2192,10 +2317,12 @@ function getSetGlobalLocale(key, values) {
         }
     }
 
+	logger.debug(`<<< Exiting getSetGlobalLocale(key=${key},values=${values})`);
     return globalLocale._abbr;
 }
 
 function defineLocale(name, config) {
+	logger.debug(`>>> Entering defineLocale(name=${name},config=${config})`);
     if (config !== null) {
         var locale,
             parentConfig = baseConfig;
@@ -2227,11 +2354,13 @@ function defineLocale(name, config) {
                     return null;
                 }
             }
+			logger.debug(`<<< Exiting unescapeFormat(s=${s})`);
         }
         locales[name] = new Locale(mergeConfigs(parentConfig, config));
 
         if (localeFamilies[name]) {
             localeFamilies[name].forEach(function (x) {
+				logger.debug('>>> Entering forEach()');
                 defineLocale(x.name, x.config);
             });
         }
@@ -2245,11 +2374,13 @@ function defineLocale(name, config) {
     } else {
         // useful for testing
         delete locales[name];
+		logger.debug(`<<< Exiting defineLocale(name=${name},config=${config})`);
         return null;
     }
 }
 
 function updateLocale(name, config) {
+	logger.debug(`>>> Entering updateLocale(name=${name},config=${config})`);
     if (config != null) {
         var locale,
             tmpLocale,
@@ -2263,6 +2394,7 @@ function updateLocale(name, config) {
             tmpLocale = loadLocale(name);
             if (tmpLocale != null) {
                 parentConfig = tmpLocale._config;
+				logger.debug('<<< Exiting forEach()');
             }
             config = mergeConfigs(parentConfig, config);
             if (tmpLocale == null) {
@@ -2272,6 +2404,7 @@ function updateLocale(name, config) {
                 config.abbr = name;
             }
             locale = new Locale(config);
+			logger.debug(`updateLocale(name=${name},config=${config}): config → ${config}`);
             locale.parentLocale = locales[name];
             locales[name] = locale;
         }
@@ -2291,11 +2424,13 @@ function updateLocale(name, config) {
             }
         }
     }
+	logger.debug(`<<< Exiting updateLocale(name=${name},config=${config})`);
     return locales[name];
 }
 
 // returns locale data
 function getLocale(key) {
+	logger.debug(`>>> Entering getLocale(key=${key})`);
     var locale;
 
     if (key && key._locale && key._locale._abbr) {
@@ -2315,10 +2450,14 @@ function getLocale(key) {
         key = [key];
     }
 
+	logger.warn(`getLocale(key=${key}): key → ${key}`);
+	logger.debug(`<<< Exiting getLocale(key=${key})`);
     return chooseLocale(key);
 }
 
 function listLocales() {
+	logger.debug('>>> Entering listLocales()');
+	logger.debug('<<< Exiting listLocales()');
     return keys(locales);
 }
 
@@ -2419,6 +2558,7 @@ var extendedIsoRegex =
 
 // date from iso format
 function configFromISO(config) {
+	logger.debug(`>>> Entering configFromISO(config=${config})`);
     var i,
         l,
         string = config._i,
@@ -2473,6 +2613,7 @@ function configFromISO(config) {
     } else {
         config._isValid = false;
     }
+	logger.debug(`<<< Exiting configFromISO(config=${config})`);
 }
 
 function extractFromRFC2822Strings(
@@ -2499,16 +2640,20 @@ function extractFromRFC2822Strings(
 }
 
 function untruncateYear(yearStr) {
+	logger.debug(`>>> Entering untruncateYear(yearStr=${yearStr})`);
     var year = parseInt(yearStr, 10);
     if (year <= 49) {
         return 2000 + year;
     } else if (year <= 999) {
+	logger.debug(`untruncateYear(yearStr=${yearStr}): year → ${year}`);
+	logger.debug(`<<< Exiting untruncateYear(yearStr=${yearStr})`);
         return 1900 + year;
     }
     return year;
 }
 
 function preprocessRFC2822(s) {
+	logger.debug(`>>> Entering preprocessRFC2822(s=${s})`);
     // Remove comments and folding whitespace and replace multiple-spaces with a single space
     return s
         .replace(/\([^()]*\)|[\n\t]/g, ' ')
@@ -2518,6 +2663,7 @@ function preprocessRFC2822(s) {
 }
 
 function checkWeekday(weekdayStr, parsedInput, config) {
+	logger.debug(`>>> Entering checkWeekday(weekdayStr=${weekdayStr},parsedInput=${parsedInput},config=${config})`);
     if (weekdayStr) {
         // TODO: Replace the vanilla JS Date object with an independent day-of-week check.
         var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr),
@@ -2532,10 +2678,13 @@ function checkWeekday(weekdayStr, parsedInput, config) {
             return false;
         }
     }
+	logger.debug(`checkWeekday(weekdayStr=${weekdayStr},parsedInput=${parsedInput},config=${config}): weekdayProvided → ${weekdayProvided}`);
+	logger.debug(`<<< Exiting checkWeekday(weekdayStr=${weekdayStr},parsedInput=${parsedInput},config=${config})`);
     return true;
 }
 
 function calculateOffset(obsOffset, militaryOffset, numOffset) {
+	logger.debug(`>>> Entering calculateOffset(obsOffset=${obsOffset},militaryOffset=${militaryOffset},numOffset=${numOffset})`);
     if (obsOffset) {
         return obsOffsets[obsOffset];
     } else if (militaryOffset) {
@@ -2545,14 +2694,19 @@ function calculateOffset(obsOffset, militaryOffset, numOffset) {
         var hm = parseInt(numOffset, 10),
             m = hm % 100,
             h = (hm - m) / 100;
+			logger.debug(`calculateOffset(obsOffset=${obsOffset},militaryOffset=${militaryOffset},numOffset=${numOffset}): hm → ${hm}`);
+		logger.debug(`calculateOffset(obsOffset=${obsOffset},militaryOffset=${militaryOffset},numOffset=${numOffset}): h → ${h}`);
+		logger.debug(`<<< Exiting calculateOffset(obsOffset=${obsOffset},militaryOffset=${militaryOffset},numOffset=${numOffset})`);
         return h * 60 + m;
     }
 }
 
 // date and time from ref 2822 format
 function configFromRFC2822(config) {
+	logger.debug(`>>> Entering configFromRFC2822(config=${config})`);
     var match = rfc2822.exec(preprocessRFC2822(config._i)),
         parsedArray;
+		logger.debug(`configFromRFC2822(config=${config}): match → ${match}`);
     if (match) {
         parsedArray = extractFromRFC2822Strings(
             match[4],
@@ -2576,12 +2730,15 @@ function configFromRFC2822(config) {
     } else {
         config._isValid = false;
     }
+	logger.debug(`<<< Exiting configFromRFC2822(config=${config})`);
 }
 
 // date from 1) ASP.NET, 2) ISO, 3) RFC 2822 formats, or 4) optional fallback if parsing isn't strict
 function configFromString(config) {
+	logger.debug(`>>> Entering configFromString(config=${config})`);
     var matched = aspNetJsonRegex.exec(config._i);
     if (matched !== null) {
+		logger.debug(`configFromString(config=${config}): matched → ${matched}`);
         config._d = new Date(+matched[1]);
         return;
     }
@@ -2606,6 +2763,7 @@ function configFromString(config) {
         // Final attempt, use Input Fallback
         hooks.createFromInputFallback(config);
     }
+	logger.debug(`<<< Exiting configFromString(config=${config})`);
 }
 
 hooks.createFromInputFallback = deprecate(
@@ -2629,6 +2787,7 @@ function defaults(a, b, c) {
 }
 
 function currentDateArray(config) {
+	logger.debug(`>>> Entering currentDateArray(config=${config})`);
     // hooks is actually the exported moment object
     var nowValue = new Date(hooks.now());
     if (config._useUTC) {
@@ -2638,6 +2797,8 @@ function currentDateArray(config) {
             nowValue.getUTCDate(),
         ];
     }
+	logger.debug(`currentDateArray(config=${config}): nowValue → ${nowValue}`);
+	logger.debug(`<<< Exiting currentDateArray(config=${config})`);
     return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
 }
 
@@ -2646,6 +2807,7 @@ function currentDateArray(config) {
 // note: all values past the year are optional and will default to the lowest possible value.
 // [year, month, day , hour, minute, second, millisecond]
 function configFromArray(config) {
+	logger.debug(`>>> Entering configFromArray(config=${config})`);
     var i,
         date,
         input = [],
@@ -2732,9 +2894,11 @@ function configFromArray(config) {
     ) {
         getParsingFlags(config).weekdayMismatch = true;
     }
+	logger.debug(`<<< Exiting configFromArray(config=${config})`);
 }
 
 function dayOfYearFromWeekInfo(config) {
+	logger.debug(`>>> Entering dayOfYearFromWeekInfo(config=${config})`);
     var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow, curWeek;
 
     w = config._w;
@@ -2792,6 +2956,7 @@ function dayOfYearFromWeekInfo(config) {
         temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
         config._a[YEAR] = temp.year;
         config._dayOfYear = temp.dayOfYear;
+		logger.debug(`<<< Exiting dayOfYearFromWeekInfo(config=${config})`);
     }
 }
 
@@ -2803,6 +2968,7 @@ hooks.RFC_2822 = function () {};
 
 // date from string and format string
 function configFromStringAndFormat(config) {
+	logger.debug(`>>> Entering configFromStringAndFormat(config=${config})`);
     // TODO: Move this to another part of the creation flow to prevent circular deps
     if (config._f === hooks.ISO_8601) {
         configFromISO(config);
@@ -2826,6 +2992,7 @@ function configFromStringAndFormat(config) {
         totalParsedInputLength = 0,
         era,
         tokenLen;
+		logger.debug(`configFromStringAndFormat(config=${config}): string → ${string}`);
 
     tokens =
         expandFormat(config._f, config._locale).match(formattingTokens) || [];
@@ -2890,6 +3057,7 @@ function configFromStringAndFormat(config) {
 
     configFromArray(config);
     checkOverflow(config);
+	logger.debug(`<<< Exiting configFromStringAndFormat(config=${config})`);
 }
 
 function meridiemFixWrap(locale, hour, meridiem) {
@@ -2919,6 +3087,7 @@ function meridiemFixWrap(locale, hour, meridiem) {
 
 // date from string and array of format strings
 function configFromStringAndArray(config) {
+	logger.debug(`>>> Entering configFromStringAndArray(config=${config})`);
     var tempConfig,
         bestMoment,
         scoreToBeat,
@@ -2977,9 +3146,11 @@ function configFromStringAndArray(config) {
     }
 
     extend(config, bestMoment || tempConfig);
+	logger.debug(`<<< Exiting configFromStringAndArray(config=${config})`);
 }
 
 function configFromObject(config) {
+	logger.debug(`>>> Entering configFromObject(config=${config})`);
     if (config._d) {
         return;
     }
@@ -2994,20 +3165,25 @@ function configFromObject(config) {
     );
 
     configFromArray(config);
+	logger.debug(`<<< Exiting configFromObject(config=${config})`);
 }
 
 function createFromConfig(config) {
+	logger.debug(`>>> Entering createFromConfig(config=${config})`);
     var res = new Moment(checkOverflow(prepareConfig(config)));
     if (res._nextDay) {
+		logger.debug(`createFromConfig(config=${config}): res → ${res}`);
         // Adding is smart enough around DST
         res.add(1, 'd');
         res._nextDay = undefined;
     }
 
+	logger.debug(`<<< Exiting createFromConfig(config=${config})`);
     return res;
 }
 
 function prepareConfig(config) {
+	logger.debug(`>>> Entering prepareConfig(config=${config})`);
     var input = config._i,
         format = config._f;
 
@@ -3037,10 +3213,12 @@ function prepareConfig(config) {
         config._d = null;
     }
 
+	logger.debug(`<<< Exiting prepareConfig(config=${config})`);
     return config;
 }
 
 function configFromInput(config) {
+	logger.debug(`>>> Entering configFromInput(config=${config})`);
     var input = config._i;
     if (isUndefined(input)) {
         config._d = new Date(hooks.now());
@@ -3061,6 +3239,7 @@ function configFromInput(config) {
     } else {
         hooks.createFromInputFallback(config);
     }
+	logger.debug(`<<< Exiting configFromInput(config=${config})`);
 }
 
 function createLocalOrUTC(input, format, locale, strict, isUTC) {
@@ -3127,6 +3306,7 @@ var prototypeMin = deprecate(
 // moments should either be an array of moment objects or an array, whose
 // first element is an array of moment objects.
 function pickBy(fn, moments) {
+	logger.debug(`>>> Entering pickBy(fn=${fn},moments=${moments})`);
     var res, i;
     if (moments.length === 1 && isArray(moments[0])) {
         moments = moments[0];
@@ -3140,19 +3320,27 @@ function pickBy(fn, moments) {
             res = moments[i];
         }
     }
+	logger.debug(`pickBy(fn=${fn},moments=${moments}): res → ${res}`);
+	logger.debug(`<<< Exiting pickBy(fn=${fn},moments=${moments})`);
     return res;
 }
 
 // TODO: Use [].sort instead?
 function min() {
+	logger.debug('>>> Entering min()');
     var args = [].slice.call(arguments, 0);
 
+	logger.debug(`min(): args → ${args}`);
+	logger.debug('<<< Exiting min()');
     return pickBy('isBefore', args);
 }
 
 function max() {
+	logger.debug('>>> Entering max()');
     var args = [].slice.call(arguments, 0);
 
+	logger.debug(`max(): args → ${args}`);
+	logger.debug('<<< Exiting max()');
     return pickBy('isAfter', args);
 }
 
@@ -3247,23 +3435,29 @@ function Duration(duration) {
 }
 
 function isDuration(obj) {
+	logger.debug(`>>> Entering isDuration(obj=${obj})`);
+	logger.debug(`<<< Exiting isDuration(obj=${obj})`);
     return obj instanceof Duration;
 }
 
 function absRound(number) {
+	logger.debug(`>>> Entering absRound(number=${number})`);
     if (number < 0) {
         return Math.round(-1 * number) * -1;
     } else {
+		logger.debug(`<<< Exiting absRound(number=${number})`);
         return Math.round(number);
     }
 }
 
 // compare two arrays, return the number of differences
 function compareArrays(array1, array2, dontConvert) {
+	logger.debug(`>>> Entering compareArrays(array1=${array1},array2=${array2},dontConvert=${dontConvert})`);
     var len = Math.min(array1.length, array2.length),
         lengthDiff = Math.abs(array1.length - array2.length),
         diffs = 0,
         i;
+		logger.debug(`compareArrays(array1=${array1},array2=${array2},dontConvert=${dontConvert}): len → ${len}`);
     for (i = 0; i < len; i++) {
         if (
             (dontConvert && array1[i] !== array2[i]) ||
@@ -3272,6 +3466,7 @@ function compareArrays(array1, array2, dontConvert) {
             diffs++;
         }
     }
+	logger.debug(`<<< Exiting compareArrays(array1=${array1},array2=${array2},dontConvert=${dontConvert})`);
     return diffs + lengthDiff;
 }
 
@@ -3411,6 +3606,7 @@ function getSetOffset(input, keepLocalTime, keepMinutes) {
         }
         return this;
     } else {
+		logger.debug(`<<< Exiting getSetOffset(input=${input},keepLocalTime=${keepLocalTime},keepMinutes=${keepMinutes})`);
         return this._isUTC ? offset : getDateOffset(this);
     }
 }
@@ -3430,10 +3626,13 @@ function getSetZone(input, keepLocalTime) {
 }
 
 function setOffsetToUTC(keepLocalTime) {
+	logger.debug(`>>> Entering setOffsetToUTC(keepLocalTime=${keepLocalTime})`);
+	logger.debug(`<<< Exiting setOffsetToUTC(keepLocalTime=${keepLocalTime})`);
     return this.utcOffset(0, keepLocalTime);
 }
 
 function setOffsetToLocal(keepLocalTime) {
+	logger.debug(`>>> Entering setOffsetToLocal(keepLocalTime=${keepLocalTime})`);
     if (this._isUTC) {
         this.utcOffset(0, keepLocalTime);
         this._isUTC = false;
@@ -3442,10 +3641,12 @@ function setOffsetToLocal(keepLocalTime) {
             this.subtract(getDateOffset(this), 'm');
         }
     }
+	logger.debug(`<<< Exiting setOffsetToLocal(keepLocalTime=${keepLocalTime})`);
     return this;
 }
 
 function setOffsetToParsedOffset() {
+	logger.debug('>>> Entering setOffsetToParsedOffset()');
     if (this._tzm != null) {
         this.utcOffset(this._tzm, false, true);
     } else if (typeof this._i === 'string') {
@@ -3456,6 +3657,8 @@ function setOffsetToParsedOffset() {
             this.utcOffset(0, true);
         }
     }
+	logger.debug(`setOffsetToParsedOffset(): tZone → ${tZone}`);
+	logger.debug('<<< Exiting setOffsetToParsedOffset()');
     return this;
 }
 
@@ -3465,10 +3668,14 @@ function hasAlignedHourOffset(input) {
     }
     input = input ? createLocal(input).utcOffset() : 0;
 
+	logger.debug(`hasAlignedHourOffset(input=${input}): input → ${input}`);
+	logger.debug(`<<< Exiting hasAlignedHourOffset(input=${input})`);
     return (this.utcOffset() - input) % 60 === 0;
 }
 
 function isDaylightSavingTime() {
+	logger.debug('>>> Entering isDaylightSavingTime()');
+	logger.debug('<<< Exiting isDaylightSavingTime()');
     return (
         this.utcOffset() > this.clone().month(0).utcOffset() ||
         this.utcOffset() > this.clone().month(5).utcOffset()
@@ -3476,12 +3683,14 @@ function isDaylightSavingTime() {
 }
 
 function isDaylightSavingTimeShifted() {
+	logger.debug('>>> Entering isDaylightSavingTimeShifted()');
     if (!isUndefined(this._isDSTShifted)) {
         return this._isDSTShifted;
     }
 
     var c = {},
         other;
+		logger.debug(`isDaylightSavingTimeShifted(): c → ${c}`);
 
     copyConfig(c, this);
     c = prepareConfig(c);
@@ -3494,18 +3703,25 @@ function isDaylightSavingTimeShifted() {
         this._isDSTShifted = false;
     }
 
+	logger.debug('<<< Exiting isDaylightSavingTimeShifted()');
     return this._isDSTShifted;
 }
 
 function isLocal() {
+	logger.debug('>>> Entering isLocal()');
+	logger.debug('<<< Exiting isLocal()');
     return this.isValid() ? !this._isUTC : false;
 }
 
 function isUtcOffset() {
+	logger.debug('>>> Entering isUtcOffset()');
+	logger.debug('<<< Exiting isUtcOffset()');
     return this.isValid() ? this._isUTC : false;
 }
 
 function isUtc() {
+	logger.debug('>>> Entering isUtc()');
+	logger.debug('<<< Exiting isUtc()');
     return this.isValid() ? this._isUTC && this._offset === 0 : false;
 }
 
@@ -3586,6 +3802,8 @@ function createDuration(input, key) {
         ret._isValid = input._isValid;
     }
 
+	logger.debug(`>>> Entering parseIso(inp=${inp},sign=${sign})`);
+	logger.debug(`<<< Exiting parseIso(inp=${inp},sign=${sign})`);
     return ret;
 }
 
@@ -3627,14 +3845,18 @@ function momentsDifference(base, other) {
     } else {
         res = positiveMomentsDifference(other, base);
         res.milliseconds = -res.milliseconds;
+		logger.debug(`momentsDifference(base=${base},other=${other}): res → ${res}`);
         res.months = -res.months;
     }
 
+	logger.debug(`momentsDifference(base=${base},other=${other}): other → ${other}`);
+	logger.debug(`<<< Exiting momentsDifference(base=${base},other=${other})`);
     return res;
 }
 
 // TODO: remove 'name' arg after deprecation is removed
 function createAdder(direction, name) {
+	logger.debug(`>>> Entering createAdder(direction=${direction},name=${name})`);
     return function (val, period) {
         var dur, tmp;
         //invert the arguments, but complain about it
@@ -3655,6 +3877,7 @@ function createAdder(direction, name) {
 
         dur = createDuration(val, period);
         addSubtract(this, dur, direction);
+		logger.debug(`<<< Exiting createAdder(direction=${direction},name=${name})`);
         return this;
     };
 }
@@ -3683,6 +3906,7 @@ function addSubtract(mom, duration, isAdding, updateOffset) {
     if (updateOffset) {
         hooks.updateOffset(mom, days || months);
     }
+	logger.debug(`<<< Exiting addSubtract(mom=${mom},duration=${duration},isAdding=${isAdding},updateOffset=${updateOffset})`);
 }
 
 var add = createAdder(1, 'add'),
@@ -3822,6 +4046,7 @@ function calendar$1(time, formats) {
             (isFunction(formats[format])
                 ? formats[format].call(this, now)
                 : formats[format]);
+				logger.debug('>>> Entering filter()');
 
     return this.format(
         output || this.localeData().calendar(format, this, createLocal(now))
@@ -3829,6 +4054,8 @@ function calendar$1(time, formats) {
 }
 
 function clone() {
+	logger.debug('>>> Entering clone()');
+	logger.debug('<<< Exiting clone()');
     return new Moment(this);
 }
 
@@ -3981,10 +4208,13 @@ hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
 hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
 
 function toString() {
+	logger.debug('>>> Entering toString()');
+	logger.debug('<<< Exiting toString()');
     return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
 }
 
 function toISOString(keepOffset) {
+	logger.debug(`>>> Entering toISOString(keepOffset=${keepOffset})`);
     if (!this.isValid()) {
         return null;
     }
@@ -4008,6 +4238,7 @@ function toISOString(keepOffset) {
                 .replace('Z', formatMoment(m, 'Z'));
         }
     }
+	logger.debug(`<<< Exiting toISOString(keepOffset=${keepOffset})`);
     return formatMoment(
         m,
         utc ? 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]' : 'YYYY-MM-DD[T]HH:mm:ss.SSSZ'
@@ -4021,6 +4252,7 @@ function toISOString(keepOffset) {
  * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
  */
 function inspect() {
+	logger.debug('>>> Entering inspect()');
     if (!this.isValid()) {
         return 'moment.invalid(/* ' + this._i + ' */)';
     }
@@ -4030,6 +4262,7 @@ function inspect() {
         year,
         datetime,
         suffix;
+		logger.debug(`inspect(): func → ${func}`);
     if (!this.isLocal()) {
         func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
         zone = 'Z';
@@ -4039,6 +4272,7 @@ function inspect() {
     datetime = '-MM-DD[T]HH:mm:ss.SSS';
     suffix = zone + '[")]';
 
+	logger.debug('<<< Exiting inspect()');
     return this.format(prefix + year + datetime + suffix);
 }
 
@@ -4053,6 +4287,7 @@ function format(inputString) {
 }
 
 function from(time, withoutSuffix) {
+	logger.debug(`>>> Entering from(time=${time},withoutSuffix=${withoutSuffix})`);
     if (
         this.isValid() &&
         ((isMoment(time) && time.isValid()) || createLocal(time).isValid())
@@ -4061,15 +4296,21 @@ function from(time, withoutSuffix) {
             .locale(this.locale())
             .humanize(!withoutSuffix);
     } else {
+		logger.debug(`>>> Entering locale(key=${key})`);
+		logger.debug(`<<< Exiting Locale(config=${config})`);
+		logger.debug(`<<< Exiting locale(key=${key})`);
         return this.localeData().invalidDate();
     }
 }
 
 function fromNow(withoutSuffix) {
+	logger.debug(`>>> Entering fromNow(withoutSuffix=${withoutSuffix})`);
+	logger.debug(`<<< Exiting fromNow(withoutSuffix=${withoutSuffix})`);
     return this.from(createLocal(), withoutSuffix);
 }
 
 function to(time, withoutSuffix) {
+	logger.debug(`>>> Entering to(time=${time},withoutSuffix=${withoutSuffix})`);
     if (
         this.isValid() &&
         ((isMoment(time) && time.isValid()) || createLocal(time).isValid())
@@ -4078,11 +4319,14 @@ function to(time, withoutSuffix) {
             .locale(this.locale())
             .humanize(!withoutSuffix);
     } else {
+		logger.debug(`<<< Exiting to(time=${time},withoutSuffix=${withoutSuffix})`);
         return this.localeData().invalidDate();
     }
 }
 
 function toNow(withoutSuffix) {
+	logger.debug(`>>> Entering toNow(withoutSuffix=${withoutSuffix})`);
+	logger.debug(`<<< Exiting toNow(withoutSuffix=${withoutSuffix})`);
     return this.to(createLocal(), withoutSuffix);
 }
 
@@ -4109,6 +4353,8 @@ var lang = deprecate(
         if (key === undefined) {
             return this.localeData();
         } else {
+			logger.debug('>>> Entering localeData()');
+			logger.debug('<<< Exiting localeData()');
             return this.locale(key);
         }
     }
@@ -4151,7 +4397,9 @@ function utcStartOfDate(y, m, d) {
 function startOf(units) {
     var time, startOfDate;
     units = normalizeUnits(units);
+	logger.debug(`startOf(units=${units}): time → ${time}`);
     if (units === undefined || units === 'millisecond' || !this.isValid()) {
+	logger.debug(`startOf(units=${units}): units → ${units}`);
         return this;
     }
 
@@ -4208,13 +4456,16 @@ function startOf(units) {
 
     this._d.setTime(time);
     hooks.updateOffset(this, true);
+	logger.debug(`<<< Exiting startOf(units=${units})`);
     return this;
 }
 
 function endOf(units) {
     var time, startOfDate;
     units = normalizeUnits(units);
+	logger.debug(`endOf(units=${units}): time → ${time}`);
     if (units === undefined || units === 'millisecond' || !this.isValid()) {
+	logger.debug(`endOf(units=${units}): units → ${units}`);
         return this;
     }
 
@@ -4277,23 +4528,32 @@ function endOf(units) {
 
     this._d.setTime(time);
     hooks.updateOffset(this, true);
+	logger.debug(`<<< Exiting endOf(units=${units})`);
     return this;
 }
 
 function valueOf() {
+	logger.debug('>>> Entering valueOf()');
+	logger.debug('<<< Exiting valueOf()');
     return this._d.valueOf() - (this._offset || 0) * 60000;
 }
 
 function unix() {
+	logger.debug('>>> Entering unix()');
+	logger.debug('<<< Exiting unix()');
     return Math.floor(this.valueOf() / 1000);
 }
 
 function toDate() {
+	logger.debug('>>> Entering toDate()');
+	logger.debug('<<< Exiting toDate()');
     return new Date(this.valueOf());
 }
 
 function toArray() {
+	logger.debug('>>> Entering toArray()');
     var m = this;
+	logger.debug('<<< Exiting toArray()');
     return [
         m.year(),
         m.month(),
@@ -4306,7 +4566,9 @@ function toArray() {
 }
 
 function toObject() {
+	logger.debug('>>> Entering toObject()');
     var m = this;
+	logger.debug('<<< Exiting toObject()');
     return {
         years: m.year(),
         months: m.month(),
@@ -4319,7 +4581,9 @@ function toObject() {
 }
 
 function toJSON() {
+	logger.debug('>>> Entering toJSON()');
     // new Date(NaN).toJSON() === null
+	logger.debug('<<< Exiting toJSON()');
     return this.isValid() ? this.toISOString() : null;
 }
 
@@ -4328,14 +4592,20 @@ function isValid$2() {
 }
 
 function parsingFlags() {
+	logger.debug('>>> Entering parsingFlags()');
+	logger.debug('<<< Exiting parsingFlags()');
     return extend({}, getParsingFlags(this));
 }
 
 function invalidAt() {
+	logger.debug('>>> Entering invalidAt()');
+	logger.debug('<<< Exiting invalidAt()');
     return getParsingFlags(this).overflow;
 }
 
 function creationData() {
+	logger.debug('>>> Entering creationData()');
+	logger.debug('<<< Exiting creationData()');
     return {
         input: this._i,
         format: this._f,
@@ -4429,6 +4699,7 @@ function localeErasParse(eraName, format, strict) {
         name,
         abbr,
         narrow;
+		logger.debug(`filter(): eras → ${eras}`);
     eraName = eraName.toUpperCase();
 
     for (i = 0, l = eras.length; i < l; ++i) {
@@ -4456,6 +4727,7 @@ function localeErasParse(eraName, format, strict) {
                     if (narrow === eraName) {
                         return eras[i];
                     }
+					logger.debug('<<< Exiting filter()');
                     break;
             }
         } else if ([name, abbr, narrow].indexOf(eraName) >= 0) {
@@ -4474,6 +4746,7 @@ function localeErasConvertYear(era, year) {
 }
 
 function getEraName() {
+	logger.debug('>>> Entering getEraName()');
     var i,
         l,
         val,
@@ -4490,10 +4763,12 @@ function getEraName() {
         }
     }
 
+	logger.debug('<<< Exiting getEraName()');
     return '';
 }
 
 function getEraNarrow() {
+	logger.debug('>>> Entering getEraNarrow()');
     var i,
         l,
         val,
@@ -4510,10 +4785,12 @@ function getEraNarrow() {
         }
     }
 
+	logger.debug('<<< Exiting getEraNarrow()');
     return '';
 }
 
 function getEraAbbr() {
+	logger.debug('>>> Entering getEraAbbr()');
     var i,
         l,
         val,
@@ -4530,10 +4807,12 @@ function getEraAbbr() {
         }
     }
 
+	logger.debug('<<< Exiting getEraAbbr()');
     return '';
 }
 
 function getEraYear() {
+	logger.debug('>>> Entering getEraYear()');
     var i,
         l,
         dir,
@@ -4549,6 +4828,7 @@ function getEraYear() {
             (eras[i].since <= val && val <= eras[i].until) ||
             (eras[i].until <= val && val <= eras[i].since)
         ) {
+			logger.debug(`getEraYear(): eras → ${eras}`);
             return (
                 (this.year() - hooks(eras[i].since).year()) * dir +
                 eras[i].offset
@@ -4556,27 +4836,34 @@ function getEraYear() {
         }
     }
 
+	logger.debug('<<< Exiting getEraYear()');
     return this.year();
 }
 
 function erasNameRegex(isStrict) {
+	logger.debug(`>>> Entering erasNameRegex(isStrict=${isStrict})`);
     if (!hasOwnProp(this, '_erasNameRegex')) {
         computeErasParse.call(this);
     }
+	logger.debug(`<<< Exiting erasNameRegex(isStrict=${isStrict})`);
     return isStrict ? this._erasNameRegex : this._erasRegex;
 }
 
 function erasAbbrRegex(isStrict) {
+	logger.debug(`>>> Entering erasAbbrRegex(isStrict=${isStrict})`);
     if (!hasOwnProp(this, '_erasAbbrRegex')) {
         computeErasParse.call(this);
     }
+	logger.debug(`<<< Exiting erasAbbrRegex(isStrict=${isStrict})`);
     return isStrict ? this._erasAbbrRegex : this._erasRegex;
 }
 
 function erasNarrowRegex(isStrict) {
+	logger.debug(`>>> Entering erasNarrowRegex(isStrict=${isStrict})`);
     if (!hasOwnProp(this, '_erasNarrowRegex')) {
         computeErasParse.call(this);
     }
+	logger.debug(`<<< Exiting erasNarrowRegex(isStrict=${isStrict})`);
     return isStrict ? this._erasNarrowRegex : this._erasRegex;
 }
 
@@ -4597,6 +4884,7 @@ function matchEraYearOrdinal(isStrict, locale) {
 }
 
 function computeErasParse() {
+	logger.debug('>>> Entering computeErasParse()');
     var abbrPieces = [],
         namePieces = [],
         narrowPieces = [],
@@ -4698,20 +4986,30 @@ function getSetISOWeekYear(input) {
 }
 
 function getISOWeeksInYear() {
+	logger.debug('>>> Entering getISOWeeksInYear()');
+	logger.debug('<<< Exiting getISOWeeksInYear()');
     return weeksInYear(this.year(), 1, 4);
 }
 
 function getISOWeeksInISOWeekYear() {
+	logger.debug('>>> Entering getISOWeeksInISOWeekYear()');
+	logger.debug('<<< Exiting getISOWeeksInISOWeekYear()');
     return weeksInYear(this.isoWeekYear(), 1, 4);
 }
 
 function getWeeksInYear() {
+	logger.debug('>>> Entering getWeeksInYear()');
     var weekInfo = this.localeData()._week;
+	logger.debug(`getWeeksInYear(): weekInfo → ${weekInfo}`);
+	logger.debug('<<< Exiting getWeeksInYear()');
     return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
 }
 
 function getWeeksInWeekYear() {
+	logger.debug('>>> Entering getWeeksInWeekYear()');
     var weekInfo = this.localeData()._week;
+	logger.debug(`getWeeksInWeekYear(): weekInfo → ${weekInfo}`);
+	logger.debug('<<< Exiting getWeeksInWeekYear()');
     return weeksInYear(this.weekYear(), weekInfo.dow, weekInfo.doy);
 }
 
@@ -4892,10 +5190,14 @@ addFormatToken('zz', 0, 0, 'zoneName');
 // MOMENTS
 
 function getZoneAbbr() {
+	logger.debug('>>> Entering getZoneAbbr()');
+	logger.debug('<<< Exiting getZoneAbbr()');
     return this._isUTC ? 'UTC' : '';
 }
 
 function getZoneName() {
+	logger.debug('>>> Entering getZoneName()');
+	logger.debug('<<< Exiting getZoneName()');
     return this._isUTC ? 'Coordinated Universal Time' : '';
 }
 
@@ -5008,6 +5310,8 @@ function createUnix(input) {
 }
 
 function createInZone() {
+	logger.debug('>>> Entering createInZone()');
+	logger.debug('<<< Exiting createInZone()');
     return createLocal.apply(null, arguments).parseZone();
 }
 
@@ -5077,6 +5381,8 @@ function listMonthsImpl(format, index, field) {
     for (i = 0; i < 12; i++) {
         out[i] = get$1(format, i, field, 'month');
     }
+	logger.debug(`listMonthsImpl(format=${format},index=${index},field=${field}): out → ${out}`);
+	logger.debug(`<<< Exiting listMonthsImpl(format=${format},index=${index},field=${field})`);
     return out;
 }
 
@@ -5194,8 +5500,10 @@ hooks.langData = deprecate(
 var mathAbs = Math.abs;
 
 function abs() {
+	logger.debug('>>> Entering abs()');
     var data = this._data;
 
+	logger.debug(`abs(): data → ${data}`);
     this._milliseconds = mathAbs(this._milliseconds);
     this._days = mathAbs(this._days);
     this._months = mathAbs(this._months);
@@ -5207,6 +5515,7 @@ function abs() {
     data.months = mathAbs(data.months);
     data.years = mathAbs(data.years);
 
+	logger.debug('<<< Exiting abs()');
     return this;
 }
 
@@ -5231,14 +5540,17 @@ function subtract$1(input, value) {
 }
 
 function absCeil(number) {
+	logger.debug(`>>> Entering absCeil(number=${number})`);
     if (number < 0) {
         return Math.floor(number);
     } else {
+		logger.debug(`<<< Exiting absCeil(number=${number})`);
         return Math.ceil(number);
     }
 }
 
 function bubble() {
+	logger.debug('>>> Entering bubble()');
     var milliseconds = this._milliseconds,
         days = this._days,
         months = this._months,
@@ -5290,17 +5602,22 @@ function bubble() {
     data.months = months;
     data.years = years;
 
+	logger.debug('<<< Exiting bubble()');
     return this;
 }
 
 function daysToMonths(days) {
+	logger.debug(`>>> Entering daysToMonths(days=${days})`);
     // 400 years have 146097 days (taking into account leap year rules)
     // 400 years have 12 months === 4800
+	logger.debug(`<<< Exiting daysToMonths(days=${days})`);
     return (days * 4800) / 146097;
 }
 
 function monthsToDays(months) {
+	logger.debug(`>>> Entering monthsToDays(months=${months})`);
     // the reverse of daysToMonths
+	logger.debug(`<<< Exiting monthsToDays(months=${months})`);
     return (months * 146097) / 4800;
 }
 
@@ -5349,6 +5666,8 @@ function as(units) {
 }
 
 function makeAs(alias) {
+	logger.debug(`>>> Entering makeAs(alias=${alias})`);
+		logger.debug(`<<< Exiting makeAs(alias=${alias})`);
     return function () {
         return this.as(alias);
     };
@@ -5375,6 +5694,8 @@ function get$2(units) {
 }
 
 function makeGetter(name) {
+	logger.debug(`>>> Entering makeGetter(name=${name})`);
+		logger.debug(`<<< Exiting makeGetter(name=${name})`);
     return function () {
         return this.isValid() ? this._data[name] : NaN;
     };
@@ -5389,6 +5710,8 @@ var milliseconds = makeGetter('milliseconds'),
     years = makeGetter('years');
 
 function weeks() {
+	logger.debug('>>> Entering weeks()');
+	logger.debug('<<< Exiting weeks()');
     return absFloor(this.days() / 7);
 }
 
@@ -5446,11 +5769,13 @@ function relativeTime$1(posNegDuration, withoutSuffix, thresholds, locale) {
 
 // This function allows you to set the rounding function for relative time strings
 function getSetRelativeTimeRounding(roundingFunction) {
+	logger.debug(`>>> Entering getSetRelativeTimeRounding(roundingFunction=${roundingFunction})`);
     if (roundingFunction === undefined) {
         return round;
     }
     if (typeof roundingFunction === 'function') {
         round = roundingFunction;
+	logger.debug(`<<< Exiting getSetRelativeTimeRounding(roundingFunction=${roundingFunction})`);
         return true;
     }
     return false;
@@ -5458,6 +5783,7 @@ function getSetRelativeTimeRounding(roundingFunction) {
 
 // This function allows you to set a threshold for relative time strings
 function getSetRelativeTimeThreshold(threshold, limit) {
+	logger.debug(`>>> Entering getSetRelativeTimeThreshold(threshold=${threshold},limit=${limit})`);
     if (thresholds[threshold] === undefined) {
         return false;
     }
@@ -5468,10 +5794,12 @@ function getSetRelativeTimeThreshold(threshold, limit) {
     if (threshold === 's') {
         thresholds.ss = limit - 1;
     }
+	logger.debug(`<<< Exiting getSetRelativeTimeThreshold(threshold=${threshold},limit=${limit})`);
     return true;
 }
 
 function humanize(argWithSuffix, argThresholds) {
+	logger.debug(`>>> Entering humanize(argWithSuffix=${argWithSuffix},argThresholds=${argThresholds})`);
     if (!this.isValid()) {
         return this.localeData().invalidDate();
     }
@@ -5502,12 +5830,15 @@ function humanize(argWithSuffix, argThresholds) {
         output = locale.pastFuture(+this, output);
     }
 
+	logger.debug(`<<< Exiting humanize(argWithSuffix=${argWithSuffix},argThresholds=${argThresholds})`);
     return locale.postformat(output);
 }
 
 var abs$1 = Math.abs;
 
 function sign(x) {
+	logger.debug(`>>> Entering sign(x=${x})`);
+	logger.debug(`<<< Exiting sign(x=${x})`);
     return (x > 0) - (x < 0) || +x;
 }
 

@@ -36,9 +36,13 @@ public partial class ShippingMethodsService : IShippingMethodsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShippingMethodAsync(ShippingMethod shippingMethod)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _shippingMethodRepository.DeleteAsync(shippingMethod);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteShippingMethodAsync(shippingMethod)={ShippingMethod}: external service call took {Arg1} ms", shippingMethod, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteShippingMethodAsync(shippingMethod)={ShippingMethod}: external service call took {Arg1} ms", shippingMethod, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets a shipping method
     /// </summary>
@@ -62,15 +66,19 @@ public partial class ShippingMethodsService : IShippingMethodsService
     /// </returns>
     public virtual async Task<IList<ShippingMethod>> GetAllShippingMethodsAsync(int? filterByCountryId = null)
     {
+		_logger.LogDebug(">>> Entering GetAllShippingMethodsAsync(filterByCountryId={FilterByCountryId})", filterByCountryId);
         if (filterByCountryId is > 0)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return await _shippingMethodRepository.GetAllAsync(query =>
             {
                 var query1 =
                     from shippingMethod in query
+					_logger.LogDebug("GetAllShippingMethodsAsync(filterByCountryId={FilterByCountryId}): query1 → {Query1}", filterByCountryId, query1);
                     join shippingMethodCountryMapping in _shippingMethodCountryMappingRepository.Table on shippingMethod.Id equals shippingMethodCountryMapping.ShippingMethodId
                     where shippingMethodCountryMapping.CountryId == filterByCountryId.Value
                     select shippingMethod.Id;
+					_logger.LogInformation("GetAllShippingMethodsAsync(filterByCountryId)={FilterByCountryId}: find query executed in {Arg1} ms", filterByCountryId, __logStart.ElapsedMilliseconds);
 
                 query1 = query1.Distinct();
 
@@ -84,8 +92,10 @@ public partial class ShippingMethodsService : IShippingMethodsService
             }, cache => cache.PrepareKeyForDefaultCache(NopShippingDefaults.ShippingMethodsAllCacheKey, filterByCountryId));
         }
 
+		_logger.LogDebug("<<< Exiting GetAllShippingMethodsAsync(filterByCountryId={FilterByCountryId})", filterByCountryId);
         return await _shippingMethodRepository.GetAllAsync(query =>
             from sm in query
+			using Microsoft.Extensions.Logging;
             orderby sm.DisplayOrder, sm.Id
             select sm, _ => default);
     }
@@ -97,6 +107,7 @@ public partial class ShippingMethodsService : IShippingMethodsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShippingMethodAsync(ShippingMethod shippingMethod)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         await _shippingMethodRepository.InsertAsync(shippingMethod);
     }
 
@@ -124,6 +135,8 @@ public partial class ShippingMethodsService : IShippingMethodsService
         ArgumentNullException.ThrowIfNull(shippingMethod);
 
         var result = await _shippingMethodCountryMappingRepository.Table
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("CountryRestrictionExistsAsync(shippingMethod,countryId)={ShippingMethod},{CountryId}: count query executed in {Arg2} ms", shippingMethod, countryId, __logStart.ElapsedMilliseconds);
             .AnyAsync(shippingMethodCountryMapping => shippingMethodCountryMapping.ShippingMethodId == shippingMethod.Id && shippingMethodCountryMapping.CountryId == countryId);
 
         return result;
@@ -164,8 +177,12 @@ public partial class ShippingMethodsService : IShippingMethodsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShippingMethodCountryMappingAsync(ShippingMethodCountryMapping shippingMethodCountryMapping)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _shippingMethodCountryMappingRepository.DeleteAsync(shippingMethodCountryMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteShippingMethodCountryMappingAsync(shippingMethodCountryMapping)={ShippingMethodCountryMapping}: external service call took {Arg1} ms", shippingMethodCountryMapping, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteShippingMethodCountryMappingAsync(shippingMethodCountryMapping)={ShippingMethodCountryMapping}: external service call took {Arg1} ms", shippingMethodCountryMapping, __logStart.ElapsedMilliseconds);
     #endregion
 }

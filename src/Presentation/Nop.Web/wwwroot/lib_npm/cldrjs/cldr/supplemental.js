@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * CLDR JavaScript Library v0.5.4
  * http://jquery.com/
@@ -13,6 +14,7 @@
  * http://git.io/h4lmVg
  */
 (function( factory ) {
+logger.debug('>>> Entering function()');
 
 	if ( typeof define === "function" && define.amd ) {
 		// AMD.
@@ -33,12 +35,14 @@
 
 
 	var supplementalMain = function( cldr ) {
+	logger.debug(`>>> Entering supplementalMain(cldr=${cldr})`);
 
 		var prepend, supplemental;
 		
 		prepend = function( prepend ) {
 			return function( path ) {
 				path = alwaysArray( path );
+				logger.debug(`<<< Exiting function(prepend=${prepend})`);
 				return cldr.get( [ prepend ].concat( path ) );
 			};
 		};
@@ -74,6 +78,7 @@
 				cldr.get( "supplemental/timeData/001/_preferred" );
 		};
 
+		logger.debug(`<<< Exiting supplementalMain(cldr=${cldr})`);
 		return supplemental;
 
 	};

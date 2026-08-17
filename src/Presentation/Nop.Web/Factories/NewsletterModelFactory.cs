@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Security;
 using Nop.Services.Localization;
 using Nop.Web.Models.Newsletter;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class NewsLetterModelFactory : INewsLetterModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -24,9 +26,14 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
         CustomerSettings customerSettings,
         ILocalizationService localizationService)
     {
+		_logger.LogDebug(">>> Entering NewsLetterModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},localizationService={LocalizationService})", captchaSettings, customerSettings, localizationService);
         _captchaSettings = captchaSettings;
         _customerSettings = customerSettings;
+		_logger.LogDebug("NewsLetterModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},localizationService={LocalizationService}): _customerSettings → {_customerSettings}", captchaSettings, customerSettings, localizationService, _customerSettings);
+		_logger.LogDebug("NewsLetterModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},localizationService={LocalizationService}): _captchaSettings → {_captchaSettings}", captchaSettings, customerSettings, localizationService, _captchaSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("<<< Exiting NewsLetterModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},localizationService={LocalizationService})", captchaSettings, customerSettings, localizationService);
+		_logger.LogDebug("NewsLetterModelFactory(captchaSettings={CaptchaSettings},customerSettings={CustomerSettings},localizationService={LocalizationService}): _localizationService → {_localizationService}", captchaSettings, customerSettings, localizationService, _localizationService);
     }
 
     #endregion
@@ -42,6 +49,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
     /// </returns>
     public virtual Task<NewsLetterBoxModel> PrepareNewsLetterBoxModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareNewsLetterBoxModelAsync()");
         var model = new NewsLetterBoxModel
         {
             AllowToUnsubscribe = _customerSettings.NewsletterBlockAllowToUnsubscribe,
@@ -50,6 +58,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
             ReCaptchaPublicKey = _captchaSettings.ReCaptchaPublicKey
         };
 
+		_logger.LogDebug("<<< Exiting PrepareNewsLetterBoxModelAsync()");
         return Task.FromResult(model);
     }
 
@@ -63,6 +72,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
     /// </returns>
     public virtual async Task<SubscriptionActivationModel> PrepareSubscriptionActivationModelAsync(bool active)
     {
+		_logger.LogDebug(">>> Entering PrepareSubscriptionActivationModelAsync(active={Active})", active);
         var model = new SubscriptionActivationModel
         {
             Result = active
@@ -70,6 +80,7 @@ public partial class NewsLetterModelFactory : INewsLetterModelFactory
                 : await _localizationService.GetResourceAsync("Newsletter.ResultDeactivated")
         };
 
+		_logger.LogDebug("<<< Exiting PrepareSubscriptionActivationModelAsync(active={Active})", active);
         return model;
     }
 

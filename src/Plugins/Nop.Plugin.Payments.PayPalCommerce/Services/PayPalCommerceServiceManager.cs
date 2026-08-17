@@ -220,6 +220,7 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<string> PrepareMessagesAmountAsync(ButtonPlacement placement, Customer customer, string currencyCode, int? productId)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //cache result during HTTP request
         return await _shortTermCacheManager.GetAsync(async () =>
         {
@@ -242,6 +243,7 @@ public class PayPalCommerceServiceManager
 
             return amount is not null ? PrepareMoney(amount.Value, currencyCode).Value : null;
         }, new($"{PayPalCommerceDefaults.SystemName}.Messages.Amount-{productId ?? 0}"));
+		_logger.LogDebug("<<< Exiting PrepareMessagesAmountAsync(placement={Placement},customer={Customer},currencyCode={CurrencyCode},productId={ProductId})", placement, customer, currencyCode, productId);
     }
 
     #endregion
@@ -1110,6 +1112,7 @@ public class PayPalCommerceServiceManager
     /// <returns>SHA256 hash</returns>
     private static string GetSha256Hash(string stringToHash)
     {
+		_logger.LogDebug("<<< Exiting GetSha256Hash(stringToHash=<redacted>)");
         return SHA256.HashData(Encoding.Default.GetBytes(stringToHash)).Aggregate(string.Empty, (current, next) => $"{current}{next:x2}");
     }
 
@@ -1147,7 +1150,9 @@ public class PayPalCommerceServiceManager
     /// <returns>Result</returns>
     public static bool IsConfigured(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConfigured(settings={Settings})", settings);
         //client id and secret are required to request remote services
+		_logger.LogDebug("<<< Exiting IsConfigured(settings={Settings})", settings);
         return !string.IsNullOrEmpty(settings?.ClientId) && !string.IsNullOrEmpty(settings.SecretKey);
     }
 
@@ -1158,7 +1163,9 @@ public class PayPalCommerceServiceManager
     /// <returns>Result</returns>
     public static bool IsConnected(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConnected(settings={Settings})", settings);
         //webhook is required to accept notifications
+		_logger.LogDebug("<<< Exiting IsConnected(settings={Settings})", settings);
         return IsConfigured(settings) && !string.IsNullOrEmpty(settings.WebhookUrl);
     }
 
@@ -3055,6 +3062,8 @@ public class PayPalCommerceServiceManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteWebhookAsync(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering DeleteWebhookAsync(settings={Settings})", settings);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await HandleFunctionAsync(async () =>
         {
             if (!IsConnected(settings))
@@ -3064,8 +3073,10 @@ public class PayPalCommerceServiceManager
             if (webhook is not null)
                 await _httpClient.RequestAsync<DeleteWebhookRequest, EmptyResponse>(new() { WebhookId = webhook.Id }, settings);
 
+			_logger.LogInformation("DeleteWebhookAsync(settings)={Settings}: external service call took {Arg1} ms", settings, __logStart.ElapsedMilliseconds);
             return true;
         });
+		_logger.LogDebug("<<< Exiting DeleteWebhookAsync(settings={Settings})", settings);
     }
 
     /// <summary>
@@ -3094,6 +3105,8 @@ public class PayPalCommerceServiceManager
             //define a local function to validate the webhook event and get its resource
             async Task<IWebhookResource> getWebhookResource<TResource>() where TResource : class, IWebhookResource
             {
+				_logger.LogDebug(">>> Entering getWebhookResource()");
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 //verify webhook event data
                 var verifyRequest = new CreateWebhookSignatureRequest
                 {
@@ -3106,10 +3119,13 @@ public class PayPalCommerceServiceManager
                     WebhookEvent = new(webhookEvent)
                 };
                 var result = await _httpClient.RequestAsync<CreateWebhookSignatureRequest, CreateWebhookSignatureResponse>(verifyRequest, settings);
+				_logger.LogDebug("getWebhookResource(): result → {Result}", result);
+				_logger.LogInformation("getWebhookResource(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
 
                 if (result?.VerificationStatus?.ToUpper() != WebhookSignatureVerificationStatusType.SUCCESS.ToString())
                     throw new NopException("Webhook error", new NopException($"Webhook signature verification {result?.VerificationStatus}"));
 
+				_logger.LogDebug("<<< Exiting getWebhookResource()");
                 return JsonConvert.DeserializeObject<Event<TResource>>(webhookEvent)?.Resource;
             }
 
@@ -3372,6 +3388,7 @@ public class PayPalCommerceServiceManager
 
             return true;
         });
+		_logger.LogDebug("<<< Exiting HandleWebhookAsync(settings={Settings},request={Request})", settings, request);
     }
 
     #endregion

@@ -5,16 +5,19 @@ using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Validators.Customers;
 
 public partial class CustomerValidator : BaseNopValidator<CustomerModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerValidator(CustomerSettings customerSettings,
         ICustomerService customerService,
         ILocalizationService localizationService,
         IStateProvinceService stateProvinceService)
     {
+		_logger.LogDebug(">>> Entering CustomerValidator(customerSettings={CustomerSettings},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService})", customerSettings, customerService, localizationService, stateProvinceService);
         //ensure that valid email address is entered if Registered role is checked to avoid registered customers with empty email address
         RuleFor(x => x.Email)
             .NotEmpty()
@@ -23,6 +26,7 @@ public partial class CustomerValidator : BaseNopValidator<CustomerModel>
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Common.WrongEmail"))
             //only for registered users
             .WhenAwait(async x => await IsRegisteredCustomerRoleCheckedAsync(x, customerService));
+			_logger.LogDebug("CustomerValidator(customerSettings={CustomerSettings},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService}): x → {X}", customerSettings, customerService, localizationService, stateProvinceService, x);
 
         //form fields
         if (customerSettings.CountryEnabled && customerSettings.CountryRequired)
@@ -41,6 +45,7 @@ public partial class CustomerValidator : BaseNopValidator<CustomerModel>
             {
                 //does selected country have states?
                 var hasStates = (await stateProvinceService.GetStateProvincesByCountryIdAsync(x.CountryId)).Any();
+				_logger.LogDebug("CustomerValidator(customerSettings={CustomerSettings},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService}): hasStates → {HasStates}", customerSettings, customerService, localizationService, stateProvinceService, hasStates);
                 if (hasStates)
                 {
                     //if yes, then ensure that a state is selected
@@ -106,6 +111,8 @@ public partial class CustomerValidator : BaseNopValidator<CustomerModel>
                 .WithMessageAwait(localizationService.GetResourceAsync("Admin.Customers.Customers.Fields.Phone.Required"))
                 //only for registered users
                 .WhenAwait(async x => await IsRegisteredCustomerRoleCheckedAsync(x, customerService));
+				_logger.LogDebug(">>> Entering IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
+				_logger.LogDebug("<<< Exiting IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
         }
         if (customerSettings.FaxRequired && customerSettings.FaxEnabled)
         {
@@ -117,17 +124,23 @@ public partial class CustomerValidator : BaseNopValidator<CustomerModel>
         }
 
         SetDatabaseValidationRules<Customer>();
+		_logger.LogDebug("<<< Exiting CustomerValidator(customerSettings={CustomerSettings},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService})", customerSettings, customerService, localizationService, stateProvinceService);
     }
 
     protected virtual async Task<bool> IsRegisteredCustomerRoleCheckedAsync(CustomerModel model, ICustomerService customerService)
     {
+		_logger.LogDebug(">>> Entering IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
         var allCustomerRoles = await customerService.GetAllCustomerRolesAsync(true);
         var newCustomerRoles = new List<CustomerRole>();
+		_logger.LogDebug("IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService}): newCustomerRoles → {NewCustomerRoles}", model, customerService, newCustomerRoles);
+		_logger.LogDebug("IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService}): allCustomerRoles → {AllCustomerRoles}", model, customerService, allCustomerRoles);
         foreach (var customerRole in allCustomerRoles)
             if (model.SelectedCustomerRoleIds.Contains(customerRole.Id))
                 newCustomerRoles.Add(customerRole);
 
         var isInRegisteredRole = newCustomerRoles.FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.RegisteredRoleName) != null;
+		_logger.LogDebug("IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService}): isInRegisteredRole → {IsInRegisteredRole}", model, customerService, isInRegisteredRole);
+		_logger.LogDebug("<<< Exiting IsRegisteredCustomerRoleCheckedAsync(model={Model},customerService={CustomerService})", model, customerService);
         return isInRegisteredRole;
     }
 }

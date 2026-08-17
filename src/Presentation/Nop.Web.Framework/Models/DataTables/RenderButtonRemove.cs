@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderButtonRemove : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -13,8 +15,12 @@ public partial class RenderButtonRemove : IRender
     /// <param name="title">Button title</param>
     public RenderButtonRemove(string title)
     {
+		_logger.LogDebug(">>> Entering RenderButtonRemove(title={Title})", title);
         Title = title;
         ClassName = NopButtonClassDefaults.Default;
+		_logger.LogDebug("<<< Exiting RenderButtonRemove(title={Title})", title);
+		_logger.LogDebug("RenderButtonRemove(title={Title}): ClassName → {ClassName}", title, ClassName);
+		_logger.LogDebug("RenderButtonRemove(title={Title}): Title → {Title1}", title, Title);
     }
 
     #endregion

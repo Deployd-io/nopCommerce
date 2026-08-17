@@ -4,6 +4,7 @@
 //!           Burak Yiğit Kaya: https://github.com/BYK
 
 import moment from '../moment';
+const logger = console;
 
 var suffixes = {
     1: "'inci",
@@ -37,14 +38,17 @@ export default moment.defineLocale('tr', {
     weekdaysShort: 'Paz_Pzt_Sal_Çar_Per_Cum_Cmt'.split('_'),
     weekdaysMin: 'Pz_Pt_Sa_Ça_Pe_Cu_Ct'.split('_'),
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 12) {
             return isLower ? 'öö' : 'ÖÖ';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'ös' : 'ÖS';
         }
     },
     meridiemParse: /öö|ÖÖ|ös|ÖS/,
     isPM: function (input) {
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return input === 'ös' || input === 'ÖS';
     },
     longDateFormat: {
@@ -82,6 +86,7 @@ export default moment.defineLocale('tr', {
         yy: '%d yıl',
     },
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -96,6 +101,7 @@ export default moment.defineLocale('tr', {
                 var a = number % 10,
                     b = (number % 100) - a,
                     c = number >= 100 ? 100 : null;
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number + (suffixes[a] || suffixes[b] || suffixes[c]);
         }
     },

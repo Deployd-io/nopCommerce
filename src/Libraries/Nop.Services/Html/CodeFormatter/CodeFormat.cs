@@ -22,6 +22,7 @@
 
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html.CodeFormatter;
 
@@ -30,6 +31,7 @@ namespace Nop.Services.Html.CodeFormatter;
 /// </summary>
 public abstract partial class CodeFormat : SourceFormat
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Must be overridden to provide a list of keywords defined in 
     /// each language.
@@ -83,10 +85,14 @@ public abstract partial class CodeFormat : SourceFormat
     /// <summary/>
     protected CodeFormat()
     {
+		_logger.LogDebug(">>> Entering CodeFormat()");
         //generate the keyword and preprocessor regexes from the keyword lists
         var r = new Regex(@"\w+|-\w+|#\w+|@@\w+|#(?:\\(?:s|w)(?:\*|\+)?\w+)+|@\\w\*+");
+		_logger.LogDebug("CodeFormat(): r → {R}", r);
         var regKeyword = r.Replace(Keywords, @"(?<=^|\W)$0(?=\W)");
+		_logger.LogDebug("CodeFormat(): regKeyword → {RegKeyword}", regKeyword);
         var regPreproc = r.Replace(Preprocessors, @"(?<=^|\s)$0(?=\s|$)");
+		_logger.LogDebug("CodeFormat(): regPreproc → {RegPreproc}", regPreproc);
         r = new Regex(@" +");
         regKeyword = r.Replace(regKeyword, @"|");
         regPreproc = r.Replace(regPreproc, @"|");
@@ -98,6 +104,7 @@ public abstract partial class CodeFormat : SourceFormat
 
         //build a master regex with capturing groups
         var regAll = new StringBuilder();
+		_logger.LogDebug("CodeFormat(): regAll → {RegAll}", regAll);
         regAll.Append('(');
         regAll.Append(CommentRegex);
         regAll.Append(")|(");
@@ -113,6 +120,8 @@ public abstract partial class CodeFormat : SourceFormat
 
         var caseInsensitive = CaseSensitive ? 0 : RegexOptions.IgnoreCase;
         CodeRegex = new Regex(regAll.ToString(), RegexOptions.Singleline | caseInsensitive);
+		_logger.LogDebug("<<< Exiting CodeFormat()");
+		_logger.LogDebug("CodeFormat(): CodeRegex → {CodeRegex}", CodeRegex);
     }
 
     /// <summary>
@@ -124,11 +133,14 @@ public abstract partial class CodeFormat : SourceFormat
     /// <returns>A string containing the HTML code fragment.</returns>
     protected override string MatchEval(Match match)
     {
+		_logger.LogDebug(">>> Entering MatchEval(match={Match})", match);
         if (match.Groups[1].Success) //comment
         {
             var reader = new StringReader(match.ToString());
+			_logger.LogDebug("MatchEval(match={Match}): reader → {Reader}", match, reader);
             string line;
             var sb = new StringBuilder();
+			_logger.LogDebug("MatchEval(match={Match}): sb → {Sb}", match, sb);
             while ((line = reader.ReadLine()) != null)
             {
                 if (sb.Length > 0)
@@ -156,6 +168,7 @@ public abstract partial class CodeFormat : SourceFormat
 
         if (match.Groups[4].Success) //keyword
         {
+		_logger.LogDebug("<<< Exiting MatchEval(match={Match})", match);
             return "<span class=\"kwrd\">" + match + "</span>";
         }
 

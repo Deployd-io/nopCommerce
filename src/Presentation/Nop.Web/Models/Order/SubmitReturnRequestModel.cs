@@ -1,15 +1,22 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Order;
 
 public partial record SubmitReturnRequestModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SubmitReturnRequestModel()
     {
+		_logger.LogDebug(">>> Entering SubmitReturnRequestModel()");
         Items = new List<OrderItemModel>();
         AvailableReturnReasons = new List<ReturnRequestReasonModel>();
+		_logger.LogDebug("SubmitReturnRequestModel(): AvailableReturnReasons → {AvailableReturnReasons}", AvailableReturnReasons);
+		_logger.LogDebug("SubmitReturnRequestModel(): Items → {Items}", Items);
         AvailableReturnActions = new List<ReturnRequestActionModel>();
+		_logger.LogDebug("<<< Exiting SubmitReturnRequestModel()");
+		_logger.LogDebug("SubmitReturnRequestModel(): AvailableReturnActions → {AvailableReturnActions}", AvailableReturnActions);
     }
 
     public int OrderId { get; set; }

@@ -3,16 +3,20 @@
 //! author : Jean-Baptiste Le Duigou : https://github.com/jbleduigou
 
 import moment from '../moment';
+const logger = console;
 
 function relativeTimeWithMutation(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithMutation(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var format = {
         mm: 'munutenn',
         MM: 'miz',
         dd: 'devezh',
     };
+	logger.debug(`<<< Exiting relativeTimeWithMutation(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     return number + ' ' + mutation(format[key], number);
 }
 function specialMutationForYears(number) {
+	logger.debug(`>>> Entering specialMutationForYears(number=${number})`);
     switch (lastNumber(number)) {
         case 1:
         case 3:
@@ -21,28 +25,35 @@ function specialMutationForYears(number) {
         case 9:
             return number + ' bloaz';
         default:
+			logger.debug(`<<< Exiting specialMutationForYears(number=${number})`);
             return number + ' vloaz';
     }
 }
 function lastNumber(number) {
+	logger.debug(`>>> Entering lastNumber(number=${number})`);
     if (number > 9) {
+	logger.debug(`<<< Exiting lastNumber(number=${number})`);
         return lastNumber(number % 10);
     }
     return number;
 }
 function mutation(text, number) {
+	logger.debug(`>>> Entering mutation(text=${text},number=${number})`);
     if (number === 2) {
+	logger.debug(`<<< Exiting mutation(text=${text},number=${number})`);
         return softMutation(text);
     }
     return text;
 }
 function softMutation(text) {
+	logger.debug(`>>> Entering softMutation(text=${text})`);
     var mutationTable = {
         m: 'v',
         b: 'v',
         d: 'z',
     };
     if (mutationTable[text.charAt(0)] === undefined) {
+	logger.debug(`<<< Exiting softMutation(text=${text})`);
         return text;
     }
     return mutationTable[text.charAt(0)] + text.substring(1);
@@ -151,7 +162,10 @@ export default moment.defineLocale('br', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(añ|vet)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var output = number === 1 ? 'añ' : 'vet';
+		logger.debug(`ordinal(number=${number}): output → ${output}`);
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + output;
     },
     week: {
@@ -160,9 +174,12 @@ export default moment.defineLocale('br', {
     },
     meridiemParse: /a.m.|g.m./, // goude merenn | a-raok merenn
     isPM: function (token) {
+		logger.debug(`<<< Exiting isPM(token=<redacted>)`);
         return token === 'g.m.';
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+		logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         return hour < 12 ? 'a.m.' : 'g.m.';
     },
 });

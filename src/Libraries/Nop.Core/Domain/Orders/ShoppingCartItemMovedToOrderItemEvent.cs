@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Orders;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class ShoppingCartItemMovedToOrderItemEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>

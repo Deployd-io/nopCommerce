@@ -14,11 +14,13 @@ using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class FilterLevelValueController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -45,15 +47,26 @@ public partial class FilterLevelValueController : BaseAdminController
         IProductService productService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext})", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _customerActivityService → {_customerActivityService}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _customerActivityService);
         _exportManager = exportManager;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _exportManager → {_exportManager}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _exportManager);
         _filterLevelValueModelFactory = filterLevelValueModelFactory;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _filterLevelValueModelFactory → {_filterLevelValueModelFactory}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _filterLevelValueModelFactory);
         _filterLevelValueService = filterLevelValueService;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _filterLevelValueService → {_filterLevelValueService}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _filterLevelValueService);
         _importManager = importManager;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _importManager → {_importManager}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _importManager);
         _localizationService = localizationService;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _localizationService → {_localizationService}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _notificationService → {_notificationService}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _notificationService);
         _productService = productService;
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _productService → {_productService}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _productService);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext})", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext);
+		_logger.LogDebug("FilterLevelValueController(customerActivityService={CustomerActivityService},exportManager={ExportManager},filterLevelValueModelFactory={FilterLevelValueModelFactory},filterLevelValueService={FilterLevelValueService},importManager={ImportManager},localizationService={LocalizationService},notificationService={NotificationService},productService={ProductService},workContext={WorkContext}): _workContext → {_workContext}", customerActivityService, exportManager, filterLevelValueModelFactory, filterLevelValueService, importManager, localizationService, notificationService, productService, workContext, _workContext);
     }
 
     #endregion
@@ -64,15 +77,20 @@ public partial class FilterLevelValueController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueSearchModelAsync(new FilterLevelValueSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -83,6 +101,7 @@ public partial class FilterLevelValueController : BaseAdminController
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -93,9 +112,12 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual IActionResult Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(new FilterLevelValueModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -135,20 +157,25 @@ public partial class FilterLevelValueController : BaseAdminController
         model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(model, null);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a filter level value with the specified id
         var filterLevelValue = await _filterLevelValueService.GetFilterLevelValueByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): filterLevelValue → {FilterLevelValue}", id, filterLevelValue);
         if (filterLevelValue == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(null, filterLevelValue);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -197,6 +224,7 @@ public partial class FilterLevelValueController : BaseAdminController
         model = _filterLevelValueModelFactory.PrepareFilterLevelValueModel(model, filterLevelValue);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -204,8 +232,10 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a filter level value with the specified id
         var filterLevelValue = await _filterLevelValueService.GetFilterLevelValueByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): filterLevelValue → {FilterLevelValue}", id, filterLevelValue);
         if (filterLevelValue == null)
             return RedirectToAction("List");
 
@@ -217,6 +247,7 @@ public partial class FilterLevelValueController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.FilterLevelValues.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -224,17 +255,21 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var filterLevelValues = await _filterLevelValueService.GetFilterLevelValuesByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): filterLevelValues → {FilterLevelValues}", selectedIds, filterLevelValues);
 
         await _filterLevelValueService.DeleteFilterLevelValuesAsync(filterLevelValues);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteFilterLevelValue");
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
         await _customerActivityService.InsertActivitiesAsync("DeleteFilterLevelValue", filterLevelValues, filterLevelValue => string.Format(activityLogFormat, filterLevelValue.Id));
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -245,16 +280,21 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXlsx()
     {
+		_logger.LogDebug(">>> Entering ExportXlsx()");
         try
         {
             var filterLevelValues = (await _filterLevelValueService.GetAllFilterLevelValuesAsync()).ToList();
+			_logger.LogDebug("ExportXlsx(): filterLevelValues → {FilterLevelValues}", filterLevelValues);
             var bytes = await _exportManager.ExportFilterLevelValuesToXlsxAsync(filterLevelValues);
+			_logger.LogDebug("ExportXlsx(): bytes → {Bytes}", bytes);
 
             return File(bytes, MimeTypes.TextXlsx, "FilterLevelValues.xlsx");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXlsx(): {Arg0}", exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ExportXlsx()");
             return RedirectToAction("List");
         }
     }
@@ -263,6 +303,7 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile)
     {
+		_logger.LogDebug(">>> Entering ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
         //a vendor cannot import filter level values
         if (await _workContext.GetCurrentVendorAsync() != null)
             return AccessDeniedView();
@@ -285,7 +326,9 @@ public partial class FilterLevelValueController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ImportFromXlsx(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }
@@ -298,34 +341,42 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductList(FilterLevelValueProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductList(searchModel={SearchModel})", searchModel);
         //try to get a filter level value with the specified id
         var filterLevelValue = await _filterLevelValueService.GetFilterLevelValueByIdAsync(searchModel.FilterLevelValueId)
             ?? throw new ArgumentException("No filter level value found with the specified id");
 
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareFilterLevelValueProductListModelAsync(searchModel, filterLevelValue);
+		_logger.LogDebug("ProductList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ProductList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductDelete(int id)
     {
+		_logger.LogDebug(">>> Entering ProductDelete(id={Id})", id);
         //try to get a filter level value product mapping with the specified id
         var filterLevelValueProduct = await _filterLevelValueService.GetFilterLevelValueProductByIdAsync(id)
             ?? throw new ArgumentException("No filter level value product mapping found with the specified id", nameof(id));
 
         await _filterLevelValueService.DeleteFilterLevelValueProductAsync(filterLevelValueProduct);
 
+		_logger.LogDebug("<<< Exiting ProductDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopup(int filterLevelValueId)
     {
+		_logger.LogDebug(">>> Entering ProductAddPopup(filterLevelValueId={FilterLevelValueId})", filterLevelValueId);
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareAddProductToFilterLevelValueSearchModelAsync(new AddProductToFilterLevelValueSearchModel());
+		_logger.LogDebug("ProductAddPopup(filterLevelValueId={FilterLevelValueId}): model → {Model}", filterLevelValueId, model);
 
+		_logger.LogDebug("<<< Exiting ProductAddPopup(filterLevelValueId={FilterLevelValueId})", filterLevelValueId);
         return View(model);
     }
 
@@ -333,9 +384,12 @@ public partial class FilterLevelValueController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.FILTER_LEVEL_VALUE_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopupList(AddProductToFilterLevelValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _filterLevelValueModelFactory.PrepareAddProductToFilterLevelValueListModelAsync(searchModel);
+		_logger.LogDebug("ProductAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ProductAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

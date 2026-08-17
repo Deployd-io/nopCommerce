@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Cms;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Cms;
 /// </summary>
 public partial class WidgetPluginManager : PluginManager<IWidgetPlugin>, IWidgetPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly WidgetSettings _widgetSettings;
@@ -22,7 +24,10 @@ public partial class WidgetPluginManager : PluginManager<IWidgetPlugin>, IWidget
         IPluginService pluginService,
         WidgetSettings widgetSettings) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering WidgetPluginManager(customerService={CustomerService},pluginService={PluginService},widgetSettings={WidgetSettings})", customerService, pluginService, widgetSettings);
         _widgetSettings = widgetSettings;
+		_logger.LogDebug("<<< Exiting WidgetPluginManager(customerService={CustomerService},pluginService={PluginService},widgetSettings={WidgetSettings})", customerService, pluginService, widgetSettings);
+		_logger.LogDebug("WidgetPluginManager(customerService={CustomerService},pluginService={PluginService},widgetSettings={WidgetSettings}): _widgetSettings → {_widgetSettings}", customerService, pluginService, widgetSettings, _widgetSettings);
     }
 
     #endregion
@@ -41,13 +46,18 @@ public partial class WidgetPluginManager : PluginManager<IWidgetPlugin>, IWidget
     /// </returns>
     public virtual async Task<IList<IWidgetPlugin>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0, string widgetZone = null)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},widgetZone={WidgetZone})", customer, storeId, widgetZone);
         var widgets = await LoadActivePluginsAsync(_widgetSettings.ActiveWidgetSystemNames, customer, storeId);
 
+		_logger.LogDebug("LoadActivePluginsAsync(customer={Customer},storeId={StoreId},widgetZone={WidgetZone}): widgets → {Widgets}", customer, storeId, widgetZone, widgets);
         //filter by widget zone
         if (!string.IsNullOrEmpty(widgetZone))
             widgets = await widgets.WhereAwait(async widget =>
                 (await widget.GetWidgetZonesAsync()).Contains(widgetZone, StringComparer.InvariantCultureIgnoreCase)).ToListAsync();
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("LoadActivePluginsAsync(customer,storeId,widgetZone)={Customer},{StoreId},{WidgetZone}: find query executed in {Arg3} ms", customer, storeId, widgetZone, __logStart.ElapsedMilliseconds);
 
+		_logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId},widgetZone={WidgetZone})", customer, storeId, widgetZone);
         return widgets;
     }
 
@@ -73,8 +83,11 @@ public partial class WidgetPluginManager : PluginManager<IWidgetPlugin>, IWidget
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var widget = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
 
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): widget → {Widget}", systemName, customer, storeId, widget);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(widget);
     }
 

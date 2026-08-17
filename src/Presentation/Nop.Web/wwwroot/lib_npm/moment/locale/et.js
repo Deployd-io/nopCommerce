@@ -4,8 +4,10 @@
 //! improvements : Illimar Tambek : https://github.com/ragulka
 
 import moment from '../moment';
+const logger = console;
 
 function processRelativeTime(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var format = {
         s: ['mõne sekundi', 'mõni sekund', 'paar sekundit'],
         ss: [number + 'sekundi', number + 'sekundit'],
@@ -20,6 +22,7 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
         yy: [number + ' aasta', number + ' aastat'],
     };
     if (withoutSuffix) {
+	logger.debug(`<<< Exiting processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
         return format[key][2] ? format[key][2] : format[key][1];
     }
     return isFuture ? format[key][0] : format[key][1];

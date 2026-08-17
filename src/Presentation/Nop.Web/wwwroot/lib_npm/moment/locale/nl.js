@@ -4,6 +4,7 @@
 //! author : Jacob Middag : https://github.com/middagj
 
 import moment from '../moment';
+const logger = console;
 
 var monthsShortWithDots =
         'jan._feb._mrt._apr._mei_jun._jul._aug._sep._okt._nov._dec.'.split('_'),
@@ -31,11 +32,13 @@ export default moment.defineLocale('nl', {
         '_'
     ),
     monthsShort: function (m, format) {
+		logger.debug(`>>> Entering monthsShort(m=${m},format=${format})`);
         if (!m) {
             return monthsShortWithDots;
         } else if (/-MMM-/.test(format)) {
             return monthsShortWithoutDots[m.month()];
         } else {
+			logger.debug(`<<< Exiting monthsShort(m=${m},format=${format})`);
             return monthsShortWithDots[m.month()];
         }
     },
@@ -92,10 +95,12 @@ export default moment.defineLocale('nl', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(ste|de)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         return (
             number +
             (number === 1 || number === 8 || number >= 20 ? 'ste' : 'de')
         );
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
     },
     week: {
         dow: 1, // Monday is the first day of the week.

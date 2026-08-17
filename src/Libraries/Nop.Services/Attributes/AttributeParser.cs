@@ -4,6 +4,7 @@ using Microsoft.Extensions.Primitives;
 using Nop.Core.Domain.Attributes;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Attributes;
 
@@ -16,6 +17,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     where TAttribute : BaseAttribute
     where TAttributeValue : BaseAttributeValue
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<TAttribute, TAttributeValue> _attributeService;
@@ -424,13 +426,16 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<string> ParseCustomAttributesAsync(IFormCollection form, string attributeControlName)
     {
+		_logger.LogDebug(">>> Entering ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName})", form, attributeControlName);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = string.Empty;
+		_logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): attributesXml → {AttributesXml}", form, attributeControlName, attributesXml);
 
         foreach (var attribute in await _attributeService.GetAllAttributesAsync())
         {
             var controlId = string.Format(attributeControlName, attribute.Id);
+			_logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): controlId → {ControlId}", form, attributeControlName, controlId);
             var attributeValues = form[controlId];
             switch (attribute.AttributeControlType)
             {
@@ -454,6 +459,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 case AttributeControlType.ReadonlyCheckboxes:
                     //load read-only (already server-side selected) values
                     var readOnlyAttributeValues = await _attributeService.GetAttributeValuesAsync(attribute.Id);
+					_logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): readOnlyAttributeValues → {ReadOnlyAttributeValues}", form, attributeControlName, readOnlyAttributeValues);
                     foreach (var readOnlyAttributeValue in readOnlyAttributeValues)
                     {
                         if (!readOnlyAttributeValue.IsPreSelected)
@@ -479,6 +485,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
             }
         }
 
+		_logger.LogDebug("<<< Exiting ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName})", form, attributeControlName);
         return attributesXml;
     }
 
@@ -493,6 +500,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<bool?> IsConditionMetAsync(string conditionAttributeXml, string selectedAttributesXml)
     {
+		_logger.LogDebug(">>> Entering IsConditionMetAsync(conditionAttributeXml={ConditionAttributeXml},selectedAttributesXml={SelectedAttributesXml})", conditionAttributeXml, selectedAttributesXml);
         if (string.IsNullOrEmpty(conditionAttributeXml))
             //no condition
             return null;
@@ -525,6 +533,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 allFound = false;
         }
 
+		_logger.LogDebug("<<< Exiting IsConditionMetAsync(conditionAttributeXml={ConditionAttributeXml},selectedAttributesXml={SelectedAttributesXml})", conditionAttributeXml, selectedAttributesXml);
         return allFound;
     }
 

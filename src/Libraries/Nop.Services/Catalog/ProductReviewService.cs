@@ -11,6 +11,7 @@ using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -19,6 +20,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ProductReviewService : IProductReviewService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -218,17 +220,23 @@ public partial class ProductReviewService : IProductReviewService
         string message = null, int storeId = 0, int productId = 0, int vendorId = 0, bool showHidden = false,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize);
         var productReviews = await _productReviewRepository.GetAllPagedAsync(async query =>
         {
+			_logger.LogDebug("GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!showHidden)
             {
                 var productsQuery = _productRepository.Table.Where(p => p.Published);
 
+				_logger.LogDebug("GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): productsQuery → {ProductsQuery}", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, productsQuery);
+				_logger.LogInformation("GetAllProductReviewsAsync(customerId,approved,fromUtc,toUtc,message,storeId,productId,vendorId,showHidden,pageIndex,pageSize)={CustomerId},{Approved},{FromUtc},{ToUtc},{Message},{StoreId},{ProductId},{VendorId},{ShowHidden},{PageIndex},{PageSize}: find query executed in {Arg11} ms", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
                 //apply store mapping constraints
                 productsQuery = await _storeMappingService.ApplyStoreMapping(productsQuery, storeId);
 
                 //apply ACL constraints
                 var customer = await _workContext.GetCurrentCustomerAsync();
+				_logger.LogDebug("GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): customer → {Customer}", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, customer);
                 productsQuery = await _aclService.ApplyAcl(productsQuery, customer);
 
                 query = query.Where(review => productsQuery.Any(product => product.Id == review.ProductId));
@@ -264,6 +272,7 @@ public partial class ProductReviewService : IProductReviewService
             return query;
         }, pageIndex, pageSize);
 
+		_logger.LogDebug("<<< Exiting GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize);
         return productReviews;
     }
 
@@ -277,6 +286,8 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<ProductReview> GetProductReviewByIdAsync(int productReviewId)
     {
+		_logger.LogDebug(">>> Entering GetProductReviewByIdAsync(productReviewId={ProductReviewId})", productReviewId);
+		_logger.LogDebug("<<< Exiting GetProductReviewByIdAsync(productReviewId={ProductReviewId})", productReviewId);
         return await _productReviewRepository.GetByIdAsync(productReviewId, _ => default);
     }
 
@@ -290,6 +301,8 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<IList<ProductReview>> GetProductReviewsByIdsAsync(int[] productReviewIds)
     {
+		_logger.LogDebug(">>> Entering GetProductReviewsByIdsAsync(productReviewIds={ProductReviewIds})", productReviewIds);
+		_logger.LogDebug("<<< Exiting GetProductReviewsByIdsAsync(productReviewIds={ProductReviewIds})", productReviewIds);
         return await _productReviewRepository.GetByIdsAsync(productReviewIds);
     }
 
@@ -301,8 +314,10 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductReviewAsync(ProductReview productReview, IList<ProductReviewReviewTypeMapping> productReviewReviewTypeMappings = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewRepository.InsertAsync(productReview);
 
+		_logger.LogInformation("InsertProductReviewAsync(productReview,productReviewReviewTypeMappings)={ProductReview},{ProductReviewReviewTypeMappings}: save query executed in {Arg2} ms", productReview, productReviewReviewTypeMappings, __logStart.ElapsedMilliseconds);
         //add product review and review type mapping
         if (productReviewReviewTypeMappings != null && productReviewReviewTypeMappings.Any())
         {
@@ -337,9 +352,15 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductReviewAsync(ProductReview productReview)
     {
+		_logger.LogDebug(">>> Entering DeleteProductReviewAsync(productReview={ProductReview})", productReview);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewRepository.DeleteAsync(productReview);
+		_logger.LogDebug("<<< Exiting DeleteProductReviewAsync(productReview={ProductReview})", productReview);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductReviewAsync(productReview)={ProductReview}: external service call took {Arg1} ms", productReview, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductReviewAsync(productReview)={ProductReview}: external service call took {Arg1} ms", productReview, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes product reviews
     /// </summary>
@@ -347,6 +368,7 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductReviewsAsync(IList<ProductReview> productReviews)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewRepository.DeleteAsync(productReviews);
     }
 
@@ -358,11 +380,15 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetProductReviewHelpfulnessAsync(ProductReview productReview, bool helpfulness)
     {
+		_logger.LogDebug(">>> Entering SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness})", productReview, helpfulness);
         ArgumentNullException.ThrowIfNull(productReview);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness}): customer → {Customer}", productReview, helpfulness, customer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var prh = await _productReviewHelpfulnessRepository.Table
             .SingleOrDefaultAsync(h => h.ProductReviewId == productReview.Id && h.CustomerId == customer.Id);
+			_logger.LogInformation("SetProductReviewHelpfulnessAsync(productReview,helpfulness)={ProductReview},{Helpfulness}: database query executed in {Arg2} ms", productReview, helpfulness, __logStart.ElapsedMilliseconds);
 
         if (prh is null)
         {
@@ -380,9 +406,11 @@ public partial class ProductReviewService : IProductReviewService
         {
             //existing one
             prh.WasHelpful = helpfulness;
+			_logger.LogDebug("SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness}): prh.WasHelpful → {Arg2}", productReview, helpfulness, prh.WasHelpful);
 
             await _productReviewHelpfulnessRepository.UpdateAsync(prh);
         }
+		_logger.LogDebug("<<< Exiting SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness})", productReview, helpfulness);
     }
 
     /// <summary>
@@ -392,7 +420,9 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductReviewAsync(ProductReview productReview)
     {
+		_logger.LogDebug(">>> Entering UpdateProductReviewAsync(productReview={ProductReview})", productReview);
         await _productReviewRepository.UpdateAsync(productReview);
+		_logger.LogDebug("<<< Exiting UpdateProductReviewAsync(productReview={ProductReview})", productReview);
     }
 
     /// <summary>
@@ -405,11 +435,15 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task UpdateProductReviewHelpfulnessTotalsAsync(ProductReview productReview)
     {
+		_logger.LogDebug(">>> Entering UpdateProductReviewHelpfulnessTotalsAsync(productReview={ProductReview})", productReview);
         ArgumentNullException.ThrowIfNull(productReview);
 
         (productReview.HelpfulYesTotal, productReview.HelpfulNoTotal) = await GetHelpfulnessCountsAsync(productReview);
 
         await _productReviewRepository.UpdateAsync(productReview);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("UpdateProductReviewHelpfulnessTotalsAsync(productReview)={ProductReview}: update query executed in {Arg1} ms", productReview, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting UpdateProductReviewHelpfulnessTotalsAsync(productReview={ProductReview})", productReview);
     }
 
     /// <summary>
@@ -423,9 +457,12 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<bool> CanAddReviewAsync(int productId, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering CanAddReviewAsync(productId={ProductId},storeId={StoreId})", productId, storeId);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("CanAddReviewAsync(productId={ProductId},storeId={StoreId}): customer → {Customer}", productId, storeId, customer);
         if (_catalogSettings.OneReviewPerProductFromCustomer)
+		_logger.LogDebug("<<< Exiting CanAddReviewAsync(productId={ProductId},storeId={StoreId})", productId, storeId);
             return (await GetAllProductReviewsAsync(customerId: customer.Id, productId: productId, storeId: storeId)).TotalCount == 0;
 
         return true;

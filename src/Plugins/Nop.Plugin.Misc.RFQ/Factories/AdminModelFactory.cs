@@ -22,11 +22,13 @@ using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Models.Extensions;
 
 using ProductSearchModel = Nop.Plugin.Misc.RFQ.Models.Admin.ProductSearchModel;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Factories;
 
 public class AdminModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly CurrencySettings _currencySettings;
@@ -67,22 +69,40 @@ public class AdminModelFactory
         IUrlRecordService urlRecordService,
         RfqService rfqService)
     {
+		_logger.LogDebug(">>> Entering AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService})", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService);
         _currencySettings = currencySettings;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _currencySettings → {_currencySettings}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _currencySettings);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _baseAdminModelFactory → {_baseAdminModelFactory}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _baseAdminModelFactory);
         _currencyService = currencyService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _currencyService → {_currencyService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _currencyService);
         _customerService = customerService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _customerService → {_customerService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _dateTimeHelper → {_dateTimeHelper}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _localizationService → {_localizationService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _localizationService);
         _priceCalculationService = priceCalculationService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _priceCalculationService → {_priceCalculationService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _priceCalculationService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _priceFormatter → {_priceFormatter}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _priceFormatter);
         _productAttributeFormatter = productAttributeFormatter;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _productAttributeFormatter → {_productAttributeFormatter}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _productAttributeFormatter);
         _productAttributeService = productAttributeService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _productAttributeService → {_productAttributeService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _productAttributeService);
         _productService = productService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _productService → {_productService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _productService);
         _customerRepository = customerRepository;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _customerRepository → {_customerRepository}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _customerRepository);
         _storeContext = storeContext;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _storeContext → {_storeContext}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _storeContext);
         _taxService = taxService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _taxService → {_taxService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _taxService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _urlRecordService → {_urlRecordService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _urlRecordService);
         _rfqService = rfqService;
+		_logger.LogDebug("<<< Exiting AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService})", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService);
+		_logger.LogDebug("AdminModelFactory(currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productAttributeService={ProductAttributeService},productService={ProductService},customerRepository={CustomerRepository},storeContext={StoreContext},taxService={TaxService},urlRecordService={UrlRecordService},rfqService={RfqService}): _rfqService → {_rfqService}", currencySettings, baseAdminModelFactory, currencyService, customerService, dateTimeHelper, localizationService, priceCalculationService, priceFormatter, productAttributeFormatter, productAttributeService, productService, customerRepository, storeContext, taxService, urlRecordService, rfqService, _rfqService);
     }
 
     #endregion
@@ -207,19 +227,23 @@ public class AdminModelFactory
     /// </returns>
     public async Task<RequestQuoteSearchModel> PrepareRequestQuoteSearchModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareRequestQuoteSearchModelAsync()");
         var searchModel = new RequestQuoteSearchModel();
 
+		_logger.LogDebug("PrepareRequestQuoteSearchModelAsync(): searchModel → {SearchModel}", searchModel);
         //prepare available statuses
         searchModel.AvailableRequestQuoteStatuses.AddRange(await RequestQuoteStatus.Submitted.ToSelectListAsync(false));
 
         //prepare default item text
         var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.All");
+		_logger.LogDebug("PrepareRequestQuoteSearchModelAsync(): defaultItemText → {DefaultItemText}", defaultItemText);
         //insert this default item at first
         searchModel.AvailableRequestQuoteStatuses.Insert(0, new SelectListItem { Text = defaultItemText, Value = "-1" });
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareRequestQuoteSearchModelAsync()");
         return searchModel;
     }
 
@@ -232,19 +256,23 @@ public class AdminModelFactory
     /// </returns>
     public async Task<QuoteSearchModel> PrepareQuoteSearchModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareQuoteSearchModelAsync()");
         var searchModel = new QuoteSearchModel();
 
+		_logger.LogDebug("PrepareQuoteSearchModelAsync(): searchModel → {SearchModel}", searchModel);
         //prepare available statuses
         searchModel.AvailableQuoteStatuses.AddRange(await QuoteStatus.CreatedFromRequestQuote.ToSelectListAsync(false));
 
         //prepare default item text
         var defaultItemText = await _localizationService.GetResourceAsync("Admin.Common.All");
+		_logger.LogDebug("PrepareQuoteSearchModelAsync(): defaultItemText → {DefaultItemText}", defaultItemText);
         //insert this default item at first
         searchModel.AvailableQuoteStatuses.Insert(0, new SelectListItem { Text = defaultItemText, Value = "-1" });
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareQuoteSearchModelAsync()");
         return searchModel;
     }
 
@@ -323,9 +351,13 @@ public class AdminModelFactory
     /// </returns>
     public async Task<List<RequestQuoteItemModel>> PrepareRequestItemListModelAsync(int requestQuoteId)
     {
+		_logger.LogDebug(">>> Entering PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         var items = await _rfqService.GetRequestQuoteItemsAsync(requestQuoteId);
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogDebug("PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId}): primaryStoreCurrency → {PrimaryStoreCurrency}", requestQuoteId, primaryStoreCurrency);
+		_logger.LogDebug("PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId}): items → {Items}", requestQuoteId, items);
 
+		_logger.LogDebug("<<< Exiting PrepareRequestItemListModelAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         return await items.SelectAwait(async p => await PreparedRequestQuoteItemModelAsync(p, primaryStoreCurrency)).ToListAsync();
     }
 
@@ -339,9 +371,13 @@ public class AdminModelFactory
     /// </returns>
     public async Task<List<QuoteItemModel>> PrepareQuoteItemListModelAsync(int quoteId)
     {
+		_logger.LogDebug(">>> Entering PrepareQuoteItemListModelAsync(quoteId={QuoteId})", quoteId);
         var items = await _rfqService.GetQuoteItemsAsync(quoteId);
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogDebug("PrepareQuoteItemListModelAsync(quoteId={QuoteId}): primaryStoreCurrency → {PrimaryStoreCurrency}", quoteId, primaryStoreCurrency);
+		_logger.LogDebug("PrepareQuoteItemListModelAsync(quoteId={QuoteId}): items → {Items}", quoteId, items);
 
+		_logger.LogDebug("<<< Exiting PrepareQuoteItemListModelAsync(quoteId={QuoteId})", quoteId);
         return await items.SelectAwait(async p => await PreparedQuoteItemModelAsync(p, primaryStoreCurrency)).ToListAsync();
     }
 

@@ -3,6 +3,7 @@
 //! author : Atamyrat Abdyrahmanov : https://github.com/atamyratabdy
 
 import moment from '../moment';
+const logger = console;
 
 var suffixes = {
     1: "'inji",
@@ -67,6 +68,7 @@ export default moment.defineLocale('tk', {
         yy: '%d ýyl',
     },
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -81,6 +83,7 @@ export default moment.defineLocale('tk', {
                 var a = number % 10,
                     b = (number % 100) - a,
                     c = number >= 100 ? 100 : null;
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number + (suffixes[a] || suffixes[b] || suffixes[c]);
         }
     },

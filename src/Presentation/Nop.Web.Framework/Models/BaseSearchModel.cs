@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Common;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Models;
 
@@ -8,12 +9,16 @@ namespace Nop.Web.Framework.Models;
 /// </summary>
 public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     protected BaseSearchModel()
     {
+		_logger.LogDebug(">>> Entering BaseSearchModel()");
         //set the default values
         Length = 10;
+		_logger.LogDebug("<<< Exiting BaseSearchModel()");
+		_logger.LogDebug("BaseSearchModel(): Length → {Length}", Length);
     }
 
     #endregion
@@ -59,8 +64,10 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
     /// </summary>
     public virtual void SetGridPageSize()
     {
+		_logger.LogDebug(">>> Entering SetGridPageSize()");
         var adminAreaSettings = EngineContext.Current.Resolve<AdminAreaSettings>();
         SetGridPageSize(adminAreaSettings?.DefaultGridPageSize ?? 0, adminAreaSettings?.GridPageSizes);
+		_logger.LogDebug("<<< Exiting SetGridPageSize()");
     }
 
     /// <summary>
@@ -68,8 +75,11 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
     /// </summary>
     public virtual void SetPopupGridPageSize()
     {
+		_logger.LogDebug(">>> Entering SetPopupGridPageSize()");
         var adminAreaSettings = EngineContext.Current.Resolve<AdminAreaSettings>();
         SetGridPageSize(adminAreaSettings.PopupGridPageSize, adminAreaSettings.GridPageSizes);
+		_logger.LogDebug("<<< Exiting SetPopupGridPageSize()");
+		_logger.LogDebug("SetPopupGridPageSize(): adminAreaSettings → {AdminAreaSettings}", adminAreaSettings);
     }
 
     /// <summary>
@@ -79,9 +89,14 @@ public abstract partial record BaseSearchModel : BaseNopModel, IPagingRequestMod
     /// <param name="availablePageSizes">Available page sizes; pass null to use default value</param>
     public virtual void SetGridPageSize(int pageSize, string availablePageSizes = null)
     {
+		_logger.LogDebug(">>> Entering SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes})", pageSize, availablePageSizes);
         Start = 0;
         Length = pageSize;
+		_logger.LogDebug("SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes}): Length → {Length}", pageSize, availablePageSizes, Length);
+		_logger.LogDebug("SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes}): Start → {Start}", pageSize, availablePageSizes, Start);
         AvailablePageSizes = availablePageSizes;
+		_logger.LogDebug("<<< Exiting SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes})", pageSize, availablePageSizes);
+		_logger.LogDebug("SetGridPageSize(pageSize={PageSize},availablePageSizes={AvailablePageSizes}): AvailablePageSizes → {AvailablePageSizes1}", pageSize, availablePageSizes, AvailablePageSizes);
     }
 
     #endregion

@@ -8,6 +8,7 @@ using Nop.Data;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -16,6 +17,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ProductAttributeParser : IProductAttributeParser
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICurrencyService _currencyService;
@@ -38,12 +40,20 @@ public partial class ProductAttributeParser : IProductAttributeParser
         IRepository<ProductAttributeValue> productAttributeValueRepository,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext})", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext);
         _currencyService = currencyService;
+		_logger.LogDebug("ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext}): _currencyService → {_currencyService}", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext, _currencyService);
         _downloadService = downloadService;
+		_logger.LogDebug("ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext}): _downloadService → {_downloadService}", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext, _downloadService);
         _productAttributeService = productAttributeService;
+		_logger.LogDebug("ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext}): _productAttributeService → {_productAttributeService}", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext, _productAttributeService);
         _productAttributeValueRepository = productAttributeValueRepository;
+		_logger.LogDebug("ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext}): _productAttributeValueRepository → {_productAttributeValueRepository}", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext, _productAttributeValueRepository);
         _workContext = workContext;
+		_logger.LogDebug("ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext}): _workContext → {_workContext}", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext, _workContext);
         _localizationService = localizationService;
+		_logger.LogDebug("<<< Exiting ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext})", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext);
+		_logger.LogDebug("ProductAttributeParser(currencyService={CurrencyService},downloadService={DownloadService},localizationService={LocalizationService},productAttributeService={ProductAttributeService},productAttributeValueRepository={ProductAttributeValueRepository},workContext={WorkContext}): _localizationService → {_localizationService}", currencyService, downloadService, localizationService, productAttributeService, productAttributeValueRepository, workContext, _localizationService);
     }
 
     #endregion
@@ -172,6 +182,8 @@ public partial class ProductAttributeParser : IProductAttributeParser
         }
 
         attributesXml = AddGiftCardAttribute(attributesXml, recipientName, recipientEmail, senderName, senderEmail, giftCardMessage);
+		_logger.LogDebug("AddGiftCardsAttributesXml(product={Product},form={Form},attributesXml={AttributesXml}): attributesXml → {AttributesXml1}", product, form, attributesXml, attributesXml);
+		_logger.LogDebug("<<< Exiting AddGiftCardsAttributesXml(product={Product},form={Form},attributesXml={AttributesXml})", product, form, attributesXml);
     }
 
     /// <summary>
@@ -186,11 +198,15 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// </returns>
     protected virtual async Task<string> GetProductAttributesXmlAsync(Product product, IFormCollection form, List<string> errors)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors})", product, form, errors);
         var attributesXml = string.Empty;
         var productAttributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+		_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): productAttributes → {ProductAttributes}", product, form, errors, productAttributes);
+		_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): attributesXml → {AttributesXml}", product, form, errors, attributesXml);
         foreach (var attribute in productAttributes)
         {
             var controlId = $"{NopCatalogDefaults.ProductAttributePrefix}{attribute.Id}";
+			_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): controlId → {ControlId}", product, form, errors, controlId);
             switch (attribute.AttributeControlType)
             {
                 case AttributeControlType.DropdownList:
@@ -202,11 +218,13 @@ public partial class ProductAttributeParser : IProductAttributeParser
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
                         var selectedAttributeId = int.Parse(ctrlAttributes);
+						_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): selectedAttributeId → {SelectedAttributeId}", product, form, errors, selectedAttributeId);
                         if (selectedAttributeId > 0)
                         {
                             //get quantity entered by customer
                             var quantity = 1;
                             var quantityStr = form[$"{NopCatalogDefaults.ProductAttributePrefix}{attribute.Id}_{selectedAttributeId}_qty"];
+							_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): quantityStr → {QuantityStr}", product, form, errors, quantityStr);
                             if (!StringValues.IsNullOrEmpty(quantityStr) &&
                                 (!int.TryParse(quantityStr, out quantity) || quantity < 1))
                                 errors.Add(await _localizationService.GetResourceAsync("Products.QuantityShouldBePositive"));
@@ -246,6 +264,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
                 {
                     //load read-only (already server-side selected) values
                     var attributeValues = await _productAttributeService.GetProductAttributeValuesAsync(attribute.Id);
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): attributeValues → {AttributeValues}", product, form, errors, attributeValues);
                     foreach (var selectedAttributeId in attributeValues
                                  .Where(v => v.IsPreSelected)
                                  .Select(v => v.Id)
@@ -270,6 +289,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
                         var enteredText = ctrlAttributes.ToString().Trim();
+						_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): enteredText → {EnteredText}", product, form, errors, enteredText);
                         attributesXml = AddProductAttribute(attributesXml, attribute, enteredText);
                     }
                 }
@@ -277,15 +297,20 @@ public partial class ProductAttributeParser : IProductAttributeParser
                 case AttributeControlType.Datepicker:
                 {
                     var day = form[controlId + "_day"];
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): day → {Day}", product, form, errors, day);
                     var month = form[controlId + "_month"];
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): month → {Month}", product, form, errors, month);
                     var year = form[controlId + "_year"];
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): year → {Year}", product, form, errors, year);
                     DateTime? selectedDate = null;
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): selectedDate → {SelectedDate}", product, form, errors, selectedDate);
                     try
                     {
                         selectedDate = new DateTime(int.Parse(year), int.Parse(month), int.Parse(day));
                     }
                     catch
                     {
+						_logger.LogError("Exception in GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): {Arg3}", product, form, errors, ex.Message);
                         // ignored
                     }
 
@@ -296,7 +321,9 @@ public partial class ProductAttributeParser : IProductAttributeParser
                 case AttributeControlType.FileUpload:
                 {
                     _ = Guid.TryParse(form[controlId], out var downloadGuid);
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): _ → {_}", product, form, errors, _);
                     var download = await _downloadService.GetDownloadByGuidAsync(downloadGuid);
+					_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): download → {Download}", product, form, errors, download);
                     if (download != null)
                         attributesXml = AddProductAttribute(attributesXml,
                             attribute, download.DownloadGuid.ToString());
@@ -310,11 +337,15 @@ public partial class ProductAttributeParser : IProductAttributeParser
         foreach (var attribute in productAttributes)
         {
             var conditionMet = await IsConditionMetAsync(attribute, attributesXml);
+			_logger.LogDebug("GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors}): conditionMet → {ConditionMet}", product, form, errors, conditionMet);
             if (conditionMet.HasValue && !conditionMet.Value)
             {
                 attributesXml = RemoveProductAttribute(attributesXml, attribute);
+				_logger.LogDebug(">>> Entering IsConditionMetAsync(pam={Pam},selectedAttributesXml={SelectedAttributesXml})", pam, selectedAttributesXml);
+				_logger.LogDebug("<<< Exiting IsConditionMetAsync(pam={Pam},selectedAttributesXml={SelectedAttributesXml})", pam, selectedAttributesXml);
             }
         }
+		_logger.LogDebug("<<< Exiting GetProductAttributesXmlAsync(product={Product},form={Form},errors={Errors})", product, form, errors);
         return attributesXml;
     }
 
@@ -649,11 +680,14 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// </returns>
     public virtual async Task<bool> AreProductAttributesEqualAsync(string attributesXml1, string attributesXml2, bool ignoreNonCombinableAttributes, bool ignoreQuantity = true)
     {
+		_logger.LogDebug(">>> Entering AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity})", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity);
         var attributes1 = await ParseProductAttributeMappingsAsync(attributesXml1);
         if (ignoreNonCombinableAttributes)
+			_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): attributes1 → {Attributes1}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, attributes1);
             attributes1 = attributes1.Where(x => !x.IsNonCombinable()).ToList();
 
         var attributes2 = await ParseProductAttributeMappingsAsync(attributesXml2);
+		_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): attributes2 → {Attributes2}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, attributes2);
         if (ignoreNonCombinableAttributes)
             attributes2 = attributes2.Where(x => !x.IsNonCombinable()).ToList();
 
@@ -661,9 +695,11 @@ public partial class ProductAttributeParser : IProductAttributeParser
             return false;
 
         var attributesEqual = true;
+		_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): attributesEqual → {AttributesEqual}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, attributesEqual);
         foreach (var a1 in attributes1)
         {
             var hasAttribute = false;
+			_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): hasAttribute → {HasAttribute}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, hasAttribute);
             foreach (var a2 in attributes2)
             {
                 if (a1.Id != a2.Id)
@@ -671,12 +707,15 @@ public partial class ProductAttributeParser : IProductAttributeParser
 
                 hasAttribute = true;
                 var values1Str = ParseValuesWithQuantity(attributesXml1, a1.Id);
+				_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): values1Str → {Values1Str}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, values1Str);
                 var values2Str = ParseValuesWithQuantity(attributesXml2, a2.Id);
+				_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): values2Str → {Values2Str}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, values2Str);
                 if (values1Str.Count == values2Str.Count)
                 {
                     foreach (var str1 in values1Str)
                     {
                         var hasValue = false;
+						_logger.LogDebug("AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity}): hasValue → {HasValue}", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity, hasValue);
                         foreach (var str2 in values2Str)
                         {
                             //case insensitive? 
@@ -709,6 +748,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
             break;
         }
 
+		_logger.LogDebug("<<< Exiting AreProductAttributesEqualAsync(attributesXml1={AttributesXml1},attributesXml2={AttributesXml2},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},ignoreQuantity={IgnoreQuantity})", attributesXml1, attributesXml2, ignoreNonCombinableAttributes, ignoreQuantity);
         return attributesEqual;
     }
 
@@ -723,6 +763,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// </returns>
     public virtual async Task<bool?> IsConditionMetAsync(ProductAttributeMapping pam, string selectedAttributesXml)
     {
+		_logger.LogDebug(">>> Entering IsConditionMetAsync(pam={Pam},selectedAttributesXml={SelectedAttributesXml})", pam, selectedAttributesXml);
         ArgumentNullException.ThrowIfNull(pam);
 
         var conditionAttributeXml = pam.ConditionAttributeXml;
@@ -758,6 +799,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
                 allFound = false;
         }
 
+		_logger.LogDebug("<<< Exiting IsConditionMetAsync(pam={Pam},selectedAttributesXml={SelectedAttributesXml})", pam, selectedAttributesXml);
         return allFound;
     }
 
@@ -797,17 +839,21 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// </returns>
     public virtual async Task<IList<string>> GenerateAllCombinationsAsync(Product product, bool ignoreNonCombinableAttributes = false, IList<int> allowedAttributeIds = null)
     {
+		_logger.LogDebug(">>> Entering GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds})", product, ignoreNonCombinableAttributes, allowedAttributeIds);
         ArgumentNullException.ThrowIfNull(product);
 
         var allProductAttributeMappings = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+		_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): allProductAttributeMappings → {AllProductAttributeMappings}", product, ignoreNonCombinableAttributes, allowedAttributeIds, allProductAttributeMappings);
 
         if (ignoreNonCombinableAttributes)
             allProductAttributeMappings = allProductAttributeMappings.Where(x => !x.IsNonCombinable()).ToList();
 
         //get all possible attribute combinations
         var allPossibleAttributeCombinations = CreateCombination(allProductAttributeMappings);
+		_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): allPossibleAttributeCombinations → {AllPossibleAttributeCombinations}", product, ignoreNonCombinableAttributes, allowedAttributeIds, allPossibleAttributeCombinations);
 
         var allAttributesXml = new List<string>();
+		_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): allAttributesXml → {AllAttributesXml}", product, ignoreNonCombinableAttributes, allowedAttributeIds, allAttributesXml);
 
         foreach (var combination in allPossibleAttributeCombinations)
         {
@@ -819,6 +865,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
 
                 //get product attribute values
                 var attributeValues = await _productAttributeService.GetProductAttributeValuesAsync(productAttributeMapping.Id);
+				_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): attributeValues → {AttributeValues}", product, ignoreNonCombinableAttributes, allowedAttributeIds, attributeValues);
 
                 //filter product attribute values
                 if (allowedAttributeIds?.Any() ?? false)
@@ -832,6 +879,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
                                  AttributeControlType.ReadonlyCheckboxes;
 
                 var currentAttributesXml = new List<string>();
+				_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): currentAttributesXml → {CurrentAttributesXml}", product, ignoreNonCombinableAttributes, allowedAttributeIds, currentAttributesXml);
 
                 if (isCheckbox)
                 {
@@ -843,6 +891,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
                         foreach (var checkboxCombination in CreateCombination(attributeValues))
                         {
                             var newXml = oldXml;
+							_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): newXml → {NewXml}", product, ignoreNonCombinableAttributes, allowedAttributeIds, newXml);
                             foreach (var checkboxValue in checkboxCombination)
                                 newXml = AddProductAttribute(newXml, productAttributeMapping, checkboxValue.Id.ToString());
 
@@ -879,11 +928,13 @@ public partial class ProductAttributeParser : IProductAttributeParser
             foreach (var attribute in allProductAttributeMappings)
             {
                 var conditionMet = await IsConditionMetAsync(attribute, attributesXml);
+				_logger.LogDebug("GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds}): conditionMet → {ConditionMet}", product, ignoreNonCombinableAttributes, allowedAttributeIds, conditionMet);
                 if (conditionMet.HasValue && !conditionMet.Value)
                     allAttributesXml[i] = RemoveProductAttribute(attributesXml, attribute);
             }
         }
 
+		_logger.LogDebug("<<< Exiting GenerateAllCombinationsAsync(product={Product},ignoreNonCombinableAttributes={IgnoreNonCombinableAttributes},allowedAttributeIds={AllowedAttributeIds})", product, ignoreNonCombinableAttributes, allowedAttributeIds);
         return allAttributesXml;
     }
 
@@ -898,10 +949,12 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// </returns>
     public virtual async Task<decimal> ParseCustomerEnteredPriceAsync(Product product, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParseCustomerEnteredPriceAsync(product={Product},form={Form})", product, form);
         ArgumentNullException.ThrowIfNull(product);
         ArgumentNullException.ThrowIfNull(form);
 
         var customerEnteredPriceConverted = decimal.Zero;
+		_logger.LogDebug("ParseCustomerEnteredPriceAsync(product={Product},form={Form}): customerEnteredPriceConverted → {CustomerEnteredPriceConverted}", product, form, customerEnteredPriceConverted);
         if (product.CustomerEntersPrice)
         {
             foreach (var formKey in form.Keys)
@@ -915,6 +968,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
             }
         }
 
+		_logger.LogDebug("<<< Exiting ParseCustomerEnteredPriceAsync(product={Product},form={Form})", product, form);
         return customerEnteredPriceConverted;
     }
 
@@ -926,6 +980,7 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// <returns>Customer entered price of the product</returns>
     public virtual int ParseEnteredQuantity(Product product, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParseEnteredQuantity(product={Product},form={Form})", product, form);
         ArgumentNullException.ThrowIfNull(product);
         ArgumentNullException.ThrowIfNull(form);
 
@@ -934,9 +989,11 @@ public partial class ProductAttributeParser : IProductAttributeParser
             if (formKey.Equals($"addtocart_{product.Id}.EnteredQuantity", StringComparison.InvariantCultureIgnoreCase))
             {
                 _ = int.TryParse(form[formKey], out quantity);
+				_logger.LogDebug("ParseEnteredQuantity(product={Product},form={Form}): _ → {_}", product, form, _);
                 break;
             }
 
+		_logger.LogDebug("<<< Exiting ParseEnteredQuantity(product={Product},form={Form})", product, form);
         return quantity;
     }
 
@@ -949,16 +1006,21 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// <param name="endDate">End date</param>
     public virtual void ParseRentalDates(Product product, IFormCollection form, out DateTime? startDate, out DateTime? endDate)
     {
+		_logger.LogDebug(">>> Entering ParseRentalDates(product={Product},form={Form})", product, form);
         ArgumentNullException.ThrowIfNull(product);
         ArgumentNullException.ThrowIfNull(form);
 
         startDate = null;
+		_logger.LogDebug("ParseRentalDates(product={Product},form={Form}): startDate → {StartDate}", product, form, startDate);
         endDate = null;
+		_logger.LogDebug("ParseRentalDates(product={Product},form={Form}): endDate → {EndDate}", product, form, endDate);
 
         if (product.IsRental)
         {
             var ctrlStartDate = form[$"rental_start_date_{product.Id}"];
+			_logger.LogDebug("ParseRentalDates(product={Product},form={Form}): ctrlStartDate → {CtrlStartDate}", product, form, ctrlStartDate);
             var ctrlEndDate = form[$"rental_end_date_{product.Id}"];
+			_logger.LogDebug("ParseRentalDates(product={Product},form={Form}): ctrlEndDate → {CtrlEndDate}", product, form, ctrlEndDate);
 
             var dateFormat = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft ?
                         CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern :
@@ -975,9 +1037,11 @@ public partial class ProductAttributeParser : IProductAttributeParser
             }
             catch
             {
+				_logger.LogError("Exception in ParseRentalDates(product={Product},form={Form}): {Arg2}", product, form, ex.Message);
                 // ignored
             }
         }
+		_logger.LogDebug("<<< Exiting ParseRentalDates(product={Product},form={Form})", product, form);
     }
 
     /// <summary>
@@ -992,15 +1056,18 @@ public partial class ProductAttributeParser : IProductAttributeParser
     /// </returns>
     public virtual async Task<string> ParseProductAttributesAsync(Product product, IFormCollection form, List<string> errors)
     {
+		_logger.LogDebug(">>> Entering ParseProductAttributesAsync(product={Product},form={Form},errors={Errors})", product, form, errors);
         ArgumentNullException.ThrowIfNull(product);
         ArgumentNullException.ThrowIfNull(form);
 
         //product attributes
         var attributesXml = await GetProductAttributesXmlAsync(product, form, errors);
+		_logger.LogDebug("ParseProductAttributesAsync(product={Product},form={Form},errors={Errors}): attributesXml → {AttributesXml}", product, form, errors, attributesXml);
 
         //gift cards
         AddGiftCardsAttributesXml(product, form, ref attributesXml);
 
+		_logger.LogDebug("<<< Exiting ParseProductAttributesAsync(product={Product},form={Form},errors={Errors})", product, form, errors);
         return attributesXml;
     }
 

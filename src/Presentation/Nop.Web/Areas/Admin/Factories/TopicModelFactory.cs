@@ -10,6 +10,7 @@ using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -18,6 +19,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class TopicModelFactory : ITopicModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -69,6 +71,7 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicSearchModel> PrepareTopicSearchModelAsync(TopicSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareTopicSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -79,6 +82,7 @@ public partial class TopicModelFactory : ITopicModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareTopicSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -92,6 +96,7 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicListModel> PrepareTopicListModelAsync(TopicSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareTopicListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get topics
@@ -101,6 +106,7 @@ public partial class TopicModelFactory : ITopicModelFactory
             ignoreAcl: true);
 
         var pagedTopics = topics.ToPagedList(searchModel);
+		_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): pagedTopics → {PagedTopics}", searchModel, pagedTopics);
 
         //prepare grid model
         var model = await new TopicListModel().PrepareToGridAsync(searchModel, pagedTopics, () =>
@@ -109,14 +115,17 @@ public partial class TopicModelFactory : ITopicModelFactory
             {
                 //fill in model values from the entity
                 var topicModel = topic.ToModel<TopicModel>();
+				_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): topicModel → {TopicModel}", searchModel, topicModel);
 
                 //little performance optimization: ensure that "Body" is not returned
                 topicModel.Body = string.Empty;
+				_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): topicModel.Body → {Arg1}", searchModel, topicModel.Body);
 
                 topicModel.SeName = await _urlRecordService.GetSeNameAsync(topic, 0, true, false);
 
                 if (!string.IsNullOrEmpty(topicModel.SystemName))
                     topicModel.TopicName = topicModel.SystemName;
+					_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): topicModel.TopicName → {Arg1}", searchModel, topicModel.TopicName);
                 else
                     topicModel.TopicName = topicModel.Title;
 
@@ -124,6 +133,7 @@ public partial class TopicModelFactory : ITopicModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareTopicListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -147,6 +157,7 @@ public partial class TopicModelFactory : ITopicModelFactory
             if (model == null)
             {
                 model = topic.ToModel<TopicModel>();
+				_logger.LogDebug("PrepareTopicModelAsync(model={Model},topic={Topic},excludeProperties={ExcludeProperties}): model → {Model1}", model, topic, excludeProperties, model);
                 model.SeName = await _urlRecordService.GetSeNameAsync(topic, 0, true, false);
             }
 

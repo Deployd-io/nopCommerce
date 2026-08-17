@@ -3,6 +3,7 @@
 //! author: boyaq : https://github.com/boyaq
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('ug-cn', {
     months: 'يانۋار_فېۋرال_مارت_ئاپرېل_ماي_ئىيۇن_ئىيۇل_ئاۋغۇست_سېنتەبىر_ئۆكتەبىر_نويابىر_دېكابىر'.split(
@@ -27,6 +28,7 @@ export default moment.defineLocale('ug-cn', {
     },
     meridiemParse: /يېرىم كېچە|سەھەر|چۈشتىن بۇرۇن|چۈش|چۈشتىن كېيىن|كەچ/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -39,6 +41,9 @@ export default moment.defineLocale('ug-cn', {
         } else if (meridiem === 'چۈشتىن كېيىن' || meridiem === 'كەچ') {
             return hour + 12;
         } else {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour >= 11 ? hour : hour + 12;
         }
     },
@@ -85,6 +90,7 @@ export default moment.defineLocale('ug-cn', {
 
     dayOfMonthOrdinalParse: /\d{1,2}(-كۈنى|-ئاي|-ھەپتە)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -94,13 +100,18 @@ export default moment.defineLocale('ug-cn', {
             case 'W':
                 return number + '-ھەپتە';
             default:
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
+		logger.debug(`<<< Exiting preparse(string=${string})`);
         return string.replace(/،/g, ',');
     },
     postformat: function (string) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
+		logger.debug(`<<< Exiting postformat(string=${string})`);
         return string.replace(/,/g, '،');
     },
     week: {

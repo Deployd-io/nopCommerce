@@ -13,6 +13,7 @@ using Nop.Services.Logging;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Customers;
 
@@ -21,6 +22,7 @@ namespace Nop.Services.Customers;
 /// </summary>
 public partial class CustomerRegistrationService : ICustomerRegistrationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -207,12 +209,14 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<CustomerRegistrationResult> RegisterCustomerAsync(CustomerRegistrationRequest request)
     {
+		_logger.LogDebug(">>> Entering RegisterCustomerAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         if (request.Customer == null)
             throw new ArgumentException("Can't load current customer");
 
         var result = new CustomerRegistrationResult();
+		_logger.LogDebug("RegisterCustomerAsync(request={Request}): result → {Result}", request, result);
         if (request.Customer.IsSearchEngineAccount())
         {
             result.AddError("Search engine can't be registered");
@@ -282,12 +286,15 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             case PasswordFormat.Clear:
                 customerPassword.Password = request.Password;
+				_logger.LogDebug("RegisterCustomerAsync(request={Request}): customerPassword.Password → {Arg1}", request, customerPassword.Password);
                 break;
             case PasswordFormat.Encrypted:
                 customerPassword.Password = _encryptionService.EncryptText(request.Password);
                 break;
             case PasswordFormat.Hashed:
                 var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
+				_logger.LogDebug("RegisterCustomerAsync(request={Request}): saltKey → {SaltKey}", request, saltKey);
+				_logger.LogDebug("RegisterCustomerAsync(request={Request}): customerPassword.PasswordSalt → {Arg1}", request, customerPassword.PasswordSalt);
                 customerPassword.PasswordSalt = saltKey;
                 customerPassword.Password = _encryptionService.CreatePasswordHash(request.Password, saltKey, _customerSettings.HashedPasswordFormat);
                 break;
@@ -299,6 +306,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         //add to 'Registered' role
         var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName) ?? throw new NopException("'Registered' role could not be loaded");
+		_logger.LogDebug("RegisterCustomerAsync(request={Request}): registeredRole → {RegisteredRole}", request, registeredRole);
 
         await _customerService.AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = request.Customer.Id, CustomerRoleId = registeredRole.Id });
 
@@ -306,6 +314,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         if (await _customerService.IsGuestAsync(request.Customer))
         {
             var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
+			_logger.LogDebug("RegisterCustomerAsync(request={Request}): guestRole → {GuestRole}", request, guestRole);
             await _customerService.RemoveCustomerRoleMappingAsync(request.Customer, guestRole);
         }
 
@@ -320,6 +329,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
 
         await _customerService.UpdateCustomerAsync(request.Customer);
 
+		_logger.LogDebug("<<< Exiting RegisterCustomerAsync(request={Request})", request);
         return result;
     }
 
@@ -333,9 +343,11 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
     /// </returns>
     public virtual async Task<ChangePasswordResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
+		_logger.LogDebug(">>> Entering ChangePasswordAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         var result = new ChangePasswordResult();
+		_logger.LogDebug("ChangePasswordAsync(request={Request}): result → {Result}", request, result);
         if (string.IsNullOrWhiteSpace(request.Email))
         {
             result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.EmailIsNotProvided"));
@@ -349,6 +361,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         }
 
         var customer = await _customerService.GetCustomerByEmailAsync(request.Email);
+		_logger.LogDebug("ChangePasswordAsync(request={Request}): customer → {Customer}", request, customer);
         if (customer == null)
         {
             result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.EmailNotFound"));
@@ -367,8 +380,10 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             //get some of previous passwords
             var previousPasswords = await _customerService.GetCustomerPasswordsAsync(customer.Id, passwordsToReturn: _customerSettings.UnduplicatedPasswordsNumber);
+			_logger.LogDebug("ChangePasswordAsync(request={Request}): previousPasswords → {PreviousPasswords}", request, previousPasswords);
 
             var newPasswordMatchesWithPrevious = previousPasswords.Any(password => PasswordsMatch(password, request.NewPassword));
+			_logger.LogDebug("ChangePasswordAsync(request={Request}): newPasswordMatchesWithPrevious → {NewPasswordMatchesWithPrevious}", request, newPasswordMatchesWithPrevious);
             if (newPasswordMatchesWithPrevious)
             {
                 result.AddError(await _localizationService.GetResourceAsync("Account.ChangePassword.Errors.PasswordMatchesWithPrevious"));
@@ -387,12 +402,15 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         {
             case PasswordFormat.Clear:
                 customerPassword.Password = request.NewPassword;
+				_logger.LogDebug("ChangePasswordAsync(request={Request}): customerPassword.Password → {Arg1}", request, customerPassword.Password);
                 break;
             case PasswordFormat.Encrypted:
                 customerPassword.Password = _encryptionService.EncryptText(request.NewPassword);
                 break;
             case PasswordFormat.Hashed:
                 var saltKey = _encryptionService.CreateSaltKey(NopCustomerServicesDefaults.PasswordSaltKeySize);
+				_logger.LogDebug("ChangePasswordAsync(request={Request}): saltKey → {SaltKey}", request, saltKey);
+				_logger.LogDebug("ChangePasswordAsync(request={Request}): customerPassword.PasswordSalt → {Arg1}", request, customerPassword.PasswordSalt);
                 customerPassword.PasswordSalt = saltKey;
                 customerPassword.Password = _encryptionService.CreatePasswordHash(request.NewPassword, saltKey,
                     request.HashedPasswordFormat ?? _customerSettings.HashedPasswordFormat);
@@ -404,12 +422,14 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
         if (customer.MustChangePassword)
         {
             customer.MustChangePassword = false;
+			_logger.LogDebug("ChangePasswordAsync(request={Request}): customer.MustChangePassword → {Arg1}", request, customer.MustChangePassword);
             await _customerService.UpdateCustomerAsync(customer);
         }
 
         //publish event
         await _eventPublisher.PublishAsync(new CustomerPasswordChangedEvent(customerPassword));
 
+		_logger.LogDebug("<<< Exiting ChangePasswordAsync(request={Request})", request);
         return result;
     }
 
@@ -524,6 +544,7 @@ public partial class CustomerRegistrationService : ICustomerRegistrationService
                 await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(subscription);
             }
         }
+		_logger.LogDebug("<<< Exiting SetEmailAsync(customer={Customer},newEmail={NewEmail},requireValidation={RequireValidation})", customer, newEmail, requireValidation);
     }
 
     /// <summary>

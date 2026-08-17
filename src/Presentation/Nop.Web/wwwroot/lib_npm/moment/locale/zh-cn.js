@@ -5,6 +5,7 @@
 //! author : uu109 : https://github.com/uu109
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('zh-cn', {
     months: '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split(
@@ -30,6 +31,7 @@ export default moment.defineLocale('zh-cn', {
     },
     meridiemParse: /凌晨|早上|上午|中午|下午|晚上/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -38,7 +40,10 @@ export default moment.defineLocale('zh-cn', {
         } else if (meridiem === '下午' || meridiem === '晚上') {
             return hour + 12;
         } else {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
             // '中午'
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour >= 11 ? hour : hour + 12;
         }
     },
@@ -62,17 +67,21 @@ export default moment.defineLocale('zh-cn', {
         sameDay: '[今天]LT',
         nextDay: '[明天]LT',
         nextWeek: function (now) {
+			logger.debug(`>>> Entering nextWeek(now=${now})`);
             if (now.week() !== this.week()) {
                 return '[下]dddLT';
             } else {
+				logger.debug(`<<< Exiting nextWeek(now=${now})`);
                 return '[本]dddLT';
             }
         },
         lastDay: '[昨天]LT',
         lastWeek: function (now) {
+			logger.debug(`>>> Entering lastWeek(now=${now})`);
             if (this.week() !== now.week()) {
                 return '[上]dddLT';
             } else {
+				logger.debug(`<<< Exiting lastWeek(now=${now})`);
                 return '[本]dddLT';
             }
         },
@@ -80,6 +89,7 @@ export default moment.defineLocale('zh-cn', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(日|月|周)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -91,6 +101,7 @@ export default moment.defineLocale('zh-cn', {
             case 'W':
                 return number + '周';
             default:
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },

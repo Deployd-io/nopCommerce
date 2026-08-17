@@ -2,6 +2,7 @@
 using Nop.Core.Caching;
 using Nop.Core.Domain.Common;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Common;
 /// </summary>
 public partial class GenericAttributeService : IGenericAttributeService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<GenericAttribute> _genericAttributeRepository;
@@ -24,9 +26,14 @@ public partial class GenericAttributeService : IGenericAttributeService
         IShortTermCacheManager shortTermCacheManager,
         IStaticCacheManager staticCacheManager)
     {
+		_logger.LogDebug(">>> Entering GenericAttributeService(genericAttributeRepository={GenericAttributeRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager})", genericAttributeRepository, shortTermCacheManager, staticCacheManager);
         _genericAttributeRepository = genericAttributeRepository;
         _shortTermCacheManager = shortTermCacheManager;
+		_logger.LogDebug("GenericAttributeService(genericAttributeRepository={GenericAttributeRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager}): _shortTermCacheManager → {_shortTermCacheManager}", genericAttributeRepository, shortTermCacheManager, staticCacheManager, _shortTermCacheManager);
+		_logger.LogDebug("GenericAttributeService(genericAttributeRepository={GenericAttributeRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager}): _genericAttributeRepository → {_genericAttributeRepository}", genericAttributeRepository, shortTermCacheManager, staticCacheManager, _genericAttributeRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("<<< Exiting GenericAttributeService(genericAttributeRepository={GenericAttributeRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager})", genericAttributeRepository, shortTermCacheManager, staticCacheManager);
+		_logger.LogDebug("GenericAttributeService(genericAttributeRepository={GenericAttributeRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", genericAttributeRepository, shortTermCacheManager, staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -40,9 +47,15 @@ public partial class GenericAttributeService : IGenericAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAttributeAsync(GenericAttribute attribute)
     {
+		_logger.LogDebug(">>> Entering DeleteAttributeAsync(attribute={Attribute})", attribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _genericAttributeRepository.DeleteAsync(attribute);
+		_logger.LogDebug("<<< Exiting DeleteAttributeAsync(attribute={Attribute})", attribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteAttributeAsync(attribute)={Attribute}: external service call took {Arg1} ms", attribute, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteAttributeAsync(attribute)={Attribute}: external service call took {Arg1} ms", attribute, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes an attributes
     /// </summary>
@@ -50,7 +63,12 @@ public partial class GenericAttributeService : IGenericAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAttributesAsync(IList<GenericAttribute> attributes)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _genericAttributeRepository.DeleteAsync(attributes);
+		_logger.LogDebug(">>> Entering DeleteAttributesAsync(key={Key})", key);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogDebug("<<< Exiting DeleteAttributesAsync(key={Key})", key);
+		_logger.LogInformation("DeleteAttributesAsync(key)={Key}: external service call took {Arg1} ms", key, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -60,9 +78,11 @@ public partial class GenericAttributeService : IGenericAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAttributesAsync<TEntity>(string key)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var keyGroup = typeof(TEntity).Name;
         await _genericAttributeRepository.DeleteAsync(a => a.Key == key && a.KeyGroup == keyGroup);
     }
+	_logger.LogInformation("DeleteAttributesAsync(key)={Key}: external service call took {Arg1} ms", key, __logStart.ElapsedMilliseconds);
 
     /// <summary>
     /// Inserts an attribute
@@ -71,11 +91,16 @@ public partial class GenericAttributeService : IGenericAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAttributeAsync(GenericAttribute attribute)
     {
+		_logger.LogDebug(">>> Entering InsertAttributeAsync(attribute={Attribute})", attribute);
         ArgumentNullException.ThrowIfNull(attribute);
 
         attribute.CreatedOrUpdatedDateUTC = DateTime.UtcNow;
+		_logger.LogDebug("InsertAttributeAsync(attribute={Attribute}): attribute.CreatedOrUpdatedDateUTC → {Arg1}", attribute, attribute.CreatedOrUpdatedDateUTC);
 
         await _genericAttributeRepository.InsertAsync(attribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("InsertAttributeAsync(attribute)={Attribute}: save query executed in {Arg1} ms", attribute, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting InsertAttributeAsync(attribute={Attribute})", attribute);
     }
 
     /// <summary>
@@ -85,11 +110,16 @@ public partial class GenericAttributeService : IGenericAttributeService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAttributeAsync(GenericAttribute attribute)
     {
+		_logger.LogDebug(">>> Entering UpdateAttributeAsync(attribute={Attribute})", attribute);
         ArgumentNullException.ThrowIfNull(attribute);
 
         attribute.CreatedOrUpdatedDateUTC = DateTime.UtcNow;
+		_logger.LogDebug("UpdateAttributeAsync(attribute={Attribute}): attribute.CreatedOrUpdatedDateUTC → {Arg1}", attribute, attribute.CreatedOrUpdatedDateUTC);
 
         await _genericAttributeRepository.UpdateAsync(attribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("UpdateAttributeAsync(attribute)={Attribute}: update query executed in {Arg1} ms", attribute, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting UpdateAttributeAsync(attribute={Attribute})", attribute);
     }
 
     /// <summary>
@@ -103,6 +133,7 @@ public partial class GenericAttributeService : IGenericAttributeService
     /// </returns>
     public virtual async Task<IList<GenericAttribute>> GetAttributesForEntityAsync(int entityId, string keyGroup)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from ga in _genericAttributeRepository.Table
             where ga.EntityId == entityId &&
                   ga.KeyGroup == keyGroup
@@ -221,9 +252,13 @@ public partial class GenericAttributeService : IGenericAttributeService
     public virtual async Task<TPropType> GetAttributeAsync<TEntity, TPropType>(int entityId, string key, int storeId = 0, TPropType defaultValue = default)
         where TEntity : BaseEntity
     {
+		_logger.LogDebug(">>> Entering GetAttributeAsync(entityId={EntityId},key={Key},storeId={StoreId},defaultValue={DefaultValue})", entityId, key, storeId, defaultValue);
         var entity = (TEntity)Activator.CreateInstance(typeof(TEntity));
         entity.Id = entityId;
+		_logger.LogDebug("GetAttributeAsync(entityId={EntityId},key={Key},storeId={StoreId},defaultValue={DefaultValue}): entity.Id → {Arg4}", entityId, key, storeId, defaultValue, entity.Id);
+		_logger.LogDebug("GetAttributeAsync(entityId={EntityId},key={Key},storeId={StoreId},defaultValue={DefaultValue}): entity → {Entity}", entityId, key, storeId, defaultValue, entity);
 
+		_logger.LogDebug("<<< Exiting GetAttributeAsync(entityId={EntityId},key={Key},storeId={StoreId},defaultValue={DefaultValue})", entityId, key, storeId, defaultValue);
         return await GetAttributeAsync(entity, key, storeId, defaultValue);
     }
 

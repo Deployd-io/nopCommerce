@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Core.Caching;
 /// </summary>
 public partial class PerRequestCacheManager : CacheKeyService, IShortTermCacheManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ConcurrentTrie<object> _concurrentCollection;
@@ -18,7 +20,10 @@ public partial class PerRequestCacheManager : CacheKeyService, IShortTermCacheMa
 
     public PerRequestCacheManager(AppSettings appSettings) : base(appSettings)
     {
+		_logger.LogDebug(">>> Entering PerRequestCacheManager(appSettings={AppSettings})", appSettings);
         _concurrentCollection = new ConcurrentTrie<object>();
+		_logger.LogDebug("<<< Exiting PerRequestCacheManager(appSettings={AppSettings})", appSettings);
+		_logger.LogDebug("PerRequestCacheManager(appSettings={AppSettings}): _concurrentCollection → {_concurrentCollection}", appSettings, _concurrentCollection);
     }
 
     #endregion
@@ -38,16 +43,20 @@ public partial class PerRequestCacheManager : CacheKeyService, IShortTermCacheMa
     /// </returns>
     public virtual async Task<T> GetAsync<T>(Func<Task<T>> acquire, CacheKey cacheKey, params object[] cacheKeyParameters)
     {
+		_logger.LogDebug(">>> Entering GetAsync(acquire={Acquire},cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", acquire, cacheKey, cacheKeyParameters);
         var key = cacheKey.Create(CreateCacheKeyParameters, cacheKeyParameters).Key;
 
+		_logger.LogWarning("GetAsync(acquire={Acquire},cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters}): key → {Key}", acquire, cacheKey, cacheKeyParameters, key);
         if (_concurrentCollection.TryGetValue(key, out var data))
             return (T)data;
 
         var result = await acquire();
+		_logger.LogDebug("GetAsync(acquire={Acquire},cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters}): result → {Result}", acquire, cacheKey, cacheKeyParameters, result);
 
         if (result != null)
             _concurrentCollection.Add(key, result);
 
+		_logger.LogDebug("<<< Exiting GetAsync(acquire={Acquire},cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", acquire, cacheKey, cacheKeyParameters);
         return result;
     }
         
@@ -58,8 +67,11 @@ public partial class PerRequestCacheManager : CacheKeyService, IShortTermCacheMa
     /// <param name="prefixParameters">Parameters to create cache key prefix</param>
     public virtual void RemoveByPrefix(string prefix, params object[] prefixParameters)
     {
+		_logger.LogDebug(">>> Entering RemoveByPrefix(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         var keyPrefix = PrepareKeyPrefix(prefix, prefixParameters);
         _concurrentCollection.Prune(keyPrefix, out _);
+		_logger.LogDebug("<<< Exiting RemoveByPrefix(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
+		_logger.LogDebug("RemoveByPrefix(prefix={Prefix},prefixParameters={PrefixParameters}): keyPrefix → {KeyPrefix}", prefix, prefixParameters, keyPrefix);
     }
         
     /// <summary>
@@ -69,7 +81,9 @@ public partial class PerRequestCacheManager : CacheKeyService, IShortTermCacheMa
     /// <param name="cacheKeyParameters">Parameters to create cache key</param>
     public virtual void Remove(string cacheKey, params object[] cacheKeyParameters)
     {
+		_logger.LogDebug(">>> Entering Remove(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         _concurrentCollection.Remove(PrepareKey(new CacheKey(cacheKey), cacheKeyParameters).Key);
+		_logger.LogDebug("<<< Exiting Remove(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
     }
 
     #endregion

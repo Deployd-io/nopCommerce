@@ -4,6 +4,7 @@
 //! author : Jeeeyul Lee <jeeeyul@gmail.com>
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('ko', {
     months: '1월_2월_3월_4월_5월_6월_7월_8월_9월_10월_11월_12월'.split('_'),
@@ -51,6 +52,7 @@ export default moment.defineLocale('ko', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(일|월|주)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'd':
             case 'D':
@@ -62,14 +64,18 @@ export default moment.defineLocale('ko', {
             case 'W':
                 return number + '주';
             default:
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },
     meridiemParse: /오전|오후/,
     isPM: function (token) {
+		logger.debug(`<<< Exiting isPM(token=<redacted>)`);
         return token === '오후';
     },
     meridiem: function (hour, minute, isUpper) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isUpper=${isUpper})`);
+		logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isUpper=${isUpper})`);
         return hour < 12 ? '오전' : '오후';
     },
 });

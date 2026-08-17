@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,15 +10,23 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record AddProductToFilterLevelValueSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToFilterLevelValueSearchModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToFilterLevelValueSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		_logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting AddProductToFilterLevelValueSearchModel()");
+		_logger.LogDebug("AddProductToFilterLevelValueSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
     }
 
     #endregion

@@ -4,6 +4,7 @@ using Nop.Core.Caching;
 using Nop.Core.Domain.Media;
 using Nop.Core.Infrastructure;
 using Nop.Services.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.AzureBlob.Services;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Misc.AzureBlob.Services;
 /// </summary>
 public class AzureThumbService : IThumbService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private static BlobContainerClient _blobContainerClient;
@@ -36,9 +38,14 @@ public class AzureThumbService : IThumbService
         INopFileProvider fileProvider,
         IStaticCacheManager staticCacheManager)
     {
+		_logger.LogDebug(">>> Entering AzureThumbService(azureBlobSettings={AzureBlobSettings},fileProvider={FileProvider},staticCacheManager={StaticCacheManager})", azureBlobSettings, fileProvider, staticCacheManager);
         _azureBlobSettings = azureBlobSettings;
         _fileProvider = fileProvider;
+		_logger.LogDebug("AzureThumbService(azureBlobSettings={AzureBlobSettings},fileProvider={FileProvider},staticCacheManager={StaticCacheManager}): _fileProvider → {_fileProvider}", azureBlobSettings, fileProvider, staticCacheManager, _fileProvider);
+		_logger.LogDebug("AzureThumbService(azureBlobSettings={AzureBlobSettings},fileProvider={FileProvider},staticCacheManager={StaticCacheManager}): _azureBlobSettings → {_azureBlobSettings}", azureBlobSettings, fileProvider, staticCacheManager, _azureBlobSettings);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("<<< Exiting AzureThumbService(azureBlobSettings={AzureBlobSettings},fileProvider={FileProvider},staticCacheManager={StaticCacheManager})", azureBlobSettings, fileProvider, staticCacheManager);
+		_logger.LogDebug("AzureThumbService(azureBlobSettings={AzureBlobSettings},fileProvider={FileProvider},staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", azureBlobSettings, fileProvider, staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -50,6 +57,8 @@ public class AzureThumbService : IThumbService
     /// </summary>
     private void Init()
     {
+		_logger.LogDebug(">>> Entering Init()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (_isInitialized)
             return;
 
@@ -68,17 +77,26 @@ public class AzureThumbService : IThumbService
                 return;
 
             _azureBlobStorageAppendContainerName = _azureBlobSettings.AppendContainerName;
+			_logger.LogDebug("Init(): _azureBlobStorageAppendContainerName → {_azureBlobStorageAppendContainerName}", _azureBlobStorageAppendContainerName);
+			_logger.LogInformation("Init(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
             _azureBlobStorageConnectionString = _azureBlobSettings.ConnectionString;
+			_logger.LogDebug("Init(): _azureBlobStorageConnectionString → {_azureBlobStorageConnectionString}", _azureBlobStorageConnectionString);
             _azureBlobStorageContainerName = _azureBlobSettings.ContainerName.Trim().ToLowerInvariant();
+			_logger.LogDebug("Init(): _azureBlobStorageContainerName → {_azureBlobStorageContainerName}", _azureBlobStorageContainerName);
             _azureBlobStorageEndPoint = _azureBlobSettings.EndPoint.Trim().ToLowerInvariant().TrimEnd('/');
+			_logger.LogDebug("Init(): _azureBlobStorageEndPoint → {_azureBlobStorageEndPoint}", _azureBlobStorageEndPoint);
 
             _blobServiceClient = new BlobServiceClient(_azureBlobStorageConnectionString);
+			_logger.LogDebug("Init(): _blobServiceClient → {_blobServiceClient}", _blobServiceClient);
             _blobContainerClient = _blobServiceClient.GetBlobContainerClient(_azureBlobStorageContainerName);
+			_logger.LogDebug("Init(): _blobContainerClient → {_blobContainerClient}", _blobContainerClient);
 
             _blobContainerClient.CreateIfNotExistsAsync(PublicAccessType.Blob).GetAwaiter().GetResult();
 
             _isInitialized = true;
+			_logger.LogDebug("Init(): _isInitialized → {_isInitialized}", _isInitialized);
         }
+		_logger.LogDebug("<<< Exiting Init()");
     }
 
     #endregion
@@ -95,10 +113,13 @@ public class AzureThumbService : IThumbService
     /// </returns>
     public Task<string> GetThumbLocalPathByFileNameAsync(string thumbFileName)
     {
+		_logger.LogDebug(">>> Entering GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName})", thumbFileName);
         Init();
 
         var path = _azureBlobStorageAppendContainerName ? $"{_azureBlobStorageContainerName}/" : string.Empty;
+		_logger.LogDebug("GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName}): path → {Path}", thumbFileName, path);
 
+		_logger.LogDebug("<<< Exiting GetThumbLocalPathByFileNameAsync(thumbFileName={ThumbFileName})", thumbFileName);
         return Task.FromResult($"{_azureBlobStorageEndPoint}/{path}{thumbFileName}");
     }
 
@@ -113,6 +134,8 @@ public class AzureThumbService : IThumbService
     /// </returns>
     public async Task<string> GetThumbUrlAsync(string thumbFileName, string storeLocation = null)
     {
+		_logger.LogDebug(">>> Entering GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation})", thumbFileName, storeLocation);
+		_logger.LogDebug("<<< Exiting GetThumbUrlAsync(thumbFileName={ThumbFileName},storeLocation={StoreLocation})", thumbFileName, storeLocation);
         return await GetThumbLocalPathByFileNameAsync(thumbFileName);
     }
 
@@ -123,19 +146,26 @@ public class AzureThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeletePictureThumbsAsync(Picture picture)
     {
+		_logger.LogDebug(">>> Entering DeletePictureThumbsAsync(picture={Picture})", picture);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         Init();
 
         //create a string containing the Blob name prefix
         var prefix = $"{picture.Id:0000000}";
+		_logger.LogDebug("DeletePictureThumbsAsync(picture={Picture}): prefix → {Prefix}", picture, prefix);
 
         var tasks = await _blobContainerClient
             .GetBlobsAsync(BlobTraits.All, BlobStates.All, prefix)
             .Select(blob => _blobContainerClient.DeleteBlobIfExistsAsync(blob.Name, DeleteSnapshotsOption.IncludeSnapshots))
             .Select(dummy => (Task)dummy)
             .ToListAsync();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("DeletePictureThumbsAsync(picture)={Picture}: database query executed in {Arg1} ms", picture, __logStart.ElapsedMilliseconds);
         await Task.WhenAll(tasks);
 
         await _staticCacheManager.RemoveByPrefixAsync(AzureBlobDefaults.ThumbsExistsPrefix);
+		_logger.LogDebug("<<< Exiting DeletePictureThumbsAsync(picture={Picture})", picture);
+		_logger.LogInformation("DeletePictureThumbsAsync(picture)={Picture}: external service call took {Arg1} ms", picture, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -148,7 +178,9 @@ public class AzureThumbService : IThumbService
     /// </returns>
     public async Task<string> GetThumbLocalPathAsync(string pictureUrl)
     {
+		_logger.LogDebug(">>> Entering GetThumbLocalPathAsync(pictureUrl={PictureUrl})", pictureUrl);
         if (string.IsNullOrEmpty(pictureUrl))
+		_logger.LogDebug("<<< Exiting GetThumbLocalPathAsync(pictureUrl={PictureUrl})", pictureUrl);
             return string.Empty;
 
         return await GetThumbLocalPathByFileNameAsync(_fileProvider.GetFileName(pictureUrl));
@@ -165,16 +197,22 @@ public class AzureThumbService : IThumbService
     /// </returns>
     public async Task<bool> GeneratedThumbExistsAsync(string thumbFilePath, string thumbFileName)
     {
+		_logger.LogDebug(">>> Entering GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName})", thumbFilePath, thumbFileName);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         Init();
 
         try
         {
             var key = _staticCacheManager.PrepareKeyForDefaultCache(AzureBlobDefaults.ThumbExistsCacheKey, thumbFileName);
+			_logger.LogWarning("GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName}): key → {Key}", thumbFilePath, thumbFileName, key);
 
             return await _staticCacheManager.GetAsync(key, async () => await _blobContainerClient.GetBlobClient(thumbFileName).ExistsAsync());
         }
         catch
         {
+			_logger.LogError("Exception in GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName}): {Arg2}", thumbFilePath, thumbFileName, ex.Message);
+			_logger.LogInformation("GeneratedThumbExistsAsync(thumbFilePath,thumbFileName)={ThumbFilePath},{ThumbFileName}: external service call took {Arg2} ms", thumbFilePath, thumbFileName, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GeneratedThumbExistsAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName})", thumbFilePath, thumbFileName);
             return false;
         }
     }
@@ -189,13 +227,18 @@ public class AzureThumbService : IThumbService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task SaveThumbAsync(string thumbFilePath, string thumbFileName, string mimeType, byte[] binary)
     {
+		_logger.LogDebug(">>> Entering SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary})", thumbFilePath, thumbFileName, mimeType, binary);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         Init();
 
         var blobClient = _blobContainerClient.GetBlobClient(thumbFileName);
+		_logger.LogDebug("SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary}): blobClient → {BlobClient}", thumbFilePath, thumbFileName, mimeType, binary, blobClient);
         await using var ms = new MemoryStream(binary);
+		_logger.LogDebug("SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary}): ms → {Ms}", thumbFilePath, thumbFileName, mimeType, binary, ms);
 
         //set mime type
         BlobHttpHeaders headers = null;
+		_logger.LogDebug("SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary}): headers → {Headers}", thumbFilePath, thumbFileName, mimeType, binary, headers);
         if (!string.IsNullOrWhiteSpace(mimeType))
             headers = new BlobHttpHeaders { ContentType = mimeType };
 
@@ -204,6 +247,7 @@ public class AzureThumbService : IThumbService
         {
             headers ??= new BlobHttpHeaders();
             headers.CacheControl = _azureBlobSettings.AzureCacheControlHeader;
+			_logger.LogDebug("SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary}): headers.CacheControl → {Arg4}", thumbFilePath, thumbFileName, mimeType, binary, headers.CacheControl);
         }
 
         if (headers is null)
@@ -214,6 +258,8 @@ public class AzureThumbService : IThumbService
             await blobClient.UploadAsync(ms, new BlobUploadOptions { HttpHeaders = headers });
 
         await _staticCacheManager.RemoveByPrefixAsync(AzureBlobDefaults.ThumbsExistsPrefix);
+		_logger.LogDebug("<<< Exiting SaveThumbAsync(thumbFilePath={ThumbFilePath},thumbFileName={ThumbFileName},mimeType={MimeType},binary={Binary})", thumbFilePath, thumbFileName, mimeType, binary);
+		_logger.LogInformation("SaveThumbAsync(thumbFilePath,thumbFileName,mimeType,binary)={ThumbFilePath},{ThumbFileName},{MimeType},{Binary}: external service call took {Arg4} ms", thumbFilePath, thumbFileName, mimeType, binary, __logStart.ElapsedMilliseconds);
     }
 
     #endregion

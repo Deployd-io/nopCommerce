@@ -12,6 +12,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Data.Mapping;
 using Nop.Data.Mapping.Builders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Extensions;
 
@@ -20,6 +21,7 @@ namespace Nop.Data.Extensions;
 /// </summary>
 public static class FluentMigratorExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region  Utils
 
     private const int DATE_TIME_PRECISION = 6;
@@ -83,8 +85,11 @@ public static class FluentMigratorExtensions
     /// </summary>
     public static ICreateTableColumnOptionOrWithColumnSyntax AsNopDateTime2(this ICreateTableColumnAsTypeSyntax syntax)
     {
+		_logger.LogDebug(">>> Entering AsNopDateTime2(syntax={Syntax})", syntax);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		_logger.LogDebug("AsNopDateTime2(syntax={Syntax}): dataSettings → {DataSettings}", syntax, dataSettings);
+		_logger.LogDebug("<<< Exiting AsNopDateTime2(syntax={Syntax})", syntax);
         return dataSettings.DataProvider switch
         {
             DataProviderType.MySql => syntax.AsCustom($"datetime({DATE_TIME_PRECISION})"),
@@ -140,9 +145,13 @@ public static class FluentMigratorExtensions
     /// <typeparam name="TEntity">Entity type</typeparam>
     public static void TableFor<TEntity>(this ICreateExpressionRoot expressionRoot) where TEntity : BaseEntity
     {
+		_logger.LogDebug(">>> Entering TableFor(expressionRoot={ExpressionRoot})", expressionRoot);
         var type = typeof(TEntity);
         var builder = expressionRoot.Table(NameCompatibilityManager.GetTableName(type)) as CreateTableExpressionBuilder;
+		_logger.LogDebug("TableFor(expressionRoot={ExpressionRoot}): builder → {Builder}", expressionRoot, builder);
+		_logger.LogDebug("TableFor(expressionRoot={ExpressionRoot}): type → {Type}", expressionRoot, type);
         builder.RetrieveTableExpressions(type);
+		_logger.LogDebug("<<< Exiting TableFor(expressionRoot={ExpressionRoot})", expressionRoot);
     }
 
     /// <summary>
@@ -193,7 +202,9 @@ public static class FluentMigratorExtensions
 
     public static (Type propType, bool canBeNullable) GetTypeToMap(this Type type)
     {
+		_logger.LogDebug(">>> Entering GetTypeToMap(propType={PropType},canBeNullable={CanBeNullable})", propType, canBeNullable);
         if (Nullable.GetUnderlyingType(type) is Type uType)
+		_logger.LogDebug("<<< Exiting GetTypeToMap(propType={PropType},canBeNullable={CanBeNullable})", propType, canBeNullable);
             return (uType, true);
 
         return (type, false);

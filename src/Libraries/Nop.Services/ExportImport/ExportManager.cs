@@ -254,6 +254,7 @@ public partial class ExportManager : IExportManager
 
             await xmlWriter.WriteStartElementAsync("SubCategories");
             totalCategories = await WriteCategoriesAsync(xmlWriter, category.Id, totalCategories);
+			_logger.LogDebug("WriteCategoriesAsync(xmlWriter={XmlWriter},parentCategoryId={ParentCategoryId},totalCategories={TotalCategories}): totalCategories → {TotalCategories1}", xmlWriter, parentCategoryId, totalCategories, totalCategories);
             await xmlWriter.WriteEndElementAsync();
             await xmlWriter.WriteEndElementAsync();
         }
@@ -271,10 +272,13 @@ public partial class ExportManager : IExportManager
     /// </returns>
     protected virtual async Task<string> GetPicturesAsync(int pictureId)
     {
+		_logger.LogDebug(">>> Entering GetPicturesAsync(pictureId={PictureId})", pictureId);
         var picture = await _pictureService.GetPictureByIdAsync(pictureId);
 
+		_logger.LogDebug("GetPicturesAsync(pictureId={PictureId}): picture → {Picture}", pictureId, picture);
         var (pictureUrl, _) = await _pictureService.GetPictureUrlAsync(picture);
 
+		_logger.LogDebug("<<< Exiting GetPicturesAsync(pictureId={PictureId})", pictureId);
         return await _thumbService.GetThumbLocalPathAsync(pictureUrl);
     }
 
@@ -348,11 +352,13 @@ public partial class ExportManager : IExportManager
     /// </returns>
     protected virtual async Task<object> GetLimitedToStoresAsync<TEntity>(TEntity entity) where TEntity : BaseEntity, IStoreMappingSupported
     {
+		_logger.LogDebug(">>> Entering GetLimitedToStoresAsync(entity={Entity})", entity);
         string limitedToStores = null;
 
         foreach (var storeMapping in await _storeMappingService.GetStoreMappingsAsync(entity))
         {
             var store = await _storeService.GetStoreByIdAsync(storeMapping.StoreId);
+			_logger.LogDebug("GetLimitedToStoresAsync(entity={Entity}): store → {Store}", entity, store);
 
             if (store == null)
                 continue;
@@ -362,6 +368,7 @@ public partial class ExportManager : IExportManager
             limitedToStores += ";";
         }
 
+		_logger.LogDebug("<<< Exiting GetLimitedToStoresAsync(entity={Entity})", entity);
         return limitedToStores;
     }
 
@@ -435,12 +442,15 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<bool> IgnoreExportCategoryPropertyAsync()
     {
+		_logger.LogDebug(">>> Entering IgnoreExportCategoryPropertyAsync()");
         try
         {
             return !await _genericAttributeService.GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), "category-advanced-mode");
         }
         catch (ArgumentNullException)
         {
+			_logger.LogError("Exception in IgnoreExportCategoryPropertyAsync(): {Arg0}", ArgumentNullException.Message);
+			_logger.LogDebug("<<< Exiting IgnoreExportCategoryPropertyAsync()");
             return false;
         }
     }
@@ -448,12 +458,15 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<bool> IgnoreExportManufacturerPropertyAsync()
     {
+		_logger.LogDebug(">>> Entering IgnoreExportManufacturerPropertyAsync()");
         try
         {
             return !await _genericAttributeService.GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), "manufacturer-advanced-mode");
         }
         catch (ArgumentNullException)
         {
+			_logger.LogError("Exception in IgnoreExportManufacturerPropertyAsync(): {Arg0}", ArgumentNullException.Message);
+			_logger.LogDebug("<<< Exiting IgnoreExportManufacturerPropertyAsync()");
             return false;
         }
     }
@@ -461,6 +474,8 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<bool> ProductIgnoreExportLimitedToStoreAsync()
     {
+		_logger.LogDebug(">>> Entering ProductIgnoreExportLimitedToStoreAsync()");
+		_logger.LogDebug("<<< Exiting ProductIgnoreExportLimitedToStoreAsync()");
         return _catalogSettings.IgnoreStoreLimitations ||
                !_catalogSettings.ExportImportProductUseLimitedToStores ||
                (await _storeService.GetAllStoresAsync()).Count == 1;
@@ -469,6 +484,8 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<bool> CategoryIgnoreExportLimitedToStoreAsync()
     {
+		_logger.LogDebug(">>> Entering CategoryIgnoreExportLimitedToStoreAsync()");
+		_logger.LogDebug("<<< Exiting CategoryIgnoreExportLimitedToStoreAsync()");
         return _catalogSettings.IgnoreStoreLimitations ||
             !_catalogSettings.ExportImportCategoryUseLimitedToStores ||
             (await _storeService.GetAllStoresAsync()).Count == 1;
@@ -481,6 +498,7 @@ public partial class ExportManager : IExportManager
         if (entity == null)
             return default;
 
+		_logger.LogDebug("<<< Exiting GetLocalizedAsync(entity={Entity},Expression<Func<TEntity={Arg1},keySelector={KeySelector},language={Language})", entity, Expression<Func<TEntity, keySelector, language);
         return await _localizationService.GetLocalizedAsync(entity, keySelector, language.Id, false);
     }
 
@@ -698,6 +716,7 @@ public partial class ExportManager : IExportManager
                             PictureIds = string.Join(";",
                                 (await _productAttributeService.GetProductAttributeValuePicturesAsync(pav.Id)).Select(vp => vp.PictureId))
                         }).ToListAsync();
+								var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
                     return productAttributes;
                 }
@@ -859,6 +878,7 @@ public partial class ExportManager : IExportManager
         await using var stream = new MemoryStream();
         // ok, we can run the real code of the sample now
         using (var workbook = new XLWorkbook())
+		using Microsoft.Extensions.Logging;
         {
             // uncomment this line if you want the XML written out to the outputDir
             //xlPackage.DebugMode = true; 
@@ -876,6 +896,7 @@ public partial class ExportManager : IExportManager
             var row = 2;
             foreach (var order in itemsToExport)
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 manager.CurrentObject = order;
                 await manager.WriteDefaultToXlsxAsync(worksheet, row++);
 
@@ -911,6 +932,8 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<object> GetCustomCustomerAttributesAsync(Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetCustomCustomerAttributesAsync(customer={Customer})", customer);
+		_logger.LogDebug("<<< Exiting GetCustomCustomerAttributesAsync(customer={Customer})", customer);
         return await _customerAttributeFormatter.FormatAttributesAsync(customer.CustomCustomerAttributesXML, ";");
     }
 
@@ -1000,6 +1023,7 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<string> ExportManufacturersToXmlAsync(IList<Manufacturer> manufacturers)
     {
+		_logger.LogDebug(">>> Entering ExportManufacturersToXmlAsync(manufacturers={Manufacturers})", manufacturers);
         var settings = new XmlWriterSettings
         {
             Async = true,
@@ -1007,13 +1031,16 @@ public partial class ExportManager : IExportManager
         };
 
         await using var stringWriter = new StringWriter();
+		_logger.LogDebug("ExportManufacturersToXmlAsync(manufacturers={Manufacturers}): stringWriter → {StringWriter}", manufacturers, stringWriter);
         await using var xmlWriter = XmlWriter.Create(stringWriter, settings);
+		_logger.LogDebug("ExportManufacturersToXmlAsync(manufacturers={Manufacturers}): xmlWriter → {XmlWriter}", manufacturers, xmlWriter);
 
         await xmlWriter.WriteStartDocumentAsync();
         await xmlWriter.WriteStartElementAsync("Manufacturers");
         await xmlWriter.WriteAttributeStringAsync("Version", NopVersion.CURRENT_VERSION);
 
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ExportManufacturersToXmlAsync(manufacturers={Manufacturers}): languages → {Languages}", manufacturers, languages);
 
         foreach (var manufacturer in manufacturers)
         {
@@ -1043,11 +1070,13 @@ public partial class ExportManager : IExportManager
 
             await xmlWriter.WriteStartElementAsync("Products");
             var productManufacturers = await _manufacturerService.GetProductManufacturersByManufacturerIdAsync(manufacturer.Id, showHidden: true);
+			_logger.LogDebug("ExportManufacturersToXmlAsync(manufacturers={Manufacturers}): productManufacturers → {ProductManufacturers}", manufacturers, productManufacturers);
             if (productManufacturers != null)
             {
                 foreach (var productManufacturer in productManufacturers)
                 {
                     var product = await _productService.GetProductByIdAsync(productManufacturer.ProductId);
+					_logger.LogDebug("ExportManufacturersToXmlAsync(manufacturers={Manufacturers}): product → {Product}", manufacturers, product);
                     if (product == null || product.Deleted)
                         continue;
 
@@ -1073,6 +1102,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportManufacturers",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportManufacturers"), manufacturers.Count));
 
+		_logger.LogDebug("<<< Exiting ExportManufacturersToXmlAsync(manufacturers={Manufacturers})", manufacturers);
         return stringWriter.ToString();
     }
 
@@ -1083,8 +1113,10 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<byte[]> ExportManufacturersToXlsxAsync(IList<Manufacturer> manufacturers)
     {
+		_logger.LogDebug(">>> Entering ExportManufacturersToXlsxAsync(manufacturers={Manufacturers})", manufacturers);
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
 
+		_logger.LogDebug("ExportManufacturersToXlsxAsync(manufacturers={Manufacturers}): languages → {Languages}", manufacturers, languages);
         var localizedProperties = new[]
         {
             new PropertyByName<Manufacturer>("Id", (p, _) => p.Id),
@@ -1122,6 +1154,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportManufacturers",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportManufacturers"), manufacturers.Count()));
 
+		_logger.LogDebug("<<< Exiting ExportManufacturersToXlsxAsync(manufacturers={Manufacturers})", manufacturers);
         return await manager.ExportToXlsxAsync(manufacturers);
     }
 
@@ -1134,6 +1167,7 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<string> ExportCategoriesToXmlAsync()
     {
+		_logger.LogDebug(">>> Entering ExportCategoriesToXmlAsync()");
         var settings = new XmlWriterSettings
         {
             Async = true,
@@ -1141,12 +1175,15 @@ public partial class ExportManager : IExportManager
         };
 
         await using var stringWriter = new StringWriter();
+		_logger.LogDebug("ExportCategoriesToXmlAsync(): stringWriter → {StringWriter}", stringWriter);
         await using var xmlWriter = XmlWriter.Create(stringWriter, settings);
+		_logger.LogDebug("ExportCategoriesToXmlAsync(): xmlWriter → {XmlWriter}", xmlWriter);
 
         await xmlWriter.WriteStartDocumentAsync();
         await xmlWriter.WriteStartElementAsync("Categories");
         await xmlWriter.WriteAttributeStringAsync("Version", NopVersion.CURRENT_VERSION);
         var totalCategories = await WriteCategoriesAsync(xmlWriter, 0, 0);
+		_logger.LogDebug("ExportCategoriesToXmlAsync(): totalCategories → {TotalCategories}", totalCategories);
         await xmlWriter.WriteEndElementAsync();
         await xmlWriter.WriteEndDocumentAsync();
         await xmlWriter.FlushAsync();
@@ -1155,6 +1192,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportCategories",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportCategories"), totalCategories));
 
+		_logger.LogDebug("<<< Exiting ExportCategoriesToXmlAsync()");
         return stringWriter.ToString();
     }
 
@@ -1232,6 +1270,7 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<string> ExportProductsToXmlAsync(IList<Product> products)
     {
+		_logger.LogDebug(">>> Entering ExportProductsToXmlAsync(products={Products})", products);
         var settings = new XmlWriterSettings
         {
             Async = true,
@@ -1239,14 +1278,18 @@ public partial class ExportManager : IExportManager
         };
 
         await using var stringWriter = new StringWriter();
+		_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): stringWriter → {StringWriter}", products, stringWriter);
         await using var xmlWriter = XmlWriter.Create(stringWriter, settings);
+		_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): xmlWriter → {XmlWriter}", products, xmlWriter);
 
         await xmlWriter.WriteStartDocumentAsync();
         await xmlWriter.WriteStartElementAsync("Products");
         await xmlWriter.WriteAttributeStringAsync("Version", NopVersion.CURRENT_VERSION);
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): currentVendor → {CurrentVendor}", products, currentVendor);
 
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): languages → {Languages}", products, languages);
 
         foreach (var product in products)
         {
@@ -1370,6 +1413,7 @@ public partial class ExportManager : IExportManager
             {
                 await xmlWriter.WriteStartElementAsync("TierPrices");
                 var tierPrices = await _productService.GetTierPricesByProductAsync(product.Id);
+				_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): tierPrices → {TierPrices}", products, tierPrices);
                 foreach (var tierPrice in tierPrices)
                 {
                     await xmlWriter.WriteStartElementAsync("TierPrice");
@@ -1394,6 +1438,7 @@ public partial class ExportManager : IExportManager
                 foreach (var productAttributeMapping in productAttributMappings)
                 {
                     var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(productAttributeMapping.ProductAttributeId);
+					_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productAttribute → {ProductAttribute}", products, productAttribute);
 
                     await xmlWriter.WriteStartElementAsync("ProductAttributeMapping");
                     await xmlWriter.WriteStringAsync("ProductAttributeMappingId", productAttributeMapping.Id);
@@ -1437,6 +1482,7 @@ public partial class ExportManager : IExportManager
 
                     await xmlWriter.WriteStartElementAsync("ProductAttributeValues");
                     var productAttributeValues = await _productAttributeService.GetProductAttributeValuesAsync(productAttributeMapping.Id);
+					_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productAttributeValues → {ProductAttributeValues}", products, productAttributeValues);
                     foreach (var productAttributeValue in productAttributeValues)
                     {
                         await xmlWriter.WriteStartElementAsync("ProductAttributeValue");
@@ -1468,6 +1514,7 @@ public partial class ExportManager : IExportManager
 
             await xmlWriter.WriteStartElementAsync("ProductPictures");
             var productPictures = await _productService.GetProductPicturesByProductIdAsync(product.Id);
+			_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productPictures → {ProductPictures}", products, productPictures);
             foreach (var productPicture in productPictures)
             {
                 await xmlWriter.WriteStartElementAsync("ProductPicture");
@@ -1481,6 +1528,7 @@ public partial class ExportManager : IExportManager
 
             await xmlWriter.WriteStartElementAsync("ProductCategories");
             var productCategories = await _categoryService.GetProductCategoriesByProductIdAsync(product.Id, true);
+			_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productCategories → {ProductCategories}", products, productCategories);
             if (productCategories != null)
             {
                 foreach (var productCategory in productCategories)
@@ -1500,6 +1548,7 @@ public partial class ExportManager : IExportManager
             {
                 await xmlWriter.WriteStartElementAsync("ProductManufacturers");
                 var productManufacturers = await _manufacturerService.GetProductManufacturersByProductIdAsync(product.Id);
+				_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productManufacturers → {ProductManufacturers}", products, productManufacturers);
                 if (productManufacturers != null)
                 {
                     foreach (var productManufacturer in productManufacturers)
@@ -1520,6 +1569,7 @@ public partial class ExportManager : IExportManager
             {
                 await xmlWriter.WriteStartElementAsync("ProductSpecificationAttributes");
                 var productSpecificationAttributes = await _specificationAttributeService.GetProductSpecificationAttributesAsync(product.Id);
+				_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productSpecificationAttributes → {ProductSpecificationAttributes}", products, productSpecificationAttributes);
                 foreach (var productSpecificationAttribute in productSpecificationAttributes)
                 {
                     await xmlWriter.WriteStartElementAsync("ProductSpecificationAttribute");
@@ -1539,6 +1589,7 @@ public partial class ExportManager : IExportManager
             {
                 await xmlWriter.WriteStartElementAsync("ProductTags");
                 var productTags = await _productTagService.GetAllProductTagsByProductIdAsync(product.Id);
+				_logger.LogDebug("ExportProductsToXmlAsync(products={Products}): productTags → {ProductTags}", products, productTags);
                 foreach (var productTag in productTags)
                 {
                     await xmlWriter.WriteStartElementAsync("ProductTag");
@@ -1561,6 +1612,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportProducts",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportProducts"), products.Count));
 
+		_logger.LogDebug("<<< Exiting ExportProductsToXmlAsync(products={Products})", products);
         return stringWriter.ToString();
     }
 
@@ -1571,8 +1623,11 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<byte[]> ExportProductsToXlsxAsync(IEnumerable<Product> products)
     {
+		_logger.LogDebug(">>> Entering ExportProductsToXlsxAsync(products={Products})", products);
         var currentVendor = await _workContext.GetCurrentVendorAsync();
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
+		_logger.LogDebug("ExportProductsToXlsxAsync(products={Products}): languages → {Languages}", products, languages);
+		_logger.LogDebug("ExportProductsToXlsxAsync(products={Products}): currentVendor → {CurrentVendor}", products, currentVendor);
 
         var localizedProperties = new[]
         {
@@ -1587,12 +1642,14 @@ public partial class ExportManager : IExportManager
         };
 
         var productAdvancedMode = true;
+		_logger.LogDebug("ExportProductsToXlsxAsync(products={Products}): productAdvancedMode → {ProductAdvancedMode}", products, productAdvancedMode);
         try
         {
             productAdvancedMode = await _genericAttributeService.GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), "product-advanced-mode");
         }
         catch (ArgumentNullException)
         {
+		_logger.LogError("Exception in ExportProductsToXlsxAsync(products={Products}): {Arg1}", products, ArgumentNullException.Message);
         }
 
         var properties = new[]
@@ -1756,6 +1813,7 @@ public partial class ExportManager : IExportManager
         };
 
         var productList = products.ToList();
+		_logger.LogDebug("ExportProductsToXlsxAsync(products={Products}): productList → {ProductList}", products, productList);
 
         if (!_catalogSettings.ExportImportProductAttributes && !_catalogSettings.ExportImportProductSpecificationAttributes)
             return await new PropertyManager<Product>(properties, _catalogSettings).ExportToXlsxAsync(productList);
@@ -1765,6 +1823,7 @@ public partial class ExportManager : IExportManager
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportProducts"), productList.Count));
 
         if (productAdvancedMode || _productEditorSettings.ProductAttributes || _productEditorSettings.SpecificationAttributes || _productEditorSettings.TierPrices)
+		_logger.LogDebug("<<< Exiting ExportProductsToXlsxAsync(products={Products})", products);
             return await ExportProductsToXlsxWithAdditionalInfoAsync(properties, localizedProperties, productList, languages);
 
         return await new PropertyManager<Product>(properties, _catalogSettings, localizedProperties, languages).ExportToXlsxAsync(productList);
@@ -2020,8 +2079,10 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<byte[]> ExportCustomersToXlsxAsync(IList<Customer> customers)
     {
+		_logger.LogDebug(">>> Entering ExportCustomersToXlsxAsync(customers={Customers})", customers);
         var vendors = await _vendorService.GetVendorsByCustomerIdsAsync(customers.Select(c => c.Id).ToArray());
 
+		_logger.LogDebug("ExportCustomersToXlsxAsync(customers={Customers}): vendors → {Vendors}", customers, vendors);
         object getVendor(Customer customer)
         {
             if (!_catalogSettings.ExportImportRelatedEntitiesByName)
@@ -2032,25 +2093,31 @@ public partial class ExportManager : IExportManager
 
         async Task<object> getCountry(Customer customer)
         {
+			_logger.LogDebug(">>> Entering getCountry(customer={Customer})", customer);
             var countryId = customer.CountryId;
 
             if (!_catalogSettings.ExportImportRelatedEntitiesByName)
                 return countryId;
 
             var country = await _countryService.GetCountryByIdAsync(countryId);
+			_logger.LogDebug("getCountry(customer={Customer}): country → {Country}", customer, country);
 
+			_logger.LogDebug("<<< Exiting getCountry(customer={Customer})", customer);
             return country?.Name ?? string.Empty;
         }
 
         async Task<object> getStateProvince(Customer customer)
         {
+			_logger.LogDebug(">>> Entering getStateProvince(customer={Customer})", customer);
             var stateProvinceId = customer.StateProvinceId;
 
             if (!_catalogSettings.ExportImportRelatedEntitiesByName)
                 return stateProvinceId;
 
             var stateProvince = await _stateProvinceService.GetStateProvinceByIdAsync(stateProvinceId);
+			_logger.LogDebug("getStateProvince(customer={Customer}): stateProvince → {StateProvince}", customer, stateProvince);
 
+			_logger.LogDebug("<<< Exiting getStateProvince(customer={Customer})", customer);
             return stateProvince?.Name ?? string.Empty;
         }
 
@@ -2136,6 +2203,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportCustomers",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportCustomers"), customers.Count));
 
+		_logger.LogDebug("<<< Exiting ExportCustomersToXlsxAsync(customers={Customers})", customers);
         return await manager.ExportToXlsxAsync(customers);
     }
 
@@ -2149,6 +2217,7 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<string> ExportCustomersToXmlAsync(IList<Customer> customers)
     {
+		_logger.LogDebug(">>> Entering ExportCustomersToXmlAsync(customers={Customers})", customers);
         var settings = new XmlWriterSettings
         {
             Async = true,
@@ -2156,7 +2225,9 @@ public partial class ExportManager : IExportManager
         };
 
         await using var stringWriter = new StringWriter();
+		_logger.LogDebug("ExportCustomersToXmlAsync(customers={Customers}): stringWriter → {StringWriter}", customers, stringWriter);
         await using var xmlWriter = XmlWriter.Create(stringWriter, settings);
+		_logger.LogDebug("ExportCustomersToXmlAsync(customers={Customers}): xmlWriter → {XmlWriter}", customers, xmlWriter);
 
         await xmlWriter.WriteStartDocumentAsync();
         await xmlWriter.WriteStartElementAsync("Customers");
@@ -2206,7 +2277,9 @@ public partial class ExportManager : IExportManager
             if (!string.IsNullOrEmpty(customer.CustomCustomerAttributesXML))
             {
                 var selectedCustomerAttributes = new StringReader(customer.CustomCustomerAttributesXML);
+				_logger.LogDebug("ExportCustomersToXmlAsync(customers={Customers}): selectedCustomerAttributes → {SelectedCustomerAttributes}", customers, selectedCustomerAttributes);
                 var selectedCustomerAttributesXmlReader = XmlReader.Create(selectedCustomerAttributes);
+				_logger.LogDebug("ExportCustomersToXmlAsync(customers={Customers}): selectedCustomerAttributesXmlReader → {SelectedCustomerAttributesXmlReader}", customers, selectedCustomerAttributesXmlReader);
                 await xmlWriter.WriteNodeAsync(selectedCustomerAttributesXmlReader, false);
             }
 
@@ -2221,6 +2294,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportCustomers",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportCustomers"), customers.Count));
 
+		_logger.LogDebug("<<< Exiting ExportCustomersToXmlAsync(customers={Customers})", customers);
         return stringWriter.ToString();
     }
 
@@ -2234,10 +2308,13 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<string> ExportNewsLetterSubscribersToTxtAsync(IList<NewsLetterSubscription> subscriptions)
     {
+		_logger.LogDebug(">>> Entering ExportNewsLetterSubscribersToTxtAsync(subscriptions={Subscriptions})", subscriptions);
         ArgumentNullException.ThrowIfNull(subscriptions);
 
         const char separator = ',';
+		_logger.LogDebug("ExportNewsLetterSubscribersToTxtAsync(subscriptions={Subscriptions}): separator → {Separator}", subscriptions, separator);
         var sb = new StringBuilder();
+		_logger.LogDebug("ExportNewsLetterSubscribersToTxtAsync(subscriptions={Subscriptions}): sb → {Sb}", subscriptions, sb);
 
         sb.Append(await _localizationService.GetResourceAsync("Admin.Promotions.NewsLetterSubscription.Fields.Email"));
         sb.Append(separator);
@@ -2268,6 +2345,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportNewsLetterSubscriptions",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportNewsLetterSubscriptions"), subscriptions.Count));
 
+		_logger.LogDebug("<<< Exiting ExportNewsLetterSubscribersToTxtAsync(subscriptions={Subscriptions})", subscriptions);
         return sb.ToString();
     }
 
@@ -2281,10 +2359,13 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<string> ExportStatesToTxtAsync(IList<StateProvince> states)
     {
+		_logger.LogDebug(">>> Entering ExportStatesToTxtAsync(states={States})", states);
         ArgumentNullException.ThrowIfNull(states);
 
         const char separator = ',';
+		_logger.LogDebug("ExportStatesToTxtAsync(states={States}): separator → {Separator}", states, separator);
         var sb = new StringBuilder();
+		_logger.LogDebug("ExportStatesToTxtAsync(states={States}): sb → {Sb}", states, sb);
         foreach (var state in states)
         {
             sb.Append((await _countryService.GetCountryByIdAsync(state.CountryId)).TwoLetterIsoCode);
@@ -2303,6 +2384,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportStates",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportStates"), states.Count));
 
+		_logger.LogDebug("<<< Exiting ExportStatesToTxtAsync(states={States})", states);
         return sb.ToString();
     }
 
@@ -2317,6 +2399,7 @@ public partial class ExportManager : IExportManager
     /// </returns>
     public virtual async Task<byte[]> ExportCustomerGdprInfoToXlsxAsync(Customer customer, int storeId)
     {
+		_logger.LogDebug(">>> Entering ExportCustomerGdprInfoToXlsxAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         ArgumentNullException.ThrowIfNull(customer);
 
         //lambda expressions for choosing correct order address
@@ -2383,6 +2466,7 @@ public partial class ExportManager : IExportManager
             new PropertyByName<Order>("Shipping phone number", async (p, _) => (await orderAddress(p))?.PhoneNumber ?? string.Empty, !_addressSettings.PhoneEnabled),
             new PropertyByName<Order>("Shipping fax number", async (p, _) => (await orderAddress(p))?.FaxNumber ?? string.Empty, !_addressSettings.FaxEnabled)
         }, _catalogSettings);
+				_logger.LogDebug(">>> Entering async(p={P},_={_})", p, _);
 
         var orderItemsManager = new PropertyManager<OrderItem>(new[]
         {
@@ -2392,6 +2476,7 @@ public partial class ExportManager : IExportManager
             new PropertyByName<OrderItem>("Quantity", (oi, _) => oi.Quantity),
             new PropertyByName<OrderItem>("Total", async (oi, _) => await _priceFormatter.FormatPriceAsync((await _orderService.GetOrderByIdAsync(oi.OrderId)).CustomerTaxDisplayType == TaxDisplayType.IncludingTax ? oi.PriceInclTax : oi.PriceExclTax))
         }, _catalogSettings);
+			_logger.LogDebug("<<< Exiting async(p={P},_={_})", p, _);
 
         var orders = await _orderService.SearchOrdersAsync(customerId: customer.Id);
 
@@ -2554,6 +2639,7 @@ public partial class ExportManager : IExportManager
             workbook.SaveAs(stream);
         }
 
+		_logger.LogDebug("<<< Exiting ExportCustomerGdprInfoToXlsxAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return stream.ToArray();
     }
 
@@ -2564,8 +2650,10 @@ public partial class ExportManager : IExportManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<byte[]> ExportFilterLevelValuesToXlsxAsync(IList<FilterLevelValue> filterLevelValues)
     {
+		_logger.LogDebug(">>> Entering ExportFilterLevelValuesToXlsxAsync(filterLevelValues={FilterLevelValues})", filterLevelValues);
         var languages = await _languageService.GetAllLanguagesAsync(showHidden: true);
 
+		_logger.LogDebug("ExportFilterLevelValuesToXlsxAsync(filterLevelValues={FilterLevelValues}): languages → {Languages}", filterLevelValues, languages);
         var localizedProperties = new[]
         {
             new PropertyByName<FilterLevelValue>("Id", (p, _) => p.Id),
@@ -2587,6 +2675,7 @@ public partial class ExportManager : IExportManager
         await _customerActivityService.InsertActivityAsync("ExportFilterLevelValues",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.ExportFilterLevelValues"), filterLevelValues.Count));
 
+		_logger.LogDebug("<<< Exiting ExportFilterLevelValuesToXlsxAsync(filterLevelValues={FilterLevelValues})", filterLevelValues);
         return await manager.ExportToXlsxAsync(filterLevelValues);
     }
 

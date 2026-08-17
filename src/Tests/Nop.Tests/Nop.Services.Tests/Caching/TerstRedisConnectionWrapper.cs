@@ -2,11 +2,13 @@
 using Moq;
 using Nop.Services.Caching;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Caching;
 
 internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected static int _npp = 1;
 
     protected readonly ISubscriber _subscriber = new TestSubscriber();
@@ -17,14 +19,21 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
 
     public TestRedisConnectionWrapper()
     {
+		_logger.LogDebug(">>> Entering TestRedisConnectionWrapper()");
         _instance = $"test_redis_connection_wrapper_{_npp}";
         var database = new Mock<IDatabase>();
+		_logger.LogDebug("TestRedisConnectionWrapper(): database → {Database}", database);
+		_logger.LogDebug("TestRedisConnectionWrapper(): _instance → {_instance}", _instance);
         database.Setup(d => d.Database).Returns(_npp);
         _database = database.Object;
+		_logger.LogDebug("TestRedisConnectionWrapper(): _database → {_database}", _database);
         var server = new Mock<IServer>();
+		_logger.LogDebug("TestRedisConnectionWrapper(): server → {Server}", server);
         _server = server.Object;
+		_logger.LogDebug("TestRedisConnectionWrapper(): _server → {_server}", _server);
 
         _npp += 1;
+		_logger.LogDebug("<<< Exiting TestRedisConnectionWrapper()");
     }
 
     /// <summary>
@@ -33,6 +42,8 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Redis cache database</returns>
     public Task<IDatabase> GetDatabaseAsync()
     {
+		_logger.LogDebug(">>> Entering GetDatabaseAsync()");
+		_logger.LogDebug("<<< Exiting GetDatabaseAsync()");
         return Task.FromResult(GetDatabase());
     }
 
@@ -42,6 +53,8 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Redis cache database</returns>
     public IDatabase GetDatabase()
     {
+		_logger.LogDebug(">>> Entering GetDatabase()");
+		_logger.LogDebug("<<< Exiting GetDatabase()");
         return _database;
     }
 
@@ -52,6 +65,8 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Redis server</returns>
     public Task<IServer> GetServerAsync(EndPoint endPoint)
     {
+		_logger.LogDebug(">>> Entering GetServerAsync(endPoint={EndPoint})", endPoint);
+		_logger.LogDebug("<<< Exiting GetServerAsync(endPoint={EndPoint})", endPoint);
         return Task.FromResult(_server);
     }
 
@@ -61,6 +76,8 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Array of endpoints</returns>
     public Task<EndPoint[]> GetEndPointsAsync()
     {
+		_logger.LogDebug(">>> Entering GetEndPointsAsync()");
+		_logger.LogDebug("<<< Exiting GetEndPointsAsync()");
         return Task.FromResult(new[] { _server.EndPoint });
     }
 
@@ -70,6 +87,8 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Array of endpoints</returns>
     public Task<ISubscriber> GetSubscriberAsync()
     {
+		_logger.LogDebug(">>> Entering GetSubscriberAsync()");
+		_logger.LogDebug("<<< Exiting GetSubscriberAsync()");
         return Task.FromResult(GetSubscriber());
     }
 
@@ -79,6 +98,8 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// <returns>Array of endpoints</returns>
     public ISubscriber GetSubscriber()
     {
+		_logger.LogDebug(">>> Entering GetSubscriber()");
+		_logger.LogDebug("<<< Exiting GetSubscriber()");
         return _subscriber;
     }
 
@@ -87,7 +108,9 @@ internal class TestRedisConnectionWrapper : IRedisConnectionWrapper
     /// </summary>
     public async Task FlushDatabaseAsync()
     {
+		_logger.LogDebug(">>> Entering FlushDatabaseAsync()");
         await _server.FlushDatabaseAsync(_database.Database);
+		_logger.LogDebug("<<< Exiting FlushDatabaseAsync()");
     }
 
     /// <summary>

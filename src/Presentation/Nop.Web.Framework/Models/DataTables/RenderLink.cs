@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderLink : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -13,7 +15,10 @@ public partial class RenderLink : IRender
     /// <param name="url">URL</param>
     public RenderLink(DataUrl url)
     {
+		_logger.LogDebug(">>> Entering RenderLink(url={Url})", url);
         Url = url;
+		_logger.LogDebug("<<< Exiting RenderLink(url={Url})", url);
+		_logger.LogInformation("RenderLink(url={Url}): Url → {Url1}", url, Url);
     }
 
     #endregion

@@ -6,6 +6,7 @@
 //! comment : Vivakvo corrected the translation by colindean and miestasmia
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('eo', {
     months: 'januaro_februaro_marto_aprilo_majo_junio_julio_aŭgusto_septembro_oktobro_novembro_decembro'.split(
@@ -26,12 +27,16 @@ export default moment.defineLocale('eo', {
     },
     meridiemParse: /[ap]\.t\.m/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return input.charAt(0).toLowerCase() === 'p';
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours > 11) {
             return isLower ? 'p.t.m.' : 'P.T.M.';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'a.t.m.' : 'A.T.M.';
         }
     },

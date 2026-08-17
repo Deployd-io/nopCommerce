@@ -11,6 +11,7 @@ using Nop.Services.Localization;
 using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Services;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.Misc.Brevo.Services;
 /// </summary>
 public class BrevoMessageService : WorkflowMessageService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly BrevoManager _brevoEmailManager;
@@ -203,6 +205,7 @@ public class BrevoMessageService : WorkflowMessageService
 
         //queue email
         await _queuedEmailService.InsertQueuedEmailAsync(email);
+		_logger.LogDebug("<<< Exiting SendEmailNotificationAsync(messageTemplate={MessageTemplate},emailAccount={EmailAccount},tokens=<redacted>,toEmailAddress={ToEmailAddress},toName={ToName},attachmentFilePath={AttachmentFilePath},attachmentFileName={AttachmentFileName},replyToEmailAddress={ReplyToEmailAddress},replyToName={ReplyToName},fromEmail={FromEmail},fromName={FromName},subject={Subject})", messageTemplate, emailAccount, toEmailAddress, toName, attachmentFilePath, attachmentFileName, replyToEmailAddress, replyToName, fromEmail, fromName, subject);
         return email.Id;
     }
 

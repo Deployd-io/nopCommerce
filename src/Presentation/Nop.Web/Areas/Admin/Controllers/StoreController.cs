@@ -12,11 +12,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Stores;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class StoreController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -43,16 +45,27 @@ public partial class StoreController : BaseAdminController
         IStoreService storeService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper})", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _customerActivityService → {_customerActivityService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _customerActivityService);
         _localizationService = localizationService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _localizationService → {_localizationService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _localizedEntityService → {_localizedEntityService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _notificationService → {_notificationService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _permissionService → {_permissionService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _settingService → {_settingService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _settingService);
         _storeModelFactory = storeModelFactory;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _storeModelFactory → {_storeModelFactory}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _storeModelFactory);
         _storeService = storeService;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _storeService → {_storeService}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _storeService);
         _webHelper = webHelper;
+		_logger.LogDebug("StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper}): _webHelper → {_webHelper}", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper, _webHelper);
 
+	_logger.LogDebug("<<< Exiting StoreController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeModelFactory={StoreModelFactory},storeService={StoreService},webHelper={WebHelper})", customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, settingService, storeModelFactory, storeService, webHelper);
     }
 
     #endregion
@@ -102,9 +115,12 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _storeModelFactory.PrepareStoreSearchModelAsync(new StoreSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -115,15 +131,19 @@ public partial class StoreController : BaseAdminController
         //prepare model
         var model = await _storeModelFactory.PrepareStoreListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _storeModelFactory.PrepareStoreModelAsync(new StoreModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -157,6 +177,7 @@ public partial class StoreController : BaseAdminController
         model = await _storeModelFactory.PrepareStoreModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -164,21 +185,26 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> SetStoreSslByCurrentRequestScheme(int id)
     {
+		_logger.LogDebug(">>> Entering SetStoreSslByCurrentRequestScheme(id={Id})", id);
         //try to get a store with the specified id
         var store = await _storeService.GetStoreByIdAsync(id);
+		_logger.LogDebug("SetStoreSslByCurrentRequestScheme(id={Id}): store → {Store}", id, store);
         if (store == null)
             return RedirectToAction("List");
 
         var value = _webHelper.IsCurrentConnectionSecured();
+		_logger.LogDebug("SetStoreSslByCurrentRequestScheme(id={Id}): value → {Value}", id, value);
 
         if (store.SslEnabled != value)
         {
             store.SslEnabled = value;
+			_logger.LogDebug("SetStoreSslByCurrentRequestScheme(id={Id}): store.SslEnabled → {Arg1}", id, store.SslEnabled);
             await _storeService.UpdateStoreAsync(store);
 
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Stores.Ssl.Updated"));
         }
 
+		_logger.LogDebug("<<< Exiting SetStoreSslByCurrentRequestScheme(id={Id})", id);
         return RedirectToAction("Edit", new { id = id });
     }
 
@@ -186,14 +212,18 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a store with the specified id
         var store = await _storeService.GetStoreByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): store → {Store}", id, store);
         if (store == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _storeModelFactory.PrepareStoreModelAsync(null, store);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -233,6 +263,7 @@ public partial class StoreController : BaseAdminController
         model = await _storeModelFactory.PrepareStoreModelAsync(model, store, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -240,8 +271,10 @@ public partial class StoreController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_STORES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a store with the specified id
         var store = await _storeService.GetStoreByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): store → {Store}", id, store);
         if (store == null)
             return RedirectToAction("List");
 
@@ -262,6 +295,7 @@ public partial class StoreController : BaseAdminController
 
             //when we had two stores and now have only one store, we also should delete all "per store" settings
             var allStores = await _storeService.GetAllStoresAsync();
+			_logger.LogDebug("Delete(id={Id}): allStores → {AllStores}", id, allStores);
             if (allStores.Count == 1)
             {
                 settingsToDelete = (await _settingService
@@ -277,7 +311,9 @@ public partial class StoreController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = store.Id });
         }
     }

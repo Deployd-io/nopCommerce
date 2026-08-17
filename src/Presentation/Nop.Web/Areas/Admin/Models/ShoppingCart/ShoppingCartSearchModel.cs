@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Orders;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.ShoppingCart;
 
@@ -11,14 +12,21 @@ namespace Nop.Web.Areas.Admin.Models.ShoppingCart;
 /// </summary>
 public partial record ShoppingCartSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ShoppingCartSearchModel()
     {
+		_logger.LogDebug(">>> Entering ShoppingCartSearchModel()");
         AvailableShoppingCartTypes = new List<SelectListItem>();
         ShoppingCartItemSearchModel = new ShoppingCartItemSearchModel();
+		_logger.LogDebug("ShoppingCartSearchModel(): ShoppingCartItemSearchModel → {ShoppingCartItemSearchModel}", ShoppingCartItemSearchModel);
+		_logger.LogDebug("ShoppingCartSearchModel(): AvailableShoppingCartTypes → {AvailableShoppingCartTypes}", AvailableShoppingCartTypes);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("ShoppingCartSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogDebug("<<< Exiting ShoppingCartSearchModel()");
+		_logger.LogDebug("ShoppingCartSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

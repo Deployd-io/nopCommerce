@@ -8,6 +8,7 @@ using Nop.Services.Orders;
 using Nop.Services.Plugins;
 using Nop.Services.Shipping;
 using Nop.Services.Shipping.Tracking;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal;
 
@@ -16,6 +17,7 @@ namespace Nop.Plugin.Shipping.FixedByWeightByTotal;
 /// </summary>
 public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateComputationMethod
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FixedByWeightByTotalSettings _fixedByWeightByTotalSettings;
@@ -204,6 +206,8 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
                 Rate = await GetRateAsync(shippingMethod.Id),
                 TransitDays = await GetTransitDaysAsync(shippingMethod.Id)
             }).ToListAsync();
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("GetShippingOptionsAsync(getShippingOptionRequest)={GetShippingOptionRequest}: database query executed in {Arg1} ms", getShippingOptionRequest, __logStart.ElapsedMilliseconds);
         }
 
         return response;
@@ -228,7 +232,9 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
         var restrictByCountryId = getShippingOptionRequest.ShippingAddress?.CountryId;
         var rates = await (await _shippingMethodsService.GetAllShippingMethodsAsync(restrictByCountryId))
             .SelectAwait(async shippingMethod => await GetRateAsync(shippingMethod.Id)).Distinct().ToListAsync();
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
+		_logger.LogInformation("GetFixedRateAsync(getShippingOptionRequest)={GetShippingOptionRequest}: database query executed in {Arg1} ms", getShippingOptionRequest, __logStart.ElapsedMilliseconds);
         //return default rate if all of them equal
         if (rates.Count == 1)
             return rates.FirstOrDefault();
@@ -245,6 +251,8 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		_logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		_logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 
@@ -253,6 +261,8 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/FixedByWeightByTotal/Configure";
     }
 
@@ -262,6 +272,7 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new FixedByWeightByTotalSettings
         {
@@ -313,6 +324,7 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -321,6 +333,7 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<FixedByWeightByTotalSettings>();
 
@@ -329,12 +342,15 @@ public class FixedByWeightByTotalComputationMethod : BasePlugin, IShippingRateCo
             .SelectAwait(async shippingMethod => await _settingService.GetSettingAsync(
                 string.Format(FixedByWeightByTotalDefaults.FIXED_RATE_SETTINGS_KEY, shippingMethod.Id)))
             .Where(setting => setting != null).ToListAsync();
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("UninstallAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         await _settingService.DeleteSettingsAsync(fixedRates);
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Shipping.FixedByWeightByTotal");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

@@ -5,6 +5,7 @@
 //! author : Tin Aung Lin : https://github.com/thanyawzinmin
 
 import moment from '../moment';
+const logger = console;
 
 var symbolMap = {
         1: '၁',
@@ -75,14 +76,18 @@ export default moment.defineLocale('my', {
         yy: '%d နှစ်',
     },
     preparse: function (string) {
+		logger.debug(`>>> Entering preparse(string=${string})`);
         return string.replace(/[၁၂၃၄၅၆၇၈၉၀]/g, function (match) {
             return numberMap[match];
         });
+		logger.debug(`<<< Exiting preparse(string=${string})`);
     },
     postformat: function (string) {
         return string.replace(/\d/g, function (match) {
+		logger.debug(`>>> Entering postformat(string=${string})`);
             return symbolMap[match];
         });
+		logger.debug(`<<< Exiting postformat(string=${string})`);
     },
     week: {
         dow: 1, // Monday is the first day of the week.

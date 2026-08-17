@@ -1,12 +1,17 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Checkout;
 
 public partial record CheckoutPaymentMethodModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CheckoutPaymentMethodModel()
     {
+		_logger.LogDebug(">>> Entering CheckoutPaymentMethodModel()");
         PaymentMethods = new List<PaymentMethodModel>();
+		_logger.LogDebug("<<< Exiting CheckoutPaymentMethodModel()");
+		_logger.LogDebug("CheckoutPaymentMethodModel(): PaymentMethods → {PaymentMethods}", PaymentMethods);
     }
 
     public IList<PaymentMethodModel> PaymentMethods { get; set; }

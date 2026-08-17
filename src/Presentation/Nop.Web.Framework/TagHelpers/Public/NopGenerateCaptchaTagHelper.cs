@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Core.Domain.Security;
 using Nop.Web.Framework.Security.Captcha;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Public;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.TagHelpers.Public;
 [HtmlTargetElement("nop-captcha", TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopGenerateCaptchaTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -24,8 +26,12 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
 
     public NopGenerateCaptchaTagHelper(CaptchaSettings captchaSettings, IHtmlHelper htmlHelper)
     {
+		_logger.LogDebug(">>> Entering NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper})", captchaSettings, htmlHelper);
         _captchaSettings = captchaSettings;
         _htmlHelper = htmlHelper;
+		_logger.LogDebug("<<< Exiting NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper})", captchaSettings, htmlHelper);
+		_logger.LogDebug("NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", captchaSettings, htmlHelper, _htmlHelper);
+		_logger.LogDebug("NopGenerateCaptchaTagHelper(captchaSettings={CaptchaSettings},htmlHelper={HtmlHelper}): _captchaSettings → {_captchaSettings}", captchaSettings, htmlHelper, _captchaSettings);
     }
 
     #endregion
@@ -40,6 +46,7 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -54,6 +61,7 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
             case CaptchaType.CheckBoxReCaptchaV2:
                 output.Attributes.Add("class", "captcha-box");
                 captchaHtmlContent = await _htmlHelper.GenerateCheckBoxReCaptchaV2Async(_captchaSettings);
+				_logger.LogDebug("ProcessAsync(context={Context},output={Output}): captchaHtmlContent → {CaptchaHtmlContent}", context, output, captchaHtmlContent);
                 break;
             case CaptchaType.ReCaptchaV3:
                 captchaHtmlContent = await _htmlHelper.GenerateReCaptchaV3Async(_captchaSettings, ActionName);
@@ -64,8 +72,11 @@ public partial class NopGenerateCaptchaTagHelper : TagHelper
 
         //tag details
         output.TagName = "div";
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
         output.Content.SetHtmlContent(captchaHtmlContent);
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

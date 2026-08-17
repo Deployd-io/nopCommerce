@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record FilterLevelSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public FilterLevelSettingsModel()
     {
+		_logger.LogDebug(">>> Entering FilterLevelSettingsModel()");
         FilterLevelSearchModel = new FilterLevelSearchModel();
+		_logger.LogDebug("<<< Exiting FilterLevelSettingsModel()");
+		_logger.LogDebug("FilterLevelSettingsModel(): FilterLevelSearchModel → {FilterLevelSearchModel}", FilterLevelSearchModel);
     }
 
     #endregion

@@ -20,6 +20,7 @@ using Nop.Services.Shipping;
 using Nop.Services.Tax;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Services;
 
@@ -28,6 +29,7 @@ namespace Nop.Plugin.Misc.Omnisend.Services;
 /// </summary>
 public class OmnisendEventsService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IAddressService _addressService;
@@ -122,11 +124,15 @@ public class OmnisendEventsService
 
     private async Task SendEventAsync(CustomerEvents customerEvent)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (customerEvent == null)
             return;
 
         var data = JsonConvert.SerializeObject(customerEvent);
+		_logger.LogDebug("SendEventAsync(customerEvent={CustomerEvent}): data → {Data}", customerEvent, data);
+		_logger.LogInformation("SendEventAsync(customerEvent)={CustomerEvent}: external service call took {Arg1} ms", customerEvent, __logStart.ElapsedMilliseconds);
         await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.CustomerEventsApiUrl, data, HttpMethod.Post);
+		_logger.LogDebug("<<< Exiting SendEventAsync(customerEvent={CustomerEvent})", customerEvent);
     }
 
     private async Task<CustomerEvents> CreateAddedProductToCartEventAsync(ShoppingCartItem shoppingCartItem)
@@ -141,11 +147,14 @@ public class OmnisendEventsService
 
     private async Task<CustomerEvents> CreateStartedCheckoutEventAsync()
     {
+		_logger.LogDebug(">>> Entering CreateStartedCheckoutEventAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerEvent =
             await _omnisendCustomerService.CreateCustomerEventAsync(customer,
                 await PrepareStartedCheckoutPropertyAsync(customer));
+			_logger.LogDebug("CreateStartedCheckoutEventAsync(): customer → {Customer}", customer);
 
+		_logger.LogDebug("<<< Exiting CreateStartedCheckoutEventAsync()");
         return customerEvent;
     }
 
@@ -157,6 +166,9 @@ public class OmnisendEventsService
             await _omnisendCustomerService.CreateCustomerEventAsync(customer,
                 await PreparePlacedOrderPropertyAsync(order));
 
+		_logger.LogDebug(">>> Entering PrepareStartedCheckoutPropertyAsync(customer={Customer})", customer);
+		_logger.LogInformation("PrepareStartedCheckoutPropertyAsync(customer)={Customer}: database query executed in {Arg1} ms", customer, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareStartedCheckoutPropertyAsync(customer={Customer})", customer);
         return customerEvent;
     }
 
@@ -224,6 +236,7 @@ public class OmnisendEventsService
             Value = (await GetShoppingCartItemPriceAsync(shoppingCartItem)).price,
             AddedItem = await ShoppingCartItemToProductItemAsync(shoppingCartItem)
         };
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         return property;
     }
@@ -244,6 +257,7 @@ public class OmnisendEventsService
             LineItems = await cart.SelectAwait(async sci => await ShoppingCartItemToProductItemAsync(sci))
                 .ToListAsync(),
             Value = (float)cartSum
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
         };
 
         return property;
@@ -262,6 +276,7 @@ public class OmnisendEventsService
         var property = new PaidForOrderProperty();
         await FillOrderEventBaseAsync(property, order);
 
+		_logger.LogDebug("<<< Exiting FillOrderEventBaseAsync(property={Property},order={Order})", property, order);
         return property;
     }
 
@@ -374,22 +389,29 @@ public class OmnisendEventsService
 
     private async Task<OrderProductItem> OrderItemToProductItemAsync(OrderItem orderItem)
     {
+		_logger.LogDebug(">>> Entering OrderItemToProductItemAsync(orderItem={OrderItem})", orderItem);
         var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+		_logger.LogDebug("OrderItemToProductItemAsync(orderItem={OrderItem}): product → {Product}", orderItem, product);
         var (sku, variantId) = await _omnisendHelper.GetSkuAndVariantIdAsync(product, orderItem.AttributesXml);
 
         var picture = await _pictureService.GetProductPictureAsync(product, orderItem.AttributesXml);
+		_logger.LogDebug("OrderItemToProductItemAsync(orderItem={OrderItem}): picture → {Picture}", orderItem, picture);
         var (pictureUrl, _) = await _pictureService.GetPictureUrlAsync(picture);
 
         var productManufacturer = (await _manufacturerService.GetProductManufacturersByProductIdAsync(orderItem.ProductId)).FirstOrDefault();
+		_logger.LogDebug("OrderItemToProductItemAsync(orderItem={OrderItem}): productManufacturer → {ProductManufacturer}", orderItem, productManufacturer);
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(productManufacturer?.ManufacturerId ?? 0);
+		_logger.LogDebug("OrderItemToProductItemAsync(orderItem={OrderItem}): manufacturer → {Manufacturer}", orderItem, manufacturer);
         var productsTags = await _productTagService.GetAllProductTagsByProductIdAsync(product.Id);
+		_logger.LogDebug("OrderItemToProductItemAsync(orderItem={OrderItem}): productsTags → {ProductsTags}", orderItem, productsTags);
 
         var weight = await _measureService.GetMeasureWeightBySystemKeywordAsync("grams") is { } measureWeight
             ? await _measureService.ConvertFromPrimaryMeasureWeightAsync(orderItem.ItemWeight ?? 0, measureWeight)
             : 0;
 
         float discount = 0;
+		_logger.LogDebug("OrderItemToProductItemAsync(orderItem={OrderItem}): discount → {Discount}", orderItem, discount);
 
         if (orderItem.DiscountAmountInclTax > 0 && orderItem.Quantity > 0)
             discount = (float)orderItem.DiscountAmountInclTax / orderItem.Quantity;
@@ -414,19 +436,25 @@ public class OmnisendEventsService
             ProductWeight = (int)weight
         };
 
+		_logger.LogDebug("<<< Exiting OrderItemToProductItemAsync(orderItem={OrderItem})", orderItem);
         return productItem;
     }
 
     private async Task<AddressItem> GetAddressItemDataAsync(int? addressId)
     {
+		_logger.LogDebug(">>> Entering GetAddressItemDataAsync(addressId={AddressId})", addressId);
         var address = await _addressService.GetAddressByIdAsync(addressId ?? 0);
 
+		_logger.LogDebug("GetAddressItemDataAsync(addressId={AddressId}): address → {Address}", addressId, address);
         if (address == null)
             return null;
 
         var country = await _countryService.GetCountryByIdAsync(address.CountryId ?? 0);
+		_logger.LogDebug("GetAddressItemDataAsync(addressId={AddressId}): country → {Country}", addressId, country);
         var state = await _stateProvinceService.GetStateProvinceByIdAsync(address.StateProvinceId ?? 0);
+		_logger.LogDebug("GetAddressItemDataAsync(addressId={AddressId}): state → {State}", addressId, state);
 
+		_logger.LogDebug("<<< Exiting GetAddressItemDataAsync(addressId={AddressId})", addressId);
         return new AddressItem
         {
             Address1 = address.Address1,
@@ -496,7 +524,9 @@ public class OmnisendEventsService
     /// <param name="eventMessage">Order paid event</param>
     public async Task SendOrderPaidEventAsync(OrderPaidEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering SendOrderPaidEventAsync(eventMessage={EventMessage})", eventMessage);
         await SendEventAsync(await CreateOrderPaidEventAsync(eventMessage.Order));
+		_logger.LogDebug("<<< Exiting SendOrderPaidEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -505,8 +535,10 @@ public class OmnisendEventsService
     /// <param name="eventMessage">Order refunded event</param>
     public async Task SendOrderRefundedEventAsync(OrderRefundedEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering SendOrderRefundedEventAsync(eventMessage={EventMessage})", eventMessage);
         if (eventMessage.Order.PaymentStatus == PaymentStatus.Refunded)
             await SendEventAsync(await CreateOrderRefundedEventAsync(eventMessage.Order));
+			_logger.LogDebug("<<< Exiting SendOrderRefundedEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -515,6 +547,7 @@ public class OmnisendEventsService
     /// <param name="eventMessage">Order status changed event</param>
     public async Task SendOrderStatusChangedEventAsync(OrderStatusChangedEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering SendOrderStatusChangedEventAsync(eventMessage={EventMessage})", eventMessage);
         var order = eventMessage.Order;
 
         if (eventMessage.PreviousOrderStatus == order.OrderStatus)
@@ -525,6 +558,7 @@ public class OmnisendEventsService
             case OrderStatus.Cancelled:
             {
                 var sent = await _genericAttributeService.GetAttributeAsync<bool>(order, OmnisendDefaults.OrderCanceledAttribute);
+				_logger.LogDebug("SendOrderStatusChangedEventAsync(eventMessage={EventMessage}): sent → {Sent}", eventMessage, sent);
 
                 if (sent)
                     return;
@@ -549,6 +583,7 @@ public class OmnisendEventsService
                 break;
             }
         }
+		_logger.LogDebug("<<< Exiting SendOrderStatusChangedEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -557,9 +592,12 @@ public class OmnisendEventsService
     /// <param name="eventMessage">Page rendering event</param>
     public async Task SendStartedCheckoutEventAsync(PageRenderingEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering SendStartedCheckoutEventAsync(eventMessage={EventMessage})", eventMessage);
         var routeName = eventMessage.GetRouteName();
         if (!routeName.Equals(NopRouteNames.Standard.CHECKOUT_ONE_PAGE, StringComparison.InvariantCultureIgnoreCase) &&
+			_logger.LogDebug("SendStartedCheckoutEventAsync(eventMessage={EventMessage}): routeName → {RouteName}", eventMessage, routeName);
             !routeName.Equals(NopRouteNames.Standard.CHECKOUT_BILLING_ADDRESS, StringComparison.InvariantCultureIgnoreCase))
+			_logger.LogDebug("<<< Exiting SendStartedCheckoutEventAsync(eventMessage={EventMessage})", eventMessage);
             return;
 
         await SendEventAsync(await CreateStartedCheckoutEventAsync());

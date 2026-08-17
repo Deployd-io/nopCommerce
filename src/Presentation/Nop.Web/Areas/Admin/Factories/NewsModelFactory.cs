@@ -14,6 +14,7 @@ using Nop.Web.Areas.Admin.Models.News;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -22,6 +23,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class NewsModelFactory : INewsModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -80,13 +82,16 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsContentModel> PrepareNewsContentModelAsync(NewsContentModel newsContentModel, int? filterByNewsItemId)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsContentModelAsync(newsContentModel={NewsContentModel},filterByNewsItemId={FilterByNewsItemId})", newsContentModel, filterByNewsItemId);
         ArgumentNullException.ThrowIfNull(newsContentModel);
 
         //prepare nested search models
         await PrepareNewsItemSearchModelAsync(newsContentModel.NewsItems);
         var newsItem = await _newsService.GetNewsByIdAsync(filterByNewsItemId ?? 0);
+		_logger.LogDebug("PrepareNewsContentModelAsync(newsContentModel={NewsContentModel},filterByNewsItemId={FilterByNewsItemId}): newsItem → {NewsItem}", newsContentModel, filterByNewsItemId, newsItem);
         await PrepareNewsCommentSearchModelAsync(newsContentModel.NewsComments, newsItem);
 
+		_logger.LogDebug("<<< Exiting PrepareNewsContentModelAsync(newsContentModel={NewsContentModel},filterByNewsItemId={FilterByNewsItemId})", newsContentModel, filterByNewsItemId);
         return newsContentModel;
     }
 
@@ -100,6 +105,7 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsItemListModel> PrepareNewsItemListModelAsync(NewsItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsItemListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get news items
@@ -115,9 +121,11 @@ public partial class NewsModelFactory : INewsModelFactory
             {
                 //fill in model values from the entity
                 var newsItemModel = newsItem.ToModel<NewsItemModel>();
+				_logger.LogDebug("PrepareNewsItemListModelAsync(searchModel={SearchModel}): newsItemModel → {NewsItemModel}", searchModel, newsItemModel);
 
                 //little performance optimization: ensure that "Full" is not returned
                 newsItemModel.Full = string.Empty;
+				_logger.LogDebug("PrepareNewsItemListModelAsync(searchModel={SearchModel}): newsItemModel.Full → {Arg1}", searchModel, newsItemModel.Full);
 
                 //convert dates to the user time
                 if (newsItem.StartDateUtc.HasValue)
@@ -136,6 +144,9 @@ public partial class NewsModelFactory : INewsModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareNewsItemListModelAsync(searchModel={SearchModel})", searchModel);
+		_logger.LogDebug(">>> Entering PrepareNewsItemSearchModelAsync(searchModel={SearchModel})", searchModel);
+		_logger.LogDebug("<<< Exiting PrepareNewsItemSearchModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -229,6 +240,7 @@ public partial class NewsModelFactory : INewsModelFactory
     /// </returns>
     public virtual async Task<NewsCommentListModel> PrepareNewsCommentListModelAsync(NewsCommentSearchModel searchModel, int? newsItemId)
     {
+		_logger.LogDebug(">>> Entering PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId})", searchModel, newsItemId);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter comments
@@ -237,6 +249,7 @@ public partial class NewsModelFactory : INewsModelFactory
         var createdOnToValue = searchModel.CreatedOnTo == null ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedOnTo.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var isApprovedOnly = searchModel.SearchApprovedId == 0 ? null : searchModel.SearchApprovedId == 1 ? true : (bool?)false;
+		_logger.LogDebug("PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId}): isApprovedOnly → {IsApprovedOnly}", searchModel, newsItemId, isApprovedOnly);
 
         //get comments
         var comments = (await _newsService.GetAllCommentsAsync(newsItemId: newsItemId,
@@ -256,6 +269,7 @@ public partial class NewsModelFactory : INewsModelFactory
             {
                 //fill in model values from the entity
                 var commentModel = newsComment.ToModel<NewsCommentModel>();
+				_logger.LogDebug("PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId}): commentModel → {CommentModel}", searchModel, newsItemId, commentModel);
 
                 //convert dates to the user time
                 commentModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(newsComment.CreatedOnUtc, DateTimeKind.Utc);
@@ -277,6 +291,7 @@ public partial class NewsModelFactory : INewsModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareNewsCommentListModelAsync(searchModel={SearchModel},newsItemId={NewsItemId})", searchModel, newsItemId);
         return model;
     }
 

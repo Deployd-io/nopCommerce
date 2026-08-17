@@ -27,11 +27,13 @@ using Nop.Web.Areas.Admin.Models.Reports;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class OrderController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -155,6 +157,7 @@ public partial class OrderController : BaseAdminController
         var vendorId = currentVendor.Id;
         var hasVendorProducts = (await _orderService.GetOrderItemsAsync(orderId, vendorId: vendorId)).Any();
 
+		_logger.LogDebug("<<< Exiting HasAccessToOrderAsync(orderId={OrderId})", orderId);
         return hasVendorProducts;
     }
 
@@ -164,12 +167,14 @@ public partial class OrderController : BaseAdminController
             return false;
 
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("HasAccessToProductAsync(orderItem={OrderItem}): currentVendor → {CurrentVendor}", orderItem, currentVendor);
         if (currentVendor == null)
             //not a vendor; has access
             return true;
 
         var vendorId = currentVendor.Id;
 
+		_logger.LogDebug("<<< Exiting HasAccessToProductAsync(orderItem={OrderItem})", orderItem);
         return (await _productService.GetProductByIdAsync(orderItem.ProductId))?.VendorId == vendorId;
     }
 
@@ -198,6 +203,8 @@ public partial class OrderController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
@@ -219,9 +226,12 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> OrderList(OrderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering OrderList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _orderModelFactory.PrepareOrderListModelAsync(searchModel);
+		_logger.LogDebug("OrderList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting OrderList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -229,9 +239,12 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> ReportAggregates(OrderSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ReportAggregates(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _orderModelFactory.PrepareOrderAggregatorModelAsync(searchModel);
+		_logger.LogDebug("ReportAggregates(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ReportAggregates(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -325,8 +338,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXmlSelected(string selectedIds)
     {
+		_logger.LogDebug(">>> Entering ExportXmlSelected(selectedIds={SelectedIds})", selectedIds);
         var orders = new List<Order>();
         if (selectedIds != null)
+		_logger.LogDebug("ExportXmlSelected(selectedIds={SelectedIds}): orders → {Orders}", selectedIds, orders);
         {
             var ids = selectedIds
                 .Split(_separator, StringSplitOptions.RemoveEmptyEntries)
@@ -334,16 +349,21 @@ public partial class OrderController : BaseAdminController
                 .ToArray();
             orders.AddRange(await (await _orderService.GetOrdersByIdsAsync(ids))
                 .WhereAwait(HasAccessToOrderAsync).ToListAsync());
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("ExportXmlSelected(selectedIds)={SelectedIds}: database query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
         }
 
         try
         {
             var xml = await _exportManager.ExportOrdersToXmlAsync(orders);
+			_logger.LogDebug("ExportXmlSelected(selectedIds={SelectedIds}): xml → {Xml}", selectedIds, xml);
             return File(Encoding.UTF8.GetBytes(xml), MimeTypes.ApplicationXml, "orders.xml");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXmlSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ExportXmlSelected(selectedIds={SelectedIds})", selectedIds);
             return RedirectToAction("List");
         }
     }
@@ -421,24 +441,31 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportExcelSelected(string selectedIds)
     {
+		_logger.LogDebug(">>> Entering ExportExcelSelected(selectedIds={SelectedIds})", selectedIds);
         var orders = new List<Order>();
         if (selectedIds != null)
+		_logger.LogDebug("ExportExcelSelected(selectedIds={SelectedIds}): orders → {Orders}", selectedIds, orders);
         {
             var ids = selectedIds
                 .Split(_separator, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => Convert.ToInt32(x))
                 .ToArray();
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("ExportExcelSelected(selectedIds)={SelectedIds}: find query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
             orders.AddRange(await (await _orderService.GetOrdersByIdsAsync(ids)).WhereAwait(HasAccessToOrderAsync).ToListAsync());
         }
 
         try
         {
             var bytes = await _exportManager.ExportOrdersToXlsxAsync(orders);
+			_logger.LogDebug("ExportExcelSelected(selectedIds={SelectedIds}): bytes → {Bytes}", selectedIds, bytes);
             return File(bytes, MimeTypes.TextXlsx, "orders.xlsx");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportExcelSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ExportExcelSelected(selectedIds={SelectedIds})", selectedIds);
             return RedirectToAction("List");
         }
     }
@@ -447,6 +474,7 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile)
     {
+		_logger.LogDebug(">>> Entering ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
         //a vendor cannot import orders
         if (await _workContext.GetCurrentVendorAsync() != null)
             return AccessDeniedView();
@@ -469,7 +497,9 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ImportFromXlsx(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }
@@ -485,8 +515,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CancelOrder(int id)
     {
+		_logger.LogDebug(">>> Entering CancelOrder(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("CancelOrder(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -503,10 +535,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in CancelOrder(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("CancelOrder(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting CancelOrder(id={Id})", id);
             return View(model);
         }
     }
@@ -516,8 +551,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CaptureOrder(int id)
     {
+		_logger.LogDebug(">>> Entering CaptureOrder(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("CaptureOrder(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -528,6 +565,7 @@ public partial class OrderController : BaseAdminController
         try
         {
             var errors = await _orderProcessingService.CaptureAsync(order);
+			_logger.LogDebug("CaptureOrder(id={Id}): errors → {Errors}", id, errors);
             await LogEditOrderAsync(order.Id);
 
             foreach (var error in errors)
@@ -537,10 +575,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in CaptureOrder(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("CaptureOrder(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting CaptureOrder(id={Id})", id);
             return View(model);
         }
     }
@@ -550,8 +591,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> MarkOrderAsPaid(int id)
     {
+		_logger.LogDebug(">>> Entering MarkOrderAsPaid(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("MarkOrderAsPaid(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -568,10 +611,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in MarkOrderAsPaid(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("MarkOrderAsPaid(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting MarkOrderAsPaid(id={Id})", id);
             return View(model);
         }
     }
@@ -581,8 +627,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> RefundOrder(int id)
     {
+		_logger.LogDebug(">>> Entering RefundOrder(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("RefundOrder(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -593,6 +641,7 @@ public partial class OrderController : BaseAdminController
         try
         {
             var errors = await _orderProcessingService.RefundAsync(order);
+			_logger.LogDebug("RefundOrder(id={Id}): errors → {Errors}", id, errors);
             await LogEditOrderAsync(order.Id);
 
             foreach (var error in errors)
@@ -602,10 +651,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in RefundOrder(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("RefundOrder(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting RefundOrder(id={Id})", id);
             return View(model);
         }
     }
@@ -615,8 +667,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> RefundOrderOffline(int id)
     {
+		_logger.LogDebug(">>> Entering RefundOrderOffline(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("RefundOrderOffline(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -633,10 +687,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in RefundOrderOffline(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("RefundOrderOffline(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting RefundOrderOffline(id={Id})", id);
             return View(model);
         }
     }
@@ -646,8 +703,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> VoidOrder(int id)
     {
+		_logger.LogDebug(">>> Entering VoidOrder(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("VoidOrder(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -658,6 +717,7 @@ public partial class OrderController : BaseAdminController
         try
         {
             var errors = await _orderProcessingService.VoidAsync(order);
+			_logger.LogDebug("VoidOrder(id={Id}): errors → {Errors}", id, errors);
             await LogEditOrderAsync(order.Id);
 
             foreach (var error in errors)
@@ -667,10 +727,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in VoidOrder(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("VoidOrder(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting VoidOrder(id={Id})", id);
             return View(model);
         }
     }
@@ -680,8 +743,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> VoidOrderOffline(int id)
     {
+		_logger.LogDebug(">>> Entering VoidOrderOffline(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("VoidOrderOffline(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -698,10 +763,13 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in VoidOrderOffline(id={Id}): {Arg1}", id, exc.Message);
             //prepare model
             var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+			_logger.LogDebug("VoidOrderOffline(id={Id}): model → {Model}", id, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting VoidOrderOffline(id={Id})", id);
             return View(model);
         }
     }
@@ -709,8 +777,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PartiallyRefundOrderPopup(int id, bool online)
     {
+		_logger.LogDebug(">>> Entering PartiallyRefundOrderPopup(id={Id},online={Online})", id, online);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("PartiallyRefundOrderPopup(id={Id},online={Online}): order → {Order}", id, online, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -720,7 +790,9 @@ public partial class OrderController : BaseAdminController
 
         //prepare model
         var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+		_logger.LogDebug("PartiallyRefundOrderPopup(id={Id},online={Online}): model → {Model}", id, online, model);
 
+		_logger.LogDebug("<<< Exiting PartiallyRefundOrderPopup(id={Id},online={Online})", id, online);
         return View(model);
     }
 
@@ -781,6 +853,7 @@ public partial class OrderController : BaseAdminController
             model = await _orderModelFactory.PrepareOrderModelAsync(model, order);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting PartiallyRefundOrderPopup(id={Id},online={Online},model={Model})", id, online, model);
             return View(model);
         }
     }
@@ -825,8 +898,10 @@ public partial class OrderController : BaseAdminController
         {
             //prepare model
             model = await _orderModelFactory.PrepareOrderModelAsync(model, order);
+			_logger.LogDebug("ChangeOrderStatus(id={Id},model={Model}): model → {Model1}", id, model, model);
 
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ChangeOrderStatus(id={Id},model={Model})", id, model);
             return View(model);
         }
     }
@@ -838,8 +913,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): order → {Order}", id, order);
         if (order == null || order.Deleted)
             return RedirectToAction("List");
 
@@ -849,7 +926,9 @@ public partial class OrderController : BaseAdminController
 
         //prepare model
         var model = await _orderModelFactory.PrepareOrderModelAsync(null, order);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -857,8 +936,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -872,6 +953,7 @@ public partial class OrderController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteOrder",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteOrder"), order.Id), order);
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -975,8 +1057,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> PdfInvoiceSelected(string selectedIds)
     {
+		_logger.LogDebug(">>> Entering PdfInvoiceSelected(selectedIds={SelectedIds})", selectedIds);
         var orders = new List<Order>();
         if (selectedIds != null)
+		_logger.LogDebug("PdfInvoiceSelected(selectedIds={SelectedIds}): orders → {Orders}", selectedIds, orders);
         {
             var ids = selectedIds
                 .Split(_separator, StringSplitOptions.RemoveEmptyEntries)
@@ -987,10 +1071,13 @@ public partial class OrderController : BaseAdminController
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("PdfInvoiceSelected(selectedIds={SelectedIds}): currentVendor → {CurrentVendor}", selectedIds, currentVendor);
         if (currentVendor != null)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             orders = await orders.WhereAwait(HasAccessToOrderAsync).ToListAsync();
         }
+		_logger.LogInformation("PdfInvoiceSelected(selectedIds)={SelectedIds}: database query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
 
         try
         {
@@ -1005,7 +1092,9 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in PdfInvoiceSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting PdfInvoiceSelected(selectedIds={SelectedIds})", selectedIds);
             return RedirectToAction("List");
         }
     }
@@ -1015,22 +1104,30 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> ProductDetails_AttributeChange(int productId, bool validateAttributeConditions, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form})", productId, validateAttributeConditions, form);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null)
+			_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): product → {Product}", productId, validateAttributeConditions, form, product);
             return new NullJsonResult();
 
         var errors = new List<string>();
+		_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): errors → {Errors}", productId, validateAttributeConditions, form, errors);
         var attributeXml = await _productAttributeParser.ParseProductAttributesAsync(product, form, errors);
+		_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): attributeXml → {AttributeXml}", productId, validateAttributeConditions, form, attributeXml);
 
         //conditional attributes
         var enabledAttributeMappingIds = new List<int>();
+		_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): enabledAttributeMappingIds → {EnabledAttributeMappingIds}", productId, validateAttributeConditions, form, enabledAttributeMappingIds);
         var disabledAttributeMappingIds = new List<int>();
+		_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): disabledAttributeMappingIds → {DisabledAttributeMappingIds}", productId, validateAttributeConditions, form, disabledAttributeMappingIds);
         if (validateAttributeConditions)
         {
             var attributes = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+			_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): attributes → {Attributes}", productId, validateAttributeConditions, form, attributes);
             foreach (var attribute in attributes)
             {
                 var conditionMet = await _productAttributeParser.IsConditionMetAsync(attribute, attributeXml);
+				_logger.LogDebug("ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form}): conditionMet → {ConditionMet}", productId, validateAttributeConditions, form, conditionMet);
                 if (!conditionMet.HasValue)
                     continue;
 
@@ -1041,6 +1138,7 @@ public partial class OrderController : BaseAdminController
             }
         }
 
+		_logger.LogDebug("<<< Exiting ProductDetails_AttributeChange(productId={ProductId},validateAttributeConditions={ValidateAttributeConditions},form={Form})", productId, validateAttributeConditions, form);
         return Json(new
         {
             enabledattributemappingids = enabledAttributeMappingIds.ToArray(),
@@ -1177,8 +1275,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> EditOrderItem(int id, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering EditOrderItem(id={Id},form={Form})", id, form);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("EditOrderItem(id={Id},form={Form}): order → {Order}", id, form, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -1188,6 +1288,7 @@ public partial class OrderController : BaseAdminController
 
         //get order item identifier
         var orderItemId = 0;
+		_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItemId → {OrderItemId}", id, form, orderItemId);
         foreach (var formValue in form.Keys)
             if (formValue.StartsWith("btnSaveOrderItem", StringComparison.InvariantCultureIgnoreCase))
                 orderItemId = Convert.ToInt32(formValue["btnSaveOrderItem".Length..]);
@@ -1197,20 +1298,28 @@ public partial class OrderController : BaseAdminController
 
         if (!decimal.TryParse(form["pvUnitPriceInclTax" + orderItemId], NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPriceInclTax))
             unitPriceInclTax = orderItem.UnitPriceInclTax;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): unitPriceInclTax → {UnitPriceInclTax}", id, form, unitPriceInclTax);
         if (!decimal.TryParse(form["pvUnitPriceExclTax" + orderItemId], NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPriceExclTax))
             unitPriceExclTax = orderItem.UnitPriceExclTax;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): unitPriceExclTax → {UnitPriceExclTax}", id, form, unitPriceExclTax);
         if (!int.TryParse(form["pvQuantity" + orderItemId], out var quantity))
             quantity = orderItem.Quantity;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): quantity → {Quantity}", id, form, quantity);
         if (!decimal.TryParse(form["pvDiscountInclTax" + orderItemId], NumberStyles.Any, CultureInfo.InvariantCulture, out var discountInclTax))
             discountInclTax = orderItem.DiscountAmountInclTax;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): discountInclTax → {DiscountInclTax}", id, form, discountInclTax);
         if (!decimal.TryParse(form["pvDiscountExclTax" + orderItemId], NumberStyles.Any, CultureInfo.InvariantCulture, out var discountExclTax))
             discountExclTax = orderItem.DiscountAmountExclTax;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): discountExclTax → {DiscountExclTax}", id, form, discountExclTax);
         if (!decimal.TryParse(form["pvPriceInclTax" + orderItemId], NumberStyles.Any, CultureInfo.InvariantCulture, out var priceInclTax))
             priceInclTax = orderItem.PriceInclTax;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): priceInclTax → {PriceInclTax}", id, form, priceInclTax);
         if (!decimal.TryParse(form["pvPriceExclTax" + orderItemId], NumberStyles.Any, CultureInfo.InvariantCulture, out var priceExclTax))
             priceExclTax = orderItem.PriceExclTax;
+			_logger.LogDebug("EditOrderItem(id={Id},form={Form}): priceExclTax → {PriceExclTax}", id, form, priceExclTax);
 
         var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+		_logger.LogDebug("EditOrderItem(id={Id},form={Form}): product → {Product}", id, form, product);
 
         if (quantity > 0)
         {
@@ -1219,6 +1328,13 @@ public partial class OrderController : BaseAdminController
             if (!_orderSettings.AutoUpdateOrderTotalsOnEditingOrder)
             {
                 orderItem.UnitPriceInclTax = unitPriceInclTax;
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.UnitPriceInclTax → {Arg2}", id, form, orderItem.UnitPriceInclTax);
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.UnitPriceExclTax → {Arg2}", id, form, orderItem.UnitPriceExclTax);
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.Quantity → {Arg2}", id, form, orderItem.Quantity);
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.DiscountAmountInclTax → {Arg2}", id, form, orderItem.DiscountAmountInclTax);
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.DiscountAmountExclTax → {Arg2}", id, form, orderItem.DiscountAmountExclTax);
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.PriceInclTax → {Arg2}", id, form, orderItem.PriceInclTax);
+				_logger.LogDebug("EditOrderItem(id={Id},form={Form}): orderItem.PriceExclTax → {Arg2}", id, form, orderItem.PriceExclTax);
                 orderItem.UnitPriceExclTax = unitPriceExclTax;
                 orderItem.Quantity = quantity;
                 orderItem.DiscountAmountInclTax = discountInclTax;
@@ -1272,6 +1388,7 @@ public partial class OrderController : BaseAdminController
         //selected card
         SaveSelectedCardName("order-products");
 
+		_logger.LogDebug("<<< Exiting EditOrderItem(id={Id},form={Form})", id, form);
         return RedirectToAction("Edit", new { id = order.Id });
     }
 
@@ -1280,8 +1397,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteOrderItem(int id, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering DeleteOrderItem(id={Id},form={Form})", id, form);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("DeleteOrderItem(id={Id},form={Form}): order → {Order}", id, form, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -1291,6 +1410,7 @@ public partial class OrderController : BaseAdminController
 
         //get order item identifier
         var orderItemId = 0;
+		_logger.LogDebug("DeleteOrderItem(id={Id},form={Form}): orderItemId → {OrderItemId}", id, form, orderItemId);
         foreach (var formValue in form.Keys)
             if (formValue.StartsWith("btnDeleteOrderItem", StringComparison.InvariantCultureIgnoreCase))
                 orderItemId = Convert.ToInt32(formValue["btnDeleteOrderItem".Length..]);
@@ -1308,6 +1428,7 @@ public partial class OrderController : BaseAdminController
         else
         {
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogDebug("DeleteOrderItem(id={Id},form={Form}): product → {Product}", id, form, product);
 
             //adjust inventory
             await _productService.AdjustInventoryAsync(product, orderItem.Quantity, orderItem.AttributesXml,
@@ -1318,6 +1439,7 @@ public partial class OrderController : BaseAdminController
 
             //update order totals
             var updateOrderParameters = new UpdateOrderParameters(order, orderItem);
+			_logger.LogDebug("DeleteOrderItem(id={Id},form={Form}): updateOrderParameters → {UpdateOrderParameters}", id, form, updateOrderParameters);
             await _orderProcessingService.UpdateOrderTotalsAsync(updateOrderParameters);
 
             //add a note
@@ -1338,6 +1460,7 @@ public partial class OrderController : BaseAdminController
         //selected card
         SaveSelectedCardName("order-products");
 
+		_logger.LogDebug("<<< Exiting DeleteOrderItem(id={Id},form={Form})", id, form);
         return RedirectToAction("Edit", new { id = order.Id });
     }
 
@@ -1346,13 +1469,16 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ResetDownloadCount(int id, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ResetDownloadCount(id={Id},form={Form})", id, form);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("ResetDownloadCount(id={Id},form={Form}): order → {Order}", id, form, order);
         if (order == null)
             return RedirectToAction("List");
 
         //get order item identifier
         var orderItemId = 0;
+		_logger.LogDebug("ResetDownloadCount(id={Id},form={Form}): orderItemId → {OrderItemId}", id, form, orderItemId);
         foreach (var formValue in form.Keys)
             if (formValue.StartsWith("btnResetDownloadCount", StringComparison.InvariantCultureIgnoreCase))
                 orderItemId = Convert.ToInt32(formValue["btnResetDownloadCount".Length..]);
@@ -1365,12 +1491,14 @@ public partial class OrderController : BaseAdminController
             return RedirectToAction("List");
 
         orderItem.DownloadCount = 0;
+		_logger.LogDebug("ResetDownloadCount(id={Id},form={Form}): orderItem.DownloadCount → {Arg2}", id, form, orderItem.DownloadCount);
         await _orderService.UpdateOrderItemAsync(orderItem);
         await LogEditOrderAsync(order.Id);
 
         //selected card
         SaveSelectedCardName("order-products");
 
+		_logger.LogDebug("<<< Exiting ResetDownloadCount(id={Id},form={Form})", id, form);
         return RedirectToAction("Edit", new { id = order.Id });
     }
 
@@ -1379,13 +1507,16 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ActivateDownloadItem(int id, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ActivateDownloadItem(id={Id},form={Form})", id, form);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("ActivateDownloadItem(id={Id},form={Form}): order → {Order}", id, form, order);
         if (order == null)
             return RedirectToAction("List");
 
         //get order item identifier
         var orderItemId = 0;
+		_logger.LogDebug("ActivateDownloadItem(id={Id},form={Form}): orderItemId → {OrderItemId}", id, form, orderItemId);
         foreach (var formValue in form.Keys)
             if (formValue.StartsWith("btnPvActivateDownload", StringComparison.InvariantCultureIgnoreCase))
                 orderItemId = Convert.ToInt32(formValue["btnPvActivateDownload".Length..]);
@@ -1398,6 +1529,7 @@ public partial class OrderController : BaseAdminController
             return RedirectToAction("List");
 
         orderItem.IsDownloadActivated = !orderItem.IsDownloadActivated;
+		_logger.LogDebug("ActivateDownloadItem(id={Id},form={Form}): orderItem.IsDownloadActivated → {Arg2}", id, form, orderItem.IsDownloadActivated);
         await _orderService.UpdateOrderItemAsync(orderItem);
 
         await LogEditOrderAsync(order.Id);
@@ -1405,6 +1537,7 @@ public partial class OrderController : BaseAdminController
         //selected card
         SaveSelectedCardName("order-products");
 
+		_logger.LogDebug("<<< Exiting ActivateDownloadItem(id={Id},form={Form})", id, form);
         return RedirectToAction("Edit", new { id = order.Id });
     }
 
@@ -1532,6 +1665,7 @@ public partial class OrderController : BaseAdminController
         //prepare model
         var model = await _orderModelFactory.PrepareAddProductToOrderListModelAsync(searchModel, order);
 
+		_logger.LogDebug("<<< Exiting AddProductToOrder(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1773,6 +1907,7 @@ public partial class OrderController : BaseAdminController
         model = await _orderModelFactory.PrepareOrderAddressModelAsync(model, order, address);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting AddressEdit(model={Model},form={Form})", model, form);
         return View(model);
     }
 
@@ -1783,9 +1918,12 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_VIEW)]
     public virtual async Task<IActionResult> ShipmentList()
     {
+		_logger.LogDebug(">>> Entering ShipmentList()");
         //prepare model
         var model = await _orderModelFactory.PrepareShipmentSearchModelAsync(new ShipmentSearchModel());
+		_logger.LogDebug("ShipmentList(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting ShipmentList()");
         return View(model);
     }
 
@@ -1793,9 +1931,12 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_VIEW)]
     public virtual async Task<IActionResult> ShipmentListSelect(ShipmentSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ShipmentListSelect(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _orderModelFactory.PrepareShipmentListModelAsync(searchModel);
+		_logger.LogDebug("ShipmentListSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ShipmentListSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1803,6 +1944,7 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> ShipmentsByOrder(OrderShipmentSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ShipmentsByOrder(searchModel={SearchModel})", searchModel);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(searchModel.OrderId)
             ?? throw new ArgumentException("No order found with the specified id");
@@ -1813,7 +1955,9 @@ public partial class OrderController : BaseAdminController
 
         //prepare model
         var model = await _orderModelFactory.PrepareOrderShipmentListModelAsync(searchModel, order);
+		_logger.LogDebug("ShipmentsByOrder(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ShipmentsByOrder(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1821,12 +1965,14 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_VIEW)]
     public virtual async Task<IActionResult> ShipmentsItemsByShipmentId(ShipmentItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ShipmentsItemsByShipmentId(searchModel={SearchModel})", searchModel);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(searchModel.ShipmentId)
             ?? throw new ArgumentException("No shipment found with the specified id");
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("ShipmentsItemsByShipmentId(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null && !await HasAccessToShipmentAsync(shipment))
             return Content(string.Empty);
 
@@ -1841,15 +1987,19 @@ public partial class OrderController : BaseAdminController
         //prepare model
         searchModel.SetGridPageSize();
         var model = await _orderModelFactory.PrepareShipmentItemListModelAsync(searchModel, shipment);
+		_logger.LogDebug("ShipmentsItemsByShipmentId(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ShipmentsItemsByShipmentId(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> AddShipment(int id)
     {
+		_logger.LogDebug(">>> Entering AddShipment(id={Id})", id);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(id);
+		_logger.LogDebug("AddShipment(id={Id}): order → {Order}", id, order);
         if (order == null)
             return RedirectToAction("List");
 
@@ -1859,7 +2009,9 @@ public partial class OrderController : BaseAdminController
 
         //prepare model
         var model = await _orderModelFactory.PrepareShipmentModelAsync(new ShipmentModel(), null, order);
+		_logger.LogDebug("AddShipment(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting AddShipment(id={Id})", id);
         return View(model);
     }
 
@@ -2012,8 +2164,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_VIEW)]
     public virtual async Task<IActionResult> ShipmentDetails(int id)
     {
+		_logger.LogDebug(">>> Entering ShipmentDetails(id={Id})", id);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(id);
+		_logger.LogDebug("ShipmentDetails(id={Id}): shipment → {Shipment}", id, shipment);
         if (shipment == null)
             return RedirectToAction("List");
 
@@ -2023,7 +2177,9 @@ public partial class OrderController : BaseAdminController
 
         //prepare model
         var model = await _orderModelFactory.PrepareShipmentModelAsync(null, shipment, null);
+		_logger.LogDebug("ShipmentDetails(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting ShipmentDetails(id={Id})", id);
         return View(model);
     }
 
@@ -2031,8 +2187,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteShipment(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteShipment(id={Id})", id);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(id);
+		_logger.LogDebug("DeleteShipment(id={Id}): shipment → {Shipment}", id, shipment);
         if (shipment == null)
             return RedirectToAction("List");
 
@@ -2043,10 +2201,12 @@ public partial class OrderController : BaseAdminController
         foreach (var shipmentItem in await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id))
         {
             var orderItem = await _orderService.GetOrderItemByIdAsync(shipmentItem.OrderItemId);
+			_logger.LogDebug("DeleteShipment(id={Id}): orderItem → {OrderItem}", id, orderItem);
             if (orderItem == null)
                 continue;
 
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogDebug("DeleteShipment(id={Id}): product → {Product}", id, product);
 
             await _productService.ReverseBookedInventoryAsync(product, shipmentItem,
                 string.Format(await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.DeleteShipment"), shipment.OrderId));
@@ -2056,6 +2216,7 @@ public partial class OrderController : BaseAdminController
         await _shipmentService.DeleteShipmentAsync(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(orderId);
+		_logger.LogDebug("DeleteShipment(id={Id}): order → {Order}", id, order);
         //add a note
         await _orderService.InsertOrderNoteAsync(new OrderNote
         {
@@ -2068,6 +2229,7 @@ public partial class OrderController : BaseAdminController
         await LogEditOrderAsync(order.Id);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Orders.Shipments.Deleted"));
+		_logger.LogDebug("<<< Exiting DeleteShipment(id={Id})", id);
         return RedirectToAction("Edit", new { id = orderId });
     }
 
@@ -2121,8 +2283,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SetAsShipped(int id)
     {
+		_logger.LogDebug(">>> Entering SetAsShipped(id={Id})", id);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(id);
+		_logger.LogDebug("SetAsShipped(id={Id}): shipment → {Shipment}", id, shipment);
         if (shipment == null)
             return RedirectToAction("List");
 
@@ -2138,8 +2302,10 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in SetAsShipped(id={Id}): {Arg1}", id, exc.Message);
             //error
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting SetAsShipped(id={Id})", id);
             return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
         }
     }
@@ -2182,8 +2348,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SetAsReadyForPickup(int id)
     {
+		_logger.LogDebug(">>> Entering SetAsReadyForPickup(id={Id})", id);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(id);
+		_logger.LogDebug("SetAsReadyForPickup(id={Id}): shipment → {Shipment}", id, shipment);
         if (shipment == null)
             return RedirectToAction("List");
 
@@ -2199,8 +2367,10 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in SetAsReadyForPickup(id={Id}): {Arg1}", id, exc.Message);
             //error
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting SetAsReadyForPickup(id={Id})", id);
             return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
         }
     }
@@ -2240,8 +2410,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SetAsDelivered(int id)
     {
+		_logger.LogDebug(">>> Entering SetAsDelivered(id={Id})", id);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(id);
+		_logger.LogDebug("SetAsDelivered(id={Id}): shipment → {Shipment}", id, shipment);
         if (shipment == null)
             return RedirectToAction("List");
 
@@ -2257,8 +2429,10 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in SetAsDelivered(id={Id}): {Arg1}", id, exc.Message);
             //error
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting SetAsDelivered(id={Id})", id);
             return RedirectToAction("ShipmentDetails", new { id = shipment.Id });
         }
     }
@@ -2299,8 +2473,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_VIEW)]
     public virtual async Task<IActionResult> PdfPackagingSlip(int shipmentId)
     {
+		_logger.LogDebug(">>> Entering PdfPackagingSlip(shipmentId={ShipmentId})", shipmentId);
         //try to get a shipment with the specified id
         var shipment = await _shipmentService.GetShipmentByIdAsync(shipmentId);
+		_logger.LogDebug("PdfPackagingSlip(shipmentId={ShipmentId}): shipment → {Shipment}", shipmentId, shipment);
         if (shipment == null)
             return RedirectToAction("List");
 
@@ -2315,6 +2491,7 @@ public partial class OrderController : BaseAdminController
             bytes = stream.ToArray();
         }
 
+		_logger.LogDebug("<<< Exiting PdfPackagingSlip(shipmentId={ShipmentId})", shipmentId);
         return File(bytes, MimeTypes.ApplicationPdf, $"packagingslip_{shipment.Id}.pdf");
     }
 
@@ -2377,8 +2554,10 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_VIEW)]
     public virtual async Task<IActionResult> PdfPackagingSlipSelected(string selectedIds)
     {
+		_logger.LogDebug(">>> Entering PdfPackagingSlipSelected(selectedIds={SelectedIds})", selectedIds);
         var shipments = new List<Shipment>();
         if (selectedIds != null)
+		_logger.LogDebug("PdfPackagingSlipSelected(selectedIds={SelectedIds}): shipments → {Shipments}", selectedIds, shipments);
         {
             var ids = selectedIds
                 .Split(_separator, StringSplitOptions.RemoveEmptyEntries)
@@ -2389,8 +2568,10 @@ public partial class OrderController : BaseAdminController
         //a vendor should have access only to his products
         if (await _workContext.GetCurrentVendorAsync() != null)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             shipments = await shipments.WhereAwait(HasAccessToShipmentAsync).ToListAsync();
         }
+		_logger.LogInformation("PdfPackagingSlipSelected(selectedIds)={SelectedIds}: database query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
 
         try
         {
@@ -2405,7 +2586,9 @@ public partial class OrderController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in PdfPackagingSlipSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting PdfPackagingSlipSelected(selectedIds={SelectedIds})", selectedIds);
             return RedirectToAction("ShipmentList");
         }
     }
@@ -2414,16 +2597,20 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SetAsShippedSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering SetAsShippedSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var shipments = await _shipmentService.GetShipmentsByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("SetAsShippedSelected(selectedIds={SelectedIds}): shipments → {Shipments}", selectedIds, shipments);
 
         //a vendor should have access only to his products
         if (await _workContext.GetCurrentVendorAsync() != null)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             shipments = await shipments.WhereAwait(HasAccessToShipmentAsync).ToListAsync();
         }
+		_logger.LogInformation("SetAsShippedSelected(selectedIds)={SelectedIds}: database query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
 
         foreach (var shipment in shipments)
         {
@@ -2433,10 +2620,12 @@ public partial class OrderController : BaseAdminController
             }
             catch
             {
+				_logger.LogError("Exception in SetAsShippedSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
                 //ignore any exception
             }
         }
 
+		_logger.LogDebug("<<< Exiting SetAsShippedSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -2444,16 +2633,20 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SetAsReadyForPickupSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering SetAsReadyForPickupSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var shipments = await _shipmentService.GetShipmentsByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("SetAsReadyForPickupSelected(selectedIds={SelectedIds}): shipments → {Shipments}", selectedIds, shipments);
 
         //a vendor should have access only to his products
         if (await _workContext.GetCurrentVendorAsync() != null)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             shipments = await shipments.WhereAwait(HasAccessToShipmentAsync).ToListAsync();
         }
+		_logger.LogInformation("SetAsReadyForPickupSelected(selectedIds)={SelectedIds}: database query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
 
         foreach (var shipment in shipments)
         {
@@ -2463,10 +2656,12 @@ public partial class OrderController : BaseAdminController
             }
             catch
             {
+				_logger.LogError("Exception in SetAsReadyForPickupSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
                 //ignore any exception
             }
         }
 
+		_logger.LogDebug("<<< Exiting SetAsReadyForPickupSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -2474,16 +2669,20 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.SHIPMENTS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SetAsDeliveredSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering SetAsDeliveredSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var shipments = await _shipmentService.GetShipmentsByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("SetAsDeliveredSelected(selectedIds={SelectedIds}): shipments → {Shipments}", selectedIds, shipments);
 
         //a vendor should have access only to his products
         if (await _workContext.GetCurrentVendorAsync() != null)
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             shipments = await shipments.WhereAwait(HasAccessToShipmentAsync).ToListAsync();
         }
+		_logger.LogInformation("SetAsDeliveredSelected(selectedIds)={SelectedIds}: database query executed in {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
 
         foreach (var shipment in shipments)
         {
@@ -2493,10 +2692,12 @@ public partial class OrderController : BaseAdminController
             }
             catch
             {
+				_logger.LogError("Exception in SetAsDeliveredSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
                 //ignore any exception
             }
         }
 
+		_logger.LogDebug("<<< Exiting SetAsDeliveredSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -2508,6 +2709,7 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> OrderNotesSelect(OrderNoteSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering OrderNotesSelect(searchModel={SearchModel})", searchModel);
         //try to get an order with the specified id
         var order = await _orderService.GetOrderByIdAsync(searchModel.OrderId)
             ?? throw new ArgumentException("No order found with the specified id");
@@ -2518,7 +2720,9 @@ public partial class OrderController : BaseAdminController
 
         //prepare model
         var model = await _orderModelFactory.PrepareOrderNoteListModelAsync(searchModel, order);
+		_logger.LogDebug("OrderNotesSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting OrderNotesSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -2587,9 +2791,12 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> BestsellersBriefReportByQuantityList(BestsellerBriefSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering BestsellersBriefReportByQuantityList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _orderModelFactory.PrepareBestsellerBriefListModelAsync(searchModel);
+		_logger.LogDebug("BestsellersBriefReportByQuantityList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting BestsellersBriefReportByQuantityList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -2597,9 +2804,12 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> BestsellersBriefReportByAmountList(BestsellerBriefSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering BestsellersBriefReportByAmountList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _orderModelFactory.PrepareBestsellerBriefListModelAsync(searchModel);
+		_logger.LogDebug("BestsellersBriefReportByAmountList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting BestsellersBriefReportByAmountList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -2607,13 +2817,16 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> OrderAverageReportList(OrderAverageReportSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering OrderAverageReportList(searchModel={SearchModel})", searchModel);
         //a vendor doesn't have access to this report
         if (await _workContext.GetCurrentVendorAsync() != null)
             return Content(string.Empty);
 
         //prepare model
         var model = await _orderModelFactory.PrepareOrderAverageReportListModelAsync(searchModel);
+		_logger.LogDebug("OrderAverageReportList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting OrderAverageReportList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -2621,36 +2834,46 @@ public partial class OrderController : BaseAdminController
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> OrderIncompleteReportList(OrderIncompleteReportSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering OrderIncompleteReportList(searchModel={SearchModel})", searchModel);
         //a vendor doesn't have access to this report
         if (await _workContext.GetCurrentVendorAsync() != null)
             return Content(string.Empty);
 
         //prepare model
         var model = await _orderModelFactory.PrepareOrderIncompleteReportListModelAsync(searchModel);
+		_logger.LogDebug("OrderIncompleteReportList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting OrderIncompleteReportList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Orders.ORDERS_VIEW)]
     public virtual async Task<IActionResult> LoadOrderStatistics(string period)
     {
+		_logger.LogDebug(">>> Entering LoadOrderStatistics(period={Period})", period);
         //a vendor doesn't have access to this report
         if (await _workContext.GetCurrentVendorAsync() != null)
             return Content(string.Empty);
 
         var result = new List<object>();
+		_logger.LogDebug("LoadOrderStatistics(period={Period}): result → {Result}", period, result);
 
         var nowDt = await _dateTimeHelper.ConvertToUserTimeAsync(DateTime.Now);
+		_logger.LogDebug("LoadOrderStatistics(period={Period}): nowDt → {NowDt}", period, nowDt);
         var timeZone = await _dateTimeHelper.GetCurrentTimeZoneAsync();
+		_logger.LogDebug("LoadOrderStatistics(period={Period}): timeZone → {TimeZone}", period, timeZone);
 
         var culture = new CultureInfo((await _workContext.GetWorkingLanguageAsync()).LanguageCulture);
+		_logger.LogDebug("LoadOrderStatistics(period={Period}): culture → {Culture}", period, culture);
 
         switch (period)
         {
             case "year":
                 //year statistics
                 var yearAgoDt = nowDt.AddYears(-1).AddMonths(1);
+				_logger.LogDebug("LoadOrderStatistics(period={Period}): yearAgoDt → {YearAgoDt}", period, yearAgoDt);
                 var searchYearDateUser = new DateTime(yearAgoDt.Year, yearAgoDt.Month, 1);
+				_logger.LogDebug("LoadOrderStatistics(period={Period}): searchYearDateUser → {SearchYearDateUser}", period, searchYearDateUser);
                 for (var i = 0; i <= 12; i++)
                 {
                     result.Add(new
@@ -2662,6 +2885,8 @@ public partial class OrderController : BaseAdminController
                             pageIndex: 0,
                             pageSize: 1, getOnlyTotalCount: true)).TotalCount.ToString()
                     });
+						_logger.LogDebug("LoadOrderStatistics(period={Period}): date → {Date}", period, date);
+						_logger.LogDebug("LoadOrderStatistics(period={Period}): value → {Value}", period, value);
 
                     searchYearDateUser = searchYearDateUser.AddMonths(1);
                 }
@@ -2670,7 +2895,9 @@ public partial class OrderController : BaseAdminController
             case "month":
                 //month statistics
                 var monthAgoDt = nowDt.AddDays(-30);
+				_logger.LogDebug("LoadOrderStatistics(period={Period}): monthAgoDt → {MonthAgoDt}", period, monthAgoDt);
                 var searchMonthDateUser = new DateTime(monthAgoDt.Year, monthAgoDt.Month, monthAgoDt.Day);
+				_logger.LogDebug("LoadOrderStatistics(period={Period}): searchMonthDateUser → {SearchMonthDateUser}", period, searchMonthDateUser);
                 for (var i = 0; i <= 30; i++)
                 {
                     result.Add(new
@@ -2691,7 +2918,9 @@ public partial class OrderController : BaseAdminController
             default:
                 //week statistics
                 var weekAgoDt = nowDt.AddDays(-7);
+				_logger.LogDebug("LoadOrderStatistics(period={Period}): weekAgoDt → {WeekAgoDt}", period, weekAgoDt);
                 var searchWeekDateUser = new DateTime(weekAgoDt.Year, weekAgoDt.Month, weekAgoDt.Day);
+				_logger.LogDebug("LoadOrderStatistics(period={Period}): searchWeekDateUser → {SearchWeekDateUser}", period, searchWeekDateUser);
                 for (var i = 0; i <= 7; i++)
                 {
                     result.Add(new
@@ -2710,6 +2939,7 @@ public partial class OrderController : BaseAdminController
                 break;
         }
 
+		_logger.LogDebug("<<< Exiting LoadOrderStatistics(period={Period})", period);
         return Json(result);
     }
 

@@ -33,6 +33,7 @@ using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -41,6 +42,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ProductModelFactory : IProductModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -245,6 +247,7 @@ public partial class ProductModelFactory : IProductModelFactory
             priceModel.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, finalPriceBase);
             priceModel.BasePricePAngVValue = finalPriceBase;
         }
+		_logger.LogDebug("<<< Exiting PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel})", product, priceModel);
     }
 
     /// <summary>
@@ -593,6 +596,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductReviewOverviewModel> PrepareProductReviewOverviewModelAsync(Product product)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ProductReviewOverviewModel productReview;
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
@@ -642,6 +646,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<PictureModel>> PrepareProductOverviewPicturesModelAsync(Product product, int? productThumbPictureSize = null)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var productName = await _localizationService.GetLocalizedAsync(product, x => x.Name);
@@ -764,6 +769,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 SeName = await _urlRecordService.GetSeNameAsync(x),
                 ProductCount = await _productTagService.GetProductCountByProductTagIdAsync(x.Id, store.Id)
             }).ToListAsync();
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         return model;
     }
@@ -900,6 +906,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductDetailsModel.ProductAttributeModel>> PrepareProductAttributeModelsAsync(Product product, ShoppingCartItem updatecartitem)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new List<ProductDetailsModel.ProductAttributeModel>();
@@ -1315,9 +1322,11 @@ public partial class ProductModelFactory : IProductModelFactory
         int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
         bool forceRedirectionAfterAddingToCart = false)
     {
+		_logger.LogDebug(">>> Entering PrepareProductOverviewModelsAsync(products={Products},preparePriceModel={PreparePriceModel},preparePictureModel={PreparePictureModel},productThumbPictureSize={ProductThumbPictureSize},prepareSpecificationAttributes={PrepareSpecificationAttributes},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart})", products, preparePriceModel, preparePictureModel, productThumbPictureSize, prepareSpecificationAttributes, forceRedirectionAfterAddingToCart);
         ArgumentNullException.ThrowIfNull(products);
 
         var models = new List<ProductOverviewModel>();
+		_logger.LogDebug("PrepareProductOverviewModelsAsync(products={Products},preparePriceModel={PreparePriceModel},preparePictureModel={PreparePictureModel},productThumbPictureSize={ProductThumbPictureSize},prepareSpecificationAttributes={PrepareSpecificationAttributes},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): models → {Models}", products, preparePriceModel, preparePictureModel, productThumbPictureSize, prepareSpecificationAttributes, forceRedirectionAfterAddingToCart, models);
         foreach (var product in products)
         {
             var model = new ProductOverviewModel
@@ -1361,6 +1370,7 @@ public partial class ProductModelFactory : IProductModelFactory
             models.Add(model);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareProductOverviewModelsAsync(products={Products},preparePriceModel={PreparePriceModel},preparePictureModel={PreparePictureModel},productThumbPictureSize={ProductThumbPictureSize},prepareSpecificationAttributes={PrepareSpecificationAttributes},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart})", products, preparePriceModel, preparePictureModel, productThumbPictureSize, prepareSpecificationAttributes, forceRedirectionAfterAddingToCart);
         return models;
     }
 
@@ -1817,8 +1827,10 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<CustomerProductReviewsModel> PrepareCustomerProductReviewsModelAsync(int? page)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerProductReviewsModelAsync(page={Page})", page);
         var pageSize = _catalogSettings.ProductReviewsPageSizeOnAccountPage;
         var pageIndex = 0;
+		_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): pageIndex → {PageIndex}", page, pageIndex);
 
         if (page > 0)
         {
@@ -1826,7 +1838,9 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): store → {Store}", page, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): customer → {Customer}", page, customer);
 
         var list = await _productReviewService.GetAllProductReviewsAsync(
             customerId: customer.Id,
@@ -1836,10 +1850,12 @@ public partial class ProductModelFactory : IProductModelFactory
             pageSize: pageSize);
 
         var productReviews = new List<CustomerProductReviewModel>();
+		_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): productReviews → {ProductReviews}", page, productReviews);
 
         foreach (var review in list)
         {
             var product = await _productService.GetProductByIdAsync(review.ProductId);
+			_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): product → {Product}", page, product);
 
             var productReviewModel = new CustomerProductReviewModel
             {
@@ -1856,6 +1872,7 @@ public partial class ProductModelFactory : IProductModelFactory
             if (_catalogSettings.ProductReviewsMustBeApproved)
             {
                 productReviewModel.ApprovalStatus = review.IsApproved
+					_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): productReviewModel.ApprovalStatus → {Arg1}", page, productReviewModel.ApprovalStatus);
                     ? await _localizationService.GetResourceAsync("Account.CustomerProductReviews.ApprovalStatus.Approved")
                     : await _localizationService.GetResourceAsync("Account.CustomerProductReviews.ApprovalStatus.Pending");
             }
@@ -1863,6 +1880,7 @@ public partial class ProductModelFactory : IProductModelFactory
             foreach (var q in await _reviewTypeService.GetProductReviewReviewTypeMappingsByProductReviewIdAsync(review.Id))
             {
                 var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(q.ReviewTypeId);
+				_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): reviewType → {ReviewType}", page, reviewType);
 
                 productReviewModel.AdditionalProductReviewList.Add(new ProductReviewReviewTypeMappingModel
                 {
@@ -1893,6 +1911,7 @@ public partial class ProductModelFactory : IProductModelFactory
             PagerModel = pagerModel
         };
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerProductReviewsModelAsync(page={Page})", page);
         return model;
     }
 

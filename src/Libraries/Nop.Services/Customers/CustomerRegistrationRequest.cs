@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Domain.Customers;
 
 namespace Nop.Services.Customers;
@@ -7,6 +8,7 @@ namespace Nop.Services.Customers;
 /// </summary>
 public partial class CustomerRegistrationRequest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>

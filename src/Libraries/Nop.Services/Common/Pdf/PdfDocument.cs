@@ -10,6 +10,7 @@ using PdfRpt.Core.Contracts;
 using PdfRpt.Core.Helper;
 using PdfRpt.FluentInterface;
 using Language = Nop.Core.Domain.Localization.Language;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -18,6 +19,7 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public abstract class PdfDocument<TItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     /// <summary>
@@ -49,6 +51,7 @@ public abstract class PdfDocument<TItem>
 
         cell.SetLeading(0f, PdfDocumentHelper.RELATIVE_LEADING);
 
+		_logger.LogDebug("<<< Exiting BuildHyperLinkCell(Expression<Func<TLabel={Arg0},labelSelector={LabelSelector},url={Url})", Expression<Func<TLabel, labelSelector, url);
         return cell;
     }
 
@@ -182,6 +185,7 @@ public abstract class PdfDocument<TItem>
             addressTable.AddCell(BuildPdfPCell($"{value.Name}: {value.Value}"));
         }
 
+		_logger.LogDebug("<<< Exiting BuildAddressTable(Expression<Func<TLabel={Arg0},labelSelector={LabelSelector},address={Address})", Expression<Func<TLabel, labelSelector, address);
         return addressTable;
     }
 
@@ -247,6 +251,7 @@ public abstract class PdfDocument<TItem>
                 });
             });
         });
+		_logger.LogDebug("<<< Exiting ConfigureProductColumn(column={Column},Expression<Func<TItem={Arg1},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes})", column, Expression<Func<TItem, propertyExpression, width, printProductAttributes);
     }
 
     /// <summary>
@@ -255,13 +260,19 @@ public abstract class PdfDocument<TItem>
     /// <returns>PDF document builder</returns>
     protected virtual PdfReport DefaultDocument()
     {
+		_logger.LogDebug(">>> Entering DefaultDocument()");
         var pdfSettings = EngineContext.Current.Resolve<PdfSettings>();
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
+		_logger.LogDebug("DefaultDocument(): fileProvider → {FileProvider}", fileProvider);
         var fontSize = pdfSettings.BaseFontSize >= 0 ? (int)pdfSettings.BaseFontSize : 10;
+		_logger.LogDebug("DefaultDocument(): fontSize → {FontSize}", fontSize);
+		_logger.LogDebug("DefaultDocument(): pdfSettings → {PdfSettings}", pdfSettings);
         var fontFileName = Language.Rtl ? pdfSettings.RtlFontName : pdfSettings.LtrFontName;
 
         var mainFontPath = fileProvider.Combine(fileProvider.MapPath("~/App_Data/Pdf/"), $"{fontFileName}.ttf");
+		_logger.LogDebug("DefaultDocument(): mainFontPath → {MainFontPath}", mainFontPath);
 
+		_logger.LogDebug("<<< Exiting DefaultDocument()");
         return new PdfReport()
             .DocumentPreferences(doc =>
             {
@@ -308,6 +319,7 @@ public abstract class PdfDocument<TItem>
         if (!string.IsNullOrEmpty(label) && args.Any())
             label = string.Format(label, args);
 
+		_logger.LogDebug("<<< Exiting LabelField(Expression<Func<TLabel={Arg0},propertyExpression={PropertyExpression},font={Font},language={Language},args={Args})", Expression<Func<TLabel, propertyExpression, font, language, args);
         return new Chunk(label, font);
     }
 

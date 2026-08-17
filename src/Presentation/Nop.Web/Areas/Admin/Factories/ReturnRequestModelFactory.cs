@@ -10,6 +10,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -18,6 +19,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -44,15 +46,26 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
         IProductService productService,
         IReturnRequestService returnRequestService)
     {
+		_logger.LogDebug(">>> Entering ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService})", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _baseAdminModelFactory);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _dateTimeHelper → {_dateTimeHelper}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _dateTimeHelper);
         _downloadService = downloadService;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _downloadService → {_downloadService}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _downloadService);
         _customerService = customerService;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _customerService → {_customerService}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _customerService);
         _localizationService = localizationService;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _localizationService → {_localizationService}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _localizedModelFactory → {_localizedModelFactory}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _localizedModelFactory);
         _orderService = orderService;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _orderService → {_orderService}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _orderService);
         _productService = productService;
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _productService → {_productService}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _productService);
         _returnRequestService = returnRequestService;
+		_logger.LogDebug("<<< Exiting ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService})", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService);
+		_logger.LogDebug("ReturnRequestModelFactory(baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},downloadService={DownloadService},customerService={CustomerService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},orderService={OrderService},productService={ProductService},returnRequestService={ReturnRequestService}): _returnRequestService → {_returnRequestService}", baseAdminModelFactory, dateTimeHelper, downloadService, customerService, localizationService, localizedModelFactory, orderService, productService, returnRequestService, _returnRequestService);
     }
 
     #endregion
@@ -69,6 +82,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<ReturnRequestSearchModel> PrepareReturnRequestSearchModelAsync(ReturnRequestSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReturnRequestSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available return request statuses
@@ -76,6 +90,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
 
         //for some reason, the standard default value (0) for the "All" item is already used for the "Pending" status, so here we use -1
         searchModel.ReturnRequestStatusId = -1;
+		_logger.LogDebug("PrepareReturnRequestSearchModelAsync(searchModel={SearchModel}): searchModel.ReturnRequestStatusId → {Arg1}", searchModel, searchModel.ReturnRequestStatusId);
         searchModel.ReturnRequestStatusList.Insert(0, new SelectListItem
         {
             Value = "-1",
@@ -85,6 +100,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareReturnRequestSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -98,6 +114,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<ReturnRequestListModel> PrepareReturnRequestListModelAsync(ReturnRequestSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReturnRequestListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter emails
@@ -106,6 +123,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
         var endDateValue = !searchModel.EndDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var returnRequestStatus = searchModel.ReturnRequestStatusId == -1 ? null : (ReturnRequestStatus?)searchModel.ReturnRequestStatusId;
+		_logger.LogDebug("PrepareReturnRequestListModelAsync(searchModel={SearchModel}): returnRequestStatus → {ReturnRequestStatus}", searchModel, returnRequestStatus);
 
         //get return requests
         var returnRequests = await _returnRequestService.SearchReturnRequestsAsync(customNumber: searchModel.CustomNumber,
@@ -117,9 +135,11 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
         //prepare list model
         var model = await new ReturnRequestListModel().PrepareToGridAsync(searchModel, returnRequests, () =>
         {
+			_logger.LogDebug("PrepareReturnRequestListModelAsync(searchModel={SearchModel}): returnRequest → {ReturnRequest}", searchModel, returnRequest);
             return returnRequests.SelectAwait(async returnRequest => await PrepareReturnRequestModelAsync(null, returnRequest));
         });
 
+		_logger.LogDebug("<<< Exiting PrepareReturnRequestListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -185,11 +205,13 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual Task<ReturnRequestReasonSearchModel> PrepareReturnRequestReasonSearchModelAsync(ReturnRequestReasonSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReturnRequestReasonSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareReturnRequestReasonSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -203,10 +225,12 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<ReturnRequestReasonListModel> PrepareReturnRequestReasonListModelAsync(ReturnRequestReasonSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReturnRequestReasonListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get return request reasons
         var reasons = (await _returnRequestService.GetAllReturnRequestReasonsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareReturnRequestReasonListModelAsync(searchModel={SearchModel}): reasons → {Reasons}", searchModel, reasons);
 
         //prepare list model
         var model = new ReturnRequestReasonListModel().PrepareToGrid(searchModel, reasons, () =>
@@ -214,6 +238,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
             return reasons.Select(reason => reason.ToModel<ReturnRequestReasonModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareReturnRequestReasonListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -261,11 +286,13 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual Task<ReturnRequestActionSearchModel> PrepareReturnRequestActionSearchModelAsync(ReturnRequestActionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReturnRequestActionSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareReturnRequestActionSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -279,10 +306,12 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
     /// </returns>
     public virtual async Task<ReturnRequestActionListModel> PrepareReturnRequestActionListModelAsync(ReturnRequestActionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReturnRequestActionListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get return request actions
         var actions = (await _returnRequestService.GetAllReturnRequestActionsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareReturnRequestActionListModelAsync(searchModel={SearchModel}): actions → {Actions}", searchModel, actions);
 
         //prepare list model
         var model = new ReturnRequestActionListModel().PrepareToGrid(searchModel, actions, () =>
@@ -290,6 +319,7 @@ public partial class ReturnRequestModelFactory : IReturnRequestModelFactory
             return actions.Select(reason => reason.ToModel<ReturnRequestActionModel>());
         });
 
+		_logger.LogDebug("<<< Exiting PrepareReturnRequestActionListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -4,6 +4,7 @@
 //! author : Chien Kira : https://github.com/chienkira
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('vi', {
     months: 'tháng 1_tháng 2_tháng 3_tháng 4_tháng 5_tháng 6_tháng 7_tháng 8_tháng 9_tháng 10_tháng 11_tháng 12'.split(
@@ -22,12 +23,16 @@ export default moment.defineLocale('vi', {
     weekdaysParseExact: true,
     meridiemParse: /sa|ch/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return /^ch$/i.test(input);
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 12) {
             return isLower ? 'sa' : 'SA';
         } else {
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
             return isLower ? 'ch' : 'CH';
         }
     },
@@ -71,6 +76,8 @@ export default moment.defineLocale('vi', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number;
     },
     week: {

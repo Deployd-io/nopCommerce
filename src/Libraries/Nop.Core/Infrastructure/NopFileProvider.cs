@@ -3,6 +3,7 @@ using System.Security.AccessControl;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Infrastructure;
 
@@ -11,6 +12,7 @@ namespace Nop.Core.Infrastructure;
 /// </summary>
 public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -20,9 +22,11 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     public NopFileProvider(IWebHostEnvironment webHostEnvironment)
         : base(File.Exists(webHostEnvironment.ContentRootPath) ? Path.GetDirectoryName(webHostEnvironment.ContentRootPath)! : webHostEnvironment.ContentRootPath)
     {
+		_logger.LogDebug(">>> Entering NopFileProvider(webHostEnvironment={WebHostEnvironment})", webHostEnvironment);
         WebRootPath = File.Exists(webHostEnvironment.WebRootPath)
             ? Path.GetDirectoryName(webHostEnvironment.WebRootPath)
             : webHostEnvironment.WebRootPath;
+			_logger.LogDebug("NopFileProvider(webHostEnvironment={WebHostEnvironment}): WebRootPath → {WebRootPath}", webHostEnvironment, WebRootPath);
     }
 
     #endregion
@@ -52,6 +56,7 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
 
             Thread.Sleep(100);
         }
+		_logger.LogDebug("<<< Exiting DeleteDirectoryRecursive(path={Path})", path);
     }
 
     /// <summary>
@@ -77,12 +82,15 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The combined paths</returns>
     public virtual string Combine(params string[] paths)
     {
+		_logger.LogDebug(">>> Entering Combine(paths={Paths})", paths);
         var path = Path.Combine(paths.SelectMany(p => IsUncPath(p) ? [p] : p.Split('\\', '/')).ToArray());
 
+		_logger.LogDebug("Combine(paths={Paths}): path → {Path}", paths, path);
         if (Environment.OSVersion.Platform == PlatformID.Unix && !IsUncPath(path))
             //add leading slash to correctly form path in the UNIX system
             path = "/" + path;
 
+		_logger.LogDebug("<<< Exiting Combine(paths={Paths})", paths);
         return path;
     }
 
@@ -112,6 +120,7 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
         using (File.Create(path))
         {
         }
+		_logger.LogDebug("<<< Exiting CreateFile(path={Path})", path);
     }
 
     /// <summary>
@@ -150,10 +159,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="filePath">The name of the file to be deleted. Wildcard characters are not supported</param>
     public virtual void DeleteFile(string filePath)
     {
+		_logger.LogDebug(">>> Entering DeleteFile(filePath={FilePath})", filePath);
         if (!FileExists(filePath))
             return;
 
         File.Delete(filePath);
+		_logger.LogDebug("<<< Exiting DeleteFile(filePath={FilePath})", filePath);
     }
 
     /// <summary>
@@ -179,7 +190,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </param>
     public virtual void DirectoryMove(string sourceDirName, string destDirName)
     {
+		_logger.LogDebug(">>> Entering DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
         Directory.Move(sourceDirName, destDirName);
+		_logger.LogDebug("<<< Exiting DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
     }
 
     /// <summary>
@@ -203,6 +216,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     public virtual IEnumerable<string> EnumerateFiles(string directoryPath, string searchPattern,
         bool topDirectoryOnly = true)
     {
+		_logger.LogDebug(">>> Entering EnumerateFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
+		_logger.LogDebug("<<< Exiting EnumerateFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
         return Directory.EnumerateFiles(directoryPath, searchPattern,
             topDirectoryOnly ? SearchOption.TopDirectoryOnly : SearchOption.AllDirectories);
     }
@@ -215,7 +230,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="overwrite">true if the destination file can be overwritten; otherwise, false</param>
     public virtual void FileCopy(string sourceFileName, string destFileName, bool overwrite = false)
     {
+		_logger.LogDebug(">>> Entering FileCopy(sourceFileName={SourceFileName},destFileName={DestFileName},overwrite={Overwrite})", sourceFileName, destFileName, overwrite);
         File.Copy(sourceFileName, destFileName, overwrite);
+		_logger.LogDebug("<<< Exiting FileCopy(sourceFileName={SourceFileName},destFileName={DestFileName},overwrite={Overwrite})", sourceFileName, destFileName, overwrite);
     }
 
     /// <summary>
@@ -228,6 +245,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual bool FileExists(string filePath)
     {
+		_logger.LogDebug(">>> Entering FileExists(filePath={FilePath})", filePath);
+		_logger.LogDebug("<<< Exiting FileExists(filePath={FilePath})", filePath);
         return File.Exists(filePath);
     }
 
@@ -251,7 +270,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="destFileName">The new path and name for the file</param>
     public virtual void FileMove(string sourceFileName, string destFileName)
     {
+		_logger.LogDebug(">>> Entering FileMove(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
         File.Move(sourceFileName, destFileName);
+		_logger.LogDebug("<<< Exiting FileMove(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
     }
 
     /// <summary>
@@ -261,13 +282,16 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The absolute path to the directory</returns>
     public virtual string GetAbsolutePath(params string[] paths)
     {
+		_logger.LogDebug(">>> Entering GetAbsolutePath(paths={Paths})", paths);
         var allPaths = new List<string>();
 
+		_logger.LogDebug("GetAbsolutePath(paths={Paths}): allPaths → {AllPaths}", paths, allPaths);
         if (paths.Any() && !paths[0].Contains(WebRootPath, StringComparison.InvariantCulture))
             allPaths.Add(WebRootPath);
 
         allPaths.AddRange(paths);
 
+		_logger.LogDebug("<<< Exiting GetAbsolutePath(paths={Paths})", paths);
         return Combine(allPaths.ToArray());
     }
 
@@ -352,6 +376,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The extension of the specified path (including the period ".")</returns>
     public virtual string GetFileExtension(string filePath)
     {
+		_logger.LogDebug(">>> Entering GetFileExtension(filePath={FilePath})", filePath);
+		_logger.LogDebug("<<< Exiting GetFileExtension(filePath={FilePath})", filePath);
         return Path.GetExtension(filePath);
     }
 
@@ -372,6 +398,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The file name, minus the last period (.) and all characters following it</returns>
     public virtual string GetFileNameWithoutExtension(string filePath)
     {
+		_logger.LogDebug(">>> Entering GetFileNameWithoutExtension(filePath={FilePath})", filePath);
+		_logger.LogDebug("<<< Exiting GetFileNameWithoutExtension(filePath={FilePath})", filePath);
         return Path.GetFileNameWithoutExtension(filePath);
     }
 
@@ -395,9 +423,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual string[] GetFiles(string directoryPath, string searchPattern = "", bool topDirectoryOnly = true)
     {
+		_logger.LogDebug(">>> Entering GetFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
         if (string.IsNullOrEmpty(searchPattern))
             searchPattern = "*.*";
+			_logger.LogDebug("GetFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly}): searchPattern → {SearchPattern1}", directoryPath, searchPattern, topDirectoryOnly, searchPattern);
 
+		_logger.LogDebug("<<< Exiting GetFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
         return Directory.GetFileSystemEntries(directoryPath, searchPattern,
             new EnumerationOptions
             {
@@ -468,6 +499,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The parent directory, or null if path is the root directory, including the root of a UNC server or share name</returns>
     public virtual string GetParentDirectory(string directoryPath)
     {
+		_logger.LogDebug(">>> Entering GetParentDirectory(directoryPath={DirectoryPath})", directoryPath);
+		_logger.LogDebug("<<< Exiting GetParentDirectory(directoryPath={DirectoryPath})", directoryPath);
         return Directory.GetParent(directoryPath).FullName;
     }
 
@@ -483,9 +516,11 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
 
         if (!IsDirectory(path) && FileExists(path))
             path = new FileInfo(path).DirectoryName;
+			_logger.LogDebug("GetVirtualPath(path={Path}): path → {Path1}", path, path);
 
         path = path?.Replace(WebRootPath, string.Empty).Replace('\\', '/').Trim('/').TrimStart('~', '/');
 
+		_logger.LogDebug("<<< Exiting GetVirtualPath(path={Path})", path);
         return $"~/{path ?? string.Empty}";
     }
 
@@ -508,9 +543,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     {
         path = path.Replace("~/", string.Empty).TrimStart('/');
 
+		_logger.LogDebug("MapPath(path={Path}): path → {Path1}", path, path);
         //if virtual path has slash on the end, it should be after transform the virtual path to physical path too
         var pathEnd = path.EndsWith('/') ? Path.DirectorySeparatorChar.ToString() : string.Empty;
+		_logger.LogDebug("MapPath(path={Path}): pathEnd → {PathEnd}", path, pathEnd);
 
+		_logger.LogDebug("<<< Exiting MapPath(path={Path})", path);
         return Combine(Root ?? string.Empty, path) + pathEnd;
     }
 
@@ -524,6 +562,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual async Task<byte[]> ReadAllBytesAsync(string filePath)
     {
+		_logger.LogDebug(">>> Entering ReadAllBytesAsync(filePath={FilePath})", filePath);
+		_logger.LogDebug("<<< Exiting ReadAllBytesAsync(filePath={FilePath})", filePath);
         return File.Exists(filePath) ? await File.ReadAllBytesAsync(filePath) : Array.Empty<byte>();
     }
 
@@ -566,7 +606,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task WriteAllBytesAsync(string filePath, byte[] bytes)
     {
+		_logger.LogDebug(">>> Entering WriteAllBytesAsync(filePath={FilePath},bytes={Bytes})", filePath, bytes);
         await File.WriteAllBytesAsync(filePath, bytes);
+		_logger.LogDebug("<<< Exiting WriteAllBytesAsync(filePath={FilePath},bytes={Bytes})", filePath, bytes);
     }
 
     /// <summary>
@@ -599,8 +641,11 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The file information. Caller must check Exists property.</returns>
     public new virtual IFileInfo GetFileInfo(string subpath)
     {
+		_logger.LogDebug(">>> Entering GetFileInfo(subpath={Subpath})", subpath);
         subpath = subpath.Replace(Root, string.Empty);
 
+		_logger.LogDebug("GetFileInfo(subpath={Subpath}): subpath → {Subpath1}", subpath, subpath);
+		_logger.LogDebug("<<< Exiting GetFileInfo(subpath={Subpath})", subpath);
         return base.GetFileInfo(subpath);
     }
 

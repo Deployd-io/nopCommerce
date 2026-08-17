@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public static class EventPublisherExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Publishes the newsletter subscribe event.
     /// </summary>
@@ -17,7 +19,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task PublishNewsLetterSubscribeAsync(this IEventPublisher eventPublisher, NewsLetterSubscription subscription)
     {
+		_logger.LogDebug(">>> Entering PublishNewsLetterSubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
         await eventPublisher.PublishAsync(new EmailSubscribedEvent(subscription));
+		_logger.LogDebug("<<< Exiting PublishNewsLetterSubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
     }
 
     /// <summary>
@@ -28,7 +32,9 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task PublishNewsLetterUnsubscribeAsync(this IEventPublisher eventPublisher, NewsLetterSubscription subscription)
     {
+		_logger.LogDebug(">>> Entering PublishNewsLetterUnsubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
         await eventPublisher.PublishAsync(new EmailUnsubscribedEvent(subscription));
+		_logger.LogDebug("<<< Exiting PublishNewsLetterUnsubscribeAsync(eventPublisher={EventPublisher},subscription={Subscription})", eventPublisher, subscription);
     }
 
     /// <summary>

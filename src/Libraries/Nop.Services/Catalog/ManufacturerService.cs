@@ -76,11 +76,17 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearDiscountManufacturerMappingAsync(Discount discount)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogDebug(">>> Entering ClearDiscountManufacturerMappingAsync(discount={Discount})", discount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
         var mappings = _discountManufacturerMappingRepository.Table.Where(dcm => dcm.DiscountId == discount.Id);
+		_logger.LogDebug("ClearDiscountManufacturerMappingAsync(discount={Discount}): mappings → {Mappings}", discount, mappings);
 
         await _discountManufacturerMappingRepository.DeleteAsync(await mappings.ToListAsync());
+		_logger.LogDebug("<<< Exiting ClearDiscountManufacturerMappingAsync(discount={Discount})", discount);
+		_logger.LogInformation("ClearDiscountManufacturerMappingAsync(discount)={Discount}: external service call took {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -90,9 +96,15 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteManufacturerAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering DeleteManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _manufacturerRepository.DeleteAsync(manufacturer);
+		_logger.LogDebug("<<< Exiting DeleteManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteManufacturerAsync(manufacturer)={Manufacturer}: external service call took {Arg1} ms", manufacturer, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteManufacturerAsync(manufacturer)={Manufacturer}: external service call took {Arg1} ms", manufacturer, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Delete manufacturers
     /// </summary>
@@ -100,6 +112,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteManufacturersAsync(IList<Manufacturer> manufacturers)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _manufacturerRepository.DeleteAsync(manufacturers);
     }
 
@@ -127,10 +140,15 @@ public partial class ManufacturerService : IManufacturerService
         bool showHidden = false,
         bool? overridePublished = null)
     {
+		_logger.LogDebug(">>> Entering GetAllManufacturersAsync(manufacturerName={ManufacturerName},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},overridePublished={OverridePublished})", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished);
         return await _manufacturerRepository.GetAllPagedAsync(async query =>
         {
+		_logger.LogDebug("<<< Exiting GetAllManufacturersAsync(manufacturerName={ManufacturerName},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},overridePublished={OverridePublished})", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished);
+		_logger.LogDebug("GetAllManufacturersAsync(manufacturerName={ManufacturerName},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},overridePublished={OverridePublished}): query → {Query}", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished, query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!showHidden)
                 query = query.Where(m => m.Published);
+				_logger.LogInformation("GetAllManufacturersAsync(manufacturerName,storeId,pageIndex,pageSize,showHidden,overridePublished)={ManufacturerName},{StoreId},{PageIndex},{PageSize},{ShowHidden},{OverridePublished}: find query executed in {Arg6} ms", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished, __logStart.ElapsedMilliseconds);
             else if (overridePublished.HasValue)
                 query = query.Where(m => m.Published == overridePublished.Value);
 
@@ -167,6 +185,7 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<IList<int>> GetAppliedManufacturerIdsAsync(Discount discount, Customer customer)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopDiscountDefaults.ManufacturerIdsByDiscountCacheKey,
@@ -192,6 +211,8 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<Manufacturer> GetManufacturerByIdAsync(int manufacturerId)
     {
+		_logger.LogDebug(">>> Entering GetManufacturerByIdAsync(manufacturerId={ManufacturerId})", manufacturerId);
+		_logger.LogDebug("<<< Exiting GetManufacturerByIdAsync(manufacturerId={ManufacturerId})", manufacturerId);
         return await _manufacturerRepository.GetByIdAsync(manufacturerId, cache => default);
     }
 
@@ -209,8 +230,10 @@ public partial class ManufacturerService : IManufacturerService
     public virtual async Task<IPagedList<Manufacturer>> GetManufacturersWithAppliedDiscountAsync(int? discountId = null,
         bool showHidden = false, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetManufacturersWithAppliedDiscountAsync(discountId={DiscountId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", discountId, showHidden, pageIndex, pageSize);
         var manufacturers = _manufacturerRepository.Table;
 
+		_logger.LogDebug("GetManufacturersWithAppliedDiscountAsync(discountId={DiscountId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): manufacturers → {Manufacturers}", discountId, showHidden, pageIndex, pageSize, manufacturers);
         if (discountId.HasValue)
             manufacturers = from manufacturer in manufacturers
                 join dmm in _discountManufacturerMappingRepository.Table on manufacturer.Id equals dmm.EntityId
@@ -222,6 +245,7 @@ public partial class ManufacturerService : IManufacturerService
 
         manufacturers = manufacturers.OrderBy(manufacturer => manufacturer.DisplayOrder).ThenBy(manufacturer => manufacturer.Id);
 
+		_logger.LogDebug("<<< Exiting GetManufacturersWithAppliedDiscountAsync(discountId={DiscountId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", discountId, showHidden, pageIndex, pageSize);
         return await manufacturers.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -235,12 +259,15 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<IList<Manufacturer>> GetManufacturersByCategoryIdAsync(int categoryId)
     {
+		_logger.LogDebug(">>> Entering GetManufacturersByCategoryIdAsync(categoryId={CategoryId})", categoryId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (categoryId <= 0)
             return new List<Manufacturer>();
 
         // get available products in category
         var productsQuery =
             from p in _productRepository.Table
+			_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): productsQuery → {ProductsQuery}", categoryId, productsQuery);
             where !p.Deleted && p.Published &&
                   (p.ParentGroupedProductId == 0 || p.VisibleIndividually) &&
                   (!p.AvailableStartDateTimeUtc.HasValue || p.AvailableStartDateTimeUtc <= DateTime.UtcNow) &&
@@ -248,8 +275,11 @@ public partial class ManufacturerService : IManufacturerService
             select p;
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): store → {Store}", categoryId, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): customer → {Customer}", categoryId, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): customerRoleIds → {CustomerRoleIds}", categoryId, customerRoleIds);
 
         //apply store mapping constraints
         productsQuery = await _storeMappingService.ApplyStoreMapping(productsQuery, store.Id);
@@ -268,6 +298,7 @@ public partial class ManufacturerService : IManufacturerService
             select pc;
 
         var manufacturerQuery = from m in _manufacturerRepository.Table
+			_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): manufacturerQuery → {ManufacturerQuery}", categoryId, manufacturerQuery);
             where !m.Deleted && m.Published
             select m;
 
@@ -280,6 +311,7 @@ public partial class ManufacturerService : IManufacturerService
         // get manufacturers of the products
         var manufacturersQuery =
             from m in manufacturerQuery
+			using Microsoft.Extensions.Logging;
             join pm in _productManufacturerRepository.Table on m.Id equals pm.ManufacturerId
             join p in productsQuery on pm.ProductId equals p.Id
             join pc in productCategoryQuery on p.Id equals pc.ProductId
@@ -290,6 +322,8 @@ public partial class ManufacturerService : IManufacturerService
         var key = _staticCacheManager
             .PrepareKeyForDefaultCache(NopCatalogDefaults.ManufacturersByCategoryCacheKey, categoryId, store, customerRoleIds);
 
+		_logger.LogInformation("GetManufacturersByCategoryIdAsync(categoryId)={CategoryId}: external service call took {Arg1} ms", categoryId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetManufacturersByCategoryIdAsync(categoryId={CategoryId})", categoryId);
         return await _staticCacheManager.GetAsync(key, async () => await manufacturersQuery.Distinct().ToListAsync());
     }
 
@@ -303,6 +337,9 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<IList<Manufacturer>> GetManufacturersByIdsAsync(int[] manufacturerIds)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
+		_logger.LogDebug(">>> Entering GetManufacturersByIdsAsync(manufacturerIds={ManufacturerIds})", manufacturerIds);
+		_logger.LogDebug("<<< Exiting GetManufacturersByIdsAsync(manufacturerIds={ManufacturerIds})", manufacturerIds);
         return await _manufacturerRepository.GetByIdsAsync(manufacturerIds, includeDeleted: false);
     }
 
@@ -313,7 +350,9 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertManufacturerAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering InsertManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
         await _manufacturerRepository.InsertAsync(manufacturer);
+		_logger.LogDebug("<<< Exiting InsertManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
     }
 
     /// <summary>
@@ -323,7 +362,9 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateManufacturerAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering UpdateManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
         await _manufacturerRepository.UpdateAsync(manufacturer);
+		_logger.LogDebug("<<< Exiting UpdateManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
     }
 
     /// <summary>
@@ -333,9 +374,15 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductManufacturerAsync(ProductManufacturer productManufacturer)
     {
+		_logger.LogDebug(">>> Entering DeleteProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productManufacturerRepository.DeleteAsync(productManufacturer);
+		_logger.LogDebug("<<< Exiting DeleteProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductManufacturerAsync(productManufacturer)={ProductManufacturer}: external service call took {Arg1} ms", productManufacturer, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductManufacturerAsync(productManufacturer)={ProductManufacturer}: external service call took {Arg1} ms", productManufacturer, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Deletes a list of product manufacturer mapping
     /// </summary>
@@ -343,9 +390,15 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductManufacturersAsync(IList<ProductManufacturer> productManufacturers)
     {
+		_logger.LogDebug(">>> Entering DeleteProductManufacturersAsync(productManufacturers={ProductManufacturers})", productManufacturers);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productManufacturerRepository.DeleteAsync(productManufacturers);
+		_logger.LogDebug("<<< Exiting DeleteProductManufacturersAsync(productManufacturers={ProductManufacturers})", productManufacturers);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductManufacturersAsync(productManufacturers)={ProductManufacturers}: external service call took {Arg1} ms", productManufacturers, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteProductManufacturersAsync(productManufacturers)={ProductManufacturers}: external service call took {Arg1} ms", productManufacturers, __logStart.ElapsedMilliseconds);
     /// <summary>
     /// Gets product manufacturer collection
     /// </summary>
@@ -360,10 +413,12 @@ public partial class ManufacturerService : IManufacturerService
     public virtual async Task<IPagedList<ProductManufacturer>> GetProductManufacturersByManufacturerIdAsync(int manufacturerId,
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", manufacturerId, pageIndex, pageSize, showHidden);
         if (manufacturerId == 0)
             return new PagedList<ProductManufacturer>(new List<ProductManufacturer>(), pageIndex, pageSize);
 
         var query = from pm in _productManufacturerRepository.Table
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): query → {Query}", manufacturerId, pageIndex, pageSize, showHidden, query);
             join p in _productRepository.Table on pm.ProductId equals p.Id
             where pm.ManufacturerId == manufacturerId && !p.Deleted
             orderby pm.DisplayOrder, pm.Id
@@ -372,18 +427,22 @@ public partial class ManufacturerService : IManufacturerService
         if (!showHidden)
         {
             var manufacturersQuery = _manufacturerRepository.Table.Where(m => m.Published);
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): manufacturersQuery → {ManufacturersQuery}", manufacturerId, pageIndex, pageSize, showHidden, manufacturersQuery);
 
             //apply store mapping constraints
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): store → {Store}", manufacturerId, pageIndex, pageSize, showHidden, store);
             manufacturersQuery = await _storeMappingService.ApplyStoreMapping(manufacturersQuery, store.Id);
 
             //apply ACL constraints
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): customer → {Customer}", manufacturerId, pageIndex, pageSize, showHidden, customer);
             manufacturersQuery = await _aclService.ApplyAcl(manufacturersQuery, customer);
 
             query = query.Where(pm => manufacturersQuery.Any(m => m.Id == pm.ManufacturerId));
         }
 
+		_logger.LogDebug("<<< Exiting GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", manufacturerId, pageIndex, pageSize, showHidden);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -399,17 +458,22 @@ public partial class ManufacturerService : IManufacturerService
     public virtual async Task<IList<ProductManufacturer>> GetProductManufacturersByProductIdAsync(int productId,
         bool showHidden = false)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (productId == 0)
             return new List<ProductManufacturer>();
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): store → {Store}", productId, showHidden, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): customer → {Customer}", productId, showHidden, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): customerRoleIds → {CustomerRoleIds}", productId, showHidden, customerRoleIds);
 
         var key = _staticCacheManager
             .PrepareKeyForDefaultCache(NopCatalogDefaults.ProductManufacturersByProductCacheKey, productId, showHidden, customerRoleIds, store);
 
         var query = from pm in _productManufacturerRepository.Table
+			_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): query → {Query}", productId, showHidden, query);
             join m in _manufacturerRepository.Table on pm.ManufacturerId equals m.Id
             where pm.ProductId == productId && !m.Deleted
             orderby pm.DisplayOrder, pm.Id
@@ -418,6 +482,7 @@ public partial class ManufacturerService : IManufacturerService
         if (!showHidden)
         {
             var manufacturersQuery = _manufacturerRepository.Table.Where(m => m.Published);
+			_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): manufacturersQuery → {ManufacturersQuery}", productId, showHidden, manufacturersQuery);
 
             //apply store mapping constraints
             manufacturersQuery = await _storeMappingService.ApplyStoreMapping(manufacturersQuery, store.Id);
@@ -428,6 +493,8 @@ public partial class ManufacturerService : IManufacturerService
             query = query.Where(pm => manufacturersQuery.Any(m => m.Id == pm.ManufacturerId));
         }
 
+		_logger.LogInformation("GetProductManufacturersByProductIdAsync(productId,showHidden)={ProductId},{ShowHidden}: external service call took {Arg2} ms", productId, showHidden, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden})", productId, showHidden);
         return await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
     }
 
@@ -441,6 +508,8 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<ProductManufacturer> GetProductManufacturerByIdAsync(int productManufacturerId)
     {
+		_logger.LogDebug(">>> Entering GetProductManufacturerByIdAsync(productManufacturerId={ProductManufacturerId})", productManufacturerId);
+		_logger.LogDebug("<<< Exiting GetProductManufacturerByIdAsync(productManufacturerId={ProductManufacturerId})", productManufacturerId);
         return await _productManufacturerRepository.GetByIdAsync(productManufacturerId, cache => default);
     }
 
@@ -451,7 +520,9 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductManufacturerAsync(ProductManufacturer productManufacturer)
     {
+		_logger.LogDebug(">>> Entering InsertProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
         await _productManufacturerRepository.InsertAsync(productManufacturer);
+		_logger.LogDebug("<<< Exiting InsertProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
     }
 
     /// <summary>
@@ -461,7 +532,9 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductManufacturerAsync(ProductManufacturer productManufacturer)
     {
+		_logger.LogDebug(">>> Entering UpdateProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
         await _productManufacturerRepository.UpdateAsync(productManufacturer);
+		_logger.LogDebug("<<< Exiting UpdateProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
     }
 
     /// <summary>
@@ -493,13 +566,19 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<string[]> GetNotExistingManufacturersAsync(string[] manufacturerIdsNames)
     {
+		_logger.LogDebug(">>> Entering GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames})", manufacturerIdsNames);
         ArgumentNullException.ThrowIfNull(manufacturerIdsNames);
 
         var query = _manufacturerRepository.Table;//.Where(m => !m.Deleted);
+		_logger.LogDebug("GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames}): query → {Query}", manufacturerIdsNames, query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var queryFilter = manufacturerIdsNames.Distinct().ToArray();
+		_logger.LogDebug("GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames}): queryFilter → {QueryFilter}", manufacturerIdsNames, queryFilter);
         //filtering by name
         var filter = await query.Select(m => m.Name).Where(m => queryFilter.Contains(m)).ToListAsync();
         queryFilter = queryFilter.Except(filter).ToArray();
+		_logger.LogDebug("GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames}): filter → {Filter}", manufacturerIdsNames, filter);
+		_logger.LogInformation("GetNotExistingManufacturersAsync(manufacturerIdsNames)={ManufacturerIdsNames}: find query executed in {Arg1} ms", manufacturerIdsNames, __logStart.ElapsedMilliseconds);
 
         //if some names not found
         if (!queryFilter.Any())
@@ -510,6 +589,7 @@ public partial class ManufacturerService : IManufacturerService
             .Where(c => queryFilter.Contains(c))
             .ToListAsync();
 
+		_logger.LogDebug("<<< Exiting GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames})", manufacturerIdsNames);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -522,6 +602,8 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A ProductManufacturer that has the specified values; otherwise null</returns>
     public virtual ProductManufacturer FindProductManufacturer(IList<ProductManufacturer> source, int productId, int manufacturerId)
     {
+		_logger.LogDebug(">>> Entering FindProductManufacturer(source={Source},productId={ProductId},manufacturerId={ManufacturerId})", source, productId, manufacturerId);
+		_logger.LogDebug("<<< Exiting FindProductManufacturer(source={Source},productId={ProductId},manufacturerId={ManufacturerId})", source, productId, manufacturerId);
         return source.FirstOrDefault(pm => pm.ProductId == productId && pm.ManufacturerId == manufacturerId);
     }
 
@@ -536,6 +618,8 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<DiscountManufacturerMapping> GetDiscountAppliedToManufacturerAsync(int manufacturerId, int discountId)
     {
+		_logger.LogDebug(">>> Entering GetDiscountAppliedToManufacturerAsync(manufacturerId={ManufacturerId},discountId={DiscountId})", manufacturerId, discountId);
+		_logger.LogDebug("<<< Exiting GetDiscountAppliedToManufacturerAsync(manufacturerId={ManufacturerId},discountId={DiscountId})", manufacturerId, discountId);
         return await _discountManufacturerMappingRepository.Table
             .FirstOrDefaultAsync(dcm => dcm.EntityId == manufacturerId && dcm.DiscountId == discountId);
     }
@@ -557,8 +641,12 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteDiscountManufacturerMappingAsync(DiscountManufacturerMapping discountManufacturerMapping)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _discountManufacturerMappingRepository.DeleteAsync(discountManufacturerMapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteDiscountManufacturerMappingAsync(discountManufacturerMapping)={DiscountManufacturerMapping}: external service call took {Arg1} ms", discountManufacturerMapping, __logStart.ElapsedMilliseconds);
     }
 
+	_logger.LogInformation("DeleteDiscountManufacturerMappingAsync(discountManufacturerMapping)={DiscountManufacturerMapping}: external service call took {Arg1} ms", discountManufacturerMapping, __logStart.ElapsedMilliseconds);
     #endregion
 }

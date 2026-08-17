@@ -7,6 +7,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CampaignModelFactory : ICampaignModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -60,6 +62,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignSearchModel> PrepareCampaignSearchModelAsync(CampaignSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCampaignSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -70,6 +73,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCampaignSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -83,10 +87,12 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignListModel> PrepareCampaignListModelAsync(CampaignSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCampaignListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get campaigns
         var campaigns = (await _campaignService.GetAllCampaignsAsync(searchModel.StoreId)).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaigns → {Campaigns}", searchModel, campaigns);
 
         //prepare grid model
         var model = await new CampaignListModel().PrepareToGridAsync(searchModel, campaigns, () =>
@@ -95,12 +101,14 @@ public partial class CampaignModelFactory : ICampaignModelFactory
             {
                 //fill in model values from the entity
                 var campaignModel = campaign.ToModel<CampaignModel>();
+				_logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaignModel → {CampaignModel}", searchModel, campaignModel);
 
                 //convert dates to the user time
                 campaignModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(campaign.CreatedOnUtc, DateTimeKind.Utc);
                 if (campaign.DontSendBeforeDateUtc.HasValue)
                 {
                     campaignModel.DontSendBeforeDate = await _dateTimeHelper
+						_logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaignModel.DontSendBeforeDate → {Arg1}", searchModel, campaignModel.DontSendBeforeDate);
                         .ConvertToUserTimeAsync(campaign.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
                 }
 
@@ -108,6 +116,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCampaignListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

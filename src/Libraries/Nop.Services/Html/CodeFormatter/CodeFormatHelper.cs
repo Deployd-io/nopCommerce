@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html.CodeFormatter;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Html.CodeFormatter;
 /// </summary>
 public partial class CodeFormatHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected static readonly Regex _regexHtml = new("<[^>]*>", RegexOptions.Compiled);
@@ -25,6 +27,7 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     protected static string CodeEvaluatorSimple(Match match)
     {
+		_logger.LogDebug(">>> Entering CodeEvaluatorSimple(match={Match})", match);
         if (!match.Success)
             return match.Value;
 
@@ -38,7 +41,9 @@ public partial class CodeFormatHelper
         };
 
         var result = match.Value;
+		_logger.LogDebug("CodeEvaluatorSimple(match={Match}): result → {Result}", match, result);
         result = Highlight(options, result);
+		_logger.LogDebug("<<< Exiting CodeEvaluatorSimple(match={Match})", match);
         return result;
     }
 
@@ -49,7 +54,9 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     protected static string StripHtml(string html)
     {
+		_logger.LogDebug(">>> Entering StripHtml(html={Html})", html);
         if (string.IsNullOrEmpty(html))
+		_logger.LogDebug("<<< Exiting StripHtml(html={Html})", html);
             return string.Empty;
 
         return _regexHtml.Replace(html, string.Empty);
@@ -141,6 +148,7 @@ public partial class CodeFormatHelper
     /// <returns>Formatted text</returns>
     public static string FormatTextSimple(string text)
     {
+		_logger.LogDebug(">>> Entering FormatTextSimple(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
@@ -148,7 +156,9 @@ public partial class CodeFormatHelper
             return text;
 
         text = _regexCode.Replace(text, CodeEvaluatorSimple);
+		_logger.LogDebug("FormatTextSimple(text={Text}): text → {Text1}", text, text);
         text = _regexCode.Replace(text, "$1");
+		_logger.LogDebug("<<< Exiting FormatTextSimple(text={Text})", text);
         return text;
     }
 

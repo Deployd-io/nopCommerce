@@ -3,6 +3,7 @@
 //! author : Nicolai Davies<mail@nicolai.io> : https://github.com/nicolaidavies
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('ss', {
     months: "Bhimbidvwane_Indlovana_Indlov'lenkhulu_Mabasa_Inkhwekhweti_Inhlaba_Kholwane_Ingci_Inyoni_Imphala_Lweti_Ingongoni".split(
@@ -50,6 +51,7 @@ export default moment.defineLocale('ss', {
     },
     meridiemParse: /ekuseni|emini|entsambama|ebusuku/,
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         if (hours < 11) {
             return 'ekuseni';
         } else if (hours < 15) {
@@ -61,6 +63,7 @@ export default moment.defineLocale('ss', {
         }
     },
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -70,6 +73,8 @@ export default moment.defineLocale('ss', {
             return hour >= 11 ? hour : hour + 12;
         } else if (meridiem === 'entsambama' || meridiem === 'ebusuku') {
             if (hour === 0) {
+				logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
                 return 0;
             }
             return hour + 12;

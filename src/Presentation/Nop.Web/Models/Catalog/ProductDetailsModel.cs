@@ -7,30 +7,51 @@ using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductDetailsModel()
     {
+		_logger.LogDebug(">>> Entering ProductDetailsModel()");
         DefaultPictureModel = new PictureModel();
         PictureModels = new List<PictureModel>();
+		_logger.LogDebug("ProductDetailsModel(): PictureModels → {PictureModels}", PictureModels);
+		_logger.LogDebug("ProductDetailsModel(): DefaultPictureModel → {DefaultPictureModel}", DefaultPictureModel);
         VideoModels = new List<VideoModel>();
+		_logger.LogDebug("ProductDetailsModel(): VideoModels → {VideoModels}", VideoModels);
         GiftCard = new GiftCardModel();
+		_logger.LogDebug("ProductDetailsModel(): GiftCard → {GiftCard}", GiftCard);
         ProductPrice = new ProductPriceModel();
+		_logger.LogDebug("ProductDetailsModel(): ProductPrice → {ProductPrice}", ProductPrice);
         AddToCart = new AddToCartModel();
+		_logger.LogDebug("ProductDetailsModel(): AddToCart → {AddToCart}", AddToCart);
         ProductAttributes = new List<ProductAttributeModel>();
+		_logger.LogDebug("ProductDetailsModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
         AssociatedProducts = new List<ProductDetailsModel>();
+		_logger.LogDebug("ProductDetailsModel(): AssociatedProducts → {AssociatedProducts}", AssociatedProducts);
         VendorModel = new VendorBriefInfoModel();
+		_logger.LogDebug("ProductDetailsModel(): VendorModel → {VendorModel}", VendorModel);
         Breadcrumb = new ProductBreadcrumbModel();
+		_logger.LogDebug("ProductDetailsModel(): Breadcrumb → {Breadcrumb}", Breadcrumb);
         ProductTags = new List<ProductTagModel>();
+		_logger.LogDebug("ProductDetailsModel(): ProductTags → {ProductTags}", ProductTags);
         ProductSpecificationModel = new ProductSpecificationModel();
+		_logger.LogDebug("ProductDetailsModel(): ProductSpecificationModel → {ProductSpecificationModel}", ProductSpecificationModel);
         ProductManufacturers = new List<ManufacturerBriefInfoModel>();
+		_logger.LogDebug("ProductDetailsModel(): ProductManufacturers → {ProductManufacturers}", ProductManufacturers);
         ProductReviewOverview = new ProductReviewOverviewModel();
+		_logger.LogDebug("ProductDetailsModel(): ProductReviewOverview → {ProductReviewOverview}", ProductReviewOverview);
         ProductReviews = new ProductReviewsModel();
+		_logger.LogDebug("ProductDetailsModel(): ProductReviews → {ProductReviews}", ProductReviews);
         TierPrices = new List<TierPriceModel>();
+		_logger.LogDebug("ProductDetailsModel(): TierPrices → {TierPrices}", TierPrices);
         ProductEstimateShipping = new ProductEstimateShippingModel();
+		_logger.LogDebug("<<< Exiting ProductDetailsModel()");
+		_logger.LogDebug("ProductDetailsModel(): ProductEstimateShipping → {ProductEstimateShipping}", ProductEstimateShipping);
     }
 
     //picture(s)
@@ -132,7 +153,10 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductBreadcrumbModel()
         {
+			_logger.LogDebug(">>> Entering ProductBreadcrumbModel()");
             CategoryBreadcrumb = new List<CategorySimpleModel>();
+			_logger.LogDebug("<<< Exiting ProductBreadcrumbModel()");
+			_logger.LogDebug("ProductBreadcrumbModel(): CategoryBreadcrumb → {CategoryBreadcrumb}", CategoryBreadcrumb);
         }
 
         public bool Enabled { get; set; }
@@ -147,8 +171,12 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public AddToCartModel()
         {
+			_logger.LogDebug(">>> Entering AddToCartModel()");
             AllowedQuantities = new List<SelectListItem>();
             ProductToWishlist = new ProductToWishlistModel();
+			_logger.LogDebug("<<< Exiting AddToCartModel()");
+			_logger.LogDebug("AddToCartModel(): ProductToWishlist → {ProductToWishlist}", ProductToWishlist);
+			_logger.LogDebug("AddToCartModel(): AllowedQuantities → {AllowedQuantities}", AllowedQuantities);
         }
         public int ProductId { get; set; }
 
@@ -218,8 +246,12 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductAttributeModel()
         {
+			_logger.LogDebug(">>> Entering ProductAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<ProductAttributeValueModel>();
+			_logger.LogDebug("<<< Exiting ProductAttributeModel()");
+			_logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
+			_logger.LogDebug("ProductAttributeModel(): AllowedFileExtensions → {AllowedFileExtensions}", AllowedFileExtensions);
         }
 
         public int ProductId { get; set; }
@@ -270,7 +302,10 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductAttributeValueModel()
         {
+			_logger.LogDebug(">>> Entering ProductAttributeValueModel()");
             ImageSquaresPictureModel = new PictureModel();
+			_logger.LogDebug("<<< Exiting ProductAttributeValueModel()");
+			_logger.LogDebug("ProductAttributeValueModel(): ImageSquaresPictureModel → {ImageSquaresPictureModel}", ImageSquaresPictureModel);
         }
 
         public string Name { get; set; }

@@ -9,11 +9,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Cms;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class WidgetController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IEventPublisher _eventPublisher;
@@ -34,12 +36,20 @@ public partial class WidgetController : BaseAdminController
         IWidgetPluginManager widgetPluginManager,
         WidgetSettings widgetSettings)
     {
+		_logger.LogDebug(">>> Entering WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings})", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings}): _eventPublisher → {_eventPublisher}", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings, _eventPublisher);
         _permissionService = permissionService;
+		_logger.LogDebug("WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings}): _permissionService → {_permissionService}", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings}): _settingService → {_settingService}", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings, _settingService);
         _widgetModelFactory = widgetModelFactory;
+		_logger.LogDebug("WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings}): _widgetModelFactory → {_widgetModelFactory}", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings, _widgetModelFactory);
         _widgetPluginManager = widgetPluginManager;
+		_logger.LogDebug("WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings}): _widgetPluginManager → {_widgetPluginManager}", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings, _widgetPluginManager);
         _widgetSettings = widgetSettings;
+		_logger.LogDebug("<<< Exiting WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings})", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings);
+		_logger.LogDebug("WidgetController(eventPublisher={EventPublisher},permissionService={PermissionService},settingService={SettingService},widgetModelFactory={WidgetModelFactory},widgetPluginManager={WidgetPluginManager},widgetSettings={WidgetSettings}): _widgetSettings → {_widgetSettings}", eventPublisher, permissionService, settingService, widgetModelFactory, widgetPluginManager, widgetSettings, _widgetSettings);
     }
 
     #endregion
@@ -48,15 +58,20 @@ public partial class WidgetController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _widgetModelFactory.PrepareWidgetSearchModelAsync(new WidgetSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -67,6 +82,7 @@ public partial class WidgetController : BaseAdminController
         //prepare model
         var model = await _widgetModelFactory.PrepareWidgetListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

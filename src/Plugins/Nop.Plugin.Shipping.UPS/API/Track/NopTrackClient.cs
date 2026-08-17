@@ -20,7 +20,9 @@ public partial class TrackClient
     partial void PrepareRequest(HttpClient client, HttpRequestMessage request,
         string url)
     {
+		logger.LogDebug(">>> Entering PrepareRequest(client={Client},request={Request},url={Url})", client, request, url);
         client.PrepareRequest(request, _upsSettings, _accessToken);
+		logger.LogDebug("<<< Exiting PrepareRequest(client={Client},request={Request},url={Url})", client, request, url);
     }
 
     /// <summary>
@@ -33,15 +35,19 @@ public partial class TrackClient
     /// </returns>
     public virtual async Task<TrackResponse> TrackAsync(string trackingNumber)
     {
+		logger.LogDebug(">>> Entering TrackAsync(trackingNumber={TrackingNumber})", trackingNumber);
         var response = await TrackV1DetailsAsync(trackingNumber, Guid.NewGuid().ToString(),
             _upsSettings.UseSandbox ? "testing" : UPSDefaults.SystemName, string.Empty);
 
+		logger.LogDebug("<<< Exiting TrackAsync(trackingNumber={TrackingNumber})", trackingNumber);
         return response.TrackResponse;
     }
 
     partial void UpdateJsonSerializerSettings(JsonSerializerSettings settings)
     {
+		logger.LogDebug(">>> Entering UpdateJsonSerializerSettings(settings={Settings})", settings);
         settings.ContractResolver = new NullToEmptyStringResolver();
+		logger.LogDebug("<<< Exiting UpdateJsonSerializerSettings(settings={Settings})", settings);
     }
 
     partial void ProcessResponse(HttpClient client, HttpResponseMessage response)

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text.RegularExpressions;
 using Nop.Core.Domain.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class Tokenizer : ITokenizer
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly MessageTemplatesSettings _messageTemplatesSettings;
@@ -20,7 +22,10 @@ public partial class Tokenizer : ITokenizer
 
     public Tokenizer(MessageTemplatesSettings messageTemplatesSettings)
     {
+		_logger.LogDebug(">>> Entering Tokenizer(messageTemplatesSettings={MessageTemplatesSettings})", messageTemplatesSettings);
         _messageTemplatesSettings = messageTemplatesSettings;
+		_logger.LogDebug("<<< Exiting Tokenizer(messageTemplatesSettings={MessageTemplatesSettings})", messageTemplatesSettings);
+		_logger.LogDebug("Tokenizer(messageTemplatesSettings={MessageTemplatesSettings}): _messageTemplatesSettings → {_messageTemplatesSettings}", messageTemplatesSettings, _messageTemplatesSettings);
     }
 
     #endregion
@@ -36,6 +41,7 @@ public partial class Tokenizer : ITokenizer
     /// <returns>A string that is equivalent to the current string except that all instances of pattern are replaced with replacement string</returns>
     protected string Replace(string original, string pattern, string replacement)
     {
+		_logger.LogDebug(">>> Entering Replace(original={Original},pattern={Pattern},replacement={Replacement})", original, pattern, replacement);
         //for case sensitive comparison use base string.Replace() method
         var stringComparison = _messageTemplatesSettings.CaseInvariantReplacement ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
         if (stringComparison == StringComparison.Ordinal)
@@ -43,11 +49,15 @@ public partial class Tokenizer : ITokenizer
 
         //or do some routine work here
         var count = 0;
+		_logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): count → {Count}", original, pattern, replacement, count);
         var position0 = 0;
+		_logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): position0 → {Position0}", original, pattern, replacement, position0);
         int position1;
 
         var inc = original.Length / pattern.Length * (replacement.Length - pattern.Length);
+		_logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): inc → {Inc}", original, pattern, replacement, inc);
         var chars = new char[original.Length + Math.Max(0, inc)];
+		_logger.LogDebug("Replace(original={Original},pattern={Pattern},replacement={Replacement}): chars → {Chars}", original, pattern, replacement, chars);
         while ((position1 = original.IndexOf(pattern, position0, stringComparison)) != -1)
         {
             for (var i = position0; i < position1; ++i)
@@ -63,6 +73,7 @@ public partial class Tokenizer : ITokenizer
         for (var i = position0; i < original.Length; ++i)
             chars[count++] = original[i];
 
+		_logger.LogDebug("<<< Exiting Replace(original={Original},pattern={Pattern},replacement={Replacement})", original, pattern, replacement);
         return new string(chars, 0, count);
     }
 

@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Common;
 using Nop.Core.Domain.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Domain.Customers;
 
@@ -8,9 +9,13 @@ namespace Nop.Core.Domain.Customers;
 /// </summary>
 public partial class Customer : BaseEntity, ISoftDeletedEntity
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public Customer()
     {
+		_logger.LogDebug(">>> Entering Customer()");
         CustomerGuid = Guid.NewGuid();
+		_logger.LogDebug("<<< Exiting Customer()");
+		_logger.LogDebug("Customer(): CustomerGuid → {CustomerGuid}", CustomerGuid);
     }
 
     /// <summary>

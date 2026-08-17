@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class RenderButtonCustom : IRender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>

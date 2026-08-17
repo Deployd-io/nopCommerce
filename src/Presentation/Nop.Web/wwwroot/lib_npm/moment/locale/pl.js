@@ -3,6 +3,7 @@
 //! author : Rafal Hirsz : https://github.com/evoL
 
 import moment from '../moment';
+const logger = console;
 
 var monthsNominative =
         'styczeń_luty_marzec_kwiecień_maj_czerwiec_lipiec_sierpień_wrzesień_październik_listopad_grudzień'.split(
@@ -27,14 +28,18 @@ var monthsNominative =
         /^gru/i,
     ];
 function plural(n) {
+	logger.debug(`>>> Entering plural(n=${n})`);
+	logger.debug(`<<< Exiting plural(n=${n})`);
     return n % 10 < 5 && n % 10 > 1 && ~~(n / 10) % 10 !== 1;
 }
 function translate(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var result = number + ' ';
     switch (key) {
         case 'ss':
             return result + (plural(number) ? 'sekundy' : 'sekund');
         case 'm':
+			logger.debug(`translate(number=${number},withoutSuffix=${withoutSuffix},key=${key}): result → ${result}`);
             return withoutSuffix ? 'minuta' : 'minutę';
         case 'mm':
             return result + (plural(number) ? 'minuty' : 'minut');
@@ -47,17 +52,20 @@ function translate(number, withoutSuffix, key) {
         case 'MM':
             return result + (plural(number) ? 'miesiące' : 'miesięcy');
         case 'yy':
+			logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
             return result + (plural(number) ? 'lata' : 'lat');
     }
 }
 
 export default moment.defineLocale('pl', {
     months: function (momentToFormat, format) {
+		logger.debug(`>>> Entering months(momentToFormat=${momentToFormat},format=${format})`);
         if (!momentToFormat) {
             return monthsNominative;
         } else if (/D MMMM/.test(format)) {
             return monthsSubjective[momentToFormat.month()];
         } else {
+			logger.debug(`<<< Exiting months(momentToFormat=${momentToFormat},format=${format})`);
             return monthsNominative[momentToFormat.month()];
         }
     },
@@ -81,6 +89,7 @@ export default moment.defineLocale('pl', {
         sameDay: '[Dziś o] LT',
         nextDay: '[Jutro o] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[W niedzielę o] LT';
@@ -95,11 +104,13 @@ export default moment.defineLocale('pl', {
                     return '[W sobotę o] LT';
 
                 default:
+			logger.debug('<<< Exiting nextWeek()');
                     return '[W] dddd [o] LT';
             }
         },
         lastDay: '[Wczoraj o] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             switch (this.day()) {
                 case 0:
                     return '[W zeszłą niedzielę o] LT';
@@ -108,6 +119,7 @@ export default moment.defineLocale('pl', {
                 case 6:
                     return '[W zeszłą sobotę o] LT';
                 default:
+			logger.debug('<<< Exiting lastWeek()');
                     return '[W zeszły] dddd [o] LT';
             }
         },

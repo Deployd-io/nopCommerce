@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Catalog;
@@ -7,10 +8,15 @@ namespace Nop.Core.Domain.Catalog;
 /// </summary>
 public partial class CatalogSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CatalogSettings()
     {
+		_logger.LogDebug(">>> Entering CatalogSettings()");
         ProductSortingEnumDisabled = new List<int>();
         ProductSortingEnumDisplayOrder = new Dictionary<int, int>();
+		_logger.LogDebug("<<< Exiting CatalogSettings()");
+		_logger.LogDebug("CatalogSettings(): ProductSortingEnumDisplayOrder → {ProductSortingEnumDisplayOrder}", ProductSortingEnumDisplayOrder);
+		_logger.LogDebug("CatalogSettings(): ProductSortingEnumDisabled → {ProductSortingEnumDisabled}", ProductSortingEnumDisabled);
     }
 
     /// <summary>

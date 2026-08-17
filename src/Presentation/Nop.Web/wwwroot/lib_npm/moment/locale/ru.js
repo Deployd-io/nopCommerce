@@ -5,9 +5,13 @@
 //! author : Коренберг Марк : https://github.com/socketpair
 
 import moment from '../moment';
+const logger = console;
 
 function plural(word, num) {
+	logger.debug(`>>> Entering plural(word=${word},num=${num})`);
     var forms = word.split('_');
+	logger.debug(`plural(word=${word},num=${num}): forms → ${forms}`);
+	logger.debug(`<<< Exiting plural(word=${word},num=${num})`);
     return num % 10 === 1 && num % 100 !== 11
         ? forms[0]
         : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
@@ -15,6 +19,7 @@ function plural(word, num) {
           : forms[2];
 }
 function relativeTimeWithPlural(number, withoutSuffix, key) {
+	logger.debug(`>>> Entering relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
     var format = {
         ss: withoutSuffix ? 'секунда_секунды_секунд' : 'секунду_секунды_секунд',
         mm: withoutSuffix ? 'минута_минуты_минут' : 'минуту_минуты_минут',
@@ -27,6 +32,7 @@ function relativeTimeWithPlural(number, withoutSuffix, key) {
     if (key === 'm') {
         return withoutSuffix ? 'минута' : 'минуту';
     } else {
+		logger.debug(`<<< Exiting relativeTimeWithPlural(number=${number},withoutSuffix=${withoutSuffix},key=${key})`);
         return number + ' ' + plural(format[key], +number);
     }
 }
@@ -112,6 +118,7 @@ export default moment.defineLocale('ru', {
         nextDay: '[Завтра, в] LT',
         lastDay: '[Вчера, в] LT',
         nextWeek: function (now) {
+			logger.debug(`>>> Entering nextWeek(now=${now})`);
             if (now.week() !== this.week()) {
                 switch (this.day()) {
                     case 0:
@@ -129,11 +136,13 @@ export default moment.defineLocale('ru', {
                 if (this.day() === 2) {
                     return '[Во] dddd, [в] LT';
                 } else {
+					logger.debug(`<<< Exiting nextWeek(now=${now})`);
                     return '[В] dddd, [в] LT';
                 }
             }
         },
         lastWeek: function (now) {
+			logger.debug(`>>> Entering lastWeek(now=${now})`);
             if (now.week() !== this.week()) {
                 switch (this.day()) {
                     case 0:
@@ -151,6 +160,7 @@ export default moment.defineLocale('ru', {
                 if (this.day() === 2) {
                     return '[Во] dddd, [в] LT';
                 } else {
+					logger.debug(`<<< Exiting lastWeek(now=${now})`);
                     return '[В] dddd, [в] LT';
                 }
             }
@@ -177,9 +187,12 @@ export default moment.defineLocale('ru', {
     },
     meridiemParse: /ночи|утра|дня|вечера/i,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return /^(дня|вечера)$/.test(input);
     },
     meridiem: function (hour, minute, isLower) {
+		logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
         if (hour < 4) {
             return 'ночи';
         } else if (hour < 12) {
@@ -187,11 +200,13 @@ export default moment.defineLocale('ru', {
         } else if (hour < 17) {
             return 'дня';
         } else {
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return 'вечера';
         }
     },
     dayOfMonthOrdinalParse: /\d{1,2}-(й|го|я)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             case 'M':
             case 'd':
@@ -203,6 +218,7 @@ export default moment.defineLocale('ru', {
             case 'W':
                 return number + '-я';
             default:
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },

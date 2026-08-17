@@ -47,14 +47,24 @@ public partial class HomeModelFactory : IHomeModelFactory
         NopHttpClient nopHttpClient)
     {
         _adminAreaSettings = adminAreaSettings;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _adminAreaSettings → {_adminAreaSettings}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _adminAreaSettings);
         _commonModelFactory = commonModelFactory;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _commonModelFactory → {_commonModelFactory}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _commonModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _localizationService → {_localizationService}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _localizationService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient})", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient);
         _orderModelFactory = orderModelFactory;
         _settingService = settingService;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _orderModelFactory → {_orderModelFactory}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _orderModelFactory);
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _settingService → {_settingService}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _settingService);
         _staticCacheManager = staticCacheManager;
         _workContext = workContext;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _staticCacheManager → {_staticCacheManager}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _staticCacheManager);
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _workContext → {_workContext}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _workContext);
         _nopHttpClient = nopHttpClient;
+		_logger.LogDebug("<<< Exiting HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient})", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient);
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _nopHttpClient → {_nopHttpClient}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _nopHttpClient);
     }
 
     #endregion
@@ -354,6 +364,8 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<NopCommerceNewsModel> PrepareNopCommerceNewsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareNopCommerceNewsModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = new NopCommerceNewsModel
         {
             HideAdvertisements = _adminAreaSettings.HideAdvertisementsOnAdminArea
@@ -370,6 +382,7 @@ public partial class HomeModelFactory : IHomeModelFactory
                 }
                 catch (AggregateException exception)
                 {
+					_logger.LogError("Exception in PrepareNopCommerceNewsModelAsync(): {Arg0}", exception.Message);
                     //rethrow actual excepion
                     throw exception.InnerException;
                 }
@@ -378,6 +391,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             for (var i = 0; i < rssData.Items.Count; i++)
             {
                 var item = rssData.Items.ElementAt(i);
+				_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): item → {Item}", item);
                 var newsItem = new NopCommerceNewsDetailsModel
                 {
                     Title = item.TitleText,
@@ -392,15 +406,18 @@ public partial class HomeModelFactory : IHomeModelFactory
                     continue;
 
                 var firstRequest = string.IsNullOrEmpty(_adminAreaSettings.LastNewsTitleAdminArea);
+				_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): firstRequest → {FirstRequest}", firstRequest);
                 if (_adminAreaSettings.LastNewsTitleAdminArea == newsItem.Title)
                     continue;
 
                 _adminAreaSettings.LastNewsTitleAdminArea = newsItem.Title;
+				_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): _adminAreaSettings.LastNewsTitleAdminArea → {Arg0}", _adminAreaSettings.LastNewsTitleAdminArea);
                 await _settingService.SaveSettingAsync(_adminAreaSettings);
 
                 //new item
                 if (!firstRequest)
                     model.HasNewItems = true;
+					_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): model.HasNewItems → {Arg0}", model.HasNewItems);
             }
         }
         catch (Exception ex)
@@ -408,6 +425,8 @@ public partial class HomeModelFactory : IHomeModelFactory
             await _logger.ErrorAsync("No access to the news. Website www.nopcommerce.com is not available.", ex);
         }
 
+		_logger.LogInformation("PrepareNopCommerceNewsModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareNopCommerceNewsModelAsync()");
         return model;
     }
 

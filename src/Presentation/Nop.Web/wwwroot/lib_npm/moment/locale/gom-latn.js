@@ -3,8 +3,10 @@
 //! author : The Discoverer : https://github.com/WikiDiscoverer
 
 import moment from '../moment';
+const logger = console;
 
 function processRelativeTime(number, withoutSuffix, key, isFuture) {
+	logger.debug(`>>> Entering processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     var format = {
         s: ['thoddea sekondamni', 'thodde sekond'],
         ss: [number + ' sekondamni', number + ' sekond'],
@@ -19,6 +21,7 @@ function processRelativeTime(number, withoutSuffix, key, isFuture) {
         y: ['eka vorsan', 'ek voros'],
         yy: [number + ' vorsamni', number + ' vorsam'],
     };
+	logger.debug(`<<< Exiting processRelativeTime(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
     return isFuture ? format[key][0] : format[key][1];
 }
 
@@ -75,6 +78,7 @@ export default moment.defineLocale('gom-latn', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(er)/,
     ordinal: function (number, period) {
+		logger.debug(`>>> Entering ordinal(number=${number},period=${period})`);
         switch (period) {
             // the ordinal 'er' only applies to day of the month
             case 'D':
@@ -86,6 +90,7 @@ export default moment.defineLocale('gom-latn', {
             case 'd':
             case 'w':
             case 'W':
+		logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
                 return number;
         }
     },
@@ -95,6 +100,7 @@ export default moment.defineLocale('gom-latn', {
     },
     meridiemParse: /rati|sokallim|donparam|sanje/,
     meridiemHour: function (hour, meridiem) {
+		logger.debug(`>>> Entering meridiemHour(hour=${hour},meridiem=${meridiem})`);
         if (hour === 12) {
             hour = 0;
         }
@@ -105,6 +111,9 @@ export default moment.defineLocale('gom-latn', {
         } else if (meridiem === 'donparam') {
             return hour > 12 ? hour : hour + 12;
         } else if (meridiem === 'sanje') {
+			logger.debug(`<<< Exiting meridiemHour(hour=${hour},meridiem=${meridiem})`);
+			logger.debug(`>>> Entering meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
+			logger.debug(`<<< Exiting meridiem(hour=${hour},minute=${minute},isLower=${isLower})`);
             return hour + 12;
         }
     },

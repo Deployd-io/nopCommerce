@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Domain.Shipping;
 
 namespace Nop.Services.Shipping.Pickup;
@@ -7,9 +8,13 @@ namespace Nop.Services.Shipping.Pickup;
 /// </summary>
 public partial class GetPickupPointsResponse : BaseNopResult
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public GetPickupPointsResponse()
     {
+		_logger.LogDebug(">>> Entering GetPickupPointsResponse()");
         PickupPoints = new List<PickupPoint>();
+		_logger.LogDebug("<<< Exiting GetPickupPointsResponse()");
+		_logger.LogDebug("GetPickupPointsResponse(): PickupPoints → {PickupPoints}", PickupPoints);
     }
 
     /// <summary>

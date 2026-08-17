@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Services.Plugins;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class PluginUpdatedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -13,7 +15,10 @@ public partial class PluginUpdatedEvent
     /// <param name="plugin">Updated plugin</param>
     public PluginUpdatedEvent(PluginDescriptor plugin)
     {
+		_logger.LogDebug(">>> Entering PluginUpdatedEvent(plugin={Plugin})", plugin);
         Plugin = plugin;
+		_logger.LogDebug("<<< Exiting PluginUpdatedEvent(plugin={Plugin})", plugin);
+		_logger.LogDebug("PluginUpdatedEvent(plugin={Plugin}): Plugin → {Plugin1}", plugin, Plugin);
     }
 
     #endregion

@@ -94,8 +94,10 @@ public partial class TaxService : ITaxService
     /// </returns>
     protected virtual async Task<Address> LoadDefaultTaxAddressAsync()
     {
+		_logger.LogDebug(">>> Entering LoadDefaultTaxAddressAsync()");
         var addressId = _taxSettings.DefaultTaxAddressId;
 
+		_logger.LogDebug("<<< Exiting LoadDefaultTaxAddressAsync()");
         return await _addressService.GetAddressByIdAsync(addressId);
     }
 
@@ -355,6 +357,7 @@ public partial class TaxService : ITaxService
             return false;
 
         var country = await _countryService.GetCountryByIdAsync(address.CountryId ?? 0);
+		_logger.LogDebug("IsVatExemptAsync(address={Address},customer={Customer}): country → {Country}", address, customer, country);
         if (country == null)
             return false;
 
@@ -366,6 +369,7 @@ public partial class TaxService : ITaxService
         // returns true if this customer is VAT exempt because they are shipping within the EU but outside our shop country, they have supplied a validated VAT number, and the shop is configured to allow VAT exemption
         var customerVatStatus = (VatNumberStatus)customer.VatNumberStatusId;
 
+		_logger.LogDebug("<<< Exiting IsVatExemptAsync(address={Address},customer={Customer})", address, customer);
         return country.Id != _taxSettings.EuVatShopCountryId &&
                customerVatStatus == VatNumberStatus.Valid &&
                _taxSettings.EuVatAllowVatExemption;
@@ -733,9 +737,13 @@ public partial class TaxService : ITaxService
     /// </returns>
     public virtual async Task<TaxTotalResult> GetTaxTotalAsync(IList<ShoppingCartItem> cart, bool usePaymentMethodAdditionalFee = true)
     {
+		_logger.LogDebug(">>> Entering GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee})", cart, usePaymentMethodAdditionalFee);
         var customer = await _customerService.GetShoppingCartCustomerAsync(cart);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): store → {Store}", cart, usePaymentMethodAdditionalFee, store);
         var activeTaxProvider = await _taxPluginManager.LoadPrimaryPluginAsync(customer, store.Id);
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): activeTaxProvider → {ActiveTaxProvider}", cart, usePaymentMethodAdditionalFee, activeTaxProvider);
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): customer → {Customer}", cart, usePaymentMethodAdditionalFee, customer);
         if (activeTaxProvider == null)
             return null;
 
@@ -748,6 +756,7 @@ public partial class TaxService : ITaxService
             UsePaymentMethodAdditionalFee = usePaymentMethodAdditionalFee
         };
         var taxTotalResult = await activeTaxProvider.GetTaxTotalAsync(taxTotalRequest);
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): taxTotalResult → {TaxTotalResult}", cart, usePaymentMethodAdditionalFee, taxTotalResult);
 
         //tax total is calculated, now consumers can adjust it
         await _eventPublisher.PublishAsync(new TaxTotalCalculatedEvent(taxTotalRequest, taxTotalResult));
@@ -761,6 +770,7 @@ public partial class TaxService : ITaxService
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee})", cart, usePaymentMethodAdditionalFee);
         return taxTotalResult;
     }
 

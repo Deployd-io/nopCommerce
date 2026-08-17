@@ -5,6 +5,7 @@
 //! author : Oerd Cukalla : https://github.com/oerd
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('sq', {
     months: 'Janar_Shkurt_Mars_Prill_Maj_Qershor_Korrik_Gusht_Shtator_Tetor_Nëntor_Dhjetor'.split(
@@ -19,9 +20,13 @@ export default moment.defineLocale('sq', {
     weekdaysParseExact: true,
     meridiemParse: /PD|MD/,
     isPM: function (input) {
+		logger.debug(`>>> Entering isPM(input=${input})`);
+		logger.debug(`<<< Exiting isPM(input=${input})`);
         return input.charAt(0) === 'M';
     },
     meridiem: function (hours, minutes, isLower) {
+		logger.debug(`>>> Entering meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
+		logger.debug(`<<< Exiting meridiem(hours=${hours},minutes=${minutes},isLower=${isLower})`);
         return hours < 12 ? 'PD' : 'MD';
     },
     longDateFormat: {

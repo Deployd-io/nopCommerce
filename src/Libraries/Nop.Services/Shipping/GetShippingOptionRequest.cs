@@ -4,6 +4,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping;
 
@@ -12,11 +13,15 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class GetShippingOptionRequest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GetShippingOptionRequest()
     {
+		_logger.LogDebug(">>> Entering GetShippingOptionRequest()");
         Items = new List<PackageItem>();
+		_logger.LogDebug("<<< Exiting GetShippingOptionRequest()");
+		_logger.LogDebug("GetShippingOptionRequest(): Items → {Items}", Items);
     }
 
     #endregion
@@ -95,9 +100,14 @@ public partial class GetShippingOptionRequest
         /// <param name="qty">Override "Quantity" property of shopping cart item</param>
         public PackageItem(ShoppingCartItem sci, Product product, int? qty = null)
         {
+			_logger.LogDebug(">>> Entering PackageItem(sci={Sci},product={Product},qty={Qty})", sci, product, qty);
             ShoppingCartItem = sci;
             Product = product;
+			_logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): Product → {Product1}", sci, product, qty, Product);
+			_logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): ShoppingCartItem → {ShoppingCartItem}", sci, product, qty, ShoppingCartItem);
             OverriddenQuantity = qty;
+			_logger.LogDebug("<<< Exiting PackageItem(sci={Sci},product={Product},qty={Qty})", sci, product, qty);
+			_logger.LogDebug("PackageItem(sci={Sci},product={Product},qty={Qty}): OverriddenQuantity → {OverriddenQuantity}", sci, product, qty, OverriddenQuantity);
         }
 
         /// <summary>
@@ -121,7 +131,9 @@ public partial class GetShippingOptionRequest
         /// <returns></returns>
         public int GetQuantity()
         {
+			_logger.LogDebug(">>> Entering GetQuantity()");
             if (OverriddenQuantity.HasValue)
+			_logger.LogDebug("<<< Exiting GetQuantity()");
                 return OverriddenQuantity.Value;
 
             return ShoppingCartItem.Quantity;

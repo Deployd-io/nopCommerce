@@ -31,10 +31,16 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
         IStoreContext storeContext)
     {
         _localizationService = localizationService;
+		_logger.LogDebug("ScheduleTaskRunner(localizationService={LocalizationService},locker={Locker},logger={Logger},scheduleTaskService={ScheduleTaskService},storeContext={StoreContext}): _localizationService → {_localizationService}", localizationService, locker, logger, scheduleTaskService, storeContext, _localizationService);
         _locker = locker;
+		_logger.LogDebug("ScheduleTaskRunner(localizationService={LocalizationService},locker={Locker},logger={Logger},scheduleTaskService={ScheduleTaskService},storeContext={StoreContext}): _locker → {_locker}", localizationService, locker, logger, scheduleTaskService, storeContext, _locker);
         _logger = logger;
+		_logger.LogDebug(">>> Entering ScheduleTaskRunner(localizationService={LocalizationService},locker={Locker},logger={Logger},scheduleTaskService={ScheduleTaskService},storeContext={StoreContext})", localizationService, locker, logger, scheduleTaskService, storeContext);
         _scheduleTaskService = scheduleTaskService;
         _storeContext = storeContext;
+		_logger.LogDebug("<<< Exiting ScheduleTaskRunner(localizationService={LocalizationService},locker={Locker},logger={Logger},scheduleTaskService={ScheduleTaskService},storeContext={StoreContext})", localizationService, locker, logger, scheduleTaskService, storeContext);
+		_logger.LogDebug("ScheduleTaskRunner(localizationService={LocalizationService},locker={Locker},logger={Logger},scheduleTaskService={ScheduleTaskService},storeContext={StoreContext}): _scheduleTaskService → {_scheduleTaskService}", localizationService, locker, logger, scheduleTaskService, storeContext, _scheduleTaskService);
+		_logger.LogDebug("ScheduleTaskRunner(localizationService={LocalizationService},locker={Locker},logger={Logger},scheduleTaskService={ScheduleTaskService},storeContext={StoreContext}): _storeContext → {_storeContext}", localizationService, locker, logger, scheduleTaskService, storeContext, _storeContext);
     }
 
     #endregion
@@ -46,6 +52,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
     /// </summary>
     protected virtual async Task PerformTaskAsync(ScheduleTask scheduleTask)
     {
+		_logger.LogDebug(">>> Entering PerformTaskAsync(scheduleTask={ScheduleTask})", scheduleTask);
         var type = (Type.GetType(scheduleTask.Type) ??
                     //ensure that it works fine when only the type name is specified (do not require fully qualified names)
                     AppDomain.CurrentDomain.GetAssemblies()
@@ -53,6 +60,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
                         .FirstOrDefault(t => t != null)) ?? throw new Exception($"Schedule task ({scheduleTask.Type}) cannot by instantiated");
 
         object instance = null;
+		_logger.LogDebug("PerformTaskAsync(scheduleTask={ScheduleTask}): instance → {Instance}", scheduleTask, instance);
 
         try
         {
@@ -60,6 +68,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
         }
         catch
         {
+			_logger.LogError("Exception in PerformTaskAsync(scheduleTask={ScheduleTask}): {Arg1}", scheduleTask, ex.Message);
             // ignored
         }
 
@@ -69,12 +78,15 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
             return;
 
         scheduleTask.LastStartUtc = DateTime.UtcNow;
+		_logger.LogDebug("PerformTaskAsync(scheduleTask={ScheduleTask}): scheduleTask.LastStartUtc → {Arg1}", scheduleTask, scheduleTask.LastStartUtc);
         //update appropriate datetime properties
         await _scheduleTaskService.UpdateTaskAsync(scheduleTask);
         await task.ExecuteAsync();
         scheduleTask.LastEndUtc = scheduleTask.LastSuccessUtc = DateTime.UtcNow;
+		_logger.LogDebug("PerformTaskAsync(scheduleTask={ScheduleTask}): scheduleTask.LastEndUtc → {Arg1}", scheduleTask, scheduleTask.LastEndUtc);
         //update appropriate datetime properties
         await _scheduleTaskService.UpdateTaskAsync(scheduleTask);
+		_logger.LogDebug("<<< Exiting PerformTaskAsync(scheduleTask={ScheduleTask})", scheduleTask);
     }
 
     /// <summary>
@@ -84,6 +96,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
     /// <returns>Result</returns>
     protected virtual bool IsTaskAlreadyRunning(ScheduleTask scheduleTask)
     {
+		_logger.LogDebug(">>> Entering IsTaskAlreadyRunning(scheduleTask={ScheduleTask})", scheduleTask);
         //task run for the first time
         if (!scheduleTask.LastStartUtc.HasValue && !scheduleTask.LastEndUtc.HasValue)
             return false;
@@ -96,6 +109,7 @@ public partial class ScheduleTaskRunner : IScheduleTaskRunner
 
         //task wasn't finished last time
         if (lastStartUtc.AddSeconds(scheduleTask.Seconds) <= DateTime.UtcNow)
+		_logger.LogDebug("<<< Exiting IsTaskAlreadyRunning(scheduleTask={ScheduleTask})", scheduleTask);
             return false;
 
         return true;

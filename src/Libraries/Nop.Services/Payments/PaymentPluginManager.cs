@@ -3,6 +3,7 @@ using Nop.Core.Domain.Payments;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Payments;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Payments;
 /// </summary>
 public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaymentPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ISettingService _settingService;
@@ -25,8 +27,12 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
         ISettingService settingService,
         PaymentSettings paymentSettings) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering PaymentPluginManager(customerService={CustomerService},pluginService={PluginService},settingService={SettingService},paymentSettings={PaymentSettings})", customerService, pluginService, settingService, paymentSettings);
         _settingService = settingService;
         _paymentSettings = paymentSettings;
+		_logger.LogDebug("<<< Exiting PaymentPluginManager(customerService={CustomerService},pluginService={PluginService},settingService={SettingService},paymentSettings={PaymentSettings})", customerService, pluginService, settingService, paymentSettings);
+		_logger.LogDebug("PaymentPluginManager(customerService={CustomerService},pluginService={PluginService},settingService={SettingService},paymentSettings={PaymentSettings}): _paymentSettings → {_paymentSettings}", customerService, pluginService, settingService, paymentSettings, _paymentSettings);
+		_logger.LogDebug("PaymentPluginManager(customerService={CustomerService},pluginService={PluginService},settingService={SettingService},paymentSettings={PaymentSettings}): _settingService → {_settingService}", customerService, pluginService, settingService, paymentSettings, _settingService);
     }
 
     #endregion
@@ -46,6 +52,7 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     public virtual async Task<IList<IPaymentMethod>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0,
         int countryId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},countryId={CountryId})", customer, storeId, countryId);
         var paymentMethods = await LoadActivePluginsAsync(_paymentSettings.ActivePaymentMethodSystemNames, customer, storeId);
 
         //filter by country
@@ -77,7 +84,10 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var paymentMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): paymentMethod → {PaymentMethod}", systemName, customer, storeId, paymentMethod);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(paymentMethod);
     }
 

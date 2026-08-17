@@ -3,6 +3,7 @@
 //! author : Jon Ashdown : https://github.com/jonashdown
 
 import moment from '../moment';
+const logger = console;
 
 var months = [
         'Am Faoilleach',
@@ -85,7 +86,10 @@ export default moment.defineLocale('gd', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(d|na|mh)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var output = number === 1 ? 'd' : number % 10 === 2 ? 'na' : 'mh';
+		logger.debug(`ordinal(number=${number}): output → ${output}`);
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + output;
     },
     week: {

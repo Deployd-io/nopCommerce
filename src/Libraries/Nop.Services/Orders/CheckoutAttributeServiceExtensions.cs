@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Orders;
 using Nop.Services.Attributes;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public static partial class CheckoutAttributeServiceExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Gets all checkout attributes
     /// </summary>
@@ -22,6 +24,7 @@ public static partial class CheckoutAttributeServiceExtensions
     /// </returns>
     public static async Task<IList<CheckoutAttribute>> GetAllAttributesAsync(this IAttributeService<CheckoutAttribute, CheckoutAttributeValue> service, IStaticCacheManager staticCacheManager, IStoreMappingService storeMappingService, int storeId = 0, bool excludeShippableAttributes = false)
     {
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = staticCacheManager.PrepareKeyForDefaultCache(NopOrderDefaults.CheckoutAttributesAllCacheKey, storeId, excludeShippableAttributes);
 
         return await staticCacheManager.GetAsync(key, async () =>
@@ -36,6 +39,8 @@ public static partial class CheckoutAttributeServiceExtensions
                 //remove attributes which require shippable products
                 checkoutAttributes = checkoutAttributes.Where(x => !x.ShippableProductRequired);
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetAllAttributesAsync(IAttributeService<CheckoutAttribute,service,staticCacheManager,storeMappingService,storeId,excludeShippableAttributes)={Arg0},{Service},{StaticCacheManager},{StoreMappingService},{StoreId},{ExcludeShippableAttributes}: database query executed in {Arg6} ms", IAttributeService<CheckoutAttribute, service, staticCacheManager, storeMappingService, storeId, excludeShippableAttributes, __logStart.ElapsedMilliseconds);
             return await checkoutAttributes.ToListAsync();
         });
     }

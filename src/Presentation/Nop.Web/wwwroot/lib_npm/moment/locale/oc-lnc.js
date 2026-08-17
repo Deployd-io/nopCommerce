@@ -3,6 +3,7 @@
 //! author : Quentin PAGÈS : https://github.com/Quenty31
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('oc-lnc', {
     months: {
@@ -75,6 +76,8 @@ export default moment.defineLocale('oc-lnc', {
                       : 'è';
         if (period === 'w' || period === 'W') {
             output = 'a';
+			logger.debug(`ordinal(number=${number},period=${period}): output → ${output}`);
+			logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
         }
         return number + output;
     },

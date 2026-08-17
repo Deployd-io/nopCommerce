@@ -25,12 +25,15 @@ public partial class CustomValues : List<CustomValue>
     /// <returns>XML of custom values</returns>
     public virtual string SerializeToXml()
     {
+		_logger.LogDebug(">>> Entering SerializeToXml()");
         if (!this.Any())
             return string.Empty;
 
         using var textWriter = new StringWriter();
+		_logger.LogDebug("SerializeToXml(): textWriter → {TextWriter}", textWriter);
 
         var root = new XElement("DictionarySerializer");
+		_logger.LogWarning("SerializeToXml(): root → {Root}", root);
         root.Add(this.Select(value => new XElement("item",
             new XElement("key", value.Name),
             new XElement("value", value.Value),
@@ -39,11 +42,14 @@ public partial class CustomValues : List<CustomValue>
             new XElement("createdOn", value.CreatedOnUtc?.Ticks ?? 0))));
 
         var document = new XDocument();
+		_logger.LogDebug("SerializeToXml(): document → {Document}", document);
         document.Add(root);
         document.Save(textWriter, SaveOptions.DisableFormatting);
 
         var result = textWriter.ToString();
+		_logger.LogDebug("SerializeToXml(): result → {Result}", result);
 
+		_logger.LogDebug("<<< Exiting SerializeToXml()");
         return result;
     }
 
@@ -55,6 +61,7 @@ public partial class CustomValues : List<CustomValue>
     /// <returns>Custom values</returns>
     public virtual void FillByXml(string customValuesXml, bool displayToCustomerOnly = false)
     {
+		_logger.LogDebug(">>> Entering FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly})", customValuesXml, displayToCustomerOnly);
         Clear();
 
         if (string.IsNullOrWhiteSpace(customValuesXml))
@@ -69,11 +76,17 @@ public partial class CustomValues : List<CustomValue>
         try
         {
             using var textReader = new StringReader(customValuesXml);
+			using Microsoft.Extensions.Logging;
             var rootElement = XDocument.Load(textReader).Root;
+			_logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): textReader → {TextReader}", customValuesXml, displayToCustomerOnly, textReader);
+			_logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): rootElement → {RootElement}", customValuesXml, displayToCustomerOnly, rootElement);
             AddRange(rootElement!.Elements("item").Select(i =>
             {
+				private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                 var name = i.Element("key")!.Value;
+				_logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): name → {Name}", customValuesXml, displayToCustomerOnly, name);
                 var value = i.Element("value")!.Value;
+				_logger.LogDebug("FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): value → {Value}", customValuesXml, displayToCustomerOnly, value);
                 var displayLocation = int.TryParse(i.Element("location")?.Value, out var location) && Enum.IsDefined(typeof(CustomValueDisplayLocation), location)
                     ? (CustomValueDisplayLocation)location
                     : defaultLocation;
@@ -89,8 +102,10 @@ public partial class CustomValues : List<CustomValue>
         }
         catch
         {
+			_logger.LogError("Exception in FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly}): {Arg2}", customValuesXml, displayToCustomerOnly, ex.Message);
             //ignore
         }
+		_logger.LogDebug("<<< Exiting FillByXml(customValuesXml={CustomValuesXml},displayToCustomerOnly={DisplayToCustomerOnly})", customValuesXml, displayToCustomerOnly);
     }
 
     /// <summary>

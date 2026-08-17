@@ -4,20 +4,24 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo480;
 
 [NopUpdateMigration("2024-08-01 00:00:01", "4.80", UpdateMigrationType.Localization)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
 
         var (languageId, _) = this.GetLanguageData();
 
@@ -277,6 +281,8 @@ public class LocalizationMigration : MigrationBase
             ["Admin.ContentManagement.MessageTemplates.Description.QuantityBelow.AttributeCombination.VendorNotification"] = "This message template is used to notify a vendor that the certain product attribute combination is getting low stock. You can set up the combination minimum quantity when creating or editing the product in Product attribute tab - Attributes combinations tab in Notify admin for quantity below field.",
 
             //#7299
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("Up(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             ["Admin.Catalog.Products.Multimedia.Videos.Description"] = "How to embed a video: Find your video in your library (on any video hosting) and select it to open the video settings page. Select the privacy icon from your \"Share\" button. Click on \"Embed\" from the window that opens up. You can copy the <strong>src</strong> from the embed option and use it.",
 
             //4306
@@ -321,17 +327,22 @@ public class LocalizationMigration : MigrationBase
             ["Admin.ConfigurationSteps.PaymentPayPal.Register.Text"] = "Click this button to register an account. You need to go through a few steps to fill in all the required data. The last step will be to verify your email address to activate your account.",
             ["Admin.ConfigurationSteps.PaymentPayPal.Credentials.Text"] = "After you create and set up your application in your <b>PayPal</b> account, you need to copy the <b>Client ID</b>, <b>Secret</b> and <b>Merchant ID</b>, and paste them into these fields.",
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             //#7618
             ["Admin.Orders.Address.CustomAttributes"] = "Custom Attributes",
 
         }, languageId);
+		_logger.LogInformation("Up(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         #endregion
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

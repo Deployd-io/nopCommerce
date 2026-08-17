@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Discounts;
 using Nop.Core.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Domain.Orders;
 
@@ -8,6 +9,7 @@ namespace Nop.Core.Domain.Orders;
 /// </summary>
 public partial class GetShoppingCartItemUnitPriceEvent : IStopProcessingEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>

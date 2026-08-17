@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class ShippingPluginManager : PluginManager<IShippingRateComputationMethod>, IShippingPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ShippingSettings _shippingSettings;
@@ -42,6 +44,7 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
     public virtual async Task<IList<IShippingRateComputationMethod>> LoadActivePluginsAsync(Customer customer = null,
         int storeId = 0, string systemName = null)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         var shippingProviders = await LoadActivePluginsAsync(_shippingSettings.ActiveShippingRateComputationMethodSystemNames, customer, storeId);
 
         //filter by passed system name
@@ -77,7 +80,10 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var shippingProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): shippingProvider → {ShippingProvider}", systemName, customer, storeId, shippingProvider);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(shippingProvider);
     }
 

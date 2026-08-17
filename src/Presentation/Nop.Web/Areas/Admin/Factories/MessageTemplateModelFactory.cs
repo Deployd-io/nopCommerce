@@ -9,6 +9,7 @@ using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -65,6 +67,7 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
     /// </returns>
     public virtual async Task<MessageTemplateSearchModel> PrepareMessageTemplateSearchModelAsync(MessageTemplateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMessageTemplateSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -97,6 +100,7 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMessageTemplateSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -110,9 +114,11 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
     /// </returns>
     public virtual async Task<MessageTemplateListModel> PrepareMessageTemplateListModelAsync(MessageTemplateSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMessageTemplateListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var isActive = searchModel.IsActiveId == 0 ? null : (bool?)(searchModel.IsActiveId == 1);
+		_logger.LogDebug("PrepareMessageTemplateListModelAsync(searchModel={SearchModel}): isActive → {IsActive}", searchModel, isActive);
 
         //get message templates
         var messageTemplates = (await _messageTemplateService
@@ -120,6 +126,7 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
 
         //prepare store names (to avoid loading for each message template)
         var stores = (await _storeService.GetAllStoresAsync()).Select(store => new { store.Id, store.Name }).ToList();
+		_logger.LogDebug("PrepareMessageTemplateListModelAsync(searchModel={SearchModel}): stores → {Stores}", searchModel, stores);
 
         //prepare list model
         var model = await new MessageTemplateListModel().PrepareToGridAsync(searchModel, messageTemplates, () =>
@@ -128,6 +135,7 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
             {
                 //fill in model values from the entity
                 var messageTemplateModel = messageTemplate.ToModel<MessageTemplateModel>();
+				_logger.LogDebug("PrepareMessageTemplateListModelAsync(searchModel={SearchModel}): messageTemplateModel → {MessageTemplateModel}", searchModel, messageTemplateModel);
 
                 //fill in additional values (not existing in the entity)
                 if (messageTemplate.LimitedToStores)
@@ -140,6 +148,8 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
                 else
                 {
                     var allstores = await _localizationService.GetResourceAsync("Admin.Configuration.Settings.AllSettings.Fields.StoreName.AllStores");
+					_logger.LogDebug("PrepareMessageTemplateListModelAsync(searchModel={SearchModel}): allstores → {Allstores}", searchModel, allstores);
+					_logger.LogDebug("PrepareMessageTemplateListModelAsync(searchModel={SearchModel}): messageTemplateModel.ListOfStores → {Arg1}", searchModel, messageTemplateModel.ListOfStores);
                     messageTemplateModel.ListOfStores = allstores;
                 }
 
@@ -147,6 +157,7 @@ public partial class MessageTemplateModelFactory : IMessageTemplateModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareMessageTemplateListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -20,7 +20,10 @@ public partial class EncryptionService : IEncryptionService
 
     public EncryptionService(SecuritySettings securitySettings)
     {
+		_logger.LogDebug(">>> Entering EncryptionService(securitySettings={SecuritySettings})", securitySettings);
         _securitySettings = securitySettings;
+		_logger.LogDebug("<<< Exiting EncryptionService(securitySettings={SecuritySettings})", securitySettings);
+		_logger.LogDebug("EncryptionService(securitySettings={SecuritySettings}): _securitySettings → {_securitySettings}", securitySettings, _securitySettings);
     }
 
     #endregion
@@ -91,12 +94,15 @@ public partial class EncryptionService : IEncryptionService
     /// <returns>Salt key</returns>
     public virtual string CreateSaltKey(int size)
     {
+		_logger.LogDebug(">>> Entering CreateSaltKey(size={Size})", size);
         //generate a cryptographic random number
         using var provider = RandomNumberGenerator.Create();
+		_logger.LogDebug("CreateSaltKey(size={Size}): provider → {Provider}", size, provider);
         var buff = new byte[size];
         provider.GetBytes(buff);
 
         // Return a Base64 string representation of the random number
+		_logger.LogDebug("<<< Exiting CreateSaltKey(size={Size})", size);
         return Convert.ToBase64String(buff);
     }
 
@@ -147,8 +153,10 @@ public partial class EncryptionService : IEncryptionService
             encryptionPrivateKey = _securitySettings.EncryptionKey;
 
         using var provider = GetEncryptionAlgorithm(encryptionPrivateKey);
+		using Microsoft.Extensions.Logging;
 
         var buffer = Convert.FromBase64String(cipherText);
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         return DecryptTextFromMemory(buffer, provider);
     }
 

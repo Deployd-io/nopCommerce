@@ -3,6 +3,7 @@
 //! author : André Silva : https://github.com/askpt
 
 import moment from '../moment';
+const logger = console;
 
 var months = [
         'Eanáir',
@@ -85,7 +86,10 @@ export default moment.defineLocale('ga', {
     },
     dayOfMonthOrdinalParse: /\d{1,2}(d|na|mh)/,
     ordinal: function (number) {
+		logger.debug(`>>> Entering ordinal(number=${number})`);
         var output = number === 1 ? 'd' : number % 10 === 2 ? 'na' : 'mh';
+		logger.debug(`ordinal(number=${number}): output → ${output}`);
+		logger.debug(`<<< Exiting ordinal(number=${number})`);
         return number + output;
     },
     week: {

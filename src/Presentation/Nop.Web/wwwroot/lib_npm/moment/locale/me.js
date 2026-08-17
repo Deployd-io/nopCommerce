@@ -3,6 +3,7 @@
 //! author : Miodrag Nikač <miodrag@restartit.me> : https://github.com/miodragnikac
 
 import moment from '../moment';
+const logger = console;
 
 var translator = {
     words: {
@@ -63,6 +64,7 @@ export default moment.defineLocale('me', {
         nextDay: '[sjutra u] LT',
 
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[u] [nedjelju] [u] LT';
@@ -74,11 +76,13 @@ export default moment.defineLocale('me', {
                 case 2:
                 case 4:
                 case 5:
+			logger.debug('<<< Exiting nextWeek()');
                     return '[u] dddd [u] LT';
             }
         },
         lastDay: '[juče u] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             var lastWeekDays = [
                 '[prošle] [nedjelje] [u] LT',
                 '[prošlog] [ponedjeljka] [u] LT',
@@ -88,6 +92,7 @@ export default moment.defineLocale('me', {
                 '[prošlog] [petka] [u] LT',
                 '[prošle] [subote] [u] LT',
             ];
+			logger.debug('<<< Exiting lastWeek()');
             return lastWeekDays[this.day()];
         },
         sameElse: 'L',

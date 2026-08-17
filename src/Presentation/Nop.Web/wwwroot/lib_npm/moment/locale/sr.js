@@ -4,6 +4,7 @@
 //! author : Stefan Crnjaković <stefan@hotmail.rs> : https://github.com/crnjakovic
 
 import moment from '../moment';
+const logger = console;
 
 var translator = {
     words: {
@@ -31,6 +32,7 @@ var translator = {
         return wordKey[2];
     },
     translate: function (number, withoutSuffix, key, isFuture) {
+		logger.debug(`>>> Entering translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
         var wordKey = translator.words[key],
             word;
 
@@ -43,6 +45,7 @@ var translator = {
         word = translator.correctGrammaticalCase(number, wordKey);
         // Nominativ
         if (key === 'yy' && withoutSuffix && word === 'godinu') {
+		logger.debug(`<<< Exiting translate(number=${number},withoutSuffix=${withoutSuffix},key=${key},isFuture=${isFuture})`);
             return number + ' godina';
         }
 
@@ -75,6 +78,7 @@ export default moment.defineLocale('sr', {
         sameDay: '[danas u] LT',
         nextDay: '[sutra u] LT',
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
             switch (this.day()) {
                 case 0:
                     return '[u] [nedelju] [u] LT';
@@ -86,11 +90,13 @@ export default moment.defineLocale('sr', {
                 case 2:
                 case 4:
                 case 5:
+			logger.debug('<<< Exiting nextWeek()');
                     return '[u] dddd [u] LT';
             }
         },
         lastDay: '[juče u] LT',
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             var lastWeekDays = [
                 '[prošle] [nedelje] [u] LT',
                 '[prošlog] [ponedeljka] [u] LT',
@@ -100,6 +106,7 @@ export default moment.defineLocale('sr', {
                 '[prošlog] [petka] [u] LT',
                 '[prošle] [subote] [u] LT',
             ];
+			logger.debug('<<< Exiting lastWeek()');
             return lastWeekDays[this.day()];
         },
         sameElse: 'L',

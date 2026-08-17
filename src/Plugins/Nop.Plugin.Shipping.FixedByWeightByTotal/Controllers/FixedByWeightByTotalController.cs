@@ -16,6 +16,7 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Controllers;
 
@@ -24,6 +25,7 @@ namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Controllers;
 [AutoValidateAntiforgeryToken]
 public class FixedByWeightByTotalController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -80,6 +82,7 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             LimitMethodsToCreated = _fixedByWeightByTotalSettings.LimitMethodsToCreated,
@@ -101,6 +104,7 @@ public class FixedByWeightByTotalController : BasePluginController
         //countries
         model.AvailableCountries.Add(new SelectListItem { Text = "*", Value = "0" });
         var countries = await _countryService.GetAllCountriesAsync();
+		_logger.LogDebug("Configure(): countries → {Countries}", countries);
         foreach (var c in countries)
             model.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
         //states
@@ -108,6 +112,7 @@ public class FixedByWeightByTotalController : BasePluginController
 
         model.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Shipping.FixedByWeightByTotal/Views/Configure.cshtml", model);
     }
 
@@ -126,10 +131,13 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> SaveMode(bool value)
     {
+		_logger.LogDebug(">>> Entering SaveMode(value={Value})", value);
         //save settings
         _fixedByWeightByTotalSettings.ShippingByWeightByTotalEnabled = value;
+		_logger.LogDebug("SaveMode(value={Value}): _fixedByWeightByTotalSettings.ShippingByWeightByTotalEnabled → {Arg1}", value, _fixedByWeightByTotalSettings.ShippingByWeightByTotalEnabled);
         await _settingService.SaveSettingAsync(_fixedByWeightByTotalSettings);
 
+		_logger.LogDebug("<<< Exiting SaveMode(value={Value})", value);
         return Json(new { Result = true });
     }
 
@@ -139,8 +147,10 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> FixedShippingRateList(ConfigurationModel searchModel)
     {
+		_logger.LogDebug(">>> Entering FixedShippingRateList(searchModel={SearchModel})", searchModel);
         var shippingMethods = (await _shippingMethodsService.GetAllShippingMethodsAsync()).ToPagedList(searchModel);
 
+		_logger.LogDebug("FixedShippingRateList(searchModel={SearchModel}): shippingMethods → {ShippingMethods}", searchModel, shippingMethods);
         var gridModel = await new FixedRateListModel().PrepareToGridAsync(searchModel, shippingMethods, () =>
         {
             return shippingMethods.SelectAwait(async shippingMethod => new FixedRateModel
@@ -155,6 +165,7 @@ public class FixedByWeightByTotalController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting FixedShippingRateList(searchModel={SearchModel})", searchModel);
         return Json(gridModel);
     }
 
@@ -178,6 +189,7 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> RateByWeightByTotalList(ConfigurationModel searchModel, ConfigurationModel filter)
     {
+		_logger.LogDebug(">>> Entering RateByWeightByTotalList(searchModel={SearchModel},filter={Filter})", searchModel, filter);
         //var records = _shippingByWeightService.GetAll(command.Page - 1, command.PageSize);
         var records = await _shippingByWeightService.FindRecordsAsync(
             pageIndex: searchModel.Page - 1,
@@ -221,6 +233,7 @@ public class FixedByWeightByTotalController : BasePluginController
                 };
 
                 var htmlSb = new StringBuilder("<div>");
+				_logger.LogDebug("RateByWeightByTotalList(searchModel={SearchModel},filter={Filter}): htmlSb → {HtmlSb}", searchModel, filter, htmlSb);
                 htmlSb.AppendFormat("{0}: {1}",
                     await _localizationService.GetResourceAsync("Plugins.Shipping.FixedByWeightByTotal.Fields.WeightFrom"),
                     model.WeightFrom);
@@ -260,12 +273,14 @@ public class FixedByWeightByTotalController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting RateByWeightByTotalList(searchModel={SearchModel},filter={Filter})", searchModel, filter);
         return Json(gridModel);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> AddRateByWeightByTotalPopup()
     {
+		_logger.LogDebug(">>> Entering AddRateByWeightByTotalPopup()");
         var model = new ShippingByWeightByTotalModel
         {
             PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode,
@@ -275,6 +290,7 @@ public class FixedByWeightByTotalController : BasePluginController
         };
 
         var shippingMethods = await _shippingMethodsService.GetAllShippingMethodsAsync();
+		_logger.LogDebug("AddRateByWeightByTotalPopup(): shippingMethods → {ShippingMethods}", shippingMethods);
         if (!shippingMethods.Any())
             return Content("No shipping methods can be loaded");
 
@@ -292,11 +308,13 @@ public class FixedByWeightByTotalController : BasePluginController
         //countries
         model.AvailableCountries.Add(new SelectListItem { Text = "*", Value = "0" });
         var countries = await _countryService.GetAllCountriesAsync(showHidden: true);
+		_logger.LogDebug("AddRateByWeightByTotalPopup(): countries → {Countries}", countries);
         foreach (var c in countries)
             model.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
         //states
         model.AvailableStates.Add(new SelectListItem { Text = "*", Value = "0" });
 
+		_logger.LogDebug("<<< Exiting AddRateByWeightByTotalPopup()");
         return View("~/Plugins/Shipping.FixedByWeightByTotal/Views/AddRateByWeightByTotalPopup.cshtml", model);
     }
 
@@ -331,8 +349,10 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> EditRateByWeightByTotalPopup(int id)
     {
+		_logger.LogDebug(">>> Entering EditRateByWeightByTotalPopup(id={Id})", id);
         var sbw = await _shippingByWeightService.GetByIdAsync(id);
         if (sbw == null)
+			_logger.LogDebug("EditRateByWeightByTotalPopup(id={Id}): sbw → {Sbw}", id, sbw);
             //no record found with the specified id
             return RedirectToAction("Configure");
 
@@ -389,6 +409,7 @@ public class FixedByWeightByTotalController : BasePluginController
         foreach (var s in states)
             model.AvailableStates.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString(), Selected = (selectedState != null && s.Id == selectedState.Id) });
 
+		_logger.LogDebug("<<< Exiting EditRateByWeightByTotalPopup(id={Id})", id);
         return View("~/Plugins/Shipping.FixedByWeightByTotal/Views/EditRateByWeightByTotalPopup.cshtml", model);
     }
 
@@ -428,10 +449,13 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> DeleteRateByWeightByTotal(int id)
     {
+		_logger.LogDebug(">>> Entering DeleteRateByWeightByTotal(id={Id})", id);
         var sbw = await _shippingByWeightService.GetByIdAsync(id);
         if (sbw != null)
+			_logger.LogDebug("DeleteRateByWeightByTotal(id={Id}): sbw → {Sbw}", id, sbw);
             await _shippingByWeightService.DeleteShippingByWeightRecordAsync(sbw);
 
+		_logger.LogDebug("<<< Exiting DeleteRateByWeightByTotal(id={Id})", id);
         return new NullJsonResult();
     }
 

@@ -17,11 +17,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class EmailAccountController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private const char SEPARATOR = '-';
@@ -56,18 +58,32 @@ public partial class EmailAccountController : BaseAdminController
         IStoreContext storeContext,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper})", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper);
         _emailAccountSettings = emailAccountSettings;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _emailAccountSettings → {_emailAccountSettings}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _emailAccountSettings);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _customerActivityService → {_customerActivityService}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _customerActivityService);
         _emailAccountModelFactory = emailAccountModelFactory;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _emailAccountModelFactory → {_emailAccountModelFactory}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _emailAccountModelFactory);
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _emailAccountService → {_emailAccountService}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _emailAccountService);
         _emailSender = emailSender;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _emailSender → {_emailSender}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _emailSender);
         _localizationService = localizationService;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _localizationService → {_localizationService}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _localizationService);
         _fileProvider = fileProvider;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _fileProvider → {_fileProvider}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _fileProvider);
         _notificationService = notificationService;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _notificationService → {_notificationService}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _permissionService → {_permissionService}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _settingService → {_settingService}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _storeContext → {_storeContext}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _storeContext);
         _webHelper = webHelper;
+		_logger.LogDebug("<<< Exiting EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper})", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper);
+		_logger.LogDebug("EmailAccountController(emailAccountSettings={EmailAccountSettings},customerActivityService={CustomerActivityService},emailAccountModelFactory={EmailAccountModelFactory},emailAccountService={EmailAccountService},emailSender={EmailSender},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext},webHelper={WebHelper}): _webHelper → {_webHelper}", emailAccountSettings, customerActivityService, emailAccountModelFactory, emailAccountService, emailSender, localizationService, fileProvider, notificationService, permissionService, settingService, storeContext, webHelper, _webHelper);
     }
 
     #endregion
@@ -111,9 +127,12 @@ public partial class EmailAccountController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountSearchModelAsync(new EmailAccountSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -124,28 +143,36 @@ public partial class EmailAccountController : BaseAdminController
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountListModelAsync(searchModel);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> MarkAsDefaultEmail(int id)
     {
+		_logger.LogDebug(">>> Entering MarkAsDefaultEmail(id={Id})", id);
         var defaultEmailAccount = await _emailAccountService.GetEmailAccountByIdAsync(id);
         if (defaultEmailAccount == null)
+			_logger.LogDebug("MarkAsDefaultEmail(id={Id}): defaultEmailAccount → {DefaultEmailAccount}", id, defaultEmailAccount);
             return RedirectToAction("List");
 
         _emailAccountSettings.DefaultEmailAccountId = defaultEmailAccount.Id;
+		_logger.LogDebug("MarkAsDefaultEmail(id={Id}): _emailAccountSettings.DefaultEmailAccountId → {Arg1}", id, _emailAccountSettings.DefaultEmailAccountId);
         await _settingService.SaveSettingAsync(_emailAccountSettings);
 
+		_logger.LogDebug("<<< Exiting MarkAsDefaultEmail(id={Id})", id);
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(new EmailAccountModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
         return View(model);
     }
 
@@ -174,23 +201,28 @@ public partial class EmailAccountController : BaseAdminController
         model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(model, null, true);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get an email account with the specified id
         var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): emailAccount → {EmailAccount}", id, emailAccount);
         if (emailAccount == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(null, emailAccount);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
         if (emailAccount.EmailAuthenticationMethod == EmailAuthenticationMethod.GmailOAuth2)
             model.AuthUrl = await PrepareOAuthUrlAsync(emailAccount);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
         return View(model);
     }
 
@@ -225,6 +257,7 @@ public partial class EmailAccountController : BaseAdminController
             model.AuthUrl = await PrepareOAuthUrlAsync(emailAccount);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -302,8 +335,10 @@ public partial class EmailAccountController : BaseAdminController
 
         //prepare model
         model = await _emailAccountModelFactory.PrepareEmailAccountModelAsync(model, emailAccount, true);
+		_logger.LogDebug("SendTestEmail(model={Model}): model → {Model1}", model, model);
 
         //if we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting SendTestEmail(model={Model})", model);
         return View(model);
     }
 
@@ -311,8 +346,10 @@ public partial class EmailAccountController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_EMAIL_ACCOUNTS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get an email account with the specified id
         var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): emailAccount → {EmailAccount}", id, emailAccount);
         if (emailAccount == null)
             return RedirectToAction("List");
 
@@ -330,7 +367,9 @@ public partial class EmailAccountController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = emailAccount.Id });
         }
     }

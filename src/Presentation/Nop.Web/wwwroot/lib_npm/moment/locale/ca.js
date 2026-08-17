@@ -3,6 +3,7 @@
 //! author : Juan G. Hurtado : https://github.com/juanghurtado
 
 import moment from '../moment';
+const logger = console;
 
 export default moment.defineLocale('ca', {
     months: {
@@ -40,23 +41,33 @@ export default moment.defineLocale('ca', {
     },
     calendar: {
         sameDay: function () {
+			logger.debug('>>> Entering sameDay()');
+			logger.debug('<<< Exiting sameDay()');
             return '[avui a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         nextDay: function () {
+			logger.debug('>>> Entering nextDay()');
+			logger.debug('<<< Exiting nextDay()');
             return '[demà a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         nextWeek: function () {
+			logger.debug('>>> Entering nextWeek()');
+			logger.debug('<<< Exiting nextWeek()');
             return 'dddd [a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         lastDay: function () {
+			logger.debug('>>> Entering lastDay()');
+			logger.debug('<<< Exiting lastDay()');
             return '[ahir a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT';
         },
         lastWeek: function () {
+			logger.debug('>>> Entering lastWeek()');
             return (
                 '[el] dddd [passat a ' +
                 (this.hours() !== 1 ? 'les' : 'la') +
                 '] LT'
             );
+			logger.debug('<<< Exiting lastWeek()');
         },
         sameElse: 'L',
     },
@@ -90,6 +101,8 @@ export default moment.defineLocale('ca', {
                       : 'è';
         if (period === 'w' || period === 'W') {
             output = 'a';
+			logger.debug(`ordinal(number=${number},period=${period}): output → ${output}`);
+			logger.debug(`<<< Exiting ordinal(number=${number},period=${period})`);
         }
         return number + output;
     },

@@ -16,6 +16,7 @@ using Nop.Web.Areas.Admin.Models.Menus;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -24,6 +25,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class MenuModelFactory : IMenuModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -198,8 +200,10 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task PrepareModelAvailableParentMenuItemsAsync(MenuItemModel menuItemModel, int depth, IList<SelectListItem> menuItemsToAdd)
     {
+		_logger.LogDebug(">>> Entering PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd})", menuItemModel, depth, menuItemsToAdd);
         var items = await _menuService.GetAllMenuItemsAsync(menuId: menuItemModel.MenuId, treeSorting: true, showHidden: true);
         menuItemsToAdd.Add(new SelectListItem { Text = await _localizationService.GetResourceAsync("Admin.Common.No"), Value = string.Empty });
+		_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): items → {Items}", menuItemModel, depth, menuItemsToAdd, items);
 
         if (menuItemModel.Id > 0 && childrenLevels(items, menuItemModel.Id) >= _menuSettings.MaximumMainMenuLevels - 1)
             return;
@@ -221,18 +225,22 @@ public partial class MenuModelFactory : IMenuModelFactory
                 return 0;
 
             var children = elements.Where(x => x.ParentId == parentId).ToList();
+			_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): children → {Children}", menuItemModel, depth, menuItemsToAdd, children);
 
             if (!children.Any())
                 return 0;
 
             var maxChildDepth = 0;
+			_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): maxChildDepth → {MaxChildDepth}", menuItemModel, depth, menuItemsToAdd, maxChildDepth);
             foreach (var child in children)
             {
                 var childDepth = childrenLevels(elements, child.Id, visited);
+				_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): childDepth → {ChildDepth}", menuItemModel, depth, menuItemsToAdd, childDepth);
                 if (childDepth > maxChildDepth)
                     maxChildDepth = childDepth;
             }
 
+			_logger.LogDebug("<<< Exiting PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd})", menuItemModel, depth, menuItemsToAdd);
             return maxChildDepth + 1;
         }
     }
@@ -278,11 +286,13 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual Task<MenuSearchModel> PrepareMenuSearchModelAsync(MenuSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMenuSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -296,8 +306,10 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<MenuListModel> PrepareMenuListModelAsync(MenuSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuListModelAsync(searchModel={SearchModel})", searchModel);
         var menus = await _menuService.GetAllMenusAsync(pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize, showHidden: true);
 
+		_logger.LogDebug("PrepareMenuListModelAsync(searchModel={SearchModel}): menus → {Menus}", searchModel, menus);
         //prepare list model
         return await new MenuListModel().PrepareToGridAsync(searchModel, menus, () =>
         {
@@ -310,6 +322,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 return model;
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuListModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     /// <summary>
@@ -330,6 +343,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         {
             if (model == null)
                 model = menu.ToModel<MenuModel>();
+				_logger.LogDebug("PrepareMenuModelAsync(model={Model},menu={Menu},excludeProperties={ExcludeProperties}): model → {Model1}", model, menu, excludeProperties, model);
 
             //define localized model configuration action
             localizedModelConfiguration = async (locale, languageId) =>
@@ -365,11 +379,13 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual Task<MenuItemSearchModel> PrepareMenuItemSearchModelAsync(MenuItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -383,9 +399,12 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<MenuItemListModel> PrepareMenuItemListModelAsync(MenuItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemListModelAsync(searchModel={SearchModel})", searchModel);
         var allItems = await _menuService.GetAllMenuItemsAsync(menuId: searchModel.MenuId, treeSorting: true, showHidden: true);
 
+		_logger.LogDebug("PrepareMenuItemListModelAsync(searchModel={SearchModel}): allItems → {AllItems}", searchModel, allItems);
         var itemsPaged = allItems.ToPagedList(searchModel);
+		_logger.LogDebug("PrepareMenuItemListModelAsync(searchModel={SearchModel}): itemsPaged → {ItemsPaged}", searchModel, itemsPaged);
 
         //prepare list model
         return await new MenuItemListModel().PrepareToGridAsync(searchModel, itemsPaged, () =>
@@ -401,6 +420,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 return model;
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuItemListModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     /// <summary>
@@ -423,6 +443,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         {
             if (model == null)
                 model = menuItem.ToModel<MenuItemModel>();
+				_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model → {Model1}", menu, model, menuItem, excludeProperties, model);
 
             //define localized model configuration action
             localizedModelConfiguration = async (locale, languageId) =>
@@ -477,6 +498,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<SelectMenuItemProductSearchModel> PrepareMenuItemSelectProductSearchModelAsync(SelectMenuItemProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemSelectProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -487,6 +509,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemSelectProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -500,6 +523,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<SelectMenuItemProductListModel> PrepareMenuItemSelectProductListModelAsync(SelectMenuItemProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemSelectProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get categories
@@ -518,6 +542,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 Published = product.Published
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuItemSelectProductListModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     #endregion

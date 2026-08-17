@@ -95,6 +95,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     protected virtual async Task<bool> AreMultipleItemsAsync(IList<GetShippingOptionRequest.PackageItem> items)
     {
+		_logger.LogDebug(">>> Entering AreMultipleItemsAsync(items={Items})", items);
         //no items
         if (!items.Any())
             return false;
@@ -105,6 +106,7 @@ public partial class ShippingService : IShippingService
 
         //or single item
         var singleItem = items.First();
+		_logger.LogDebug("AreMultipleItemsAsync(items={Items}): singleItem → {SingleItem}", items, singleItem);
 
         //but quantity more than one
         if (singleItem.GetQuantity() > 1)
@@ -119,6 +121,7 @@ public partial class ShippingService : IShippingService
             .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct);
 
         //whether to ship associated products
+		_logger.LogDebug("<<< Exiting AreMultipleItemsAsync(items={Items})", items);
         return await associatedAttributeValues.AnyAwaitAsync(async attributeValue =>
             (await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId))?.IsShipEnabled ?? false);
     }
@@ -638,13 +641,17 @@ public partial class ShippingService : IShippingService
     public virtual async Task<GetPickupPointsResponse> GetPickupPointsAsync(IList<ShoppingCartItem> cart, Address address,
         Customer customer = null, string providerSystemName = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId})", cart, address, customer, providerSystemName, storeId);
         var result = new GetPickupPointsResponse();
 
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId}): result → {Result}", cart, address, customer, providerSystemName, storeId, result);
         var pickupPointsProviders = await _pickupPluginManager.LoadActivePluginsAsync(customer, storeId, providerSystemName);
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId}): pickupPointsProviders → {PickupPointsProviders}", cart, address, customer, providerSystemName, storeId, pickupPointsProviders);
         if (!pickupPointsProviders.Any())
             return result;
 
         var allPickupPoints = new List<PickupPoint>();
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId}): allPickupPoints → {AllPickupPoints}", cart, address, customer, providerSystemName, storeId, allPickupPoints);
         foreach (var provider in pickupPointsProviders)
         {
             var pickPointsResponse = await provider.GetPickupPointsAsync(cart, address);

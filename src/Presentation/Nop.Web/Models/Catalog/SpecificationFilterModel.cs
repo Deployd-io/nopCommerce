@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
@@ -7,6 +8,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record SpecificationFilterModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -25,7 +27,10 @@ public partial record SpecificationFilterModel : BaseNopModel
 
     public SpecificationFilterModel()
     {
+		_logger.LogDebug(">>> Entering SpecificationFilterModel()");
         Attributes = new List<SpecificationAttributeFilterModel>();
+		_logger.LogDebug("<<< Exiting SpecificationFilterModel()");
+		_logger.LogDebug("SpecificationFilterModel(): Attributes → {Attributes}", Attributes);
     }
 
     #endregion

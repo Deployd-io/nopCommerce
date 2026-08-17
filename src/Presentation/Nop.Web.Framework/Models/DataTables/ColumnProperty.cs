@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Models.DataTables;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class ColumnProperty
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -13,10 +15,14 @@ public partial class ColumnProperty
     /// <param name="data">The data source for the column from the rows data object</param>
     public ColumnProperty(string data)
     {
+		_logger.LogDebug(">>> Entering ColumnProperty(data={Data})", data);
         Data = data;
         //set default values
         Visible = true;
+		_logger.LogDebug("ColumnProperty(data={Data}): Visible → {Visible}", data, Visible);
         Encode = true;
+		_logger.LogDebug("<<< Exiting ColumnProperty(data={Data})", data);
+		_logger.LogDebug("ColumnProperty(data={Data}): Encode → {Encode}", data, Encode);
     }
 
     #endregion

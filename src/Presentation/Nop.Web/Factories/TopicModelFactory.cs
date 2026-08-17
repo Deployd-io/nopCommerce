@@ -4,6 +4,7 @@ using Nop.Services.Localization;
 using Nop.Services.Seo;
 using Nop.Services.Topics;
 using Nop.Web.Models.Topics;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class TopicModelFactory : ITopicModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -30,11 +32,18 @@ public partial class TopicModelFactory : ITopicModelFactory
         ITopicTemplateService topicTemplateService,
         IUrlRecordService urlRecordService)
     {
+		_logger.LogDebug(">>> Entering TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService})", localizationService, storeContext, topicService, topicTemplateService, urlRecordService);
         _localizationService = localizationService;
+		_logger.LogDebug("TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService}): _localizationService → {_localizationService}", localizationService, storeContext, topicService, topicTemplateService, urlRecordService, _localizationService);
         _storeContext = storeContext;
+		_logger.LogDebug("TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService}): _storeContext → {_storeContext}", localizationService, storeContext, topicService, topicTemplateService, urlRecordService, _storeContext);
         _topicService = topicService;
+		_logger.LogDebug("TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService}): _topicService → {_topicService}", localizationService, storeContext, topicService, topicTemplateService, urlRecordService, _topicService);
         _topicTemplateService = topicTemplateService;
+		_logger.LogDebug("TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService}): _topicTemplateService → {_topicTemplateService}", localizationService, storeContext, topicService, topicTemplateService, urlRecordService, _topicTemplateService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("<<< Exiting TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService})", localizationService, storeContext, topicService, topicTemplateService, urlRecordService);
+		_logger.LogDebug("TopicModelFactory(localizationService={LocalizationService},storeContext={StoreContext},topicService={TopicService},topicTemplateService={TopicTemplateService},urlRecordService={UrlRecordService}): _urlRecordService → {_urlRecordService}", localizationService, storeContext, topicService, topicTemplateService, urlRecordService, _urlRecordService);
     }
 
     #endregion
@@ -79,10 +88,14 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicModel> PrepareTopicModelBySystemNameAsync(string systemName)
     {
+		_logger.LogDebug(">>> Entering PrepareTopicModelBySystemNameAsync(systemName={SystemName})", systemName);
         //load by store
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareTopicModelBySystemNameAsync(systemName={SystemName}): store → {Store}", systemName, store);
         var topic = await _topicService.GetTopicBySystemNameAsync(systemName, store.Id);
+		_logger.LogDebug("PrepareTopicModelBySystemNameAsync(systemName={SystemName}): topic → {Topic}", systemName, topic);
         if (topic == null)
+		_logger.LogDebug("<<< Exiting PrepareTopicModelBySystemNameAsync(systemName={SystemName})", systemName);
             return null;
 
         return await PrepareTopicModelAsync(topic);
@@ -98,9 +111,11 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<string> PrepareTemplateViewPathAsync(int topicTemplateId)
     {
+		_logger.LogDebug(">>> Entering PrepareTemplateViewPathAsync(topicTemplateId={TopicTemplateId})", topicTemplateId);
         var template = (await _topicTemplateService.GetTopicTemplateByIdAsync(topicTemplateId) ??
                         (await _topicTemplateService.GetAllTopicTemplatesAsync()).FirstOrDefault()) ?? throw new Exception("No default template could be loaded");
 
+		_logger.LogDebug("<<< Exiting PrepareTemplateViewPathAsync(topicTemplateId={TopicTemplateId})", topicTemplateId);
         return template.ViewPath;
     }
 

@@ -1,3 +1,4 @@
+const logger = console;
 /**
  * Globalize Runtime v1.7.0
  *
@@ -14,6 +15,7 @@
  * http://git.io/TrdQbw
  */
 (function( root, factory ) {
+logger.debug('>>> Entering function()');
 
 	"use strict";
 
@@ -43,22 +45,28 @@ var runtimeKey = Globalize._runtimeKey,
 
 
 var validateParameterTypeNumber = function( value, name ) {
+	logger.debug(`>>> Entering validateParameterTypeNumber(value=${value},name=${name})`);
 	validateParameterType(
 		value,
 		name,
 		value === undefined || typeof value === "number",
 		"Number"
 	);
+	logger.debug(`<<< Exiting validateParameterTypeNumber(value=${value},name=${name})`);
 };
 
 
 
 
 var pluralGeneratorFn = function( plural ) {
+	logger.debug(`>>> Entering pluralGeneratorFn(plural=${plural})`);
 	return function pluralGenerator( value ) {
+	logger.debug(`>>> Entering pluralGenerator(value=${value})`);
 		validateParameterPresence( value, "value" );
+		logger.debug(`<<< Exiting pluralGeneratorFn(plural=${plural})`);
 		validateParameterTypeNumber( value, "value" );
 
+		logger.debug(`<<< Exiting pluralGenerator(value=${value})`);
 		return plural( value );
 	};
 };
@@ -67,7 +75,9 @@ var pluralGeneratorFn = function( plural ) {
 
 
 Globalize._pluralGeneratorFn = pluralGeneratorFn;
+logger.debug(`function(): Globalize._pluralGeneratorFn → ${Globalize._pluralGeneratorFn}`);
 Globalize._validateParameterTypeNumber = validateParameterTypeNumber;
+logger.debug(`function(): Globalize._validateParameterTypeNumber → ${Globalize._validateParameterTypeNumber}`);
 
 Globalize.plural =
 Globalize.prototype.plural = function( value, options ) {
@@ -82,6 +92,7 @@ Globalize.prototype.pluralGenerator = function( options ) {
 	return Globalize[ runtimeKey( "pluralGenerator", this._locale, [ options ] ) ];
 };
 
+logger.debug(`<<< Exiting function(value=${value},options=${options})`);
 return Globalize;
 
 

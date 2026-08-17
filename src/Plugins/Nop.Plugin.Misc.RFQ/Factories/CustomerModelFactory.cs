@@ -11,11 +11,13 @@ using Nop.Services.Helpers;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Seo;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Factories;
 
 public class CustomerModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICurrencyService _currencyService;
@@ -48,18 +50,32 @@ public class CustomerModelFactory
         MediaSettings mediaSettings,
         RfqService rfqService)
     {
+		_logger.LogDebug(">>> Entering CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService})", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService);
         _currencyService = currencyService;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _currencyService → {_currencyService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _currencyService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _dateTimeHelper → {_dateTimeHelper}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _localizationService → {_localizationService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _localizationService);
         _pictureService = pictureService;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _pictureService → {_pictureService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _pictureService);
         _priceCalculationService = priceCalculationService;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _priceCalculationService → {_priceCalculationService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _priceCalculationService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _priceFormatter → {_priceFormatter}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _priceFormatter);
         _productAttributeFormatter = productAttributeFormatter;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _productAttributeFormatter → {_productAttributeFormatter}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _productAttributeFormatter);
         _productService = productService;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _productService → {_productService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _productService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _urlRecordService → {_urlRecordService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _urlRecordService);
         _workContext = workContext;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _workContext → {_workContext}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _workContext);
         _mediaSettings = mediaSettings;
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _mediaSettings → {_mediaSettings}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _mediaSettings);
         _rfqService = rfqService;
+		_logger.LogDebug("<<< Exiting CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService})", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService);
+		_logger.LogDebug("CustomerModelFactory(currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},pictureService={PictureService},priceCalculationService={PriceCalculationService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext},mediaSettings={MediaSettings},rfqService={RfqService}): _rfqService → {_rfqService}", currencyService, dateTimeHelper, localizationService, pictureService, priceCalculationService, priceFormatter, productAttributeFormatter, productService, urlRecordService, workContext, mediaSettings, rfqService, _rfqService);
     }
 
     #endregion
@@ -115,21 +131,33 @@ public class CustomerModelFactory
     /// </returns>
     public async Task<RequestQuoteModel> PrepareRequestQuoteModelAsync(RequestQuote requestQuote, IList<RequestQuoteItem> requestQuoteItems = null, RequestQuoteModel model = null)
     {
+		_logger.LogDebug(">>> Entering PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model})", requestQuote, requestQuoteItems, model);
         ArgumentNullException.ThrowIfNull(requestQuote);
 
         var items = requestQuoteItems ?? await _rfqService.GetRequestQuoteItemsAsync(requestQuote.Id);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): items → {Items}", requestQuote, requestQuoteItems, model, items);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): currentCurrency → {CurrentCurrency}", requestQuote, requestQuoteItems, model, currentCurrency);
 
         var modelItems = await items.SelectAwait(async item => await PrepareRequestQuoteItemModelAsync(requestQuote, item, currentCurrency)).ToListAsync();
 
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): modelItems → {ModelItems}", requestQuote, requestQuoteItems, model, modelItems);
+		_logger.LogInformation("PrepareRequestQuoteModelAsync(requestQuote,requestQuoteItems,model)={RequestQuote},{RequestQuoteItems},{Model}: database query executed in {Arg3} ms", requestQuote, requestQuoteItems, model, __logStart.ElapsedMilliseconds);
         model ??= new RequestQuoteModel();
 
         if (requestQuote.Status != 0)
             model.Status = await _localizationService.GetLocalizedEnumAsync(requestQuote.Status);
 
         model.StatusType = requestQuote.Status;
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.StatusType → {Arg3}", requestQuote, requestQuoteItems, model, model.StatusType);
         model.CreatedOnUtc = await _dateTimeHelper.ConvertToUserTimeAsync(requestQuote.CreatedOnUtc, DateTimeKind.Utc);
         model.CustomerNotes = requestQuote.CustomerNotes;
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.CustomerNotes → {Arg3}", requestQuote, requestQuoteItems, model, model.CustomerNotes);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.Id → {Arg3}", requestQuote, requestQuoteItems, model, model.Id);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.CustomerId → {Arg3}", requestQuote, requestQuoteItems, model, model.CustomerId);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.CustomerItems → {Arg3}", requestQuote, requestQuoteItems, model, model.CustomerItems);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.QuoteId → {Arg3}", requestQuote, requestQuoteItems, model, model.QuoteId);
         model.Id = requestQuote.Id;
         model.CustomerId = requestQuote.CustomerId;
         model.CustomerItems = modelItems;
@@ -139,6 +167,8 @@ public class CustomerModelFactory
             return model;
 
         var quote = await _rfqService.GetQuoteByIdAsync(requestQuote.QuoteId.Value);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): quote → {Quote}", requestQuote, requestQuoteItems, model, quote);
+		_logger.LogDebug("PrepareRequestQuoteModelAsync(requestQuote={RequestQuote},requestQuoteItems={RequestQuoteItems},model={Model}): model.QuoteStatus → {Arg3}", requestQuote, requestQuoteItems, model, model.QuoteStatus);
         model.QuoteStatus = quote.Status;
 
         return model;
@@ -235,6 +265,7 @@ public class CustomerModelFactory
     /// </returns>
     public async Task<RequestQuoteModel> PrepareRequestQuoteModelAsync(RequestQuoteModel model)
     {
+		_logger.LogDebug("<<< Exiting PrepareRequestQuoteModelAsync(model={Model})", model);
         return await PrepareRequestQuoteModelAsync(await _rfqService.GetRequestQuoteByIdAsync(model.Id), model: model);
     }
 

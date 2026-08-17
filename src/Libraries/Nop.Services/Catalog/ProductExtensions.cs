@@ -20,6 +20,7 @@ public static class ProductExtensions
     /// </remarks>
     public static IQueryable<Product> OrderBy(this IQueryable<Product> productsQuery, IRepository<LocalizedProperty> localizedPropertyRepository, Language currentLanguage, ProductSortingEnum orderBy)
     {
+		_logger.LogDebug(">>> Entering OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy})", productsQuery, localizedPropertyRepository, currentLanguage, orderBy);
         if (orderBy == ProductSortingEnum.NameAsc || orderBy == ProductSortingEnum.NameDesc)
         {
             var currentLanguageId = currentLanguage.Id;
@@ -33,6 +34,9 @@ public static class ProductExtensions
                         keyGroup = nameof(Product),
                         key = nameof(Product.Name)
                     }
+						_logger.LogDebug("OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy}): languageId → {LanguageId}", productsQuery, localizedPropertyRepository, currentLanguage, orderBy, languageId);
+						_logger.LogDebug("OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy}): keyGroup → {KeyGroup}", productsQuery, localizedPropertyRepository, currentLanguage, orderBy, keyGroup);
+						_logger.LogWarning("OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy}): key → {Key}", productsQuery, localizedPropertyRepository, currentLanguage, orderBy, key);
                     equals new
                     {
                         Id = localizedProperty.EntityId,
@@ -41,8 +45,10 @@ public static class ProductExtensions
                         key = localizedProperty.LocaleKey
                     } into localizedProperties
                 from localizedProperty in localizedProperties.DefaultIfEmpty(new LocalizedProperty { LocaleValue = product.Name })
+				using Microsoft.Extensions.Logging;
                 select new 
                 {
+					private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
                     sortName = localizedProperty == null ? product.Name : localizedProperty.LocaleValue,
                     product
                 };
@@ -56,6 +62,7 @@ public static class ProductExtensions
                     orderby item.sortName descending
                     select item.product;
 
+		_logger.LogDebug("<<< Exiting OrderBy(productsQuery={ProductsQuery},localizedPropertyRepository={LocalizedPropertyRepository},currentLanguage={CurrentLanguage},orderBy={OrderBy})", productsQuery, localizedPropertyRepository, currentLanguage, orderBy);
             return productsQuery;
         }
 
