@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using AutoMapper;
 
 namespace Nop.Core.Infrastructure.Mapper;
@@ -7,6 +8,7 @@ namespace Nop.Core.Infrastructure.Mapper;
 /// </summary>
 public static class AutoMapperConfiguration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Mapper
     /// </summary>
@@ -23,7 +25,9 @@ public static class AutoMapperConfiguration
     /// <param name="config">Mapper configuration</param>
     public static void Init(MapperConfiguration config)
     {
+		_logger.LogDebug(">>> Entering Init(config={Config})", config);
         MapperConfiguration = config;
         Mapper = config.CreateMapper();
+		_logger.LogDebug("<<< Exiting Init(config={Config})", config);
     }
 }

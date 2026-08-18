@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.News;
 
@@ -11,14 +12,20 @@ namespace Nop.Web.Areas.Admin.Models.News;
 /// </summary>
 public partial record NewsItemModel : BaseNopEntityModel, IStoreMappingSupportedModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NewsItemModel()
     {
+		_logger.LogDebug(">>> Entering NewsItemModel()");
         AvailableLanguages = new List<SelectListItem>();
 
+		_logger.LogDebug("NewsItemModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("NewsItemModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("NewsItemModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
+		_logger.LogDebug("<<< Exiting NewsItemModel()");
     }
 
     #endregion

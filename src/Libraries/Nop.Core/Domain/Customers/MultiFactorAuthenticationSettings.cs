@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Customers;
@@ -7,11 +8,15 @@ namespace Nop.Core.Domain.Customers;
 /// </summary>
 public partial class MultiFactorAuthenticationSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MultiFactorAuthenticationSettings()
     {
+		_logger.LogDebug(">>> Entering MultiFactorAuthenticationSettings()");
         ActiveAuthenticationMethodSystemNames = new List<string>();
+		_logger.LogDebug("MultiFactorAuthenticationSettings(): ActiveAuthenticationMethodSystemNames → {ActiveAuthenticationMethodSystemNames}", ActiveAuthenticationMethodSystemNames);
+		_logger.LogDebug("<<< Exiting MultiFactorAuthenticationSettings()");
     }
 
     #endregion

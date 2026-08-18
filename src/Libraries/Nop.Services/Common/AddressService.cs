@@ -5,6 +5,7 @@ using Nop.Data;
 using Nop.Services.Attributes;
 using Nop.Services.Directory;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common;
 
@@ -13,6 +14,7 @@ namespace Nop.Services.Common;
 /// </summary>
 public partial class AddressService : IAddressService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -35,13 +37,22 @@ public partial class AddressService : IAddressService
         IRepository<Address> addressRepository,
         IStateProvinceService stateProvinceService)
     {
+		_logger.LogDebug(">>> Entering AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService})", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService);
         _addressSettings = addressSettings;
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _addressSettings → {_addressSettings}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _addressSettings);
         _addressAttributeParser = addressAttributeParser;
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _addressAttributeParser → {_addressAttributeParser}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _addressAttributeParser);
         _addressAttributeService = addressAttributeService;
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _addressAttributeService → {_addressAttributeService}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _addressAttributeService);
         _countryService = countryService;
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _countryService → {_countryService}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _countryService);
         _localizationService = localizationService;
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _localizationService → {_localizationService}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _localizationService);
         _addressRepository = addressRepository;
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _addressRepository → {_addressRepository}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _addressRepository);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("<<< Exiting AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService})", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService);
+		_logger.LogDebug("AddressService(addressSettings={AddressSettings},addressAttributeParser={AddressAttributeParser},addressAttributeService={AddressAttributeService},countryService={CountryService},localizationService={LocalizationService},addressRepository={AddressRepository},stateProvinceService={StateProvinceService}): _stateProvinceService → {_stateProvinceService}", addressSettings, addressAttributeParser, addressAttributeService, countryService, localizationService, addressRepository, stateProvinceService, _stateProvinceService);
     }
 
     #endregion
@@ -55,7 +66,10 @@ public partial class AddressService : IAddressService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAddressAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering DeleteAddressAsync(address={Address})", address);
+		_logger.LogInformation("DeleteAddressAsync(address)={Address}: external service call took {Arg1} ms", address, __logStart.ElapsedMilliseconds);
         await _addressRepository.DeleteAsync(address);
+		_logger.LogDebug("<<< Exiting DeleteAddressAsync(address={Address})", address);
     }
 
     /// <summary>
@@ -68,6 +82,7 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<int> GetAddressTotalByCountryIdAsync(int countryId)
     {
+		_logger.LogDebug(">>> Entering GetAddressTotalByCountryIdAsync(countryId={CountryId})", countryId);
         if (countryId == 0)
             return 0;
 
@@ -75,6 +90,7 @@ public partial class AddressService : IAddressService
             where a.CountryId == countryId
             select a;
 
+		_logger.LogDebug("<<< Exiting GetAddressTotalByCountryIdAsync(countryId={CountryId})", countryId);
         return await query.CountAsync();
     }
 
@@ -88,6 +104,7 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<int> GetAddressTotalByStateProvinceIdAsync(int stateProvinceId)
     {
+		_logger.LogDebug(">>> Entering GetAddressTotalByStateProvinceIdAsync(stateProvinceId={StateProvinceId})", stateProvinceId);
         if (stateProvinceId == 0)
             return 0;
 
@@ -95,6 +112,7 @@ public partial class AddressService : IAddressService
             where a.StateProvinceId == stateProvinceId
             select a;
 
+		_logger.LogDebug("<<< Exiting GetAddressTotalByStateProvinceIdAsync(stateProvinceId={StateProvinceId})", stateProvinceId);
         return await query.CountAsync();
     }
 
@@ -108,6 +126,8 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<Address> GetAddressByIdAsync(int addressId)
     {
+		_logger.LogDebug(">>> Entering GetAddressByIdAsync(addressId={AddressId})", addressId);
+		_logger.LogDebug("<<< Exiting GetAddressByIdAsync(addressId={AddressId})", addressId);
         return await _addressRepository.GetByIdAsync(addressId, cache => default, useShortTermCache: true);
     }
 
@@ -118,17 +138,24 @@ public partial class AddressService : IAddressService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAddressAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering InsertAddressAsync(address={Address})", address);
         ArgumentNullException.ThrowIfNull(address);
 
         address.CreatedOnUtc = DateTime.UtcNow;
+		_logger.LogDebug("InsertAddressAsync(address={Address}): address.CreatedOnUtc → {Arg1}", address, address.CreatedOnUtc);
 
         //some validation
         if (address.CountryId == 0)
             address.CountryId = null;
+			_logger.LogDebug("InsertAddressAsync(address={Address}): address.CountryId → {Arg1}", address, address.CountryId);
         if (address.StateProvinceId == 0)
             address.StateProvinceId = null;
+			_logger.LogDebug("InsertAddressAsync(address={Address}): address.StateProvinceId → {Arg1}", address, address.StateProvinceId);
 
         await _addressRepository.InsertAsync(address);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("InsertAddressAsync(address)={Address}: save query executed in {Arg1} ms", address, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting InsertAddressAsync(address={Address})", address);
     }
 
     /// <summary>
@@ -138,15 +165,21 @@ public partial class AddressService : IAddressService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAddressAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering UpdateAddressAsync(address={Address})", address);
         ArgumentNullException.ThrowIfNull(address);
 
         //some validation
         if (address.CountryId == 0)
             address.CountryId = null;
+			_logger.LogDebug("UpdateAddressAsync(address={Address}): address.CountryId → {Arg1}", address, address.CountryId);
         if (address.StateProvinceId == 0)
             address.StateProvinceId = null;
+			_logger.LogDebug("UpdateAddressAsync(address={Address}): address.StateProvinceId → {Arg1}", address, address.StateProvinceId);
 
         await _addressRepository.UpdateAsync(address);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("UpdateAddressAsync(address)={Address}: update query executed in {Arg1} ms", address, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting UpdateAddressAsync(address={Address})", address);
     }
 
     /// <summary>
@@ -159,6 +192,7 @@ public partial class AddressService : IAddressService
     /// </returns>
     public virtual async Task<bool> IsAddressValidAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering IsAddressValidAsync(address={Address})", address);
         ArgumentNullException.ThrowIfNull(address);
 
         if (string.IsNullOrWhiteSpace(address.FirstName))
@@ -238,6 +272,7 @@ public partial class AddressService : IAddressService
             var value = _addressAttributeParser.ParseValues(address.CustomAttributes, requiredAttribute.Id);
 
             if (!value.Any() || string.IsNullOrEmpty(value[0]))
+		_logger.LogDebug("<<< Exiting IsAddressValidAsync(address={Address})", address);
                 return false;
         }
 
@@ -267,6 +302,8 @@ public partial class AddressService : IAddressService
         string faxNumber, string company, string address1, string address2, string city, string county, int? stateProvinceId,
         string zipPostalCode, int? countryId, string customAttributes)
     {
+		_logger.LogDebug(">>> Entering FindAddress(source={Source},firstName={FirstName},lastName={LastName},phoneNumber={PhoneNumber},email={Email},faxNumber={FaxNumber},company={Company},address1={Address1},address2={Address2},city={City},county={County},stateProvinceId={StateProvinceId},zipPostalCode={ZipPostalCode},countryId={CountryId},customAttributes={CustomAttributes})", source, firstName, lastName, phoneNumber, email, faxNumber, company, address1, address2, city, county, stateProvinceId, zipPostalCode, countryId, customAttributes);
+								_logger.LogDebug("<<< Exiting FindAddress(source={Source},firstName={FirstName},lastName={LastName},phoneNumber={PhoneNumber},email={Email},faxNumber={FaxNumber},company={Company},address1={Address1},address2={Address2},city={City},county={County},stateProvinceId={StateProvinceId},zipPostalCode={ZipPostalCode},countryId={CountryId},customAttributes={CustomAttributes})", source, firstName, lastName, phoneNumber, email, faxNumber, company, address1, address2, city, county, stateProvinceId, zipPostalCode, countryId, customAttributes);
         return source.Find(a => ((string.IsNullOrEmpty(a.FirstName) && string.IsNullOrEmpty(firstName)) || a.FirstName == firstName) &&
                                 ((string.IsNullOrEmpty(a.LastName) && string.IsNullOrEmpty(lastName)) || a.LastName == lastName) &&
                                 ((string.IsNullOrEmpty(a.PhoneNumber) && string.IsNullOrEmpty(phoneNumber)) || a.PhoneNumber == phoneNumber) &&
@@ -291,6 +328,7 @@ public partial class AddressService : IAddressService
     /// <returns>A deep copy of address</returns>
     public virtual Address CloneAddress(Address address)
     {
+		_logger.LogDebug(">>> Entering CloneAddress(address={Address})", address);
         var addr = new Address
         {
             FirstName = address.FirstName,
@@ -310,6 +348,7 @@ public partial class AddressService : IAddressService
             CreatedOnUtc = address.CreatedOnUtc
         };
 
+		_logger.LogDebug("<<< Exiting CloneAddress(address={Address})", address);
         return addr;
     }
 

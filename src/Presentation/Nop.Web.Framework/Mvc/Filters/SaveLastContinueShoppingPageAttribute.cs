@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Core;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -18,6 +20,8 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
     /// </summary>
     public SaveLastContinueShoppingPageAttribute() : base(typeof(SaveLastContinueShoppingPageFilter))
     {
+	_logger.LogDebug(">>> Entering SaveLastContinueShoppingPageAttribute()");
+	_logger.LogDebug("<<< Exiting SaveLastContinueShoppingPageAttribute()");
     }
 
     #endregion
@@ -42,10 +46,16 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 
         public SaveLastContinueShoppingPageFilter(IGenericAttributeService genericAttributeService, IStoreContext storeContext, IWebHelper webHelper, IWorkContext workContext)
         {
+			_logger.LogDebug(">>> Entering SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext})", genericAttributeService, storeContext, webHelper, workContext);
             _genericAttributeService = genericAttributeService;
             _storeContext = storeContext;
+			_logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _storeContext → {_storeContext}", genericAttributeService, storeContext, webHelper, workContext, _storeContext);
+			_logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _genericAttributeService → {_genericAttributeService}", genericAttributeService, storeContext, webHelper, workContext, _genericAttributeService);
             _webHelper = webHelper;
+			_logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", genericAttributeService, storeContext, webHelper, workContext, _webHelper);
             _workContext = workContext;
+			_logger.LogDebug("SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", genericAttributeService, storeContext, webHelper, workContext, _workContext);
+			_logger.LogDebug("<<< Exiting SaveLastContinueShoppingPageFilter(genericAttributeService={GenericAttributeService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext})", genericAttributeService, storeContext, webHelper, workContext);
         }
 
         #endregion
@@ -54,8 +64,10 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             var store = await _storeContext.GetCurrentStoreAsync();
 
+			_logger.LogDebug("OnActionExecutionAsync(context={Context},next={Next}): store → {Store}", context, next, store);
             //'Continue shopping' URL
             await _genericAttributeService.SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(),
                 NopCustomerDefaults.LastContinueShoppingPageAttribute,
@@ -64,6 +76,7 @@ public sealed class SaveLastContinueShoppingPageAttribute : TypeFilterAttribute
 
             if (context.Result == null)
                 await next();
+				_logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

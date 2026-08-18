@@ -2,14 +2,18 @@
 using Nop.Services.Plugins;
 using Nop.Services.Shipping;
 using Nop.Services.Shipping.Tracking;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Shipping;
 
 public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingRateComputationMethod
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private decimal GetRate()
     {
+		_logger.LogDebug(">>> Entering GetRate()");
         var rate = 10M;
+		_logger.LogDebug("<<< Exiting GetRate()");
         return rate;
     }
 
@@ -20,9 +24,11 @@ public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingR
     /// <returns>Represents a response of getting shipping rate options</returns>
     public Task<GetShippingOptionResponse> GetShippingOptionsAsync(GetShippingOptionRequest getShippingOptionRequest)
     {
+		_logger.LogDebug(">>> Entering GetShippingOptionsAsync(getShippingOptionRequest=<redacted>)");
         ArgumentNullException.ThrowIfNull(getShippingOptionRequest);
 
         var response = new GetShippingOptionResponse();
+		_logger.LogDebug("GetShippingOptionsAsync(getShippingOptionRequest=<redacted>): response → {Response}", response);
         response.ShippingOptions.Add(new ShippingOption
         {
             Name = "Shipping option 1",
@@ -36,6 +42,7 @@ public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingR
             Rate = GetRate()
         });
 
+		_logger.LogDebug("<<< Exiting GetShippingOptionsAsync(getShippingOptionRequest=<redacted>)");
         return Task.FromResult(response);
     }
 
@@ -46,8 +53,10 @@ public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingR
     /// <returns>Fixed shipping rate; or null in case there's no fixed shipping rate</returns>
     public Task<decimal?> GetFixedRateAsync(GetShippingOptionRequest getShippingOptionRequest)
     {
+		_logger.LogDebug(">>> Entering GetFixedRateAsync(getShippingOptionRequest=<redacted>)");
         ArgumentNullException.ThrowIfNull(getShippingOptionRequest);
 
+		_logger.LogDebug("<<< Exiting GetFixedRateAsync(getShippingOptionRequest=<redacted>)");
         return Task.FromResult<decimal?>(GetRate());
     }
 
@@ -60,6 +69,8 @@ public class FixedRateTestShippingRateComputationMethod : BasePlugin, IShippingR
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		_logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		_logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 }

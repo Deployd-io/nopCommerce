@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -9,13 +10,19 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record AddProductToOrderSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToOrderSearchModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToOrderSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToOrderSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		_logger.LogDebug("AddProductToOrderSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableProductTypes = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToOrderSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
+		_logger.LogDebug("<<< Exiting AddProductToOrderSearchModel()");
     }
 
     #endregion

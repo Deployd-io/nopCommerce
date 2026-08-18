@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Models.ItemClassification;
 
@@ -9,15 +10,23 @@ namespace Nop.Plugin.Tax.Avalara.Models.ItemClassification;
 /// </summary>
 public record AddProductToClassificationSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToClassificationSearchModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToClassificationSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToClassificationSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		_logger.LogDebug("AddProductToClassificationSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToClassificationSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToClassificationSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToClassificationSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
+		_logger.LogDebug("<<< Exiting AddProductToClassificationSearchModel()");
     }
 
     #endregion

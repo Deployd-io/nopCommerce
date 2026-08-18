@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Models.EntityUseCode;
 
@@ -9,11 +10,15 @@ namespace Nop.Plugin.Tax.Avalara.Models.EntityUseCode;
 /// </summary>
 public record EntityUseCodeModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public EntityUseCodeModel()
     {
+		_logger.LogDebug(">>> Entering EntityUseCodeModel()");
         EntityUseCodes = new List<SelectListItem>();
+		_logger.LogDebug("EntityUseCodeModel(): EntityUseCodes → {EntityUseCodes}", EntityUseCodes);
+		_logger.LogDebug("<<< Exiting EntityUseCodeModel()");
     }
 
     #endregion

@@ -10,6 +10,7 @@ using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.Swiper;
 
@@ -18,6 +19,7 @@ namespace Nop.Plugin.Widgets.Swiper;
 /// </summary>
 public class SwiperPlugin : BasePlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -38,12 +40,20 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
         IWebHelper webHelper,
         WidgetSettings widgetSettings)
     {
+		_logger.LogDebug(">>> Entering SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings})", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings, _localizationService);
         _fileProvider = fileProvider;
+		_logger.LogDebug("SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _fileProvider → {_fileProvider}", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings, _fileProvider);
         _pictureService = pictureService;
+		_logger.LogDebug("SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _pictureService → {_pictureService}", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings, _pictureService);
         _settingService = settingService;
+		_logger.LogDebug("SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _settingService → {_settingService}", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings, _settingService);
         _webHelper = webHelper;
+		_logger.LogDebug("SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _webHelper → {_webHelper}", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings, _webHelper);
         _widgetSettings = widgetSettings;
+		_logger.LogDebug("SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings}): _widgetSettings → {_widgetSettings}", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings, _widgetSettings);
+		_logger.LogDebug("<<< Exiting SwiperPlugin(localizationService={LocalizationService},fileProvider={FileProvider},pictureService={PictureService},settingService={SettingService},webHelper={WebHelper},widgetSettings={WidgetSettings})", localizationService, fileProvider, pictureService, settingService, webHelper, widgetSettings);
     }
 
     #endregion
@@ -59,6 +69,8 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogDebug(">>> Entering GetWidgetZonesAsync()");
+		_logger.LogDebug("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string> { PublicWidgetZones.HomepageTop });
     }
 
@@ -67,6 +79,8 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return _webHelper.GetStoreLocation() + "Admin/WidgetSwiper/Configure";
     }
 
@@ -77,6 +91,8 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// <returns>View component name</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogDebug(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
+		_logger.LogDebug("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(WidgetSwiperViewComponent);
     }
 
@@ -86,8 +102,10 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //pictures
         var sampleImagesPath = _fileProvider.MapPath("~/Plugins/Widgets.Swiper/Content/sample-images/");
+		_logger.LogDebug("InstallAsync(): sampleImagesPath → {SampleImagesPath}", sampleImagesPath);
 
         //settings
 
@@ -155,6 +173,7 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -163,6 +182,7 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<SwiperSettings>();
         if (_widgetSettings.ActiveWidgetSystemNames.Contains(PluginDescriptor.SystemName))
@@ -175,6 +195,7 @@ public class SwiperPlugin : BasePlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Widgets.Swiper");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

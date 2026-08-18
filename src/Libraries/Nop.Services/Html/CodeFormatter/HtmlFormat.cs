@@ -22,6 +22,7 @@
 
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html.CodeFormatter;
 
@@ -37,6 +38,7 @@ namespace Nop.Services.Html.CodeFormatter;
 /// </remarks>
 public partial class HtmlFormat : SourceFormat
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly CSharpFormat _csf; //to format embedded C# code
     protected readonly JavaScriptFormat _jsf; //to format client-side JavaScript code
     protected readonly Regex _attributeRegex;
@@ -44,6 +46,7 @@ public partial class HtmlFormat : SourceFormat
     /// <summary/>
     public HtmlFormat()
     {
+		_logger.LogDebug(">>> Entering HtmlFormat()");
         const string regJavaScript = @"(?<=&lt;script(?:\s.*?)?&gt;).+?(?=&lt;/script&gt;)";
         const string regComment = @"&lt;!--.*?--&gt;";
         const string regAspTag = @"&lt;%@.*?%&gt;|&lt;%|%&gt;";
@@ -63,8 +66,13 @@ public partial class HtmlFormat : SourceFormat
         CodeRegex = new Regex(regAll, RegexOptions.IgnoreCase | RegexOptions.Singleline);
         _attributeRegex = new Regex(regAttributeMatch, RegexOptions.Singleline);
 
+		_logger.LogDebug("HtmlFormat(): CodeRegex → {CodeRegex}", CodeRegex);
+		_logger.LogDebug("HtmlFormat(): _attributeRegex → {_attributeRegex}", _attributeRegex);
         _csf = new CSharpFormat();
+		_logger.LogDebug("HtmlFormat(): _csf → {_csf}", _csf);
         _jsf = new JavaScriptFormat();
+		_logger.LogDebug("HtmlFormat(): _jsf → {_jsf}", _jsf);
+		_logger.LogDebug("<<< Exiting HtmlFormat()");
     }
 
     /// <summary>
@@ -76,12 +84,16 @@ public partial class HtmlFormat : SourceFormat
     /// <returns>A string containing the HTML code fragment.</returns>
     protected string AttributeMatchEval(Match match)
     {
+		_logger.LogDebug(">>> Entering AttributeMatchEval(match={Match})", match);
         if (match.Groups[1].Success) //attribute value
             return "<span class=\"kwrd\">" + match + "</span>";
 
         if (match.Groups[2].Success) //attribute name
             return "<span class=\"attr\">" + match + "</span>";
 
+		_logger.LogDebug(">>> Entering MatchEval(match={Match})", match);
+		_logger.LogDebug("<<< Exiting MatchEval(match={Match})", match);
+		_logger.LogDebug("<<< Exiting AttributeMatchEval(match={Match})", match);
         return match.ToString();
     }
 

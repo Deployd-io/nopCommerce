@@ -49,20 +49,36 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
         IStaticCacheManager staticCacheManager,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext})", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _catalogSettings → {_catalogSettings}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _catalogSettings);
         _aclService = aclService;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _aclService → {_aclService}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _aclService);
         _categoryService = categoryService;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _categoryService → {_categoryService}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _categoryService);
         _productRepository = productRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _productRepository → {_productRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _productRepository);
         _productCategoryRepository = productCategoryRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _productCategoryRepository → {_productCategoryRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _productCategoryRepository);
         _productManufacturerRepository = productManufacturerRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _productManufacturerRepository → {_productManufacturerRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _productManufacturerRepository);
         _productSpecificationAttributeRepository = productSpecificationAttributeRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _productSpecificationAttributeRepository → {_productSpecificationAttributeRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _productSpecificationAttributeRepository);
         _specificationAttributeRepository = specificationAttributeRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _specificationAttributeRepository → {_specificationAttributeRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _specificationAttributeRepository);
         _specificationAttributeOptionRepository = specificationAttributeOptionRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _specificationAttributeOptionRepository → {_specificationAttributeOptionRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _specificationAttributeOptionRepository);
         _specificationAttributeGroupRepository = specificationAttributeGroupRepository;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _specificationAttributeGroupRepository → {_specificationAttributeGroupRepository}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _specificationAttributeGroupRepository);
         _storeContext = storeContext;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _storeContext → {_storeContext}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _storeContext);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _storeMappingService → {_storeMappingService}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _storeMappingService);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _staticCacheManager → {_staticCacheManager}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _staticCacheManager);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext})", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext);
+		_logger.LogDebug("SpecificationAttributeService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},productRepository={ProductRepository},productCategoryRepository={ProductCategoryRepository},productManufacturerRepository={ProductManufacturerRepository},productSpecificationAttributeRepository={ProductSpecificationAttributeRepository},specificationAttributeRepository={SpecificationAttributeRepository},specificationAttributeOptionRepository={SpecificationAttributeOptionRepository},specificationAttributeGroupRepository={SpecificationAttributeGroupRepository},storeContext={StoreContext},storeMappingService=<redacted>,staticCacheManager={StaticCacheManager},workContext={WorkContext}): _workContext → {_workContext}", catalogSettings, aclService, categoryService, productRepository, productCategoryRepository, productManufacturerRepository, productSpecificationAttributeRepository, specificationAttributeRepository, specificationAttributeOptionRepository, specificationAttributeGroupRepository, storeContext, staticCacheManager, workContext, _workContext);
     }
 
     #endregion
@@ -78,8 +94,10 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     protected virtual async Task<IQueryable<Product>> GetAvailableProductsQueryAsync()
     {
+		_logger.LogDebug(">>> Entering GetAvailableProductsQueryAsync()");
         var productsQuery =
             from p in _productRepository.Table
+			_logger.LogDebug("GetAvailableProductsQueryAsync(): productsQuery → {ProductsQuery}", productsQuery);
             where !p.Deleted && p.Published &&
                   (p.ParentGroupedProductId == 0 || p.VisibleIndividually) &&
                   (!p.AvailableStartDateTimeUtc.HasValue || p.AvailableStartDateTimeUtc <= DateTime.UtcNow) &&
@@ -87,7 +105,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
             select p;
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetAvailableProductsQueryAsync(): store → {Store}", store);
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetAvailableProductsQueryAsync(): currentCustomer → {CurrentCustomer}", currentCustomer);
 
         //apply store mapping constraints
         productsQuery = await _storeMappingService.ApplyStoreMapping(productsQuery, store.Id);
@@ -95,6 +115,7 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
         //apply ACL constraints
         productsQuery = await _aclService.ApplyAcl(productsQuery, currentCustomer);
 
+		_logger.LogDebug("<<< Exiting GetAvailableProductsQueryAsync()");
         return productsQuery;
     }
 
@@ -114,6 +135,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<SpecificationAttributeGroup> GetSpecificationAttributeGroupByIdAsync(int specificationAttributeGroupId)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeGroupByIdAsync(specificationAttributeGroupId={SpecificationAttributeGroupId})", specificationAttributeGroupId);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeGroupByIdAsync(specificationAttributeGroupId={SpecificationAttributeGroupId})", specificationAttributeGroupId);
         return await _specificationAttributeGroupRepository.GetByIdAsync(specificationAttributeGroupId, cache => default);
     }
 
@@ -128,10 +151,12 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IPagedList<SpecificationAttributeGroup>> GetSpecificationAttributeGroupsAsync(int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeGroupsAsync(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         var query = from sag in _specificationAttributeGroupRepository.Table
             orderby sag.DisplayOrder, sag.Id
             select sag;
 
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeGroupsAsync(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -145,6 +170,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttributeGroup>> GetProductSpecificationAttributeGroupsAsync(int productId)
     {
+		_logger.LogDebug(">>> Entering GetProductSpecificationAttributeGroupsAsync(productId={ProductId})", productId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productAttributesForGroupQuery =
             from sa in _specificationAttributeRepository.Table
             join sao in _specificationAttributeOptionRepository.Table
@@ -160,7 +187,10 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
             select sag;
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.SpecificationAttributeGroupByProductCacheKey, productId);
+		_logger.LogWarning("GetProductSpecificationAttributeGroupsAsync(productId={ProductId}): key → {Key}", productId, key);
 
+		_logger.LogInformation("GetProductSpecificationAttributeGroupsAsync(productId)={ProductId}: external service call took {Arg1} ms", productId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductSpecificationAttributeGroupsAsync(productId={ProductId})", productId);
         return await _staticCacheManager.GetAsync(key, async () => await availableGroupsQuery.ToListAsync());
     }
 
@@ -171,7 +201,10 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSpecificationAttributeGroupAsync(SpecificationAttributeGroup specificationAttributeGroup)
     {
+		_logger.LogDebug(">>> Entering DeleteSpecificationAttributeGroupAsync(specificationAttributeGroup={SpecificationAttributeGroup})", specificationAttributeGroup);
+		_logger.LogInformation("DeleteSpecificationAttributeGroupAsync(specificationAttributeGroup)={SpecificationAttributeGroup}: external service call took {Arg1} ms", specificationAttributeGroup, __logStart.ElapsedMilliseconds);
         await _specificationAttributeGroupRepository.DeleteAsync(specificationAttributeGroup);
+		_logger.LogDebug("<<< Exiting DeleteSpecificationAttributeGroupAsync(specificationAttributeGroup={SpecificationAttributeGroup})", specificationAttributeGroup);
     }
 
     /// <summary>
@@ -181,7 +214,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSpecificationAttributeGroupAsync(SpecificationAttributeGroup specificationAttributeGroup)
     {
+		_logger.LogDebug(">>> Entering InsertSpecificationAttributeGroupAsync(specificationAttributeGroup={SpecificationAttributeGroup})", specificationAttributeGroup);
         await _specificationAttributeGroupRepository.InsertAsync(specificationAttributeGroup);
+		_logger.LogDebug("<<< Exiting InsertSpecificationAttributeGroupAsync(specificationAttributeGroup={SpecificationAttributeGroup})", specificationAttributeGroup);
     }
 
     /// <summary>
@@ -191,7 +226,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateSpecificationAttributeGroupAsync(SpecificationAttributeGroup specificationAttributeGroup)
     {
+		_logger.LogDebug(">>> Entering UpdateSpecificationAttributeGroupAsync(specificationAttributeGroup={SpecificationAttributeGroup})", specificationAttributeGroup);
         await _specificationAttributeGroupRepository.UpdateAsync(specificationAttributeGroup);
+		_logger.LogDebug("<<< Exiting UpdateSpecificationAttributeGroupAsync(specificationAttributeGroup={SpecificationAttributeGroup})", specificationAttributeGroup);
     }
 
     #endregion
@@ -209,12 +246,16 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IPagedList<SpecificationAttribute>> GetAllSpecificationAttributesAsync(int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetAllSpecificationAttributesAsync(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
         return await _specificationAttributeRepository.GetAllPagedAsync(query =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             return from sa in query
                    orderby sa.Name
                    select sa;
+				_logger.LogInformation("GetAllSpecificationAttributesAsync(pageIndex,pageSize)={PageIndex},{PageSize}: find query executed in {Arg2} ms", pageIndex, pageSize, __logStart.ElapsedMilliseconds);
         }, pageIndex, pageSize);
+		_logger.LogDebug("<<< Exiting GetAllSpecificationAttributesAsync(pageIndex={PageIndex},pageSize={PageSize})", pageIndex, pageSize);
     }
 
     /// <summary>
@@ -227,6 +268,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<SpecificationAttribute> GetSpecificationAttributeByIdAsync(int specificationAttributeId)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeByIdAsync(specificationAttributeId={SpecificationAttributeId})", specificationAttributeId);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeByIdAsync(specificationAttributeId={SpecificationAttributeId})", specificationAttributeId);
         return await _specificationAttributeRepository.GetByIdAsync(specificationAttributeId, cache => default);
     }
 
@@ -240,6 +283,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttribute>> GetSpecificationAttributeByIdsAsync(int[] specificationAttributeIds)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeByIdsAsync(specificationAttributeIds={SpecificationAttributeIds})", specificationAttributeIds);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeByIdsAsync(specificationAttributeIds={SpecificationAttributeIds})", specificationAttributeIds);
         return await _specificationAttributeRepository.GetByIdsAsync(specificationAttributeIds);
     }
 
@@ -258,10 +303,12 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
         int pageIndex = 0,
         int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributesByGroupIdAsync(groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize})", groupId, pageIndex, pageSize);
         return await _specificationAttributeRepository.Table
             .Where(sa => sa.SpecificationAttributeGroupId == groupId)
             .OrderBy(sa => sa.DisplayOrder).ThenBy(sa => sa.Id)
             .ToPagedListAsync(pageIndex, pageSize);
+			_logger.LogDebug("<<< Exiting GetSpecificationAttributesByGroupIdAsync(groupId={GroupId},pageIndex={PageIndex},pageSize={PageSize})", groupId, pageIndex, pageSize);
     }
 
     /// <summary>
@@ -279,6 +326,7 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
         int pageIndex = 0,
         int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributesByNameAsync(name={Name},pageIndex={PageIndex},pageSize={PageSize})", name, pageIndex, pageSize);
         ArgumentNullException.ThrowIfNullOrEmpty(name);
 
         return await _specificationAttributeRepository.Table
@@ -286,6 +334,7 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
             .OrderBy(sa => sa.DisplayOrder)
             .ThenBy(sa => sa.Id)
             .ToPagedListAsync(pageIndex, pageSize);
+			_logger.LogDebug("<<< Exiting GetSpecificationAttributesByNameAsync(name={Name},pageIndex={PageIndex},pageSize={PageSize})", name, pageIndex, pageSize);
     }
 
     /// <summary>
@@ -297,11 +346,15 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttribute>> GetSpecificationAttributesWithOptionsAsync()
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributesWithOptionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from sa in _specificationAttributeRepository.Table
             where _specificationAttributeOptionRepository.Table.Any(o => o.SpecificationAttributeId == sa.Id)
             orderby sa.DisplayOrder, sa.Id
             select sa;
 
+		_logger.LogInformation("GetSpecificationAttributesWithOptionsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributesWithOptionsAsync()");
         return await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.SpecificationAttributesWithOptionsCacheKey), async () => await query.ToListAsync());
     }
 
@@ -312,7 +365,11 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSpecificationAttributeAsync(SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering DeleteSpecificationAttributeAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _specificationAttributeRepository.DeleteAsync(specificationAttribute);
+		_logger.LogInformation("DeleteSpecificationAttributeAsync(specificationAttribute)={SpecificationAttribute}: external service call took {Arg1} ms", specificationAttribute, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteSpecificationAttributeAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
     }
 
     /// <summary>
@@ -322,10 +379,12 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSpecificationAttributesAsync(IList<SpecificationAttribute> specificationAttributes)
     {
+		_logger.LogDebug(">>> Entering DeleteSpecificationAttributesAsync(specificationAttributes={SpecificationAttributes})", specificationAttributes);
         ArgumentNullException.ThrowIfNull(specificationAttributes);
 
         foreach (var specificationAttribute in specificationAttributes)
             await DeleteSpecificationAttributeAsync(specificationAttribute);
+			_logger.LogDebug("<<< Exiting DeleteSpecificationAttributesAsync(specificationAttributes={SpecificationAttributes})", specificationAttributes);
     }
 
     /// <summary>
@@ -335,7 +394,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSpecificationAttributeAsync(SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering InsertSpecificationAttributeAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
         await _specificationAttributeRepository.InsertAsync(specificationAttribute);
+		_logger.LogDebug("<<< Exiting InsertSpecificationAttributeAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
     }
 
     /// <summary>
@@ -345,7 +406,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateSpecificationAttributeAsync(SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering UpdateSpecificationAttributeAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
         await _specificationAttributeRepository.UpdateAsync(specificationAttribute);
+		_logger.LogDebug("<<< Exiting UpdateSpecificationAttributeAsync(specificationAttribute={SpecificationAttribute})", specificationAttribute);
     }
 
     #endregion
@@ -362,6 +425,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<SpecificationAttributeOption> GetSpecificationAttributeOptionByIdAsync(int specificationAttributeOptionId)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeOptionByIdAsync(specificationAttributeOptionId={SpecificationAttributeOptionId})", specificationAttributeOptionId);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeOptionByIdAsync(specificationAttributeOptionId={SpecificationAttributeOptionId})", specificationAttributeOptionId);
         return await _specificationAttributeOptionRepository.GetByIdAsync(specificationAttributeOptionId, cache => default);
     }
 
@@ -375,6 +440,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttributeOption>> GetSpecificationAttributeOptionsByIdsAsync(int[] specificationAttributeOptionIds)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeOptionsByIdsAsync(specificationAttributeOptionIds={SpecificationAttributeOptionIds})", specificationAttributeOptionIds);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeOptionsByIdsAsync(specificationAttributeOptionIds={SpecificationAttributeOptionIds})", specificationAttributeOptionIds);
         return await _specificationAttributeOptionRepository.GetByIdsAsync(specificationAttributeOptionIds);
     }
 
@@ -388,6 +455,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttributeOption>> GetSpecificationAttributeOptionsBySpecificationAttributeAsync(int specificationAttributeId)
     {
+		_logger.LogDebug(">>> Entering GetSpecificationAttributeOptionsBySpecificationAttributeAsync(specificationAttributeId={SpecificationAttributeId})", specificationAttributeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = from sao in _specificationAttributeOptionRepository.Table
             orderby sao.DisplayOrder, sao.Id
             where sao.SpecificationAttributeId == specificationAttributeId
@@ -395,6 +464,10 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
 
         var specificationAttributeOptions = await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.SpecificationAttributeOptionsCacheKey, specificationAttributeId), async () => await query.ToListAsync());
 
+		_logger.LogDebug("GetSpecificationAttributeOptionsBySpecificationAttributeAsync(specificationAttributeId={SpecificationAttributeId}): specificationAttributeOptions → {SpecificationAttributeOptions}", specificationAttributeId, specificationAttributeOptions);
+		_logger.LogInformation("GetSpecificationAttributeOptionsBySpecificationAttributeAsync(specificationAttributeId)={SpecificationAttributeId}: external service call took {Arg1} ms", specificationAttributeId, __logStart.ElapsedMilliseconds);
+		_logger.LogInformation("GetSpecificationAttributeOptionsBySpecificationAttributeAsync(specificationAttributeId)={SpecificationAttributeId}: find query executed in {Arg1} ms", specificationAttributeId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetSpecificationAttributeOptionsBySpecificationAttributeAsync(specificationAttributeId={SpecificationAttributeId})", specificationAttributeId);
         return specificationAttributeOptions;
     }
 
@@ -405,7 +478,10 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteSpecificationAttributeOptionAsync(SpecificationAttributeOption specificationAttributeOption)
     {
+		_logger.LogDebug(">>> Entering DeleteSpecificationAttributeOptionAsync(specificationAttributeOption={SpecificationAttributeOption})", specificationAttributeOption);
+		_logger.LogInformation("DeleteSpecificationAttributeOptionAsync(specificationAttributeOption)={SpecificationAttributeOption}: external service call took {Arg1} ms", specificationAttributeOption, __logStart.ElapsedMilliseconds);
         await _specificationAttributeOptionRepository.DeleteAsync(specificationAttributeOption);
+		_logger.LogDebug("<<< Exiting DeleteSpecificationAttributeOptionAsync(specificationAttributeOption={SpecificationAttributeOption})", specificationAttributeOption);
     }
 
     /// <summary>
@@ -415,7 +491,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertSpecificationAttributeOptionAsync(SpecificationAttributeOption specificationAttributeOption)
     {
+		_logger.LogDebug(">>> Entering InsertSpecificationAttributeOptionAsync(specificationAttributeOption={SpecificationAttributeOption})", specificationAttributeOption);
         await _specificationAttributeOptionRepository.InsertAsync(specificationAttributeOption);
+		_logger.LogDebug("<<< Exiting InsertSpecificationAttributeOptionAsync(specificationAttributeOption={SpecificationAttributeOption})", specificationAttributeOption);
     }
 
     /// <summary>
@@ -425,7 +503,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateSpecificationAttributeOptionAsync(SpecificationAttributeOption specificationAttributeOption)
     {
+		_logger.LogDebug(">>> Entering UpdateSpecificationAttributeOptionAsync(specificationAttributeOption={SpecificationAttributeOption})", specificationAttributeOption);
         await _specificationAttributeOptionRepository.UpdateAsync(specificationAttributeOption);
+		_logger.LogDebug("<<< Exiting UpdateSpecificationAttributeOptionAsync(specificationAttributeOption={SpecificationAttributeOption})", specificationAttributeOption);
     }
 
     /// <summary>
@@ -438,13 +518,17 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<int[]> GetNotExistingSpecificationAttributeOptionsAsync(int[] attributeOptionIds)
     {
+		_logger.LogDebug(">>> Entering GetNotExistingSpecificationAttributeOptionsAsync(attributeOptionIds={AttributeOptionIds})", attributeOptionIds);
         ArgumentNullException.ThrowIfNull(attributeOptionIds);
 
         var query = _specificationAttributeOptionRepository.Table;
+		_logger.LogDebug("GetNotExistingSpecificationAttributeOptionsAsync(attributeOptionIds={AttributeOptionIds}): query → {Query}", attributeOptionIds, query);
         var queryFilter = attributeOptionIds.Distinct().ToArray();
+		_logger.LogDebug("GetNotExistingSpecificationAttributeOptionsAsync(attributeOptionIds={AttributeOptionIds}): queryFilter → {QueryFilter}", attributeOptionIds, queryFilter);
         var filter = await query.Select(a => a.Id)
             .Where(m => queryFilter.Contains(m))
             .ToListAsync();
+		_logger.LogDebug("<<< Exiting GetNotExistingSpecificationAttributeOptionsAsync(attributeOptionIds={AttributeOptionIds})", attributeOptionIds);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -458,16 +542,21 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttributeOption>> GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(int categoryId)
     {
+		_logger.LogDebug(">>> Entering GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(categoryId={CategoryId})", categoryId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (categoryId <= 0)
             return new List<SpecificationAttributeOption>();
 
         var productsQuery = await GetAvailableProductsQueryAsync();
+		_logger.LogDebug("GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(categoryId={CategoryId}): productsQuery → {ProductsQuery}", categoryId, productsQuery);
 
         IList<int> subCategoryIds = null;
+		_logger.LogDebug("GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(categoryId={CategoryId}): subCategoryIds → {SubCategoryIds}", categoryId, subCategoryIds);
 
         if (_catalogSettings.ShowProductsFromSubcategories)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(categoryId={CategoryId}): store → {Store}", categoryId, store);
             subCategoryIds = await _categoryService.GetChildCategoryIdsAsync(categoryId, store.Id);
         }
 
@@ -494,6 +583,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(
             NopCatalogDefaults.SpecificationAttributeOptionsByCategoryCacheKey, categoryId.ToString());
 
+		_logger.LogInformation("GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(categoryId)={CategoryId}: external service call took {Arg1} ms", categoryId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetFiltrableSpecificationAttributeOptionsByCategoryIdAsync(categoryId={CategoryId})", categoryId);
         return await _staticCacheManager.GetAsync(cacheKey, async () => (await result.Distinct().ToListAsync()).Select(query => query.sao).ToList());
     }
 
@@ -507,10 +598,13 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IList<SpecificationAttributeOption>> GetFiltrableSpecificationAttributeOptionsByManufacturerIdAsync(int manufacturerId)
     {
+		_logger.LogDebug(">>> Entering GetFiltrableSpecificationAttributeOptionsByManufacturerIdAsync(manufacturerId={ManufacturerId})", manufacturerId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (manufacturerId <= 0)
             return new List<SpecificationAttributeOption>();
 
         var productsQuery = await GetAvailableProductsQueryAsync();
+		_logger.LogDebug("GetFiltrableSpecificationAttributeOptionsByManufacturerIdAsync(manufacturerId={ManufacturerId}): productsQuery → {ProductsQuery}", manufacturerId, productsQuery);
 
         var productManufacturerQuery =
             from pm in _productManufacturerRepository.Table
@@ -520,6 +614,7 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
 
         var result =
             from sao in _specificationAttributeOptionRepository.Table
+			using Microsoft.Extensions.Logging;
             join psa in _productSpecificationAttributeRepository.Table on sao.Id equals psa.SpecificationAttributeOptionId
             join p in productsQuery on psa.ProductId equals p.Id
             join pm in productManufacturerQuery on p.Id equals pm.ProductId
@@ -535,6 +630,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(
             NopCatalogDefaults.SpecificationAttributeOptionsByManufacturerCacheKey, manufacturerId.ToString());
 
+		_logger.LogInformation("GetFiltrableSpecificationAttributeOptionsByManufacturerIdAsync(manufacturerId)={ManufacturerId}: external service call took {Arg1} ms", manufacturerId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetFiltrableSpecificationAttributeOptionsByManufacturerIdAsync(manufacturerId={ManufacturerId})", manufacturerId);
         return await _staticCacheManager.GetAsync(cacheKey, async () => (await result.Distinct().ToListAsync()).Select(query => query.sao).ToList());
     }
 
@@ -549,7 +646,12 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductSpecificationAttributeAsync(ProductSpecificationAttribute productSpecificationAttribute)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         await _productSpecificationAttributeRepository.DeleteAsync(productSpecificationAttribute);
+		_logger.LogDebug(">>> Entering DeleteProductSpecificationAttributeAsync(productSpecificationAttribute={ProductSpecificationAttribute})", productSpecificationAttribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteProductSpecificationAttributeAsync(productSpecificationAttribute)={ProductSpecificationAttribute}: external service call took {Arg1} ms", productSpecificationAttribute, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteProductSpecificationAttributeAsync(productSpecificationAttribute={ProductSpecificationAttribute})", productSpecificationAttribute);
     }
 
     /// <summary>
@@ -567,14 +669,20 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     public virtual async Task<IList<ProductSpecificationAttribute>> GetProductSpecificationAttributesAsync(int productId = 0,
         int specificationAttributeOptionId = 0, bool? allowFiltering = null, bool? showOnProductPage = null, int? specificationAttributeGroupId = 0)
     {
+		_logger.LogDebug(">>> Entering GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId})", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var allowFilteringCacheStr = allowFiltering.HasValue ? allowFiltering.ToString() : "null";
         var showOnProductPageCacheStr = showOnProductPage.HasValue ? showOnProductPage.ToString() : "null";
+		_logger.LogDebug("GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId}): showOnProductPageCacheStr → {ShowOnProductPageCacheStr}", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, showOnProductPageCacheStr);
         var specificationAttributeGroupIdCacheStr = specificationAttributeGroupId.HasValue ? specificationAttributeGroupId.ToString() : "null";
+		_logger.LogDebug("GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId}): specificationAttributeGroupIdCacheStr → {SpecificationAttributeGroupIdCacheStr}", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, specificationAttributeGroupIdCacheStr);
+		_logger.LogDebug("GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId}): allowFilteringCacheStr → {AllowFilteringCacheStr}", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, allowFilteringCacheStr);
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopCatalogDefaults.ProductSpecificationAttributeByProductCacheKey,
             productId, specificationAttributeOptionId, allowFilteringCacheStr, showOnProductPageCacheStr, specificationAttributeGroupIdCacheStr);
 
         var query = _productSpecificationAttributeRepository.Table;
+		_logger.LogDebug("GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId}): query → {Query}", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, query);
         if (productId > 0)
             query = query.Where(psa => psa.ProductId == productId);
         if (specificationAttributeOptionId > 0)
@@ -597,6 +705,10 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
 
         var productSpecificationAttributes = await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
 
+		_logger.LogDebug("GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId}): productSpecificationAttributes → {ProductSpecificationAttributes}", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, productSpecificationAttributes);
+		_logger.LogInformation("GetProductSpecificationAttributesAsync(productId,specificationAttributeOptionId,allowFiltering,showOnProductPage,specificationAttributeGroupId)={ProductId},{SpecificationAttributeOptionId},{AllowFiltering},{ShowOnProductPage},{SpecificationAttributeGroupId}: external service call took {Arg5} ms", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, __logStart.ElapsedMilliseconds);
+		_logger.LogInformation("GetProductSpecificationAttributesAsync(productId,specificationAttributeOptionId,allowFiltering,showOnProductPage,specificationAttributeGroupId)={ProductId},{SpecificationAttributeOptionId},{AllowFiltering},{ShowOnProductPage},{SpecificationAttributeGroupId}: find query executed in {Arg5} ms", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetProductSpecificationAttributesAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId},allowFiltering={AllowFiltering},showOnProductPage={ShowOnProductPage},specificationAttributeGroupId={SpecificationAttributeGroupId})", productId, specificationAttributeOptionId, allowFiltering, showOnProductPage, specificationAttributeGroupId);
         return productSpecificationAttributes;
     }
 
@@ -610,6 +722,8 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<ProductSpecificationAttribute> GetProductSpecificationAttributeByIdAsync(int productSpecificationAttributeId)
     {
+		_logger.LogDebug(">>> Entering GetProductSpecificationAttributeByIdAsync(productSpecificationAttributeId={ProductSpecificationAttributeId})", productSpecificationAttributeId);
+		_logger.LogDebug("<<< Exiting GetProductSpecificationAttributeByIdAsync(productSpecificationAttributeId={ProductSpecificationAttributeId})", productSpecificationAttributeId);
         return await _productSpecificationAttributeRepository.GetByIdAsync(productSpecificationAttributeId);
     }
 
@@ -620,7 +734,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductSpecificationAttributeAsync(ProductSpecificationAttribute productSpecificationAttribute)
     {
+		_logger.LogDebug(">>> Entering InsertProductSpecificationAttributeAsync(productSpecificationAttribute={ProductSpecificationAttribute})", productSpecificationAttribute);
         await _productSpecificationAttributeRepository.InsertAsync(productSpecificationAttribute);
+		_logger.LogDebug("<<< Exiting InsertProductSpecificationAttributeAsync(productSpecificationAttribute={ProductSpecificationAttribute})", productSpecificationAttribute);
     }
 
     /// <summary>
@@ -630,7 +746,9 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductSpecificationAttributeAsync(ProductSpecificationAttribute productSpecificationAttribute)
     {
+		_logger.LogDebug(">>> Entering UpdateProductSpecificationAttributeAsync(productSpecificationAttribute={ProductSpecificationAttribute})", productSpecificationAttribute);
         await _productSpecificationAttributeRepository.UpdateAsync(productSpecificationAttribute);
+		_logger.LogDebug("<<< Exiting UpdateProductSpecificationAttributeAsync(productSpecificationAttribute={ProductSpecificationAttribute})", productSpecificationAttribute);
     }
 
     /// <summary>
@@ -644,12 +762,15 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<int> GetProductSpecificationAttributeCountAsync(int productId = 0, int specificationAttributeOptionId = 0)
     {
+		_logger.LogDebug(">>> Entering GetProductSpecificationAttributeCountAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId})", productId, specificationAttributeOptionId);
         var query = _productSpecificationAttributeRepository.Table;
         if (productId > 0)
+			_logger.LogDebug("GetProductSpecificationAttributeCountAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId}): query → {Query}", productId, specificationAttributeOptionId, query);
             query = query.Where(psa => psa.ProductId == productId);
         if (specificationAttributeOptionId > 0)
             query = query.Where(psa => psa.SpecificationAttributeOptionId == specificationAttributeOptionId);
 
+		_logger.LogDebug("<<< Exiting GetProductSpecificationAttributeCountAsync(productId={ProductId},specificationAttributeOptionId={SpecificationAttributeOptionId})", productId, specificationAttributeOptionId);
         return await query.CountAsync();
     }
 
@@ -665,6 +786,7 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
     /// </returns>
     public virtual async Task<IPagedList<Product>> GetProductsBySpecificationAttributeIdAsync(int specificationAttributeId, int pageIndex, int pageSize)
     {
+		_logger.LogDebug(">>> Entering GetProductsBySpecificationAttributeIdAsync(specificationAttributeId={SpecificationAttributeId},pageIndex={PageIndex},pageSize={PageSize})", specificationAttributeId, pageIndex, pageSize);
         var query = from product in _productRepository.Table
             join psa in _productSpecificationAttributeRepository.Table on product.Id equals psa.ProductId
             join spao in _specificationAttributeOptionRepository.Table on psa.SpecificationAttributeOptionId equals spao.Id
@@ -672,6 +794,7 @@ public partial class SpecificationAttributeService : ISpecificationAttributeServ
             orderby product.Name
             select product;
 
+		_logger.LogDebug("<<< Exiting GetProductsBySpecificationAttributeIdAsync(specificationAttributeId={SpecificationAttributeId},pageIndex={PageIndex},pageSize={PageSize})", specificationAttributeId, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
