@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Nop.Core.Infrastructure;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.ModelBinding;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc.ModelBinding;
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class NopResourceDisplayNameAttribute : DisplayNameAttribute, IModelAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private string _resourceValue = string.Empty;
@@ -24,7 +26,10 @@ public sealed class NopResourceDisplayNameAttribute : DisplayNameAttribute, IMod
     /// <param name="resourceKey">Key of the locale resource</param>
     public NopResourceDisplayNameAttribute(string resourceKey) : base(resourceKey)
     {
+		_logger.LogDebug(">>> Entering NopResourceDisplayNameAttribute(resourceKey={ResourceKey})", resourceKey);
         ResourceKey = resourceKey;
+		_logger.LogDebug("NopResourceDisplayNameAttribute(resourceKey={ResourceKey}): ResourceKey → {ResourceKey1}", resourceKey, ResourceKey);
+		_logger.LogDebug("<<< Exiting NopResourceDisplayNameAttribute(resourceKey={ResourceKey})", resourceKey);
     }
 
     #endregion

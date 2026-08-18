@@ -67,22 +67,40 @@ public partial class MenuModelFactory : IMenuModelFactory
         MenuSettings menuSettings)
     {
         _aclService = aclService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _aclService → {_aclService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _aclService);
         _categoryService = categoryService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _categoryService → {_categoryService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _categoryService);
         _customerService = customerService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _customerService → {_customerService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _customerService);
         _localizationService = localizationService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _localizationService → {_localizationService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _localizationService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings})", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings);
         _manufacturerService = manufacturerService;
         _menuService = menuService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _manufacturerService → {_manufacturerService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _manufacturerService);
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _menuService → {_menuService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _menuService);
         _nopUrlHelper = nopUrlHelper;
         _pictureService = pictureService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _nopUrlHelper → {_nopUrlHelper}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _nopUrlHelper);
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _pictureService → {_pictureService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _pictureService);
         _productService = productService;
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _productService → {_productService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _productService);
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _staticCacheManager → {_staticCacheManager}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _staticCacheManager);
         _storeContext = storeContext;
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _storeContext → {_storeContext}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _storeContext);
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _storeMappingService → {_storeMappingService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _storeMappingService);
         _topicService = topicService;
         _vendorService = vendorService;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _topicService → {_topicService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _topicService);
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _vendorService → {_vendorService}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _vendorService);
         _workContext = workContext;
         _menuSettings = menuSettings;
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _workContext → {_workContext}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _workContext);
+		_logger.LogDebug("<<< Exiting MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings})", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings);
+		_logger.LogDebug("MenuModelFactory(aclService={AclService},categoryService={CategoryService},customerService={CustomerService},localizationService={LocalizationService},logger={Logger},manufacturerService={ManufacturerService},menuService={MenuService},nopUrlHelper={NopUrlHelper},pictureService={PictureService},productService={ProductService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,topicService={TopicService},vendorService={VendorService},workContext={WorkContext},menuSettings={MenuSettings}): _menuSettings → {_menuSettings}", aclService, categoryService, customerService, localizationService, logger, manufacturerService, menuService, nopUrlHelper, pictureService, productService, staticCacheManager, storeContext, topicService, vendorService, workContext, menuSettings, _menuSettings);
     }
 
     #endregion
@@ -243,10 +261,13 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<PictureModel> PreparePictureModelAsync(int pictureId, string title, string alternateText)
     {
+		_logger.LogDebug(">>> Entering PreparePictureModelAsync(pictureId={PictureId},title={Title},alternateText={AlternateText})", pictureId, title, alternateText);
         var picture = await _pictureService.GetPictureByIdAsync(pictureId);
         (var fullSizeImageUrl, picture) = await _pictureService.GetPictureUrlAsync(picture);
+		_logger.LogDebug("PreparePictureModelAsync(pictureId={PictureId},title={Title},alternateText={AlternateText}): picture → {Picture}", pictureId, title, alternateText, picture);
         (var imageUrl, _) = await _pictureService.GetPictureUrlAsync(picture, _menuSettings.GridThumbPictureSize);
 
+		_logger.LogDebug("<<< Exiting PreparePictureModelAsync(pictureId={PictureId},title={Title},alternateText={AlternateText})", pictureId, title, alternateText);
         return new PictureModel
         {
             FullSizeImageUrl = fullSizeImageUrl,
@@ -265,8 +286,11 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<List<MenuItemModel>> PrepareAllCategoriesMenuItemModelsAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareAllCategoriesMenuItemModelsAsync()");
         //root categories
         var categories = await _categoryService.GetAllCategoriesByParentCategoryIdAsync(parentCategoryId: 0);
+		_logger.LogDebug("PrepareAllCategoriesMenuItemModelsAsync(): categories → {Categories}", categories);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         return await categories.SelectAwait(async c =>
         {
@@ -284,6 +308,8 @@ public partial class MenuModelFactory : IMenuModelFactory
 
             return item;
         }).ToListAsync();
+		_logger.LogInformation("PrepareAllCategoriesMenuItemModelsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareAllCategoriesMenuItemModelsAsync()");
     }
 
     /// <summary>
@@ -296,6 +322,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<MenuItemModel> PrepareMenuItemModelAsync(MenuItem menuItem)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemModelAsync(menuItem={MenuItem})", menuItem);
         var entityId = menuItem.EntityId ?? 0;
         var title = string.Empty;
         var url = string.Empty;
@@ -303,6 +330,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         try
         {
             if (menuItem is null || !menuItem.Published || !await _aclService.AuthorizeAsync(menuItem) || !await _storeMappingService.AuthorizeAsync(menuItem))
+				_logger.LogWarning("Throwing NopException from PrepareMenuItemModelAsync(menuItem={MenuItem})", menuItem);
                 throw new NopException("Menu item not found");
 
             (title, url) = menuItem.MenuItemType switch
@@ -323,6 +351,7 @@ public partial class MenuModelFactory : IMenuModelFactory
             await _logger.ErrorAsync(ex.Message);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemModelAsync(menuItem={MenuItem})", menuItem);
         return new MenuItemModel
         {
             Id = menuItem.Id,
@@ -338,6 +367,7 @@ public partial class MenuModelFactory : IMenuModelFactory
             Url = url,
             ChildrenItems = new()
         };
+		_logger.LogDebug("<<< Exiting PrepareSubMenuItemsAsync(menuItemModel={MenuItemModel},limitItems={LimitItems},loadChildren={LoadChildren})", menuItemModel, limitItems, loadChildren);
     }
 
     /// <summary>
@@ -350,20 +380,27 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<List<MenuItemModel>> PrepareMenuItemModelsAsync(Menu menu)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemModelsAsync(menu={Menu})", menu);
         var store = await _storeContext.GetCurrentStoreAsync();
         var allItems = await _menuService.GetAllMenuItemsAsync(menuId: menu.Id, storeId: store.Id);
+		_logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): allItems → {AllItems}", menu, allItems);
         var result = new List<MenuItemModel>();
+		_logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): result → {Result}", menu, result);
         var rootItems = allItems.Where(item => item.ParentId == 0);
+		_logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): rootItems → {RootItems}", menu, rootItems);
+		_logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): store → {Store}", menu, store);
 
         foreach (var rootItem in rootItems)
         {
             var rootItemModel = await PrepareMenuItemModelAsync(rootItem);
+			_logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): rootItemModel → {RootItemModel}", menu, rootItemModel);
 
             if (string.IsNullOrEmpty(rootItemModel.Title) && string.IsNullOrEmpty(rootItemModel.Url))
                 continue;
 
             if (allItems.Any(i => i.ParentId == rootItemModel.Id))
                 rootItemModel.Template = MenuItemTemplate.Simple;
+				_logger.LogDebug("PrepareMenuItemModelsAsync(menu={Menu}): rootItemModel.Template → {Arg1}", menu, rootItemModel.Template);
 
             await getItemTree(rootItemModel);
 
@@ -378,16 +415,19 @@ public partial class MenuModelFactory : IMenuModelFactory
         if (menu.MenuType == MenuType.Main && menu.DisplayAllCategories)
             result.InsertRange(0, await PrepareAllCategoriesMenuItemModelsAsync());
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemModelsAsync(menu={Menu})", menu);
         return result;
 
         async Task getItemTree(MenuItemModel parentItem)
         {
+			_logger.LogDebug(">>> Entering getItemTree(parentItem={ParentItem})", parentItem);
             var children = allItems
                 .Where(item => item.ParentId == parentItem.Id);
 
             foreach (var item in children)
             {
                 var menuItemModel = await PrepareMenuItemModelAsync(item);
+				_logger.LogDebug("getItemTree(parentItem={ParentItem}): menuItemModel → {MenuItemModel}", parentItem, menuItemModel);
 
                 if (string.IsNullOrEmpty(menuItemModel.Title) && string.IsNullOrEmpty(menuItemModel.Url))
                     continue;
@@ -396,6 +436,10 @@ public partial class MenuModelFactory : IMenuModelFactory
 
                 parentItem.ChildrenItems.Add(menuItemModel);
             }
+			_logger.LogDebug("<<< Exiting getItemTree(parentItem={ParentItem})", parentItem);
+			_logger.LogDebug(">>> Entering PrepareSubMenuItemsAsync(menuItemModel={MenuItemModel},limitItems={LimitItems},loadChildren={LoadChildren})", menuItemModel, limitItems, loadChildren);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("PrepareSubMenuItemsAsync(menuItemModel,limitItems,loadChildren)={MenuItemModel},{LimitItems},{LoadChildren}: database query executed in {Arg3} ms", menuItemModel, limitItems, loadChildren, __logStart.ElapsedMilliseconds);
         }
     }
 
@@ -411,10 +455,12 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<List<MenuItemModel>> PrepareSubMenuItemsAsync(MenuItemModel menuItemModel, int limitItems, bool loadChildren = false)
     {
+		_logger.LogDebug(">>> Entering PrepareSubMenuItemsAsync(menuItemModel={MenuItemModel},limitItems={LimitItems},loadChildren={LoadChildren})", menuItemModel, limitItems, loadChildren);
         if (menuItemModel.Template == MenuItemTemplate.Simple)
             return new();
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareSubMenuItemsAsync(menuItemModel={MenuItemModel},limitItems={LimitItems},loadChildren={LoadChildren}): store → {Store}", menuItemModel, limitItems, loadChildren, store);
 
         return menuItemModel.MenuItemType switch
         {
@@ -442,6 +488,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 .SelectAwait(async manufacturer =>
                 {
                     var localizedName = await _localizationService.GetLocalizedAsync(manufacturer, x => x.Name);
+					_logger.LogInformation("PrepareSubMenuItemsAsync(menuItemModel,limitItems,loadChildren)={MenuItemModel},{LimitItems},{LoadChildren}: database query executed in {Arg3} ms", menuItemModel, limitItems, loadChildren, __logStart.ElapsedMilliseconds);
                     var item = new MenuItemModel
                     {
                         EntityId = manufacturer.Id,
@@ -490,12 +537,19 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<IList<MenuModel>> PrepareMenuModelsAsync(MenuType menuType)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuModelsAsync(menuType={MenuType})", menuType);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var language = await _workContext.GetWorkingLanguageAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): language → {Language}", menuType, language);
+		_logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): customer → {Customer}", menuType, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): customerRoleIds → {CustomerRoleIds}", menuType, customerRoleIds);
+		_logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): store → {Store}", menuType, store);
         var menuCacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.MenuByTypeModelKey, menuType, customerRoleIds, store, language);
 
+		_logger.LogDebug("PrepareMenuModelsAsync(menuType={MenuType}): menuCacheKey → {MenuCacheKey}", menuType, menuCacheKey);
         return await _staticCacheManager.GetAsync(menuCacheKey, async () =>
         {
             var menus = await _menuService.GetAllMenusAsync(menuType, store.Id);
@@ -508,7 +562,10 @@ public partial class MenuModelFactory : IMenuModelFactory
                 CssClass = menu.CssClass,
                 Items = await PrepareMenuItemModelsAsync(menu)
             }).ToListAsync();
+			_logger.LogInformation("PrepareMenuModelsAsync(menuType)={MenuType}: database query executed in {Arg1} ms", menuType, __logStart.ElapsedMilliseconds);
+			_logger.LogInformation("PrepareMenuModelsAsync(menuType)={MenuType}: external service call took {Arg1} ms", menuType, __logStart.ElapsedMilliseconds);
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuModelsAsync(menuType={MenuType})", menuType);
     }
 
     #endregion

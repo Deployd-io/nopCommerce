@@ -2,17 +2,22 @@
 using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Topics;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo480;
 
 [NopSchemaMigration("2024-11-25 00:00:00", "AddIndexesMigration for 4.80.0")]
 public class AddIndexesMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private readonly INopDataProvider _dataProvider;
 
     public AddIndexesMigration(INopDataProvider dataProvider)
     {
+		_logger.LogDebug(">>> Entering AddIndexesMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("AddIndexesMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+		_logger.LogDebug("<<< Exiting AddIndexesMigration(dataProvider={DataProvider})", dataProvider);
     }
 
     /// <summary>
@@ -20,6 +25,7 @@ public class AddIndexesMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!Schema.Table(nameof(Customer)).Index("IX_Customer_Deleted").Exists())
             Create.Index("IX_Customer_Deleted")
                 .OnTable(nameof(Customer))
@@ -54,5 +60,6 @@ public class AddIndexesMigration : ForwardOnlyMigration
                 .OnTable(nameof(Topic))
                 .OnColumn(nameof(Topic.SystemName)).Ascending()
                 .WithOptions().NonClustered();
+				_logger.LogDebug("<<< Exiting Up()");
     }
 }

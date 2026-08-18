@@ -4,24 +4,31 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Configuration;
 using Nop.Services.Configuration;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Configuration;
 
 [TestFixture]
 public class SettingServiceTests : ServiceTest<Setting>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private ISettingService _settingService;
 
     [OneTimeSetUp]
     public void SetUp()
     {
+		_logger.LogDebug(">>> Entering SetUp()");
         _settingService = GetService<ISettingService>();
+		_logger.LogDebug("SetUp(): _settingService → {_settingService}", _settingService);
+		_logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [TearDown]
     public async Task TearDown()
     {
+		_logger.LogDebug(">>> Entering TearDown()");
         await _settingService.DeleteSettingAsync<TestSettings>();
+		_logger.LogDebug("<<< Exiting TearDown()");
     }
 
     protected override CrudData<Setting> CrudData
@@ -59,47 +66,64 @@ public class SettingServiceTests : ServiceTest<Setting>
     [Test]
     public async Task CanGetSettings()
     {
+		_logger.LogDebug(">>> Entering CanGetSettings()");
         var setting = await _settingService.LoadSettingAsync<CatalogSettings>();
 
+		_logger.LogDebug("CanGetSettings(): setting → {Setting}", setting);
         setting.Should().NotBeNull();
         setting.DefaultViewMode.Should().Be("grid");
         setting.NewProductsPageSizeOptions.Should().Be("6, 3, 9");
+		_logger.LogDebug("<<< Exiting CanGetSettings()");
     }
 
     [Test]
     public async Task CanGetAllSettings()
     {
+		_logger.LogDebug(">>> Entering CanGetAllSettings()");
         var settings = await _settingService.GetAllSettingsAsync();
         settings.Should().NotBeNull();
+		_logger.LogDebug("CanGetAllSettings(): settings → {Settings}", settings);
         settings.Any().Should().BeTrue();
+		_logger.LogDebug("<<< Exiting CanGetAllSettings()");
     }
 
     [Test]
     public async Task CanGetSettingByKey()
     {
+		_logger.LogDebug(">>> Entering CanGetSettingByKey()");
         var setting = await _settingService.GetSettingByKeyAsync<string>("CatalogSettings.DefaultViewMode");
         setting.Should().Be("grid");
+		_logger.LogDebug("CanGetSettingByKey(): setting → {Setting}", setting);
+		_logger.LogDebug("<<< Exiting CanGetSettingByKey()");
     }
 
     [Test]
     public async Task CanGetTypedSettingValueByKey()
     {
+		_logger.LogDebug(">>> Entering CanGetTypedSettingValueByKey()");
         var setting = await _settingService.GetSettingByKeyAsync<int>("CatalogSettings.NumberOfProductTags");
         setting.Should().Be(15);
+		_logger.LogDebug("CanGetTypedSettingValueByKey(): setting → {Setting}", setting);
+		_logger.LogDebug("<<< Exiting CanGetTypedSettingValueByKey()");
     }
 
     [Test]
     public async Task DefaultValueReturnedIfSettingDoesNotExist()
     {
+		_logger.LogDebug(">>> Entering DefaultValueReturnedIfSettingDoesNotExist()");
         var setting = await _settingService.GetSettingByKeyAsync("NonExistentKey", 1.0f);
         setting.Should().Be(1.0f);
+		_logger.LogDebug("DefaultValueReturnedIfSettingDoesNotExist(): setting → {Setting}", setting);
+		_logger.LogDebug("<<< Exiting DefaultValueReturnedIfSettingDoesNotExist()");
     }
 
     [Test]
     public async Task CanDeleteSetting()
     {
+		_logger.LogDebug(">>> Entering CanDeleteSetting()");
         var setting = new TestSettings
         {
+			_logger.LogDebug("CanDeleteSetting(): setting → {Setting}", setting);
             ServerName = "Ruby",
             Ip = "192.168.0.1",
             PortNumber = 21,
@@ -121,6 +145,7 @@ public class SettingServiceTests : ServiceTest<Setting>
         setting.Username.Should().BeNullOrEmpty();
         setting.Password.Should().BeNullOrEmpty();
         var ipExists = await _settingService.SettingExistsAsync(setting, settings => setting.Ip);
+		_logger.LogDebug("CanDeleteSetting(): ipExists → {IpExists}", ipExists);
         ipExists.Should().BeTrue();
         await _settingService.DeleteSettingAsync<TestSettings>();
         var portNumber =
@@ -131,13 +156,16 @@ public class SettingServiceTests : ServiceTest<Setting>
 
         ipExists = await _settingService.SettingExistsAsync(setting, settings => setting.Ip);
         ipExists.Should().BeFalse();
+		_logger.LogDebug("<<< Exiting CanDeleteSetting()");
     }
 
     [Test]
     public async Task CanSaveSetting()
     {
+		_logger.LogDebug(">>> Entering CanSaveSetting()");
         var setting = new TestSettings
         {
+			_logger.LogDebug("CanSaveSetting(): setting → {Setting}", setting);
             ServerName = "Ruby",
             Ip = "192.168.0.1",
             PortNumber = 21,
@@ -156,6 +184,7 @@ public class SettingServiceTests : ServiceTest<Setting>
         setting.Password.Should().Be("password");
 
         setting.PortNumber = 24;
+		_logger.LogDebug("CanSaveSetting(): setting.PortNumber → {Arg0}", setting.PortNumber);
 
         await _settingService.SaveSettingAsync(setting, settings => settings.PortNumber);
 
@@ -165,6 +194,7 @@ public class SettingServiceTests : ServiceTest<Setting>
         setting.PortNumber.Should().Be(24);
 
         setting.Ip = "192.168.1.1";
+		_logger.LogDebug("CanSaveSetting(): setting.Ip → {Arg0}", setting.Ip);
 
         await _settingService.SaveSettingOverridablePerStoreAsync(setting, settings => settings.Ip, false);
 
@@ -188,6 +218,7 @@ public class SettingServiceTests : ServiceTest<Setting>
             _settingService.GetSettingKey(setting, settings => settings.Ip), 1))?.Value;
 
         ip.Should().NotBeNull().And.Be("192.168.0.2");
+		_logger.LogDebug("<<< Exiting CanSaveSetting()");
     }
 
     #region Nested class

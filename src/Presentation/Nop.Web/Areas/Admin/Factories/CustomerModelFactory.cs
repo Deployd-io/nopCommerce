@@ -29,6 +29,7 @@ using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Areas.Admin.Models.ShoppingCart;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -37,6 +38,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CustomerModelFactory : ICustomerModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -175,16 +177,22 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareAddRewardPointsToCustomerModelAsync(AddRewardPointsToCustomerModel model)
     {
+		_logger.LogDebug(">>> Entering PrepareAddRewardPointsToCustomerModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareAddRewardPointsToCustomerModelAsync(model={Model}): store → {Store}", model, store);
 
         model.Message = string.Empty;
+		_logger.LogDebug("PrepareAddRewardPointsToCustomerModelAsync(model={Model}): model.Message → {Arg1}", model, model.Message);
+		_logger.LogDebug("PrepareAddRewardPointsToCustomerModelAsync(model={Model}): model.ActivatePointsImmediately → {Arg1}", model, model.ActivatePointsImmediately);
+		_logger.LogDebug("PrepareAddRewardPointsToCustomerModelAsync(model={Model}): model.StoreId → {Arg1}", model, model.StoreId);
         model.ActivatePointsImmediately = true;
         model.StoreId = store.Id;
 
         //prepare available stores
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores, false);
+		_logger.LogDebug("<<< Exiting PrepareAddRewardPointsToCustomerModelAsync(model={Model})", model);
     }
 
     /// <summary>
@@ -195,6 +203,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareAssociatedExternalAuthModelsAsync(IList<CustomerAssociatedExternalAuthModel> models, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareAssociatedExternalAuthModelsAsync(models={Models},customer={Customer})", models, customer);
         ArgumentNullException.ThrowIfNull(models);
 
         ArgumentNullException.ThrowIfNull(customer);
@@ -202,6 +211,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         foreach (var record in await _externalAuthenticationService.GetCustomerExternalAuthenticationRecordsAsync(customer))
         {
             var method = await _authenticationPluginManager.LoadPluginBySystemNameAsync(record.ProviderSystemName);
+			_logger.LogDebug("PrepareAssociatedExternalAuthModelsAsync(models={Models},customer={Customer}): method → {Method}", models, customer, method);
             if (method == null)
                 continue;
 
@@ -214,6 +224,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 AuthMethodName = method.PluginDescriptor.FriendlyName
             });
         }
+		_logger.LogDebug("<<< Exiting PrepareAssociatedExternalAuthModelsAsync(models={Models},customer={Customer})", models, customer);
     }
 
     /// <summary>
@@ -224,10 +235,12 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareCustomerAttributeModelsAsync(IList<CustomerModel.CustomerAttributeModel> models, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer})", models, customer);
         ArgumentNullException.ThrowIfNull(models);
 
         //get available customer attributes
         var customerAttributes = await _customerAttributeService.GetAllAttributesAsync();
+		_logger.LogDebug("PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer}): customerAttributes → {CustomerAttributes}", models, customer, customerAttributes);
         foreach (var attribute in customerAttributes)
         {
             var attributeModel = new CustomerModel.CustomerAttributeModel
@@ -242,6 +255,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //values
                 var attributeValues = await _customerAttributeService.GetAttributeValuesAsync(attribute.Id);
+				_logger.LogDebug("PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer}): attributeValues → {AttributeValues}", models, customer, attributeValues);
                 foreach (var attributeValue in attributeValues)
                 {
                     var attributeValueModel = new CustomerModel.CustomerAttributeValueModel
@@ -269,9 +283,11 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                             //clear default selection
                             foreach (var item in attributeModel.Values)
                                 item.IsPreSelected = false;
+								_logger.LogDebug("PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer}): item.IsPreSelected → {Arg2}", models, customer, item.IsPreSelected);
 
                             //select new values
                             var selectedValues = await _customerAttributeParser.ParseAttributeValuesAsync(selectedCustomerAttributes);
+							_logger.LogDebug("PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer}): selectedValues → {SelectedValues}", models, customer, selectedValues);
                             foreach (var attributeValue in selectedValues)
                             foreach (var item in attributeModel.Values)
                                 if (attributeValue.Id == item.Id)
@@ -291,8 +307,10 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                         if (!string.IsNullOrEmpty(selectedCustomerAttributes))
                         {
                             var enteredText = _customerAttributeParser.ParseValues(selectedCustomerAttributes, attribute.Id);
+							_logger.LogDebug("PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer}): enteredText → {EnteredText}", models, customer, enteredText);
                             if (enteredText.Any())
                                 attributeModel.DefaultValue = enteredText[0];
+								_logger.LogDebug("PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer}): attributeModel.DefaultValue → {Arg2}", models, customer, attributeModel.DefaultValue);
                         }
                     }
                         break;
@@ -308,6 +326,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
 
             models.Add(attributeModel);
         }
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeModelsAsync(models={Models},customer={Customer})", models, customer);
     }
 
     /// <summary>
@@ -318,15 +337,20 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareModelAddressHtmlAsync(AddressModel model, Address address)
     {
+		_logger.LogDebug(">>> Entering PrepareModelAddressHtmlAsync(model={Model},address={Address})", model, address);
         ArgumentNullException.ThrowIfNull(model);
 
         var separator = "<br />";
+		_logger.LogDebug("PrepareModelAddressHtmlAsync(model={Model},address={Address}): separator → {Separator}", model, address, separator);
         var addressHtmlSb = new StringBuilder("<div>");
+		_logger.LogDebug("PrepareModelAddressHtmlAsync(model={Model},address={Address}): addressHtmlSb → {AddressHtmlSb}", model, address, addressHtmlSb);
         var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
+		_logger.LogDebug("PrepareModelAddressHtmlAsync(model={Model},address={Address}): languageId → {LanguageId}", model, address, languageId);
         var (addressLine, _) = await _addressService.FormatAddressAsync(address, languageId, separator, true);
         addressHtmlSb.Append(addressLine);
 
         var customAttributesFormatted = await _addressAttributeFormatter.FormatAttributesAsync(address?.CustomAttributes);
+		_logger.LogDebug("PrepareModelAddressHtmlAsync(model={Model},address={Address}): customAttributesFormatted → {CustomAttributesFormatted}", model, address, customAttributesFormatted);
         if (!string.IsNullOrEmpty(customAttributesFormatted))
         {
             //already encoded
@@ -336,6 +360,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         addressHtmlSb.Append("</div>");
 
         model.AddressHtml = addressHtmlSb.ToString();
+		_logger.LogDebug("<<< Exiting PrepareModelAddressHtmlAsync(model={Model},address={Address})", model, address);
     }
 
     /// <summary>
@@ -346,15 +371,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>Reward points search model</returns>
     protected virtual CustomerRewardPointsSearchModel PrepareRewardPointsSearchModel(CustomerRewardPointsSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareRewardPointsSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareRewardPointsSearchModel(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareRewardPointsSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -366,15 +394,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>Customer address search model</returns>
     protected virtual CustomerAddressSearchModel PrepareCustomerAddressSearchModel(CustomerAddressSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAddressSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareCustomerAddressSearchModel(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAddressSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -386,15 +417,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>Customer order search model</returns>
     protected virtual CustomerOrderSearchModel PrepareCustomerOrderSearchModel(CustomerOrderSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerOrderSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareCustomerOrderSearchModel(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerOrderSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -410,11 +444,13 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     protected virtual async Task<CustomerShoppingCartSearchModel> PrepareCustomerShoppingCartSearchModelAsync(CustomerShoppingCartSearchModel searchModel,
         Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerShoppingCartSearchModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareCustomerShoppingCartSearchModelAsync(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare available shopping cart types (search shopping cart by default)
         searchModel.ShoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
@@ -423,6 +459,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerShoppingCartSearchModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -434,15 +471,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// <returns>Customer activity log search model</returns>
     protected virtual CustomerActivityLogSearchModel PrepareCustomerActivityLogSearchModel(CustomerActivityLogSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerActivityLogSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareCustomerActivityLogSearchModel(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerActivityLogSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -455,15 +495,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     protected virtual CustomerBackInStockSubscriptionSearchModel PrepareCustomerBackInStockSubscriptionSearchModel(
         CustomerBackInStockSubscriptionSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerBackInStockSubscriptionSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareCustomerBackInStockSubscriptionSearchModel(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerBackInStockSubscriptionSearchModel(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -479,17 +522,20 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     protected virtual async Task<CustomerAssociatedExternalAuthRecordsSearchModel> PrepareCustomerAssociatedExternalAuthRecordsSearchModelAsync(
         CustomerAssociatedExternalAuthRecordsSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAssociatedExternalAuthRecordsSearchModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
 
         searchModel.CustomerId = customer.Id;
+		_logger.LogDebug("PrepareCustomerAssociatedExternalAuthRecordsSearchModelAsync(searchModel={SearchModel},customer={Customer}): searchModel.CustomerId → {Arg2}", searchModel, customer, searchModel.CustomerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
         //prepare external authentication records
         await PrepareAssociatedExternalAuthModelsAsync(searchModel.AssociatedExternalAuthRecords, customer);
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAssociatedExternalAuthRecordsSearchModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return searchModel;
     }
 
@@ -507,9 +553,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerSearchModel> PrepareCustomerSearchModelAsync(CustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.UsernamesEnabled = _customerSettings.UsernamesEnabled;
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.UsernamesEnabled → {Arg1}", searchModel, searchModel.UsernamesEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.AvatarEnabled → {Arg1}", searchModel, searchModel.AvatarEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.FirstNameEnabled → {Arg1}", searchModel, searchModel.FirstNameEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.LastNameEnabled → {Arg1}", searchModel, searchModel.LastNameEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.DateOfBirthEnabled → {Arg1}", searchModel, searchModel.DateOfBirthEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.CompanyEnabled → {Arg1}", searchModel, searchModel.CompanyEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.PhoneEnabled → {Arg1}", searchModel, searchModel.PhoneEnabled);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.ZipPostalCodeEnabled → {Arg1}", searchModel, searchModel.ZipPostalCodeEnabled);
         searchModel.AvatarEnabled = _customerSettings.AllowCustomersToUploadAvatars;
         searchModel.FirstNameEnabled = _customerSettings.FirstNameEnabled;
         searchModel.LastNameEnabled = _customerSettings.LastNameEnabled;
@@ -520,10 +575,12 @@ public partial class CustomerModelFactory : ICustomerModelFactory
 
         //search registered customers by default
         var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
+		_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): registeredRole → {RegisteredRole}", searchModel, registeredRole);
         if (registeredRole != null)
             searchModel.SelectedCustomerRoleIds.Add(registeredRole.Id);
 
         searchModel.AvailableActiveValues = new List<SelectListItem> {
+			_logger.LogDebug("PrepareCustomerSearchModelAsync(searchModel={SearchModel}): searchModel.AvailableActiveValues → {Arg1}", searchModel, searchModel.AvailableActiveValues);
             new(await _localizationService.GetResourceAsync("Admin.Common.All"), string.Empty),
             new(await _localizationService.GetResourceAsync("Admin.Common.Yes"), true.ToString(), true),
             new(await _localizationService.GetResourceAsync("Admin.Common.No"), false.ToString())
@@ -532,6 +589,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -545,10 +603,12 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerListModel> PrepareCustomerListModelAsync(CustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter customers
         _ = int.TryParse(searchModel.SearchDayOfBirth, out var dayOfBirth);
+		_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): _ → {_}", searchModel, _);
         _ = int.TryParse(searchModel.SearchMonthOfBirth, out var monthOfBirth);
         var createdFromUtc = !searchModel.SearchRegistrationDateFrom.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.SearchRegistrationDateFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
@@ -565,12 +625,15 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             if (!searchModel.SelectedCustomerRoleIds.Any())
             {
                 var customerRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
+				_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerRoles → {CustomerRoles}", searchModel, customerRoles);
                 searchModel.SelectedCustomerRoleIds = customerRoles
                     .Where(cr => cr.SystemName != NopCustomerDefaults.GuestsRoleName).Select(cr => cr.Id).ToList();
+					_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): searchModel.SelectedCustomerRoleIds → {Arg1}", searchModel, searchModel.SelectedCustomerRoleIds);
             }
             else
             {
                 var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
+				_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): guestRole → {GuestRole}", searchModel, guestRole);
                 if (guestRole != null)
                     searchModel.SelectedCustomerRoleIds.Remove(guestRole.Id);
             }
@@ -602,6 +665,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //fill in model values from the entity
                 var customerModel = customer.ToModel<CustomerModel>();
+				_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel → {CustomerModel}", searchModel, customerModel);
 
                 //convert dates to the user time
                 customerModel.Email = (await _customerService.IsRegisteredAsync(customer))
@@ -609,6 +673,9 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                     : await _localizationService.GetResourceAsync("Admin.Customers.Guest");
                 customerModel.FullName = await _customerService.GetCustomerFullNameAsync(customer);
                 customerModel.Company = customer.Company;
+				_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.Company → {Arg1}", searchModel, customerModel.Company);
+				_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.Phone → {Arg1}", searchModel, customerModel.Phone);
+				_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.ZipPostalCode → {Arg1}", searchModel, customerModel.ZipPostalCode);
                 customerModel.Phone = customer.Phone;
                 customerModel.ZipPostalCode = customer.ZipPostalCode;
 
@@ -621,14 +688,17 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 if (_customerSettings.AllowCustomersToUploadAvatars)
                 {
                     var avatarPictureId = await _genericAttributeService.GetAttributeAsync<int>(customer, NopCustomerDefaults.AvatarPictureIdAttribute);
+					_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): avatarPictureId → {AvatarPictureId}", searchModel, avatarPictureId);
                     customerModel.AvatarUrl = await _pictureService
                         .GetPictureUrlAsync(avatarPictureId, _mediaSettings.AvatarPictureSize, _customerSettings.DefaultAvatarEnabled, defaultPictureType: PictureType.Avatar);
+						_logger.LogDebug("PrepareCustomerListModelAsync(searchModel={SearchModel}): customerModel.AvatarUrl → {Arg1}", searchModel, customerModel.AvatarUrl);
                 }
 
                 return customerModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -644,12 +714,15 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerModel> PrepareCustomerModelAsync(CustomerModel model, Customer customer, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties})", model, customer, excludeProperties);
         if (customer != null)
         {
             //fill in model values from the entity
             model ??= new CustomerModel();
 
             model.Id = customer.Id;
+			_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Id → {Arg3}", model, customer, excludeProperties, model.Id);
+			_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.DisplayVatNumber → {Arg3}", model, customer, excludeProperties, model.DisplayVatNumber);
             model.DisplayVatNumber = _taxSettings.EuVatEnabled;
             model.AllowSendingOfPrivateMessage = await _customerService.IsRegisteredAsync(customer) &&
                                                  _forumSettings.AllowPrivateMessages;
@@ -658,14 +731,38 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             model.AllowReSendingOfActivationMessage = await _customerService.IsRegisteredAsync(customer) && !customer.Active &&
                                                       _customerSettings.UserRegistrationType == UserRegistrationType.EmailValidation;
             model.GdprEnabled = _gdprSettings.GdprEnabled;
+			_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.GdprEnabled → {Arg3}", model, customer, excludeProperties, model.GdprEnabled);
 
             model.MultiFactorAuthenticationProvider = await _genericAttributeService
                 .GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.MultiFactorAuthenticationProvider → {Arg3}", model, customer, excludeProperties, model.MultiFactorAuthenticationProvider);
 
             //whether to fill in some of properties
             if (!excludeProperties)
             {
                 model.Email = customer.Email;
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Email → {Arg3}", model, customer, excludeProperties, model.Email);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Username → {Arg3}", model, customer, excludeProperties, model.Username);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.VendorId → {Arg3}", model, customer, excludeProperties, model.VendorId);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.AdminComment → {Arg3}", model, customer, excludeProperties, model.AdminComment);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.IsTaxExempt → {Arg3}", model, customer, excludeProperties, model.IsTaxExempt);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Active → {Arg3}", model, customer, excludeProperties, model.Active);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.FirstName → {Arg3}", model, customer, excludeProperties, model.FirstName);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.LastName → {Arg3}", model, customer, excludeProperties, model.LastName);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Gender → {Arg3}", model, customer, excludeProperties, model.Gender);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.DateOfBirth → {Arg3}", model, customer, excludeProperties, model.DateOfBirth);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Company → {Arg3}", model, customer, excludeProperties, model.Company);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.StreetAddress → {Arg3}", model, customer, excludeProperties, model.StreetAddress);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.StreetAddress2 → {Arg3}", model, customer, excludeProperties, model.StreetAddress2);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.ZipPostalCode → {Arg3}", model, customer, excludeProperties, model.ZipPostalCode);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.City → {Arg3}", model, customer, excludeProperties, model.City);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.County → {Arg3}", model, customer, excludeProperties, model.County);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.CountryId → {Arg3}", model, customer, excludeProperties, model.CountryId);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.StateProvinceId → {Arg3}", model, customer, excludeProperties, model.StateProvinceId);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Phone → {Arg3}", model, customer, excludeProperties, model.Phone);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.Fax → {Arg3}", model, customer, excludeProperties, model.Fax);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.TimeZoneId → {Arg3}", model, customer, excludeProperties, model.TimeZoneId);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.VatNumber → {Arg3}", model, customer, excludeProperties, model.VatNumber);
                 model.Username = customer.Username;
                 model.VendorId = customer.VendorId;
                 model.AdminComment = customer.AdminComment;
@@ -690,6 +787,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 model.VatNumberStatusNote = await _localizationService.GetLocalizedEnumAsync(customer.VatNumberStatus);
                 model.LastActivityDate = await _dateTimeHelper.ConvertToUserTimeAsync(customer.LastActivityDateUtc, DateTimeKind.Utc);
                 model.LastIpAddress = customer.LastIpAddress;
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.LastIpAddress → {Arg3}", model, customer, excludeProperties, model.LastIpAddress);
                 model.LastVisitedPage = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastVisitedPageAttribute);
                 model.SelectedCustomerRoleIds = (await _customerService.GetCustomerRoleIdsAsync(customer)).ToList();
                 model.RegisteredInStore = (await _storeService.GetAllStoresAsync())
@@ -699,17 +797,21 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 model.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(customer.CreatedOnUtc, DateTimeKind.Utc);
 
                 model.MustChangePassword = customer.MustChangePassword;
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.MustChangePassword → {Arg3}", model, customer, excludeProperties, model.MustChangePassword);
 
                 //prepare model affiliate
                 var affiliate = await _affiliateService.GetAffiliateByIdAsync(customer.AffiliateId);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): affiliate → {Affiliate}", model, customer, excludeProperties, affiliate);
                 if (affiliate != null)
                 {
                     model.AffiliateId = affiliate.Id;
+					_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.AffiliateId → {Arg3}", model, customer, excludeProperties, model.AffiliateId);
                     model.AffiliateName = await _affiliateService.GetAffiliateFullNameAsync(affiliate);
                 }
             }
             //prepare reward points model
             model.DisplayRewardPointsHistory = _rewardPointsSettings.Enabled;
+			_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.DisplayRewardPointsHistory → {Arg3}", model, customer, excludeProperties, model.DisplayRewardPointsHistory);
             if (model.DisplayRewardPointsHistory)
                 await PrepareAddRewardPointsToCustomerModelAsync(model.AddRewardPoints);
 
@@ -729,12 +831,30 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //precheck Registered Role as a default role while creating a new customer through admin
                 var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
+				_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): registeredRole → {RegisteredRole}", model, customer, excludeProperties, registeredRole);
                 if (registeredRole != null)
                     model.SelectedCustomerRoleIds.Add(registeredRole.Id);
             }
         }
 
         model.UsernamesEnabled = _customerSettings.UsernamesEnabled;
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.UsernamesEnabled → {Arg3}", model, customer, excludeProperties, model.UsernamesEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.AllowCustomersToSetTimeZone → {Arg3}", model, customer, excludeProperties, model.AllowCustomersToSetTimeZone);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.FirstNameEnabled → {Arg3}", model, customer, excludeProperties, model.FirstNameEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.LastNameEnabled → {Arg3}", model, customer, excludeProperties, model.LastNameEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.GenderEnabled → {Arg3}", model, customer, excludeProperties, model.GenderEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.NeutralGenderEnabled → {Arg3}", model, customer, excludeProperties, model.NeutralGenderEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.DateOfBirthEnabled → {Arg3}", model, customer, excludeProperties, model.DateOfBirthEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.CompanyEnabled → {Arg3}", model, customer, excludeProperties, model.CompanyEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.StreetAddressEnabled → {Arg3}", model, customer, excludeProperties, model.StreetAddressEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.StreetAddress2Enabled → {Arg3}", model, customer, excludeProperties, model.StreetAddress2Enabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.ZipPostalCodeEnabled → {Arg3}", model, customer, excludeProperties, model.ZipPostalCodeEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.CityEnabled → {Arg3}", model, customer, excludeProperties, model.CityEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.CountyEnabled → {Arg3}", model, customer, excludeProperties, model.CountyEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.CountryEnabled → {Arg3}", model, customer, excludeProperties, model.CountryEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.StateProvinceEnabled → {Arg3}", model, customer, excludeProperties, model.StateProvinceEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.PhoneEnabled → {Arg3}", model, customer, excludeProperties, model.PhoneEnabled);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): model.FaxEnabled → {Arg3}", model, customer, excludeProperties, model.FaxEnabled);
         model.AllowCustomersToSetTimeZone = _dateTimeSettings.AllowCustomersToSetTimeZone;
         model.FirstNameEnabled = _customerSettings.FirstNameEnabled;
         model.LastNameEnabled = _customerSettings.LastNameEnabled;
@@ -768,6 +888,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
 
         //prepare available customer roles
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
+		_logger.LogDebug("PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties}): availableRoles → {AvailableRoles}", model, customer, excludeProperties, availableRoles);
         model.AvailableCustomerRoles = availableRoles.Select(role => new SelectListItem
         {
             Text = role.Name,
@@ -786,6 +907,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 await _baseAdminModelFactory.PrepareStatesAndProvincesAsync(model.AvailableStates, model.CountryId == 0 ? null : (int?)model.CountryId);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerModelAsync(model={Model},customer={Customer},excludeProperties={ExcludeProperties})", model, customer, excludeProperties);
         return model;
     }
 
@@ -800,6 +922,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerRewardPointsListModel> PrepareRewardPointsListModelAsync(CustomerRewardPointsSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
@@ -816,17 +939,22 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //fill in model values from the entity        
                 var rewardPointsHistoryModel = historyEntry.ToModel<CustomerRewardPointsModel>();
+				_logger.LogDebug("PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer}): rewardPointsHistoryModel → {RewardPointsHistoryModel}", searchModel, customer, rewardPointsHistoryModel);
 
                 //convert dates to the user time
                 var activatingDate = await _dateTimeHelper.ConvertToUserTimeAsync(historyEntry.CreatedOnUtc, DateTimeKind.Utc);
+				_logger.LogDebug("PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer}): activatingDate → {ActivatingDate}", searchModel, customer, activatingDate);
+				_logger.LogDebug("PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer}): rewardPointsHistoryModel.CreatedOn → {Arg2}", searchModel, customer, rewardPointsHistoryModel.CreatedOn);
                 rewardPointsHistoryModel.CreatedOn = activatingDate;
 
                 rewardPointsHistoryModel.PointsBalance = historyEntry.PointsBalance.HasValue
                     ? historyEntry.PointsBalance.ToString()
                     : string.Format((await _localizationService.GetResourceAsync("Admin.Customers.Customers.RewardPoints.ActivatedLater")), activatingDate);
+					_logger.LogDebug("PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer}): rewardPointsHistoryModel.PointsBalance → {Arg2}", searchModel, customer, rewardPointsHistoryModel.PointsBalance);
                 rewardPointsHistoryModel.EndDate = !historyEntry.EndDateUtc.HasValue
                     ? null
                     : (DateTime?)(await _dateTimeHelper.ConvertToUserTimeAsync(historyEntry.EndDateUtc.Value, DateTimeKind.Utc));
+					_logger.LogDebug("PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer}): rewardPointsHistoryModel.EndDate → {Arg2}", searchModel, customer, rewardPointsHistoryModel.EndDate);
 
                 //fill in additional values (not existing in the entity)
                 rewardPointsHistoryModel.StoreName = (await _storeService.GetStoreByIdAsync(historyEntry.StoreId))?.Name ?? "Unknown";
@@ -835,6 +963,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareRewardPointsListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return model;
     }
 
@@ -849,6 +978,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerAddressListModel> PrepareCustomerAddressListModelAsync(CustomerAddressSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAddressListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
@@ -865,6 +995,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //fill in model values from the entity        
                 var addressModel = address.ToModel<AddressModel>();
+				_logger.LogDebug("PrepareCustomerAddressListModelAsync(searchModel={SearchModel},customer={Customer}): addressModel → {AddressModel}", searchModel, customer, addressModel);
 
                 addressModel.CountryName = (await _countryService.GetCountryByAddressAsync(address))?.Name;
                 addressModel.StateProvinceName = (await _stateProvinceService.GetStateProvinceByAddressAsync(address))?.Name;
@@ -876,6 +1007,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAddressListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return model;
     }
 
@@ -935,6 +1067,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerOrderListModel> PrepareCustomerOrderListModelAsync(CustomerOrderSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerOrderListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
@@ -950,6 +1083,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //fill in model values from the entity
                 var orderModel = order.ToModel<CustomerOrderModel>();
+				_logger.LogDebug("PrepareCustomerOrderListModelAsync(searchModel={SearchModel},customer={Customer}): orderModel → {OrderModel}", searchModel, customer, orderModel);
 
                 //convert dates to the user time
                 orderModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(order.CreatedOnUtc, DateTimeKind.Utc);
@@ -965,6 +1099,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerOrderListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return model;
     }
 
@@ -1041,6 +1176,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<CustomerActivityLogListModel> PrepareCustomerActivityLogListModelAsync(CustomerActivityLogSearchModel searchModel, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerActivityLogListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customer);
@@ -1056,6 +1192,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //fill in model values from the entity
                 var customerActivityLogModel = logItem.ToModel<CustomerActivityLogModel>();
+				_logger.LogDebug("PrepareCustomerActivityLogListModelAsync(searchModel={SearchModel},customer={Customer}): customerActivityLogModel → {CustomerActivityLogModel}", searchModel, customer, customerActivityLogModel);
 
                 //fill in additional values (not existing in the entity)
                 customerActivityLogModel.ActivityLogTypeName = (await _customerActivityService.GetActivityTypeByIdAsync(logItem.ActivityLogTypeId))?.Name;
@@ -1067,6 +1204,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerActivityLogListModelAsync(searchModel={SearchModel},customer={Customer})", searchModel, customer);
         return model;
     }
 
@@ -1123,11 +1261,13 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual Task<OnlineCustomerSearchModel> PrepareOnlineCustomerSearchModelAsync(OnlineCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareOnlineCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareOnlineCustomerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -1141,10 +1281,12 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<OnlineCustomerListModel> PrepareOnlineCustomerListModelAsync(OnlineCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareOnlineCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter customers
         var lastActivityFrom = DateTime.UtcNow.AddMinutes(-_customerSettings.OnlineCustomerMinutes);
+		_logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): lastActivityFrom → {LastActivityFrom}", searchModel, lastActivityFrom);
 
         //get online customers
         var customers = await _customerService.GetOnlineCustomersAsync(customerRoleIds: searchModel.SelectedCustomerRoleIds.ToArray(),
@@ -1158,6 +1300,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             {
                 //fill in model values from the entity
                 var customerModel = customer.ToModel<OnlineCustomerModel>();
+				_logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): customerModel → {CustomerModel}", searchModel, customerModel);
 
                 //convert dates to the user time
                 customerModel.LastActivityDate = await _dateTimeHelper.ConvertToUserTimeAsync(customer.LastActivityDateUtc, DateTimeKind.Utc);
@@ -1169,15 +1312,18 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 customerModel.LastIpAddress = _customerSettings.StoreIpAddresses
                     ? customer.LastIpAddress
                     : await _localizationService.GetResourceAsync("Admin.Customers.OnlineCustomers.Fields.IPAddress.Disabled");
+					_logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): customerModel.LastIpAddress → {Arg1}", searchModel, customerModel.LastIpAddress);
                 customerModel.Location = _geoLookupService.LookupCountryName(customer.LastIpAddress);
                 customerModel.LastVisitedPage = _customerSettings.StoreLastVisitedPage
                     ? await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.LastVisitedPageAttribute)
                     : await _localizationService.GetResourceAsync("Admin.Customers.OnlineCustomers.Fields.LastVisitedPage.Disabled");
+					_logger.LogDebug("PrepareOnlineCustomerListModelAsync(searchModel={SearchModel}): customerModel.LastVisitedPage → {Arg1}", searchModel, customerModel.LastVisitedPage);
 
                 return customerModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareOnlineCustomerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -1191,6 +1337,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<GdprLogSearchModel> PrepareGdprLogSearchModelAsync(GdprLogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareGdprLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare request types
@@ -1199,6 +1346,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareGdprLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -1212,13 +1360,17 @@ public partial class CustomerModelFactory : ICustomerModelFactory
     /// </returns>
     public virtual async Task<GdprLogListModel> PrepareGdprLogListModelAsync(GdprLogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareGdprLogListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var customerId = 0;
+		_logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): customerId → {CustomerId}", searchModel, customerId);
         var customerInfo = "";
+		_logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): customerInfo → {CustomerInfo}", searchModel, customerInfo);
         if (!string.IsNullOrEmpty(searchModel.SearchEmail))
         {
             var customer = await _customerService.GetCustomerByEmailAsync(searchModel.SearchEmail);
+			_logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): customer → {Customer}", searchModel, customer);
             if (customer != null)
                 customerId = customer.Id;
             else
@@ -1243,6 +1395,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
                 var customer = await _customerService.GetCustomerByIdAsync(log.CustomerId);
 
                 var requestModel = log.ToModel<GdprLogModel>();
+				_logger.LogDebug("PrepareGdprLogListModelAsync(searchModel={SearchModel}): requestModel → {RequestModel}", searchModel, requestModel);
 
                 //fill in additional values (not existing in the entity)
                 requestModel.CustomerInfo = customer != null && !customer.Deleted && !string.IsNullOrEmpty(customer.Email)
@@ -1256,6 +1409,7 @@ public partial class CustomerModelFactory : ICustomerModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareGdprLogListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

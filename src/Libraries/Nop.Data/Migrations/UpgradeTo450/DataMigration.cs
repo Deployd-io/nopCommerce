@@ -6,17 +6,22 @@ using Nop.Core.Domain.ScheduleTasks;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo450;
 
 [NopUpdateMigration("2021-04-23 00:00:00", "4.50", UpdateMigrationType.Data)]
 public class DataMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly INopDataProvider _dataProvider;
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		_logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+		_logger.LogDebug("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
     }
 
     /// <summary>
@@ -24,9 +29,12 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         // add column
         var shipmentTableName = nameof(Shipment);
+		_logger.LogDebug("Up(): shipmentTableName → {ShipmentTableName}", shipmentTableName);
         var collectedDateUtcColumnName = "ReadyForPickupDateUtc";
+		_logger.LogDebug("Up(): collectedDateUtcColumnName → {CollectedDateUtcColumnName}", collectedDateUtcColumnName);
 
         if (!Schema.Table(shipmentTableName).Column(collectedDateUtcColumnName).Exists())
         {
@@ -50,6 +58,7 @@ public class DataMigration : Migration
         }
         //#5547
         var scheduleTaskTableName = NameCompatibilityManager.GetTableName(typeof(ScheduleTask));
+		_logger.LogDebug("Up(): scheduleTaskTableName → {ScheduleTaskTableName}", scheduleTaskTableName);
 
         //add column
         if (!Schema.Table(scheduleTaskTableName).Column(nameof(ScheduleTask.LastEnabledUtc)).Exists())
@@ -90,7 +99,9 @@ public class DataMigration : Migration
 
         //add column
         var returnRequestTableName = NameCompatibilityManager.GetTableName(typeof(ReturnRequest));
+		_logger.LogDebug("Up(): returnRequestTableName → {ReturnRequestTableName}", returnRequestTableName);
         var returnedQuantityColumnName = "ReturnedQuantity";
+		_logger.LogDebug("Up(): returnedQuantityColumnName → {ReturnedQuantityColumnName}", returnedQuantityColumnName);
 
         if (!Schema.Table(returnRequestTableName).Column(returnedQuantityColumnName).Exists())
         {
@@ -123,10 +134,13 @@ public class DataMigration : Migration
                 }
             );
         }
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

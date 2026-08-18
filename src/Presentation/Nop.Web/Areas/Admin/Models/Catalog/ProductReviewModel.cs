@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductReviewModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductReviewModel()
     {
+		_logger.LogDebug(">>> Entering ProductReviewModel()");
         ProductReviewReviewTypeMappingSearchModel = new ProductReviewReviewTypeMappingSearchModel();
+		_logger.LogDebug("ProductReviewModel(): ProductReviewReviewTypeMappingSearchModel → {ProductReviewReviewTypeMappingSearchModel}", ProductReviewReviewTypeMappingSearchModel);
+		_logger.LogDebug("<<< Exiting ProductReviewModel()");
     }
 
     #endregion

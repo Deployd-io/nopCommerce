@@ -3,20 +3,31 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Customer;
 
 public partial record CustomerInfoModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerInfoModel()
     {
+		_logger.LogDebug(">>> Entering CustomerInfoModel()");
         AvailableTimeZones = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogDebug("CustomerInfoModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
+		_logger.LogDebug("CustomerInfoModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
         AvailableStates = new List<SelectListItem>();
+		_logger.LogDebug("CustomerInfoModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
+		_logger.LogDebug("CustomerInfoModel(): AssociatedExternalAuthRecords → {AssociatedExternalAuthRecords}", AssociatedExternalAuthRecords);
         CustomerAttributes = new List<CustomerAttributeModel>();
+		_logger.LogDebug("CustomerInfoModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
         GdprConsents = new List<GdprConsentModel>();
+		_logger.LogDebug("CustomerInfoModel(): GdprConsents → {GdprConsents}", GdprConsents);
         NewsLetterSubscriptions = new List<NewsLetterSubscriptionModel>();
+		_logger.LogDebug("CustomerInfoModel(): NewsLetterSubscriptions → {NewsLetterSubscriptions}", NewsLetterSubscriptions);
+		_logger.LogDebug("<<< Exiting CustomerInfoModel()");
     }
 
     [DataType(DataType.EmailAddress)]
@@ -58,6 +69,8 @@ public partial record CustomerInfoModel : BaseNopModel
     public bool DateOfBirthRequired { get; set; }
     public DateTime? ParseDateOfBirth()
     {
+		_logger.LogDebug(">>> Entering ParseDateOfBirth()");
+		_logger.LogDebug("<<< Exiting ParseDateOfBirth()");
         return CommonHelper.ParseDate(DateOfBirthYear, DateOfBirthMonth, DateOfBirthDay);
     }
 

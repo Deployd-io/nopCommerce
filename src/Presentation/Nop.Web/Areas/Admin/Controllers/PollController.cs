@@ -12,11 +12,13 @@ using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class PollController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -35,11 +37,18 @@ public partial class PollController : BaseAdminController
         IPollService pollService,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>)", localizationService, notificationService, pollModelFactory, pollService);
         _localizationService = localizationService;
+		_logger.LogDebug("PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>): _localizationService → {_localizationService}", localizationService, notificationService, pollModelFactory, pollService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>): _notificationService → {_notificationService}", localizationService, notificationService, pollModelFactory, pollService, _notificationService);
         _pollModelFactory = pollModelFactory;
+		_logger.LogDebug("PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>): _pollModelFactory → {_pollModelFactory}", localizationService, notificationService, pollModelFactory, pollService, _pollModelFactory);
         _pollService = pollService;
+		_logger.LogDebug("PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>): _pollService → {_pollService}", localizationService, notificationService, pollModelFactory, pollService, _pollService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("<<< Exiting PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>)", localizationService, notificationService, pollModelFactory, pollService);
+		_logger.LogDebug("PollController(localizationService={LocalizationService},notificationService={NotificationService},pollModelFactory={PollModelFactory},pollService={PollService},storeMappingService=<redacted>): _storeMappingService → {_storeMappingService}", localizationService, notificationService, pollModelFactory, pollService, _storeMappingService);
     }
 
     #endregion
@@ -48,15 +57,21 @@ public partial class PollController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.POLLS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _pollModelFactory.PreparePollSearchModelAsync(new PollSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -73,9 +88,13 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _pollModelFactory.PreparePollModelAsync(new PollModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -109,14 +128,19 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a poll with the specified id
         var poll = await _pollService.GetPollByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): poll → {Poll}", id, poll);
         if (poll == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _pollModelFactory.PreparePollModelAsync(null, poll);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -156,8 +180,10 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a poll with the specified id
         var poll = await _pollService.GetPollByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): poll → {Poll}", id, poll);
         if (poll == null)
             return RedirectToAction("List");
 
@@ -165,6 +191,7 @@ public partial class PollController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Polls.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -176,13 +203,16 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_VIEW)]
     public virtual async Task<IActionResult> PollAnswers(PollAnswerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PollAnswers(searchModel={SearchModel})", searchModel);
         //try to get a poll with the specified id
         var poll = await _pollService.GetPollByIdAsync(searchModel.PollId)
             ?? throw new ArgumentException("No poll found with the specified id");
 
         //prepare model
         var model = await _pollModelFactory.PreparePollAnswerListModelAsync(searchModel, poll);
+		_logger.LogDebug("PollAnswers(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting PollAnswers(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -191,17 +221,20 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PollAnswerUpdate([Validate] PollAnswerModel model)
     {
+		_logger.LogDebug(">>> Entering PollAnswerUpdate(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         //try to get a poll answer with the specified id
         var pollAnswer = await _pollService.GetPollAnswerByIdAsync(model.Id)
             ?? throw new ArgumentException("No poll answer found with the specified id");
+			_logger.LogDebug("PollAnswerUpdate(model={Model}): pollAnswer → {PollAnswer}", model, pollAnswer);
 
         pollAnswer = model.ToEntity(pollAnswer);
 
         await _pollService.UpdatePollAnswerAsync(pollAnswer);
 
+		_logger.LogDebug("<<< Exiting PollAnswerUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -210,12 +243,14 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PollAnswerAdd(int pollId, [Validate] PollAnswerModel model)
     {
+		_logger.LogDebug(">>> Entering PollAnswerAdd(pollId={PollId},model={Model})", pollId, model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         //fill entity from model
         await _pollService.InsertPollAnswerAsync(model.ToEntity<PollAnswer>());
 
+		_logger.LogDebug("<<< Exiting PollAnswerAdd(pollId={PollId},model={Model})", pollId, model);
         return Json(new { Result = true });
     }
 
@@ -223,12 +258,14 @@ public partial class PollController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.POLLS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PollAnswerDelete(int id)
     {
+		_logger.LogDebug(">>> Entering PollAnswerDelete(id={Id})", id);
         //try to get a poll answer with the specified id
         var pollAnswer = await _pollService.GetPollAnswerByIdAsync(id)
             ?? throw new ArgumentException("No poll answer found with the specified id", nameof(id));
 
         await _pollService.DeletePollAnswerAsync(pollAnswer);
 
+		_logger.LogDebug("<<< Exiting PollAnswerDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

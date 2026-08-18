@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
@@ -7,11 +8,15 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record AddFilterLevelValueModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddFilterLevelValueModel()
     {
+		_logger.LogDebug(">>> Entering AddFilterLevelValueModel()");
         SelectedFilterLevelValueIds = new List<int>();
+		_logger.LogDebug("AddFilterLevelValueModel(): SelectedFilterLevelValueIds → {SelectedFilterLevelValueIds}", SelectedFilterLevelValueIds);
+		_logger.LogDebug("<<< Exiting AddFilterLevelValueModel()");
     }
     #endregion
 

@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Core.Domain.Messages;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class QueuedEmailService : IQueuedEmailService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<QueuedEmail> _queuedEmailRepository;
@@ -19,7 +21,10 @@ public partial class QueuedEmailService : IQueuedEmailService
 
     public QueuedEmailService(IRepository<QueuedEmail> queuedEmailRepository)
     {
+		_logger.LogDebug(">>> Entering QueuedEmailService(queuedEmailRepository={QueuedEmailRepository})", queuedEmailRepository);
         _queuedEmailRepository = queuedEmailRepository;
+		_logger.LogDebug("QueuedEmailService(queuedEmailRepository={QueuedEmailRepository}): _queuedEmailRepository → {_queuedEmailRepository}", queuedEmailRepository, _queuedEmailRepository);
+		_logger.LogDebug("<<< Exiting QueuedEmailService(queuedEmailRepository={QueuedEmailRepository})", queuedEmailRepository);
     }
 
     #endregion
@@ -33,7 +38,9 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertQueuedEmailAsync(QueuedEmail queuedEmail)
     {
+		_logger.LogDebug(">>> Entering InsertQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
         await _queuedEmailRepository.InsertAsync(queuedEmail);
+		_logger.LogDebug("<<< Exiting InsertQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
     }
 
     /// <summary>
@@ -43,7 +50,9 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateQueuedEmailAsync(QueuedEmail queuedEmail)
     {
+		_logger.LogDebug(">>> Entering UpdateQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
         await _queuedEmailRepository.UpdateAsync(queuedEmail);
+		_logger.LogDebug("<<< Exiting UpdateQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
     }
 
     /// <summary>
@@ -53,7 +62,10 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteQueuedEmailAsync(QueuedEmail queuedEmail)
     {
+		_logger.LogDebug(">>> Entering DeleteQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
+		_logger.LogInformation("DeleteQueuedEmailAsync(queuedEmail)={QueuedEmail}: external service call took {Arg1} ms", queuedEmail, __logStart.ElapsedMilliseconds);
         await _queuedEmailRepository.DeleteAsync(queuedEmail);
+		_logger.LogDebug("<<< Exiting DeleteQueuedEmailAsync(queuedEmail={QueuedEmail})", queuedEmail);
     }
 
     /// <summary>
@@ -63,7 +75,10 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteQueuedEmailsAsync(IList<QueuedEmail> queuedEmails)
     {
+		_logger.LogDebug(">>> Entering DeleteQueuedEmailsAsync(queuedEmails={QueuedEmails})", queuedEmails);
+		_logger.LogInformation("DeleteQueuedEmailsAsync(queuedEmails)={QueuedEmails}: external service call took {Arg1} ms", queuedEmails, __logStart.ElapsedMilliseconds);
         await _queuedEmailRepository.DeleteAsync(queuedEmails);
+		_logger.LogDebug("<<< Exiting DeleteQueuedEmailsAsync(queuedEmails={QueuedEmails})", queuedEmails);
     }
 
     /// <summary>
@@ -76,6 +91,8 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// </returns>
     public virtual async Task<QueuedEmail> GetQueuedEmailByIdAsync(int queuedEmailId)
     {
+		_logger.LogDebug(">>> Entering GetQueuedEmailByIdAsync(queuedEmailId={QueuedEmailId})", queuedEmailId);
+		_logger.LogDebug("<<< Exiting GetQueuedEmailByIdAsync(queuedEmailId={QueuedEmailId})", queuedEmailId);
         return await _queuedEmailRepository.GetByIdAsync(queuedEmailId, cache => default, useShortTermCache: true);
     }
 
@@ -89,6 +106,8 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// </returns>
     public virtual async Task<IList<QueuedEmail>> GetQueuedEmailsByIdsAsync(int[] queuedEmailIds)
     {
+		_logger.LogDebug(">>> Entering GetQueuedEmailsByIdsAsync(queuedEmailIds={QueuedEmailIds})", queuedEmailIds);
+		_logger.LogDebug("<<< Exiting GetQueuedEmailsByIdsAsync(queuedEmailIds={QueuedEmailIds})", queuedEmailIds);
         return await _queuedEmailRepository.GetByIdsAsync(queuedEmailIds);
     }
 
@@ -99,6 +118,7 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RequeueQueuedEmailsAsync(IList<QueuedEmail> queuedEmails)
     {
+		_logger.LogDebug(">>> Entering RequeueQueuedEmailsAsync(queuedEmails={QueuedEmails})", queuedEmails);
         ArgumentNullException.ThrowIfNull(queuedEmails);
 
         var newEmails = queuedEmails.Select(queuedEmail => new QueuedEmail
@@ -123,6 +143,9 @@ public partial class QueuedEmailService : IQueuedEmailService
         }).ToList();
 
         await _queuedEmailRepository.InsertAsync(newEmails);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("RequeueQueuedEmailsAsync(queuedEmails)={QueuedEmails}: save query executed in {Arg1} ms", queuedEmails, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting RequeueQueuedEmailsAsync(queuedEmails={QueuedEmails})", queuedEmails);
     }
 
     /// <summary>
@@ -147,10 +170,14 @@ public partial class QueuedEmailService : IQueuedEmailService
         bool loadNotSentItemsOnly, bool loadOnlyItemsToBeSent, int maxSendTries,
         bool loadNewest, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering SearchEmailsAsync(fromEmail={FromEmail},toEmail={ToEmail},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},loadNotSentItemsOnly={LoadNotSentItemsOnly},loadOnlyItemsToBeSent={LoadOnlyItemsToBeSent},maxSendTries={MaxSendTries},loadNewest={LoadNewest},pageIndex={PageIndex},pageSize={PageSize})", fromEmail, toEmail, createdFromUtc, createdToUtc, loadNotSentItemsOnly, loadOnlyItemsToBeSent, maxSendTries, loadNewest, pageIndex, pageSize);
         fromEmail = (fromEmail ?? string.Empty).Trim();
         toEmail = (toEmail ?? string.Empty).Trim();
+		_logger.LogDebug("SearchEmailsAsync(fromEmail={FromEmail},toEmail={ToEmail},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},loadNotSentItemsOnly={LoadNotSentItemsOnly},loadOnlyItemsToBeSent={LoadOnlyItemsToBeSent},maxSendTries={MaxSendTries},loadNewest={LoadNewest},pageIndex={PageIndex},pageSize={PageSize}): toEmail → {ToEmail1}", fromEmail, toEmail, createdFromUtc, createdToUtc, loadNotSentItemsOnly, loadOnlyItemsToBeSent, maxSendTries, loadNewest, pageIndex, pageSize, toEmail);
+		_logger.LogDebug("SearchEmailsAsync(fromEmail={FromEmail},toEmail={ToEmail},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},loadNotSentItemsOnly={LoadNotSentItemsOnly},loadOnlyItemsToBeSent={LoadOnlyItemsToBeSent},maxSendTries={MaxSendTries},loadNewest={LoadNewest},pageIndex={PageIndex},pageSize={PageSize}): fromEmail → {FromEmail1}", fromEmail, toEmail, createdFromUtc, createdToUtc, loadNotSentItemsOnly, loadOnlyItemsToBeSent, maxSendTries, loadNewest, pageIndex, pageSize, fromEmail);
 
         var query = _queuedEmailRepository.Table;
+		_logger.LogDebug("SearchEmailsAsync(fromEmail={FromEmail},toEmail={ToEmail},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},loadNotSentItemsOnly={LoadNotSentItemsOnly},loadOnlyItemsToBeSent={LoadOnlyItemsToBeSent},maxSendTries={MaxSendTries},loadNewest={LoadNewest},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", fromEmail, toEmail, createdFromUtc, createdToUtc, loadNotSentItemsOnly, loadOnlyItemsToBeSent, maxSendTries, loadNewest, pageIndex, pageSize, query);
         if (!string.IsNullOrEmpty(fromEmail))
             query = query.Where(qe => qe.From.Contains(fromEmail));
         if (!string.IsNullOrEmpty(toEmail))
@@ -175,7 +202,9 @@ public partial class QueuedEmailService : IQueuedEmailService
             query.OrderByDescending(qe => qe.PriorityId).ThenBy(qe => qe.CreatedOnUtc);
 
         var queuedEmails = await query.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogDebug("SearchEmailsAsync(fromEmail={FromEmail},toEmail={ToEmail},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},loadNotSentItemsOnly={LoadNotSentItemsOnly},loadOnlyItemsToBeSent={LoadOnlyItemsToBeSent},maxSendTries={MaxSendTries},loadNewest={LoadNewest},pageIndex={PageIndex},pageSize={PageSize}): queuedEmails → {QueuedEmails}", fromEmail, toEmail, createdFromUtc, createdToUtc, loadNotSentItemsOnly, loadOnlyItemsToBeSent, maxSendTries, loadNewest, pageIndex, pageSize, queuedEmails);
 
+		_logger.LogDebug("<<< Exiting SearchEmailsAsync(fromEmail={FromEmail},toEmail={ToEmail},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},loadNotSentItemsOnly={LoadNotSentItemsOnly},loadOnlyItemsToBeSent={LoadOnlyItemsToBeSent},maxSendTries={MaxSendTries},loadNewest={LoadNewest},pageIndex={PageIndex},pageSize={PageSize})", fromEmail, toEmail, createdFromUtc, createdToUtc, loadNotSentItemsOnly, loadOnlyItemsToBeSent, maxSendTries, loadNewest, pageIndex, pageSize);
         return queuedEmails;
     }
 
@@ -190,8 +219,10 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// </returns>
     public virtual async Task<int> DeleteAlreadySentEmailsAsync(DateTime? createdFromUtc, DateTime? createdToUtc)
     {
+		_logger.LogDebug(">>> Entering DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc})", createdFromUtc, createdToUtc);
         var query = _queuedEmailRepository.Table;
 
+		_logger.LogDebug("DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc}): query → {Query}", createdFromUtc, createdToUtc, query);
         // only sent emails
         query = query.Where(qe => qe.SentOnUtc.HasValue);
 
@@ -200,10 +231,14 @@ public partial class QueuedEmailService : IQueuedEmailService
         if (createdToUtc.HasValue)
             query = query.Where(qe => qe.CreatedOnUtc <= createdToUtc);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var emails = await query.ToArrayAsync();
 
+		_logger.LogDebug("DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc}): emails → {Emails}", createdFromUtc, createdToUtc, emails);
+		_logger.LogInformation("DeleteAlreadySentEmailsAsync(createdFromUtc,createdToUtc)={CreatedFromUtc},{CreatedToUtc}: database query executed in {Arg2} ms", createdFromUtc, createdToUtc, __logStart.ElapsedMilliseconds);
         await DeleteQueuedEmailsAsync(emails);
 
+		_logger.LogDebug("<<< Exiting DeleteAlreadySentEmailsAsync(createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc})", createdFromUtc, createdToUtc);
         return emails.Length;
     }
 
@@ -213,7 +248,9 @@ public partial class QueuedEmailService : IQueuedEmailService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAllEmailsAsync()
     {
+		_logger.LogDebug(">>> Entering DeleteAllEmailsAsync()");
         await _queuedEmailRepository.TruncateAsync();
+		_logger.LogDebug("<<< Exiting DeleteAllEmailsAsync()");
     }
 
     #endregion

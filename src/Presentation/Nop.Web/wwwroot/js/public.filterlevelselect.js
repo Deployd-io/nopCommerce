@@ -1,3 +1,4 @@
+const logger = console;
 /*
 ** nopCommerce filter level select js functions
 */
@@ -8,10 +9,14 @@
     }
 
     function filterLevel1SelectHandler() {
+		logger.debug('>>> Entering filterLevel1SelectHandler()');
         var $this = $(this);
         var selectedItem = $this.val();
+		logger.debug(`filterLevel1SelectHandler(): selectedItem → ${selectedItem}`);
         var filterLevel2 = $($this.data('filterlevel2'));
+		logger.debug(`filterLevel1SelectHandler(): filterLevel2 → ${filterLevel2}`);
         var filterLevel3 = $($this.data('filterlevel3'));
+		logger.debug(`filterLevel1SelectHandler(): filterLevel3 → ${filterLevel3}`);
 
         if (filterLevel2.length == 0)
             return;
@@ -29,6 +34,7 @@
                 'filterLevel3Value': ''
             },
             success: function (data, textStatus, jqXHR) {
+			logger.debug(`>>> Entering success(data=${data},textStatus=${textStatus},jqXHR=${jqXHR})`);
               filterLevel2.html('');
               if (selectedItem != '') {
                 filterLevel2.append($('<option></option>').val('').html(data[0].defaultItemText));
@@ -42,6 +48,7 @@
                 // Clear level 3 dropdown
                 filterLevel3.html('');
                 filterLevel3.append($('<option></option>').val('0').html(''));
+				logger.debug(`<<< Exiting success(data=${data},textStatus=${textStatus},jqXHR=${jqXHR})`);
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert('Failed to retrieve filter level 2 values.');
@@ -50,6 +57,7 @@
                 loading.hide();
             }
         });
+		logger.debug('<<< Exiting filterLevel1SelectHandler()');
     }
 
     function filterLevel2SelectHandler() {

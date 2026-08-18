@@ -7,12 +7,14 @@ using Nop.Services.Configuration;
 using Nop.Web.Factories;
 using Nop.Web.Models.Customer;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Web.Tests.Public.Factories;
 
 [TestFixture]
 public class CustomerModelFactoryTests : WebTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
     private ICustomerModelFactory _customerModelFactory;
     private Customer _customer;
@@ -23,9 +25,14 @@ public class CustomerModelFactoryTests : WebTest
     [OneTimeSetUp]
     public async Task SetUp()
     {
+		_logger.LogDebug(">>> Entering SetUp()");
         _customerSettings = GetService<CustomerSettings>();
         _settingService = GetService<ISettingService>();
 
+		_logger.LogDebug("SetUp(): _customerSettings → {_customerSettings}", _customerSettings);
+		_logger.LogDebug("SetUp(): _settingService → {_settingService}", _settingService);
+		_logger.LogDebug("SetUp(): _customerSettings.CountryEnabled → {Arg0}", _customerSettings.CountryEnabled);
+		_logger.LogDebug("SetUp(): _customerSettings.StateProvinceEnabled → {Arg0}", _customerSettings.StateProvinceEnabled);
         _customerSettings.CountryEnabled = true;
         _customerSettings.StateProvinceEnabled = true;
         await _settingService.SaveSettingAsync(_customerSettings);
@@ -34,10 +41,13 @@ public class CustomerModelFactoryTests : WebTest
         _customerModelFactory = GetService<ICustomerModelFactory>();
         _customer = await GetService<IWorkContext>().GetCurrentCustomerAsync();
         
+		_logger.LogDebug("SetUp(): _customerAttributeService → {_customerAttributeService}", _customerAttributeService);
+		_logger.LogDebug("SetUp(): _customerModelFactory → {_customerModelFactory}", _customerModelFactory);
         _customerAttributes =
         [
             new CustomerAttribute
         {
+			_logger.LogDebug("SetUp(): _customer → {_customer}", _customer);
             AttributeControlType = AttributeControlType.Checkboxes, Name = "Test customer attribute 1"
         },
         new CustomerAttribute
@@ -80,24 +90,31 @@ public class CustomerModelFactoryTests : WebTest
 
         foreach (var customerAttribute in _customerAttributes)
             await _customerAttributeService.InsertAttributeAsync(customerAttribute);
+			_logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
     public async Task TearDown()
     {
+		_logger.LogDebug(">>> Entering TearDown()");
         _customerSettings.CountryEnabled = false;
         _customerSettings.StateProvinceEnabled = false;
+		_logger.LogDebug("TearDown(): _customerSettings.StateProvinceEnabled → {Arg0}", _customerSettings.StateProvinceEnabled);
+		_logger.LogDebug("TearDown(): _customerSettings.CountryEnabled → {Arg0}", _customerSettings.CountryEnabled);
         await _settingService.SaveSettingAsync(_customerSettings);
 
         foreach (var customerAttribute in _customerAttributes)
             await _customerAttributeService.DeleteAttributeAsync(customerAttribute);
+			_logger.LogDebug("<<< Exiting TearDown()");
     }
 
     [Test]
     public async Task CanPrepareCustomerInfoModel()
     {
+		_logger.LogDebug(">>> Entering CanPrepareCustomerInfoModel()");
         var model = await _customerModelFactory.PrepareCustomerInfoModelAsync(new CustomerInfoModel(), _customer, false);
         model.AvailableTimeZones.Any().Should().BeTrue();
+		_logger.LogDebug("CanPrepareCustomerInfoModel(): model → {Model}", model);
 
         model.Email.Should().Be(NopTestsDefaults.AdminEmail);
         model.Username.Should().Be(NopTestsDefaults.AdminEmail);
@@ -110,40 +127,52 @@ public class CustomerModelFactoryTests : WebTest
         model.Username.Should().BeNullOrEmpty();
         model.FirstName.Should().BeNullOrEmpty();
         model.LastName.Should().BeNullOrEmpty();
+		_logger.LogDebug("<<< Exiting CanPrepareCustomerInfoModel()");
     }
 
     [Test]
     public async Task CanPrepareRegisterModel()
     {
+		_logger.LogDebug(">>> Entering CanPrepareRegisterModel()");
         var model = await _customerModelFactory.PrepareRegisterModelAsync(new RegisterModel(), false);
         model.AvailableTimeZones.Any().Should().BeTrue();
+		_logger.LogDebug("CanPrepareRegisterModel(): model → {Model}", model);
         model.CustomerAttributes.Any().Should().BeTrue();
+		_logger.LogDebug("<<< Exiting CanPrepareRegisterModel()");
     }
 
     [Test]
     public async Task CanPrepareLoginModel()
     {
+		_logger.LogDebug(">>> Entering CanPrepareLoginModel()");
         var model = await _customerModelFactory.PrepareLoginModelAsync(null);
         model.CheckoutAsGuest.Should().Be(default);
+		_logger.LogDebug("CanPrepareLoginModel(): model → {Model}", model);
         model = await _customerModelFactory.PrepareLoginModelAsync(true);
         model.CheckoutAsGuest.Should().BeTrue();
         model = await _customerModelFactory.PrepareLoginModelAsync(false);
         model.CheckoutAsGuest.Should().BeFalse();
+		_logger.LogDebug("<<< Exiting CanPrepareLoginModel()");
     }
 
     [Test]
     public async Task CanPreparePasswordRecoveryModel()
     {
+		_logger.LogDebug(">>> Entering CanPreparePasswordRecoveryModel()");
         var model = await _customerModelFactory.PreparePasswordRecoveryModelAsync(new PasswordRecoveryModel { Email = "test@email.com" });
         model.DisplayCaptcha.Should().BeFalse();
+		_logger.LogDebug("CanPreparePasswordRecoveryModel(): model → {Model}", model);
         model.Email.Should().Be("test@email.com");
+		_logger.LogDebug("<<< Exiting CanPreparePasswordRecoveryModel()");
     }
 
     [Test]
     public async Task CanPrepareRegisterResultModel()
     {
+		_logger.LogDebug(">>> Entering CanPrepareRegisterResultModel()");
         var model = await _customerModelFactory.PrepareRegisterResultModelAsync((int)UserRegistrationType.AdminApproval, string.Empty);
         model.Result.Should().Be("Your account will be activated after approving by administrator.");
+		_logger.LogDebug("CanPrepareRegisterResultModel(): model → {Model}", model);
         model = await _customerModelFactory.PrepareRegisterResultModelAsync((int)UserRegistrationType.Disabled, string.Empty);
         model.Result.Should().Be("Registration not allowed. You can edit this in the admin area.");
         model = await _customerModelFactory.PrepareRegisterResultModelAsync((int)UserRegistrationType.EmailValidation, string.Empty);
@@ -152,13 +181,17 @@ public class CustomerModelFactoryTests : WebTest
         model.Result.Should().Be("Your registration completed");
         model = await _customerModelFactory.PrepareRegisterResultModelAsync(400, string.Empty);
         model.Result.Should().BeNullOrEmpty();
+		_logger.LogDebug("<<< Exiting CanPrepareRegisterResultModel()");
     }
 
     [Test]
     public async Task CanPrepareCustomCustomerAttributes()
     {
+		_logger.LogDebug(">>> Entering CanPrepareCustomCustomerAttributes()");
         var model = await _customerModelFactory.PrepareCustomCustomerAttributesAsync(_customer);
         model.Any().Should().BeTrue();
+		_logger.LogDebug("CanPrepareCustomCustomerAttributes(): model → {Model}", model);
         model.Count.Should().Be(10);
+		_logger.LogDebug("<<< Exiting CanPrepareCustomCustomerAttributes()");
     }
 }

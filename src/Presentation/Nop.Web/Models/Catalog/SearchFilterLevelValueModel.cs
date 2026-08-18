@@ -1,16 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record SearchFilterLevelValueModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SearchFilterLevelValueModel()
     {
+		_logger.LogDebug(">>> Entering SearchFilterLevelValueModel()");
         AvailableFilterLevel1Values = new List<SelectListItem>();
         AvailableFilterLevel2Values = new List<SelectListItem>();
+		_logger.LogDebug("SearchFilterLevelValueModel(): AvailableFilterLevel2Values → {AvailableFilterLevel2Values}", AvailableFilterLevel2Values);
+		_logger.LogDebug("SearchFilterLevelValueModel(): AvailableFilterLevel1Values → {AvailableFilterLevel1Values}", AvailableFilterLevel1Values);
         AvailableFilterLevel3Values = new List<SelectListItem>();
+		_logger.LogDebug("SearchFilterLevelValueModel(): AvailableFilterLevel3Values → {AvailableFilterLevel3Values}", AvailableFilterLevel3Values);
+		_logger.LogDebug("<<< Exiting SearchFilterLevelValueModel()");
     }
 
     /// <summary>

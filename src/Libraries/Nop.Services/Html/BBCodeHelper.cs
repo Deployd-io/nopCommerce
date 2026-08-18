@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Nop.Core.Domain.Common;
 using Nop.Services.Html.CodeFormatter;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Html;
 /// </summary>
 public partial class BBCodeHelper : IBBCodeHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CommonSettings _commonSettings;
@@ -27,7 +29,10 @@ public partial class BBCodeHelper : IBBCodeHelper
 
     public BBCodeHelper(CommonSettings commonSettings)
     {
+		_logger.LogDebug(">>> Entering BBCodeHelper(commonSettings={CommonSettings})", commonSettings);
         _commonSettings = commonSettings;
+		_logger.LogDebug("BBCodeHelper(commonSettings={CommonSettings}): _commonSettings → {_commonSettings}", commonSettings, _commonSettings);
+		_logger.LogDebug("<<< Exiting BBCodeHelper(commonSettings={CommonSettings})", commonSettings);
     }
 
     #endregion
@@ -49,12 +54,14 @@ public partial class BBCodeHelper : IBBCodeHelper
     public virtual string FormatText(string text, bool replaceBold, bool replaceItalic,
         bool replaceUnderline, bool replaceUrl, bool replaceCode, bool replaceQuote, bool replaceImg)
     {
+		_logger.LogDebug(">>> Entering FormatText(text={Text},replaceBold={ReplaceBold},replaceItalic={ReplaceItalic},replaceUnderline={ReplaceUnderline},replaceUrl={ReplaceUrl},replaceCode={ReplaceCode},replaceQuote={ReplaceQuote},replaceImg={ReplaceImg})", text, replaceBold, replaceItalic, replaceUnderline, replaceUrl, replaceCode, replaceQuote, replaceImg);
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         if (replaceBold)
             // format the bold tags: [b][/b] becomes: <strong></strong>
             text = _regexBold.Replace(text, "<strong>$1</strong>");
+			_logger.LogDebug("FormatText(text={Text},replaceBold={ReplaceBold},replaceItalic={ReplaceItalic},replaceUnderline={ReplaceUnderline},replaceUrl={ReplaceUrl},replaceCode={ReplaceCode},replaceQuote={ReplaceQuote},replaceImg={ReplaceImg}): text → {Text1}", text, replaceBold, replaceItalic, replaceUnderline, replaceUrl, replaceCode, replaceQuote, replaceImg, text);
 
         if (replaceItalic)
             // format the italic tags: [i][/i] becomes: <em></em>
@@ -88,6 +95,7 @@ public partial class BBCodeHelper : IBBCodeHelper
             // becomes: <img src="https://www.nopCommerce.com/Content/Images/Image.jpg">
             text = _regexImg.Replace(text, "<img src=\"$1\" class=\"user-posted-image\" alt=\"\">");
 
+		_logger.LogDebug("<<< Exiting FormatText(text={Text},replaceBold={ReplaceBold},replaceItalic={ReplaceItalic},replaceUnderline={ReplaceUnderline},replaceUrl={ReplaceUrl},replaceCode={ReplaceCode},replaceQuote={ReplaceQuote},replaceImg={ReplaceImg})", text, replaceBold, replaceItalic, replaceUnderline, replaceUrl, replaceCode, replaceQuote, replaceImg);
         return text;
     }
 
@@ -98,8 +106,11 @@ public partial class BBCodeHelper : IBBCodeHelper
     /// <returns>string</returns>
     public virtual string RemoveQuotes(string str)
     {
+		_logger.LogDebug(">>> Entering RemoveQuotes(str={Str})", str);
         str = Regex.Replace(str, @"\[quote=(.+?)\]", string.Empty, RegexOptions.Compiled | RegexOptions.IgnoreCase);
         str = Regex.Replace(str, @"\[/quote\]", string.Empty, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		_logger.LogDebug("RemoveQuotes(str={Str}): str → {Str1}", str, str);
+		_logger.LogDebug("<<< Exiting RemoveQuotes(str={Str})", str);
         return str;
     }
 

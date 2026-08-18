@@ -1,16 +1,23 @@
+using Microsoft.Extensions.Logging;
 ﻿using Newtonsoft.Json;
 
 namespace Nop.Web.Models.JsonLD;
 
 public partial record JsonLdProductModel : JsonLdModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public JsonLdProductModel()
     {
+		_logger.LogDebug(">>> Entering JsonLdProductModel()");
         Brand = new List<JsonLdBrandModel>();
         Review = new List<JsonLdReviewModel>();
+		_logger.LogDebug("JsonLdProductModel(): Review → {Review}", Review);
+		_logger.LogDebug("JsonLdProductModel(): Brand → {Brand}", Brand);
         HasVariant = new List<JsonLdProductModel>();
+		_logger.LogDebug("JsonLdProductModel(): HasVariant → {HasVariant}", HasVariant);
+		_logger.LogDebug("<<< Exiting JsonLdProductModel()");
     }
 
     #endregion

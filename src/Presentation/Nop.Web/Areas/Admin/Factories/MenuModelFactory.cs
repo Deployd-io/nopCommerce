@@ -16,6 +16,7 @@ using Nop.Web.Areas.Admin.Models.Menus;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -24,6 +25,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class MenuModelFactory : IMenuModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -59,19 +61,34 @@ public partial class MenuModelFactory : IMenuModelFactory
         IVendorService vendorService,
         MenuSettings menuSettings)
     {
+		_logger.LogDebug(">>> Entering MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings})", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _catalogSettings → {_catalogSettings}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _catalogSettings);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _baseAdminModelFactory);
         _categoryService = categoryService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _categoryService → {_categoryService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _categoryService);
         _localizationService = localizationService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _localizationService → {_localizationService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _localizedModelFactory → {_localizedModelFactory}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _localizedModelFactory);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _manufacturerService → {_manufacturerService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _manufacturerService);
         _menuService = menuService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _menuService → {_menuService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _menuService);
         _notificationService = notificationService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _notificationService → {_notificationService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _notificationService);
         _productService = productService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _productService → {_productService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _productService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _storeMappingSupportedModelFactory);
         _topicService = topicService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _topicService → {_topicService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _topicService);
         _vendorService = vendorService;
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _vendorService → {_vendorService}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _vendorService);
         _menuSettings = menuSettings;
+		_logger.LogDebug("<<< Exiting MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings})", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings);
+		_logger.LogDebug("MenuModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},manufacturerService={ManufacturerService},menuService={MenuService},notificationService={NotificationService},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},vendorService={VendorService},menuSettings={MenuSettings}): _menuSettings → {_menuSettings}", catalogSettings, baseAdminModelFactory, categoryService, localizationService, localizedModelFactory, manufacturerService, menuService, notificationService, productService, topicService, vendorService, menuSettings, _menuSettings);
     }
 
     #endregion
@@ -89,8 +106,11 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task<string> GetMenuItemBreadcrumbAsync(MenuItem item, IEnumerable<MenuItem> allItems)
     {
+		_logger.LogDebug(">>> Entering GetMenuItemBreadcrumbAsync(item={Item},allItems={AllItems})", item, allItems);
         var titles = new List<string>();
         var current = item;
+		_logger.LogDebug("GetMenuItemBreadcrumbAsync(item={Item},allItems={AllItems}): current → {Current}", item, allItems, current);
+		_logger.LogDebug("GetMenuItemBreadcrumbAsync(item={Item},allItems={AllItems}): titles → {Titles}", item, allItems, titles);
 
         while (current is not null)
         {
@@ -109,6 +129,7 @@ public partial class MenuModelFactory : IMenuModelFactory
             current = allItems.FirstOrDefault(x => x.Id == current.ParentId);
         }
 
+		_logger.LogDebug("<<< Exiting GetMenuItemBreadcrumbAsync(item={Item},allItems={AllItems})", item, allItems);
         return string.Join(" >> ", titles);
     }
 
@@ -122,6 +143,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task InitMenuItemModelEntityIdAsync(MenuItemModel model, int entityId)
     {
+		_logger.LogDebug(">>> Entering InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId})", model, entityId);
         ArgumentOutOfRangeException.ThrowIfZero(entityId);
 
         try
@@ -139,12 +161,18 @@ public partial class MenuModelFactory : IMenuModelFactory
                     model.ProductId = product.Id;
                     break;
                 }
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): product → {Product}", model, entityId, product);
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): model.ProductName → {Arg2}", model, entityId, model.ProductName);
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): model.ProductId → {Arg2}", model, entityId, model.ProductId);
                 case MenuItemType.TopicPage:
                 {
+					_logger.LogWarning("Throwing NopException from InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId})", model, entityId);
                     var topic = await _topicService.GetTopicByIdAsync(entityId) ?? throw new NopException("Topic not found");
                     model.TopicId = topic.Id;
                     break;
                 }
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): topic → {Topic}", model, entityId, topic);
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): model.TopicId → {Arg2}", model, entityId, model.TopicId);
                 case MenuItemType.Category:
                 {
                     var category = await _categoryService.GetCategoryByIdAsync(entityId);
@@ -155,6 +183,8 @@ public partial class MenuModelFactory : IMenuModelFactory
                     model.CategoryId = category.Id;
                     break;
                 }
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): category → {Category}", model, entityId, category);
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): model.CategoryId → {Arg2}", model, entityId, model.CategoryId);
                 case MenuItemType.Vendor:
                 {
                     var vendor = await _vendorService.GetVendorByIdAsync(entityId);
@@ -165,6 +195,8 @@ public partial class MenuModelFactory : IMenuModelFactory
                     model.VendorId = vendor.Id;
                     break;
                 }
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): vendor → {Vendor}", model, entityId, vendor);
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): model.VendorId → {Arg2}", model, entityId, model.VendorId);
                 case MenuItemType.Manufacturer:
                 {
                     var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(entityId);
@@ -175,14 +207,18 @@ public partial class MenuModelFactory : IMenuModelFactory
                     model.ManufacturerId = manufacturer.Id;
                     break;
                 }
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): manufacturer → {Manufacturer}", model, entityId, manufacturer);
+				_logger.LogDebug("InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): model.ManufacturerId → {Arg2}", model, entityId, model.ManufacturerId);
                 default:
                     break;
             }
         }
         catch (NopException ex)
         {
+			_logger.LogError("Exception in InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId}): {Arg2}", model, entityId, ex.getMessage());
             _notificationService.WarningNotification(ex.Message);
         }
+		_logger.LogDebug("<<< Exiting InitMenuItemModelEntityIdAsync(model={Model},entityId={EntityId})", model, entityId);
     }
 
     #region Select lists
@@ -198,8 +234,10 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task PrepareModelAvailableParentMenuItemsAsync(MenuItemModel menuItemModel, int depth, IList<SelectListItem> menuItemsToAdd)
     {
+		_logger.LogDebug(">>> Entering PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd})", menuItemModel, depth, menuItemsToAdd);
         var items = await _menuService.GetAllMenuItemsAsync(menuId: menuItemModel.MenuId, treeSorting: true, showHidden: true);
         menuItemsToAdd.Add(new SelectListItem { Text = await _localizationService.GetResourceAsync("Admin.Common.No"), Value = string.Empty });
+		_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): items → {Items}", menuItemModel, depth, menuItemsToAdd, items);
 
         if (menuItemModel.Id > 0 && childrenLevels(items, menuItemModel.Id) >= _menuSettings.MaximumMainMenuLevels - 1)
             return;
@@ -221,18 +259,22 @@ public partial class MenuModelFactory : IMenuModelFactory
                 return 0;
 
             var children = elements.Where(x => x.ParentId == parentId).ToList();
+			_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): children → {Children}", menuItemModel, depth, menuItemsToAdd, children);
 
             if (!children.Any())
                 return 0;
 
             var maxChildDepth = 0;
+			_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): maxChildDepth → {MaxChildDepth}", menuItemModel, depth, menuItemsToAdd, maxChildDepth);
             foreach (var child in children)
             {
                 var childDepth = childrenLevels(elements, child.Id, visited);
+				_logger.LogDebug("PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd}): childDepth → {ChildDepth}", menuItemModel, depth, menuItemsToAdd, childDepth);
                 if (childDepth > maxChildDepth)
                     maxChildDepth = childDepth;
             }
 
+			_logger.LogDebug("<<< Exiting PrepareModelAvailableParentMenuItemsAsync(menuItemModel={MenuItemModel},depth={Depth},menuItemsToAdd={MenuItemsToAdd})", menuItemModel, depth, menuItemsToAdd);
             return maxChildDepth + 1;
         }
     }
@@ -246,10 +288,12 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     protected virtual async Task PrepareAvailableTopicsAsync(IList<SelectListItem> items)
     {
+		_logger.LogDebug(">>> Entering PrepareAvailableTopicsAsync(items={Items})", items);
         ArgumentNullException.ThrowIfNull(items);
 
         //get topics
         var topics = await _topicService.GetAllTopicsAsync(storeId: 0, showHidden: true);
+		_logger.LogDebug("PrepareAvailableTopicsAsync(items={Items}): topics → {Topics}", items, topics);
 
         var availableTopics = topics.Select(t => new SelectListItem
         {
@@ -258,6 +302,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         }).ToList();
 
         items.AddRange(availableTopics);
+		_logger.LogDebug("<<< Exiting PrepareAvailableTopicsAsync(items={Items})", items);
     }
 
     #endregion
@@ -278,11 +323,13 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual Task<MenuSearchModel> PrepareMenuSearchModelAsync(MenuSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMenuSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -296,8 +343,10 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<MenuListModel> PrepareMenuListModelAsync(MenuSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuListModelAsync(searchModel={SearchModel})", searchModel);
         var menus = await _menuService.GetAllMenusAsync(pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize, showHidden: true);
 
+		_logger.LogDebug("PrepareMenuListModelAsync(searchModel={SearchModel}): menus → {Menus}", searchModel, menus);
         //prepare list model
         return await new MenuListModel().PrepareToGridAsync(searchModel, menus, () =>
         {
@@ -310,6 +359,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 return model;
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuListModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     /// <summary>
@@ -324,12 +374,14 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<MenuModel> PrepareMenuModelAsync(MenuModel model, Menu menu, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuModelAsync(model={Model},menu={Menu},excludeProperties={ExcludeProperties})", model, menu, excludeProperties);
         Func<MenuLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (menu != null)
         {
             if (model == null)
                 model = menu.ToModel<MenuModel>();
+				_logger.LogDebug("PrepareMenuModelAsync(model={Model},menu={Menu},excludeProperties={ExcludeProperties}): model → {Model1}", model, menu, excludeProperties, model);
 
             //define localized model configuration action
             localizedModelConfiguration = async (locale, languageId) =>
@@ -348,6 +400,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareMenuModelAsync(model={Model},menu={Menu},excludeProperties={ExcludeProperties})", model, menu, excludeProperties);
         return model;
     }
 
@@ -365,11 +418,13 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual Task<MenuItemSearchModel> PrepareMenuItemSearchModelAsync(MenuItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -383,9 +438,12 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<MenuItemListModel> PrepareMenuItemListModelAsync(MenuItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemListModelAsync(searchModel={SearchModel})", searchModel);
         var allItems = await _menuService.GetAllMenuItemsAsync(menuId: searchModel.MenuId, treeSorting: true, showHidden: true);
 
+		_logger.LogDebug("PrepareMenuItemListModelAsync(searchModel={SearchModel}): allItems → {AllItems}", searchModel, allItems);
         var itemsPaged = allItems.ToPagedList(searchModel);
+		_logger.LogDebug("PrepareMenuItemListModelAsync(searchModel={SearchModel}): itemsPaged → {ItemsPaged}", searchModel, itemsPaged);
 
         //prepare list model
         return await new MenuItemListModel().PrepareToGridAsync(searchModel, itemsPaged, () =>
@@ -401,6 +459,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 return model;
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuItemListModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     /// <summary>
@@ -416,6 +475,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<MenuItemModel> PrepareMenuItemModelAsync(Menu menu, MenuItemModel model, MenuItem menuItem, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties})", menu, model, menuItem, excludeProperties);
         ArgumentNullException.ThrowIfNull(menu);
         Func<MenuItemLocalizedModel, int, Task> localizedModelConfiguration = null;
 
@@ -423,6 +483,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         {
             if (model == null)
                 model = menuItem.ToModel<MenuItemModel>();
+				_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model → {Model1}", menu, model, menuItem, excludeProperties, model);
 
             //define localized model configuration action
             localizedModelConfiguration = async (locale, languageId) =>
@@ -436,6 +497,11 @@ public partial class MenuModelFactory : IMenuModelFactory
         else
         {
             model.MenuId = menu.Id;
+			_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model.MenuId → {Arg4}", menu, model, menuItem, excludeProperties, model.MenuId);
+			_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model.Published → {Arg4}", menu, model, menuItem, excludeProperties, model.Published);
+			_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model.MaximumNumberEntities → {Arg4}", menu, model, menuItem, excludeProperties, model.MaximumNumberEntities);
+			_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model.NumberOfSubItemsPerGridElement → {Arg4}", menu, model, menuItem, excludeProperties, model.NumberOfSubItemsPerGridElement);
+			_logger.LogDebug("PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties}): model.NumberOfItemsPerGridRow → {Arg4}", menu, model, menuItem, excludeProperties, model.NumberOfItemsPerGridRow);
             model.Published = true;
             model.MaximumNumberEntities = _menuSettings.MaximumNumberEntities;
             model.NumberOfSubItemsPerGridElement = _menuSettings.NumberOfSubItemsPerGridElement;
@@ -462,6 +528,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemModelAsync(menu={Menu},model={Model},menuItem={MenuItem},excludeProperties={ExcludeProperties})", menu, model, menuItem, excludeProperties);
         return model;
     }
 
@@ -477,6 +544,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<SelectMenuItemProductSearchModel> PrepareMenuItemSelectProductSearchModelAsync(SelectMenuItemProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemSelectProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -487,6 +555,7 @@ public partial class MenuModelFactory : IMenuModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMenuItemSelectProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -500,6 +569,7 @@ public partial class MenuModelFactory : IMenuModelFactory
     /// </returns>
     public virtual async Task<SelectMenuItemProductListModel> PrepareMenuItemSelectProductListModelAsync(SelectMenuItemProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMenuItemSelectProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get categories
@@ -518,6 +588,7 @@ public partial class MenuModelFactory : IMenuModelFactory
                 Published = product.Published
             });
         });
+		_logger.LogDebug("<<< Exiting PrepareMenuItemSelectProductListModelAsync(searchModel={SearchModel})", searchModel);
     }
 
     #endregion

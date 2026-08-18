@@ -25,8 +25,12 @@ using SkiaSharp;
      public RoxyFilemanFileProvider(INopFileProvider nopFileProvider, 
          MediaSettings mediaSettings) : base(nopFileProvider.Combine(nopFileProvider.GetLocalImagesPath(mediaSettings), NopRoxyFilemanDefaults.DefaultRootDirectory))
      {
+		_logger.LogDebug(">>> Entering RoxyFilemanFileProvider(nopFileProvider={NopFileProvider},mediaSettings={MediaSettings})", nopFileProvider, mediaSettings);
          _mediaSettings = mediaSettings;
          _nopFileProvider = nopFileProvider;
+		_logger.LogDebug("RoxyFilemanFileProvider(nopFileProvider={NopFileProvider},mediaSettings={MediaSettings}): _nopFileProvider → {_nopFileProvider}", nopFileProvider, mediaSettings, _nopFileProvider);
+		_logger.LogDebug("RoxyFilemanFileProvider(nopFileProvider={NopFileProvider},mediaSettings={MediaSettings}): _mediaSettings → {_mediaSettings}", nopFileProvider, mediaSettings, _mediaSettings);
+		_logger.LogDebug("<<< Exiting RoxyFilemanFileProvider(nopFileProvider={NopFileProvider},mediaSettings={MediaSettings})", nopFileProvider, mediaSettings);
      }
 
      #endregion
@@ -46,8 +50,10 @@ using SkiaSharp;
 
          float width = Math.Min(image.Width, maxWidth);
          float height = Math.Min(image.Height, maxHeight);
+		_logger.LogDebug("ValidateImageMeasures(width={Width},height={Height}): height → {Height1}", width, height, height);
 
          var targetSize = Math.Max(width, height);
+		_logger.LogDebug("ValidateImageMeasures(width={Width},height={Height}): targetSize → {TargetSize}", width, height, targetSize);
 
          if (image.Height > image.Width)
          {
@@ -62,6 +68,7 @@ using SkiaSharp;
              height = image.Height * (targetSize / image.Width);
          }
 
+		_logger.LogDebug("<<< Exiting ValidateImageMeasures(width={Width},height={Height})", width, height);
          return ((int)width, (int)height);
      }
 
@@ -72,8 +79,10 @@ using SkiaSharp;
      /// <returns>File type</returns>
      protected virtual string GetFileType(string subpath)
      {
+		_logger.LogDebug(">>> Entering GetFileType(subpath={Subpath})", subpath);
          var fileExtension = Path.GetExtension(subpath)?.ToLowerInvariant();
 
+		_logger.LogDebug("GetFileType(subpath={Subpath}): fileExtension → {FileExtension}", subpath, fileExtension);
          return fileExtension switch
          {
              ".jpg" or ".jpeg" or ".png" or ".gif" or ".webp" or ".svg" => "image",
@@ -92,6 +101,7 @@ using SkiaSharp;
           *     || fileExtension == ".asf" || fileExtension == ".asx" || fileExtension == ".wma"
           *     || fileExtension == ".mid" || fileExtension == ".mp2") // audio
           *     fileType = "media"; */
+		_logger.LogDebug("<<< Exiting GetFileType(subpath={Subpath})", subpath);
      }
 
      /// <summary>
@@ -101,17 +111,22 @@ using SkiaSharp;
      /// <returns>The fully qualified location of path, such as "C:\MyFile.txt"</returns>
      protected virtual string GetFullPath(string path)
      {
+		_logger.LogDebug(">>> Entering GetFullPath(path={Path})", path);
          if (string.IsNullOrEmpty(path))
+			_logger.LogWarning("Throwing RoxyFilemanException from GetFullPath(path={Path})", path);
              throw new RoxyFilemanException("NoFilesFound");
 
          path = path.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+		_logger.LogDebug("GetFullPath(path={Path}): path → {Path1}", path, path);
 
          if (_nopFileProvider.IsPathRooted(path))
              throw new RoxyFilemanException("NoFilesFound");
 
          var fullPath = Path.GetFullPath(Path.Combine(Root, path));
+		_logger.LogDebug("GetFullPath(path={Path}): fullPath → {FullPath}", path, fullPath);
 
          if (!IsUnderneathRoot(fullPath))
+		_logger.LogDebug("<<< Exiting GetFullPath(path={Path})", path);
              throw new RoxyFilemanException("NoFilesFound");
 
          return fullPath;
@@ -124,11 +139,14 @@ using SkiaSharp;
      /// <returns>SKEncodedImageFormat</returns>
      protected virtual SKEncodedImageFormat GetImageFormatByMimeType(string mimeType)
      {
+		_logger.LogDebug(">>> Entering GetImageFormatByMimeType(mimeType={MimeType})", mimeType);
          var format = SKEncodedImageFormat.Jpeg;
          if (string.IsNullOrEmpty(mimeType))
+			_logger.LogDebug("GetImageFormatByMimeType(mimeType={MimeType}): format → {Format}", mimeType, format);
              return format;
 
          var parts = mimeType.ToLowerInvariant().Split('/');
+		_logger.LogDebug("GetImageFormatByMimeType(mimeType={MimeType}): parts → {Parts}", mimeType, parts);
          var lastPart = parts[^1];
 
          switch (lastPart)
@@ -146,6 +164,7 @@ using SkiaSharp;
                  break;
          }
 
+		_logger.LogDebug("<<< Exiting GetImageFormatByMimeType(mimeType={MimeType})", mimeType);
          return format;
      }
 
@@ -157,14 +176,17 @@ using SkiaSharp;
      /// <returns>Unique name of the file</returns>
      protected virtual string GetUniqueFileName(string directoryPath, string fileName)
      {
+		_logger.LogDebug(">>> Entering GetUniqueFileName(directoryPath={DirectoryPath},fileName={FileName})", directoryPath, fileName);
          var uniqueFileName = fileName;
 
+		_logger.LogDebug("GetUniqueFileName(directoryPath={DirectoryPath},fileName={FileName}): uniqueFileName → {UniqueFileName}", directoryPath, fileName, uniqueFileName);
          var i = 0;
          while (GetFileInfo(Path.Combine(directoryPath, uniqueFileName)) is IFileInfo fileInfo && fileInfo.Exists)
          {
              uniqueFileName = $"{Path.GetFileNameWithoutExtension(fileName)}-Copy-{++i}{Path.GetExtension(fileName)}";
          }
 
+		_logger.LogDebug("<<< Exiting GetUniqueFileName(directoryPath={DirectoryPath},fileName={FileName})", directoryPath, fileName);
          return uniqueFileName;
      }
 
@@ -175,6 +197,8 @@ using SkiaSharp;
      /// <returns>True if passed path is in the root; otherwise false</returns>
      protected virtual bool IsUnderneathRoot(string fullPath)
      {
+		_logger.LogDebug(">>> Entering IsUnderneathRoot(fullPath={FullPath})", fullPath);
+		_logger.LogDebug("<<< Exiting IsUnderneathRoot(fullPath={FullPath})", fullPath);
          return fullPath
              .StartsWith(Root, StringComparison.OrdinalIgnoreCase);
      }
@@ -189,22 +213,32 @@ using SkiaSharp;
      /// <returns>The byte array of resized image</returns>
      protected virtual byte[] ResizeImage(byte[] data, SKEncodedImageFormat format, int maxWidth, int maxHeight)
      {
+		_logger.LogDebug(">>> Entering ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight})", data, format, maxWidth, maxHeight);
          using var sourceStream = new SKMemoryStream(data);
          using var inputData = SKData.Create(sourceStream);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): inputData → {InputData}", data, format, maxWidth, maxHeight, inputData);
          using var image = SKBitmap.Decode(inputData);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): image → {Image}", data, format, maxWidth, maxHeight, image);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): sourceStream → {SourceStream}", data, format, maxWidth, maxHeight, sourceStream);
 
          var (width, height) = ValidateImageMeasures(image, maxWidth, maxHeight);
 
          var toBitmap = new SKBitmap(width, height, image.ColorType, image.AlphaType);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): toBitmap → {ToBitmap}", data, format, maxWidth, maxHeight, toBitmap);
          var samplingOptions = new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): samplingOptions → {SamplingOptions}", data, format, maxWidth, maxHeight, samplingOptions);
 
          if (!image.ScalePixels(toBitmap, samplingOptions))
+			_logger.LogWarning("Throwing Exception from ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight})", data, format, maxWidth, maxHeight);
              throw new Exception("Image scaling");
 
          var newImage = SKImage.FromBitmap(toBitmap);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): newImage → {NewImage}", data, format, maxWidth, maxHeight, newImage);
          var imageData = newImage.Encode(format, _mediaSettings.DefaultImageQuality);
+		_logger.LogDebug("ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight}): imageData → {ImageData}", data, format, maxWidth, maxHeight, imageData);
 
          newImage.Dispose();
+		_logger.LogDebug("<<< Exiting ResizeImage(data={Data},format={Format},maxWidth={MaxWidth},maxHeight={MaxHeight})", data, format, maxWidth, maxHeight);
          return imageData.ToArray();
      }
 
@@ -222,10 +256,13 @@ using SkiaSharp;
      /// </param>
      public virtual void DirectoryMove(string sourceDirName, string destDirName)
      {
+		_logger.LogDebug(">>> Entering DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
          if (destDirName.StartsWith(sourceDirName, StringComparison.InvariantCulture))
+			_logger.LogWarning("Throwing RoxyFilemanException from DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
              throw new RoxyFilemanException("E_CannotMoveDirToChild");
 
          var sourceDirInfo = new DirectoryInfo(GetFullPath(sourceDirName));
+		_logger.LogDebug("DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName}): sourceDirInfo → {SourceDirInfo}", sourceDirName, destDirName, sourceDirInfo);
          if (!sourceDirInfo.Exists)
              throw new RoxyFilemanException("E_MoveDirInvalisPath");
 
@@ -233,8 +270,11 @@ using SkiaSharp;
              throw new RoxyFilemanException("E_MoveDir");
 
          var newFullPath = Path.Combine(GetFullPath(destDirName), sourceDirInfo.Name);
+		_logger.LogDebug("DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName}): newFullPath → {NewFullPath}", sourceDirName, destDirName, newFullPath);
          var destinationDirInfo = new DirectoryInfo(newFullPath);
+		_logger.LogDebug("DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName}): destinationDirInfo → {DestinationDirInfo}", sourceDirName, destDirName, destinationDirInfo);
          if (destinationDirInfo.Exists)
+			_logger.LogDebug("<<< Exiting DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
              throw new RoxyFilemanException("E_DirAlreadyExists");
 
          try
@@ -243,6 +283,7 @@ using SkiaSharp;
          }
          catch
          {
+			_logger.LogError("Exception in DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName}): {Arg2}", sourceDirName, destDirName, ex.Message);
              throw new RoxyFilemanException("E_MoveDir");
          }
      }
@@ -254,13 +295,16 @@ using SkiaSharp;
      /// <returns>The file information. Caller must check Microsoft.Extensions.FileProviders.IFileInfo.Exists property.</returns>
      public new IFileInfo GetFileInfo(string subpath)
      {
+		_logger.LogDebug(">>> Entering GetFileInfo(subpath={Subpath})", subpath);
          if (string.IsNullOrEmpty(subpath))
              return new NotFoundFileInfo(subpath);
 
          subpath = subpath.TrimStart(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+		_logger.LogDebug("GetFileInfo(subpath={Subpath}): subpath → {Subpath1}", subpath, subpath);
 
          //absolute paths not permitted.
          if (_nopFileProvider.IsPathRooted(subpath))
+		_logger.LogDebug("<<< Exiting GetFileInfo(subpath={Subpath})", subpath);
              return new NotFoundFileInfo(subpath);
 
          return base.GetFileInfo(subpath);
@@ -274,6 +318,7 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual async Task<RoxyFilemanConfig> GetOrCreateConfigurationAsync(string pathBase, string lang)
      {
+		_logger.LogDebug(">>> Entering GetOrCreateConfigurationAsync(pathBase={PathBase},lang={Lang})", pathBase, lang);
          //check whether the path base has changed, otherwise there is no need to overwrite the configuration file
          if (Singleton<RoxyFilemanConfig>.Instance?.RETURN_URL_PREFIX?.Equals(pathBase) ?? false)
          {
@@ -281,13 +326,16 @@ using SkiaSharp;
          }
 
          var filePath = _nopFileProvider.GetAbsolutePath(NopRoxyFilemanDefaults.ConfigurationFile);
+		_logger.LogDebug("GetOrCreateConfigurationAsync(pathBase={PathBase},lang={Lang}): filePath → {FilePath}", pathBase, lang, filePath);
 
          //create file if not exists
          _nopFileProvider.CreateFile(filePath);
 
          //try to read existing configuration
          var existingText = await _nopFileProvider.ReadAllTextAsync(filePath, Encoding.UTF8);
+		_logger.LogDebug("GetOrCreateConfigurationAsync(pathBase={PathBase},lang={Lang}): existingText → {ExistingText}", pathBase, lang, existingText);
          var existingConfiguration = JsonConvert.DeserializeObject<RoxyFilemanConfig>(existingText);
+		_logger.LogDebug("GetOrCreateConfigurationAsync(pathBase={PathBase},lang={Lang}): existingConfiguration → {ExistingConfiguration}", pathBase, lang, existingConfiguration);
 
          //create configuration
          var configuration = new RoxyFilemanConfig
@@ -331,10 +379,12 @@ using SkiaSharp;
 
          //save the file
          var text = JsonConvert.SerializeObject(configuration, Formatting.Indented);
+		_logger.LogDebug("GetOrCreateConfigurationAsync(pathBase={PathBase},lang={Lang}): text → {Text}", pathBase, lang, text);
          await File.WriteAllTextAsync(filePath, text, Encoding.UTF8);
 
          Singleton<RoxyFilemanConfig>.Instance = configuration;
 
+		_logger.LogDebug("<<< Exiting GetOrCreateConfigurationAsync(pathBase={PathBase},lang={Lang})", pathBase, lang);
          return configuration;
      }
 
@@ -346,11 +396,13 @@ using SkiaSharp;
      /// <param name="rootDirectoryPath">Path to start directory</param>
      public virtual IEnumerable<RoxyDirectoryInfo> GetDirectories(string type, bool isRecursive = true, string rootDirectoryPath = "")
      {
+		_logger.LogDebug(">>> Entering GetDirectories(type={Type},isRecursive={IsRecursive},rootDirectoryPath={RootDirectoryPath})", type, isRecursive, rootDirectoryPath);
          foreach (var item in GetDirectoryContents(rootDirectoryPath))
          {
              if (item.IsDirectory)
              {
                  var dirInfo = new DirectoryInfo(item.PhysicalPath);
+				_logger.LogDebug("GetDirectories(type={Type},isRecursive={IsRecursive},rootDirectoryPath={RootDirectoryPath}): dirInfo → {DirInfo}", type, isRecursive, rootDirectoryPath, dirInfo);
 
                  yield return new RoxyDirectoryInfo(
                      getRelativePath(item.Name),
@@ -367,6 +419,7 @@ using SkiaSharp;
 
          string getRelativePath(string name) => Path.Combine(rootDirectoryPath, name);
          bool isMatchType(string name) => string.IsNullOrEmpty(type) || GetFileType(name) == type;
+		_logger.LogDebug("<<< Exiting GetDirectories(type={Type},isRecursive={IsRecursive},rootDirectoryPath={RootDirectoryPath})", type, isRecursive, rootDirectoryPath);
      }
 
      /// <summary>
@@ -379,8 +432,10 @@ using SkiaSharp;
      /// </returns>
      public virtual IEnumerable<RoxyFileInfo> GetFiles(string directoryPath = "", string type = "")
      {
+		_logger.LogDebug(">>> Entering GetFiles(directoryPath={DirectoryPath},type={Type})", directoryPath, type);
          var files = GetDirectoryContents(directoryPath);
 
+		_logger.LogDebug("GetFiles(directoryPath={DirectoryPath},type={Type}): files → {Files}", directoryPath, type, files);
          return files
              .Where(f => !f.IsDirectory && isMatchType(f.Name))
              .Select(f =>
@@ -406,6 +461,7 @@ using SkiaSharp;
 
          bool isMatchType(string name) => string.IsNullOrEmpty(type) || GetFileType(name) == type;
          string getRelativePath(string name) => Path.Combine(directoryPath, name);
+		_logger.LogDebug("<<< Exiting GetFiles(directoryPath={DirectoryPath},type={Type})", directoryPath, type);
      }
 
      /// <summary>
@@ -415,13 +471,18 @@ using SkiaSharp;
      /// <param name="destinationPath">The new path and name for the file</param>
      public virtual void FileMove(string sourcePath, string destinationPath)
      {
+		_logger.LogDebug(">>> Entering FileMove(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
          var sourceFile = GetFileInfo(sourcePath);
 
+		_logger.LogDebug("FileMove(sourcePath={SourcePath},destinationPath={DestinationPath}): sourceFile → {SourceFile}", sourcePath, destinationPath, sourceFile);
          if (!sourceFile.Exists)
+			_logger.LogWarning("Throwing RoxyFilemanException from FileMove(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
              throw new RoxyFilemanException("E_MoveFileInvalisPath");
 
          var destinationFile = GetFileInfo(destinationPath);
+		_logger.LogDebug("FileMove(sourcePath={SourcePath},destinationPath={DestinationPath}): destinationFile → {DestinationFile}", sourcePath, destinationPath, destinationFile);
          if (destinationFile.Exists)
+			_logger.LogDebug("<<< Exiting FileMove(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
              throw new RoxyFilemanException("E_MoveFileAlreadyExists");
 
          try
@@ -431,6 +492,7 @@ using SkiaSharp;
          }
          catch
          {
+			_logger.LogError("Exception in FileMove(sourcePath={SourcePath},destinationPath={DestinationPath}): {Arg2}", sourcePath, destinationPath, ex.Message);
              throw new RoxyFilemanException("E_MoveFile");
          }
      }
@@ -442,14 +504,20 @@ using SkiaSharp;
      /// <param name="destinationPath">Path to the destination directory</param>
      public virtual void CopyDirectory(string sourcePath, string destinationPath)
      {
+		_logger.LogDebug(">>> Entering CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
          var sourceDirInfo = new DirectoryInfo(GetFullPath(sourcePath));
          if (!sourceDirInfo.Exists)
+			_logger.LogWarning("Throwing RoxyFilemanException from CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
+			_logger.LogDebug("CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): sourceDirInfo → {SourceDirInfo}", sourcePath, destinationPath, sourceDirInfo);
              throw new RoxyFilemanException("E_CopyDirInvalidPath");
 
          var newPath = Path.Combine(GetFullPath(destinationPath), sourceDirInfo.Name);
+		_logger.LogDebug("CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): newPath → {NewPath}", sourcePath, destinationPath, newPath);
          var destinationDirInfo = new DirectoryInfo(newPath);
+		_logger.LogDebug("CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): destinationDirInfo → {DestinationDirInfo}", sourcePath, destinationPath, destinationDirInfo);
 
          if (destinationDirInfo.Exists)
+			_logger.LogDebug("<<< Exiting CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
              throw new RoxyFilemanException("E_DirAlreadyExists");
 
          try
@@ -459,6 +527,7 @@ using SkiaSharp;
              foreach (var file in sourceDirInfo.GetFiles())
              {
                  var newFile = GetFileInfo(Path.Combine(destinationPath, file.Name));
+				_logger.LogDebug("CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): newFile → {NewFile}", sourcePath, destinationPath, newFile);
                  if (!newFile.Exists)
                      file.CopyTo(Path.Combine(destinationDirInfo.FullName, file.Name));
              }
@@ -466,12 +535,15 @@ using SkiaSharp;
              foreach (var directory in sourceDirInfo.GetDirectories())
              {
                  var destinationSubPath = Path.Combine(destinationPath, sourceDirInfo.Name, directory.Name);
+				_logger.LogDebug("CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): destinationSubPath → {DestinationSubPath}", sourcePath, destinationPath, destinationSubPath);
                  var sourceSubPath = Path.Combine(sourcePath, directory.Name);
+				_logger.LogDebug("CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): sourceSubPath → {SourceSubPath}", sourcePath, destinationPath, sourceSubPath);
                  CopyDirectory(sourceSubPath, destinationSubPath);
              }
          }
          catch
          {
+			_logger.LogError("Exception in CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath}): {Arg2}", sourcePath, destinationPath, ex.Message);
              throw new RoxyFilemanException("E_CopyFile");
          }
      }
@@ -484,13 +556,17 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual void RenameDirectory(string sourcePath, string newName)
      {
+		_logger.LogDebug(">>> Entering RenameDirectory(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
          try
          {
              var destinationPath = Path.Combine(Path.GetDirectoryName(sourcePath), newName);
+			_logger.LogDebug("RenameDirectory(sourcePath={SourcePath},newName={NewName}): destinationPath → {DestinationPath}", sourcePath, newName, destinationPath);
              DirectoryMove(sourcePath, destinationPath);
          }
          catch (Exception ex)
          {
+			_logger.LogError("Exception in RenameDirectory(sourcePath={SourcePath},newName={NewName}): {Arg2}", sourcePath, newName, ex.getMessage());
+		_logger.LogDebug("<<< Exiting RenameDirectory(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
              throw new RoxyFilemanException("E_RenameDir", ex);
          }
      }
@@ -503,13 +579,17 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual void RenameFile(string sourcePath, string newName)
      {
+		_logger.LogDebug(">>> Entering RenameFile(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
          try
          {
              var destinationPath = Path.Combine(Path.GetDirectoryName(sourcePath), newName);
+			_logger.LogDebug("RenameFile(sourcePath={SourcePath},newName={NewName}): destinationPath → {DestinationPath}", sourcePath, newName, destinationPath);
              FileMove(sourcePath, destinationPath);
          }
          catch (Exception ex)
          {
+			_logger.LogError("Exception in RenameFile(sourcePath={SourcePath},newName={NewName}): {Arg2}", sourcePath, newName, ex.getMessage());
+		_logger.LogDebug("<<< Exiting RenameFile(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
              throw new RoxyFilemanException("E_RenameFile", ex);
          }
      }
@@ -521,9 +601,13 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual void DeleteFile(string path)
      {
+		_logger.LogDebug(">>> Entering DeleteFile(path={Path})", path);
          var fileToDelete = GetFileInfo(path);
 
+		_logger.LogDebug("DeleteFile(path={Path}): fileToDelete → {FileToDelete}", path, fileToDelete);
          if (!fileToDelete.Exists)
+			_logger.LogDebug("<<< Exiting DeleteFile(path={Path})", path);
+			_logger.LogWarning("Throwing RoxyFilemanException from DeleteFile(path={Path})", path);
              throw new RoxyFilemanException("E_DeleteFileInvalidPath");
 
          try
@@ -532,6 +616,7 @@ using SkiaSharp;
          }
          catch
          {
+			_logger.LogError("Exception in DeleteFile(path={Path}): {Arg1}", path, ex.Message);
              throw new RoxyFilemanException("E_DeleteFile");
          }
      }
@@ -544,13 +629,19 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual void CopyFile(string sourcePath, string destinationPath)
      {
+		_logger.LogDebug(">>> Entering CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
          var sourceFile = GetFileInfo(sourcePath);
 
+		_logger.LogDebug("CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath}): sourceFile → {SourceFile}", sourcePath, destinationPath, sourceFile);
          if (!sourceFile.Exists)
+			_logger.LogDebug("<<< Exiting CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
+			_logger.LogWarning("Throwing RoxyFilemanException from CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
              throw new RoxyFilemanException("E_CopyFileInvalidPath");
 
          var newFilePath = Path.Combine(destinationPath, sourceFile.Name);
+		_logger.LogDebug("CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath}): newFilePath → {NewFilePath}", sourcePath, destinationPath, newFilePath);
          var destinationFile = GetFileInfo(newFilePath);
+		_logger.LogDebug("CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath}): destinationFile → {DestinationFile}", sourcePath, destinationPath, destinationFile);
 
          if (destinationFile.Exists)
              newFilePath = Path.Combine(destinationPath, GetUniqueFileName(destinationPath, sourceFile.Name));
@@ -561,6 +652,7 @@ using SkiaSharp;
          }
          catch
          {
+			_logger.LogError("Exception in CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath}): {Arg2}", sourcePath, destinationPath, ex.Message);
              throw new RoxyFilemanException("E_CopyFile");
          }
      }
@@ -573,12 +665,16 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual void CreateDirectory(string parentDirectoryPath, string name)
      {
+		_logger.LogDebug(">>> Entering CreateDirectory(parentDirectoryPath={ParentDirectoryPath},name={Name})", parentDirectoryPath, name);
          //validate path and get absolute form
          var fullPath = GetFullPath(Path.Combine(parentDirectoryPath, name));
+		_logger.LogDebug("CreateDirectory(parentDirectoryPath={ParentDirectoryPath},name={Name}): fullPath → {FullPath}", parentDirectoryPath, name, fullPath);
 
          var newDirectory = new DirectoryInfo(fullPath);
+		_logger.LogDebug("CreateDirectory(parentDirectoryPath={ParentDirectoryPath},name={Name}): newDirectory → {NewDirectory}", parentDirectoryPath, name, newDirectory);
          if (!newDirectory.Exists)
              newDirectory.Create();
+			_logger.LogDebug("<<< Exiting CreateDirectory(parentDirectoryPath={ParentDirectoryPath},name={Name})", parentDirectoryPath, name);
      }
 
      /// <summary>
@@ -587,14 +683,18 @@ using SkiaSharp;
      /// <param name="path">Path to the directory</param>
      public virtual void DeleteDirectory(string path)
      {
+		_logger.LogDebug(">>> Entering DeleteDirectory(path={Path})", path);
          var sourceDirInfo = new DirectoryInfo(GetFullPath(path));
          if (!sourceDirInfo.Exists)
+			_logger.LogWarning("Throwing RoxyFilemanException from DeleteDirectory(path={Path})", path);
+			_logger.LogDebug("DeleteDirectory(path={Path}): sourceDirInfo → {SourceDirInfo}", path, sourceDirInfo);
              throw new RoxyFilemanException("E_DeleteDirInvalidPath");
 
          if (string.Equals(sourceDirInfo.FullName, Root, StringComparison.InvariantCultureIgnoreCase))
              throw new RoxyFilemanException("E_CannotDeleteRoot");
 
          if (sourceDirInfo.GetFiles().Length > 0 || sourceDirInfo.GetDirectories().Length > 0)
+			_logger.LogDebug("<<< Exiting DeleteDirectory(path={Path})", path);
              throw new RoxyFilemanException("E_DeleteNonEmpty");
 
          try
@@ -603,6 +703,7 @@ using SkiaSharp;
          }
          catch
          {
+			_logger.LogError("Exception in DeleteDirectory(path={Path}): {Arg1}", path, ex.Message);
              throw new RoxyFilemanException("E_CannotDeleteDir");
          }
      }
@@ -617,14 +718,19 @@ using SkiaSharp;
      /// <returns>A task that represents the asynchronous operation</returns>
      public virtual async Task SaveFileAsync(string directoryPath, string fileName, string contentType, Stream fileStream)
      {
+		_logger.LogDebug(">>> Entering SaveFileAsync(directoryPath={DirectoryPath},fileName={FileName},contentType={ContentType},fileStream={FileStream})", directoryPath, fileName, contentType, fileStream);
          var uniqueFileName = GetUniqueFileName(directoryPath, Path.GetFileName(fileName));
          var destinationFile = Path.Combine(directoryPath, uniqueFileName);
+		_logger.LogDebug("SaveFileAsync(directoryPath={DirectoryPath},fileName={FileName},contentType={ContentType},fileStream={FileStream}): destinationFile → {DestinationFile}", directoryPath, fileName, contentType, fileStream, destinationFile);
+		_logger.LogDebug("SaveFileAsync(directoryPath={DirectoryPath},fileName={FileName},contentType={ContentType},fileStream={FileStream}): uniqueFileName → {UniqueFileName}", directoryPath, fileName, contentType, fileStream, uniqueFileName);
 
          await using var stream = new FileStream(GetFullPath(destinationFile), FileMode.Create);
+		_logger.LogDebug("SaveFileAsync(directoryPath={DirectoryPath},fileName={FileName},contentType={ContentType},fileStream={FileStream}): stream → {Stream}", directoryPath, fileName, contentType, fileStream, stream);
 
          if (GetFileType(Path.GetExtension(uniqueFileName)) == "image")
          {
              using var memoryStream = new MemoryStream();
+			_logger.LogDebug("SaveFileAsync(directoryPath={DirectoryPath},fileName={FileName},contentType={ContentType},fileStream={FileStream}): memoryStream → {MemoryStream}", directoryPath, fileName, contentType, fileStream, memoryStream);
              await fileStream.CopyToAsync(memoryStream);
 
              var roxyConfig = Singleton<RoxyFilemanConfig>.Instance;
@@ -642,6 +748,7 @@ using SkiaSharp;
          }
 
          await stream.FlushAsync();
+		_logger.LogDebug("<<< Exiting SaveFileAsync(directoryPath={DirectoryPath},fileName={FileName},contentType={ContentType},fileStream={FileStream})", directoryPath, fileName, contentType, fileStream);
      }
 
      /// <summary>
@@ -652,18 +759,24 @@ using SkiaSharp;
      /// <returns>Byte array of the specified image</returns>
      public virtual byte[] CreateImageThumbnail(string sourcePath, string contentType)
      {
+		_logger.LogDebug(">>> Entering CreateImageThumbnail(sourcePath={SourcePath},contentType={ContentType})", sourcePath, contentType);
          var imageInfo = GetFileInfo(sourcePath);
 
+		_logger.LogDebug("CreateImageThumbnail(sourcePath={SourcePath},contentType={ContentType}): imageInfo → {ImageInfo}", sourcePath, contentType, imageInfo);
          if (!imageInfo.Exists)
+			_logger.LogWarning("Throwing RoxyFilemanException from CreateImageThumbnail(sourcePath={SourcePath},contentType={ContentType})", sourcePath, contentType);
              throw new RoxyFilemanException("Image not found");
 
          var roxyConfig = Singleton<RoxyFilemanConfig>.Instance;
 
          using var imageStream = imageInfo.CreateReadStream();
+		_logger.LogDebug("CreateImageThumbnail(sourcePath={SourcePath},contentType={ContentType}): imageStream → {ImageStream}", sourcePath, contentType, imageStream);
          using var ms = new MemoryStream();
+		_logger.LogDebug("CreateImageThumbnail(sourcePath={SourcePath},contentType={ContentType}): ms → {Ms}", sourcePath, contentType, ms);
 
          imageStream.CopyTo(ms);
 
+		_logger.LogDebug("<<< Exiting CreateImageThumbnail(sourcePath={SourcePath},contentType={ContentType})", sourcePath, contentType);
          return ResizeImage(
              ms.ToArray(),
              GetImageFormatByMimeType(contentType),
@@ -678,11 +791,16 @@ using SkiaSharp;
      /// <returns>The byte array</returns>
      public virtual byte[] CreateZipArchiveFromDirectory(string directoryPath)
      {
+		_logger.LogDebug(">>> Entering CreateZipArchiveFromDirectory(directoryPath={DirectoryPath})", directoryPath);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
          var sourceDirInfo = new DirectoryInfo(GetFullPath(directoryPath));
          if (!sourceDirInfo.Exists)
+			_logger.LogWarning("Throwing RoxyFilemanException from CreateZipArchiveFromDirectory(directoryPath={DirectoryPath})", directoryPath);
+			_logger.LogDebug("CreateZipArchiveFromDirectory(directoryPath={DirectoryPath}): sourceDirInfo → {SourceDirInfo}", directoryPath, sourceDirInfo);
              throw new RoxyFilemanException("E_CreateArchive");
 
          using var memoryStream = new MemoryStream();
+		_logger.LogDebug("CreateZipArchiveFromDirectory(directoryPath={DirectoryPath}): memoryStream → {MemoryStream}", directoryPath, memoryStream);
          using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
          {
              foreach (var file in sourceDirInfo.EnumerateFiles("*", SearchOption.AllDirectories))
@@ -692,11 +810,15 @@ using SkiaSharp;
 
                  using var fileStream = file.OpenRead();
                  using var fileStreamInZip = archive.CreateEntry(fileRelativePath).Open();
+				using Microsoft.Extensions.Logging;
                  fileStream.CopyTo(fileStreamInZip);
              }
+			private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
          }
 
          //ToArray() should be outside of the archive using
+		_logger.LogInformation("CreateZipArchiveFromDirectory(directoryPath)={DirectoryPath}: external service call took {Arg1} ms", directoryPath, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting CreateZipArchiveFromDirectory(directoryPath={DirectoryPath})", directoryPath);
          return memoryStream.ToArray();
      }
 

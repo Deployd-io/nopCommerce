@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -10,11 +11,15 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record ReturnRequestSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ReturnRequestSearchModel()
     {
+		_logger.LogDebug(">>> Entering ReturnRequestSearchModel()");
         ReturnRequestStatusList = new List<SelectListItem>();
+		_logger.LogDebug("ReturnRequestSearchModel(): ReturnRequestStatusList → {ReturnRequestStatusList}", ReturnRequestStatusList);
+		_logger.LogDebug("<<< Exiting ReturnRequestSearchModel()");
     }
 
     #endregion

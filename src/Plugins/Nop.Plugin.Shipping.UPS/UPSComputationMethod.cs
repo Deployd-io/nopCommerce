@@ -30,10 +30,16 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
         IWebHelper webHelper,
         UPSService upsService)
     {
+		logger.LogDebug(">>> Entering UPSComputationMethod(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper},upsService={UpsService})", localizationService, settingService, webHelper, upsService);
         _localizationService = localizationService;
         _settingService = settingService;
+		logger.LogDebug("UPSComputationMethod(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper},upsService={UpsService}): _settingService → {_settingService}", localizationService, settingService, webHelper, upsService, _settingService);
+		logger.LogDebug("UPSComputationMethod(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper},upsService={UpsService}): _localizationService → {_localizationService}", localizationService, settingService, webHelper, upsService, _localizationService);
         _webHelper = webHelper;
+		logger.LogDebug("UPSComputationMethod(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper},upsService={UpsService}): _webHelper → {_webHelper}", localizationService, settingService, webHelper, upsService, _webHelper);
         _upsService = upsService;
+		logger.LogDebug("UPSComputationMethod(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper},upsService={UpsService}): _upsService → {_upsService}", localizationService, settingService, webHelper, upsService, _upsService);
+		logger.LogDebug("<<< Exiting UPSComputationMethod(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper},upsService={UpsService})", localizationService, settingService, webHelper, upsService);
     }
 
     #endregion
@@ -50,12 +56,14 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
     /// </returns>
     public async Task<GetShippingOptionResponse> GetShippingOptionsAsync(GetShippingOptionRequest getShippingOptionRequest)
     {
+		logger.LogDebug(">>> Entering GetShippingOptionsAsync(getShippingOptionRequest=<redacted>)");
         ArgumentNullException.ThrowIfNull(getShippingOptionRequest);
 
         if (!getShippingOptionRequest.Items?.Any() ?? true)
             return new GetShippingOptionResponse { Errors = new[] { "No shipment items" } };
 
         if (getShippingOptionRequest.ShippingAddress?.CountryId == null)
+		logger.LogDebug("<<< Exiting GetShippingOptionsAsync(getShippingOptionRequest=<redacted>)");
             return new GetShippingOptionResponse { Errors = new[] { "Shipping address is not set" } };
 
         return await _upsService.GetRatesAsync(getShippingOptionRequest);
@@ -71,6 +79,8 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
     /// </returns>
     public Task<decimal?> GetFixedRateAsync(GetShippingOptionRequest getShippingOptionRequest)
     {
+		logger.LogDebug(">>> Entering GetFixedRateAsync(getShippingOptionRequest=<redacted>)");
+		logger.LogDebug("<<< Exiting GetFixedRateAsync(getShippingOptionRequest=<redacted>)");
         return Task.FromResult<decimal?>(null);
     }
 
@@ -83,6 +93,8 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
+		logger.LogDebug("<<< Exiting GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(new UPSShipmentTracker(_upsService));
     }
 
@@ -91,6 +103,8 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/UPSShipping/Configure";
     }
 
@@ -100,6 +114,7 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new UPSSettings
         {
@@ -166,6 +181,7 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
         });
 
         await base.InstallAsync();
+		logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -174,6 +190,7 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<UPSSettings>();
 
@@ -182,6 +199,7 @@ public class UPSComputationMethod : BasePlugin, IShippingRateComputationMethod
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Shipping.UPS");
 
         await base.UninstallAsync();
+		logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion
