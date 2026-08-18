@@ -3,6 +3,7 @@ using Nop.Services.Directory;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class MeasureModelFactory : IMeasureModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IMeasureService _measureService;
@@ -23,8 +25,12 @@ public partial class MeasureModelFactory : IMeasureModelFactory
     public MeasureModelFactory(IMeasureService measureService,
         MeasureSettings measureSettings)
     {
+		_logger.LogDebug(">>> Entering MeasureModelFactory(measureService={MeasureService},measureSettings={MeasureSettings})", measureService, measureSettings);
         _measureService = measureService;
         _measureSettings = measureSettings;
+		_logger.LogDebug("MeasureModelFactory(measureService={MeasureService},measureSettings={MeasureSettings}): _measureService → {_measureService}", measureService, measureSettings, _measureService);
+		_logger.LogDebug("MeasureModelFactory(measureService={MeasureService},measureSettings={MeasureSettings}): _measureSettings → {_measureSettings}", measureService, measureSettings, _measureSettings);
+		_logger.LogDebug("<<< Exiting MeasureModelFactory(measureService={MeasureService},measureSettings={MeasureSettings})", measureService, measureSettings);
     }
 
     #endregion
@@ -38,11 +44,13 @@ public partial class MeasureModelFactory : IMeasureModelFactory
     /// <returns>Measure dimension search model</returns>
     protected virtual MeasureDimensionSearchModel PrepareMeasureDimensionSearchModel(MeasureDimensionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMeasureDimensionSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMeasureDimensionSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -53,11 +61,13 @@ public partial class MeasureModelFactory : IMeasureModelFactory
     /// <returns>Measure weight search model</returns>
     protected virtual MeasureWeightSearchModel PrepareMeasureWeightSearchModel(MeasureWeightSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMeasureWeightSearchModel(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareMeasureWeightSearchModel(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -75,12 +85,14 @@ public partial class MeasureModelFactory : IMeasureModelFactory
     /// </returns>
     public virtual Task<MeasureSearchModel> PrepareMeasureSearchModelAsync(MeasureSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMeasureSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare nested search models
         PrepareMeasureDimensionSearchModel(searchModel.MeasureDimensionSearchModel);
         PrepareMeasureWeightSearchModel(searchModel.MeasureWeightSearchModel);
 
+		_logger.LogDebug("<<< Exiting PrepareMeasureSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -94,10 +106,12 @@ public partial class MeasureModelFactory : IMeasureModelFactory
     /// </returns>
     public virtual async Task<MeasureDimensionListModel> PrepareMeasureDimensionListModelAsync(MeasureDimensionSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMeasureDimensionListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get dimensions
         var dimensions = (await _measureService.GetAllMeasureDimensionsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareMeasureDimensionListModelAsync(searchModel={SearchModel}): dimensions → {Dimensions}", searchModel, dimensions);
 
         //prepare list model
         var model = new MeasureDimensionListModel().PrepareToGrid(searchModel, dimensions, () =>
@@ -106,6 +120,7 @@ public partial class MeasureModelFactory : IMeasureModelFactory
             {
                 //fill in model values from the entity
                 var dimensionModel = dimension.ToModel<MeasureDimensionModel>();
+				_logger.LogDebug("PrepareMeasureDimensionListModelAsync(searchModel={SearchModel}): dimensionModel → {DimensionModel}", searchModel, dimensionModel);
 
                 //fill in additional values (not existing in the entity)
                 dimensionModel.IsPrimaryDimension = dimension.Id == _measureSettings.BaseDimensionId;
@@ -114,6 +129,7 @@ public partial class MeasureModelFactory : IMeasureModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareMeasureDimensionListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -127,10 +143,12 @@ public partial class MeasureModelFactory : IMeasureModelFactory
     /// </returns>
     public virtual async Task<MeasureWeightListModel> PrepareMeasureWeightListModelAsync(MeasureWeightSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareMeasureWeightListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get weights
         var weights = (await _measureService.GetAllMeasureWeightsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareMeasureWeightListModelAsync(searchModel={SearchModel}): weights → {Weights}", searchModel, weights);
 
         //prepare list model
         var model = new MeasureWeightListModel().PrepareToGrid(searchModel, weights, () =>
@@ -139,6 +157,7 @@ public partial class MeasureModelFactory : IMeasureModelFactory
             {
                 //fill in model values from the entity
                 var weightModel = weight.ToModel<MeasureWeightModel>();
+				_logger.LogDebug("PrepareMeasureWeightListModelAsync(searchModel={SearchModel}): weightModel → {WeightModel}", searchModel, weightModel);
 
                 //fill in additional values (not existing in the entity)
                 weightModel.IsPrimaryWeight = weight.Id == _measureSettings.BaseWeightId;
@@ -147,6 +166,7 @@ public partial class MeasureModelFactory : IMeasureModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareMeasureWeightListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

@@ -23,8 +23,12 @@ public partial class WarehouseService : IWarehouseService
     public WarehouseService(IAddressService addressService,
         IRepository<Warehouse> warehouseRepository)
     {
+		_logger.LogDebug(">>> Entering WarehouseService(addressService={AddressService},warehouseRepository={WarehouseRepository})", addressService, warehouseRepository);
         _addressService = addressService;
         _warehouseRepository = warehouseRepository;
+		_logger.LogDebug("WarehouseService(addressService={AddressService},warehouseRepository={WarehouseRepository}): _warehouseRepository → {_warehouseRepository}", addressService, warehouseRepository, _warehouseRepository);
+		_logger.LogDebug("WarehouseService(addressService={AddressService},warehouseRepository={WarehouseRepository}): _addressService → {_addressService}", addressService, warehouseRepository, _addressService);
+		_logger.LogDebug("<<< Exiting WarehouseService(addressService={AddressService},warehouseRepository={WarehouseRepository})", addressService, warehouseRepository);
     }
 
     #endregion
@@ -38,7 +42,10 @@ public partial class WarehouseService : IWarehouseService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteWarehouseAsync(Warehouse warehouse)
     {
+		_logger.LogDebug(">>> Entering DeleteWarehouseAsync(warehouse={Warehouse})", warehouse);
+		_logger.LogInformation("DeleteWarehouseAsync(warehouse)={Warehouse}: external service call took {Arg1} ms", warehouse, __logStart.ElapsedMilliseconds);
         await _warehouseRepository.DeleteAsync(warehouse);
+		_logger.LogDebug("<<< Exiting DeleteWarehouseAsync(warehouse={Warehouse})", warehouse);
     }
 
     /// <summary>
@@ -51,6 +58,8 @@ public partial class WarehouseService : IWarehouseService
     /// </returns>
     public virtual async Task<Warehouse> GetWarehouseByIdAsync(int warehouseId)
     {
+		_logger.LogDebug(">>> Entering GetWarehouseByIdAsync(warehouseId={WarehouseId})", warehouseId);
+		_logger.LogDebug("<<< Exiting GetWarehouseByIdAsync(warehouseId={WarehouseId})", warehouseId);
         return await _warehouseRepository.GetByIdAsync(warehouseId, _ => default);
     }
 
@@ -64,14 +73,20 @@ public partial class WarehouseService : IWarehouseService
     /// </returns>
     public virtual async Task<IList<Warehouse>> GetAllWarehousesAsync(string name = null)
     {
+		_logger.LogDebug(">>> Entering GetAllWarehousesAsync(name={Name})", name);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var warehouses = await _warehouseRepository.GetAllAsync(query =>
             from wh in query
+			using Microsoft.Extensions.Logging;
             orderby wh.Name
             select wh, _ => default);
+			_logger.LogDebug("GetAllWarehousesAsync(name={Name}): warehouses → {Warehouses}", name, warehouses);
+			_logger.LogInformation("GetAllWarehousesAsync(name)={Name}: find query executed in {Arg1} ms", name, __logStart.ElapsedMilliseconds);
 
         if (!string.IsNullOrEmpty(name))
             warehouses = warehouses.Where(wh => wh.Name.Contains(name)).ToList();
 
+		_logger.LogDebug("<<< Exiting GetAllWarehousesAsync(name={Name})", name);
         return warehouses;
     }
 
@@ -82,7 +97,10 @@ public partial class WarehouseService : IWarehouseService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertWarehouseAsync(Warehouse warehouse)
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         await _warehouseRepository.InsertAsync(warehouse);
+		_logger.LogDebug(">>> Entering InsertWarehouseAsync(warehouse={Warehouse})", warehouse);
+		_logger.LogDebug("<<< Exiting InsertWarehouseAsync(warehouse={Warehouse})", warehouse);
     }
 
     /// <summary>
@@ -92,7 +110,9 @@ public partial class WarehouseService : IWarehouseService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateWarehouseAsync(Warehouse warehouse)
     {
+		_logger.LogDebug(">>> Entering UpdateWarehouseAsync(warehouse={Warehouse})", warehouse);
         await _warehouseRepository.UpdateAsync(warehouse);
+		_logger.LogDebug("<<< Exiting UpdateWarehouseAsync(warehouse={Warehouse})", warehouse);
     }
 
     /// <summary>
@@ -106,6 +126,7 @@ public partial class WarehouseService : IWarehouseService
     /// </returns>
     public virtual async Task<Warehouse> GetNearestWarehouseAsync(Address address, IList<Warehouse> warehouses = null)
     {
+		_logger.LogDebug(">>> Entering GetNearestWarehouseAsync(address={Address},warehouses={Warehouses})", address, warehouses);
         warehouses ??= await GetAllWarehousesAsync();
 
         //no address specified. return any
@@ -118,9 +139,11 @@ public partial class WarehouseService : IWarehouseService
 
         //find by country
         var matchedByCountry = new List<Warehouse>();
+		_logger.LogDebug("GetNearestWarehouseAsync(address={Address},warehouses={Warehouses}): matchedByCountry → {MatchedByCountry}", address, warehouses, matchedByCountry);
         foreach (var warehouse in warehouses)
         {
             var warehouseAddress = await _addressService.GetAddressByIdAsync(warehouse.AddressId);
+			_logger.LogDebug("GetNearestWarehouseAsync(address={Address},warehouses={Warehouses}): warehouseAddress → {WarehouseAddress}", address, warehouses, warehouseAddress);
             if (warehouseAddress == null)
                 continue;
 
@@ -133,6 +156,7 @@ public partial class WarehouseService : IWarehouseService
 
         //find by state
         var matchedByState = new List<Warehouse>();
+		_logger.LogDebug("GetNearestWarehouseAsync(address={Address},warehouses={Warehouses}): matchedByState → {MatchedByState}", address, warehouses, matchedByState);
         foreach (var warehouse in matchedByCountry)
         {
             var warehouseAddress = await _addressService.GetAddressByIdAsync(warehouse.AddressId);
@@ -144,6 +168,7 @@ public partial class WarehouseService : IWarehouseService
         }
 
         if (matchedByState.Any())
+		_logger.LogDebug("<<< Exiting GetNearestWarehouseAsync(address={Address},warehouses={Warehouses})", address, warehouses);
             return matchedByState.FirstOrDefault();
 
         //no state matches. return any

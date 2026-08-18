@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
@@ -7,6 +8,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record ProductSpecificationAttributeGroupModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -25,7 +27,10 @@ public partial record ProductSpecificationAttributeGroupModel : BaseNopEntityMod
 
     public ProductSpecificationAttributeGroupModel()
     {
+		_logger.LogDebug(">>> Entering ProductSpecificationAttributeGroupModel()");
         Attributes = new List<ProductSpecificationAttributeModel>();
+		_logger.LogDebug("ProductSpecificationAttributeGroupModel(): Attributes → {Attributes}", Attributes);
+		_logger.LogDebug("<<< Exiting ProductSpecificationAttributeGroupModel()");
     }
 
     #endregion

@@ -3,6 +3,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.WebApi.Frontend.Controllers;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Misc.WebApi.Frontend.Controllers;
 [Area(AreaNames.ADMIN)]
 public class WebApiFrontendController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPermissionService _permissionService;
@@ -21,7 +23,10 @@ public class WebApiFrontendController : BasePluginController
 
     public WebApiFrontendController(IPermissionService permissionService)
     {
+		_logger.LogDebug(">>> Entering WebApiFrontendController(permissionService={PermissionService})", permissionService);
         _permissionService = permissionService;
+		_logger.LogDebug("WebApiFrontendController(permissionService={PermissionService}): _permissionService → {_permissionService}", permissionService, _permissionService);
+		_logger.LogDebug("<<< Exiting WebApiFrontendController(permissionService={PermissionService})", permissionService);
     }
 
     #endregion
@@ -31,6 +36,8 @@ public class WebApiFrontendController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public virtual IActionResult Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Misc.WebApi.Frontend/Views/Configure.cshtml");
     }
 

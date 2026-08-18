@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Domain.Customers;
 
 namespace Nop.Services.Authentication.External;
@@ -7,6 +8,7 @@ namespace Nop.Services.Authentication.External;
 /// </summary>
 public partial class CustomerAutoRegisteredByExternalMethodEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -14,8 +16,12 @@ public partial class CustomerAutoRegisteredByExternalMethodEvent
     /// <param name="parameters">Parameters</param>
     public CustomerAutoRegisteredByExternalMethodEvent(Customer customer, ExternalAuthenticationParameters parameters)
     {
+		_logger.LogDebug(">>> Entering CustomerAutoRegisteredByExternalMethodEvent(customer={Customer},parameters={Parameters})", customer, parameters);
         Customer = customer;
         AuthenticationParameters = parameters;
+		_logger.LogDebug("CustomerAutoRegisteredByExternalMethodEvent(customer={Customer},parameters={Parameters}): Customer → {Customer1}", customer, parameters, Customer);
+		_logger.LogDebug("CustomerAutoRegisteredByExternalMethodEvent(customer={Customer},parameters={Parameters}): AuthenticationParameters → {AuthenticationParameters}", customer, parameters, AuthenticationParameters);
+		_logger.LogDebug("<<< Exiting CustomerAutoRegisteredByExternalMethodEvent(customer={Customer},parameters={Parameters})", customer, parameters);
     }
 
     /// <summary>

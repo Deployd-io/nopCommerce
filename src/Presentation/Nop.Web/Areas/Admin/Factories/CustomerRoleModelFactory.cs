@@ -8,6 +8,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -16,6 +17,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -34,11 +36,18 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
         IUrlRecordService urlRecordService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext})", baseAdminModelFactory, customerService, productService, urlRecordService, workContext);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, customerService, productService, urlRecordService, workContext, _baseAdminModelFactory);
         _customerService = customerService;
+		_logger.LogDebug("CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext}): _customerService → {_customerService}", baseAdminModelFactory, customerService, productService, urlRecordService, workContext, _customerService);
         _productService = productService;
+		_logger.LogDebug("CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext}): _productService → {_productService}", baseAdminModelFactory, customerService, productService, urlRecordService, workContext, _productService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext}): _urlRecordService → {_urlRecordService}", baseAdminModelFactory, customerService, productService, urlRecordService, workContext, _urlRecordService);
         _workContext = workContext;
+		_logger.LogDebug("CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext}): _workContext → {_workContext}", baseAdminModelFactory, customerService, productService, urlRecordService, workContext, _workContext);
+		_logger.LogDebug("<<< Exiting CustomerRoleModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerService={CustomerService},productService={ProductService},urlRecordService={UrlRecordService},workContext={WorkContext})", baseAdminModelFactory, customerService, productService, urlRecordService, workContext);
     }
 
     #endregion
@@ -55,11 +64,13 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual Task<CustomerRoleSearchModel> PrepareCustomerRoleSearchModelAsync(CustomerRoleSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRoleSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRoleSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -73,10 +84,12 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleListModel> PrepareCustomerRoleListModelAsync(CustomerRoleSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRoleListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customer roles
         var customerRoles = (await _customerService.GetAllCustomerRolesAsync(true)).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareCustomerRoleListModelAsync(searchModel={SearchModel}): customerRoles → {CustomerRoles}", searchModel, customerRoles);
 
         //prepare grid model
         var model = await new CustomerRoleListModel().PrepareToGridAsync(searchModel, customerRoles, () =>
@@ -85,6 +98,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             {
                 //fill in model values from the entity
                 var customerRoleModel = role.ToModel<CustomerRoleModel>();
+				_logger.LogDebug("PrepareCustomerRoleListModelAsync(searchModel={SearchModel}): customerRoleModel → {CustomerRoleModel}", searchModel, customerRoleModel);
 
                 //fill in additional values (not existing in the entity)
                 customerRoleModel.PurchasedWithProductName = (await _productService.GetProductByIdAsync(role.PurchasedWithProductId))?.Name;
@@ -93,6 +107,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRoleListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -108,6 +123,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleModel> PrepareCustomerRoleModelAsync(CustomerRoleModel model, CustomerRole customerRole, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRoleModelAsync(model={Model},customerRole={CustomerRole},excludeProperties={ExcludeProperties})", model, customerRole, excludeProperties);
         if (customerRole != null)
         {
             //fill in model values from the entity
@@ -118,10 +134,12 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
         //set default values for the new model
         if (customerRole == null)
             model.Active = true;
+			_logger.LogDebug("PrepareCustomerRoleModelAsync(model={Model},customerRole={CustomerRole},excludeProperties={ExcludeProperties}): model.Active → {Arg3}", model, customerRole, excludeProperties, model.Active);
 
         //prepare available tax display types
         await _baseAdminModelFactory.PrepareTaxDisplayTypesAsync(model.TaxDisplayTypeValues, false);
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRoleModelAsync(model={Model},customerRole={CustomerRole},excludeProperties={ExcludeProperties})", model, customerRole, excludeProperties);
         return model;
     }
 
@@ -135,6 +153,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleProductSearchModel> PrepareCustomerRoleProductSearchModelAsync(CustomerRoleProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRoleProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
@@ -158,6 +177,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRoleProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -171,12 +191,15 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
     /// </returns>
     public virtual async Task<CustomerRoleProductListModel> PrepareCustomerRoleProductListModelAsync(CustomerRoleProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //a vendor should have access only to his products
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogDebug("PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null)
             searchModel.SearchVendorId = currentVendor.Id;
+			_logger.LogDebug("PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
 
         //get products
         var products = await _productService.SearchProductsAsync(showHidden: true,
@@ -194,6 +217,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             return products.SelectAwait(async product =>
             {
                 var productModel = product.ToModel<ProductModel>();
+				_logger.LogDebug("PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
 
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
@@ -201,6 +225,7 @@ public partial class CustomerRoleModelFactory : ICustomerRoleModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerRoleProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

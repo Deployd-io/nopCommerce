@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Nop.Plugin.Widgets.FacebookPixel.Services;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Components;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Components;
 /// </summary>
 public class FacebookPixelViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FacebookPixelService _facebookPixelService;
@@ -22,7 +24,10 @@ public class FacebookPixelViewComponent : NopViewComponent
 
     public FacebookPixelViewComponent(FacebookPixelService facebookPixelService)
     {
+		_logger.LogDebug(">>> Entering FacebookPixelViewComponent(facebookPixelService={FacebookPixelService})", facebookPixelService);
         _facebookPixelService = facebookPixelService;
+		_logger.LogDebug("FacebookPixelViewComponent(facebookPixelService={FacebookPixelService}): _facebookPixelService → {_facebookPixelService}", facebookPixelService, _facebookPixelService);
+		_logger.LogDebug("<<< Exiting FacebookPixelViewComponent(facebookPixelService={FacebookPixelService})", facebookPixelService);
     }
 
     #endregion
@@ -40,10 +45,12 @@ public class FacebookPixelViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var script = widgetZone != PublicWidgetZones.HeadHtmlTag
             ? await _facebookPixelService.PrepareCustomEventsScriptAsync(widgetZone)
             : await _facebookPixelService.PrepareScriptAsync();
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return new HtmlContentViewComponentResult(new HtmlString(script ?? string.Empty));
     }
 

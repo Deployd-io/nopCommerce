@@ -1,13 +1,19 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Order;
 
 public partial record ShipmentDetailsModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ShipmentDetailsModel()
     {
+		_logger.LogDebug(">>> Entering ShipmentDetailsModel()");
         ShipmentStatusEvents = new List<ShipmentStatusEventModel>();
         Items = new List<ShipmentItemModel>();
+		_logger.LogDebug("ShipmentDetailsModel(): Items → {Items}", Items);
+		_logger.LogDebug("ShipmentDetailsModel(): ShipmentStatusEvents → {ShipmentStatusEvents}", ShipmentStatusEvents);
+		_logger.LogDebug("<<< Exiting ShipmentDetailsModel()");
     }
 
     public string TrackingNumber { get; set; }

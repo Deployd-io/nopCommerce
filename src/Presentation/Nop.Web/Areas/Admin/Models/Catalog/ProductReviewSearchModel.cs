@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -10,12 +11,17 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductReviewSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductReviewSearchModel()
     {
+		_logger.LogDebug(">>> Entering ProductReviewSearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableApprovedOptions = new List<SelectListItem>();
+		_logger.LogDebug("ProductReviewSearchModel(): AvailableApprovedOptions → {AvailableApprovedOptions}", AvailableApprovedOptions);
+		_logger.LogDebug("ProductReviewSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("<<< Exiting ProductReviewSearchModel()");
     }
 
     #endregion

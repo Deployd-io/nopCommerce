@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Nop.Core.Http.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Controllers;
 
@@ -19,15 +20,21 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
     /// </summary>
     /// <param name="submitButtonNames">Submit button names</param>
     public FormValueRequiredAttribute(params string[] submitButtonNames) :
+		_logger.LogDebug(">>> Entering FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
+		_logger.LogDebug("<<< Exiting FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
         this(FormValueRequirement.Equal, submitButtonNames)
     {
+	_logger.LogDebug(">>> Entering FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
     }
+	_logger.LogDebug("<<< Exiting FormValueRequiredAttribute(submitButtonNames={SubmitButtonNames})", submitButtonNames);
     /// <summary>
     /// Ctor
     /// </summary>
     /// <param name="requirement">Requirement</param>
     /// <param name="submitButtonNames">Submit button names</param>
     public FormValueRequiredAttribute(FormValueRequirement requirement, params string[] submitButtonNames) :
+		_logger.LogDebug(">>> Entering FormValueRequiredAttribute(requirement={Requirement},submitButtonNames={SubmitButtonNames})", requirement, submitButtonNames);
+		_logger.LogDebug("<<< Exiting FormValueRequiredAttribute(requirement={Requirement},submitButtonNames={SubmitButtonNames})", requirement, submitButtonNames);
         this(requirement, true, submitButtonNames)
     {
     }
@@ -41,8 +48,11 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
     {
         //at least one submit button should be found
         _submitButtonNames = submitButtonNames;
+		_logger.LogDebug("FormValueRequiredAttribute(requirement={Requirement},validateNameOnly={ValidateNameOnly},submitButtonNames={SubmitButtonNames}): _submitButtonNames → {_submitButtonNames}", requirement, validateNameOnly, submitButtonNames, _submitButtonNames);
         _validateNameOnly = validateNameOnly;
+		_logger.LogDebug("FormValueRequiredAttribute(requirement={Requirement},validateNameOnly={ValidateNameOnly},submitButtonNames={SubmitButtonNames}): _validateNameOnly → {_validateNameOnly}", requirement, validateNameOnly, submitButtonNames, _validateNameOnly);
         _requirement = requirement;
+		_logger.LogDebug("FormValueRequiredAttribute(requirement={Requirement},validateNameOnly={ValidateNameOnly},submitButtonNames={SubmitButtonNames}): _requirement → {_requirement}", requirement, validateNameOnly, submitButtonNames, _requirement);
     }
 
 
@@ -54,10 +64,12 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
     /// <returns>Result</returns>
     public override bool IsValidForRequest(RouteContext routeContext, ActionDescriptor action)
     {
+		_logger.LogDebug(">>> Entering IsValidForRequest(routeContext={RouteContext},action={Action})", routeContext, action);
         if (!routeContext.HttpContext.Request.IsPostRequest())
             return false;
 
         var form = routeContext.HttpContext.Request.ReadFormAsync().Result;
+		_logger.LogDebug("IsValidForRequest(routeContext={RouteContext},action={Action}): form → {Form}", routeContext, action, form);
 
         foreach (var buttonName in _submitButtonNames)
         {
@@ -108,9 +120,11 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
             }
             catch
             {
+				_logger.LogError("Exception in IsValidForRequest(routeContext={RouteContext},action={Action}): {Arg2}", routeContext, action, ex.Message);
                 //try-catch to ensure that no exception is throw
             }
         }
+		_logger.LogDebug("<<< Exiting IsValidForRequest(routeContext={RouteContext},action={Action})", routeContext, action);
         return false;
     }
 }
@@ -120,6 +134,7 @@ public sealed class FormValueRequiredAttribute : ActionMethodSelectorAttribute
 /// </summary>
 public enum FormValueRequirement
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Equal
     /// </summary>

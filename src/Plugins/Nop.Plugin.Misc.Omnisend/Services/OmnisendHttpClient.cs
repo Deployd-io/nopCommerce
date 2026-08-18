@@ -39,10 +39,17 @@ public class OmnisendHttpClient
         httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, MimeTypes.ApplicationJson);
 
         _httpClient = httpClient;
+		_logger.LogDebug("OmnisendHttpClient(httpClient={HttpClient},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},omnisendSettings={OmnisendSettings}): _httpClient → {_httpClient}", httpClient, localizationService, logger, workContext, omnisendSettings, _httpClient);
         _localizationService = localizationService;
+		_logger.LogDebug("OmnisendHttpClient(httpClient={HttpClient},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},omnisendSettings={OmnisendSettings}): _localizationService → {_localizationService}", httpClient, localizationService, logger, workContext, omnisendSettings, _localizationService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering OmnisendHttpClient(httpClient={HttpClient},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},omnisendSettings={OmnisendSettings})", httpClient, localizationService, logger, workContext, omnisendSettings);
         _workContext = workContext;
         _omnisendSettings = omnisendSettings;
+		_logger.LogDebug("OmnisendHttpClient(httpClient={HttpClient},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},omnisendSettings={OmnisendSettings}): _omnisendSettings → {_omnisendSettings}", httpClient, localizationService, logger, workContext, omnisendSettings, _omnisendSettings);
+		_logger.LogDebug("OmnisendHttpClient(httpClient={HttpClient},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},omnisendSettings={OmnisendSettings}): _workContext → {_workContext}", httpClient, localizationService, logger, workContext, omnisendSettings, _workContext);
+		_logger.LogInformation("OmnisendHttpClient(httpClient,localizationService,logger,workContext,omnisendSettings)={HttpClient},{LocalizationService},{Logger},{WorkContext},{OmnisendSettings}: external service call took {Arg5} ms", httpClient, localizationService, logger, workContext, omnisendSettings, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting OmnisendHttpClient(httpClient={HttpClient},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},omnisendSettings={OmnisendSettings})", httpClient, localizationService, logger, workContext, omnisendSettings);
     }
 
     #endregion
@@ -58,8 +65,11 @@ public class OmnisendHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     private async Task<string> RequestAsync(string apiUri, string data = null, HttpMethod httpMethod = null)
     {
+		_logger.LogDebug(">>> Entering RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //specifies whether to skip BrandId parameter validation
         var skipBrandIdCheck = apiUri.Equals(OmnisendDefaults.AccountsApiUrl);
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): skipBrandIdCheck → {SkipBrandIdCheck}", apiUri, data, httpMethod, skipBrandIdCheck);
 
         if (string.IsNullOrEmpty(_omnisendSettings.BrandId) && !skipBrandIdCheck)
         {
@@ -73,10 +83,12 @@ public class OmnisendHttpClient
             httpMethod = HttpMethod.Get;
 
         var requestUri = new Uri(apiUri);
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): requestUri → {RequestUri}", apiUri, data, httpMethod, requestUri);
 
         if (_omnisendSettings.LogRequests)
         {
             var logMessage = $"{httpMethod.Method.ToUpper()} {requestUri.PathAndQuery}{Environment.NewLine}";
+			_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): logMessage → {LogMessage}", apiUri, data, httpMethod, logMessage);
             logMessage += $"Host: {requestUri.Host}{Environment.NewLine}";
             if (httpMethod != HttpMethod.Get)
             {
@@ -99,8 +111,11 @@ public class OmnisendHttpClient
             request.Content = new StringContent(data, Encoding.UTF8, MimeTypes.ApplicationJson);
 
         var httpResponse = await _httpClient.SendAsync(request);
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): httpResponse → {HttpResponse}", apiUri, data, httpMethod, httpResponse);
+		_logger.LogInformation("RequestAsync(apiUri,data,httpMethod)={ApiUri},{Data},{HttpMethod}: external service call {ApiUri1} took {Arg4} ms", apiUri, data, httpMethod, apiUri, __logStart.ElapsedMilliseconds);
         var response = await httpResponse.Content.ReadAsStringAsync();
 
+		_logger.LogDebug("RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod}): response → {Response}", apiUri, data, httpMethod, response);
         if (_omnisendSettings.LogRequests)
         {
             var logMessage = $"Response:{Environment.NewLine}";
@@ -127,9 +142,11 @@ public class OmnisendHttpClient
                     if (!string.IsNullOrEmpty(response))
                         throw new NopException(response);
 
+				_logger.LogWarning("Throwing NopException from RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
                     throw new NopException("Omnisend unknown error.");
                 }
         }
+		_logger.LogDebug("<<< Exiting RequestAsync(apiUri={ApiUri},data={Data},httpMethod={HttpMethod})", apiUri, data, httpMethod);
     }
 
     private async Task<T> RequestAsync<T>(string apiUri, string data = null, HttpMethod httpMethod = null)
@@ -141,9 +158,11 @@ public class OmnisendHttpClient
 
     private async Task<T> PerformRequestAsync<T>(Func<Task<T>> request)
     {
+		_logger.LogDebug(">>> Entering PerformRequestAsync(request={Request})", request);
         try
         {
             var result = await request();
+			_logger.LogDebug("PerformRequestAsync(request={Request}): result → {Result}", request, result);
 
             return result;
         }
@@ -155,9 +174,11 @@ public class OmnisendHttpClient
             var errorMessage = exception.Message;
 
             var logMessage = $"{OmnisendDefaults.SystemName} error: {Environment.NewLine}{errorMessage}";
+			_logger.LogDebug("PerformRequestAsync(request={Request}): logMessage → {LogMessage}", request, logMessage);
             await _logger.ErrorAsync(logMessage, exception, await _workContext.GetCurrentCustomerAsync());
 
             return default;
+		_logger.LogDebug("<<< Exiting PerformRequestAsync(request={Request})", request);
         }
     }
 

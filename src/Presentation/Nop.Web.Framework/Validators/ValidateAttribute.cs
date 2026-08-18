@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using FluentValidation.AspNetCore;
 
 namespace Nop.Web.Framework.Validators;
@@ -9,9 +10,13 @@ namespace Nop.Web.Framework.Validators;
 [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false)]
 public sealed partial class ValidateAttribute : CustomizeValidatorAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ValidateAttribute()
     {
+		_logger.LogDebug(">>> Entering ValidateAttribute()");
         //specify rule set
         RuleSet = NopValidationDefaults.ValidationRuleSet;
+		_logger.LogDebug("ValidateAttribute(): RuleSet → {RuleSet}", RuleSet);
+		_logger.LogDebug("<<< Exiting ValidateAttribute()");
     }
 }

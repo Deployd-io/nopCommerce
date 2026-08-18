@@ -10,6 +10,7 @@ using Nop.Services.Catalog;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Models.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Components.Public;
 
@@ -18,6 +19,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components.Public;
 /// </summary>
 public class ButtonsViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IProductService _productService;
@@ -34,10 +36,16 @@ public class ButtonsViewComponent : NopViewComponent
         PayPalCommerceServiceManager serviceManager,
         PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering ButtonsViewComponent(productService={ProductService},modelFactory={ModelFactory},serviceManager={ServiceManager},settings={Settings})", productService, modelFactory, serviceManager, settings);
         _productService = productService;
         _modelFactory = modelFactory;
+		_logger.LogDebug("ButtonsViewComponent(productService={ProductService},modelFactory={ModelFactory},serviceManager={ServiceManager},settings={Settings}): _modelFactory → {_modelFactory}", productService, modelFactory, serviceManager, settings, _modelFactory);
+		_logger.LogDebug("ButtonsViewComponent(productService={ProductService},modelFactory={ModelFactory},serviceManager={ServiceManager},settings={Settings}): _productService → {_productService}", productService, modelFactory, serviceManager, settings, _productService);
         _serviceManager = serviceManager;
+		_logger.LogDebug("ButtonsViewComponent(productService={ProductService},modelFactory={ModelFactory},serviceManager={ServiceManager},settings={Settings}): _serviceManager → {_serviceManager}", productService, modelFactory, serviceManager, settings, _serviceManager);
         _settings = settings;
+		_logger.LogDebug("ButtonsViewComponent(productService={ProductService},modelFactory={ModelFactory},serviceManager={ServiceManager},settings={Settings}): _settings → {_settings}", productService, modelFactory, serviceManager, settings, _settings);
+		_logger.LogDebug("<<< Exiting ButtonsViewComponent(productService={ProductService},modelFactory={ModelFactory},serviceManager={ServiceManager},settings={Settings})", productService, modelFactory, serviceManager, settings);
     }
 
     #endregion
@@ -55,17 +63,20 @@ public class ButtonsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         var (active, _) = await _serviceManager.IsActiveAsync(_settings);
         if (!active)
             return Content(string.Empty);
 
         PaymentInfoModel model = null;
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
 
         if (widgetZone.Equals(PublicWidgetZones.ProductDetailsAddInfo))
         {
             if (_settings.DisplayButtonsOnProductDetails)
             {
                 var productId = additionalData is ProductDetailsModel.AddToCartModel product ? (int?)product.ProductId : null;
+				_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): productId → {ProductId}", widgetZone, additionalData, productId);
                 if (productId is null || (await _productService.GetProductByIdAsync(productId ?? 0))?.ParentGroupedProductId == 0)
                     model = await _modelFactory.PreparePaymentInfoModelAsync(ButtonPlacement.Product, productId);
             }
@@ -75,6 +86,7 @@ public class ButtonsViewComponent : NopViewComponent
             if (_settings.DisplayButtonsOnShoppingCart)
             {
                 var routeName = HttpContext.GetEndpoint()?.Metadata.GetMetadata<RouteNameMetadata>()?.RouteName;
+				_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): routeName → {RouteName}", widgetZone, additionalData, routeName);
                 if (routeName == NopRouteNames.General.CART)
                     model = await _modelFactory.PreparePaymentInfoModelAsync(ButtonPlacement.Cart);
             }
@@ -89,6 +101,7 @@ public class ButtonsViewComponent : NopViewComponent
             return Content(string.Empty);
 
         if (model.Cart.IsRecurring == true)
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
             return View("~/Plugins/Payments.PayPalCommerce/Views/Public/_Buttons.Recurring.cshtml", model);
 
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/_Buttons.cshtml", model);

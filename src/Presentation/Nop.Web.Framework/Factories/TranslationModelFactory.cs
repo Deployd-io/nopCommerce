@@ -32,10 +32,16 @@ public partial class TranslationModelFactory : ITranslationModelFactory
         TranslationSettings translationSettings)
     {
         _languageService = languageService;
+		_logger.LogDebug("TranslationModelFactory(languageService={LanguageService},localizationService={LocalizationService},logger={Logger},translationSettings={TranslationSettings}): _languageService → {_languageService}", languageService, localizationService, logger, translationSettings, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("TranslationModelFactory(languageService={LanguageService},localizationService={LocalizationService},logger={Logger},translationSettings={TranslationSettings}): _localizationService → {_localizationService}", languageService, localizationService, logger, translationSettings, _localizationService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering TranslationModelFactory(languageService={LanguageService},localizationService={LocalizationService},logger={Logger},translationSettings={TranslationSettings})", languageService, localizationService, logger, translationSettings);
         _translationClientHelper = null;
         _translationSettings = translationSettings;
+		_logger.LogDebug("TranslationModelFactory(languageService={LanguageService},localizationService={LocalizationService},logger={Logger},translationSettings={TranslationSettings}): _translationSettings → {_translationSettings}", languageService, localizationService, logger, translationSettings, _translationSettings);
+		_logger.LogDebug("TranslationModelFactory(languageService={LanguageService},localizationService={LocalizationService},logger={Logger},translationSettings={TranslationSettings}): _translationClientHelper → {_translationClientHelper}", languageService, localizationService, logger, translationSettings, _translationClientHelper);
+		_logger.LogDebug("<<< Exiting TranslationModelFactory(languageService={LanguageService},localizationService={LocalizationService},logger={Logger},translationSettings={TranslationSettings})", languageService, localizationService, logger, translationSettings);
     }
 
     #endregion
@@ -73,11 +79,14 @@ public partial class TranslationModelFactory : ITranslationModelFactory
         params (string PropertyName, bool IsHtml)[] propertiesToTranslate)
         where T : ILocalizedLocaleModel
     {
+		_logger.LogDebug(">>> Entering PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate})", model, propertiesToTranslate);
         _translationClientHelper ??= new TranslationClientHelper(_translationSettings);
 
         var result = new TranslationModel();
+		_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): result → {Result}", model, propertiesToTranslate, result);
 
         var properties = propertiesToTranslate.Select(p => new KeyValuePair<string, bool>(p.PropertyName, p.IsHtml)).ToDictionary();
+		_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): properties → {Properties}", model, propertiesToTranslate, properties);
 
         //get model properties to use as original text for translation
         var modelProperties = model.GetType().GetProperties()
@@ -91,6 +100,7 @@ public partial class TranslationModelFactory : ITranslationModelFactory
 
         //get original language
         var originalLanguage = await _languageService.GetLanguageByIdAsync(_translationSettings.TranslateFromLanguageId);
+		_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): originalLanguage → {OriginalLanguage}", model, propertiesToTranslate, originalLanguage);
         var position = 0;
 
         //the loop by locales which should be translated
@@ -108,12 +118,14 @@ public partial class TranslationModelFactory : ITranslationModelFactory
 
             //get target languages to translation for
             var translateToLanguage = await _languageService.GetLanguageByIdAsync(modelLocale.LanguageId);
+			_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): translateToLanguage → {TranslateToLanguage}", model, propertiesToTranslate, translateToLanguage);
 
             //the loop by properties which should be translated
             foreach (var prop in localizedProperties)
             {
                 //get the current value of property
                 var currentTranslatedText = prop.GetValue(modelLocale, null)?.ToString();
+				_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): currentTranslatedText → {CurrentTranslatedText}", model, propertiesToTranslate, currentTranslatedText);
 
                 //ignore the property which already has a value
                 if (!string.IsNullOrEmpty(currentTranslatedText))
@@ -121,6 +133,7 @@ public partial class TranslationModelFactory : ITranslationModelFactory
 
                 //get original text to translate
                 var originText = modelProperties.FirstOrDefault(p => p.Name.Equals(prop.Name))?.GetValue(model, null)?.ToString();
+				_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): originText → {OriginText}", model, propertiesToTranslate, originText);
 
                 //ignore the empty original text
                 if (string.IsNullOrEmpty(originText))
@@ -129,12 +142,14 @@ public partial class TranslationModelFactory : ITranslationModelFactory
                 try
                 {
                     var translatedText = await _translationClientHelper.TranslateAsync(originalLanguage, originText, translateToLanguage, properties[prop.Name]);
+					_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): translatedText → {TranslatedText}", model, propertiesToTranslate, translatedText);
                     if (string.IsNullOrEmpty(translatedText))
                         continue;
 
                     //set translated text to property
                     prop.SetValue(modelLocale, translatedText);
                     var inputName = $"{nameof(model.Locales)}_{position - 1}__{prop.Name}";
+					_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): inputName → {InputName}", model, propertiesToTranslate, inputName);
                     result.Translations.Add(new()
                     {
                         Name = inputName,
@@ -142,14 +157,22 @@ public partial class TranslationModelFactory : ITranslationModelFactory
                         OriginValue = originText,
                         Language = translateToLanguage.UniqueSeoCode,
                         OriginLanguage = originalLanguage.UniqueSeoCode
+						_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): OriginLanguage → {OriginLanguage}", model, propertiesToTranslate, OriginLanguage);
+						_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): OriginValue → {OriginValue}", model, propertiesToTranslate, OriginValue);
+						_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): Value → {Value}", model, propertiesToTranslate, Value);
+						_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): Language → {Language}", model, propertiesToTranslate, Language);
+						_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): Name → {Name}", model, propertiesToTranslate, Name);
                     });
                 }
                 catch (Exception e)
                 {
                     var serviceName = await _localizationService.GetLocalizedEnumAsync((TranslationServiceType)_translationSettings.TranslationServiceId);
+					_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): serviceName → {ServiceName}", model, propertiesToTranslate, serviceName);
                     var errorMessage = $"{serviceName}: {e.Message}";
+					_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): errorMessage → {ErrorMessage}", model, propertiesToTranslate, errorMessage);
                     await _logger.ErrorAsync(errorMessage, e);
                     result.HasErrors = true;
+					_logger.LogDebug("PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate}): result.HasErrors → {Arg2}", model, propertiesToTranslate, result.HasErrors);
 
                     //DeepL: stop translate if one of the languages aren't support
                     //to reduce error count
@@ -159,6 +182,7 @@ public partial class TranslationModelFactory : ITranslationModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting PrepareTranslationModelAsync(model={Model},propertiesToTranslate={PropertiesToTranslate})", model, propertiesToTranslate);
         return result;
 
         //filter for get only string property which should be translated
@@ -188,6 +212,7 @@ public partial class TranslationModelFactory : ITranslationModelFactory
 
         public TranslationClientHelper(TranslationSettings translationSettings)
         {
+			_logger.LogDebug(">>> Entering TranslationClientHelper(translationSettings={TranslationSettings})", translationSettings);
             switch ((TranslationServiceType)translationSettings.TranslationServiceId)
             {
                 case TranslationServiceType.GoogleTranslate:
@@ -196,6 +221,8 @@ public partial class TranslationModelFactory : ITranslationModelFactory
                             _googleClient = Google.Cloud.Translation.V2.TranslationClient.CreateFromApiKey(translationSettings.GoogleApiKey);
                         _deeplClient = null;
                     }
+					_logger.LogDebug("TranslationClientHelper(translationSettings={TranslationSettings}): _googleClient → {_googleClient}", translationSettings, _googleClient);
+					_logger.LogDebug("TranslationClientHelper(translationSettings={TranslationSettings}): _deeplClient → {_deeplClient}", translationSettings, _deeplClient);
                     break;
 
                 case TranslationServiceType.DeepL:
@@ -206,6 +233,7 @@ public partial class TranslationModelFactory : ITranslationModelFactory
                     }
                     break;
             }
+			_logger.LogDebug("<<< Exiting TranslationClientHelper(translationSettings={TranslationSettings})", translationSettings);
         }
 
         #endregion
@@ -225,6 +253,8 @@ public partial class TranslationModelFactory : ITranslationModelFactory
         /// </returns>
         public virtual async Task<string> TranslateAsync(Language originalLanguage, string originText, Language targetLanguage, bool isHtml)
         {
+			_logger.LogDebug(">>> Entering TranslateAsync(originalLanguage={OriginalLanguage},originText={OriginText},targetLanguage={TargetLanguage},isHtml={IsHtml})", originalLanguage, originText, targetLanguage, isHtml);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (_googleClient != null)
             {
                 var response = isHtml
@@ -244,6 +274,8 @@ public partial class TranslationModelFactory : ITranslationModelFactory
                 return response.Text;
             }
 
+			_logger.LogInformation("TranslateAsync(originalLanguage,originText,targetLanguage,isHtml)={OriginalLanguage},{OriginText},{TargetLanguage},{IsHtml}: external service call took {Arg4} ms", originalLanguage, originText, targetLanguage, isHtml, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting TranslateAsync(originalLanguage={OriginalLanguage},originText={OriginText},targetLanguage={TargetLanguage},isHtml={IsHtml})", originalLanguage, originText, targetLanguage, isHtml);
             return string.Empty;
         }
 

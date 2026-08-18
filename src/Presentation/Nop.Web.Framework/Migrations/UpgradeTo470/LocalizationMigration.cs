@@ -4,20 +4,24 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo470;
 
 [NopUpdateMigration("2023-01-01 00:00:03", "4.70", UpdateMigrationType.Localization)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
 
         var (languageId, languages) = this.GetLanguageData();
 
@@ -118,9 +122,11 @@ public class LocalizationMigration : MigrationBase
             ["Admin.ConfigurationSteps.PaymentPayPal.Sandbox.Title"] = "Sandbox",
             ["Admin.ConfigurationSteps.PaymentPayPal.Sandbox.Text"] = "Use sandbox if you want to test the payment method first.",
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ["Admin.ConfigurationSteps.PaymentPayPal.Credentials.Title"] = "Credentials",
             ["Admin.ConfigurationSteps.PaymentPayPal.Credentials.Text"] = "After you create and set up your application in your <b>PayPal</b> account, you need to copy the <b>Client ID</b> and <b>Secret</b>, and paste them into these fields.",
 
+			_logger.LogInformation("Up(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             ["Admin.ConfigurationSteps.PaymentPayPal.PaymentType.Title"] = "Payment type",
             ["Admin.ConfigurationSteps.PaymentPayPal.PaymentType.Text"] = "Choose the <b>Payment type</b> to either capture payment immediately (<b>Capture</b>) or <b>Authorize</b> payment for an order after order creation.",
 
@@ -274,11 +280,14 @@ public class LocalizationMigration : MigrationBase
         }, languageId);
 
         #endregion
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

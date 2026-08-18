@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Localization;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Localization;
 /// </summary>
 public static class LocalizedUrlExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private static readonly char[] _separator = ['/', '?'];
 
     /// <summary>
@@ -53,7 +55,9 @@ public static class LocalizedUrlExtensions
     /// <returns>Result</returns>
     public static string RemoveApplicationPathFromRawUrl(this string rawUrl, PathString pathBase)
     {
+		_logger.LogDebug(">>> Entering RemoveApplicationPathFromRawUrl(rawUrl={RawUrl},pathBase={PathBase})", rawUrl, pathBase);
         new PathString(rawUrl).StartsWithSegments(pathBase, out var result);
+		_logger.LogDebug("<<< Exiting RemoveApplicationPathFromRawUrl(rawUrl={RawUrl},pathBase={PathBase})", rawUrl, pathBase);
         return WebUtility.UrlDecode(result);
     }
 
@@ -66,21 +70,25 @@ public static class LocalizedUrlExtensions
     /// <returns>URL without language SEO code</returns>
     public static string RemoveLanguageSeoCodeFromUrl(this string url, PathString pathBase, bool isRawPath)
     {
+		_logger.LogDebug(">>> Entering RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath})", url, pathBase, isRawPath);
         if (string.IsNullOrEmpty(url))
             return url;
 
         //remove application path from raw URL
         if (isRawPath)
             url = url.RemoveApplicationPathFromRawUrl(pathBase);
+			_logger.LogDebug("RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath}): url → {Url1}", url, pathBase, isRawPath, url);
 
         //get result URL
         url = url.TrimStart('/');
         var result = url.Contains('/') ? url[(url.IndexOf('/'))..] : string.Empty;
+		_logger.LogDebug("RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath}): result → {Result}", url, pathBase, isRawPath, result);
 
         //and add back application path to raw URL
         if (isRawPath)
             result = pathBase + result;
 
+		_logger.LogDebug("<<< Exiting RemoveLanguageSeoCodeFromUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath})", url, pathBase, isRawPath);
         return result;
     }
 
@@ -94,6 +102,7 @@ public static class LocalizedUrlExtensions
     /// <returns>Result</returns>
     public static string AddLanguageSeoCodeToUrl(this string url, PathString pathBase, bool isRawPath, Language language)
     {
+		_logger.LogDebug(">>> Entering AddLanguageSeoCodeToUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath},language={Language})", url, pathBase, isRawPath, language);
         ArgumentNullException.ThrowIfNull(language);
 
         //null validation is not required
@@ -103,6 +112,7 @@ public static class LocalizedUrlExtensions
         //remove application path from raw URL
         if (isRawPath && !string.IsNullOrEmpty(url))
             url = url.RemoveApplicationPathFromRawUrl(pathBase);
+			_logger.LogDebug("AddLanguageSeoCodeToUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath},language={Language}): url → {Url1}", url, pathBase, isRawPath, language, url);
 
         //add language code
         url = $"/{language.UniqueSeoCode}{url}";
@@ -111,6 +121,7 @@ public static class LocalizedUrlExtensions
         if (isRawPath)
             url = pathBase + url;
 
+		_logger.LogDebug("<<< Exiting AddLanguageSeoCodeToUrl(url={Url},pathBase={PathBase},isRawPath={IsRawPath},language={Language})", url, pathBase, isRawPath, language);
         return url;
     }
 }

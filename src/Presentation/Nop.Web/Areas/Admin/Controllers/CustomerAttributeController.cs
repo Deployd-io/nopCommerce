@@ -10,11 +10,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CustomerAttributeController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
@@ -37,13 +39,22 @@ public partial class CustomerAttributeController : BaseAdminController
         INotificationService notificationService,
         IPermissionService permissionService)
     {
+		_logger.LogDebug(">>> Entering CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService})", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService);
         _customerAttributeService = customerAttributeService;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _customerAttributeService → {_customerAttributeService}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _customerAttributeService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _customerActivityService → {_customerActivityService}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _customerActivityService);
         _customerAttributeModelFactory = customerAttributeModelFactory;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _customerAttributeModelFactory → {_customerAttributeModelFactory}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _customerAttributeModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _localizationService → {_localizationService}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _localizedEntityService → {_localizedEntityService}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _notificationService → {_notificationService}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService}): _permissionService → {_permissionService}", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService, _permissionService);
+		_logger.LogDebug("<<< Exiting CustomerAttributeController(customerAttributeService={CustomerAttributeService},customerActivityService={CustomerActivityService},customerAttributeModelFactory={CustomerAttributeModelFactory},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService})", customerAttributeService, customerActivityService, customerAttributeModelFactory, localizationService, localizedEntityService, notificationService, permissionService);
     }
 
     #endregion
@@ -52,6 +63,7 @@ public partial class CustomerAttributeController : BaseAdminController
 
     protected virtual async Task UpdateAttributeLocalesAsync(CustomerAttribute customerAttribute, CustomerAttributeModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateAttributeLocalesAsync(customerAttribute={CustomerAttribute},model={Model})", customerAttribute, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(customerAttribute,
@@ -59,10 +71,12 @@ public partial class CustomerAttributeController : BaseAdminController
                 localized.Name,
                 localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateAttributeLocalesAsync(customerAttribute={CustomerAttribute},model={Model})", customerAttribute, model);
     }
 
     protected virtual async Task UpdateValueLocalesAsync(CustomerAttributeValue customerAttributeValue, CustomerAttributeValueModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateValueLocalesAsync(customerAttributeValue={CustomerAttributeValue},model={Model})", customerAttributeValue, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(customerAttributeValue,
@@ -70,6 +84,7 @@ public partial class CustomerAttributeController : BaseAdminController
                 localized.Name,
                 localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateValueLocalesAsync(customerAttributeValue={CustomerAttributeValue},model={Model})", customerAttributeValue, model);
     }
 
     #endregion
@@ -78,16 +93,21 @@ public partial class CustomerAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //select an appropriate card
         SaveSelectedCardName("customersettings-customerformfields");
 
         //we just redirect a user to the customer settings page
+		_logger.LogDebug("<<< Exiting List()");
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return RedirectToAction("CustomerUser", "Setting");
     }
 
@@ -104,9 +124,13 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeModelAsync(new CustomerAttributeModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -145,14 +169,19 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): customerAttribute → {CustomerAttribute}", id, customerAttribute);
         if (customerAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeModelAsync(null, customerAttribute);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -192,8 +221,10 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(id);
         await _customerAttributeService.DeleteAttributeAsync(customerAttribute);
+		_logger.LogDebug("Delete(id={Id}): customerAttribute → {CustomerAttribute}", id, customerAttribute);
 
         //activity log
         await _customerActivityService.InsertActivityAsync("DeleteCustomerAttribute",
@@ -201,6 +232,7 @@ public partial class CustomerAttributeController : BaseAdminController
             customerAttribute);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.CustomerAttributes.Deleted"));
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -212,21 +244,26 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueList(CustomerAttributeValueSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ValueList(searchModel={SearchModel})", searchModel);
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(searchModel.CustomerAttributeId)
             ?? throw new ArgumentException("No customer attribute found with the specified id");
 
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeValueListModelAsync(searchModel, customerAttribute);
+		_logger.LogDebug("ValueList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ValueList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueCreatePopup(int customerAttributeId)
     {
+		_logger.LogDebug(">>> Entering ValueCreatePopup(customerAttributeId={CustomerAttributeId})", customerAttributeId);
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeId);
+		_logger.LogDebug("ValueCreatePopup(customerAttributeId={CustomerAttributeId}): customerAttribute → {CustomerAttribute}", customerAttributeId, customerAttribute);
         if (customerAttribute == null)
             return RedirectToAction("List");
 
@@ -234,6 +271,8 @@ public partial class CustomerAttributeController : BaseAdminController
         var model = await _customerAttributeModelFactory
             .PrepareCustomerAttributeValueModelAsync(new CustomerAttributeValueModel(), customerAttribute, null);
 
+		_logger.LogDebug("<<< Exiting ValueCreatePopup(customerAttributeId={CustomerAttributeId})", customerAttributeId);
+		_logger.LogDebug("<<< Exiting ValueCreatePopup(model={Model})", model);
         return View(model);
     }
 
@@ -272,19 +311,25 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueEditPopup(int id)
     {
+		_logger.LogDebug(">>> Entering ValueEditPopup(id={Id})", id);
         //try to get a customer attribute value with the specified id
         var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(id);
+		_logger.LogDebug("ValueEditPopup(id={Id}): customerAttributeValue → {CustomerAttributeValue}", id, customerAttributeValue);
         if (customerAttributeValue == null)
             return RedirectToAction("List");
 
         //try to get a customer attribute with the specified id
         var customerAttribute = await _customerAttributeService.GetAttributeByIdAsync(customerAttributeValue.AttributeId);
+		_logger.LogDebug("ValueEditPopup(id={Id}): customerAttribute → {CustomerAttribute}", id, customerAttribute);
         if (customerAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerAttributeModelFactory.PrepareCustomerAttributeValueModelAsync(null, customerAttribute, customerAttributeValue);
+		_logger.LogDebug("ValueEditPopup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting ValueEditPopup(id={Id})", id);
+		_logger.LogDebug("<<< Exiting ValueEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -330,6 +375,7 @@ public partial class CustomerAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueDelete(int id)
     {
+		_logger.LogDebug(">>> Entering ValueDelete(id={Id})", id);
         //try to get a customer attribute value with the specified id
         var customerAttributeValue = await _customerAttributeService.GetAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No customer attribute value found with the specified id", nameof(id));
@@ -341,6 +387,7 @@ public partial class CustomerAttributeController : BaseAdminController
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteCustomerAttributeValue"), customerAttributeValue.Id),
             customerAttributeValue);
 
+		_logger.LogDebug("<<< Exiting ValueDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
