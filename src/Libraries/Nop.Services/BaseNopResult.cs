@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Services;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public abstract partial class BaseNopResult
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Gets a value indicating whether request has been completed successfully
     /// </summary>
@@ -16,7 +18,9 @@ public abstract partial class BaseNopResult
     /// <param name="error">Error</param>
     public virtual void AddError(string error)
     {
+		_logger.LogDebug(">>> Entering AddError(error={Error})", error);
         Errors.Add(error);
+		_logger.LogDebug("<<< Exiting AddError(error={Error})", error);
     }
 
     /// <summary>

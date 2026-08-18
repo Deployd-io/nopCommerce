@@ -4,6 +4,7 @@ using Nop.Core.Domain.Polls;
 using Nop.Services.Polls;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Polls;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class PollModelFactory : IPollModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPollService _pollService;
@@ -28,10 +30,16 @@ public partial class PollModelFactory : IPollModelFactory
         IStoreContext storeContext,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering PollModelFactory(pollService={PollService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},workContext={WorkContext})", pollService, staticCacheManager, storeContext, workContext);
         _pollService = pollService;
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("PollModelFactory(pollService={PollService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},workContext={WorkContext}): _staticCacheManager → {_staticCacheManager}", pollService, staticCacheManager, storeContext, workContext, _staticCacheManager);
+		_logger.LogDebug("PollModelFactory(pollService={PollService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},workContext={WorkContext}): _pollService → {_pollService}", pollService, staticCacheManager, storeContext, workContext, _pollService);
         _storeContext = storeContext;
+		_logger.LogDebug("PollModelFactory(pollService={PollService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},workContext={WorkContext}): _storeContext → {_storeContext}", pollService, staticCacheManager, storeContext, workContext, _storeContext);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting PollModelFactory(pollService={PollService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},workContext={WorkContext})", pollService, staticCacheManager, storeContext, workContext);
+		_logger.LogDebug("PollModelFactory(pollService={PollService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},workContext={WorkContext}): _workContext → {_workContext}", pollService, staticCacheManager, storeContext, workContext, _workContext);
     }
 
     #endregion
@@ -49,9 +57,11 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollModel> PreparePollModelAsync(Poll poll, bool setAlreadyVotedProperty)
     {
+		_logger.LogDebug(">>> Entering PreparePollModelAsync(poll={Poll},setAlreadyVotedProperty={SetAlreadyVotedProperty})", poll, setAlreadyVotedProperty);
         ArgumentNullException.ThrowIfNull(poll);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PreparePollModelAsync(poll={Poll},setAlreadyVotedProperty={SetAlreadyVotedProperty}): customer → {Customer}", poll, setAlreadyVotedProperty, customer);
 
         var model = new PollModel
         {
@@ -60,6 +70,7 @@ public partial class PollModelFactory : IPollModelFactory
             Name = poll.Name
         };
         var answers = await _pollService.GetPollAnswerByPollAsync(poll.Id);
+		_logger.LogDebug("PreparePollModelAsync(poll={Poll},setAlreadyVotedProperty={SetAlreadyVotedProperty}): answers → {Answers}", poll, setAlreadyVotedProperty, answers);
 
         foreach (var answer in answers)
             model.TotalVotes += answer.NumberOfVotes;
@@ -74,6 +85,7 @@ public partial class PollModelFactory : IPollModelFactory
             });
         }
 
+		_logger.LogDebug("<<< Exiting PreparePollModelAsync(poll={Poll},setAlreadyVotedProperty={SetAlreadyVotedProperty})", poll, setAlreadyVotedProperty);
         return model;
     }
 
@@ -87,11 +99,15 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollModel> PreparePollModelBySystemNameAsync(string systemKeyword)
     {
+		_logger.LogDebug(">>> Entering PreparePollModelBySystemNameAsync(systemKeyword={SystemKeyword})", systemKeyword);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(systemKeyword))
             return null;
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PreparePollModelBySystemNameAsync(systemKeyword={SystemKeyword}): store → {Store}", systemKeyword, store);
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("PreparePollModelBySystemNameAsync(systemKeyword={SystemKeyword}): currentLanguage → {CurrentLanguage}", systemKeyword, currentLanguage);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.PollBySystemNameModelKey,
             systemKeyword, currentLanguage, store);
 
@@ -115,8 +131,11 @@ public partial class PollModelFactory : IPollModelFactory
         //But first we need to clone the cached model (the updated one should not be cached)
         var model = cachedModel with { };
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PreparePollModelBySystemNameAsync(systemKeyword={SystemKeyword}): customer → {Customer}", systemKeyword, customer);
         model.AlreadyVoted = await _pollService.AlreadyVotedAsync(model.Id, customer.Id);
 
+		_logger.LogInformation("PreparePollModelBySystemNameAsync(systemKeyword)={SystemKeyword}: external service call took {Arg1} ms", systemKeyword, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PreparePollModelBySystemNameAsync(systemKeyword={SystemKeyword})", systemKeyword);
         return model;
     }
 
@@ -129,21 +148,32 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<List<PollModel>> PrepareHomepagePollModelsAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareHomepagePollModelsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareHomepagePollModelsAsync(): customer → {Customer}", customer);
+		_logger.LogDebug("PrepareHomepagePollModelsAsync(): store → {Store}", store);
         var language = await _workContext.GetWorkingLanguageAsync();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.HomepagePollsModelKey, language, store);
+		_logger.LogDebug("PrepareHomepagePollModelsAsync(): language → {Language}", language);
+		_logger.LogDebug("PrepareHomepagePollModelsAsync(): cacheKey → {CacheKey}", cacheKey);
 
         var cachedPolls = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var polls = await _pollService.GetPollsAsync(store.Id, language.Id, loadShownOnHomepageOnly: true);
             var pollsModels = await polls.SelectAwait(async poll => await PreparePollModelAsync(poll, false)).ToListAsync();
+			_logger.LogDebug("PrepareHomepagePollModelsAsync(): polls → {Polls}", polls);
+			_logger.LogDebug("PrepareHomepagePollModelsAsync(): pollsModels → {PollsModels}", pollsModels);
+			_logger.LogInformation("PrepareHomepagePollModelsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             return pollsModels;
         });
+		_logger.LogInformation("PrepareHomepagePollModelsAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         //"AlreadyVoted" property of "PollModel" object depends on the current customer. Let's update it.
         //But first we need to clone the cached model (the updated one should not be cached)
         var model = new List<PollModel>();
+		_logger.LogDebug("PrepareHomepagePollModelsAsync(): model → {Model}", model);
         foreach (var poll in cachedPolls)
         {
             var pollModel = poll with { };
@@ -151,6 +181,8 @@ public partial class PollModelFactory : IPollModelFactory
             model.Add(pollModel);
         }
 
+		_logger.LogInformation("PrepareHomepagePollModelsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareHomepagePollModelsAsync()");
         return model;
     }
 

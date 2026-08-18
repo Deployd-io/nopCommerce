@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Services.Caching;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Catalog.Caching;
 /// </summary>
 public partial class ProductAttributeMappingCacheEventConsumer : CacheEventConsumer<ProductAttributeMapping>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache data
     /// </summary>
@@ -15,9 +17,11 @@ public partial class ProductAttributeMappingCacheEventConsumer : CacheEventConsu
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductAttributeMapping entity)
     {
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopCatalogDefaults.ProductAttributeMappingsByProductCacheKey, entity.ProductId);
         await RemoveAsync(NopCatalogDefaults.ProductAttributeValuesByAttributeCacheKey, entity);
         await RemoveAsync(NopCatalogDefaults.ProductAttributeCombinationsByProductCacheKey, entity.ProductId);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductMultiplePricePrefix, entity.ProductId);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

@@ -2,6 +2,7 @@
 using Nop.Services.Authentication.External;
 using Nop.Services.Customers;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.ExternalAuth.Facebook.Infrastructure;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.ExternalAuth.Facebook.Infrastructure;
 /// </summary>
 public class FacebookAuthenticationEventConsumer : IConsumer<CustomerAutoRegisteredByExternalMethodEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -20,7 +22,10 @@ public class FacebookAuthenticationEventConsumer : IConsumer<CustomerAutoRegiste
 
     public FacebookAuthenticationEventConsumer(ICustomerService customerService)
     {
+		_logger.LogDebug(">>> Entering FacebookAuthenticationEventConsumer(customerService={CustomerService})", customerService);
         _customerService = customerService;
+		_logger.LogDebug("FacebookAuthenticationEventConsumer(customerService={CustomerService}): _customerService → {_customerService}", customerService, _customerService);
+		_logger.LogDebug("<<< Exiting FacebookAuthenticationEventConsumer(customerService={CustomerService})", customerService);
     }
 
     #endregion
@@ -34,6 +39,7 @@ public class FacebookAuthenticationEventConsumer : IConsumer<CustomerAutoRegiste
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(CustomerAutoRegisteredByExternalMethodEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (eventMessage?.Customer == null || eventMessage.AuthenticationParameters == null)
             return;
 
@@ -44,14 +50,19 @@ public class FacebookAuthenticationEventConsumer : IConsumer<CustomerAutoRegiste
         var customer = eventMessage.Customer;
         //store some of the customer fields
         var firstName = eventMessage.AuthenticationParameters.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.GivenName)?.Value;
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): firstName → {FirstName}", eventMessage, firstName);
         if (!string.IsNullOrEmpty(firstName))
             customer.FirstName = firstName;
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): customer.FirstName → {Arg1}", eventMessage, customer.FirstName);
 
         var lastName = eventMessage.AuthenticationParameters.Claims?.FirstOrDefault(claim => claim.Type == ClaimTypes.Surname)?.Value;
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): lastName → {LastName}", eventMessage, lastName);
         if (!string.IsNullOrEmpty(lastName))
             customer.LastName = lastName;
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): customer.LastName → {Arg1}", eventMessage, customer.LastName);
 
         await _customerService.UpdateCustomerAsync(customer);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

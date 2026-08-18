@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Polls;
 
@@ -9,11 +10,15 @@ namespace Nop.Web.Areas.Admin.Models.Polls;
 /// </summary>
 public partial record PollSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PollSearchModel()
     {
+		_logger.LogDebug(">>> Entering PollSearchModel()");
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("PollSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("<<< Exiting PollSearchModel()");
     }
 
     #endregion

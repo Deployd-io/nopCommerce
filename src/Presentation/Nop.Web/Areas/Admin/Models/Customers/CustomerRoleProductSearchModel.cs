@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -9,16 +10,25 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerRoleProductSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerRoleProductSearchModel()
     {
+		_logger.LogDebug(">>> Entering CustomerRoleProductSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("CustomerRoleProductSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
+		_logger.LogDebug("CustomerRoleProductSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("CustomerRoleProductSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("CustomerRoleProductSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
+		_logger.LogDebug("CustomerRoleProductSearchModel(): AvailableProductTypes → {AvailableProductTypes}", AvailableProductTypes);
         AddProductToCustomerRoleModel = new AddProductToCustomerRoleModel();
+		_logger.LogDebug("CustomerRoleProductSearchModel(): AddProductToCustomerRoleModel → {AddProductToCustomerRoleModel}", AddProductToCustomerRoleModel);
+		_logger.LogDebug("<<< Exiting CustomerRoleProductSearchModel()");
     }
 
     #endregion

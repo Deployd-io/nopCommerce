@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 namespace Nop.Services.Authentication.External;
 
 /// <summary>
@@ -6,6 +7,7 @@ namespace Nop.Services.Authentication.External;
 [Serializable]
 public partial class ExternalAuthenticationClaim
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -13,8 +15,12 @@ public partial class ExternalAuthenticationClaim
     /// <param name="value">Value</param>
     public ExternalAuthenticationClaim(string type, string value)
     {
+		_logger.LogDebug(">>> Entering ExternalAuthenticationClaim(type={Type},value={Value})", type, value);
         Type = type;
         Value = value;
+		_logger.LogDebug("ExternalAuthenticationClaim(type={Type},value={Value}): Value → {Value1}", type, value, Value);
+		_logger.LogDebug("ExternalAuthenticationClaim(type={Type},value={Value}): Type → {Type1}", type, value, Type);
+		_logger.LogDebug("<<< Exiting ExternalAuthenticationClaim(type={Type},value={Value})", type, value);
     }
 
     /// <summary>

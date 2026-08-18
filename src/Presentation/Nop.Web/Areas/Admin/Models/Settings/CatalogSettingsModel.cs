@@ -2,6 +2,7 @@
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -10,14 +11,21 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record CatalogSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CatalogSettingsModel()
     {
+		_logger.LogDebug(">>> Entering CatalogSettingsModel()");
         AvailableViewModes = new List<SelectListItem>();
         SortOptionSearchModel = new SortOptionSearchModel();
+		_logger.LogDebug("CatalogSettingsModel(): SortOptionSearchModel → {SortOptionSearchModel}", SortOptionSearchModel);
+		_logger.LogDebug("CatalogSettingsModel(): AvailableViewModes → {AvailableViewModes}", AvailableViewModes);
         ReviewTypeSearchModel = new ReviewTypeSearchModel();
+		_logger.LogDebug("CatalogSettingsModel(): ReviewTypeSearchModel → {ReviewTypeSearchModel}", ReviewTypeSearchModel);
         ArtificialIntelligenceSettingsModel = new ArtificialIntelligenceSettingsModel();
+		_logger.LogDebug("CatalogSettingsModel(): ArtificialIntelligenceSettingsModel → {ArtificialIntelligenceSettingsModel}", ArtificialIntelligenceSettingsModel);
+		_logger.LogDebug("<<< Exiting CatalogSettingsModel()");
     }
 
     #endregion

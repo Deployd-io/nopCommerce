@@ -2,6 +2,7 @@
 using System.Numerics;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.ModelBinding.Binders;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc.ModelBinding.Binders;
 /// </summary>
 public partial class InvariantNumberModelBinderProvider : IModelBinderProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected static readonly HashSet<Type> _integerTypes =
@@ -32,6 +34,7 @@ public partial class InvariantNumberModelBinderProvider : IModelBinderProvider
     /// <returns>Instance of model binder for floating-point types</returns>
     public IModelBinder GetBinder(ModelBinderProviderContext context)
     {
+		_logger.LogDebug(">>> Entering GetBinder(context={Context})", context);
         ArgumentNullException.ThrowIfNull(context);
 
         var modelType = context.Metadata.UnderlyingOrModelType;
@@ -43,6 +46,7 @@ public partial class InvariantNumberModelBinderProvider : IModelBinderProvider
             return new InvariantNumberModelBinder(NumberStyles.Float, new FloatingPointTypeModelBinderProvider().GetBinder(context));
 
         if (_integerTypes.Contains(modelType))
+		_logger.LogDebug("<<< Exiting GetBinder(context={Context})", context);
             return new InvariantNumberModelBinder(NumberStyles.Integer, new SimpleTypeModelBinderProvider().GetBinder(context));
 
         return null;

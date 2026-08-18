@@ -1,13 +1,18 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Common;
 
 public partial record AddressAttributeModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AddressAttributeModel()
     {
+		_logger.LogDebug(">>> Entering AddressAttributeModel()");
         Values = new List<AddressAttributeValueModel>();
+		_logger.LogDebug("AddressAttributeModel(): Values → {Values}", Values);
+		_logger.LogDebug("<<< Exiting AddressAttributeModel()");
     }
 
     public string ControlId { get; set; }

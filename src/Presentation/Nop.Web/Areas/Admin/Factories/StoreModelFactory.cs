@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Stores;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class StoreModelFactory : IStoreModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -29,10 +31,16 @@ public partial class StoreModelFactory : IStoreModelFactory
         ILocalizedModelFactory localizedModelFactory,
         IStoreService storeService)
     {
+		_logger.LogDebug(">>> Entering StoreModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeService={StoreService})", baseAdminModelFactory, localizationService, localizedModelFactory, storeService);
         _baseAdminModelFactory = baseAdminModelFactory;
         _localizationService = localizationService;
+		_logger.LogDebug("StoreModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeService={StoreService}): _localizationService → {_localizationService}", baseAdminModelFactory, localizationService, localizedModelFactory, storeService, _localizationService);
+		_logger.LogDebug("StoreModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeService={StoreService}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, localizationService, localizedModelFactory, storeService, _baseAdminModelFactory);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("StoreModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeService={StoreService}): _localizedModelFactory → {_localizedModelFactory}", baseAdminModelFactory, localizationService, localizedModelFactory, storeService, _localizedModelFactory);
         _storeService = storeService;
+		_logger.LogDebug("StoreModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeService={StoreService}): _storeService → {_storeService}", baseAdminModelFactory, localizationService, localizedModelFactory, storeService, _storeService);
+		_logger.LogDebug("<<< Exiting StoreModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeService={StoreService})", baseAdminModelFactory, localizationService, localizedModelFactory, storeService);
     }
 
     #endregion
@@ -49,11 +57,13 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual Task<StoreSearchModel> PrepareStoreSearchModelAsync(StoreSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareStoreSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareStoreSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -67,15 +77,18 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual async Task<StoreListModel> PrepareStoreListModelAsync(StoreSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareStoreListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get stores
         var stores = (await _storeService.GetAllStoresAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareStoreListModelAsync(searchModel={SearchModel}): stores → {Stores}", searchModel, stores);
 
         //prepare list model
         var model = new StoreListModel().PrepareToGrid(searchModel, stores, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareStoreListModelAsync(searchModel={SearchModel})", searchModel);
             return stores.Select(store => store.ToModel<StoreModel>());
         });
 
@@ -94,6 +107,7 @@ public partial class StoreModelFactory : IStoreModelFactory
     /// </returns>
     public virtual async Task<StoreModel> PrepareStoreModelAsync(StoreModel model, Store store, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareStoreModelAsync(model={Model},store={Store},excludeProperties={ExcludeProperties})", model, store, excludeProperties);
         Func<StoreLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (store != null)
@@ -121,6 +135,7 @@ public partial class StoreModelFactory : IStoreModelFactory
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareStoreModelAsync(model={Model},store={Store},excludeProperties={ExcludeProperties})", model, store, excludeProperties);
         return model;
     }
 

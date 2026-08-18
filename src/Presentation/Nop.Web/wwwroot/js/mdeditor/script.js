@@ -1,13 +1,19 @@
+const logger = console;
 /**
  * Initializes the Markdown editor
  * @param {string} textareaId - ID of the <textarea> element.
  * @param {string} iconsPath - Path to the icons folder (must end with '/').
  */
 function initializeMarkdownEditor(textareaId, iconsPath) {
+logger.debug(`>>> Entering initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath})`);
   const markdownInput = document.getElementById(textareaId);
   const htmlOutput = document.getElementById('html-output');
+logger.debug(`initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath}): markdownInput → ${markdownInput}`);
+logger.debug(`initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath}): htmlOutput → ${htmlOutput}`);
   const toolbar = document.getElementById('editor-toolbar');
   const editorContainer = markdownInput.closest('.markdown-editor-container');
+logger.debug(`initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath}): toolbar → ${toolbar}`);
+logger.debug(`initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath}): editorContainer → ${editorContainer}`);
 
   if (!markdownInput || !htmlOutput || !toolbar || !editorContainer) {
     console.error("Error: Required DOM elements not found (textarea, output, toolbar, or container).");
@@ -18,7 +24,9 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
 
   // Add scroll synchronization
   const writePanel = document.getElementById('write-panel');
+logger.debug(`initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath}): writePanel → ${writePanel}`);
   const previewPanel = document.getElementById('preview-panel');
+logger.debug(`initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath}): previewPanel → ${previewPanel}`);
 
   if (writePanel && previewPanel) {
     markdownInput.addEventListener('scroll', () => {
@@ -29,7 +37,9 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
 
   // Save the editor height in localStorage
   function saveEditorHeight() {
+	logger.debug('>>> Entering saveEditorHeight()');
     localStorage.setItem('markdownEditorHeight', editorContainer.style.height);
+	logger.debug('<<< Exiting saveEditorHeight()');
   }
 
   // Restore the editor height from localStorage
@@ -46,11 +56,13 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
 
   // Preview update function
   function updatePreview() {
+	logger.debug('>>> Entering updatePreview()');
     const markdownText = markdownInput.value;
     // Use marked.parse() for conversion
     // Add GFM (GitHub Flavored Markdown) option for better compatibility
     // and breaks option to treat newlines as <br>
     htmlOutput.innerHTML = marked.parse(markdownText, { gfm: true, breaks: true });
+	logger.debug('<<< Exiting updatePreview()');
   }
 
   // Helper to insert text into textarea
@@ -61,13 +73,17 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
    * @param {string} [placeholder='text'] - Placeholder text if nothing is selected.
    */
   function insertMarkdown(prefix, suffix = '', placeholder = 'text') {
+	logger.debug(`>>> Entering insertMarkdown(prefix=${prefix},suffix=${suffix},placeholder=${placeholder})`);
     const start = markdownInput.selectionStart;
     const end = markdownInput.selectionEnd;
     const selectedText = markdownInput.value.substring(start, end);
+	logger.debug(`insertMarkdown(prefix=${prefix},suffix=${suffix},placeholder=${placeholder}): selectedText → ${selectedText}`);
     const textToInsert = selectedText || placeholder;
 
     const before = markdownInput.value.substring(0, start);
+	logger.debug(`insertMarkdown(prefix=${prefix},suffix=${suffix},placeholder=${placeholder}): before → ${before}`);
     const after = markdownInput.value.substring(end);
+	logger.debug(`insertMarkdown(prefix=${prefix},suffix=${suffix},placeholder=${placeholder}): after → ${after}`);
 
     markdownInput.value = before + prefix + textToInsert + suffix + after;
 
@@ -84,6 +100,7 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
 
     markdownInput.focus();
     updatePreview();
+	logger.debug(`<<< Exiting insertMarkdown(prefix=${prefix},suffix=${suffix},placeholder=${placeholder})`);
   }
 
   // Helper to insert block-level elements like images
@@ -92,14 +109,19 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
    * @param {string} markdownToInsert - The complete Markdown string to insert.
    */
   function insertBlockMarkdown(markdownToInsert) {
+	logger.debug(`>>> Entering insertBlockMarkdown(markdownToInsert=${markdownToInsert})`);
     const start = markdownInput.selectionStart;
     const end = markdownInput.selectionEnd;
     const before = markdownInput.value.substring(0, start);
+	logger.debug(`insertBlockMarkdown(markdownToInsert=${markdownToInsert}): before → ${before}`);
     const after = markdownInput.value.substring(end);
+	logger.debug(`insertBlockMarkdown(markdownToInsert=${markdownToInsert}): after → ${after}`);
 
     // Add newline before/after if inserting mid-line and no newline exists
     const prefix = (start > 0 && markdownInput.value[start - 1] !== '\n') ? '\n' : '';
+	logger.debug(`insertBlockMarkdown(markdownToInsert=${markdownToInsert}): prefix → ${prefix}`);
     const suffix = (end < markdownInput.value.length && markdownInput.value[end] !== '\n') ? '\n' : '';
+	logger.debug(`insertBlockMarkdown(markdownToInsert=${markdownToInsert}): suffix → ${suffix}`);
 
     markdownInput.value = before + prefix + markdownToInsert + suffix + after;
 
@@ -110,6 +132,7 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
 
     markdownInput.focus();
     updatePreview();
+	logger.debug(`<<< Exiting insertBlockMarkdown(markdownToInsert=${markdownToInsert})`);
   }
 
   // Toolbar button definitions
@@ -169,12 +192,15 @@ function initializeMarkdownEditor(textareaId, iconsPath) {
   console.log("Markdown editor initialized."); 
 
   // Return the update function reference for potential use by tabs (though not strictly needed by current setupTabs)
+logger.debug(`<<< Exiting initializeMarkdownEditor(textareaId=${textareaId},iconsPath=${iconsPath})`);
   return { updatePreview };
 }
 
 function clickTab(button, tabButtons, tabPanels, markdownInput) {
+logger.debug(`>>> Entering clickTab(button=${button},tabButtons=${tabButtons},tabPanels=${tabPanels},markdownInput=${markdownInput})`);
   const targetTab = button.dataset.tab;
   const toolbar = document.getElementById('editor-toolbar');
+logger.debug(`clickTab(button=${button},tabButtons=${tabButtons},tabPanels=${tabPanels},markdownInput=${markdownInput}): toolbar → ${toolbar}`);
 
   // 1. Update buttons
   tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -194,6 +220,7 @@ function clickTab(button, tabButtons, tabPanels, markdownInput) {
     toolbar.style.display = 'none';
   } else if (targetTab === 'write') {
     toolbar.style.display = 'flex';
+	logger.debug(`<<< Exiting clickTab(button=${button},tabButtons=${tabButtons},tabPanels=${tabPanels},markdownInput=${markdownInput})`);
   }
 }
 
@@ -203,6 +230,7 @@ function clickTab(button, tabButtons, tabPanels, markdownInput) {
  * @param {string} textareaId - ID of the <textarea> element.
  */
 function setupTabs(containerId, textareaId) {
+logger.debug(`>>> Entering setupTabs(containerId=${containerId},textareaId=${textareaId})`);
   const container = document.getElementById(containerId);
   if (!container) {
     console.error(`Error: Tab container with ID '${containerId}' not found.`);
@@ -228,4 +256,5 @@ function setupTabs(containerId, textareaId) {
   if (writePanel && writePanel.classList.contains('active')) {
     if (markdownInput) markdownInput.focus();
   }
+logger.debug(`<<< Exiting setupTabs(containerId=${containerId},textareaId=${textareaId})`);
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,11 +10,15 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record StockQuantityHistorySearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public StockQuantityHistorySearchModel()
     {
+		_logger.LogDebug(">>> Entering StockQuantityHistorySearchModel()");
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogDebug("StockQuantityHistorySearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
+		_logger.LogDebug("<<< Exiting StockQuantityHistorySearchModel()");
     }
 
     #endregion
