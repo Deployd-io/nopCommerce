@@ -2,6 +2,7 @@
 
 using Nop.Core;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.UI.Paging;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.UI.Paging;
 /// </summary>
 public abstract record BasePageableModel : BaseNopModel, IPageableModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -19,14 +21,23 @@ public abstract record BasePageableModel : BaseNopModel, IPageableModel
     /// <param name="pagedList">Entities (models)</param>
     public virtual void LoadPagedList<T>(IPagedList<T> pagedList)
     {
+		_logger.LogDebug(">>> Entering LoadPagedList(pagedList={PagedList})", pagedList);
         FirstItem = (pagedList.PageIndex * pagedList.PageSize) + 1;
         HasNextPage = pagedList.HasNextPage;
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): FirstItem → {FirstItem}", pagedList, FirstItem);
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): HasNextPage → {HasNextPage}", pagedList, HasNextPage);
         HasPreviousPage = pagedList.HasPreviousPage;
         LastItem = Math.Min(pagedList.TotalCount, ((pagedList.PageIndex * pagedList.PageSize) + pagedList.PageSize));
         PageNumber = pagedList.PageIndex + 1;
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): HasPreviousPage → {HasPreviousPage}", pagedList, HasPreviousPage);
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): LastItem → {LastItem}", pagedList, LastItem);
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): PageNumber → {PageNumber}", pagedList, PageNumber);
         PageSize = pagedList.PageSize;
         TotalItems = pagedList.TotalCount;
         TotalPages = pagedList.TotalPages;
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): PageSize → {PageSize}", pagedList, PageSize);
+		_logger.LogDebug("<<< Exiting LoadPagedList(pagedList={PagedList})", pagedList);
+		_logger.LogDebug("LoadPagedList(pagedList={PagedList}): TotalItems → {TotalItems}", pagedList, TotalItems);
     }
 
     #endregion

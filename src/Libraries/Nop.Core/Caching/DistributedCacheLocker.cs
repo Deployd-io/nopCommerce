@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Caching;
 
 public partial class DistributedCacheLocker : ILocker
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected static readonly string _running = JsonConvert.SerializeObject(TaskStatus.Running);
@@ -16,7 +18,10 @@ public partial class DistributedCacheLocker : ILocker
 
     public DistributedCacheLocker(IDistributedCache distributedCache)
     {
+		_logger.LogDebug(">>> Entering DistributedCacheLocker(distributedCache={DistributedCache})", distributedCache);
         _distributedCache = distributedCache;
+		_logger.LogDebug("DistributedCacheLocker(distributedCache={DistributedCache}): _distributedCache → {_distributedCache}", distributedCache, _distributedCache);
+		_logger.LogDebug("<<< Exiting DistributedCacheLocker(distributedCache={DistributedCache})", distributedCache);
     }
 
     #endregion
@@ -32,6 +37,8 @@ public partial class DistributedCacheLocker : ILocker
     /// <returns>A task that resolves true if lock was acquired and action was performed; otherwise false</returns>
     public virtual async Task<bool> PerformActionWithLockAsync(string resource, TimeSpan expirationTime, Func<Task> action)
     {
+		_logger.LogDebug(">>> Entering PerformActionWithLockAsync(resource={Resource},expirationTime={ExpirationTime},action={Action})", resource, expirationTime, action);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //ensure that lock is acquired
         if (!string.IsNullOrEmpty(await _distributedCache.GetStringAsync(resource)))
             return false;
@@ -45,6 +52,8 @@ public partial class DistributedCacheLocker : ILocker
 
             await action();
 
+			_logger.LogInformation("PerformActionWithLockAsync(resource,expirationTime,action)={Resource},{ExpirationTime},{Action}: external service call took {Arg3} ms", resource, expirationTime, action, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting PerformActionWithLockAsync(resource={Resource},expirationTime={ExpirationTime},action={Action})", resource, expirationTime, action);
             return true;
         }
         finally
@@ -66,10 +75,13 @@ public partial class DistributedCacheLocker : ILocker
     /// <returns>A task that resolves true if lock was acquired and action was performed; otherwise false</returns>
     public virtual async Task RunWithHeartbeatAsync(string key, TimeSpan expirationTime, TimeSpan heartbeatInterval, Func<CancellationToken, Task> action, CancellationTokenSource cancellationTokenSource = default)
     {
+		_logger.LogDebug(">>> Entering RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, heartbeatInterval, action);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!string.IsNullOrEmpty(await _distributedCache.GetStringAsync(key)))
             return;
 
         var tokenSource = cancellationTokenSource ?? new CancellationTokenSource();
+		_logger.LogDebug("RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>): tokenSource → {TokenSource}", key, expirationTime, heartbeatInterval, action, tokenSource);
 
         try
         {
@@ -87,6 +99,7 @@ public partial class DistributedCacheLocker : ILocker
                     {
                         tokenSource.Token.ThrowIfCancellationRequested();
                         var status = _distributedCache.GetString(key);
+						_logger.LogDebug("RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>): status → {Status}", key, expirationTime, heartbeatInterval, action, status);
                         if (!string.IsNullOrEmpty(status) && JsonConvert.DeserializeObject<TaskStatus>(status) ==
                             TaskStatus.Canceled)
                         {
@@ -100,6 +113,7 @@ public partial class DistributedCacheLocker : ILocker
                             new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = expirationTime });
                     }
                     catch (OperationCanceledException) { }
+					_logger.LogError("Exception in RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>): {Arg5}", key, expirationTime, heartbeatInterval, action, OperationCanceledException.getMessage());
                 },
                 state: null,
                 dueTime: 0,
@@ -112,6 +126,8 @@ public partial class DistributedCacheLocker : ILocker
         {
             await _distributedCache.RemoveAsync(key);
         }
+		_logger.LogInformation("RunWithHeartbeatAsync(key,expirationTime,heartbeatInterval,action,cancellationTokenSource)={Key},{ExpirationTime},{HeartbeatInterval},{Action},{CancellationTokenSource}: external service call took {Arg5} ms", key, expirationTime, heartbeatInterval, action, cancellationTokenSource, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, heartbeatInterval, action);
     }
 
     /// <summary>
@@ -124,6 +140,7 @@ public partial class DistributedCacheLocker : ILocker
     /// necessarily imply that the task has been canceled, only that cancellation has been requested.</returns>
     public virtual async Task CancelTaskAsync(string key, TimeSpan expirationTime)
     {
+		_logger.LogDebug(">>> Entering CancelTaskAsync(key={Key},expirationTime={ExpirationTime})", key, expirationTime);
         var status = await _distributedCache.GetStringAsync(key);
         if (!string.IsNullOrEmpty(status) &&
             JsonConvert.DeserializeObject<TaskStatus>(status) != TaskStatus.Canceled)
@@ -131,6 +148,8 @@ public partial class DistributedCacheLocker : ILocker
                 key,
                 JsonConvert.SerializeObject(TaskStatus.Canceled),
                 new DistributedCacheEntryOptions { AbsoluteExpirationRelativeToNow = expirationTime });
+			_logger.LogDebug("CancelTaskAsync(key={Key},expirationTime={ExpirationTime}): status → {Status}", key, expirationTime, status);
+				_logger.LogDebug("<<< Exiting CancelTaskAsync(key={Key},expirationTime={ExpirationTime})", key, expirationTime);
     }
 
     /// <summary>
@@ -140,6 +159,10 @@ public partial class DistributedCacheLocker : ILocker
     /// <returns>A task that resolves to true if the background task is running; otherwise false</returns>
     public virtual async Task<bool> IsTaskRunningAsync(string key)
     {
+		_logger.LogDebug(">>> Entering IsTaskRunningAsync(key={Key})", key);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("IsTaskRunningAsync(key)={Key}: external service call took {Arg1} ms", key, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting IsTaskRunningAsync(key={Key})", key);
         return !string.IsNullOrEmpty(await _distributedCache.GetStringAsync(key));
     }
 

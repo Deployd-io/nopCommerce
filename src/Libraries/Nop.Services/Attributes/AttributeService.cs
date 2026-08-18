@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Caching;
 using Nop.Core.Domain.Attributes;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Attributes;
 
@@ -13,6 +14,7 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     where TAttribute : BaseAttribute
     where TAttributeValue : BaseAttributeValue
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<TAttribute> _attributeRepository;
@@ -27,9 +29,14 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
         IRepository<TAttributeValue> attributeValueRepository,
         IStaticCacheManager staticCacheManager)
     {
+		_logger.LogDebug(">>> Entering AttributeService(attributeRepository={AttributeRepository},attributeValueRepository={AttributeValueRepository},staticCacheManager={StaticCacheManager})", attributeRepository, attributeValueRepository, staticCacheManager);
         _attributeRepository = attributeRepository;
         _attributeValueRepository = attributeValueRepository;
+		_logger.LogDebug("AttributeService(attributeRepository={AttributeRepository},attributeValueRepository={AttributeValueRepository},staticCacheManager={StaticCacheManager}): _attributeValueRepository → {_attributeValueRepository}", attributeRepository, attributeValueRepository, staticCacheManager, _attributeValueRepository);
+		_logger.LogDebug("AttributeService(attributeRepository={AttributeRepository},attributeValueRepository={AttributeValueRepository},staticCacheManager={StaticCacheManager}): _attributeRepository → {_attributeRepository}", attributeRepository, attributeValueRepository, staticCacheManager, _attributeRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("AttributeService(attributeRepository={AttributeRepository},attributeValueRepository={AttributeValueRepository},staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", attributeRepository, attributeValueRepository, staticCacheManager, _staticCacheManager);
+		_logger.LogDebug("<<< Exiting AttributeService(attributeRepository={AttributeRepository},attributeValueRepository={AttributeValueRepository},staticCacheManager={StaticCacheManager})", attributeRepository, attributeValueRepository, staticCacheManager);
     }
 
     #endregion
@@ -47,6 +54,8 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// </returns>
     public virtual async Task<IList<TAttribute>> GetAllAttributesAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllAttributesAsync()");
+		_logger.LogDebug("<<< Exiting GetAllAttributesAsync()");
         return await _attributeRepository.GetAllAsync(
             query => query.OrderBy(attribute => attribute.DisplayOrder)
                 .ThenBy(attribute => attribute.Id),
@@ -63,6 +72,8 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// </returns>
     public virtual async Task<TAttribute> GetAttributeByIdAsync(int attributeId)
     {
+		_logger.LogDebug(">>> Entering GetAttributeByIdAsync(attributeId={AttributeId})", attributeId);
+		_logger.LogDebug("<<< Exiting GetAttributeByIdAsync(attributeId={AttributeId})", attributeId);
         return await _attributeRepository.GetByIdAsync(attributeId, _ => default);
     }
 
@@ -73,7 +84,9 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAttributeAsync(TAttribute attribute)
     {
+		_logger.LogDebug(">>> Entering InsertAttributeAsync(attribute={Attribute})", attribute);
         await _attributeRepository.InsertAsync(attribute);
+		_logger.LogDebug("<<< Exiting InsertAttributeAsync(attribute={Attribute})", attribute);
     }
 
     /// <summary>
@@ -83,7 +96,9 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAttributeAsync(TAttribute attribute)
     {
+		_logger.LogDebug(">>> Entering UpdateAttributeAsync(attribute={Attribute})", attribute);
         await _attributeRepository.UpdateAsync(attribute);
+		_logger.LogDebug("<<< Exiting UpdateAttributeAsync(attribute={Attribute})", attribute);
     }
 
     /// <summary>
@@ -93,7 +108,11 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAttributeAsync(TAttribute attribute)
     {
+		_logger.LogDebug(">>> Entering DeleteAttributeAsync(attribute={Attribute})", attribute);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _attributeRepository.DeleteAsync(attribute);
+		_logger.LogInformation("DeleteAttributeAsync(attribute)={Attribute}: external service call took {Arg1} ms", attribute, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteAttributeAsync(attribute={Attribute})", attribute);
     }
 
     /// <summary>
@@ -106,6 +125,8 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// </returns>
     public virtual async Task<IList<TAttribute>> GetAttributeByIdsAsync(int[] attributeIds)
     {
+		_logger.LogDebug(">>> Entering GetAttributeByIdsAsync(attributeIds={AttributeIds})", attributeIds);
+		_logger.LogDebug("<<< Exiting GetAttributeByIdsAsync(attributeIds={AttributeIds})", attributeIds);
         return await _attributeRepository.GetByIdsAsync(attributeIds);
     }
 
@@ -116,9 +137,13 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAttributesAsync(IList<TAttribute> attributes)
     {
+		_logger.LogDebug(">>> Entering DeleteAttributesAsync(attributes={Attributes})", attributes);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(attributes);
 
         await _attributeRepository.DeleteAsync(attributes);
+		_logger.LogInformation("DeleteAttributesAsync(attributes)={Attributes}: external service call took {Arg1} ms", attributes, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteAttributesAsync(attributes={Attributes})", attributes);
     }
 
     #endregion
@@ -135,6 +160,8 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// </returns>
     public virtual async Task<IList<TAttributeValue>> GetAttributeValuesAsync(int attributeId)
     {
+		_logger.LogDebug(">>> Entering GetAttributeValuesAsync(attributeId={AttributeId})", attributeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(
             NopAttributeDefaults.AttributeValuesByAttributeCacheKey, typeof(TAttribute).Name, attributeId);
 
@@ -143,6 +170,8 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
             .OrderBy(attributeValue => attributeValue.DisplayOrder)
             .ThenBy(attributeValue => attributeValue.Id);
 
+		_logger.LogInformation("GetAttributeValuesAsync(attributeId)={AttributeId}: external service call took {Arg1} ms", attributeId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetAttributeValuesAsync(attributeId={AttributeId})", attributeId);
         return await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
     }
 
@@ -156,6 +185,8 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// </returns>
     public virtual async Task<TAttributeValue> GetAttributeValueByIdAsync(int attributeValueId)
     {
+		_logger.LogDebug(">>> Entering GetAttributeValueByIdAsync(attributeValueId={AttributeValueId})", attributeValueId);
+		_logger.LogDebug("<<< Exiting GetAttributeValueByIdAsync(attributeValueId={AttributeValueId})", attributeValueId);
         return await _attributeValueRepository.GetByIdAsync(attributeValueId, _ => default);
     }
 
@@ -166,7 +197,9 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAttributeValueAsync(TAttributeValue attributeValue)
     {
+		_logger.LogDebug(">>> Entering InsertAttributeValueAsync(attributeValue={AttributeValue})", attributeValue);
         await _attributeValueRepository.InsertAsync(attributeValue);
+		_logger.LogDebug("<<< Exiting InsertAttributeValueAsync(attributeValue={AttributeValue})", attributeValue);
     }
 
     /// <summary>
@@ -176,7 +209,9 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAttributeValueAsync(TAttributeValue attributeValue)
     {
+		_logger.LogDebug(">>> Entering UpdateAttributeValueAsync(attributeValue={AttributeValue})", attributeValue);
         await _attributeValueRepository.UpdateAsync(attributeValue);
+		_logger.LogDebug("<<< Exiting UpdateAttributeValueAsync(attributeValue={AttributeValue})", attributeValue);
     }
 
     /// <summary>
@@ -186,7 +221,10 @@ public partial class AttributeService<TAttribute, TAttributeValue> : IAttributeS
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAttributeValueAsync(TAttributeValue attributeValue)
     {
+		_logger.LogDebug(">>> Entering DeleteAttributeValueAsync(attributeValue={AttributeValue})", attributeValue);
+		_logger.LogInformation("DeleteAttributeValueAsync(attributeValue)={AttributeValue}: external service call took {Arg1} ms", attributeValue, __logStart.ElapsedMilliseconds);
         await _attributeValueRepository.DeleteAsync(attributeValue);
+		_logger.LogDebug("<<< Exiting DeleteAttributeValueAsync(attributeValue={AttributeValue})", attributeValue);
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Shipping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -9,16 +10,21 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class UpdateOrderParameters
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public UpdateOrderParameters(Order updatedOrder, OrderItem updatedOrderItem)
     {
+		_logger.LogDebug(">>> Entering UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem})", updatedOrder, updatedOrderItem);
         ArgumentNullException.ThrowIfNull(updatedOrder);
 
         ArgumentNullException.ThrowIfNull(updatedOrderItem);
 
         UpdatedOrder = updatedOrder;
+		_logger.LogDebug("UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem}): UpdatedOrder → {UpdatedOrder1}", updatedOrder, updatedOrderItem, UpdatedOrder);
         UpdatedOrderItem = updatedOrderItem;
+		_logger.LogDebug("UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem}): UpdatedOrderItem → {UpdatedOrderItem1}", updatedOrder, updatedOrderItem, UpdatedOrderItem);
+		_logger.LogDebug("<<< Exiting UpdateOrderParameters(updatedOrder={UpdatedOrder},updatedOrderItem={UpdatedOrderItem})", updatedOrder, updatedOrderItem);
     }
 
     #endregion

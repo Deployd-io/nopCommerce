@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Plugin.Misc.Zettle.Services;
 
 /// <summary>
@@ -44,9 +45,14 @@ public static class GuidGenerator
 
     static GuidGenerator()
     {
+		_logger.LogDebug(">>> Entering GuidGenerator()");
         _random = new Random();
         _nodeBytes = GenerateNodeBytes();
+		_logger.LogDebug("GuidGenerator(): _nodeBytes → {_nodeBytes}", _nodeBytes);
+		_logger.LogDebug("GuidGenerator(): _random → {_random}", _random);
         _clockSequenceBytes = GenerateClockSequenceBytes();
+		_logger.LogDebug("GuidGenerator(): _clockSequenceBytes → {_clockSequenceBytes}", _clockSequenceBytes);
+		_logger.LogDebug("<<< Exiting GuidGenerator()");
     }
 
     #endregion
@@ -59,9 +65,11 @@ public static class GuidGenerator
     /// <returns></returns>
     private static byte[] GenerateNodeBytes()
     {
+		_logger.LogDebug(">>> Entering GenerateNodeBytes()");
         var node = new byte[6];
 
         _random.NextBytes(node);
+		_logger.LogDebug("<<< Exiting GenerateNodeBytes()");
         return node;
     }
 
@@ -70,8 +78,11 @@ public static class GuidGenerator
     /// </summary>
     private static byte[] GenerateClockSequenceBytes()
     {
+		_logger.LogDebug(">>> Entering GenerateClockSequenceBytes()");
         var bytes = new byte[2];
         _random.NextBytes(bytes);
+		_logger.LogDebug("<<< Exiting GenerateClockSequenceBytes()");
+		_logger.LogDebug("<<< Exiting GenerateClockSequenceBytes(dt={Dt})", dt);
         return bytes;
     }
 
@@ -94,18 +105,22 @@ public static class GuidGenerator
 
     private static Guid GenerateTimeBasedGuid(DateTimeOffset dateTime, byte[] clockSequence, byte[] node)
     {
+		_logger.LogDebug(">>> Entering GenerateTimeBasedGuid(dateTime={DateTime},clockSequence={ClockSequence},node={Node})", dateTime, clockSequence, node);
         ArgumentNullException.ThrowIfNull(clockSequence);
         ArgumentNullException.ThrowIfNull(node);
 
         if (clockSequence.Length != 2)
+			_logger.LogWarning("Throwing ArgumentOutOfRangeException from GenerateTimeBasedGuid(dateTime={DateTime},clockSequence={ClockSequence},node={Node})", dateTime, clockSequence, node);
             throw new ArgumentOutOfRangeException(nameof(clockSequence), "The clockSequence must be 2 bytes.");
 
         if (node.Length != 6)
             throw new ArgumentOutOfRangeException(nameof(node), "The node must be 6 bytes.");
 
         var ticks = (dateTime - _gregorianCalendarStart).Ticks;
+		_logger.LogDebug("GenerateTimeBasedGuid(dateTime={DateTime},clockSequence={ClockSequence},node={Node}): ticks → {Ticks}", dateTime, clockSequence, node, ticks);
         var guid = new byte[BYTE_ARRAY_SIZE];
         var timestamp = BitConverter.GetBytes(ticks);
+		_logger.LogDebug("GenerateTimeBasedGuid(dateTime={DateTime},clockSequence={ClockSequence},node={Node}): timestamp → {Timestamp}", dateTime, clockSequence, node, timestamp);
 
         // copy node
         Array.Copy(node, 0, guid, NODE_BYTE, Math.Min(6, node.Length));
@@ -124,6 +139,8 @@ public static class GuidGenerator
         guid[VERSION_BYTE] &= (byte)VERSION_BYTE_MASK;
         guid[VERSION_BYTE] |= (byte)((byte)GuidVersion.TimeBased << VERSION_BYTE_SHIFT);
 
+		_logger.LogDebug("<<< Exiting GenerateTimeBasedGuid(dateTime={DateTime},clockSequence={ClockSequence},node={Node})", dateTime, clockSequence, node);
+		_logger.LogDebug("<<< Exiting GenerateTimeBasedGuid(dateTime={DateTime})", dateTime);
         return new Guid(guid);
     }
     #endregion
@@ -132,7 +149,10 @@ public static class GuidGenerator
 
     public static GuidVersion GetUuidVersion(this Guid guid)
     {
+		_logger.LogDebug(">>> Entering GetUuidVersion(guid={Guid})", guid);
         var bytes = guid.ToByteArray();
+		_logger.LogDebug("GetUuidVersion(guid={Guid}): bytes → {Bytes}", guid, bytes);
+		_logger.LogDebug("<<< Exiting GetUuidVersion(guid={Guid})", guid);
         return (GuidVersion)((bytes[VERSION_BYTE] & 0xFF) >> VERSION_BYTE_SHIFT);
     }
 
@@ -149,6 +169,7 @@ public static class GuidGenerator
 
     public enum GuidVersion
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         TimeBased = 0x01,
         Reserved = 0x02,
         NameBased = 0x03,

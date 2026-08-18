@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Models;
 
@@ -10,17 +11,27 @@ namespace Nop.Plugin.Misc.Brevo.Models;
 /// </summary>
 public record ConfigurationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering ConfigurationModel()");
         AvailableLists = new List<SelectListItem>();
         NewsLetterSubscriptionTypes = new List<NewsLetterSubscriptionMapModel>();
+		_logger.LogDebug("ConfigurationModel(): NewsLetterSubscriptionTypes → {NewsLetterSubscriptionTypes}", NewsLetterSubscriptionTypes);
+		_logger.LogDebug("ConfigurationModel(): AvailableLists → {AvailableLists}", AvailableLists);
         AvailableSenders = new List<SelectListItem>();
+		_logger.LogDebug("ConfigurationModel(): AvailableSenders → {AvailableSenders}", AvailableSenders);
         AvailableMessageTemplates = new List<SelectListItem>();
+		_logger.LogDebug("ConfigurationModel(): AvailableMessageTemplates → {AvailableMessageTemplates}", AvailableMessageTemplates);
         MessageTemplateSearchModel = new BrevoMessageTemplateSearchModel();
+		_logger.LogDebug("ConfigurationModel(): MessageTemplateSearchModel → {MessageTemplateSearchModel}", MessageTemplateSearchModel);
         SmsSearchModel = new SmsSearchModel();
+		_logger.LogDebug("ConfigurationModel(): SmsSearchModel → {SmsSearchModel}", SmsSearchModel);
         AddSms = new SmsModel();
+		_logger.LogDebug("ConfigurationModel(): AddSms → {AddSms}", AddSms);
+		_logger.LogDebug("<<< Exiting ConfigurationModel()");
     }
 
     #endregion

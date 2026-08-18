@@ -1,16 +1,24 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Services.ScheduleTasks;
 
 namespace Nop.Tests.Nop.Services.Tests.ScheduleTasks;
 
 public class TestScheduleTask : IScheduleTask
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public TestScheduleTask()
     {
+		_logger.LogDebug(">>> Entering TestScheduleTask()");
         IsInit = true;
+		_logger.LogDebug("TestScheduleTask(): IsInit → {IsInit}", IsInit);
+		_logger.LogDebug("<<< Exiting TestScheduleTask()");
     }
 
     public Task ExecuteAsync()
     {
+		_logger.LogDebug(">>> Entering ExecuteAsync()");
+		_logger.LogWarning("Throwing NotImplementedException from ExecuteAsync()");
+		_logger.LogDebug("<<< Exiting ExecuteAsync()");
         throw new System.NotImplementedException();
     }
 
@@ -18,6 +26,9 @@ public class TestScheduleTask : IScheduleTask
 
     public static void ResetInitFlag()
     {
+		_logger.LogDebug(">>> Entering ResetInitFlag()");
         IsInit = false;
+		_logger.LogDebug("ResetInitFlag(): IsInit → {IsInit}", IsInit);
+		_logger.LogDebug("<<< Exiting ResetInitFlag()");
     }
 }

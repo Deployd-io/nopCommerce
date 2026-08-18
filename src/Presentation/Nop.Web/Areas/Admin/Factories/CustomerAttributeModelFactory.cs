@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<CustomerAttribute, CustomerAttributeValue> _customerAttributeService;
@@ -27,9 +29,14 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
         ILocalizationService localizationService,
         ILocalizedModelFactory localizedModelFactory)
     {
+		_logger.LogDebug(">>> Entering CustomerAttributeModelFactory(customerAttributeService={CustomerAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory})", customerAttributeService, localizationService, localizedModelFactory);
         _customerAttributeService = customerAttributeService;
         _localizationService = localizationService;
+		_logger.LogDebug("CustomerAttributeModelFactory(customerAttributeService={CustomerAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory}): _localizationService → {_localizationService}", customerAttributeService, localizationService, localizedModelFactory, _localizationService);
+		_logger.LogDebug("CustomerAttributeModelFactory(customerAttributeService={CustomerAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory}): _customerAttributeService → {_customerAttributeService}", customerAttributeService, localizationService, localizedModelFactory, _customerAttributeService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("CustomerAttributeModelFactory(customerAttributeService={CustomerAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory}): _localizedModelFactory → {_localizedModelFactory}", customerAttributeService, localizationService, localizedModelFactory, _localizedModelFactory);
+		_logger.LogDebug("<<< Exiting CustomerAttributeModelFactory(customerAttributeService={CustomerAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory})", customerAttributeService, localizationService, localizedModelFactory);
     }
 
     #endregion
@@ -45,15 +52,18 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     protected virtual CustomerAttributeValueSearchModel PrepareCustomerAttributeValueSearchModel(CustomerAttributeValueSearchModel searchModel,
         CustomerAttribute customerAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeValueSearchModel(searchModel={SearchModel},customerAttribute={CustomerAttribute})", searchModel, customerAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customerAttribute);
 
         searchModel.CustomerAttributeId = customerAttribute.Id;
+		_logger.LogDebug("PrepareCustomerAttributeValueSearchModel(searchModel={SearchModel},customerAttribute={CustomerAttribute}): searchModel.CustomerAttributeId → {Arg2}", searchModel, customerAttribute, searchModel.CustomerAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeValueSearchModel(searchModel={SearchModel},customerAttribute={CustomerAttribute})", searchModel, customerAttribute);
         return searchModel;
     }
 
@@ -71,11 +81,13 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     /// </returns>
     public virtual Task<CustomerAttributeSearchModel> PrepareCustomerAttributeSearchModelAsync(CustomerAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -89,10 +101,12 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     /// </returns>
     public virtual async Task<CustomerAttributeListModel> PrepareCustomerAttributeListModelAsync(CustomerAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get customer attributes
         var customerAttributes = (await _customerAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareCustomerAttributeListModelAsync(searchModel={SearchModel}): customerAttributes → {CustomerAttributes}", searchModel, customerAttributes);
 
         //prepare list model
         var model = await new CustomerAttributeListModel().PrepareToGridAsync(searchModel, customerAttributes, () =>
@@ -101,6 +115,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
             {
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<CustomerAttributeModel>();
+				_logger.LogDebug("PrepareCustomerAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
 
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
@@ -109,6 +124,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -125,6 +141,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     public virtual async Task<CustomerAttributeModel> PrepareCustomerAttributeModelAsync(CustomerAttributeModel model,
         CustomerAttribute customerAttribute, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeModelAsync(model={Model},customerAttribute={CustomerAttribute},excludeProperties={ExcludeProperties})", model, customerAttribute, excludeProperties);
         Func<CustomerAttributeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (customerAttribute != null)
@@ -146,6 +163,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeModelAsync(model={Model},customerAttribute={CustomerAttribute},excludeProperties={ExcludeProperties})", model, customerAttribute, excludeProperties);
         return model;
     }
 
@@ -161,6 +179,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     public virtual async Task<CustomerAttributeValueListModel> PrepareCustomerAttributeValueListModelAsync(CustomerAttributeValueSearchModel searchModel,
         CustomerAttribute customerAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeValueListModelAsync(searchModel={SearchModel},customerAttribute={CustomerAttribute})", searchModel, customerAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(customerAttribute);
@@ -173,6 +192,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
         var model = new CustomerAttributeValueListModel().PrepareToGrid(searchModel, customerAttributeValues, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeValueListModelAsync(searchModel={SearchModel},customerAttribute={CustomerAttribute})", searchModel, customerAttribute);
             return customerAttributeValues.Select(value => value.ToModel<CustomerAttributeValueModel>());
         });
 
@@ -193,6 +213,7 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
     public virtual async Task<CustomerAttributeValueModel> PrepareCustomerAttributeValueModelAsync(CustomerAttributeValueModel model,
         CustomerAttribute customerAttribute, CustomerAttributeValue customerAttributeValue, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAttributeValueModelAsync(model={Model},customerAttribute={CustomerAttribute},customerAttributeValue={CustomerAttributeValue},excludeProperties={ExcludeProperties})", model, customerAttribute, customerAttributeValue, excludeProperties);
         ArgumentNullException.ThrowIfNull(customerAttribute);
 
         Func<CustomerAttributeValueLocalizedModel, int, Task> localizedModelConfiguration = null;
@@ -210,11 +231,13 @@ public partial class CustomerAttributeModelFactory : ICustomerAttributeModelFact
         }
 
         model.AttributeId = customerAttribute.Id;
+		_logger.LogDebug("PrepareCustomerAttributeValueModelAsync(model={Model},customerAttribute={CustomerAttribute},customerAttributeValue={CustomerAttributeValue},excludeProperties={ExcludeProperties}): model.AttributeId → {Arg4}", model, customerAttribute, customerAttributeValue, excludeProperties, model.AttributeId);
 
         //prepare localized models
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareCustomerAttributeValueModelAsync(model={Model},customerAttribute={CustomerAttribute},customerAttributeValue={CustomerAttributeValue},excludeProperties={ExcludeProperties})", model, customerAttribute, customerAttributeValue, excludeProperties);
         return model;
     }
 

@@ -17,12 +17,14 @@ using Nop.Services.Orders;
 using Nop.Services.Stores;
 using Nop.Tests.Nop.Services.Tests.Payments;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.Orders;
 
 [TestFixture]
 public class OrderTotalCalculationServiceTests : ServiceTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private IOrderTotalCalculationService _orderTotalCalcService;
     private IProductService _productService;
     private ICustomerService _customerService;
@@ -45,6 +47,7 @@ public class OrderTotalCalculationServiceTests : ServiceTest
 
     private async Task<ShoppingCartItem> CreateTestShopCartItemAsync(decimal productPrice, int quantity = 1)
     {
+		_logger.LogDebug(">>> Entering CreateTestShopCartItemAsync(productPrice={ProductPrice},quantity={Quantity})", productPrice, quantity);
         //shopping cart
         var product = new Product
         {
@@ -64,13 +67,16 @@ public class OrderTotalCalculationServiceTests : ServiceTest
             Quantity = quantity
         };
 
+		_logger.LogDebug("<<< Exiting CreateTestShopCartItemAsync(productPrice={ProductPrice},quantity={Quantity})", productPrice, quantity);
         return shoppingCartItem;
     }
 
     private async Task<List<ShoppingCartItem>> GetShoppingCartAsync()
     {
+		_logger.LogDebug(">>> Entering GetShoppingCartAsync()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         var sci1 = new ShoppingCartItem
+		_logger.LogDebug("GetShoppingCartAsync(): product → {Product}", product);
         {
             ProductId = product.Id,
             Quantity = 2
@@ -86,8 +92,10 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         foreach (var sci in cart)
         {
             sci.CustomerId = _customer.Id;
+			_logger.LogDebug("GetShoppingCartAsync(): sci.CustomerId → {Arg0}", sci.CustomerId);
         }
 
+		_logger.LogDebug("<<< Exiting GetShoppingCartAsync()");
         return cart;
     }
 
@@ -96,12 +104,18 @@ public class OrderTotalCalculationServiceTests : ServiceTest
     [SetUp]
     public async Task SetUp()
     {
+		_logger.LogDebug(">>> Entering SetUp()");
         _settingService = GetService<ISettingService>();
 
+		_logger.LogDebug("SetUp(): _settingService → {_settingService}", _settingService);
         var shippingSettings = GetService<ShippingSettings>();
+		_logger.LogDebug("SetUp(): shippingSettings → {ShippingSettings}", shippingSettings);
         shippingSettings.ActiveShippingRateComputationMethodSystemNames.Add("FixedRateTestShippingRateComputationMethod");
         _taxSettings = GetService<TaxSettings>();
         _taxSettings.ActiveTaxProviderSystemName = "FixedTaxRateTest";
+		_logger.LogDebug("SetUp(): _taxSettings → {_taxSettings}", _taxSettings);
+		_logger.LogDebug("SetUp(): _taxSettings.ActiveTaxProviderSystemName → {Arg0}", _taxSettings.ActiveTaxProviderSystemName);
+		_logger.LogDebug("SetUp(): _taxSettings.ShippingIsTaxable → {Arg0}", _taxSettings.ShippingIsTaxable);
         _taxSettings.ShippingIsTaxable = true;
         await _settingService.SaveSettingAsync(shippingSettings);
         await _settingService.SaveSettingAsync(_taxSettings);
@@ -115,17 +129,29 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         _storeService = GetService<IStoreService>();
         _rewardPointsSettings = GetService<RewardPointsSettings>();
 
+		_logger.LogDebug("SetUp(): _orderTotalCalcService → {_orderTotalCalcService}", _orderTotalCalcService);
         _genericAttributeService = GetService<IGenericAttributeService>();
         var checkoutAttributeService = GetService<IAttributeService<CheckoutAttribute, CheckoutAttributeValue>>();
+		_logger.LogDebug("SetUp(): checkoutAttributeService → {CheckoutAttributeService}", checkoutAttributeService);
+		_logger.LogDebug("SetUp(): _productService → {_productService}", _productService);
+		_logger.LogDebug("SetUp(): _customerService → {_customerService}", _customerService);
+		_logger.LogDebug("SetUp(): _discountService → {_discountService}", _discountService);
+		_logger.LogDebug("SetUp(): _shoppingCartService → {_shoppingCartService}", _shoppingCartService);
 
         var attr = await checkoutAttributeService.GetAttributeByIdAsync(1);
+		_logger.LogDebug("SetUp(): attr → {Attr}", attr);
 
         var values = await checkoutAttributeService.GetAttributeValuesAsync(attr.Id);
+		_logger.LogDebug("SetUp(): values → {Values}", values);
 
         var val = values.FirstOrDefault(p => p.Name == "Yes")?.Id.ToString();
+		_logger.LogDebug("SetUp(): val → {Val}", val);
 
         _checkoutAttrXml = GetService<IAttributeParser<CheckoutAttribute, CheckoutAttributeValue>>().AddAttribute(string.Empty, attr, val);
 
+		_logger.LogDebug("SetUp(): _shoppingCartSettings → {_shoppingCartSettings}", _shoppingCartSettings);
+		_logger.LogDebug("SetUp(): _storeService → {_storeService}", _storeService);
+		_logger.LogDebug("SetUp(): _rewardPointsSettings → {_rewardPointsSettings}", _rewardPointsSettings);
         _discount = new Discount
         {
             IsActive = true,
@@ -133,30 +159,45 @@ public class OrderTotalCalculationServiceTests : ServiceTest
             DiscountType = DiscountType.AssignedToOrderSubTotal,
             DiscountAmount = 3,
             DiscountLimitation = DiscountLimitationType.Unlimited
+			_logger.LogDebug("SetUp(): _discount → {_discount}", _discount);
+			_logger.LogDebug("SetUp(): _checkoutAttrXml → {_checkoutAttrXml}", _checkoutAttrXml);
+			_logger.LogDebug("SetUp(): _genericAttributeService → {_genericAttributeService}", _genericAttributeService);
         };
 
         _customer = await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail);
         _store = (await _storeService.GetAllStoresAsync()).First();
 
+		_logger.LogDebug("SetUp(): _customer → {_customer}", _customer);
         await _genericAttributeService.SaveAttributeAsync(_customer,
             NopCustomerDefaults.SelectedPaymentMethodAttribute, "Payments.TestMethod", 1);
+			_logger.LogDebug("SetUp(): _store → {_store}", _store);
+			_logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [TearDown]
     public async Task TearDown()
     {
+		_logger.LogDebug(">>> Entering TearDown()");
         var settingService = GetService<ISettingService>();
 
+		_logger.LogDebug("TearDown(): settingService → {SettingService}", settingService);
         var shippingSettings = GetService<ShippingSettings>();
+		_logger.LogDebug("TearDown(): shippingSettings → {ShippingSettings}", shippingSettings);
         shippingSettings.ActiveShippingRateComputationMethodSystemNames.Clear();
 
         _taxSettings.PaymentMethodAdditionalFeeIsTaxable = false;
+		_logger.LogDebug("TearDown(): _taxSettings.PaymentMethodAdditionalFeeIsTaxable → {Arg0}", _taxSettings.PaymentMethodAdditionalFeeIsTaxable);
+		_logger.LogDebug("TearDown(): _taxSettings.ActiveTaxProviderSystemName → {Arg0}", _taxSettings.ActiveTaxProviderSystemName);
+		_logger.LogDebug("TearDown(): _taxSettings.ShippingIsTaxable → {Arg0}", _taxSettings.ShippingIsTaxable);
         _taxSettings.ActiveTaxProviderSystemName = string.Empty;
         _taxSettings.ShippingIsTaxable = false;
         await settingService.SaveSettingAsync(shippingSettings);
         await settingService.SaveSettingAsync(_taxSettings);
 
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
+		_logger.LogDebug("TearDown(): product → {Product}", product);
+		_logger.LogDebug("TearDown(): product.AdditionalShippingCharge → {Arg0}", product.AdditionalShippingCharge);
+		_logger.LogDebug("TearDown(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
         product.AdditionalShippingCharge = 0M;
         product.IsFreeShipping = true;
         await _productService.UpdateProductAsync(product);
@@ -174,11 +215,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         await _productService.DeleteProductsAsync(GetService<IRepository<Product>>().Table.Where(p => p.Name == "Product name 1").ToList());
 
         await _genericAttributeService.SaveAttributeAsync<string>(_customer, NopCustomerDefaults.CheckoutAttributes, null, _store.Id);
+		_logger.LogDebug("<<< Exiting TearDown()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubTotalExcludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubTotalExcludingTax()");
         //10% - default tax rate
         var (discountAmount, appliedDiscounts, subTotalWithoutDiscount, subTotalWithDiscount, taxRates) = await _orderTotalCalcService.GetShoppingCartSubTotalAsync(await GetShoppingCartAsync(), false);
         discountAmount.Should().Be(0);
@@ -188,11 +231,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         taxRates.Count.Should().Be(1);
         taxRates.ContainsKey(10).Should().BeTrue();
         taxRates[10].Should().Be(20.7M);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubTotalExcludingTax()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubTotalIncludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubTotalIncludingTax()");
         var (discountAmount, appliedDiscounts, subTotalWithoutDiscount, subTotalWithDiscount, taxRates) = await _orderTotalCalcService.GetShoppingCartSubTotalAsync(await GetShoppingCartAsync(), true);
         discountAmount.Should().Be(0);
         appliedDiscounts.Count.Should().Be(0);
@@ -201,11 +246,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         taxRates.Count.Should().Be(1);
         taxRates.ContainsKey(10).Should().BeTrue();
         taxRates[10].Should().Be(20.7M);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubTotalIncludingTax()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubTotal()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubTotal()");
         var (discountAmountInclTax, discountAmountExclTax, appliedDiscounts, subTotalWithoutDiscountInclTax, subTotalWithoutDiscountExclTax, subTotalWithDiscountInclTax, subTotalWithDiscountExclTax, taxRates) = await _orderTotalCalcService.GetShoppingCartSubTotalsAsync(await GetShoppingCartAsync());
 
         discountAmountExclTax.Should().Be(0);
@@ -220,11 +267,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         taxRates.Count.Should().Be(1);
         taxRates.ContainsKey(10).Should().BeTrue();
         taxRates[10].Should().Be(20.7M);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubTotal()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubTotalWithCheckoutAttribute()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubTotalWithCheckoutAttribute()");
         var (discountAmountInclTax, discountAmountExclTax, appliedDiscounts, subTotalWithoutDiscountInclTax, subTotalWithoutDiscountExclTax, subTotalWithDiscountInclTax, subTotalWithDiscountExclTax, taxRates) = await _orderTotalCalcService.GetShoppingCartSubTotalsAsync(await GetShoppingCartAsync());
 
         discountAmountExclTax.Should().Be(0);
@@ -251,11 +300,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         subTotalWithDiscountInclTax.Should().Be(238.7M);
 
         await _genericAttributeService.SaveAttributeAsync<string>(_customer, NopCustomerDefaults.CheckoutAttributes, null, _store.Id);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubTotalWithCheckoutAttribute()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubtotalDiscountExcludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubtotalDiscountExcludingTax()");
         await _discountService.InsertDiscountAsync(_discount);
 
         //10% - default tax rate
@@ -271,11 +322,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         taxRates.Count.Should().Be(1);
         taxRates.ContainsKey(10).Should().BeTrue();
         taxRates[10].Should().Be(20.4M);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubtotalDiscountExcludingTax()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubtotalDiscountIncludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubtotalDiscountIncludingTax()");
         await _discountService.InsertDiscountAsync(_discount);
 
         var (discountAmount, appliedDiscounts, subTotalWithoutDiscount, subTotalWithDiscount, taxRates) = await _orderTotalCalcService.GetShoppingCartSubTotalAsync(await GetShoppingCartAsync(), true);
@@ -292,11 +345,13 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         taxRates.Count.Should().Be(1);
         taxRates.ContainsKey(10).Should().BeTrue();
         taxRates[10].Should().Be(20.4M);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubtotalDiscountIncludingTax()");
     }
 
     [Test]
     public async Task CanGetShoppingCartSubtotalDiscountExcludingAndIncludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartSubtotalDiscountExcludingAndIncludingTax()");
         await _discountService.InsertDiscountAsync(_discount);
 
         //10% - default tax rate
@@ -317,15 +372,19 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         taxRates.Count.Should().Be(1);
         taxRates.ContainsKey(10).Should().BeTrue();
         taxRates[10].Should().Be(20.4M);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartSubtotalDiscountExcludingAndIncludingTax()");
     }
 
     [Test]
     public async Task ShippingShouldBeFreeWhenAllShoppingCartItemsAreMarkedAsFreeShipping()
     {
+		_logger.LogDebug(">>> Entering ShippingShouldBeFreeWhenAllShoppingCartItemsAreMarkedAsFreeShipping()");
         await TearDown();
         await SetUp();
 
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
+		_logger.LogDebug("ShippingShouldBeFreeWhenAllShoppingCartItemsAreMarkedAsFreeShipping(): product → {Product}", product);
+		_logger.LogDebug("ShippingShouldBeFreeWhenAllShoppingCartItemsAreMarkedAsFreeShipping(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
         product.IsFreeShipping = true;
         await _productService.UpdateProductAsync(product);
 
@@ -334,28 +393,40 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         await _productService.UpdateProductAsync(product);
 
         var isFreeShipping = await _orderTotalCalcService.IsFreeShippingAsync(await GetShoppingCartAsync());
+		_logger.LogDebug("ShippingShouldBeFreeWhenAllShoppingCartItemsAreMarkedAsFreeShipping(): isFreeShipping → {IsFreeShipping}", isFreeShipping);
         isFreeShipping.Should().BeTrue();
+		_logger.LogDebug("<<< Exiting ShippingShouldBeFreeWhenAllShoppingCartItemsAreMarkedAsFreeShipping()");
     }
 
     [Test]
     public async Task ShippingShouldNotBeFreeWhenSomeOfShoppingCartItemsAreNotMarkedAsFreeShipping()
     {
+		_logger.LogDebug(">>> Entering ShippingShouldNotBeFreeWhenSomeOfShoppingCartItemsAreNotMarkedAsFreeShipping()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.IsFreeShipping = false;
+		_logger.LogDebug("ShippingShouldNotBeFreeWhenSomeOfShoppingCartItemsAreNotMarkedAsFreeShipping(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("ShippingShouldNotBeFreeWhenSomeOfShoppingCartItemsAreNotMarkedAsFreeShipping(): product → {Product}", product);
         await _productService.UpdateProductAsync(product);
         var isFreeShipping = await _orderTotalCalcService.IsFreeShippingAsync(await GetShoppingCartAsync());
+		_logger.LogDebug("ShippingShouldNotBeFreeWhenSomeOfShoppingCartItemsAreNotMarkedAsFreeShipping(): isFreeShipping → {IsFreeShipping}", isFreeShipping);
         product.IsFreeShipping = true;
         await _productService.UpdateProductAsync(product);
         isFreeShipping.Should().BeFalse();
+		_logger.LogDebug("<<< Exiting ShippingShouldNotBeFreeWhenSomeOfShoppingCartItemsAreNotMarkedAsFreeShipping()");
     }
 
     [Test]
     public async Task ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping()
     {
+		_logger.LogDebug(">>> Entering ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.IsFreeShipping = false;
+		_logger.LogDebug("ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping(): product → {Product}", product);
         await _productService.UpdateProductAsync(product);
         var role = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.AdministratorsRoleName);
+		_logger.LogDebug("ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping(): role → {Role}", role);
+		_logger.LogDebug("ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping(): role.FreeShipping → {Arg0}", role.FreeShipping);
         role.FreeShipping = true;
         await _customerService.UpdateCustomerRoleAsync(role);
         product.IsFreeShipping = true;
@@ -363,14 +434,20 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         role.FreeShipping = false;
         await _customerService.UpdateCustomerRoleAsync(role);
         var isFreeShipping = await _orderTotalCalcService.IsFreeShippingAsync(await GetShoppingCartAsync());
+		_logger.LogDebug("ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping(): isFreeShipping → {IsFreeShipping}", isFreeShipping);
         isFreeShipping.Should().BeTrue();
+		_logger.LogDebug("<<< Exiting ShippingShouldBeFreeWhenCustomerIsInRoleWithFreeShipping()");
     }
 
     [Test]
     public async Task CanGetShippingTotalWithFixedShippingRateExcludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShippingTotalWithFixedShippingRateExcludingTax()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.AdditionalShippingCharge = 21.25M;
+		_logger.LogDebug("CanGetShippingTotalWithFixedShippingRateExcludingTax(): product.AdditionalShippingCharge → {Arg0}", product.AdditionalShippingCharge);
+		_logger.LogDebug("CanGetShippingTotalWithFixedShippingRateExcludingTax(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("CanGetShippingTotalWithFixedShippingRateExcludingTax(): product → {Product}", product);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
@@ -387,13 +464,18 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         appliedDiscounts.Count.Should().Be(0);
         //10 - default fixed tax rate
         taxRate.Should().Be(10);
+		_logger.LogDebug("<<< Exiting CanGetShippingTotalWithFixedShippingRateExcludingTax()");
     }
 
     [Test]
     public async Task CanGetShippingTotalWithFixedShippingRateIncludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShippingTotalWithFixedShippingRateIncludingTax()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.AdditionalShippingCharge = 21.25M;
+		_logger.LogDebug("CanGetShippingTotalWithFixedShippingRateIncludingTax(): product.AdditionalShippingCharge → {Arg0}", product.AdditionalShippingCharge);
+		_logger.LogDebug("CanGetShippingTotalWithFixedShippingRateIncludingTax(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("CanGetShippingTotalWithFixedShippingRateIncludingTax(): product → {Product}", product);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
@@ -410,13 +492,18 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         appliedDiscounts.Count.Should().Be(0);
         //10 - default fixed tax rate
         taxRate.Should().Be(10);
+		_logger.LogDebug("<<< Exiting CanGetShippingTotalWithFixedShippingRateIncludingTax()");
     }
 
     [Test]
     public async Task CanGetShippingTotalsWithFixedShippingRate()
     {
+		_logger.LogDebug(">>> Entering CanGetShippingTotalsWithFixedShippingRate()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.AdditionalShippingCharge = 21.25M;
+		_logger.LogDebug("CanGetShippingTotalsWithFixedShippingRate(): product.AdditionalShippingCharge → {Arg0}", product.AdditionalShippingCharge);
+		_logger.LogDebug("CanGetShippingTotalsWithFixedShippingRate(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("CanGetShippingTotalsWithFixedShippingRate(): product → {Product}", product);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
@@ -437,17 +524,23 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         shippingExclTax.Should().NotBeNull();
         //10 - default fixed shipping rate, 42.5 - additional shipping change
         shippingExclTax.Should().Be(52.5M);
+		_logger.LogDebug("<<< Exiting CanGetShippingTotalsWithFixedShippingRate()");
     }
 
     [Test]
     public async Task CanGetShippingTotalDiscountExcludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShippingTotalDiscountExcludingTax()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.AdditionalShippingCharge = 21.25M;
+		_logger.LogDebug("CanGetShippingTotalDiscountExcludingTax(): product.AdditionalShippingCharge → {Arg0}", product.AdditionalShippingCharge);
+		_logger.LogDebug("CanGetShippingTotalDiscountExcludingTax(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("CanGetShippingTotalDiscountExcludingTax(): product → {Product}", product);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
         _discount.DiscountType = DiscountType.AssignedToShipping;
+		_logger.LogDebug("CanGetShippingTotalDiscountExcludingTax(): _discount.DiscountType → {Arg0}", _discount.DiscountType);
         await _discountService.InsertDiscountAsync(_discount);
 
         var (shipping, taxRate, appliedDiscounts) =
@@ -466,17 +559,23 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         shipping.Should().Be(49.5M);
         //10 - default fixed tax rate
         taxRate.Should().Be(10);
+		_logger.LogDebug("<<< Exiting CanGetShippingTotalDiscountExcludingTax()");
     }
 
     [Test]
     public async Task CanGetShippingTotalDiscountIncludingTax()
     {
+		_logger.LogDebug(">>> Entering CanGetShippingTotalDiscountIncludingTax()");
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.AdditionalShippingCharge = 21.25M;
+		_logger.LogDebug("CanGetShippingTotalDiscountIncludingTax(): product.AdditionalShippingCharge → {Arg0}", product.AdditionalShippingCharge);
+		_logger.LogDebug("CanGetShippingTotalDiscountIncludingTax(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
+		_logger.LogDebug("CanGetShippingTotalDiscountIncludingTax(): product → {Product}", product);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
         _discount.DiscountType = DiscountType.AssignedToShipping;
+		_logger.LogDebug("CanGetShippingTotalDiscountIncludingTax(): _discount.DiscountType → {Arg0}", _discount.DiscountType);
         await _discountService.InsertDiscountAsync(_discount);
 
         var (shipping, taxRate, appliedDiscounts) =
@@ -495,20 +594,27 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         shipping.Should().Be(54.45M);
         //10 - default fixed tax rate
         taxRate.Should().Be(10);
+		_logger.LogDebug("<<< Exiting CanGetShippingTotalDiscountIncludingTax()");
     }
 
     [Test]
     public async Task CanGetTaxTotal()
     {
+		_logger.LogDebug(">>> Entering CanGetTaxTotal()");
         //207 - items, 10 - shipping (fixed), 20 - payment fee
 
         TestPaymentMethod.AdditionalHandlingFee = 20M;
+		_logger.LogDebug("CanGetTaxTotal(): TestPaymentMethod.AdditionalHandlingFee → {Arg0}", TestPaymentMethod.AdditionalHandlingFee);
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
+		_logger.LogDebug("CanGetTaxTotal(): product → {Product}", product);
+		_logger.LogDebug("CanGetTaxTotal(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
         //1. shipping is taxable, payment fee is taxable
         _taxSettings.ShippingIsTaxable = true;
+		_logger.LogDebug("CanGetTaxTotal(): _taxSettings.ShippingIsTaxable → {Arg0}", _taxSettings.ShippingIsTaxable);
+		_logger.LogDebug("CanGetTaxTotal(): _taxSettings.PaymentMethodAdditionalFeeIsTaxable → {Arg0}", _taxSettings.PaymentMethodAdditionalFeeIsTaxable);
         _taxSettings.PaymentMethodAdditionalFeeIsTaxable = true;
 
         await _settingService.SaveSettingAsync(_taxSettings);
@@ -559,21 +665,26 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         product = await _productService.GetProductBySkuAsync("FR_451_RB");
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
+		_logger.LogDebug("<<< Exiting CanGetTaxTotal()");
     }
 
     [Test]
     public async Task CanGetShoppingCartTotalWithoutShippingRequired()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartTotalWithoutShippingRequired()");
         await TearDown();
         await SetUp();
 
         //shipping is taxable, payment fee is taxable
         _taxSettings.ShippingIsTaxable = true;
+		_logger.LogDebug("CanGetShoppingCartTotalWithoutShippingRequired(): _taxSettings.ShippingIsTaxable → {Arg0}", _taxSettings.ShippingIsTaxable);
+		_logger.LogDebug("CanGetShoppingCartTotalWithoutShippingRequired(): _taxSettings.PaymentMethodAdditionalFeeIsTaxable → {Arg0}", _taxSettings.PaymentMethodAdditionalFeeIsTaxable);
         _taxSettings.PaymentMethodAdditionalFeeIsTaxable = true;
 
         await _settingService.SaveSettingAsync(_taxSettings);
 
         TestPaymentMethod.AdditionalHandlingFee = 20M;
+		_logger.LogDebug("CanGetShoppingCartTotalWithoutShippingRequired(): TestPaymentMethod.AdditionalHandlingFee → {Arg0}", TestPaymentMethod.AdditionalHandlingFee);
 
         //207 - items, 20 - payment fee, 22.7 - tax
         var (cartTotal, _, _, _, _, _) =
@@ -581,22 +692,29 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         cartTotal.Should().Be(249.7M);
 
         TestPaymentMethod.AdditionalHandlingFee = 0M;
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartTotalWithoutShippingRequired()");
     }
 
     [Test]
     public async Task CanGetShoppingCartTotalWithShippingRequired()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartTotalWithShippingRequired()");
         //shipping is taxable, payment fee is taxable
         _taxSettings.ShippingIsTaxable = true;
+		_logger.LogDebug("CanGetShoppingCartTotalWithShippingRequired(): _taxSettings.ShippingIsTaxable → {Arg0}", _taxSettings.ShippingIsTaxable);
+		_logger.LogDebug("CanGetShoppingCartTotalWithShippingRequired(): _taxSettings.PaymentMethodAdditionalFeeIsTaxable → {Arg0}", _taxSettings.PaymentMethodAdditionalFeeIsTaxable);
         _taxSettings.PaymentMethodAdditionalFeeIsTaxable = true;
 
         await _settingService.SaveSettingAsync(_taxSettings);
 
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
+		_logger.LogDebug("CanGetShoppingCartTotalWithShippingRequired(): product → {Product}", product);
+		_logger.LogDebug("CanGetShoppingCartTotalWithShippingRequired(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
         TestPaymentMethod.AdditionalHandlingFee = 20M;
+		_logger.LogDebug("CanGetShoppingCartTotalWithShippingRequired(): TestPaymentMethod.AdditionalHandlingFee → {Arg0}", TestPaymentMethod.AdditionalHandlingFee);
 
         //207 - items, 10 - shipping (fixed), 20 - payment fee, 23.7 - tax
         var (cartTotal, _, _, _, _, _) =
@@ -606,22 +724,29 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         TestPaymentMethod.AdditionalHandlingFee = 0M;
         product.IsFreeShipping = true;
         await _productService.UpdateProductAsync(product);
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartTotalWithShippingRequired()");
     }
 
     [Test]
     public async Task CanGetShoppingCartItemUnitPrice()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartItemUnitPrice()");
         var items = await GetShoppingCartAsync();
         var (unitPrice, _, _) = await _shoppingCartService.GetUnitPriceAsync(items[0], true);
+		_logger.LogDebug("CanGetShoppingCartItemUnitPrice(): items → {Items}", items);
         unitPrice.Should().Be(new decimal(27.0));
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartItemUnitPrice()");
     }
 
     [Test]
     public async Task CanGetShoppingCartItemSubtotal()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartItemSubtotal()");
         var items = await GetShoppingCartAsync();
         var (subTotal, _, _, _) = await _shoppingCartService.GetSubTotalAsync(items[0], true);
+		_logger.LogDebug("CanGetShoppingCartItemSubtotal(): items → {Items}", items);
         subTotal.Should().Be(new decimal(54.0));
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartItemSubtotal()");
     }
 
     [Test]
@@ -631,17 +756,21 @@ public class OrderTotalCalculationServiceTests : ServiceTest
     [TestCase(12.114, 12.11)]
     public async Task TestGetUnitPriceWhenRoundPricesDuringCalculationIsTruePriceMustBeRounded(decimal inputPrice, decimal expectedPrice)
     {
+		_logger.LogDebug(">>> Entering TestGetUnitPriceWhenRoundPricesDuringCalculationIsTruePriceMustBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice})", inputPrice, expectedPrice);
         // arrange
         var shoppingCartItem = await CreateTestShopCartItemAsync(inputPrice);
+		_logger.LogDebug("TestGetUnitPriceWhenRoundPricesDuringCalculationIsTruePriceMustBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice}): shoppingCartItem → {ShoppingCartItem}", inputPrice, expectedPrice, shoppingCartItem);
 
         // act
         _shoppingCartSettings.RoundPricesDuringCalculation = true;
+		_logger.LogDebug("TestGetUnitPriceWhenRoundPricesDuringCalculationIsTruePriceMustBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice}): _shoppingCartSettings.RoundPricesDuringCalculation → {Arg2}", inputPrice, expectedPrice, _shoppingCartSettings.RoundPricesDuringCalculation);
         await _settingService.SaveSettingAsync(_shoppingCartSettings);
 
         var (resultPrice, _, _) = await GetService<IShoppingCartService>().GetUnitPriceAsync(shoppingCartItem, true);
 
         // assert
         resultPrice.Should().Be(expectedPrice);
+		_logger.LogDebug("<<< Exiting TestGetUnitPriceWhenRoundPricesDuringCalculationIsTruePriceMustBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice})", inputPrice, expectedPrice);
     }
 
     [Test]
@@ -651,35 +780,46 @@ public class OrderTotalCalculationServiceTests : ServiceTest
     [TestCase(12.114, 12.114)]
     public async Task TestGetUnitPriceWhenNotRoundPricesDuringCalculationIsFalsePriceMustNotBeRounded(decimal inputPrice, decimal expectedPrice)
     {
+		_logger.LogDebug(">>> Entering TestGetUnitPriceWhenNotRoundPricesDuringCalculationIsFalsePriceMustNotBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice})", inputPrice, expectedPrice);
         // arrange            
         var shoppingCartItem = await CreateTestShopCartItemAsync(inputPrice);
+		_logger.LogDebug("TestGetUnitPriceWhenNotRoundPricesDuringCalculationIsFalsePriceMustNotBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice}): shoppingCartItem → {ShoppingCartItem}", inputPrice, expectedPrice, shoppingCartItem);
 
         // act
         _shoppingCartSettings.RoundPricesDuringCalculation = false;
+		_logger.LogDebug("TestGetUnitPriceWhenNotRoundPricesDuringCalculationIsFalsePriceMustNotBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice}): _shoppingCartSettings.RoundPricesDuringCalculation → {Arg2}", inputPrice, expectedPrice, _shoppingCartSettings.RoundPricesDuringCalculation);
         await _settingService.SaveSettingAsync(_shoppingCartSettings);
 
         var (resultPrice, _, _) = await GetService<IShoppingCartService>().GetUnitPriceAsync(shoppingCartItem, true);
 
         // assert
         resultPrice.Should().Be(expectedPrice);
+		_logger.LogDebug("<<< Exiting TestGetUnitPriceWhenNotRoundPricesDuringCalculationIsFalsePriceMustNotBeRounded(inputPrice={InputPrice},expectedPrice={ExpectedPrice})", inputPrice, expectedPrice);
     }
 
     [Test]
     public async Task CanGetShoppingCartTotalDiscount()
     {
+		_logger.LogDebug(">>> Entering CanGetShoppingCartTotalDiscount()");
         _discount.DiscountType = DiscountType.AssignedToOrderTotal;
 
+		_logger.LogDebug("CanGetShoppingCartTotalDiscount(): _discount.DiscountType → {Arg0}", _discount.DiscountType);
         await _discountService.InsertDiscountAsync(_discount);
 
         //shipping is taxable, payment fee is taxable
         _taxSettings.ShippingIsTaxable = true;
+		_logger.LogDebug("CanGetShoppingCartTotalDiscount(): _taxSettings.ShippingIsTaxable → {Arg0}", _taxSettings.ShippingIsTaxable);
+		_logger.LogDebug("CanGetShoppingCartTotalDiscount(): _taxSettings.PaymentMethodAdditionalFeeIsTaxable → {Arg0}", _taxSettings.PaymentMethodAdditionalFeeIsTaxable);
         _taxSettings.PaymentMethodAdditionalFeeIsTaxable = true;
 
         await _settingService.SaveSettingAsync(_taxSettings);
 
         TestPaymentMethod.AdditionalHandlingFee = 20M;
+		_logger.LogDebug("CanGetShoppingCartTotalDiscount(): TestPaymentMethod.AdditionalHandlingFee → {Arg0}", TestPaymentMethod.AdditionalHandlingFee);
 
         var product = await _productService.GetProductBySkuAsync("FR_451_RB");
+		_logger.LogDebug("CanGetShoppingCartTotalDiscount(): product → {Product}", product);
+		_logger.LogDebug("CanGetShoppingCartTotalDiscount(): product.IsFreeShipping → {Arg0}", product.IsFreeShipping);
         product.IsFreeShipping = false;
         await _productService.UpdateProductAsync(product);
 
@@ -696,29 +836,37 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         discountAmount.Should().Be(3);
         appliedDiscounts.Count.Should().Be(1);
         appliedDiscounts.First().Name.Should().Be("Discount 1");
+		_logger.LogDebug("<<< Exiting CanGetShoppingCartTotalDiscount()");
     }
 
     [Test]
     public async Task CanConvertRewardPointsToAmount()
     {
+		_logger.LogDebug(">>> Entering CanConvertRewardPointsToAmount()");
         _rewardPointsSettings.ExchangeRate = 15M;
 
+		_logger.LogDebug("CanConvertRewardPointsToAmount(): _rewardPointsSettings.ExchangeRate → {Arg0}", _rewardPointsSettings.ExchangeRate);
         await _settingService.SaveSettingAsync(_rewardPointsSettings);
 
         var rewardPointsToAmount = await GetService<IOrderTotalCalculationService>().ConvertRewardPointsToAmountAsync(100);
+		_logger.LogDebug("CanConvertRewardPointsToAmount(): rewardPointsToAmount → {RewardPointsToAmount}", rewardPointsToAmount);
 
         _rewardPointsSettings.ExchangeRate = 1M;
 
         await _settingService.SaveSettingAsync(_rewardPointsSettings);
 
         rewardPointsToAmount.Should().Be(1500);
+		_logger.LogDebug("<<< Exiting CanConvertRewardPointsToAmount()");
     }
 
     [Test]
     public async Task CanCheckMinimumRewardPointsToUseRequirement()
     {
+		_logger.LogDebug(">>> Entering CanCheckMinimumRewardPointsToUseRequirement()");
         _rewardPointsSettings.Enabled = true;
         _rewardPointsSettings.MinimumRewardPointsToUse = 0;
+		_logger.LogDebug("CanCheckMinimumRewardPointsToUseRequirement(): _rewardPointsSettings.MinimumRewardPointsToUse → {Arg0}", _rewardPointsSettings.MinimumRewardPointsToUse);
+		_logger.LogDebug("CanCheckMinimumRewardPointsToUseRequirement(): _rewardPointsSettings.Enabled → {Arg0}", _rewardPointsSettings.Enabled);
 
         await _settingService.SaveSettingAsync(_rewardPointsSettings);
 
@@ -733,5 +881,6 @@ public class OrderTotalCalculationServiceTests : ServiceTest
         GetService<IOrderTotalCalculationService>().CheckMinimumRewardPointsToUseRequirement(1).Should().BeFalse();
         GetService<IOrderTotalCalculationService>().CheckMinimumRewardPointsToUseRequirement(2).Should().BeTrue();
         GetService<IOrderTotalCalculationService>().CheckMinimumRewardPointsToUseRequirement(10).Should().BeTrue();
+		_logger.LogDebug("<<< Exiting CanCheckMinimumRewardPointsToUseRequirement()");
     }
 }

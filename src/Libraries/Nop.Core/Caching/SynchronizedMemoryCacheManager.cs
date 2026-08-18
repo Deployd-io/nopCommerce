@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Configuration;
 
 namespace Nop.Core.Caching;
@@ -10,9 +11,12 @@ namespace Nop.Core.Caching;
 /// </remarks>
 public partial class SynchronizedMemoryCacheManager : MemoryCacheManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SynchronizedMemoryCacheManager(AppSettings appSettings,
         ISynchronizedMemoryCache memoryCache,
         ICacheKeyManager cacheKeyManager) : base(appSettings, memoryCache, cacheKeyManager)
     {
+	_logger.LogDebug(">>> Entering SynchronizedMemoryCacheManager(appSettings={AppSettings},memoryCache={MemoryCache},cacheKeyManager={CacheKeyManager})", appSettings, memoryCache, cacheKeyManager);
+	_logger.LogDebug("<<< Exiting SynchronizedMemoryCacheManager(appSettings={AppSettings},memoryCache={MemoryCache},cacheKeyManager={CacheKeyManager})", appSettings, memoryCache, cacheKeyManager);
     }
 }

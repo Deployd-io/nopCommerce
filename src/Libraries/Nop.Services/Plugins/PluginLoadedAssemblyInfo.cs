@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Services.Plugins;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class PluginLoadedAssemblyInfo
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -14,9 +16,13 @@ public partial class PluginLoadedAssemblyInfo
     /// <param name="assemblyInMemory">Assembly version</param>
     public PluginLoadedAssemblyInfo(string shortName, Version assemblyInMemory)
     {
+		_logger.LogDebug(">>> Entering PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory})", shortName, assemblyInMemory);
         ShortName = shortName;
         References = new List<(string PluginName, Version AssemblyVersion)>();
         AssemblyInMemory = assemblyInMemory;
+		_logger.LogDebug("PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory}): AssemblyInMemory → {AssemblyInMemory1}", shortName, assemblyInMemory, AssemblyInMemory);
+		_logger.LogDebug("PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory}): References → {References}", shortName, assemblyInMemory, References);
+		_logger.LogDebug("<<< Exiting PluginLoadedAssemblyInfo(shortName={ShortName},assemblyInMemory={AssemblyInMemory})", shortName, assemblyInMemory);
     }
 
     #endregion

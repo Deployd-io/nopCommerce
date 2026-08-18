@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -9,11 +10,15 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record DateTimeSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public DateTimeSettingsModel()
     {
+		_logger.LogDebug(">>> Entering DateTimeSettingsModel()");
         AvailableTimeZones = new List<SelectListItem>();
+		_logger.LogDebug("DateTimeSettingsModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
+		_logger.LogDebug("<<< Exiting DateTimeSettingsModel()");
     }
 
     #endregion

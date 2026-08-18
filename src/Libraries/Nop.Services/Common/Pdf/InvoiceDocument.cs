@@ -3,6 +3,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using PdfRpt.Core.Contracts;
 using PdfRpt.Core.Helper;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -11,30 +12,41 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public partial class InvoiceDocument : PdfDocument<ProductItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     protected virtual PdfGrid CreateAdressesInfo()
     {
+		_logger.LogDebug(">>> Entering CreateAdressesInfo()");
         var hasShipping = !string.IsNullOrEmpty(ShippingAddress.ShippingMethod);
         var addressesTable = PdfDocumentHelper.BuildPdfGrid(numColumns: hasShipping ? 2 : 1, DocumentRunDirection);
+		_logger.LogDebug("CreateAdressesInfo(): addressesTable → {AddressesTable}", addressesTable);
+		_logger.LogDebug("CreateAdressesInfo(): hasShipping → {HasShipping}", hasShipping);
 
         var billingInfo = PdfDocumentHelper.BuildPdfPCell(BuildAddressTable<InvoiceDocument>(source => BillingAddress, BillingAddress), DocumentRunDirection);
+		_logger.LogDebug("CreateAdressesInfo(): billingInfo → {BillingInfo}", billingInfo);
         addressesTable.AddCell(billingInfo);
 
         if (hasShipping)
         {
             var shippingInfo = PdfDocumentHelper.BuildPdfPCell(BuildAddressTable<InvoiceDocument>(source => ShippingAddress, ShippingAddress), DocumentRunDirection);
+			_logger.LogDebug("CreateAdressesInfo(): shippingInfo → {ShippingInfo}", shippingInfo);
             addressesTable.AddCell(shippingInfo);
         }
 
+		_logger.LogDebug("<<< Exiting CreateAdressesInfo()");
         return addressesTable;
     }
 
     protected virtual PdfGrid CreateInvoiceHeader()
     {
+		_logger.LogDebug(">>> Entering CreateInvoiceHeader()");
         var headerTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 2, DocumentRunDirection);
 
+		_logger.LogDebug("CreateInvoiceHeader(): headerTable → {HeaderTable}", headerTable);
         var info = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
+		_logger.LogDebug("CreateInvoiceHeader(): info → {Info}", info);
+		_logger.LogDebug("CreateInvoiceHeader(): info.SpacingAfter → {Arg0}", info.SpacingAfter);
         info.SpacingAfter = 15;
 
         info.AddCell(BuildPdfPCell<InvoiceDocument>(source => OrderNumberText, OrderNumberText));
@@ -46,6 +58,7 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
         if (LogoData is not null)
         {
             var logo = PdfImageHelper.GetITextSharpImageFromByteArray(LogoData);
+			_logger.LogDebug("CreateInvoiceHeader(): logo → {Logo}", logo);
             headerTable.AddCell(new PdfPCell(logo, fit: true)
             {
                 Border = 0,
@@ -66,21 +79,26 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
 
         headerTable.AddCell(PdfDocumentHelper.BuildPdfPCell(CreateAdressesInfo(), DocumentRunDirection, collSpan: 2));
 
+		_logger.LogDebug("<<< Exiting CreateInvoiceHeader()");
         return headerTable;
     }
 
     protected virtual PdfGrid CreateFooter(FooterData footerData)
     {
+		_logger.LogDebug(">>> Entering CreateFooter(footerData={FooterData})", footerData);
         var footerTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 2, DocumentRunDirection);
 
+		_logger.LogDebug("CreateFooter(footerData={FooterData}): footerTable → {FooterTable}", footerData, footerTable);
         if (!FooterTextColumn1.Any() && !FooterTextColumn2.Any())
             return footerTable;
 
         var footer1Table = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
+		_logger.LogDebug("CreateFooter(footerData={FooterData}): footer1Table → {Footer1Table}", footerData, footer1Table);
         foreach (var line in FooterTextColumn1)
             footer1Table.AddCell(BuildPdfPCell(line));
 
         var footer2Table = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
+		_logger.LogDebug("CreateFooter(footerData={FooterData}): footer2Table → {Footer2Table}", footerData, footer2Table);
         foreach (var line in FooterTextColumn2)
             footer2Table.AddCell(BuildPdfPCell(line));
 
@@ -89,13 +107,16 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
 
         footerTable.AddCell(BuildPdfPCell($"- {footerData.CurrentPageNumber} -", collSpan: 2, horizontalAlign: Element.ALIGN_CENTER));
 
+		_logger.LogDebug("<<< Exiting CreateFooter(footerData={FooterData})", footerData);
         return footerTable;
     }
 
     protected virtual PdfGrid CreateSummary()
     {
+		_logger.LogDebug(">>> Entering CreateSummary()");
         var summaryData = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
 
+		_logger.LogDebug("CreateSummary(): summaryData → {SummaryData}", summaryData);
         if (!string.IsNullOrEmpty(Totals.SubTotal))
             summaryData.AddCell(BuildTextCell<InvoiceTotals>(totals => totals.SubTotal, Totals.SubTotal));
         if (!string.IsNullOrEmpty(Totals.Discount))
@@ -118,29 +139,37 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
         if (!string.IsNullOrEmpty(Totals.OrderTotal))
             summaryData.AddCell(BuildTextCell<InvoiceTotals>(totals => totals.OrderTotal, Totals.OrderTotal));
 
+		_logger.LogDebug("<<< Exiting CreateSummary()");
         return summaryData;
     }
 
     protected virtual PdfGrid CreateCheckoutAttributes()
     {
+		_logger.LogDebug(">>> Entering CreateCheckoutAttributes()");
         var attributesData = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
 
+		_logger.LogDebug("CreateCheckoutAttributes(): attributesData → {AttributesData}", attributesData);
         attributesData.AddCell(BuildPdfPCell(CheckoutAttributes));
 
+		_logger.LogDebug("<<< Exiting CreateCheckoutAttributes()");
         return attributesData;
     }
 
     protected virtual PdfGrid CreateOrderNotes()
     {
+		_logger.LogDebug(">>> Entering CreateOrderNotes()");
         var notesTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 2, DocumentRunDirection);
 
+		_logger.LogDebug("CreateOrderNotes(): notesTable → {NotesTable}", notesTable);
         if (OrderNotes?.Any() != true)
             return notesTable;
 
         notesTable.SetWidths([2, 5]);
 
         var fontBold = PdfDocumentHelper.GetFont(Font, Font.Size, DocumentFontStyle.Bold);
+		_logger.LogDebug("CreateOrderNotes(): fontBold → {FontBold}", fontBold);
         var label = LabelField<InvoiceDocument, List<(string, string)>>(invoice => invoice.OrderNotes, fontBold, Language);
+		_logger.LogDebug("CreateOrderNotes(): label → {Label}", label);
 
         notesTable.AddCell(
             new PdfPCell(new Phrase(label))
@@ -158,6 +187,7 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
             notesTable.AddCell(BuildPdfPCell(note));
         }
 
+		_logger.LogDebug("<<< Exiting CreateOrderNotes()");
         return notesTable;
     }
 
@@ -171,6 +201,7 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
     /// <param name="pdfStreamOutput">Stream for PDF output</param>
     public override void Generate(Stream pdfStreamOutput)
     {
+		_logger.LogDebug(">>> Entering Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
         Document
             .MainTablePreferences(table =>
             {
@@ -214,6 +245,7 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
                 events.MainTableAdded(events =>
                 {
                     var summaryTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 3, DocumentRunDirection);
+					_logger.LogDebug("Generate(pdfStreamOutput={PdfStreamOutput}): summaryTable → {SummaryTable}", pdfStreamOutput, summaryTable);
                     summaryTable.AddCell(PdfDocumentHelper.BuildPdfPCell(CreateCheckoutAttributes(), DocumentRunDirection, 3, horizontalAlign: Element.ALIGN_LEFT));
 
                     summaryTable.AddCell(new PdfPCell() { Colspan = 2, Border = 0 });
@@ -224,6 +256,7 @@ public partial class InvoiceDocument : PdfDocument<ProductItem>
                 });
             })
             .Generate(builder => builder.AsPdfStream(pdfStreamOutput, closeStream: false));
+			_logger.LogDebug("<<< Exiting Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
     }
 
     #endregion

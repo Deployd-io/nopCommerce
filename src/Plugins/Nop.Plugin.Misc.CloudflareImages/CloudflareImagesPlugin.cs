@@ -3,6 +3,7 @@ using Nop.Services.Common;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.CloudflareImages;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Misc.CloudflareImages;
 /// </summary>
 public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ILocalizationService _localizationService;
@@ -25,9 +27,14 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
         ISettingService settingService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering CloudflareImagesPlugin(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper})", localizationService, settingService, webHelper);
         _localizationService = localizationService;
         _settingService = settingService;
+		_logger.LogDebug("CloudflareImagesPlugin(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper}): _settingService → {_settingService}", localizationService, settingService, webHelper, _settingService);
+		_logger.LogDebug("CloudflareImagesPlugin(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper}): _localizationService → {_localizationService}", localizationService, settingService, webHelper, _localizationService);
         _webHelper = webHelper;
+		_logger.LogDebug("<<< Exiting CloudflareImagesPlugin(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper})", localizationService, settingService, webHelper);
+		_logger.LogDebug("CloudflareImagesPlugin(localizationService={LocalizationService},settingService={SettingService},webHelper={WebHelper}): _webHelper → {_webHelper}", localizationService, settingService, webHelper, _webHelper);
     }
 
     #endregion
@@ -39,6 +46,8 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/CloudflareImages/Configure";
     }
 
@@ -48,6 +57,7 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         await _settingService.SaveSettingAsync(new CloudflareImagesSettings
         {
@@ -74,6 +84,7 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -82,11 +93,13 @@ public class CloudflareImagesPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<CloudflareImagesSettings>();
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Nop.Plugin.Misc.CloudflareImages");
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

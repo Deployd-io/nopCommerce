@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Discounts;
 
@@ -10,17 +11,27 @@ namespace Nop.Web.Areas.Admin.Models.Discounts;
 /// </summary>
 public partial record DiscountModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public DiscountModel()
     {
+		_logger.LogDebug(">>> Entering DiscountModel()");
         AvailableDiscountRequirementRules = new List<SelectListItem>();
         AvailableRequirementGroups = new List<SelectListItem>();
+		_logger.LogDebug("DiscountModel(): AvailableRequirementGroups → {AvailableRequirementGroups}", AvailableRequirementGroups);
+		_logger.LogDebug("DiscountModel(): AvailableDiscountRequirementRules → {AvailableDiscountRequirementRules}", AvailableDiscountRequirementRules);
         DiscountUsageHistorySearchModel = new DiscountUsageHistorySearchModel();
+		_logger.LogDebug("DiscountModel(): DiscountUsageHistorySearchModel → {DiscountUsageHistorySearchModel}", DiscountUsageHistorySearchModel);
         DiscountProductSearchModel = new DiscountProductSearchModel();
+		_logger.LogDebug("DiscountModel(): DiscountProductSearchModel → {DiscountProductSearchModel}", DiscountProductSearchModel);
         DiscountCategorySearchModel = new DiscountCategorySearchModel();
+		_logger.LogDebug("DiscountModel(): DiscountCategorySearchModel → {DiscountCategorySearchModel}", DiscountCategorySearchModel);
         DiscountManufacturerSearchModel = new DiscountManufacturerSearchModel();
+		_logger.LogDebug("DiscountModel(): DiscountManufacturerSearchModel → {DiscountManufacturerSearchModel}", DiscountManufacturerSearchModel);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("DiscountModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		_logger.LogDebug("<<< Exiting DiscountModel()");
     }
 
     #endregion

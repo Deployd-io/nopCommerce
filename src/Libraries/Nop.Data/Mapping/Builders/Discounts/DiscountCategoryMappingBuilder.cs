@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Discounts;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Discounts;
 
@@ -10,6 +11,7 @@ namespace Nop.Data.Mapping.Builders.Discounts;
 /// </summary>
 public partial class DiscountCategoryMappingBuilder : NopEntityBuilder<DiscountCategoryMapping>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -18,11 +20,13 @@ public partial class DiscountCategoryMappingBuilder : NopEntityBuilder<DiscountC
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(DiscountCategoryMapping), nameof(DiscountCategoryMapping.DiscountId)))
             .AsInt32().PrimaryKey().ForeignKey<Discount>()
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(DiscountCategoryMapping), nameof(DiscountCategoryMapping.EntityId)))
             .AsInt32().PrimaryKey().ForeignKey<Category>();
+			_logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

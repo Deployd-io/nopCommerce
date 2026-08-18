@@ -5,20 +5,24 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo490;
 
 [NopUpdateMigration("2024-12-02 00:00:00", "4.90", UpdateMigrationType.Localization)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
 
         var (languageId, languages) = this.GetLanguageData();
 
@@ -148,6 +152,7 @@ public class LocalizationMigration : MigrationBase
 
         #region Add or update locales
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         localizationService.AddOrUpdateLocaleResource(new Dictionary<string, string>
         {
             //#4834
@@ -507,6 +512,7 @@ public class LocalizationMigration : MigrationBase
             ["Admin.System.Maintenance.DeleteThumbFiles.IsNotSupported"] = "Delete image thumbs is not supported by current picture thumb service.",
             ["Admin.System.Maintenance.DeleteThumbFiles.Deleted"] = "All image thumbs were deleted.",
 
+			_logger.LogInformation("Up(): delete query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             //#7730
             ["Admin.Catalog.Products.AiGenerateFullDescription"] = "Generate product description with AI",
             ["Admin.Catalog.Products.AiFullDescription.Generate"] = "Generate description with AI",
@@ -683,13 +689,17 @@ public class LocalizationMigration : MigrationBase
             ["Search.FilterLevelValues"] = "Search by Year Make Model",
 
         }, languageId);
+		_logger.LogInformation("Up(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         #endregion
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

@@ -1,15 +1,18 @@
 ﻿using FluentAssertions;
 using Nop.Web.Models.News;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Web.Tests.Public.Models.News;
 
 [TestFixture]
 public class HomepageNewsItemsModelTests
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     [Test]
     public void CanClone()
     {
+		_logger.LogDebug(">>> Entering CanClone()");
         //create
         var model1 = new HomepageNewsItemsModel
         {
@@ -73,5 +76,6 @@ public class HomepageNewsItemsModelTests
         newsItemModel2.AddNewComment.CommentTitle.Should().Be("CommentTitle 1");
         newsItemModel2.AddNewComment.CommentText.Should().Be("CommentText 1");
         newsItemModel2.AddNewComment.DisplayCaptcha.Should().BeTrue();
+		_logger.LogDebug("<<< Exiting CanClone()");
     }
 }

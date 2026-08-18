@@ -15,22 +15,28 @@ using Nop.Tests.Nop.Services.Tests.Payments;
 using Nop.Tests.Nop.Services.Tests.Shipping;
 using Nop.Tests.Nop.Services.Tests.Tax;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests;
 
 [TestFixture]
 public abstract class ServiceTest : BaseNopTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected ServiceTest()
     {
+		_logger.LogDebug(">>> Entering ServiceTest()");
         //init plugins
         InitPlugins();
+		_logger.LogDebug("<<< Exiting ServiceTest()");
     }
 
     private static void InitPlugins()
     {
+		_logger.LogDebug(">>> Entering InitPlugins()");
         var webHostEnvironment = new Mock<IWebHostEnvironment>();
         webHostEnvironment.Setup(x => x.ContentRootPath).Returns(System.Reflection.Assembly.GetExecutingAssembly().Location);
+		_logger.LogDebug("InitPlugins(): webHostEnvironment → {WebHostEnvironment}", webHostEnvironment);
         webHostEnvironment.Setup(x => x.WebRootPath).Returns(System.IO.Directory.GetCurrentDirectory());
         CommonHelper.DefaultFileProvider = new NopFileProvider(webHostEnvironment.Object);
 
@@ -92,14 +98,19 @@ public abstract class ServiceTest : BaseNopTest
         };
 
         var taxSettings = GetService<TaxSettings>();
+		_logger.LogDebug("InitPlugins(): taxSettings → {TaxSettings}", taxSettings);
         var settingsService = GetService<ISettingService>();
+		_logger.LogDebug("InitPlugins(): settingsService → {SettingsService}", settingsService);
 
         taxSettings.ActiveTaxProviderSystemName = "FixedTaxRateTest";
+		_logger.LogDebug("InitPlugins(): taxSettings.ActiveTaxProviderSystemName → {Arg0}", taxSettings.ActiveTaxProviderSystemName);
         settingsService.SaveSetting(taxSettings, settings => settings.ActiveTaxProviderSystemName);
 
         var shippingSettings = GetService<ShippingSettings>();
+		_logger.LogDebug("InitPlugins(): shippingSettings → {ShippingSettings}", shippingSettings);
         shippingSettings.ActivePickupPointProviderSystemNames.Add("PickupPoint.TestProvider");
         settingsService.SaveSetting(shippingSettings, settings => settings.ActivePickupPointProviderSystemNames);
+		_logger.LogDebug("<<< Exiting InitPlugins()");
     }
 }
 
@@ -110,8 +121,10 @@ public abstract class ServiceTest<TEntity> : ServiceTest where TEntity : BaseEnt
     [Test]
     public async Task TestCrudAsync()
     {
+		_logger.LogDebug(">>> Entering TestCrudAsync()");
         var data = CrudData;
 
+		_logger.LogDebug("TestCrudAsync(): data → {Data}", data);
         data.BaseEntity.Id = 0;
 
         await data.Insert(data.BaseEntity);
@@ -121,6 +134,7 @@ public abstract class ServiceTest<TEntity> : ServiceTest where TEntity : BaseEnt
         await data.Update(data.UpdatedEntity);
 
         var item = await data.GetById(data.BaseEntity.Id);
+		_logger.LogDebug("TestCrudAsync(): item → {Item}", item);
         item.Should().NotBeNull();
         data.IsEqual(data.UpdatedEntity, item).Should().BeTrue();
 
@@ -131,5 +145,6 @@ public abstract class ServiceTest<TEntity> : ServiceTest where TEntity : BaseEnt
             softDeletedEntity.Deleted.Should().BeTrue();
         else
             item.Should().BeNull();
+			_logger.LogDebug("<<< Exiting TestCrudAsync()");
     }
 }

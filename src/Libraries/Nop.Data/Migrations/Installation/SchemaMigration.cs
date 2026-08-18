@@ -27,12 +27,14 @@ using Nop.Core.Domain.Tax;
 using Nop.Core.Domain.Topics;
 using Nop.Core.Domain.Vendors;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.Installation;
 
 [NopSchemaMigration("2020/01/31 11:24:16:2551771", "Nop.Data base schema", MigrationProcessType.Installation)]
 public class SchemaMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Collect the UP migration expressions
     /// <remarks>
@@ -42,6 +44,7 @@ public class SchemaMigration : ForwardOnlyMigration
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         Create.TableFor<AddressAttribute>();
         Create.TableFor<AddressAttributeValue>();
         Create.TableFor<GenericAttribute>();
@@ -173,5 +176,6 @@ public class SchemaMigration : ForwardOnlyMigration
         Create.TableFor<VendorNote>();
         Create.TableFor<Menu>();
         Create.TableFor<MenuItem>();
+		_logger.LogDebug("<<< Exiting Up()");
     }
 }
