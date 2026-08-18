@@ -3,13 +3,16 @@ using Nop.Core.Domain.Orders;
 using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Validators.Orders;
 
 public partial class ReturnRequestValidator : BaseNopValidator<ReturnRequestModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ReturnRequestValidator(ILocalizationService localizationService)
     {
+		_logger.LogDebug(">>> Entering ReturnRequestValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.ReasonForReturn).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.ReasonForReturn.Required"));
         RuleFor(x => x.RequestedAction).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.RequestedAction.Required"));
         RuleFor(x => x.Quantity).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.Quantity.Required"));
@@ -18,5 +21,6 @@ public partial class ReturnRequestValidator : BaseNopValidator<ReturnRequestMode
         RuleFor(x => x.ReturnedQuantity).Must((model, value) => value <= model.Quantity).WithMessage(model => string.Format(localizationService.GetResourceAsync("Admin.ReturnRequests.Fields.ReturnedQuantity.MustBeLessOrEqualQuantityField").Result, model.Quantity));
 
         SetDatabaseValidationRules<ReturnRequest>();
+		_logger.LogDebug("<<< Exiting ReturnRequestValidator(localizationService={LocalizationService})", localizationService);
     }
 }

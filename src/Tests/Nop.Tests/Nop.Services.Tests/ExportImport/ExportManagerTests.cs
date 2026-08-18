@@ -23,12 +23,14 @@ using Nop.Services.Shipping.Date;
 using Nop.Services.Tax;
 using Nop.Services.Vendors;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Services.Tests.ExportImport;
 
 [TestFixture]
 public class ExportManagerTests : ServiceTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private CustomerSettings _customerSettings;
@@ -56,6 +58,7 @@ public class ExportManagerTests : ServiceTest
     [OneTimeSetUp]
     public async Task SetUp()
     {
+		_logger.LogDebug(">>> Entering SetUp()");
         _customerSettings = GetService<CustomerSettings>();
         _catalogSettings = GetService<CatalogSettings>();
         _addressService = GetService<IAddressService>();
@@ -69,13 +72,29 @@ public class ExportManagerTests : ServiceTest
         _measureService = GetService<IMeasureService>();
         _orderService = GetService<IOrderService>();
         _productTemplateService = GetService<IProductTemplateService>();
+		_logger.LogDebug("SetUp(): _productTemplateService → {_productTemplateService}", _productTemplateService);
+		_logger.LogDebug("SetUp(): _customerSettings → {_customerSettings}", _customerSettings);
         _productRepository = GetService<IRepository<Product>>();
+		_logger.LogDebug("SetUp(): _productRepository → {_productRepository}", _productRepository);
         _taxCategoryService = GetService<ITaxCategoryService>();
+		_logger.LogDebug("SetUp(): _taxCategoryService → {_taxCategoryService}", _taxCategoryService);
         _vendorService = GetService<IVendorService>();
+		_logger.LogDebug("SetUp(): _vendorService → {_vendorService}", _vendorService);
 
         await GetService<IGenericAttributeService>()
             .SaveAttributeAsync(await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail), "category-advanced-mode",
                 true);
+				_logger.LogDebug("SetUp(): _catalogSettings → {_catalogSettings}", _catalogSettings);
+				_logger.LogDebug("SetUp(): _categoryService → {_categoryService}", _categoryService);
+				_logger.LogDebug("SetUp(): _addressService → {_addressService}", _addressService);
+				_logger.LogDebug("SetUp(): _countryService → {_countryService}", _countryService);
+				_logger.LogDebug("SetUp(): _dateRangeService → {_dateRangeService}", _dateRangeService);
+				_logger.LogDebug("SetUp(): _customerService → {_customerService}", _customerService);
+				_logger.LogDebug("SetUp(): _manufacturerService → {_manufacturerService}", _manufacturerService);
+				_logger.LogDebug("SetUp(): _exportManager → {_exportManager}", _exportManager);
+				_logger.LogDebug("SetUp(): _languageService → {_languageService}", _languageService);
+				_logger.LogDebug("SetUp(): _measureService → {_measureService}", _measureService);
+				_logger.LogDebug("SetUp(): _orderService → {_orderService}", _orderService);
         await GetService<IGenericAttributeService>()
             .SaveAttributeAsync(await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail), "manufacturer-advanced-mode",
                 true);
@@ -84,6 +103,8 @@ public class ExportManagerTests : ServiceTest
                 true);
 
         _productEditorSettings = GetService<ProductEditorSettings>();
+		_logger.LogDebug("SetUp(): _productEditorSettings → {_productEditorSettings}", _productEditorSettings);
+		_logger.LogDebug("<<< Exiting SetUp()");
     }
 
     [OneTimeTearDown]
@@ -98,6 +119,7 @@ public class ExportManagerTests : ServiceTest
         await GetService<IGenericAttributeService>()
             .SaveAttributeAsync(await _customerService.GetCustomerByEmailAsync(NopTestsDefaults.AdminEmail), "product-advanced-mode",
                 false);
+				_logger.LogDebug("<<< Exiting TearDown()");
     }
 
     #endregion
@@ -106,9 +128,11 @@ public class ExportManagerTests : ServiceTest
 
     protected static T PropertiesShouldEqual<T, Tp>(T actual, PropertyManager<Tp> manager, IDictionary<string, string> replacePairs, params string[] filter)
     {
+		_logger.LogDebug(">>> Entering PropertiesShouldEqual(actual={Actual},manager={Manager},replacePairs={ReplacePairs},filter={Filter})", actual, manager, replacePairs, filter);
         var objectProperties = typeof(T).GetProperties();
         foreach (var property in manager.GetDefaultProperties)
         {
+		_logger.LogDebug("PropertiesShouldEqual(actual={Actual},manager={Manager},replacePairs={ReplacePairs},filter={Filter}): objectProperties → {ObjectProperties}", actual, manager, replacePairs, filter, objectProperties);
             if (filter.Contains(property.PropertyName))
                 continue;
 
@@ -119,7 +143,9 @@ public class ExportManagerTests : ServiceTest
                 continue;
 
             var objectPropertyValue = objectProperty.GetValue(actual);
+			_logger.LogDebug("PropertiesShouldEqual(actual={Actual},manager={Manager},replacePairs={ReplacePairs},filter={Filter}): objectPropertyValue → {ObjectPropertyValue}", actual, manager, replacePairs, filter, objectPropertyValue);
             var propertyValue = property.PropertyValue;
+			_logger.LogDebug("PropertiesShouldEqual(actual={Actual},manager={Manager},replacePairs={ReplacePairs},filter={Filter}): propertyValue → {PropertyValue}", actual, manager, replacePairs, filter, propertyValue);
 
             if (propertyValue is XLCellValue { IsBlank: true })
                 propertyValue = null;
@@ -163,6 +189,7 @@ public class ExportManagerTests : ServiceTest
             propertyValue.Should().Be(objectPropertyValue, $"The property \"{typeof(T).Name}.{property.PropertyName}\" of these objects is not equal");
         }
 
+		_logger.LogDebug("<<< Exiting PropertiesShouldEqual(actual={Actual},manager={Manager},replacePairs={ReplacePairs},filter={Filter})", actual, manager, replacePairs, filter);
         return actual;
     }
 
@@ -180,12 +207,16 @@ public class ExportManagerTests : ServiceTest
 
     protected XLWorkbook GetWorkbook(byte[] excelData)
     {
+		_logger.LogDebug(">>> Entering GetWorkbook(excelData={ExcelData})", excelData);
         var stream = new MemoryStream(excelData);
+		_logger.LogDebug("GetWorkbook(excelData={ExcelData}): stream → {Stream}", excelData, stream);
+		_logger.LogDebug("<<< Exiting GetWorkbook(excelData={ExcelData})", excelData);
         return new XLWorkbook(stream);
     }
 
     protected T AreAllObjectPropertiesPresent<T>(T obj, PropertyManager<T> manager, params string[] filters)
     {
+		_logger.LogDebug(">>> Entering AreAllObjectPropertiesPresent(obj={Obj},manager={Manager},filters={Filters})", obj, manager, filters);
         foreach (var propertyInfo in typeof(T).GetProperties())
         {
             if (filters.Contains(propertyInfo.Name))
@@ -197,6 +228,7 @@ public class ExportManagerTests : ServiceTest
             Assert.Fail($"The property \"{typeof(T).Name}.{propertyInfo.Name}\" no present on excel file");
         }
 
+		_logger.LogDebug("<<< Exiting AreAllObjectPropertiesPresent(obj={Obj},manager={Manager},filters={Filters})", obj, manager, filters);
         return obj;
     }
 
@@ -207,11 +239,16 @@ public class ExportManagerTests : ServiceTest
     [Test]
     public async Task CanExportOrdersXlsx()
     {
+		_logger.LogDebug(">>> Entering CanExportOrdersXlsx()");
         var orders = await _orderService.SearchOrdersAsync();
 
+		_logger.LogDebug("CanExportOrdersXlsx(): orders → {Orders}", orders);
         var excelData = await _exportManager.ExportOrdersToXlsxAsync(orders);
+		_logger.LogDebug("CanExportOrdersXlsx(): excelData → {ExcelData}", excelData);
         var workbook = GetWorkbook(excelData);
+		_logger.LogDebug("CanExportOrdersXlsx(): workbook → {Workbook}", workbook);
         var manager = await GetPropertyManagerAsync<Order>(workbook);
+		_logger.LogDebug("CanExportOrdersXlsx(): manager → {Manager}", manager);
 
         // get the first worksheet in the workbook
         var worksheet = workbook.Worksheets.FirstOrDefault()
@@ -220,6 +257,7 @@ public class ExportManagerTests : ServiceTest
         manager.ReadDefaultFromXlsx(worksheet, 2);
 
         var replacePairs = new Dictionary<string, string>
+		_logger.LogDebug("CanExportOrdersXlsx(): replacePairs → {ReplacePairs}", replacePairs);
         {
             { "OrderId", "Id" },
             { "OrderStatus", "OrderStatusId" },
@@ -229,8 +267,10 @@ public class ExportManagerTests : ServiceTest
         };
 
         var order = orders.First();
+		_logger.LogDebug("CanExportOrdersXlsx(): order → {Order}", order);
 
         var ignore = new List<string>();
+		_logger.LogDebug("CanExportOrdersXlsx(): ignore → {Ignore}", ignore);
         ignore.AddRange(replacePairs.Values);
 
         //not exported fields
@@ -281,28 +321,37 @@ public class ExportManagerTests : ServiceTest
         replacePairs = addressFields.ToDictionary(p => billingPattern + p, p => p);
 
         var testBillingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+		_logger.LogDebug("CanExportOrdersXlsx(): testBillingAddress → {TestBillingAddress}", testBillingAddress);
 
         PropertiesShouldEqual(testBillingAddress, manager, replacePairs, "CreatedOnUtc", "BillingCountry");
 
         var country = await _countryService.GetCountryByAddressAsync(testBillingAddress);
+		_logger.LogDebug("CanExportOrdersXlsx(): country → {Country}", country);
         manager.GetDefaultProperties.First(p => p.PropertyName == "BillingCountry").StringValue.Should().Be(country.Name);
 
         const string shippingPattern = "Shipping";
         replacePairs = addressFields.ToDictionary(p => shippingPattern + p, p => p);
         var testShippingAddress = await _addressService.GetAddressByIdAsync(order.ShippingAddressId ?? 0);
+		_logger.LogDebug("CanExportOrdersXlsx(): testShippingAddress → {TestShippingAddress}", testShippingAddress);
         PropertiesShouldEqual(testShippingAddress, manager, replacePairs, "CreatedOnUtc", "ShippingCountry");
         country = await _countryService.GetCountryByAddressAsync(testShippingAddress);
         manager.GetDefaultProperties.First(p => p.PropertyName == "ShippingCountry").StringValue.Should().Be(country.Name);
+		_logger.LogDebug("<<< Exiting CanExportOrdersXlsx()");
     }
 
     [Test]
     public async Task CanExportManufacturersXlsx()
     {
+		_logger.LogDebug(">>> Entering CanExportManufacturersXlsx()");
         var manufacturers = await _manufacturerService.GetAllManufacturersAsync();
 
+		_logger.LogDebug("CanExportManufacturersXlsx(): manufacturers → {Manufacturers}", manufacturers);
         var excelData = await _exportManager.ExportManufacturersToXlsxAsync(manufacturers);
+		_logger.LogDebug("CanExportManufacturersXlsx(): excelData → {ExcelData}", excelData);
         var workbook = GetWorkbook(excelData);
+		_logger.LogDebug("CanExportManufacturersXlsx(): workbook → {Workbook}", workbook);
         var manager = await GetPropertyManagerAsync<Manufacturer>(workbook);
+		_logger.LogDebug("CanExportManufacturersXlsx(): manager → {Manager}", manager);
 
         // get the first worksheet in the workbook
         var worksheet = workbook.Worksheets.FirstOrDefault()
@@ -311,23 +360,31 @@ public class ExportManagerTests : ServiceTest
         manager.ReadDefaultFromXlsx(worksheet, 2);
 
         var manufacturer = manufacturers.First();
+		_logger.LogDebug("CanExportManufacturersXlsx(): manufacturer → {Manufacturer}", manufacturer);
 
         var ignore = new List<string> { "Picture", "EntityCacheKey", "PictureId", "SubjectToAcl", "LimitedToStores", "Deleted", "CreatedOnUtc", "UpdatedOnUtc", "AppliedDiscounts", "DiscountManufacturerMappings" };
+		_logger.LogDebug("CanExportManufacturersXlsx(): ignore → {Ignore}", ignore);
 
         AreAllObjectPropertiesPresent(manufacturer, manager, ignore.ToArray());
         PropertiesShouldEqual(manufacturer, manager, new Dictionary<string, string>());
 
         manager.GetDefaultProperties.First(p => p.PropertyName == "Picture").PropertyValue.Should().NotBeNull();
+		_logger.LogDebug("<<< Exiting CanExportManufacturersXlsx()");
     }
 
     [Test]
     public async Task CanExportCustomersToXlsx()
     {
+		_logger.LogDebug(">>> Entering CanExportCustomersToXlsx()");
         var customers = await _customerService.GetAllCustomersAsync();
 
+		_logger.LogDebug("CanExportCustomersToXlsx(): customers → {Customers}", customers);
         var excelData = await _exportManager.ExportCustomersToXlsxAsync(customers);
+		_logger.LogDebug("CanExportCustomersToXlsx(): excelData → {ExcelData}", excelData);
         var workbook = GetWorkbook(excelData);
+		_logger.LogDebug("CanExportCustomersToXlsx(): workbook → {Workbook}", workbook);
         var manager = await GetPropertyManagerAsync<Customer>(workbook);
+		_logger.LogDebug("CanExportCustomersToXlsx(): manager → {Manager}", manager);
 
         // get the first worksheet in the workbook
         var worksheet = workbook.Worksheets.FirstOrDefault()
@@ -337,6 +394,7 @@ public class ExportManagerTests : ServiceTest
         manager.SetSelectList("VatNumberStatus", await VatNumberStatus.Unknown.ToSelectListAsync(useLocalization: false));
 
         var customer = customers.First();
+		_logger.LogDebug("CanExportCustomersToXlsx(): customer → {Customer}", customer);
 
         var ignore = new List<string> { "Id", "ExternalAuthenticationRecords", "ShoppingCartItems",
             "ReturnRequests", "BillingAddress", "ShippingAddress", "Addresses", "AdminComment",
@@ -389,16 +447,22 @@ public class ExportManagerTests : ServiceTest
 
         AreAllObjectPropertiesPresent(customer, manager, ignore.ToArray());
         PropertiesShouldEqual(customer, manager, new Dictionary<string, string>());
+		_logger.LogDebug("<<< Exiting CanExportCustomersToXlsx()");
     }
 
     [Test]
     public async Task CanExportCategoriesToXlsx()
     {
+		_logger.LogDebug(">>> Entering CanExportCategoriesToXlsx()");
         var categories = await _categoryService.GetAllCategoriesAsync();
 
+		_logger.LogDebug("CanExportCategoriesToXlsx(): categories → {Categories}", categories);
         var excelData = await _exportManager.ExportCategoriesToXlsxAsync(categories);
+		_logger.LogDebug("CanExportCategoriesToXlsx(): excelData → {ExcelData}", excelData);
         var workbook = GetWorkbook(excelData);
+		_logger.LogDebug("CanExportCategoriesToXlsx(): workbook → {Workbook}", workbook);
         var manager = await GetPropertyManagerAsync<Category>(workbook);
+		_logger.LogDebug("CanExportCategoriesToXlsx(): manager → {Manager}", manager);
 
         // get the first worksheet in the workbook
         var worksheet = workbook.Worksheets.FirstOrDefault()
@@ -406,18 +470,22 @@ public class ExportManagerTests : ServiceTest
 
         manager.ReadDefaultFromXlsx(worksheet, 2);
         var category = categories.First();
+		_logger.LogDebug("CanExportCategoriesToXlsx(): category → {Category}", category);
 
         var ignore = new List<string> { "CreatedOnUtc", "EntityCacheKey", "Picture", "PictureId", "AppliedDiscounts", "UpdatedOnUtc", "SubjectToAcl", "LimitedToStores", "Deleted", "DiscountCategoryMappings", "RestrictFromVendors" };
+		_logger.LogDebug("CanExportCategoriesToXlsx(): ignore → {Ignore}", ignore);
 
         AreAllObjectPropertiesPresent(category, manager, ignore.ToArray());
         PropertiesShouldEqual(category, manager, new Dictionary<string, string>());
 
         manager.GetDefaultProperties.First(p => p.PropertyName == "Picture").PropertyValue.Should().NotBeNull();
+		_logger.LogDebug("<<< Exiting CanExportCategoriesToXlsx()");
     }
 
     [Test]
     public async Task CanExportProductsToXlsx()
     {
+		_logger.LogDebug(">>> Entering CanExportProductsToXlsx()");
         var replacePairs = new Dictionary<string, string>
         {
             { "ProductId", "Id" },
@@ -453,10 +521,14 @@ public class ExportManagerTests : ServiceTest
         ignore.AddRange(replacePairs.Values);
 
         var product = _productRepository.Table.ToList().First();
+		_logger.LogDebug("CanExportProductsToXlsx(): product → {Product}", product);
 
         var excelData = await _exportManager.ExportProductsToXlsxAsync(new[] { product });
+		_logger.LogDebug("CanExportProductsToXlsx(): excelData → {ExcelData}", excelData);
         var workbook = GetWorkbook(excelData);
+		_logger.LogDebug("CanExportProductsToXlsx(): workbook → {Workbook}", workbook);
         var manager = await GetPropertyManagerAsync<Product>(workbook);
+		_logger.LogDebug("CanExportProductsToXlsx(): manager → {Manager}", manager);
 
         // get the first worksheet in the workbook
         var worksheet = workbook.Worksheets.FirstOrDefault()
@@ -472,16 +544,22 @@ public class ExportManagerTests : ServiceTest
         manager.SetSelectList("RentalPricePeriod", await RentalPricePeriod.Days.ToSelectListAsync(useLocalization: false));
 
         var vendors = await _vendorService.GetAllVendorsAsync(showHidden: true);
+		_logger.LogDebug("CanExportProductsToXlsx(): vendors → {Vendors}", vendors);
         manager.SetSelectList("Vendor", vendors.Select(v => v as BaseEntity).ToSelectList(p => (p as Vendor)?.Name ?? string.Empty));
         var templates = await _productTemplateService.GetAllProductTemplatesAsync();
+		_logger.LogDebug("CanExportProductsToXlsx(): templates → {Templates}", templates);
         manager.SetSelectList("ProductTemplate", templates.Select(pt => pt as BaseEntity).ToSelectList(p => (p as ProductTemplate)?.Name ?? string.Empty));
         var dates = await _dateRangeService.GetAllDeliveryDatesAsync();
+		_logger.LogDebug("CanExportProductsToXlsx(): dates → {Dates}", dates);
         manager.SetSelectList("DeliveryDate", dates.Select(dd => dd as BaseEntity).ToSelectList(p => (p as DeliveryDate)?.Name ?? string.Empty));
         var availabilityRanges = await _dateRangeService.GetAllProductAvailabilityRangesAsync();
+		_logger.LogDebug("CanExportProductsToXlsx(): availabilityRanges → {AvailabilityRanges}", availabilityRanges);
         manager.SetSelectList("ProductAvailabilityRange", availabilityRanges.Select(range => range as BaseEntity).ToSelectList(p => (p as ProductAvailabilityRange)?.Name ?? string.Empty));
         var categories = await _taxCategoryService.GetAllTaxCategoriesAsync();
+		_logger.LogDebug("CanExportProductsToXlsx(): categories → {Categories}", categories);
         manager.SetSelectList("TaxCategory", categories.Select(tc => tc as BaseEntity).ToSelectList(p => (p as TaxCategory)?.Name ?? string.Empty));
         var measureWeights = await _measureService.GetAllMeasureWeightsAsync();
+		_logger.LogDebug("CanExportProductsToXlsx(): measureWeights → {MeasureWeights}", measureWeights);
         manager.SetSelectList("BasepriceUnit", measureWeights.Select(mw => mw as BaseEntity).ToSelectList(p => (p as MeasureWeight)?.Name ?? string.Empty));
         manager.SetSelectList("BasepriceBaseUnit", measureWeights.Select(mw => mw as BaseEntity).ToSelectList(p => (p as MeasureWeight)?.Name ?? string.Empty));
 
@@ -491,6 +569,7 @@ public class ExportManagerTests : ServiceTest
 
         AreAllObjectPropertiesPresent(product, manager, ignore.ToArray());
         PropertiesShouldEqual(product, manager, replacePairs);
+		_logger.LogDebug("<<< Exiting CanExportProductsToXlsx()");
     }
 
     #endregion

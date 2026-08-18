@@ -31,9 +31,15 @@ public class FacebookDataDeletionController : Controller
         IWebHelper webHelper)
     {
         _facebookExternalAuthSettings = facebookExternalAuthSettings;
+		_logger.LogDebug("FacebookDataDeletionController(facebookExternalAuthSettings={FacebookExternalAuthSettings},externalAuthenticationService={ExternalAuthenticationService},logger={Logger},webHelper={WebHelper}): _facebookExternalAuthSettings → {_facebookExternalAuthSettings}", facebookExternalAuthSettings, externalAuthenticationService, logger, webHelper, _facebookExternalAuthSettings);
         _externalAuthenticationService = externalAuthenticationService;
+		_logger.LogDebug("FacebookDataDeletionController(facebookExternalAuthSettings={FacebookExternalAuthSettings},externalAuthenticationService={ExternalAuthenticationService},logger={Logger},webHelper={WebHelper}): _externalAuthenticationService → {_externalAuthenticationService}", facebookExternalAuthSettings, externalAuthenticationService, logger, webHelper, _externalAuthenticationService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering FacebookDataDeletionController(facebookExternalAuthSettings={FacebookExternalAuthSettings},externalAuthenticationService={ExternalAuthenticationService},logger={Logger},webHelper={WebHelper})", facebookExternalAuthSettings, externalAuthenticationService, logger, webHelper);
+		_logger.LogDebug("FacebookDataDeletionController(facebookExternalAuthSettings={FacebookExternalAuthSettings},externalAuthenticationService={ExternalAuthenticationService},logger={Logger},webHelper={WebHelper}): _logger → {_logger}", facebookExternalAuthSettings, externalAuthenticationService, logger, webHelper, _logger);
         _webHelper = webHelper;
+		_logger.LogDebug("FacebookDataDeletionController(facebookExternalAuthSettings={FacebookExternalAuthSettings},externalAuthenticationService={ExternalAuthenticationService},logger={Logger},webHelper={WebHelper}): _webHelper → {_webHelper}", facebookExternalAuthSettings, externalAuthenticationService, logger, webHelper, _webHelper);
+		_logger.LogDebug("<<< Exiting FacebookDataDeletionController(facebookExternalAuthSettings={FacebookExternalAuthSettings},externalAuthenticationService={ExternalAuthenticationService},logger={Logger},webHelper={WebHelper})", facebookExternalAuthSettings, externalAuthenticationService, logger, webHelper);
     }
 
     #endregion
@@ -45,13 +51,18 @@ public class FacebookDataDeletionController : Controller
     /// </summary>
     protected static string DecodeUrlBase64(string str)
     {
+		_logger.LogDebug(">>> Entering DecodeUrlBase64(str={Str})", str);
         if (string.IsNullOrEmpty(str))
             return null;
 
         str = str.Replace("-", "+").Replace("_", "/");
+		_logger.LogDebug("DecodeUrlBase64(str={Str}): str → {Str1}", str, str);
         var paddingToAdd = (str.Length % 4) == 3 ? 1 : (str.Length % 4);
+		_logger.LogDebug("DecodeUrlBase64(str={Str}): paddingToAdd → {PaddingToAdd}", str, paddingToAdd);
         var charToAdd = new string('=', paddingToAdd);
+		_logger.LogDebug("DecodeUrlBase64(str={Str}): charToAdd → {CharToAdd}", str, charToAdd);
 
+		_logger.LogDebug("<<< Exiting DecodeUrlBase64(str={Str})", str);
         return str += charToAdd;
     }
 
@@ -62,28 +73,40 @@ public class FacebookDataDeletionController : Controller
     [HttpPost]
     public async Task<IActionResult> DataDeletionCallback(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering DataDeletionCallback(form={Form})", form);
         try
         {
             string signed_request = form["signed_request"];
             if (string.IsNullOrEmpty(signed_request))
+				_logger.LogWarning("Throwing NopException from DataDeletionCallback(form={Form})", form);
                 throw new NopException("Request data is missing");
 
             var split = signed_request.Split('.');
+			_logger.LogDebug("DataDeletionCallback(form={Form}): split → {Split}", form, split);
             var signatureRaw = DecodeUrlBase64(split[0]);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): signatureRaw → {SignatureRaw}", form, signatureRaw);
             var dataRaw = DecodeUrlBase64(split[1]);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): dataRaw → {DataRaw}", form, dataRaw);
             if (string.IsNullOrEmpty(signatureRaw) || string.IsNullOrEmpty(dataRaw))
                 throw new NopException("Part of the request data is missing");
 
             var signature = Convert.FromBase64String(signatureRaw);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): signature → {Signature}", form, signature);
             var dataBuffer = Convert.FromBase64String(dataRaw);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): dataBuffer → {DataBuffer}", form, dataBuffer);
             var json = Encoding.UTF8.GetString(dataBuffer);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): json → {Json}", form, json);
             var appSecretBytes = Encoding.UTF8.GetBytes(_facebookExternalAuthSettings.ClientSecret);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): appSecretBytes → {AppSecretBytes}", form, appSecretBytes);
             HMAC hmac = new HMACSHA256(appSecretBytes);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): hmac → {Hmac}", form, hmac);
             var expectedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(split[1]));
+			_logger.LogDebug("DataDeletionCallback(form={Form}): expectedHash → {ExpectedHash}", form, expectedHash);
             if (!expectedHash.SequenceEqual(signature))
                 throw new NopException("Hash validation failed");
 
             var fbUser = JsonConvert.DeserializeObject<FacebookUserDTO>(json);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): fbUser → {FbUser}", form, fbUser);
             var authenticationParameters = new ExternalAuthenticationParameters
             {
                 ProviderSystemName = FacebookAuthenticationDefaults.SystemName,
@@ -91,6 +114,7 @@ public class FacebookDataDeletionController : Controller
                 ExternalIdentifier = fbUser.UserId
             };
             var externalAuthenticationRecord = await _externalAuthenticationService.GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(authenticationParameters);
+			_logger.LogDebug("DataDeletionCallback(form={Form}): externalAuthenticationRecord → {ExternalAuthenticationRecord}", form, externalAuthenticationRecord);
             if (externalAuthenticationRecord is not null)
             {
                 await _logger.InformationAsync($"{FacebookAuthenticationDefaults.SystemName} data deletion completed. " +
@@ -110,6 +134,7 @@ public class FacebookDataDeletionController : Controller
         catch (Exception exception)
         {
             await _logger.ErrorAsync($"{FacebookAuthenticationDefaults.SystemName} data deletion error: {exception.Message}.", exception);
+			_logger.LogDebug("<<< Exiting DataDeletionCallback(form={Form})", form);
             return BadRequest();
         }
     }

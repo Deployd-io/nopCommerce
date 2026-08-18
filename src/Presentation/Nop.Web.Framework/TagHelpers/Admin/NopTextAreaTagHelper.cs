@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-textarea", Attributes = FOR_ATTRIBUTE_NAME)]
 public partial class NopTextAreaTagHelper : TextAreaTagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -22,6 +24,8 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
 
     public NopTextAreaTagHelper(IHtmlGenerator generator) : base(generator)
     {
+	_logger.LogDebug(">>> Entering NopTextAreaTagHelper(generator={Generator})", generator);
+	_logger.LogDebug("<<< Exiting NopTextAreaTagHelper(generator={Generator})", generator);
     }
 
     #endregion
@@ -36,12 +40,15 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
 
         //tag details
         output.TagName = "textarea";
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
 
         //merge classes
@@ -52,6 +59,7 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
 
         //set custom html attributes
         var htmlAttributesDictionary = HtmlHelper.AnonymousObjectToHtmlAttributes(CustomHtmlAttributes);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributesDictionary → {HtmlAttributesDictionary}", context, output, htmlAttributesDictionary);
         if (htmlAttributesDictionary?.Count > 0)
         {
             foreach (var (key, value) in htmlAttributesDictionary)
@@ -62,8 +70,10 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
 
         //additional parameters
         var rowsNumber = output.Attributes.ContainsName("rows") ? output.Attributes["rows"].Value : 4;
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): rowsNumber → {RowsNumber}", context, output, rowsNumber);
         output.Attributes.SetAttribute("rows", rowsNumber);
         var colsNumber = output.Attributes.ContainsName("cols") ? output.Attributes["cols"].Value : 20;
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): colsNumber → {ColsNumber}", context, output, colsNumber);
         output.Attributes.SetAttribute("cols", colsNumber);
 
         //required asterisk
@@ -74,6 +84,7 @@ public partial class NopTextAreaTagHelper : TextAreaTagHelper
         }
 
         await base.ProcessAsync(context, output);
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

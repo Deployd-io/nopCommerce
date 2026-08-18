@@ -5,20 +5,26 @@ using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Areas.Admin.Validators.Catalog;
 using NUnit.Framework;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Tests.Nop.Web.Tests.Admin.Validators.Catalog;
 
 [TestFixture]
 public class ProductReviewValidatorTests : BaseNopTest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private ProductReviewValidator _validator;
     private IWorkContext _workContext;
 
     [OneTimeSetUp]
     public void Setup()
     {
+		_logger.LogDebug(">>> Entering Setup()");
         _workContext = GetService<IWorkContext>();
         _validator = new ProductReviewValidator(GetService<ILocalizationService>(), _workContext);
+		_logger.LogDebug("Setup(): _validator → {_validator}", _validator);
+		_logger.LogDebug("Setup(): _workContext → {_workContext}", _workContext);
+		_logger.LogDebug("<<< Exiting Setup()");
     }
 
     #region Title Validation Tests (Non-Vendor)
@@ -26,6 +32,7 @@ public class ProductReviewValidatorTests : BaseNopTest
     [Test]
     public void ShouldHaveErrorWhenTitleIsNullForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenTitleIsNullForNonVendor()");
         // Ensure we're not logged in as vendor
         var model = new ProductReviewModel
         {
@@ -33,39 +40,46 @@ public class ProductReviewValidatorTests : BaseNopTest
             ReviewText = "Valid review text"
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Title);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenTitleIsNullForNonVendor()");
     }
 
     [Test]
     public void ShouldHaveErrorWhenTitleIsEmptyForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenTitleIsEmptyForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = string.Empty,
             ReviewText = "Valid review text"
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Title);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenTitleIsEmptyForNonVendor()");
     }
 
     [Test]
     public void ShouldHaveErrorWhenTitleIsWhitespaceForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenTitleIsWhitespaceForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "   ",
             ReviewText = "Valid review text"
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.Title);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenTitleIsWhitespaceForNonVendor()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenTitleIsSpecifiedForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenTitleIsSpecifiedForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "Great Product",
             ReviewText = "Valid review text"
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.Title);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenTitleIsSpecifiedForNonVendor()");
     }
 
     #endregion
@@ -75,45 +89,53 @@ public class ProductReviewValidatorTests : BaseNopTest
     [Test]
     public void ShouldHaveErrorWhenReviewTextIsNullForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenReviewTextIsNullForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "Valid Title",
             ReviewText = null
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenReviewTextIsNullForNonVendor()");
     }
 
     [Test]
     public void ShouldHaveErrorWhenReviewTextIsEmptyForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenReviewTextIsEmptyForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "Valid Title",
             ReviewText = string.Empty
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenReviewTextIsEmptyForNonVendor()");
     }
 
     [Test]
     public void ShouldHaveErrorWhenReviewTextIsWhitespaceForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveErrorWhenReviewTextIsWhitespaceForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "Valid Title",
             ReviewText = "   "
         };
         _validator.TestValidate(model).ShouldHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldHaveErrorWhenReviewTextIsWhitespaceForNonVendor()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenReviewTextIsSpecifiedForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenReviewTextIsSpecifiedForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "Valid Title",
             ReviewText = "This is a detailed review of the product."
         };
         _validator.TestValidate(model).ShouldNotHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenReviewTextIsSpecifiedForNonVendor()");
     }
 
     #endregion
@@ -123,6 +145,7 @@ public class ProductReviewValidatorTests : BaseNopTest
     [Test]
     public void ShouldHaveMultipleErrorsWhenBothFieldsAreInvalidForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldHaveMultipleErrorsWhenBothFieldsAreInvalidForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = null,
@@ -130,13 +153,16 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldHaveMultipleErrorsWhenBothFieldsAreInvalidForNonVendor(): result → {Result}", result);
         result.ShouldHaveValidationErrorFor(x => x.Title);
         result.ShouldHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldHaveMultipleErrorsWhenBothFieldsAreInvalidForNonVendor()");
     }
 
     [Test]
     public void ShouldNotHaveErrorsWhenAllFieldsAreValidForNonVendor()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorsWhenAllFieldsAreValidForNonVendor()");
         var model = new ProductReviewModel
         {
             Title = "Excellent Product Quality",
@@ -146,8 +172,10 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldNotHaveErrorsWhenAllFieldsAreValidForNonVendor(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.Title);
         result.ShouldNotHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorsWhenAllFieldsAreValidForNonVendor()");
     }
 
     #endregion
@@ -157,6 +185,7 @@ public class ProductReviewValidatorTests : BaseNopTest
     [Test]
     public void ShouldNotHaveErrorForOtherPropertiesWhenRequiredFieldsAreValid()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorForOtherPropertiesWhenRequiredFieldsAreValid()");
         var model = new ProductReviewModel
         {
             Title = "Good Product",
@@ -167,14 +196,17 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldNotHaveErrorForOtherPropertiesWhenRequiredFieldsAreValid(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.Rating);
         result.ShouldNotHaveValidationErrorFor(x => x.IsApproved);
         result.ShouldNotHaveValidationErrorFor(x => x.ReplyText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorForOtherPropertiesWhenRequiredFieldsAreValid()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenOptionalFieldsAreNull()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenOptionalFieldsAreNull()");
         var model = new ProductReviewModel
         {
             Title = "Average Product",
@@ -183,9 +215,11 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldNotHaveErrorWhenOptionalFieldsAreNull(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.Title);
         result.ShouldNotHaveValidationErrorFor(x => x.ReviewText);
         result.ShouldNotHaveValidationErrorFor(x => x.ReplyText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenOptionalFieldsAreNull()");
     }
 
     #endregion
@@ -195,6 +229,7 @@ public class ProductReviewValidatorTests : BaseNopTest
     [Test]
     public void ShouldInheritDatabaseValidationRules()
     {
+		_logger.LogDebug(">>> Entering ShouldInheritDatabaseValidationRules()");
         // The validator calls SetDatabaseValidationRules<ProductReview>()
         // This test ensures the method is called and basic validation works
         var model = new ProductReviewModel
@@ -204,7 +239,9 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldInheritDatabaseValidationRules(): result → {Result}", result);
         result.ShouldNotHaveAnyValidationErrors();
+		_logger.LogDebug("<<< Exiting ShouldInheritDatabaseValidationRules()");
     }
 
     #endregion
@@ -214,6 +251,7 @@ public class ProductReviewValidatorTests : BaseNopTest
     [Test]
     public void ShouldNotHaveErrorWhenTitleAndReviewTextAreMinimalValidValues()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenTitleAndReviewTextAreMinimalValidValues()");
         var model = new ProductReviewModel
         {
             Title = "A",
@@ -221,13 +259,16 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldNotHaveErrorWhenTitleAndReviewTextAreMinimalValidValues(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.Title);
         result.ShouldNotHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenTitleAndReviewTextAreMinimalValidValues()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenTitleAndReviewTextContainSpecialCharacters()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenTitleAndReviewTextContainSpecialCharacters()");
         var model = new ProductReviewModel
         {
             Title = "Great Product! 5/5 ⭐⭐⭐⭐⭐",
@@ -235,13 +276,16 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldNotHaveErrorWhenTitleAndReviewTextContainSpecialCharacters(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.Title);
         result.ShouldNotHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenTitleAndReviewTextContainSpecialCharacters()");
     }
 
     [Test]
     public void ShouldNotHaveErrorWhenTitleAndReviewTextContainUnicodeCharacters()
     {
+		_logger.LogDebug(">>> Entering ShouldNotHaveErrorWhenTitleAndReviewTextContainUnicodeCharacters()");
         var model = new ProductReviewModel
         {
             Title = "Ausgezeichnetes Produkt",
@@ -249,8 +293,10 @@ public class ProductReviewValidatorTests : BaseNopTest
         };
 
         var result = _validator.TestValidate(model);
+		_logger.LogDebug("ShouldNotHaveErrorWhenTitleAndReviewTextContainUnicodeCharacters(): result → {Result}", result);
         result.ShouldNotHaveValidationErrorFor(x => x.Title);
         result.ShouldNotHaveValidationErrorFor(x => x.ReviewText);
+		_logger.LogDebug("<<< Exiting ShouldNotHaveErrorWhenTitleAndReviewTextContainUnicodeCharacters()");
     }
 
     #endregion

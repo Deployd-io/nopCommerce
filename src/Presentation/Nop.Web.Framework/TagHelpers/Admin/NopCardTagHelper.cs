@@ -6,6 +6,7 @@ using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Models.Cms;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-card", Attributes = NAME_ATTRIBUTE_NAME)]
 public partial class NopCardTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string NAME_ATTRIBUTE_NAME = "asp-name";
@@ -38,8 +40,12 @@ public partial class NopCardTagHelper : TagHelper
 
     public NopCardTagHelper(IViewComponentHelper viewComponentHelper, IWidgetModelFactory widgetModelFactory)
     {
+		_logger.LogDebug(">>> Entering NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory})", viewComponentHelper, widgetModelFactory);
         _viewComponentHelper = viewComponentHelper;
         _widgetModelFactory = widgetModelFactory;
+		_logger.LogDebug("NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory}): _viewComponentHelper → {_viewComponentHelper}", viewComponentHelper, widgetModelFactory, _viewComponentHelper);
+		_logger.LogDebug("NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory}): _widgetModelFactory → {_widgetModelFactory}", viewComponentHelper, widgetModelFactory, _widgetModelFactory);
+		_logger.LogDebug("<<< Exiting NopCardTagHelper(viewComponentHelper={ViewComponentHelper},widgetModelFactory={WidgetModelFactory})", viewComponentHelper, widgetModelFactory);
     }
 
     #endregion
@@ -54,6 +60,7 @@ public partial class NopCardTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -86,13 +93,16 @@ public partial class NopCardTagHelper : TagHelper
 
         //create card heading and append title and icon to it
         var cardHeading = new TagBuilder("div");
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardHeading → {CardHeading}", context, output, cardHeading);
         cardHeading.AddCssClass("card-header with-border clearfix");
 
         if (context.AllAttributes.ContainsName(CARD_ICON_ATTRIBUTE_NAME))
         {
             var cardIcon = new TagBuilder("i");
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardIcon → {CardIcon}", context, output, cardIcon);
             cardIcon.AddCssClass(context.AllAttributes[CARD_ICON_ATTRIBUTE_NAME].Value.ToString());
             var iconContainer = new TagBuilder("div");
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): iconContainer → {IconContainer}", context, output, iconContainer);
             iconContainer.AddCssClass("card-title");
             iconContainer.InnerHtml.AppendHtml(cardIcon);
             iconContainer.InnerHtml.AppendHtml($"{context.AllAttributes[TITLE_ATTRIBUTE_NAME].Value}");
@@ -100,13 +110,16 @@ public partial class NopCardTagHelper : TagHelper
         }
 
         var collapseIcon = new TagBuilder("i");
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): collapseIcon → {CollapseIcon}", context, output, collapseIcon);
         collapseIcon.AddCssClass("fa");
         collapseIcon.AddCssClass("toggle-icon");
         collapseIcon.AddCssClass(context.AllAttributes[IS_HIDE_ATTRIBUTE_NAME].Value.Equals(true) ? "fa-plus" : "fa-minus");
 
         var cardToolContainer = new TagBuilder("div");
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardToolContainer → {CardToolContainer}", context, output, cardToolContainer);
         cardToolContainer.AddCssClass("card-tools float-right");
         var cardbtnContainer = new TagBuilder("button");
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): cardbtnContainer → {CardbtnContainer}", context, output, cardbtnContainer);
 
         cardbtnContainer.AddCssClass("btn btn-tool");
         cardbtnContainer.MergeAttribute("type", "button");
@@ -120,17 +133,21 @@ public partial class NopCardTagHelper : TagHelper
         card.InnerHtml.AppendHtml(cardHeading);
 
         var modelsBefore = await _widgetModelFactory.PrepareRenderWidgetModelAsync(AdminWidgetZones.CardBefore, new WidgetNopCardModel { CardName = Name });
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): modelsBefore → {ModelsBefore}", context, output, modelsBefore);
 
         foreach (var model in modelsBefore)
         {
             var content = await _viewComponentHelper.InvokeAsync(model.WidgetViewComponent, model.WidgetViewComponentArguments);
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): content → {Content}", context, output, content);
             card.InnerHtml.AppendHtml(content);
         }
 
         var childContent = await output.GetChildContentAsync();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): childContent → {ChildContent}", context, output, childContent);
         card.InnerHtml.AppendHtml(childContent.GetContent());
 
         var modelsAfter = await _widgetModelFactory.PrepareRenderWidgetModelAsync(AdminWidgetZones.CardAfter, new WidgetNopCardModel { CardName = Name });
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): modelsAfter → {ModelsAfter}", context, output, modelsAfter);
 
         foreach (var model in modelsAfter)
         {
@@ -139,6 +156,7 @@ public partial class NopCardTagHelper : TagHelper
         }
 
         output.Content.AppendHtml(await card.RenderHtmlContentAsync());
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

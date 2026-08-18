@@ -10,6 +10,7 @@ using Nop.Services.Localization;
 using Nop.Services.Stores;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Extensions;
 
@@ -18,6 +19,7 @@ namespace Nop.Web.Framework.Extensions;
 /// </summary>
 public static class HtmlExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Admin area extensions
 
     /// <summary>
@@ -42,9 +44,12 @@ public static class HtmlExtensions
         bool ignoreIfSeveralStores = false,
         string cssClass = null)
         where TModel : ILocalizedModel<TLocalizedModelLocal>
+		_logger.LogDebug(">>> Entering LocalizedEditorAsync(helper={Helper},name={Name},localizedTemplate={LocalizedTemplate},standardTemplate={StandardTemplate},ignoreIfSeveralStores={IgnoreIfSeveralStores},cssClass={CssClass})", helper, name, localizedTemplate, standardTemplate, ignoreIfSeveralStores, cssClass);
+		_logger.LogDebug("<<< Exiting LocalizedEditorAsync(helper={Helper},name={Name},localizedTemplate={LocalizedTemplate},standardTemplate={StandardTemplate},ignoreIfSeveralStores={IgnoreIfSeveralStores},cssClass={CssClass})", helper, name, localizedTemplate, standardTemplate, ignoreIfSeveralStores, cssClass);
         where TLocalizedModelLocal : ILocalizedLocaleModel
     {
         var localizationSupported = helper.ViewData.Model.Locales.Count > 1;
+		_logger.LogDebug("LocalizedEditorAsync(helper={Helper},name={Name},localizedTemplate={LocalizedTemplate},standardTemplate={StandardTemplate},ignoreIfSeveralStores={IgnoreIfSeveralStores},cssClass={CssClass}): localizationSupported → {LocalizationSupported}", helper, name, localizedTemplate, standardTemplate, ignoreIfSeveralStores, cssClass, localizationSupported);
         if (ignoreIfSeveralStores)
         {
             var storeService = EngineContext.Current.Resolve<IStoreService>();
@@ -57,6 +62,8 @@ public static class HtmlExtensions
             return new HtmlString(await standardTemplate(helper.ViewData.Model).RenderHtmlContentAsync());
 
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("LocalizedEditorAsync(helper={Helper},name={Name},localizedTemplate={LocalizedTemplate},standardTemplate={StandardTemplate},ignoreIfSeveralStores={IgnoreIfSeveralStores},cssClass={CssClass}): localizationService → {LocalizationService}", helper, name, localizedTemplate, standardTemplate, ignoreIfSeveralStores, cssClass, localizationService);
+		_logger.LogDebug("LocalizedEditorAsync(helper={Helper},name={Name},localizedTemplate={LocalizedTemplate},standardTemplate={StandardTemplate},ignoreIfSeveralStores={IgnoreIfSeveralStores},cssClass={CssClass}): storeService → {StoreService}", helper, name, localizedTemplate, standardTemplate, ignoreIfSeveralStores, cssClass, storeService);
         var languageService = EngineContext.Current.Resolve<ILanguageService>();
         var urlHelper = EngineContext.Current.Resolve<IUrlHelperFactory>().GetUrlHelper(helper.ViewContext);
 
@@ -151,10 +158,13 @@ public static class HtmlExtensions
     /// <returns>Name</returns>
     public static string GetSelectedCardName(this IHtmlHelper helper)
     {
+		_logger.LogDebug(">>> Entering GetSelectedCardName(helper={Helper})", helper);
         //keep this method synchronized with
         //"SaveSelectedCardName" method of \Area\Admin\Controllers\BaseAdminController.cs
         var cardName = string.Empty;
+		_logger.LogDebug("GetSelectedCardName(helper={Helper}): cardName → {CardName}", helper, cardName);
         const string dataKey = "nop.selected-card-name";
+		_logger.LogDebug("GetSelectedCardName(helper={Helper}): dataKey → {DataKey}", helper, dataKey);
 
         if (helper.ViewData.ContainsKey(dataKey))
             cardName = helper.ViewData[dataKey].ToString();
@@ -162,6 +172,7 @@ public static class HtmlExtensions
         if (helper.ViewContext.TempData.TryGetValue(dataKey, out var value))
             cardName = value.ToString();
 
+		_logger.LogDebug("<<< Exiting GetSelectedCardName(helper={Helper})", helper);
         return cardName;
     }
 
@@ -173,10 +184,13 @@ public static class HtmlExtensions
     /// <returns>Name</returns>
     public static string GetSelectedTabName(this IHtmlHelper helper, string dataKeyPrefix = null)
     {
+		_logger.LogDebug(">>> Entering GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix})", helper, dataKeyPrefix);
         //keep this method synchronized with
         //"SaveSelectedTab" method of \Area\Admin\Controllers\BaseAdminController.cs
         var tabName = string.Empty;
+		_logger.LogDebug("GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix}): tabName → {TabName}", helper, dataKeyPrefix, tabName);
         var dataKey = "nop.selected-tab-name";
+		_logger.LogDebug("GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix}): dataKey → {DataKey}", helper, dataKeyPrefix, dataKey);
         if (!string.IsNullOrEmpty(dataKeyPrefix))
             dataKey += $"-{dataKeyPrefix}";
 
@@ -186,6 +200,7 @@ public static class HtmlExtensions
         if (helper.ViewContext.TempData.TryGetValue(dataKey, out var value))
             tabName = value.ToString();
 
+		_logger.LogDebug("<<< Exiting GetSelectedTabName(helper={Helper},dataKeyPrefix={DataKeyPrefix})", helper, dataKeyPrefix);
         return tabName;
     }
 
@@ -199,6 +214,8 @@ public static class HtmlExtensions
     /// <returns>Html content of new Tab</returns>
     public static IHtmlContent TabContentByURL(this AdminTabStripCreated eventMessage, string tabId, string tabName, string url)
     {
+		_logger.LogDebug(">>> Entering TabContentByURL(eventMessage={EventMessage},tabId={TabId},tabName={TabName},url={Url})", eventMessage, tabId, tabName, url);
+		_logger.LogDebug("<<< Exiting TabContentByURL(eventMessage={EventMessage},tabId={TabId},tabName={TabName},url={Url})", eventMessage, tabId, tabName, url);
         return new HtmlString($@"
                 <script>
                     $(function() {{
@@ -220,6 +237,8 @@ public static class HtmlExtensions
     /// <returns>Html content of new Tab</returns>
     public static IHtmlContent TabContentByModel(this AdminTabStripCreated eventMessage, string tabId, string tabName, string contentModel)
     {
+		_logger.LogDebug(">>> Entering TabContentByModel(eventMessage={EventMessage},tabId={TabId},tabName={TabName},contentModel={ContentModel})", eventMessage, tabId, tabName, contentModel);
+		_logger.LogDebug("<<< Exiting TabContentByModel(eventMessage={EventMessage},tabId={TabId},tabName={TabName},contentModel={ContentModel})", eventMessage, tabId, tabName, contentModel);
         return new HtmlString($@"
                 <script>
                     $(function() {{
@@ -242,16 +261,20 @@ public static class HtmlExtensions
     /// </returns>
     public static async Task<IHtmlContent> HintAsync(this IHtmlHelper helper, string value)
     {
+		_logger.LogDebug(">>> Entering HintAsync(helper={Helper},value={Value})", helper, value);
         //create tag builder
         var builder = new TagBuilder("div");
+		_logger.LogDebug("HintAsync(helper={Helper},value={Value}): builder → {Builder}", helper, value, builder);
         builder.MergeAttribute("title", value);
         builder.MergeAttribute("class", "ico-help");
         builder.MergeAttribute("data-toggle", "tooltip");
         var icon = new StringBuilder();
+		_logger.LogDebug("HintAsync(helper={Helper},value={Value}): icon → {Icon}", helper, value, icon);
         icon.Append("<i class='fas fa-circle-question'></i>");
         builder.InnerHtml.AppendHtml(icon.ToString());
 
         //render tag
+		_logger.LogDebug("<<< Exiting HintAsync(helper={Helper},value={Value})", helper, value);
         return new HtmlString(await builder.RenderHtmlContentAsync());
     }
 
@@ -271,8 +294,11 @@ public static class HtmlExtensions
     /// </returns>
     public static async Task<string> RenderHtmlContentAsync(this IHtmlContent htmlContent)
     {
+		_logger.LogDebug(">>> Entering RenderHtmlContentAsync(htmlContent={HtmlContent})", htmlContent);
         await using var writer = new StringWriter();
         htmlContent.WriteTo(writer, HtmlEncoder.Default);
+		_logger.LogDebug("RenderHtmlContentAsync(htmlContent={HtmlContent}): writer → {Writer}", htmlContent, writer);
+		_logger.LogDebug("<<< Exiting RenderHtmlContentAsync(htmlContent={HtmlContent})", htmlContent);
         return writer.ToString();
     }
 

@@ -1,4 +1,5 @@
 using Nop.Core.Domain.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -7,6 +8,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public static class ProductAttributeExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// A value indicating whether this product attribute should have values
     /// </summary>
@@ -14,6 +16,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool ShouldHaveValues(this ProductAttributeMapping productAttributeMapping)
     {
+		_logger.LogDebug(">>> Entering ShouldHaveValues(productAttributeMapping=<redacted>)");
         if (productAttributeMapping == null)
             return false;
 
@@ -21,6 +24,7 @@ public static class ProductAttributeExtensions
             productAttributeMapping.AttributeControlType == AttributeControlType.MultilineTextbox ||
             productAttributeMapping.AttributeControlType == AttributeControlType.Datepicker ||
             productAttributeMapping.AttributeControlType == AttributeControlType.FileUpload)
+		_logger.LogDebug("<<< Exiting ShouldHaveValues(productAttributeMapping=<redacted>)");
             return false;
 
         //other attribute control types support values
@@ -34,6 +38,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool CanBeUsedAsCondition(this ProductAttributeMapping productAttributeMapping)
     {
+		_logger.LogDebug(">>> Entering CanBeUsedAsCondition(productAttributeMapping=<redacted>)");
         if (productAttributeMapping == null)
             return false;
 
@@ -42,6 +47,7 @@ public static class ProductAttributeExtensions
             productAttributeMapping.AttributeControlType == AttributeControlType.MultilineTextbox ||
             productAttributeMapping.AttributeControlType == AttributeControlType.Datepicker ||
             productAttributeMapping.AttributeControlType == AttributeControlType.FileUpload)
+		_logger.LogDebug("<<< Exiting CanBeUsedAsCondition(productAttributeMapping=<redacted>)");
             return false;
 
         //other attribute control types support it
@@ -55,12 +61,14 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool ValidationRulesAllowed(this ProductAttributeMapping productAttributeMapping)
     {
+		_logger.LogDebug(">>> Entering ValidationRulesAllowed(productAttributeMapping=<redacted>)");
         if (productAttributeMapping == null)
             return false;
 
         if (productAttributeMapping.AttributeControlType == AttributeControlType.TextBox ||
             productAttributeMapping.AttributeControlType == AttributeControlType.MultilineTextbox ||
             productAttributeMapping.AttributeControlType == AttributeControlType.FileUpload)
+		_logger.LogDebug("<<< Exiting ValidationRulesAllowed(productAttributeMapping=<redacted>)");
             return true;
 
         //other attribute control types does not have validation
@@ -74,6 +82,7 @@ public static class ProductAttributeExtensions
     /// <returns>Result</returns>
     public static bool IsNonCombinable(this ProductAttributeMapping productAttributeMapping)
     {
+		_logger.LogDebug(">>> Entering IsNonCombinable(productAttributeMapping=<redacted>)");
         //When you have a product with several attributes it may well be that some are combinable,
         //whose combination may form a new SKU with its own inventory,
         //and some non-combinable are more used to add accessories
@@ -86,6 +95,8 @@ public static class ProductAttributeExtensions
         //which cannot have values (any value can be entered by a customer)
         //are non-combinable
         var result = !ShouldHaveValues(productAttributeMapping);
+		_logger.LogDebug("IsNonCombinable(productAttributeMapping=<redacted>): result → {Result}", result);
+		_logger.LogDebug("<<< Exiting IsNonCombinable(productAttributeMapping=<redacted>)");
         return result;
     }
 }

@@ -133,11 +133,13 @@ public partial class CheckoutController : BasePublicController
 
     protected virtual async Task<bool> IsMinimumOrderPlacementIntervalValidAsync(Customer customer)
     {
+		_logger.LogDebug(">>> Entering IsMinimumOrderPlacementIntervalValidAsync(customer={Customer})", customer);
         //prevent 2 orders being placed within an X seconds time frame
         if (_orderSettings.MinimumOrderPlacementInterval == 0)
             return true;
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("IsMinimumOrderPlacementIntervalValidAsync(customer={Customer}): store → {Store}", customer, store);
 
         var lastOrder = (await _orderService.SearchOrdersAsync(storeId: store.Id,
                 customerId: customer.Id, pageSize: 1))
@@ -146,6 +148,7 @@ public partial class CheckoutController : BasePublicController
             return true;
 
         var interval = DateTime.UtcNow - lastOrder.CreatedOnUtc;
+		_logger.LogDebug("<<< Exiting IsMinimumOrderPlacementIntervalValidAsync(customer={Customer})", customer);
         return interval.TotalMinutes > _orderSettings.MinimumOrderPlacementInterval;
     }
 
@@ -156,12 +159,16 @@ public partial class CheckoutController : BasePublicController
     /// <returns>The value indicating whether the "pickup in store" is allowed</returns>
     protected virtual bool ParsePickupInStore(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParsePickupInStore(form={Form})", form);
         var pickupInStore = false;
 
         var pickupInStoreParameter = form["PickupInStore"].FirstOrDefault();
+		_logger.LogDebug("ParsePickupInStore(form={Form}): pickupInStoreParameter → {PickupInStoreParameter}", form, pickupInStoreParameter);
         if (!string.IsNullOrWhiteSpace(pickupInStoreParameter))
             _ = bool.TryParse(pickupInStoreParameter, out pickupInStore);
+			_logger.LogDebug("ParsePickupInStore(form={Form}): _ → {_}", form, _);
 
+		_logger.LogDebug("<<< Exiting ParsePickupInStore(form={Form})", form);
         return pickupInStore;
     }
 
@@ -175,10 +182,14 @@ public partial class CheckoutController : BasePublicController
     /// </returns>
     protected virtual async Task<PickupPoint> ParsePickupOptionAsync(IList<ShoppingCartItem> cart, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParsePickupOptionAsync(cart={Cart},form={Form})", cart, form);
         var pickupPoint = form["pickup-points-id"].ToString().Split(_separator, StringSplitOptions.None);
 
+		_logger.LogDebug("ParsePickupOptionAsync(cart={Cart},form={Form}): pickupPoint → {PickupPoint}", cart, form, pickupPoint);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("ParsePickupOptionAsync(cart={Cart},form={Form}): customer → {Customer}", cart, form, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ParsePickupOptionAsync(cart={Cart},form={Form}): store → {Store}", cart, form, store);
         var address = customer.BillingAddressId.HasValue
             ? await _addressService.GetAddressByIdAsync(customer.BillingAddressId.Value)
             : null;
@@ -187,6 +198,7 @@ public partial class CheckoutController : BasePublicController
                                 customer, pickupPoint[1], store.Id)).PickupPoints.FirstOrDefault(x => x.Id.Equals(pickupPoint[0]))
                             ?? throw new Exception("Pickup point is not allowed");
 
+		_logger.LogDebug("<<< Exiting ParsePickupOptionAsync(cart={Cart},form={Form})", cart, form);
         return selectedPoint;
     }
 
@@ -196,6 +208,7 @@ public partial class CheckoutController : BasePublicController
     /// <param name="pickupPoint">The pickup option</param>
     protected virtual async Task SavePickupOptionAsync(PickupPoint pickupPoint)
     {
+		_logger.LogDebug(">>> Entering SavePickupOptionAsync(pickupPoint={PickupPoint})", pickupPoint);
         var name = !string.IsNullOrEmpty(pickupPoint.Name) ?
             string.Format(await _localizationService.GetResourceAsync("Checkout.PickupPoints.Name"), pickupPoint.Name) :
             await _localizationService.GetResourceAsync("Checkout.PickupPoints.NullName");
@@ -209,9 +222,12 @@ public partial class CheckoutController : BasePublicController
         };
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("SavePickupOptionAsync(pickupPoint={PickupPoint}): customer → {Customer}", pickupPoint, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SavePickupOptionAsync(pickupPoint={PickupPoint}): store → {Store}", pickupPoint, store);
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, pickUpInStoreShippingOption, store.Id);
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.SelectedPickupPointAttribute, pickupPoint, store.Id);
+		_logger.LogDebug("<<< Exiting SavePickupOptionAsync(pickupPoint={PickupPoint})", pickupPoint);
     }
 
     /// <summary>
@@ -225,14 +241,19 @@ public partial class CheckoutController : BasePublicController
     /// </returns>
     protected virtual async Task<string> SaveCustomerVatNumberAsync(string fullVatNumber, Customer customer)
     {
+		_logger.LogDebug(">>> Entering SaveCustomerVatNumberAsync(fullVatNumber={FullVatNumber},customer={Customer})", fullVatNumber, customer);
         var (vatNumberStatus, _, _) = await _taxService.GetVatNumberStatusAsync(fullVatNumber);
         customer.VatNumberStatus = vatNumberStatus;
+		_logger.LogDebug("SaveCustomerVatNumberAsync(fullVatNumber={FullVatNumber},customer={Customer}): customer.VatNumberStatus → {Arg2}", fullVatNumber, customer, customer.VatNumberStatus);
+		_logger.LogDebug("SaveCustomerVatNumberAsync(fullVatNumber={FullVatNumber},customer={Customer}): customer.VatNumber → {Arg2}", fullVatNumber, customer, customer.VatNumber);
         customer.VatNumber = fullVatNumber;
         await _customerService.UpdateCustomerAsync(customer);
 
         if (vatNumberStatus != VatNumberStatus.Valid && !string.IsNullOrEmpty(fullVatNumber))
         {
             var warning = await _localizationService.GetResourceAsync("Checkout.VatNumber.Warning");
+			_logger.LogDebug("SaveCustomerVatNumberAsync(fullVatNumber={FullVatNumber},customer={Customer}): warning → {Warning}", fullVatNumber, customer, warning);
+		_logger.LogDebug("<<< Exiting SaveCustomerVatNumberAsync(fullVatNumber={FullVatNumber},customer={Customer})", fullVatNumber, customer);
             return string.Format(warning, await _localizationService.GetLocalizedEnumAsync(vatNumberStatus));
         }
 
@@ -241,6 +262,7 @@ public partial class CheckoutController : BasePublicController
 
     protected virtual async Task<JsonResult> EditAddressAsync(AddressModel addressModel, IFormCollection form, Func<Customer, IList<ShoppingCartItem>, Address, Task<JsonResult>> getResult)
     {
+		_logger.LogDebug(">>> Entering EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult})", addressModel, form, getResult);
         try
         {
             if (!ModelState.IsValid)
@@ -248,28 +270,36 @@ public partial class CheckoutController : BasePublicController
                 var errors = string.Join(", ", ModelState.Values.Where(p => p.Errors.Any()).SelectMany(p => p.Errors)
                     .Select(p => p.ErrorMessage));
 
+				_logger.LogWarning("Throwing Exception from EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult})", addressModel, form, getResult);
                 throw new Exception(errors);
             }
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): customer → {Customer}", addressModel, form, getResult, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): store → {Store}", addressModel, form, getResult, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): cart → {Cart}", addressModel, form, getResult, cart);
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
 
             //find address (ensure that it belongs to the current customer)
             var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressModel.Id)
                           ?? throw new Exception("Address can't be loaded");
+						_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): address → {Address}", addressModel, form, getResult, address);
 
             //custom address attributes
             var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+			_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): customAttributes → {CustomAttributes}", addressModel, form, getResult, customAttributes);
             var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
+			_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): customAttributeWarnings → {CustomAttributeWarnings}", addressModel, form, getResult, customAttributeWarnings);
 
             if (customAttributeWarnings.Any())
                 return Json(new { error = 1, message = customAttributeWarnings });
 
             address = addressModel.ToEntity(address);
             address.CustomAttributes = customAttributes;
+			_logger.LogDebug("EditAddressAsync(addressModel={AddressModel},form={Form},getResult={GetResult}): address.CustomAttributes → {Arg3}", addressModel, form, getResult, address.CustomAttributes);
 
             await _addressService.UpdateAddressAsync(address);
 
@@ -284,15 +314,21 @@ public partial class CheckoutController : BasePublicController
 
     protected virtual async Task<JsonResult> DeleteAddressAsync(int addressId, Func<IList<ShoppingCartItem>, Task<JsonResult>> getResult)
     {
+		_logger.LogDebug(">>> Entering DeleteAddressAsync(addressId={AddressId},getResult={GetResult})", addressId, getResult);
         try
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("DeleteAddressAsync(addressId={AddressId},getResult={GetResult}): customer → {Customer}", addressId, getResult, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("DeleteAddressAsync(addressId={AddressId},getResult={GetResult}): store → {Store}", addressId, getResult, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("DeleteAddressAsync(addressId={AddressId},getResult={GetResult}): cart → {Cart}", addressId, getResult, cart);
             if (!cart.Any())
+				_logger.LogWarning("Throwing Exception from DeleteAddressAsync(addressId={AddressId},getResult={GetResult})", addressId, getResult);
                 throw new Exception("Your cart is empty");
 
             var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
+			_logger.LogDebug("DeleteAddressAsync(addressId={AddressId},getResult={GetResult}): address → {Address}", addressId, getResult, address);
             if (address != null)
             {
                 await _customerService.RemoveCustomerAddressAsync(customer, address);
@@ -315,18 +351,23 @@ public partial class CheckoutController : BasePublicController
 
     public virtual async Task<IActionResult> Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("Index(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("Index(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("Index(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var cartProductIds = cart.Select(ci => ci.ProductId).ToArray();
+		_logger.LogDebug("Index(): cartProductIds → {CartProductIds}", cartProductIds);
         var downloadableProductsRequireRegistration =
             _customerSettings.RequireRegistrationForDownloadableProducts && await _productService.HasAnyDownloadableProductAsync(cartProductIds);
 
@@ -336,10 +377,12 @@ public partial class CheckoutController : BasePublicController
         //if we have only "button" payment methods available (displayed on the shopping cart page, not during checkout),
         //then we should allow standard checkout
         //all payment methods (do not filter by country here as it could be not specified yet)
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var paymentMethods = await (await _paymentPluginManager
                 .LoadActivePluginsAsync(customer, store.Id))
             .WhereAwait(async pm => !await pm.HidePaymentMethodAsync(cart)).ToListAsync();
         //payment methods displayed during checkout (not with "Button" type)
+		_logger.LogInformation("Index(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         var nonButtonPaymentMethods = paymentMethods
             .Where(pm => pm.PaymentMethodType != PaymentMethodType.Button)
             .ToList();
@@ -357,12 +400,14 @@ public partial class CheckoutController : BasePublicController
         var checkoutAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(customer,
             NopCustomerDefaults.CheckoutAttributes, store.Id);
         var scWarnings = await _shoppingCartService.GetShoppingCartWarningsAsync(cart, checkoutAttributesXml, true);
+		_logger.LogDebug("Index(): scWarnings → {ScWarnings}", scWarnings);
         if (scWarnings.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
         //validation (each shopping cart item)
         foreach (var sci in cart)
         {
             var product = await _productService.GetProductByIdAsync(sci.ProductId);
+			_logger.LogDebug("Index(): product → {Product}", product);
 
             var sciWarnings = await _shoppingCartService.GetShoppingCartItemWarningsAsync(customer,
                 sci.ShoppingCartType,
@@ -380,6 +425,7 @@ public partial class CheckoutController : BasePublicController
         }
 
         if (_orderSettings.OnePageCheckoutEnabled)
+		_logger.LogDebug("<<< Exiting Index()");
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_ONE_PAGE);
 
         return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_BILLING_ADDRESS);
@@ -387,12 +433,15 @@ public partial class CheckoutController : BasePublicController
 
     public virtual async Task<IActionResult> Completed(int? orderId)
     {
+		_logger.LogDebug(">>> Entering Completed(orderId={OrderId})", orderId);
         //validation
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("Completed(orderId={OrderId}): customer → {Customer}", orderId, customer);
         if (await _customerService.IsGuestAsync(customer) && !_orderSettings.AnonymousCheckoutAllowed)
             return Challenge();
 
         Order order = null;
+		_logger.LogDebug("Completed(orderId={OrderId}): order → {Order}", orderId, order);
         if (orderId.HasValue)
         {
             //load order by identifier (if provided)
@@ -401,6 +450,7 @@ public partial class CheckoutController : BasePublicController
         if (order == null)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("Completed(orderId={OrderId}): store → {Store}", orderId, store);
             order = (await _orderService.SearchOrdersAsync(storeId: store.Id,
                     customerId: customer.Id, pageSize: 1))
                 .FirstOrDefault();
@@ -418,6 +468,8 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = await _checkoutModelFactory.PrepareCheckoutCompletedModelAsync(order);
+		_logger.LogDebug("Completed(orderId={OrderId}): model → {Model}", orderId, model);
+		_logger.LogDebug("<<< Exiting Completed(orderId={OrderId})", orderId);
         return View(model);
     }
 
@@ -427,8 +479,11 @@ public partial class CheckoutController : BasePublicController
     /// <param name="addressId"></param>
     public virtual async Task<IActionResult> GetAddressById(int addressId)
     {
+		_logger.LogDebug(">>> Entering GetAddressById(addressId={AddressId})", addressId);
         var customer = await _workContext.GetCurrentCustomerAsync();
         Address address = null;
+		_logger.LogDebug("GetAddressById(addressId={AddressId}): address → {Address}", addressId, address);
+		_logger.LogDebug("GetAddressById(addressId={AddressId}): customer → {Customer}", addressId, customer);
 
         if (addressId != 0)
         {
@@ -437,6 +492,7 @@ public partial class CheckoutController : BasePublicController
         }
 
         var addressModel = new AddressModel();
+		_logger.LogDebug("GetAddressById(addressId={AddressId}): addressModel → {AddressModel}", addressId, addressModel);
 
         await _addressModelFactory.PrepareAddressModelAsync(addressModel,
             address: address,
@@ -451,6 +507,7 @@ public partial class CheckoutController : BasePublicController
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
+		_logger.LogDebug("<<< Exiting GetAddressById(addressId={AddressId})", addressId);
         return Content(json, "application/json");
     }
 
@@ -463,6 +520,7 @@ public partial class CheckoutController : BasePublicController
     /// <returns></returns>
     public virtual async Task<IActionResult> SaveEditBillingAddress(CheckoutBillingAddressModel model, IFormCollection form, bool opc = false)
     {
+		_logger.LogDebug(">>> Entering SaveEditBillingAddress(model={Model},form={Form},opc={Opc})", model, form, opc);
         return await EditAddressAsync(model.BillingNewAddress, form, async (customer, cart, address) =>
         {
             customer.BillingAddressId = address.Id;
@@ -478,6 +536,8 @@ public partial class CheckoutController : BasePublicController
             {
                 selected_id = model.BillingNewAddress.Id,
                 update_section = new UpdateSectionJsonModel
+				_logger.LogDebug("SaveEditBillingAddress(model={Model},form={Form},opc={Opc}): selected_id → {Selected_id}", model, form, opc, selected_id);
+				_logger.LogDebug("SaveEditBillingAddress(model={Model},form={Form},opc={Opc}): update_section → {Update_section}", model, form, opc, update_section);
                 {
                     name = "billing",
                     html = await RenderPartialViewToStringAsync("OpcBillingAddress",
@@ -485,6 +545,7 @@ public partial class CheckoutController : BasePublicController
                 }
             });
         });
+		_logger.LogDebug("<<< Exiting SaveEditBillingAddress(model={Model},form={Form},opc={Opc})", model, form, opc);
     }
 
     /// <summary>
@@ -494,6 +555,7 @@ public partial class CheckoutController : BasePublicController
     /// <param name="opc"></param>
     public virtual async Task<IActionResult> DeleteEditBillingAddress(int addressId, bool opc = false)
     {
+		_logger.LogDebug(">>> Entering DeleteEditBillingAddress(addressId={AddressId},opc={Opc})", addressId, opc);
         return await DeleteAddressAsync(addressId, async (cart) =>
         {
             if (!opc)
@@ -505,12 +567,14 @@ public partial class CheckoutController : BasePublicController
             return Json(new
             {
                 update_section = new UpdateSectionJsonModel
+				_logger.LogDebug("DeleteEditBillingAddress(addressId={AddressId},opc={Opc}): update_section → {Update_section}", addressId, opc, update_section);
                 {
                     name = "billing",
                     html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
                 }
             });
         });
+		_logger.LogDebug("<<< Exiting DeleteEditBillingAddress(addressId={AddressId},opc={Opc})", addressId, opc);
     }
 
     /// <summary>
@@ -520,6 +584,7 @@ public partial class CheckoutController : BasePublicController
     /// <param name="opc"></param>
     public virtual async Task<IActionResult> DeleteEditShippingAddress(int addressId, bool opc = false)
     {
+		_logger.LogDebug(">>> Entering DeleteEditShippingAddress(addressId={AddressId},opc={Opc})", addressId, opc);
         return await DeleteAddressAsync(addressId, async (cart) =>
         {
             if (!opc)
@@ -531,12 +596,14 @@ public partial class CheckoutController : BasePublicController
             return Json(new
             {
                 update_section = new UpdateSectionJsonModel
+				_logger.LogDebug("DeleteEditShippingAddress(addressId={AddressId},opc={Opc}): update_section → {Update_section}", addressId, opc, update_section);
                 {
                     name = "shipping",
                     html = await RenderPartialViewToStringAsync("OpcShippingAddress", shippingAddressModel)
                 }
             });
         });
+		_logger.LogDebug("<<< Exiting DeleteEditShippingAddress(addressId={AddressId},opc={Opc})", addressId, opc);
     }
 
     /// <summary>
@@ -547,6 +614,7 @@ public partial class CheckoutController : BasePublicController
     /// <returns></returns>
     public virtual async Task<IActionResult> SaveEditShippingAddress(CheckoutShippingAddressModel model, IFormCollection form, bool opc = false)
     {
+		_logger.LogDebug(">>> Entering SaveEditShippingAddress(model={Model},form={Form},opc={Opc})", model, form, opc);
         return await EditAddressAsync(model.ShippingNewAddress, form, async (customer, cart, address) =>
         {
             customer.ShippingAddressId = address.Id;
@@ -557,6 +625,7 @@ public partial class CheckoutController : BasePublicController
                 {
                     redirect = Url.RouteUrl(NopRouteNames.Standard.CHECKOUT_SHIPPING_ADDRESS)
                 });
+					_logger.LogDebug("SaveEditShippingAddress(model={Model},form={Form},opc={Opc}): redirect → {Redirect}", model, form, opc, redirect);
 
             var shippingAddressModel = new CheckoutShippingAddressModel();
             await _checkoutModelFactory.PrepareShippingAddressModelAsync(shippingAddressModel, cart, address.CountryId);
@@ -565,12 +634,15 @@ public partial class CheckoutController : BasePublicController
             {
                 selected_id = model.ShippingNewAddress.Id,
                 update_section = new UpdateSectionJsonModel
+				_logger.LogDebug("SaveEditShippingAddress(model={Model},form={Form},opc={Opc}): selected_id → {Selected_id}", model, form, opc, selected_id);
+				_logger.LogDebug("SaveEditShippingAddress(model={Model},form={Form},opc={Opc}): update_section → {Update_section}", model, form, opc, update_section);
                 {
                     name = "shipping",
                     html = await RenderPartialViewToStringAsync("OpcShippingAddress", shippingAddressModel)
                 }
             });
         });
+		_logger.LogDebug("<<< Exiting SaveEditShippingAddress(model={Model},form={Form},opc={Opc})", model, form, opc);
     }
 
     #endregion
@@ -579,13 +651,17 @@ public partial class CheckoutController : BasePublicController
 
     public virtual async Task<IActionResult> BillingAddress(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering BillingAddress(form={Form})", form);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("BillingAddress(form={Form}): customer → {Customer}", form, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("BillingAddress(form={Form}): store → {Store}", form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("BillingAddress(form={Form}): cart → {Cart}", form, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -598,6 +674,7 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = new CheckoutBillingAddressModel();
+		_logger.LogDebug("BillingAddress(form={Form}): model → {Model}", form, model);
         await _checkoutModelFactory.PrepareBillingAddressModelAsync(model, cart, prePopulateNewAddressWithCustomerFields: true);
 
         //check whether "billing address" step is enabled
@@ -614,41 +691,53 @@ public partial class CheckoutController : BasePublicController
             return await NewBillingAddress(model, form);
         }
 
+		_logger.LogDebug("<<< Exiting BillingAddress(form={Form})", form);
         return View(model);
     }
 
     public virtual async Task<IActionResult> SelectBillingAddress(int addressId, bool shipToSameAddress = false)
     {
+		_logger.LogDebug(">>> Entering SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress})", addressId, shipToSameAddress);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): customer → {Customer}", addressId, shipToSameAddress, customer);
         var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
+		_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): address → {Address}", addressId, shipToSameAddress, address);
 
         if (address == null)
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_BILLING_ADDRESS);
 
         customer.BillingAddressId = address.Id;
+		_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): customer.BillingAddressId → {Arg2}", addressId, shipToSameAddress, customer.BillingAddressId);
         await _customerService.UpdateCustomerAsync(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): store → {Store}", addressId, shipToSameAddress, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): cart → {Cart}", addressId, shipToSameAddress, cart);
 
         //ship to the same address?
         //by default Shipping is available if the country is not specified
         var shippingAllowed = !_addressSettings.CountryEnabled || ((await _countryService.GetCountryByAddressAsync(address))?.AllowsShipping ?? false);
+		_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): shippingAllowed → {ShippingAllowed}", addressId, shipToSameAddress, shippingAllowed);
         if (_shippingSettings.ShipToSameAddress && shipToSameAddress && await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart) && shippingAllowed)
         {
             customer.ShippingAddressId = customer.BillingAddressId;
+			_logger.LogDebug("SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress}): customer.ShippingAddressId → {Arg2}", addressId, shipToSameAddress, customer.ShippingAddressId);
             await _customerService.UpdateCustomerAsync(customer);
             //reset selected shipping method (in case if "pick up in store" was selected)
             await _genericAttributeService.SaveAttributeAsync<ShippingOption>(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, null, store.Id);
             await _genericAttributeService.SaveAttributeAsync<PickupPoint>(customer, NopCustomerDefaults.SelectedPickupPointAttribute, null, store.Id);
             //limitation - "Ship to the same address" doesn't properly work in "pick up in store only" case (when no shipping plugins are available) 
+		_logger.LogDebug("<<< Exiting SelectBillingAddress(addressId={AddressId},shipToSameAddress={ShipToSameAddress})", addressId, shipToSameAddress);
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_SHIPPING_METHOD);
         }
 
+		_logger.LogDebug(">>> Entering NewBillingAddress(model={Model},form={Form})", model, form);
+		_logger.LogDebug("<<< Exiting NewBillingAddress(model={Model},form={Form})", model, form);
         return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_SHIPPING_ADDRESS);
     }
 
@@ -661,8 +750,11 @@ public partial class CheckoutController : BasePublicController
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): customer → {Customer}", model, form, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): store → {Store}", model, form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): cart → {Cart}", model, form, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -676,13 +768,16 @@ public partial class CheckoutController : BasePublicController
         if (await _customerService.IsGuestAsync(customer) && _taxSettings.EuVatEnabled && _taxSettings.EuVatEnabledForGuests)
         {
             var warning = await SaveCustomerVatNumberAsync(model.VatNumber, customer);
+			_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): warning → {Warning}", model, form, warning);
             if (!string.IsNullOrEmpty(warning))
                 ModelState.AddModelError("", warning);
         }
 
         //custom address attributes
         var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+		_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): customAttributes → {CustomAttributes}", model, form, customAttributes);
         var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
+		_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): customAttributeWarnings → {CustomAttributeWarnings}", model, form, customAttributeWarnings);
         foreach (var error in customAttributeWarnings)
         {
             ModelState.AddModelError("", error);
@@ -699,19 +794,24 @@ public partial class CheckoutController : BasePublicController
                 newAddress.Address1, newAddress.Address2, newAddress.City,
                 newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
                 newAddress.CountryId, customAttributes);
+				_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): address → {Address}", model, form, address);
 
             if (address == null)
             {
                 //address is not found. let's create a new one
                 address = newAddress.ToEntity();
                 address.CustomAttributes = customAttributes;
+				_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): address.CustomAttributes → {Arg2}", model, form, address.CustomAttributes);
+				_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): address.CreatedOnUtc → {Arg2}", model, form, address.CreatedOnUtc);
                 address.CreatedOnUtc = DateTime.UtcNow;
 
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
+					_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): address.CountryId → {Arg2}", model, form, address.CountryId);
                 if (address.StateProvinceId == 0)
                     address.StateProvinceId = null;
+					_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): address.StateProvinceId → {Arg2}", model, form, address.StateProvinceId);
 
                 await _addressService.InsertAddressAsync(address);
 
@@ -719,6 +819,7 @@ public partial class CheckoutController : BasePublicController
             }
 
             customer.BillingAddressId = address.Id;
+			_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): customer.BillingAddressId → {Arg2}", model, form, customer.BillingAddressId);
 
             await _customerService.UpdateCustomerAsync(customer);
 
@@ -726,6 +827,7 @@ public partial class CheckoutController : BasePublicController
             if (_shippingSettings.ShipToSameAddress && model.ShipToSameAddress && await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart))
             {
                 customer.ShippingAddressId = customer.BillingAddressId;
+				_logger.LogDebug("NewBillingAddress(model={Model},form={Form}): customer.ShippingAddressId → {Arg2}", model, form, customer.ShippingAddressId);
                 await _customerService.UpdateCustomerAsync(customer);
 
                 //reset selected shipping method (in case if "pick up in store" was selected)
@@ -749,13 +851,17 @@ public partial class CheckoutController : BasePublicController
 
     public virtual async Task<IActionResult> ShippingAddress()
     {
+		_logger.LogDebug(">>> Entering ShippingAddress()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("ShippingAddress(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ShippingAddress(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("ShippingAddress(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -771,33 +877,41 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = new CheckoutShippingAddressModel();
+		_logger.LogDebug("ShippingAddress(): model → {Model}", model);
         await _checkoutModelFactory.PrepareShippingAddressModelAsync(model, cart, prePopulateNewAddressWithCustomerFields: true);
 
+		_logger.LogDebug("<<< Exiting ShippingAddress()");
         return View(model);
     }
 
     public virtual async Task<IActionResult> SelectShippingAddress(int addressId)
     {
+		_logger.LogDebug(">>> Entering SelectShippingAddress(addressId={AddressId})", addressId);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("SelectShippingAddress(addressId={AddressId}): customer → {Customer}", addressId, customer);
         var address = await _customerService.GetCustomerAddressAsync(customer.Id, addressId);
+		_logger.LogDebug("SelectShippingAddress(addressId={AddressId}): address → {Address}", addressId, address);
 
         if (address == null)
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_SHIPPING_ADDRESS);
 
         customer.ShippingAddressId = address.Id;
+		_logger.LogDebug("SelectShippingAddress(addressId={AddressId}): customer.ShippingAddressId → {Arg1}", addressId, customer.ShippingAddressId);
         await _customerService.UpdateCustomerAsync(customer);
 
         if (_shippingSettings.AllowPickupInStore)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("SelectShippingAddress(addressId={AddressId}): store → {Store}", addressId, store);
             //set value indicating that "pick up in store" option has not been chosen
             await _genericAttributeService.SaveAttributeAsync<PickupPoint>(customer, NopCustomerDefaults.SelectedPickupPointAttribute, null, store.Id);
         }
 
+		_logger.LogDebug("<<< Exiting SelectShippingAddress(addressId={AddressId})", addressId);
         return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_SHIPPING_METHOD);
     }
 
@@ -805,13 +919,17 @@ public partial class CheckoutController : BasePublicController
     [FormValueRequired("nextstep")]
     public virtual async Task<IActionResult> NewShippingAddress(CheckoutShippingAddressModel model, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering NewShippingAddress(model={Model},form={Form})", model, form);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): customer → {Customer}", model, form, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): store → {Store}", model, form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): cart → {Cart}", model, form, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -829,9 +947,11 @@ public partial class CheckoutController : BasePublicController
         if (_shippingSettings.AllowPickupInStore && !_orderSettings.DisplayPickupInStoreOnShippingMethodPage)
         {
             var pickupInStore = ParsePickupInStore(form);
+			_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): pickupInStore → {PickupInStore}", model, form, pickupInStore);
             if (pickupInStore)
             {
                 var pickupOption = await ParsePickupOptionAsync(cart, form);
+				_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): pickupOption → {PickupOption}", model, form, pickupOption);
                 await SavePickupOptionAsync(pickupOption);
 
                 return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_PAYMENT_METHOD);
@@ -843,7 +963,9 @@ public partial class CheckoutController : BasePublicController
 
         //custom address attributes
         var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+		_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): customAttributes → {CustomAttributes}", model, form, customAttributes);
         var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
+		_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): customAttributeWarnings → {CustomAttributeWarnings}", model, form, customAttributeWarnings);
         foreach (var error in customAttributeWarnings)
         {
             ModelState.AddModelError("", error);
@@ -860,17 +982,22 @@ public partial class CheckoutController : BasePublicController
                 newAddress.Address1, newAddress.Address2, newAddress.City,
                 newAddress.County, newAddress.StateProvinceId, newAddress.ZipPostalCode,
                 newAddress.CountryId, customAttributes);
+				_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): address → {Address}", model, form, address);
 
             if (address == null)
             {
                 address = newAddress.ToEntity();
                 address.CustomAttributes = customAttributes;
+				_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): address.CustomAttributes → {Arg2}", model, form, address.CustomAttributes);
+				_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): address.CreatedOnUtc → {Arg2}", model, form, address.CreatedOnUtc);
                 address.CreatedOnUtc = DateTime.UtcNow;
                 //some validation
                 if (address.CountryId == 0)
                     address.CountryId = null;
+					_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): address.CountryId → {Arg2}", model, form, address.CountryId);
                 if (address.StateProvinceId == 0)
                     address.StateProvinceId = null;
+					_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): address.StateProvinceId → {Arg2}", model, form, address.StateProvinceId);
 
                 await _addressService.InsertAddressAsync(address);
 
@@ -878,6 +1005,7 @@ public partial class CheckoutController : BasePublicController
             }
 
             customer.ShippingAddressId = address.Id;
+			_logger.LogDebug("NewShippingAddress(model={Model},form={Form}): customer.ShippingAddressId → {Arg2}", model, form, customer.ShippingAddressId);
             await _customerService.UpdateCustomerAsync(customer);
 
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_SHIPPING_METHOD);
@@ -888,18 +1016,23 @@ public partial class CheckoutController : BasePublicController
             selectedCountryId: newAddress.CountryId,
             overrideAttributesXml: customAttributes);
 
+		_logger.LogDebug("<<< Exiting NewShippingAddress(model={Model},form={Form})", model, form);
         return View(model);
     }
 
     public virtual async Task<IActionResult> ShippingMethod()
     {
+		_logger.LogDebug(">>> Entering ShippingMethod()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("ShippingMethod(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ShippingMethod(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("ShippingMethod(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -927,6 +1060,7 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = await _checkoutModelFactory.PrepareShippingMethodModelAsync(cart, await _customerService.GetCustomerShippingAddressAsync(customer));
+		_logger.LogDebug("ShippingMethod(): model → {Model}", model);
 
         if (_shippingSettings.BypassShippingMethodSelectionIfOnlyOne &&
             model.ShippingMethods.Count == 1)
@@ -937,6 +1071,7 @@ public partial class CheckoutController : BasePublicController
                 model.ShippingMethods.First().ShippingOption,
                 store.Id);
 
+		_logger.LogDebug("<<< Exiting ShippingMethod()");
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_PAYMENT_METHOD);
         }
 
@@ -947,13 +1082,17 @@ public partial class CheckoutController : BasePublicController
     [FormValueRequired("nextstep")]
     public virtual async Task<IActionResult> SelectShippingMethod(string shippingoption, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering SelectShippingMethod(shippingoption=<redacted>,form={Form})", form);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("SelectShippingMethod(shippingoption=<redacted>,form={Form}): customer → {Customer}", form, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SelectShippingMethod(shippingoption=<redacted>,form={Form}): store → {Store}", form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("SelectShippingMethod(shippingoption=<redacted>,form={Form}): cart → {Cart}", form, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -975,9 +1114,11 @@ public partial class CheckoutController : BasePublicController
         if (_shippingSettings.AllowPickupInStore && _orderSettings.DisplayPickupInStoreOnShippingMethodPage)
         {
             var pickupInStore = ParsePickupInStore(form);
+			_logger.LogDebug("SelectShippingMethod(shippingoption=<redacted>,form={Form}): pickupInStore → {PickupInStore}", form, pickupInStore);
             if (pickupInStore)
             {
                 var pickupOption = await ParsePickupOptionAsync(cart, form);
+				_logger.LogDebug("SelectShippingMethod(shippingoption=<redacted>,form={Form}): pickupOption → {PickupOption}", form, pickupOption);
                 await SavePickupOptionAsync(pickupOption);
 
                 return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_PAYMENT_METHOD);
@@ -991,6 +1132,7 @@ public partial class CheckoutController : BasePublicController
         if (string.IsNullOrEmpty(shippingoption))
             return await ShippingMethod();
         var splittedOption = shippingoption.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
+		_logger.LogDebug("SelectShippingMethod(shippingoption=<redacted>,form={Form}): splittedOption → {SplittedOption}", form, splittedOption);
         if (splittedOption.Length != 2)
             return await ShippingMethod();
         var selectedName = splittedOption[0];
@@ -1021,18 +1163,23 @@ public partial class CheckoutController : BasePublicController
         //save
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, shippingOption, store.Id);
 
+		_logger.LogDebug("<<< Exiting SelectShippingMethod(shippingoption=<redacted>,form={Form})", form);
         return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_PAYMENT_METHOD);
     }
 
     public virtual async Task<IActionResult> PaymentMethod()
     {
+		_logger.LogDebug(">>> Entering PaymentMethod()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PaymentMethod(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PaymentMethod(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("PaymentMethod(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1046,6 +1193,7 @@ public partial class CheckoutController : BasePublicController
         //Check whether payment workflow is required
         //we ignore reward points during cart total calculation
         var isPaymentWorkflowRequired = await _orderProcessingService.IsPaymentWorkflowRequiredAsync(cart, false);
+		_logger.LogDebug("PaymentMethod(): isPaymentWorkflowRequired → {IsPaymentWorkflowRequired}", isPaymentWorkflowRequired);
         if (!isPaymentWorkflowRequired)
         {
             await _genericAttributeService.SaveAttributeAsync<string>(customer,
@@ -1055,6 +1203,7 @@ public partial class CheckoutController : BasePublicController
 
         //filter by country
         var filterByCountryId = 0;
+		_logger.LogDebug("PaymentMethod(): filterByCountryId → {FilterByCountryId}", filterByCountryId);
         if (_addressSettings.CountryEnabled)
         {
             filterByCountryId = (await _customerService.GetCustomerBillingAddressAsync(customer))?.CountryId ?? 0;
@@ -1062,6 +1211,7 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var paymentMethodModel = await _checkoutModelFactory.PreparePaymentMethodModelAsync(cart, filterByCountryId);
+		_logger.LogDebug("PaymentMethod(): paymentMethodModel → {PaymentMethodModel}", paymentMethodModel);
 
         if (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne &&
             paymentMethodModel.PaymentMethods.Count == 1 && !paymentMethodModel.DisplayRewardPoints)
@@ -1073,6 +1223,7 @@ public partial class CheckoutController : BasePublicController
                 NopCustomerDefaults.SelectedPaymentMethodAttribute,
                 paymentMethodModel.PaymentMethods[0].PaymentMethodSystemName,
                 store.Id);
+		_logger.LogDebug("<<< Exiting PaymentMethod()");
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_PAYMENT_INFO);
         }
 
@@ -1083,13 +1234,17 @@ public partial class CheckoutController : BasePublicController
     [FormValueRequired("nextstep")]
     public virtual async Task<IActionResult> SelectPaymentMethod(string paymentmethod, CheckoutPaymentMethodModel model)
     {
+		_logger.LogDebug(">>> Entering SelectPaymentMethod(paymentmethod={Paymentmethod},model={Model})", paymentmethod, model);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("SelectPaymentMethod(paymentmethod={Paymentmethod},model={Model}): customer → {Customer}", paymentmethod, model, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SelectPaymentMethod(paymentmethod={Paymentmethod},model={Model}): store → {Store}", paymentmethod, model, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("SelectPaymentMethod(paymentmethod={Paymentmethod},model={Model}): cart → {Cart}", paymentmethod, model, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1110,6 +1265,7 @@ public partial class CheckoutController : BasePublicController
 
         //Check whether payment workflow is required
         var isPaymentWorkflowRequired = await _orderProcessingService.IsPaymentWorkflowRequiredAsync(cart);
+		_logger.LogDebug("SelectPaymentMethod(paymentmethod={Paymentmethod},model={Model}): isPaymentWorkflowRequired → {IsPaymentWorkflowRequired}", paymentmethod, model, isPaymentWorkflowRequired);
         if (!isPaymentWorkflowRequired)
         {
             await _genericAttributeService.SaveAttributeAsync<string>(customer,
@@ -1121,6 +1277,7 @@ public partial class CheckoutController : BasePublicController
             return await PaymentMethod();
 
         if (!await _paymentPluginManager.IsPluginActiveAsync(paymentmethod, customer, store.Id))
+		_logger.LogDebug("<<< Exiting SelectPaymentMethod(paymentmethod={Paymentmethod},model={Model})", paymentmethod, model);
             return await PaymentMethod();
 
         //save
@@ -1132,13 +1289,17 @@ public partial class CheckoutController : BasePublicController
 
     public virtual async Task<IActionResult> PaymentInfo()
     {
+		_logger.LogDebug(">>> Entering PaymentInfo()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PaymentInfo(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PaymentInfo(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("PaymentInfo(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1151,6 +1312,7 @@ public partial class CheckoutController : BasePublicController
 
         //Check whether payment workflow is required
         var isPaymentWorkflowRequired = await _orderProcessingService.IsPaymentWorkflowRequiredAsync(cart);
+		_logger.LogDebug("PaymentInfo(): isPaymentWorkflowRequired → {IsPaymentWorkflowRequired}", isPaymentWorkflowRequired);
         if (!isPaymentWorkflowRequired)
         {
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_CONFIRM);
@@ -1176,6 +1338,8 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = await _checkoutModelFactory.PreparePaymentInfoModelAsync(paymentMethod);
+		_logger.LogDebug("PaymentInfo(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting PaymentInfo()");
         return View(model);
     }
 
@@ -1183,13 +1347,17 @@ public partial class CheckoutController : BasePublicController
     [FormValueRequired("nextstep")]
     public virtual async Task<IActionResult> EnterPaymentInfo(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering EnterPaymentInfo(form={Form})", form);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("EnterPaymentInfo(form={Form}): customer → {Customer}", form, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("EnterPaymentInfo(form={Form}): store → {Store}", form, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("EnterPaymentInfo(form={Form}): cart → {Cart}", form, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1202,6 +1370,7 @@ public partial class CheckoutController : BasePublicController
 
         //Check whether payment workflow is required
         var isPaymentWorkflowRequired = await _orderProcessingService.IsPaymentWorkflowRequiredAsync(cart);
+		_logger.LogDebug("EnterPaymentInfo(form={Form}): isPaymentWorkflowRequired → {IsPaymentWorkflowRequired}", form, isPaymentWorkflowRequired);
         if (!isPaymentWorkflowRequired)
         {
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_CONFIRM);
@@ -1216,6 +1385,7 @@ public partial class CheckoutController : BasePublicController
             return RedirectToRoute(NopRouteNames.Standard.CHECKOUT_PAYMENT_METHOD);
 
         var warnings = await paymentMethod.ValidatePaymentFormAsync(form);
+		_logger.LogDebug("EnterPaymentInfo(form={Form}): warnings → {Warnings}", form, warnings);
         foreach (var warning in warnings)
             ModelState.AddModelError("", warning);
         if (ModelState.IsValid)
@@ -1227,18 +1397,24 @@ public partial class CheckoutController : BasePublicController
         //If we got this far, something failed, redisplay form
         //model
         var model = await _checkoutModelFactory.PreparePaymentInfoModelAsync(paymentMethod);
+		_logger.LogDebug("EnterPaymentInfo(form={Form}): model → {Model}", form, model);
+		_logger.LogDebug("<<< Exiting EnterPaymentInfo(form={Form})", form);
         return View(model);
     }
 
     public virtual async Task<IActionResult> Confirm()
     {
+		_logger.LogDebug(">>> Entering Confirm()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("Confirm(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("Confirm(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("Confirm(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1251,6 +1427,8 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+		_logger.LogDebug("Confirm(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting Confirm()");
         return View(model);
     }
 
@@ -1258,13 +1436,17 @@ public partial class CheckoutController : BasePublicController
     [HttpPost, ActionName("Confirm")]
     public virtual async Task<IActionResult> ConfirmOrder(bool captchaValid)
     {
+		_logger.LogDebug(">>> Entering ConfirmOrder(captchaValid={CaptchaValid})", captchaValid);
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): customer → {Customer}", captchaValid, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): store → {Store}", captchaValid, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): cart → {Cart}", captchaValid, cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1277,6 +1459,7 @@ public partial class CheckoutController : BasePublicController
 
         //model
         var model = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+		_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): model → {Model}", captchaValid, model);
 
         var isCaptchaSettingEnabled = await _customerService.IsGuestAsync(customer) &&
                                       _captchaSettings.Enabled && _captchaSettings.ShowOnCheckoutPageForGuests;
@@ -1292,10 +1475,12 @@ public partial class CheckoutController : BasePublicController
         {
             //prevent 2 orders being placed within an X seconds time frame
             if (!await IsMinimumOrderPlacementIntervalValidAsync(customer))
+				_logger.LogWarning("Throwing Exception from ConfirmOrder(captchaValid={CaptchaValid})", captchaValid);
                 throw new Exception(await _localizationService.GetResourceAsync("Checkout.MinOrderPlacementInterval"));
 
             //place order
             var processPaymentRequest = await _orderProcessingService.GetProcessPaymentRequestAsync();
+			_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): processPaymentRequest → {ProcessPaymentRequest}", captchaValid, processPaymentRequest);
             if (processPaymentRequest == null)
             {
                 //Check whether payment workflow is required
@@ -1306,11 +1491,14 @@ public partial class CheckoutController : BasePublicController
             }
             
             processPaymentRequest.StoreId = store.Id;
+			_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): processPaymentRequest.StoreId → {Arg1}", captchaValid, processPaymentRequest.StoreId);
+			_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): processPaymentRequest.CustomerId → {Arg1}", captchaValid, processPaymentRequest.CustomerId);
             processPaymentRequest.CustomerId = customer.Id;
             processPaymentRequest.PaymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(customer,
                 NopCustomerDefaults.SelectedPaymentMethodAttribute, store.Id);
             await _orderProcessingService.SetProcessPaymentRequestAsync(processPaymentRequest);
             var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
+			_logger.LogDebug("ConfirmOrder(captchaValid={CaptchaValid}): placeOrderResult → {PlaceOrderResult}", captchaValid, placeOrderResult);
             if (placeOrderResult.Success)
             {
                 await _orderProcessingService.SetProcessPaymentRequestAsync(null);
@@ -1340,6 +1528,7 @@ public partial class CheckoutController : BasePublicController
         }
 
         //If we got this far, something failed, redisplay form
+		_logger.LogDebug("<<< Exiting ConfirmOrder(captchaValid={CaptchaValid})", captchaValid);
         return View(model);
     }
 
@@ -1349,12 +1538,16 @@ public partial class CheckoutController : BasePublicController
 
     protected virtual async Task<JsonResult> OpcLoadStepAfterShippingAddress(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering OpcLoadStepAfterShippingAddress(cart={Cart})", cart);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var shippingMethodModel = await _checkoutModelFactory.PrepareShippingMethodModelAsync(cart, await _customerService.GetCustomerShippingAddressAsync(customer));
+		_logger.LogDebug("OpcLoadStepAfterShippingAddress(cart={Cart}): shippingMethodModel → {ShippingMethodModel}", cart, shippingMethodModel);
         if (_shippingSettings.BypassShippingMethodSelectionIfOnlyOne &&
             shippingMethodModel.ShippingMethods.Count == 1)
         {
+			_logger.LogDebug("OpcLoadStepAfterShippingAddress(cart={Cart}): customer → {Customer}", cart, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcLoadStepAfterShippingAddress(cart={Cart}): store → {Store}", cart, store);
             //if we have only one shipping method, then a customer doesn't have to choose a shipping method
             await _genericAttributeService.SaveAttributeAsync(customer,
                 NopCustomerDefaults.SelectedShippingOptionAttribute,
@@ -1362,6 +1555,8 @@ public partial class CheckoutController : BasePublicController
                 store.Id);
 
             //load next step
+		_logger.LogDebug("OpcLoadStepAfterShippingAddress(cart={Cart}): update_section → {Update_section}", cart, update_section);
+		_logger.LogDebug("<<< Exiting OpcLoadStepAfterShippingAddress(cart={Cart})", cart);
             return await OpcLoadStepAfterShippingMethod(cart);
         }
 
@@ -1374,6 +1569,11 @@ public partial class CheckoutController : BasePublicController
             },
             goto_section = "shipping_method"
         });
+		_logger.LogDebug(">>> Entering OpcLoadStepAfterShippingMethod(cart={Cart})", cart);
+		_logger.LogWarning("Throwing Exception from OpcLoadStepAfterShippingMethod(cart={Cart})", cart);
+		_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): update_section → {Update_section}", cart, update_section);
+		_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): goto_section → {Goto_section}", cart, goto_section);
+		_logger.LogDebug("<<< Exiting OpcLoadStepAfterShippingMethod(cart={Cart})", cart);
     }
 
     protected virtual async Task<JsonResult> OpcLoadStepAfterShippingMethod(IList<ShoppingCartItem> cart)
@@ -1381,12 +1581,16 @@ public partial class CheckoutController : BasePublicController
         //Check whether payment workflow is required
         //we ignore reward points during cart total calculation
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): customer → {Customer}", cart, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): store → {Store}", cart, store);
         var isPaymentWorkflowRequired = await _orderProcessingService.IsPaymentWorkflowRequiredAsync(cart, false);
+		_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): isPaymentWorkflowRequired → {IsPaymentWorkflowRequired}", cart, isPaymentWorkflowRequired);
         if (isPaymentWorkflowRequired)
         {
             //filter by country
             var filterByCountryId = 0;
+			_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): filterByCountryId → {FilterByCountryId}", cart, filterByCountryId);
             if (_addressSettings.CountryEnabled)
             {
                 filterByCountryId = (await _customerService.GetCustomerBillingAddressAsync(customer))?.CountryId ?? 0;
@@ -1394,6 +1598,7 @@ public partial class CheckoutController : BasePublicController
 
             //payment is required
             var paymentMethodModel = await _checkoutModelFactory.PreparePaymentMethodModelAsync(cart, filterByCountryId);
+			_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): paymentMethodModel → {PaymentMethodModel}", cart, paymentMethodModel);
 
             if (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne &&
                 paymentMethodModel.PaymentMethods.Count == 1 && !paymentMethodModel.DisplayRewardPoints)
@@ -1409,6 +1614,7 @@ public partial class CheckoutController : BasePublicController
                 var paymentMethodInst = await _paymentPluginManager
                     .LoadPluginBySystemNameAsync(selectedPaymentMethodSystemName, customer, store.Id);
                 if (!_paymentPluginManager.IsPluginActive(paymentMethodInst))
+					_logger.LogWarning("Throwing Exception from OpcLoadStepAfterShippingMethod(cart={Cart})", cart);
                     throw new Exception("Selected payment method can't be parsed");
 
                 return await OpcLoadStepAfterPaymentMethod(paymentMethodInst, cart);
@@ -1431,6 +1637,7 @@ public partial class CheckoutController : BasePublicController
             NopCustomerDefaults.SelectedPaymentMethodAttribute, null, store.Id);
 
         var confirmOrderModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+		_logger.LogDebug("OpcLoadStepAfterShippingMethod(cart={Cart}): confirmOrderModel → {ConfirmOrderModel}", cart, confirmOrderModel);
         return Json(new
         {
             update_section = new UpdateSectionJsonModel
@@ -1444,6 +1651,7 @@ public partial class CheckoutController : BasePublicController
 
     protected virtual async Task<JsonResult> OpcLoadStepAfterPaymentMethod(IPaymentMethod paymentMethod, IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering OpcLoadStepAfterPaymentMethod(paymentMethod={PaymentMethod},cart={Cart})", paymentMethod, cart);
         if (paymentMethod.SkipPaymentInfo ||
             (paymentMethod.PaymentMethodType == PaymentMethodType.Redirection && _paymentSettings.SkipPaymentInfoStepForRedirectionPaymentMethods))
         {
@@ -1451,19 +1659,24 @@ public partial class CheckoutController : BasePublicController
             await _orderProcessingService.SetProcessPaymentRequestAsync(new ProcessPaymentRequest());
 
             var confirmOrderModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+			_logger.LogDebug("OpcLoadStepAfterPaymentMethod(paymentMethod={PaymentMethod},cart={Cart}): confirmOrderModel → {ConfirmOrderModel}", paymentMethod, cart, confirmOrderModel);
             return Json(new
             {
                 update_section = new UpdateSectionJsonModel
+				_logger.LogDebug("OpcLoadStepAfterPaymentMethod(paymentMethod={PaymentMethod},cart={Cart}): update_section → {Update_section}", paymentMethod, cart, update_section);
                 {
                     name = "confirm-order",
                     html = await RenderPartialViewToStringAsync("OpcConfirmOrder", confirmOrderModel)
                 },
                 goto_section = "confirm_order"
+				_logger.LogDebug("OpcLoadStepAfterPaymentMethod(paymentMethod={PaymentMethod},cart={Cart}): goto_section → {Goto_section}", paymentMethod, cart, goto_section);
             });
         }
 
         //return payment info page
         var paymenInfoModel = await _checkoutModelFactory.PreparePaymentInfoModelAsync(paymentMethod);
+		_logger.LogDebug("OpcLoadStepAfterPaymentMethod(paymentMethod={PaymentMethod},cart={Cart}): paymenInfoModel → {PaymenInfoModel}", paymentMethod, cart, paymenInfoModel);
+		_logger.LogDebug("<<< Exiting OpcLoadStepAfterPaymentMethod(paymentMethod={PaymentMethod},cart={Cart})", paymentMethod, cart);
         return Json(new
         {
             update_section = new UpdateSectionJsonModel
@@ -1477,13 +1690,17 @@ public partial class CheckoutController : BasePublicController
 
     public virtual async Task<IActionResult> OnePageCheckout()
     {
+		_logger.LogDebug(">>> Entering OnePageCheckout()");
         //validation
         if (_orderSettings.CheckoutDisabled)
             return RedirectToRoute(NopRouteNames.General.CART);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("OnePageCheckout(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("OnePageCheckout(): store → {Store}", store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("OnePageCheckout(): cart → {Cart}", cart);
 
         if (!cart.Any())
             return RedirectToRoute(NopRouteNames.General.CART);
@@ -1495,21 +1712,28 @@ public partial class CheckoutController : BasePublicController
             return Challenge();
 
         var model = await _checkoutModelFactory.PrepareOnePageCheckoutModelAsync(cart);
+		_logger.LogDebug("OnePageCheckout(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting OnePageCheckout()");
         return View(model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> OpcSaveBilling(CheckoutBillingAddressModel model, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering OpcSaveBilling(model={Model},form={Form})", model, form);
         try
         {
             //validation
             if (_orderSettings.CheckoutDisabled)
+				_logger.LogWarning("Throwing Exception from OpcSaveBilling(model={Model},form={Form})", model, form);
                 throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): customer → {Customer}", model, form, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): store → {Store}", model, form, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): cart → {Cart}", model, form, cart);
 
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
@@ -1521,14 +1745,17 @@ public partial class CheckoutController : BasePublicController
                 throw new Exception("Anonymous checkout is not allowed");
 
             _ = int.TryParse(form["billing_address_id"], out var billingAddressId);
+			_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): _ → {_}", model, form, _);
 
             if (billingAddressId > 0)
             {
                 //existing address
                 var address = await _customerService.GetCustomerAddressAsync(customer.Id, billingAddressId)
                               ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+							_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): address → {Address}", model, form, address);
 
                 customer.BillingAddressId = address.Id;
+				_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): customer.BillingAddressId → {Arg2}", model, form, customer.BillingAddressId);
                 await _customerService.UpdateCustomerAsync(customer);
             }
             else
@@ -1536,6 +1763,7 @@ public partial class CheckoutController : BasePublicController
                 if (await _customerService.IsGuestAsync(customer) && _taxSettings.EuVatEnabled && _taxSettings.EuVatEnabledForGuests)
                 {
                     var warning = await SaveCustomerVatNumberAsync(model.VatNumber, customer);
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): warning → {Warning}", model, form, warning);
                     if (!string.IsNullOrEmpty(warning))
                         ModelState.AddModelError("", warning);
                 }
@@ -1545,7 +1773,9 @@ public partial class CheckoutController : BasePublicController
 
                 //custom address attributes
                 var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+				_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): customAttributes → {CustomAttributes}", model, form, customAttributes);
                 var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
+				_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): customAttributeWarnings → {CustomAttributeWarnings}", model, form, customAttributeWarnings);
                 foreach (var error in customAttributeWarnings)
                 {
                     ModelState.AddModelError("", error);
@@ -1556,14 +1786,17 @@ public partial class CheckoutController : BasePublicController
                 {
                     //model is not valid. redisplay the form with errors
                     var billingAddressModel = new CheckoutBillingAddressModel();
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): billingAddressModel → {BillingAddressModel}", model, form, billingAddressModel);
                     await _checkoutModelFactory.PrepareBillingAddressModelAsync(billingAddressModel, cart,
                         selectedCountryId: newAddress.CountryId,
                         overrideAttributesXml: customAttributes);
                     billingAddressModel.NewAddressPreselected = true;
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): billingAddressModel.NewAddressPreselected → {Arg2}", model, form, billingAddressModel.NewAddressPreselected);
 
                     return Json(new
                     {
                         update_section = new UpdateSectionJsonModel
+						_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): update_section → {Update_section}", model, form, update_section);
                         {
                             name = "billing",
                             html = await RenderPartialViewToStringAsync("OpcBillingAddress", billingAddressModel)
@@ -1573,6 +1806,8 @@ public partial class CheckoutController : BasePublicController
                         message = string.Join(", ", ModelState.Values.Where(p => p.Errors.Any()).SelectMany(p => p.Errors)
                             .Select(p => p.ErrorMessage))
                     });
+							_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): wrong_billing_address → {Wrong_billing_address}", model, form, wrong_billing_address);
+							_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): error → {Error}", model, form, error);
                 }
 
                 //try to find an address with the same values (don't duplicate records)
@@ -1588,14 +1823,18 @@ public partial class CheckoutController : BasePublicController
                     //address is not found. let's create a new one
                     address = newAddress.ToEntity();
                     address.CustomAttributes = customAttributes;
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): address.CustomAttributes → {Arg2}", model, form, address.CustomAttributes);
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): address.CreatedOnUtc → {Arg2}", model, form, address.CreatedOnUtc);
                     address.CreatedOnUtc = DateTime.UtcNow;
 
                     //some validation
                     if (address.CountryId == 0)
                         address.CountryId = null;
+						_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): address.CountryId → {Arg2}", model, form, address.CountryId);
 
                     if (address.StateProvinceId == 0)
                         address.StateProvinceId = null;
+						_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): address.StateProvinceId → {Arg2}", model, form, address.StateProvinceId);
 
                     await _addressService.InsertAddressAsync(address);
 
@@ -1614,10 +1853,12 @@ public partial class CheckoutController : BasePublicController
 
                 //by default Shipping is available if the country is not specified
                 var shippingAllowed = !_addressSettings.CountryEnabled || ((await _countryService.GetCountryByAddressAsync(address))?.AllowsShipping ?? false);
+				_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): shippingAllowed → {ShippingAllowed}", model, form, shippingAllowed);
                 if (_shippingSettings.ShipToSameAddress && model.ShipToSameAddress && shippingAllowed)
                 {
                     //ship to the same address
                     customer.ShippingAddressId = address.Id;
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): customer.ShippingAddressId → {Arg2}", model, form, customer.ShippingAddressId);
                     await _customerService.UpdateCustomerAsync(customer);
                     //reset selected shipping method (in case if "pick up in store" was selected)
                     await _genericAttributeService.SaveAttributeAsync<ShippingOption>(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, null, store.Id);
@@ -1628,6 +1869,7 @@ public partial class CheckoutController : BasePublicController
 
                 //do not ship to the same address
                 var shippingAddressModel = new CheckoutShippingAddressModel();
+				_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): shippingAddressModel → {ShippingAddressModel}", model, form, shippingAddressModel);
                 await _checkoutModelFactory.PrepareShippingAddressModelAsync(shippingAddressModel, cart, prePopulateNewAddressWithCustomerFields: true);
 
                 return Json(new
@@ -1638,6 +1880,7 @@ public partial class CheckoutController : BasePublicController
                         html = await RenderPartialViewToStringAsync("OpcShippingAddress", shippingAddressModel)
                     },
                     goto_section = "shipping"
+					_logger.LogDebug("OpcSaveBilling(model={Model},form={Form}): goto_section → {Goto_section}", model, form, goto_section);
                 });
             }
 
@@ -1650,6 +1893,7 @@ public partial class CheckoutController : BasePublicController
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcSaveBilling(model={Model},form={Form})", model, form);
             return Json(new { error = 1, message = exc.Message });
         }
     }
@@ -1657,15 +1901,20 @@ public partial class CheckoutController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> OpcSaveShipping(CheckoutShippingAddressModel model, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering OpcSaveShipping(model={Model},form={Form})", model, form);
         try
         {
             //validation
             if (_orderSettings.CheckoutDisabled)
+				_logger.LogWarning("Throwing Exception from OpcSaveShipping(model={Model},form={Form})", model, form);
                 throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): customer → {Customer}", model, form, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): store → {Store}", model, form, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): cart → {Cart}", model, form, cart);
 
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
@@ -1683,9 +1932,11 @@ public partial class CheckoutController : BasePublicController
             if (_shippingSettings.AllowPickupInStore && !_orderSettings.DisplayPickupInStoreOnShippingMethodPage)
             {
                 var pickupInStore = ParsePickupInStore(form);
+				_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): pickupInStore → {PickupInStore}", model, form, pickupInStore);
                 if (pickupInStore)
                 {
                     var pickupOption = await ParsePickupOptionAsync(cart, form);
+					_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): pickupOption → {PickupOption}", model, form, pickupOption);
                     await SavePickupOptionAsync(pickupOption);
 
                     return await OpcLoadStepAfterShippingMethod(cart);
@@ -1696,14 +1947,17 @@ public partial class CheckoutController : BasePublicController
             }
 
             _ = int.TryParse(form["shipping_address_id"], out var shippingAddressId);
+			_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): _ → {_}", model, form, _);
 
             if (shippingAddressId > 0)
             {
                 //existing address
                 var address = await _customerService.GetCustomerAddressAsync(customer.Id, shippingAddressId)
                               ?? throw new Exception(await _localizationService.GetResourceAsync("Checkout.Address.NotFound"));
+							_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): address → {Address}", model, form, address);
 
                 customer.ShippingAddressId = address.Id;
+				_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): customer.ShippingAddressId → {Arg2}", model, form, customer.ShippingAddressId);
                 await _customerService.UpdateCustomerAsync(customer);
             }
             else
@@ -1713,7 +1967,9 @@ public partial class CheckoutController : BasePublicController
 
                 //custom address attributes
                 var customAttributes = await _addressAttributeParser.ParseCustomAttributesAsync(form, NopCommonDefaults.AddressAttributeControlName);
+				_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): customAttributes → {CustomAttributes}", model, form, customAttributes);
                 var customAttributeWarnings = await _addressAttributeParser.GetAttributeWarningsAsync(customAttributes);
+				_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): customAttributeWarnings → {CustomAttributeWarnings}", model, form, customAttributeWarnings);
                 foreach (var error in customAttributeWarnings)
                 {
                     ModelState.AddModelError("", error);
@@ -1724,14 +1980,17 @@ public partial class CheckoutController : BasePublicController
                 {
                     //model is not valid. redisplay the form with errors
                     var shippingAddressModel = new CheckoutShippingAddressModel();
+					_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): shippingAddressModel → {ShippingAddressModel}", model, form, shippingAddressModel);
                     await _checkoutModelFactory.PrepareShippingAddressModelAsync(shippingAddressModel, cart,
                         selectedCountryId: newAddress.CountryId,
                         overrideAttributesXml: customAttributes);
                     shippingAddressModel.NewAddressPreselected = true;
+					_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): shippingAddressModel.NewAddressPreselected → {Arg2}", model, form, shippingAddressModel.NewAddressPreselected);
 
                     return Json(new
                     {
                         update_section = new UpdateSectionJsonModel
+						_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): update_section → {Update_section}", model, form, update_section);
                         {
                             name = "shipping",
                             html = await RenderPartialViewToStringAsync("OpcShippingAddress", shippingAddressModel)
@@ -1740,6 +1999,7 @@ public partial class CheckoutController : BasePublicController
                         message = string.Join(", ", ModelState.Values.Where(p => p.Errors.Any()).SelectMany(p => p.Errors)
                             .Select(p => p.ErrorMessage))
                     });
+							_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): error → {Error}", model, form, error);
                 }
 
                 //try to find an address with the same values (don't duplicate records)
@@ -1754,6 +2014,8 @@ public partial class CheckoutController : BasePublicController
                 {
                     address = newAddress.ToEntity();
                     address.CustomAttributes = customAttributes;
+					_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): address.CustomAttributes → {Arg2}", model, form, address.CustomAttributes);
+					_logger.LogDebug("OpcSaveShipping(model={Model},form={Form}): address.CreatedOnUtc → {Arg2}", model, form, address.CreatedOnUtc);
                     address.CreatedOnUtc = DateTime.UtcNow;
 
                     await _addressService.InsertAddressAsync(address);
@@ -1771,6 +2033,7 @@ public partial class CheckoutController : BasePublicController
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcSaveShipping(model={Model},form={Form})", model, form);
             return Json(new { error = 1, message = exc.Message });
         }
     }
@@ -1778,15 +2041,20 @@ public partial class CheckoutController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> OpcSaveShippingMethod(string shippingoption, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering OpcSaveShippingMethod(shippingoption=<redacted>,form={Form})", form);
         try
         {
             //validation
             if (_orderSettings.CheckoutDisabled)
+				_logger.LogWarning("Throwing Exception from OpcSaveShippingMethod(shippingoption=<redacted>,form={Form})", form);
                 throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcSaveShippingMethod(shippingoption=<redacted>,form={Form}): customer → {Customer}", form, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcSaveShippingMethod(shippingoption=<redacted>,form={Form}): store → {Store}", form, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("OpcSaveShippingMethod(shippingoption=<redacted>,form={Form}): cart → {Cart}", form, cart);
 
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
@@ -1804,9 +2072,11 @@ public partial class CheckoutController : BasePublicController
             if (_shippingSettings.AllowPickupInStore && _orderSettings.DisplayPickupInStoreOnShippingMethodPage)
             {
                 var pickupInStore = ParsePickupInStore(form);
+				_logger.LogDebug("OpcSaveShippingMethod(shippingoption=<redacted>,form={Form}): pickupInStore → {PickupInStore}", form, pickupInStore);
                 if (pickupInStore)
                 {
                     var pickupOption = await ParsePickupOptionAsync(cart, form);
+					_logger.LogDebug("OpcSaveShippingMethod(shippingoption=<redacted>,form={Form}): pickupOption → {PickupOption}", form, pickupOption);
                     await SavePickupOptionAsync(pickupOption);
 
                     return await OpcLoadStepAfterShippingMethod(cart);
@@ -1820,6 +2090,7 @@ public partial class CheckoutController : BasePublicController
             if (string.IsNullOrEmpty(shippingoption))
                 throw new Exception("Selected shipping method can't be parsed");
             var splittedOption = shippingoption.Split(_separator, StringSplitOptions.RemoveEmptyEntries);
+			_logger.LogDebug("OpcSaveShippingMethod(shippingoption=<redacted>,form={Form}): splittedOption → {SplittedOption}", form, splittedOption);
             if (splittedOption.Length != 2)
                 throw new Exception("Selected shipping method can't be parsed");
             var selectedName = splittedOption[0];
@@ -1854,6 +2125,7 @@ public partial class CheckoutController : BasePublicController
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcSaveShippingMethod(shippingoption=<redacted>,form={Form})", form);
             return Json(new { error = 1, message = exc.Message });
         }
     }
@@ -1861,15 +2133,20 @@ public partial class CheckoutController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> OpcSavePaymentMethod(string paymentmethod, CheckoutPaymentMethodModel model)
     {
+		_logger.LogDebug(">>> Entering OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model})", paymentmethod, model);
         try
         {
             //validation
             if (_orderSettings.CheckoutDisabled)
+				_logger.LogWarning("Throwing Exception from OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model})", paymentmethod, model);
                 throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): customer → {Customer}", paymentmethod, model, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): store → {Store}", paymentmethod, model, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): cart → {Cart}", paymentmethod, model, cart);
 
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
@@ -1894,6 +2171,7 @@ public partial class CheckoutController : BasePublicController
 
             //Check whether payment workflow is required
             var isPaymentWorkflowRequired = await _orderProcessingService.IsPaymentWorkflowRequiredAsync(cart);
+			_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): isPaymentWorkflowRequired → {IsPaymentWorkflowRequired}", paymentmethod, model, isPaymentWorkflowRequired);
             if (!isPaymentWorkflowRequired)
             {
                 //payment is not required
@@ -1901,14 +2179,17 @@ public partial class CheckoutController : BasePublicController
                     NopCustomerDefaults.SelectedPaymentMethodAttribute, null, store.Id);
 
                 var confirmOrderModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+				_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): confirmOrderModel → {ConfirmOrderModel}", paymentmethod, model, confirmOrderModel);
                 return Json(new
                 {
                     update_section = new UpdateSectionJsonModel
+					_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): update_section → {Update_section}", paymentmethod, model, update_section);
                     {
                         name = "confirm-order",
                         html = await RenderPartialViewToStringAsync("OpcConfirmOrder", confirmOrderModel)
                     },
                     goto_section = "confirm_order"
+					_logger.LogDebug("OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model}): goto_section → {Goto_section}", paymentmethod, model, goto_section);
                 });
             }
 
@@ -1926,6 +2207,7 @@ public partial class CheckoutController : BasePublicController
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcSavePaymentMethod(paymentmethod={Paymentmethod},model={Model})", paymentmethod, model);
             return Json(new { error = 1, message = exc.Message });
         }
     }
@@ -1934,15 +2216,20 @@ public partial class CheckoutController : BasePublicController
     [IgnoreAntiforgeryToken]
     public virtual async Task<IActionResult> OpcSavePaymentInfo(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering OpcSavePaymentInfo(form={Form})", form);
         try
         {
             //validation
             if (_orderSettings.CheckoutDisabled)
+				_logger.LogWarning("Throwing Exception from OpcSavePaymentInfo(form={Form})", form);
                 throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcSavePaymentInfo(form={Form}): customer → {Customer}", form, customer);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcSavePaymentInfo(form={Form}): store → {Store}", form, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogDebug("OpcSavePaymentInfo(form={Form}): cart → {Cart}", form, cart);
 
             if (!cart.Any())
                 throw new Exception("Your cart is empty");
@@ -1960,6 +2247,7 @@ public partial class CheckoutController : BasePublicController
                                 ?? throw new Exception("Payment method is not selected");
 
             var warnings = await paymentMethod.ValidatePaymentFormAsync(form);
+			_logger.LogDebug("OpcSavePaymentInfo(form={Form}): warnings → {Warnings}", form, warnings);
             foreach (var warning in warnings)
                 ModelState.AddModelError("", warning);
             if (ModelState.IsValid)
@@ -1967,19 +2255,23 @@ public partial class CheckoutController : BasePublicController
                 await _orderProcessingService.SetProcessPaymentRequestAsync(await paymentMethod.GetPaymentInfoAsync(form));
                 
                 var confirmOrderModel = await _checkoutModelFactory.PrepareConfirmOrderModelAsync(cart);
+				_logger.LogDebug("OpcSavePaymentInfo(form={Form}): confirmOrderModel → {ConfirmOrderModel}", form, confirmOrderModel);
                 return Json(new
                 {
                     update_section = new UpdateSectionJsonModel
+					_logger.LogDebug("OpcSavePaymentInfo(form={Form}): update_section → {Update_section}", form, update_section);
                     {
                         name = "confirm-order",
                         html = await RenderPartialViewToStringAsync("OpcConfirmOrder", confirmOrderModel)
                     },
                     goto_section = "confirm_order"
+					_logger.LogDebug("OpcSavePaymentInfo(form={Form}): goto_section → {Goto_section}", form, goto_section);
                 });
             }
 
             //If we got this far, something failed, redisplay form
             var paymenInfoModel = await _checkoutModelFactory.PreparePaymentInfoModelAsync(paymentMethod);
+			_logger.LogDebug("OpcSavePaymentInfo(form={Form}): paymenInfoModel → {PaymenInfoModel}", form, paymenInfoModel);
             return Json(new
             {
                 update_section = new UpdateSectionJsonModel
@@ -1992,6 +2284,7 @@ public partial class CheckoutController : BasePublicController
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcSavePaymentInfo(form={Form})", form);
             return Json(new { error = 1, message = exc.Message });
         }
     }
@@ -2000,9 +2293,11 @@ public partial class CheckoutController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> OpcConfirmOrder(bool captchaValid)
     {
+		_logger.LogDebug(">>> Entering OpcConfirmOrder(captchaValid={CaptchaValid})", captchaValid);
         try
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): customer → {Customer}", captchaValid, customer);
 
             var isCaptchaSettingEnabled = await _customerService.IsGuestAsync(customer) &&
                                           _captchaSettings.Enabled && _captchaSettings.ShowOnCheckoutPageForGuests;
@@ -2017,10 +2312,13 @@ public partial class CheckoutController : BasePublicController
             {
                 //validation
                 if (_orderSettings.CheckoutDisabled)
+					_logger.LogWarning("Throwing Exception from OpcConfirmOrder(captchaValid={CaptchaValid})", captchaValid);
                     throw new Exception(await _localizationService.GetResourceAsync("Checkout.Disabled"));
 
                 var store = await _storeContext.GetCurrentStoreAsync();
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): store → {Store}", captchaValid, store);
                 var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): cart → {Cart}", captchaValid, cart);
 
                 if (!cart.Any())
                     throw new Exception("Your cart is empty");
@@ -2037,6 +2335,7 @@ public partial class CheckoutController : BasePublicController
 
                 //place order
                 var processPaymentRequest = await _orderProcessingService.GetProcessPaymentRequestAsync();
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): processPaymentRequest → {ProcessPaymentRequest}", captchaValid, processPaymentRequest);
                 if (processPaymentRequest == null)
                 {
                     //Check whether payment workflow is required
@@ -2049,11 +2348,14 @@ public partial class CheckoutController : BasePublicController
                 }
 
                 processPaymentRequest.StoreId = store.Id;
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): processPaymentRequest.StoreId → {Arg1}", captchaValid, processPaymentRequest.StoreId);
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): processPaymentRequest.CustomerId → {Arg1}", captchaValid, processPaymentRequest.CustomerId);
                 processPaymentRequest.CustomerId = customer.Id;
                 processPaymentRequest.PaymentMethodSystemName = await _genericAttributeService.GetAttributeAsync<string>(customer,
                     NopCustomerDefaults.SelectedPaymentMethodAttribute, store.Id);
                 await _orderProcessingService.SetProcessPaymentRequestAsync(processPaymentRequest);
                 var placeOrderResult = await _orderProcessingService.PlaceOrderAsync(processPaymentRequest);
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): placeOrderResult → {PlaceOrderResult}", captchaValid, placeOrderResult);
                 if (placeOrderResult.Success)
                 {
                     await _orderProcessingService.SetProcessPaymentRequestAsync(null);
@@ -2078,6 +2380,7 @@ public partial class CheckoutController : BasePublicController
                         return Json(new
                         {
                             redirect = $"{_webHelper.GetStoreLocation()}checkout/OpcCompleteRedirectionPayment"
+							_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): redirect → {Redirect}", captchaValid, redirect);
                         });
                     }
 
@@ -2098,22 +2401,26 @@ public partial class CheckoutController : BasePublicController
             return Json(new
             {
                 update_section = new UpdateSectionJsonModel
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): update_section → {Update_section}", captchaValid, update_section);
                 {
                     name = "confirm-order",
                     html = await RenderPartialViewToStringAsync("OpcConfirmOrder", confirmOrderModel)
                 },
                 goto_section = "confirm_order"
+				_logger.LogDebug("OpcConfirmOrder(captchaValid={CaptchaValid}): goto_section → {Goto_section}", captchaValid, goto_section);
             });
         }
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcConfirmOrder(captchaValid={CaptchaValid})", captchaValid);
             return Json(new { error = 1, message = exc.Message });
         }
     }
 
     public virtual async Task<IActionResult> OpcCompleteRedirectionPayment()
     {
+		_logger.LogDebug(">>> Entering OpcCompleteRedirectionPayment()");
         try
         {
             //validation
@@ -2121,11 +2428,13 @@ public partial class CheckoutController : BasePublicController
                 return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("OpcCompleteRedirectionPayment(): customer → {Customer}", customer);
             if (await _customerService.IsGuestAsync(customer) && !_orderSettings.AnonymousCheckoutAllowed)
                 return Challenge();
 
             //get the order
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("OpcCompleteRedirectionPayment(): store → {Store}", store);
             var order = (await _orderService.SearchOrdersAsync(storeId: store.Id,
                 customerId: customer.Id, pageSize: 1)).FirstOrDefault();
             if (order == null)
@@ -2164,6 +2473,7 @@ public partial class CheckoutController : BasePublicController
         catch (Exception exc)
         {
             await _logger.WarningAsync(exc.Message, exc, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting OpcCompleteRedirectionPayment()");
             return Content(exc.Message);
         }
     }

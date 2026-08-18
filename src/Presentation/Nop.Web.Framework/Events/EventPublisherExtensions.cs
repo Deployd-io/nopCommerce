@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Nop.Core.Events;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Events;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.Events;
 /// </summary>
 public static class EventPublisherExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Publish ModelPrepared event
     /// </summary>
@@ -16,7 +18,9 @@ public static class EventPublisherExtensions
     /// <param name="model">Model</param>
     public static void ModelPrepared(this IEventPublisher eventPublisher, object model)
     {
+		_logger.LogDebug(">>> Entering ModelPrepared(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
         ModelPreparedAsync(eventPublisher, model).Wait();
+		_logger.LogDebug("<<< Exiting ModelPrepared(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
     }
 
     /// <summary>
@@ -27,6 +31,7 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task ModelPreparedAsync(this IEventPublisher eventPublisher, object model)
     {
+		_logger.LogDebug(">>> Entering ModelPreparedAsync(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
         switch (model)
         {
             case BaseNopModel nopModel:
@@ -40,6 +45,7 @@ public static class EventPublisherExtensions
                 await eventPublisher.PublishAsync(new ModelPreparedEvent<IEnumerable<BaseNopModel>>(modelCollection));
                 break;
         }
+		_logger.LogDebug("<<< Exiting ModelPreparedAsync(eventPublisher={EventPublisher},model={Model})", eventPublisher, model);
     }
 
     /// <summary>
@@ -52,6 +58,8 @@ public static class EventPublisherExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task ModelReceivedAsync<T>(this IEventPublisher eventPublisher, T model, ModelStateDictionary modelState)
     {
+		_logger.LogDebug(">>> Entering ModelReceivedAsync(eventPublisher={EventPublisher},model={Model},modelState={ModelState})", eventPublisher, model, modelState);
         await eventPublisher.PublishAsync(new ModelReceivedEvent<T>(model, modelState));
+		_logger.LogDebug("<<< Exiting ModelReceivedAsync(eventPublisher={EventPublisher},model={Model},modelState={ModelState})", eventPublisher, model, modelState);
     }
 }

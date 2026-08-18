@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 namespace Nop.Core.Domain.Messages;
 
 /// <summary>
@@ -5,13 +6,17 @@ namespace Nop.Core.Domain.Messages;
 /// </summary>
 public partial class EmailSubscribedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
     /// <param name="subscription">Subscription</param>
     public EmailSubscribedEvent(NewsLetterSubscription subscription)
     {
+		_logger.LogDebug(">>> Entering EmailSubscribedEvent(subscription={Subscription})", subscription);
         Subscription = subscription;
+		_logger.LogDebug("EmailSubscribedEvent(subscription={Subscription}): Subscription → {Subscription1}", subscription, Subscription);
+		_logger.LogDebug("<<< Exiting EmailSubscribedEvent(subscription={Subscription})", subscription);
     }
 
     /// <summary>
@@ -26,12 +31,15 @@ public partial class EmailSubscribedEvent
     /// <returns>Result</returns>
     public bool Equals(EmailSubscribedEvent other)
     {
+		_logger.LogDebug(">>> Entering Equals(other={Other})", other);
         if (ReferenceEquals(null, other))
             return false;
 
         if (ReferenceEquals(this, other))
+		_logger.LogDebug("<<< Exiting Equals(other={Other})", other);
             return true;
 
+		_logger.LogDebug("<<< Exiting Equals(obj={Obj})", obj);
         return Equals(other.Subscription, Subscription);
     }
 
@@ -60,6 +68,8 @@ public partial class EmailSubscribedEvent
     /// <returns>Hash code</returns>
     public override int GetHashCode()
     {
+		_logger.LogDebug(">>> Entering GetHashCode()");
+		_logger.LogDebug("<<< Exiting GetHashCode()");
         return Subscription != null ? Subscription.GetHashCode() : 0;
     }
 }
