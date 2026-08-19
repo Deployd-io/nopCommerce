@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nop.Core.Infrastructure;
 using Nop.Plugin.Widgets.GoogleAnalytics.Api;
 using Nop.Web.Framework.Infrastructure.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.GoogleAnalytics.Infrastructure;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Infrastructure;
 /// </summary>
 public class NopStartup : INopStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Add and configure any of the middleware
     /// </summary>
@@ -19,7 +21,9 @@ public class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		_logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         services.AddHttpClient<GoogleAnalyticsHttpClient>().WithProxy();
+		_logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -28,6 +32,8 @@ public class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public void Configure(IApplicationBuilder application)
     {
+	_logger.LogDebug(">>> Entering Configure(application={Application})", application);
+	_logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

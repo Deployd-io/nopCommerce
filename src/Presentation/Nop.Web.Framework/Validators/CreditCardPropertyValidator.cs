@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using FluentValidation.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Framework.Validators;
 /// </summary>
 public partial class CreditCardPropertyValidator<T, TProperty> : PropertyValidator<T, TProperty>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override string Name => "CreditCardPropertyValidator";
 
     /// <summary>
@@ -17,6 +19,7 @@ public partial class CreditCardPropertyValidator<T, TProperty> : PropertyValidat
     /// <returns>Result</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		_logger.LogDebug(">>> Entering IsValid(context={Context},value={Value})", context, value);
         var ccValue = value as string;
         if (string.IsNullOrWhiteSpace(ccValue))
             return false;
@@ -26,6 +29,7 @@ public partial class CreditCardPropertyValidator<T, TProperty> : PropertyValidat
 
         var checksum = 0;
         var evenDigit = false;
+		_logger.LogDebug("IsValid(context={Context},value={Value}): evenDigit → {EvenDigit}", context, value, evenDigit);
 
         //http://www.beachnet.com/~hstiles/cardtype.html
         foreach (var digit in ccValue.Reverse())
@@ -34,6 +38,7 @@ public partial class CreditCardPropertyValidator<T, TProperty> : PropertyValidat
                 return false;
 
             var digitValue = (digit - '0') * (evenDigit ? 2 : 1);
+			_logger.LogDebug("IsValid(context={Context},value={Value}): digitValue → {DigitValue}", context, value, digitValue);
             evenDigit = !evenDigit;
 
             while (digitValue > 0)
@@ -43,6 +48,7 @@ public partial class CreditCardPropertyValidator<T, TProperty> : PropertyValidat
             }
         }
 
+		_logger.LogDebug("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return (checksum % 10) == 0;
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record ManufacturerFilterModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -26,7 +28,10 @@ public partial record ManufacturerFilterModel : BaseNopModel
 
     public ManufacturerFilterModel()
     {
+		_logger.LogDebug(">>> Entering ManufacturerFilterModel()");
         Manufacturers = new List<SelectListItem>();
+		_logger.LogDebug("ManufacturerFilterModel(): Manufacturers → {Manufacturers}", Manufacturers);
+		_logger.LogDebug("<<< Exiting ManufacturerFilterModel()");
     }
 
     #endregion

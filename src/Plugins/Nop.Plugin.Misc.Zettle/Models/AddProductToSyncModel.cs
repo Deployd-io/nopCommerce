@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Plugin.Misc.Zettle.Models;
@@ -7,11 +8,15 @@ namespace Nop.Plugin.Misc.Zettle.Models;
 /// </summary>
 public record AddProductToSyncModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToSyncModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToSyncModel()");
         SelectedProductIds = new List<int>();
+		_logger.LogDebug("AddProductToSyncModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
+		_logger.LogDebug("<<< Exiting AddProductToSyncModel()");
     }
 
     #endregion

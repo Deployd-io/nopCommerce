@@ -8,6 +8,7 @@ using Nop.Services.Localization;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Models.Security;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -16,6 +17,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class SecurityModelFactory : ISecurityModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly HtmlEncoder _htmlEncoder;
@@ -32,10 +34,16 @@ public partial class SecurityModelFactory : ISecurityModelFactory
         ILocalizationService localizationService,
         IPermissionService permissionService)
     {
+		_logger.LogDebug(">>> Entering SecurityModelFactory(htmlEncoder={HtmlEncoder},customerService={CustomerService},localizationService={LocalizationService},permissionService={PermissionService})", htmlEncoder, customerService, localizationService, permissionService);
         _htmlEncoder = htmlEncoder;
         _customerService = customerService;
+		_logger.LogDebug("SecurityModelFactory(htmlEncoder={HtmlEncoder},customerService={CustomerService},localizationService={LocalizationService},permissionService={PermissionService}): _customerService → {_customerService}", htmlEncoder, customerService, localizationService, permissionService, _customerService);
+		_logger.LogDebug("SecurityModelFactory(htmlEncoder={HtmlEncoder},customerService={CustomerService},localizationService={LocalizationService},permissionService={PermissionService}): _htmlEncoder → {_htmlEncoder}", htmlEncoder, customerService, localizationService, permissionService, _htmlEncoder);
         _localizationService = localizationService;
+		_logger.LogDebug("SecurityModelFactory(htmlEncoder={HtmlEncoder},customerService={CustomerService},localizationService={LocalizationService},permissionService={PermissionService}): _localizationService → {_localizationService}", htmlEncoder, customerService, localizationService, permissionService, _localizationService);
         _permissionService = permissionService;
+		_logger.LogDebug("SecurityModelFactory(htmlEncoder={HtmlEncoder},customerService={CustomerService},localizationService={LocalizationService},permissionService={PermissionService}): _permissionService → {_permissionService}", htmlEncoder, customerService, localizationService, permissionService, _permissionService);
+		_logger.LogDebug("<<< Exiting SecurityModelFactory(htmlEncoder={HtmlEncoder},customerService={CustomerService},localizationService={LocalizationService},permissionService={PermissionService})", htmlEncoder, customerService, localizationService, permissionService);
     }
 
     #endregion
@@ -52,13 +60,17 @@ public partial class SecurityModelFactory : ISecurityModelFactory
     /// </returns>
     public virtual async Task<PermissionConfigurationModel> PreparePermissionConfigurationModelAsync(PermissionConfigurationModel model)
     {
+		_logger.LogDebug(">>> Entering PreparePermissionConfigurationModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var customerRoles = await _customerService.GetAllCustomerRolesAsync(true);
+		_logger.LogDebug("PreparePermissionConfigurationModelAsync(model={Model}): customerRoles → {CustomerRoles}", model, customerRoles);
         model.AreCustomerRolesAvailable = customerRoles.Any();
         var permissionRecords = await _permissionService.GetAllPermissionRecordsAsync();
+		_logger.LogDebug("PreparePermissionConfigurationModelAsync(model={Model}): permissionRecords → {PermissionRecords}", model, permissionRecords);
         model.IsPermissionsAvailable = permissionRecords.Any();
 
+		_logger.LogDebug("<<< Exiting PreparePermissionConfigurationModelAsync(model={Model})", model);
         return model;
     }
 
@@ -73,13 +85,17 @@ public partial class SecurityModelFactory : ISecurityModelFactory
     /// </returns>
     public virtual async Task<PermissionItemModel> PreparePermissionItemModelAsync(PermissionRecord permissionRecord, IList<CustomerRole> availableRoles = null)
     {
+		_logger.LogDebug(">>> Entering PreparePermissionItemModelAsync(permissionRecord={PermissionRecord},availableRoles={AvailableRoles})", permissionRecord, availableRoles);
         availableRoles ??= await _customerService.GetAllCustomerRolesAsync(showHidden: true);
 
         var mapping = await _permissionService.GetMappingByPermissionRecordIdAsync(permissionRecord.Id);
+		_logger.LogDebug("PreparePermissionItemModelAsync(permissionRecord={PermissionRecord},availableRoles={AvailableRoles}): mapping → {Mapping}", permissionRecord, availableRoles, mapping);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var names = await mapping
             .Select(m => availableRoles.FirstOrDefault(p => p.Id == m.CustomerRoleId))
             .Where(r => r != null).Select(r => _htmlEncoder.Encode(r.Name)).ToListAsync();
+			_logger.LogInformation("PreparePermissionItemModelAsync(permissionRecord,availableRoles)={PermissionRecord},{AvailableRoles}: find query executed in {Arg2} ms", permissionRecord, availableRoles, __logStart.ElapsedMilliseconds);
 
         var (ids, appliedFor) = (mapping.Select(m => m.CustomerRoleId).ToList(), string.Join(", ", names));
 
@@ -98,6 +114,7 @@ public partial class SecurityModelFactory : ISecurityModelFactory
             }).ToList()
         };
 
+		_logger.LogDebug("<<< Exiting PreparePermissionItemModelAsync(permissionRecord={PermissionRecord},availableRoles={AvailableRoles})", permissionRecord, availableRoles);
         return permissionItemModel;
     }
 
@@ -111,13 +128,16 @@ public partial class SecurityModelFactory : ISecurityModelFactory
     /// </returns>
     public virtual async Task<PermissionCategoryListModel> PreparePermissionCategoryListModelAsync(PermissionCategorySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePermissionCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         var permissions = await _permissionService.GetAllPermissionRecordsAsync();
 
+		_logger.LogDebug("PreparePermissionCategoryListModelAsync(searchModel={SearchModel}): permissions → {Permissions}", searchModel, permissions);
         var types = permissions
             .GroupBy(p => p.Category, p => p)
             .Select(p => p.Key).ToList();
 
         var pagedTypes = types.ToPagedList(searchModel);
+		_logger.LogDebug("PreparePermissionCategoryListModelAsync(searchModel={SearchModel}): pagedTypes → {PagedTypes}", searchModel, pagedTypes);
 
         //prepare list model
         var model = new PermissionCategoryListModel().PrepareToGrid(searchModel, pagedTypes, () =>
@@ -130,6 +150,7 @@ public partial class SecurityModelFactory : ISecurityModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PreparePermissionCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -143,6 +164,7 @@ public partial class SecurityModelFactory : ISecurityModelFactory
     /// </returns>
     public virtual async Task<PermissionItemListModel> PreparePermissionItemListModelAsync(PermissionItemSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePermissionItemListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get permissions
@@ -152,11 +174,13 @@ public partial class SecurityModelFactory : ISecurityModelFactory
             .ToPagedList(searchModel);
 
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
+		_logger.LogDebug("PreparePermissionItemListModelAsync(searchModel={SearchModel}): availableRoles → {AvailableRoles}", searchModel, availableRoles);
 
         //prepare list model
         var model = await new PermissionItemListModel().PrepareToGridAsync(searchModel, permissionItems, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PreparePermissionItemListModelAsync(searchModel={SearchModel})", searchModel);
             return permissionItems.SelectAwait(async item => await PreparePermissionItemModelAsync(item, availableRoles));
         });
 

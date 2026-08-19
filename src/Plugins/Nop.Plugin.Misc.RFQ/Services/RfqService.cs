@@ -12,6 +12,7 @@ using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Services;
 
@@ -20,6 +21,7 @@ namespace Nop.Plugin.Misc.RFQ.Services;
 /// </summary>
 public class RfqService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICustomerService _customerService;
@@ -60,22 +62,40 @@ public class RfqService
         IWorkContext workContext,
         RfqMessageService rfqMessageService)
     {
+		_logger.LogDebug(">>> Entering RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService})", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService);
         _customerService = customerService;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _customerService → {_customerService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _customerService);
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _httpContextAccessor → {_httpContextAccessor}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _httpContextAccessor);
         _localizationService = localizationService;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _localizationService → {_localizationService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _localizationService);
         _permissionService = permissionService;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _permissionService → {_permissionService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _permissionService);
         _productService = productService;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _productService → {_productService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _productService);
         _customerRepository = customerRepository;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _customerRepository → {_customerRepository}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _customerRepository);
         _quoteRepository = quoteRepository;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _quoteRepository → {_quoteRepository}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _quoteRepository);
         _quoteItemRepository = quoteItemRepository;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _quoteItemRepository → {_quoteItemRepository}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _quoteItemRepository);
         _requestQuoteRepository = requestQuoteRepository;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _requestQuoteRepository → {_requestQuoteRepository}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _requestQuoteRepository);
         _requestQuoteItemRepository = requestQuoteItemRepository;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _requestQuoteItemRepository → {_requestQuoteItemRepository}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _requestQuoteItemRepository);
         _sciRepository = sciRepository;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _sciRepository → {_sciRepository}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _sciRepository);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _shoppingCartService → {_shoppingCartService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _shoppingCartService);
         _storeContext = storeContext;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _storeContext → {_storeContext}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _storeContext);
         _taxService = taxService;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _taxService → {_taxService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _taxService);
         _workContext = workContext;
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _workContext → {_workContext}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _workContext);
         _rfqMessageService = rfqMessageService;
+		_logger.LogDebug("<<< Exiting RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService})", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService);
+		_logger.LogDebug("RfqService(customerService={CustomerService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},productService={ProductService},customerRepository={CustomerRepository},quoteRepository={QuoteRepository},quoteItemRepository={QuoteItemRepository},requestQuoteRepository={RequestQuoteRepository},requestQuoteItemRepository={RequestQuoteItemRepository},sciRepository={SciRepository},shoppingCartService=<redacted>,storeContext={StoreContext},taxService={TaxService},workContext={WorkContext},rfqMessageService={RfqMessageService}): _rfqMessageService → {_rfqMessageService}", customerService, httpContextAccessor, localizationService, permissionService, productService, customerRepository, quoteRepository, quoteItemRepository, requestQuoteRepository, requestQuoteItemRepository, sciRepository, storeContext, taxService, workContext, rfqMessageService, _rfqMessageService);
     }
 
     #endregion
@@ -84,21 +104,26 @@ public class RfqService
 
     private void LogNote(IAdminNote noteItem, string note)
     {
+		_logger.LogDebug(">>> Entering LogNote(noteItem={NoteItem},note={Note})", noteItem, note);
         if (string.IsNullOrEmpty(note))
             return;
 
         note = DateTime.UtcNow.ToString(RfqDefaults.DateTimeStringFormat) + $": {note}";
+		_logger.LogDebug("LogNote(noteItem={NoteItem},note={Note}): note → {Note1}", noteItem, note, note);
 
         if (!string.IsNullOrEmpty(noteItem.AdminNotes))
             note += "\r\n";
         else
             noteItem.AdminNotes = string.Empty;
+			_logger.LogDebug("LogNote(noteItem={NoteItem},note={Note}): noteItem.AdminNotes → {Arg2}", noteItem, note, noteItem.AdminNotes);
 
         noteItem.AdminNotes = noteItem.AdminNotes.Insert(0, note);
+		_logger.LogDebug("<<< Exiting LogNote(noteItem={NoteItem},note={Note})", noteItem, note);
     }
 
     private async Task UpdateQuantityWithLogAsync(RequestQuoteItem requestQuoteItem, int newQuantity)
     {
+		_logger.LogDebug(">>> Entering UpdateQuantityWithLogAsync(requestQuoteItem={RequestQuoteItem},newQuantity={NewQuantity})", requestQuoteItem, newQuantity);
         var note = string.Format(
             await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.QuantityChanged"), requestQuoteItem.RequestedQty,
             newQuantity, await GetCurrentCustomerEmailAsync());
@@ -106,10 +131,13 @@ public class RfqService
         LogNote(requestQuoteItem, note);
 
         requestQuoteItem.RequestedQty = newQuantity;
+		_logger.LogDebug("UpdateQuantityWithLogAsync(requestQuoteItem={RequestQuoteItem},newQuantity={NewQuantity}): requestQuoteItem.RequestedQty → {Arg2}", requestQuoteItem, newQuantity, requestQuoteItem.RequestedQty);
+		_logger.LogDebug("<<< Exiting UpdateQuantityWithLogAsync(requestQuoteItem={RequestQuoteItem},newQuantity={NewQuantity})", requestQuoteItem, newQuantity);
     }
 
     private async Task UpdateUnitPriceWithLogAsync(RequestQuoteItem requestQuoteItem, decimal newUnitPrice)
     {
+		_logger.LogDebug(">>> Entering UpdateUnitPriceWithLogAsync(requestQuoteItem={RequestQuoteItem},newUnitPrice={NewUnitPrice})", requestQuoteItem, newUnitPrice);
         var note = string.Format(
             await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.UnitPriceChanged"), requestQuoteItem.RequestedUnitPrice,
             newUnitPrice, await GetCurrentCustomerEmailAsync());
@@ -117,21 +145,30 @@ public class RfqService
         LogNote(requestQuoteItem, note);
 
         requestQuoteItem.RequestedUnitPrice = newUnitPrice;
+		_logger.LogDebug("UpdateUnitPriceWithLogAsync(requestQuoteItem={RequestQuoteItem},newUnitPrice={NewUnitPrice}): requestQuoteItem.RequestedUnitPrice → {Arg2}", requestQuoteItem, newUnitPrice, requestQuoteItem.RequestedUnitPrice);
+		_logger.LogDebug("<<< Exiting UpdateUnitPriceWithLogAsync(requestQuoteItem={RequestQuoteItem},newUnitPrice={NewUnitPrice})", requestQuoteItem, newUnitPrice);
     }
 
     private async Task UpdateCustomerNotesWithLogAsync(RequestQuote requestQuote, string newCustomerNotes)
     {
+		_logger.LogDebug(">>> Entering UpdateCustomerNotesWithLogAsync(requestQuote={RequestQuote},newCustomerNotes={NewCustomerNotes})", requestQuote, newCustomerNotes);
         var note = await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.CustomerNoteChanged");
 
+		_logger.LogDebug("UpdateCustomerNotesWithLogAsync(requestQuote={RequestQuote},newCustomerNotes={NewCustomerNotes}): note → {Note}", requestQuote, newCustomerNotes, note);
         LogNote(requestQuote, note);
 
         requestQuote.CustomerNotes = newCustomerNotes;
+		_logger.LogDebug("UpdateCustomerNotesWithLogAsync(requestQuote={RequestQuote},newCustomerNotes={NewCustomerNotes}): requestQuote.CustomerNotes → {Arg2}", requestQuote, newCustomerNotes, requestQuote.CustomerNotes);
+		_logger.LogDebug(">>> Entering GetCurrentCustomerEmailAsync()");
+		_logger.LogDebug("<<< Exiting GetCurrentCustomerEmailAsync()");
     }
 
     private async Task SetIfExistsAsync(RequestQuoteItem requestQuoteItem, IFormCollection form, string formKey)
     {
+		_logger.LogDebug(">>> Entering SetIfExistsAsync(requestQuoteItem={RequestQuoteItem},form={Form},formKey={FormKey})", requestQuoteItem, form, formKey);
         var key = $"{formKey}{requestQuoteItem.Id}";
 
+		_logger.LogWarning("SetIfExistsAsync(requestQuoteItem={RequestQuoteItem},form={Form},formKey={FormKey}): key → {Key}", requestQuoteItem, form, formKey, key);
         if (!form.ContainsKey(key))
             return;
 
@@ -149,43 +186,60 @@ public class RfqService
 
                 break;
         }
+		_logger.LogDebug("<<< Exiting SetIfExistsAsync(requestQuoteItem={RequestQuoteItem},form={Form},formKey={FormKey})", requestQuoteItem, form, formKey);
     }
 
     private async Task<string> GetCurrentCustomerEmailAsync()
     {
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("GetCurrentCustomerEmailAsync(): customer → {Customer}", customer);
         return customer.Email;
     }
 
     private async Task<Quote> InsertQuoteAsync(Quote quote)
     {
+		_logger.LogDebug(">>> Entering InsertQuoteAsync(quote={Quote})", quote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         LogNote(quote, string.Format(await _localizationService.GetResourceAsync(quote.RequestQuoteId.HasValue ? "Plugins.Misc.RFQ.AdminQuote.QuoteCreatedByRequest" : "Plugins.Misc.RFQ.AdminQuote.QuoteCreatedManuallyByStoreOwner"), await GetCurrentCustomerEmailAsync()));
         await _quoteRepository.InsertAsync(quote);
+		_logger.LogInformation("InsertQuoteAsync(quote)={Quote}: save query executed in {Arg1} ms", quote, __logStart.ElapsedMilliseconds);
 
+		_logger.LogDebug("<<< Exiting InsertQuoteAsync(quote={Quote})", quote);
         return quote;
     }
 
     private async Task UpdateRequestQuoteItemAsync(RequestQuoteItem requestQuoteItem)
     {
+		_logger.LogDebug(">>> Entering UpdateRequestQuoteItemAsync(requestQuoteItem={RequestQuoteItem})", requestQuoteItem);
         await _requestQuoteItemRepository.UpdateAsync(requestQuoteItem);
+		_logger.LogDebug("<<< Exiting UpdateRequestQuoteItemAsync(requestQuoteItem={RequestQuoteItem})", requestQuoteItem);
     }
 
     private async Task UpdateQuoteItemAsync(QuoteItem quoteItem)
     {
+		_logger.LogDebug(">>> Entering UpdateQuoteItemAsync(quoteItem={QuoteItem})", quoteItem);
         await _quoteItemRepository.UpdateAsync(quoteItem);
+		_logger.LogDebug("<<< Exiting UpdateQuoteItemAsync(quoteItem={QuoteItem})", quoteItem);
+		_logger.LogDebug("UpdateQuoteItemAsync(quoteItemId={QuoteItemId},quantity={Quantity},unitPrice={UnitPrice}): item.OfferedQty → {Arg3}", quoteItemId, quantity, unitPrice, item.OfferedQty);
+		_logger.LogDebug("UpdateQuoteItemAsync(quoteItemId={QuoteItemId},quantity={Quantity},unitPrice={UnitPrice}): item.OfferedUnitPrice → {Arg3}", quoteItemId, quantity, unitPrice, item.OfferedUnitPrice);
     }
 
     private async Task InsertQuoteItemsAsync(IList<QuoteItem> quoteItems)
     {
+		_logger.LogDebug(">>> Entering InsertQuoteItemsAsync(quoteItems={QuoteItems})", quoteItems);
         if (!quoteItems.Any())
             return;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         await _quoteItemRepository.InsertAsync(quoteItems);
+		_logger.LogInformation("InsertQuoteItemsAsync(quoteItems)={QuoteItems}: save query executed in {Arg1} ms", quoteItems, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting InsertQuoteItemsAsync(quoteItems={QuoteItems})", quoteItems);
     }
 
     private async Task<Quote> CheckIsQuoteExpiredAsync(Quote quote)
     {
+		_logger.LogDebug(">>> Entering CheckIsQuoteExpiredAsync(quote={Quote})", quote);
         if (quote == null)
             return null;
 
@@ -199,11 +253,14 @@ public class RfqService
             return quote;
 
         quote.Status = QuoteStatus.Expired;
+		_logger.LogDebug("CheckIsQuoteExpiredAsync(quote={Quote}): quote.Status → {Arg1}", quote, quote.Status);
         var note = await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.QuoteExpired");
+		_logger.LogDebug("CheckIsQuoteExpiredAsync(quote={Quote}): note → {Note}", quote, note);
 
         LogNote(quote, note);
         await UpdateQuoteAsync(quote);
 
+		_logger.LogDebug("<<< Exiting CheckIsQuoteExpiredAsync(quote={Quote})", quote);
         return quote;
     }
 
@@ -221,6 +278,7 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ChangeAndLogRequestQuoteStatusAsync(RequestQuote requestQuote, RequestQuoteStatus newStatus)
     {
+		_logger.LogDebug(">>> Entering ChangeAndLogRequestQuoteStatusAsync(requestQuote={RequestQuote},newStatus={NewStatus})", requestQuote, newStatus);
         if (requestQuote.Status == newStatus)
             return;
 
@@ -231,6 +289,8 @@ public class RfqService
 
         LogNote(requestQuote, note);
         requestQuote.Status = newStatus;
+		_logger.LogDebug("ChangeAndLogRequestQuoteStatusAsync(requestQuote={RequestQuote},newStatus={NewStatus}): requestQuote.Status → {Arg2}", requestQuote, newStatus, requestQuote.Status);
+		_logger.LogDebug("<<< Exiting ChangeAndLogRequestQuoteStatusAsync(requestQuote={RequestQuote},newStatus={NewStatus})", requestQuote, newStatus);
     }
 
     /// <summary>
@@ -287,6 +347,8 @@ public class RfqService
     /// </returns>
     public async Task<RequestQuote> GetRequestQuoteByIdAsync(int requestId)
     {
+		_logger.LogDebug(">>> Entering GetRequestQuoteByIdAsync(requestId={RequestId})", requestId);
+		_logger.LogDebug("<<< Exiting GetRequestQuoteByIdAsync(requestId={RequestId})", requestId);
         return await _requestQuoteRepository.GetByIdAsync(requestId);
     }
 
@@ -297,7 +359,9 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateRequestQuoteAsync(RequestQuote requestQuote)
     {
+		_logger.LogDebug(">>> Entering UpdateRequestQuoteAsync(requestQuote={RequestQuote})", requestQuote);
         await _requestQuoteRepository.UpdateAsync(requestQuote);
+		_logger.LogDebug("<<< Exiting UpdateRequestQuoteAsync(requestQuote={RequestQuote})", requestQuote);
     }
 
     /// <summary>
@@ -310,18 +374,23 @@ public class RfqService
     /// </returns>
     public async Task<int> SendNewRequestAsync(string customerNotes)
     {
+		_logger.LogDebug(">>> Entering SendNewRequestAsync(customerNotes={CustomerNotes})", customerNotes);
         var (request, items) = await CreateRequestQuoteByShoppingCartAsync();
 
         LogNote(request, string.Format(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.RequestCreated"), await GetCurrentCustomerEmailAsync()));
         request.Status = RequestQuoteStatus.Submitted;
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _requestQuoteRepository.InsertAsync(request);
 
+		_logger.LogDebug("SendNewRequestAsync(customerNotes={CustomerNotes}): request.Status → {Arg1}", customerNotes, request.Status);
+		_logger.LogInformation("SendNewRequestAsync(customerNotes)={CustomerNotes}: save query executed in {Arg1} ms", customerNotes, __logStart.ElapsedMilliseconds);
         var httpRequest = _httpContextAccessor.HttpContext?.Request;
 
         if (httpRequest == null)
             return 0;
 
         var needSave = false;
+		_logger.LogDebug("SendNewRequestAsync(customerNotes={CustomerNotes}): needSave → {NeedSave}", customerNotes, needSave);
 
         if (!string.IsNullOrEmpty(customerNotes) && (!request.CustomerNotes?.Equals(customerNotes) ?? true))
         {
@@ -337,6 +406,7 @@ public class RfqService
         if (items.Any() && httpRequest.IsPostRequest() && httpRequest.HasFormContentType)
         {
             var form = await httpRequest.ReadFormAsync();
+			_logger.LogDebug("SendNewRequestAsync(customerNotes={CustomerNotes}): form → {Form}", customerNotes, form);
 
             foreach (var requestQuoteItem in items)
             {
@@ -348,10 +418,14 @@ public class RfqService
 
                 await InsertRequestQuoteItemAsync(requestQuoteItem);
             }
+			_logger.LogDebug(">>> Entering GetRequestQuoteItemsAsync(requestId={RequestId})", requestId);
+			_logger.LogInformation("GetRequestQuoteItemsAsync(requestId)={RequestId}: database query executed in {Arg1} ms", requestId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetRequestQuoteItemsAsync(requestId={RequestId})", requestId);
         }
 
         await _rfqMessageService.CustomerSentNewRequestQuoteAsync(request);
 
+		_logger.LogDebug("<<< Exiting SendNewRequestAsync(customerNotes={CustomerNotes})", customerNotes);
         return request.Id;
     }
 
@@ -365,6 +439,8 @@ public class RfqService
     /// </returns>
     public async Task<List<RequestQuote>> GetCustomerRequestsAsync(int customerId)
     {
+		_logger.LogDebug(">>> Entering GetCustomerRequestsAsync(customerId={CustomerId})", customerId);
+		_logger.LogDebug("<<< Exiting GetCustomerRequestsAsync(customerId={CustomerId})", customerId);
         return await _requestQuoteRepository.Table.Where(p => p.CustomerId == customerId).OrderByDescending(p => p.Id)
             .ToListAsync();
     }
@@ -379,8 +455,11 @@ public class RfqService
     /// </returns>
     public async Task<List<Quote>> GetCustomerQuotesAsync(int customerId)
     {
+		_logger.LogDebug(">>> Entering GetCustomerQuotesAsync(customerId={CustomerId})", customerId);
         var statuses = new[] { (int)QuoteStatus.Submitted, (int)QuoteStatus.OrderCreated };
 
+		_logger.LogDebug("GetCustomerQuotesAsync(customerId={CustomerId}): statuses → {Statuses}", customerId, statuses);
+		_logger.LogDebug("<<< Exiting GetCustomerQuotesAsync(customerId={CustomerId})", customerId);
         return await _quoteRepository.Table.Where(p => p.CustomerId == customerId && statuses.Contains(p.StatusId))
             .OrderByDescending(p => p.Id).ToListAsync();
     }
@@ -400,11 +479,15 @@ public class RfqService
     /// </returns>
     public async Task<IPagedList<RequestQuote>> SearchRequestsQuoteAsync(int requestQuoteStatusId, DateTime? createdOnFrom, DateTime? createdOnTo, string customerEmail, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering SearchRequestsQuoteAsync(requestQuoteStatusId={RequestQuoteStatusId},createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerEmail={CustomerEmail},pageIndex={PageIndex},pageSize={PageSize})", requestQuoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var requests = await _requestQuoteRepository.GetAllPagedAsync(query =>
         {
             if (createdOnFrom.HasValue)
                 query = query.Where(l => createdOnFrom.Value <= l.CreatedOnUtc);
 
+			_logger.LogDebug("SearchRequestsQuoteAsync(requestQuoteStatusId={RequestQuoteStatusId},createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerEmail={CustomerEmail},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", requestQuoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize, query);
+			_logger.LogInformation("SearchRequestsQuoteAsync(requestQuoteStatusId,createdOnFrom,createdOnTo,customerEmail,pageIndex,pageSize)={RequestQuoteStatusId},{CreatedOnFrom},{CreatedOnTo},{CustomerEmail},{PageIndex},{PageSize}: find query executed in {Arg6} ms", requestQuoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
             if (createdOnTo.HasValue)
                 query = query.Where(l => createdOnTo.Value >= l.CreatedOnUtc);
 
@@ -421,6 +504,7 @@ public class RfqService
 
             query = query.OrderByDescending(l => l.CreatedOnUtc);
 
+		_logger.LogDebug("<<< Exiting SearchRequestsQuoteAsync(requestQuoteStatusId={RequestQuoteStatusId},createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerEmail={CustomerEmail},pageIndex={PageIndex},pageSize={PageSize})", requestQuoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize);
             return query;
         }, pageIndex, pageSize);
 
@@ -434,11 +518,16 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteRequestQuoteAsync(int requestQuoteId)
     {
+		_logger.LogDebug(">>> Entering DeleteRequestQuoteAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         var requestQuote = await GetRequestQuoteByIdAsync(requestQuoteId);
 
+		_logger.LogDebug("DeleteRequestQuoteAsync(requestQuoteId={RequestQuoteId}): requestQuote → {RequestQuote}", requestQuoteId, requestQuote);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await DeleteRequestQuoteAsync(requestQuote);
+		_logger.LogDebug("<<< Exiting DeleteRequestQuoteAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
     }
 
+	_logger.LogDebug("<<< Exiting DeleteRequestQuoteAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
     /// <summary>
     /// Deletes the request quote
     /// </summary>
@@ -446,17 +535,22 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteRequestQuoteAsync(RequestQuote requestQuote)
     {
+		_logger.LogDebug(">>> Entering DeleteRequestQuoteAsync(requestQuote={RequestQuote})", requestQuote);
         if (requestQuote == null)
             return;
 
         if (requestQuote.QuoteId.HasValue)
         {
             var quote = await GetQuoteByIdAsync(requestQuote.QuoteId.Value);
+			_logger.LogDebug("DeleteRequestQuoteAsync(requestQuote={RequestQuote}): quote → {Quote}", requestQuote, quote);
+			_logger.LogDebug("DeleteRequestQuoteAsync(requestQuote={RequestQuote}): quote.RequestQuoteId → {Arg1}", requestQuote, quote.RequestQuoteId);
             quote.RequestQuoteId = null;
             await UpdateQuoteAsync(quote);
         }
 
         await _requestQuoteRepository.DeleteAsync(requestQuote);
+		_logger.LogInformation("DeleteRequestQuoteAsync(requestQuote)={RequestQuote}: external service call took {Arg1} ms", requestQuote, __logStart.ElapsedMilliseconds);
+		_logger.LogInformation("DeleteRequestQuoteAsync(requestQuote)={RequestQuote}: delete query executed in {Arg1} ms", requestQuote, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -466,7 +560,12 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteRequestsQuoteByIdsAsync(ICollection<int> ids)
     {
+		_logger.LogDebug(">>> Entering DeleteRequestsQuoteByIdsAsync(ids={Ids})", ids);
+		_logger.LogInformation("DeleteRequestsQuoteByIdsAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
         await _requestQuoteRepository.DeleteAsync(await _requestQuoteRepository.GetByIdsAsync(ids.ToArray()));
+		_logger.LogDebug(">>> Entering UpdateQuoteAsync(quote={Quote})", quote);
+		_logger.LogDebug("<<< Exiting DeleteRequestsQuoteByIdsAsync(ids={Ids})", ids);
+		_logger.LogDebug("<<< Exiting UpdateQuoteAsync(quote={Quote})", quote);
     }
 
     #endregion
@@ -483,6 +582,8 @@ public class RfqService
     /// </returns>
     public async Task<List<RequestQuoteItem>> GetRequestQuoteItemsAsync(int requestId)
     {
+		_logger.LogDebug(">>> Entering GetRequestQuoteItemsAsync(requestId={RequestId})", requestId);
+		_logger.LogDebug("<<< Exiting GetRequestQuoteItemsAsync(requestId={RequestId})", requestId);
         return await _requestQuoteItemRepository.Table
             .Where(p => p.RequestQuoteId == requestId)
             .ToListAsync();
@@ -498,6 +599,8 @@ public class RfqService
     /// </returns>
     public async Task<RequestQuoteItem> GetRequestQuoteItemByIdAsync(int requestQuoteItemId)
     {
+		_logger.LogDebug(">>> Entering GetRequestQuoteItemByIdAsync(requestQuoteItemId={RequestQuoteItemId})", requestQuoteItemId);
+		_logger.LogDebug("<<< Exiting GetRequestQuoteItemByIdAsync(requestQuoteItemId={RequestQuoteItemId})", requestQuoteItemId);
         return await _requestQuoteItemRepository.GetByIdAsync(requestQuoteItemId, _ => default);
     }
 
@@ -508,18 +611,26 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteRequestQuoteItemAsync(int requestQuoteItemId)
     {
+		_logger.LogDebug(">>> Entering DeleteRequestQuoteItemAsync(requestQuoteItemId={RequestQuoteItemId})", requestQuoteItemId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var item = await GetRequestQuoteItemByIdAsync(requestQuoteItemId);
 
+		_logger.LogDebug("DeleteRequestQuoteItemAsync(requestQuoteItemId={RequestQuoteItemId}): item → {Item}", requestQuoteItemId, item);
         if (item == null)
             return;
+			_logger.LogInformation("DeleteRequestQuoteItemAsync(requestQuoteItemId)={RequestQuoteItemId}: delete query executed in {Arg1} ms", requestQuoteItemId, __logStart.ElapsedMilliseconds);
 
         await _requestQuoteItemRepository.DeleteAsync(item);
 
         var requestQuote = await GetRequestQuoteByIdAsync(item.RequestQuoteId);
+		_logger.LogDebug("DeleteRequestQuoteItemAsync(requestQuoteItemId={RequestQuoteItemId}): requestQuote → {RequestQuote}", requestQuoteItemId, requestQuote);
         var note = string.Format(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.RequestQuoteItemDeleted"), requestQuoteItemId, await GetCurrentCustomerEmailAsync());
+		_logger.LogDebug("DeleteRequestQuoteItemAsync(requestQuoteItemId={RequestQuoteItemId}): note → {Note}", requestQuoteItemId, note);
 
         LogNote(requestQuote, note);
         await UpdateRequestQuoteAsync(requestQuote);
+		_logger.LogInformation("DeleteRequestQuoteItemAsync(requestQuoteItemId)={RequestQuoteItemId}: external service call took {Arg1} ms", requestQuoteItemId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteRequestQuoteItemAsync(requestQuoteItemId={RequestQuoteItemId})", requestQuoteItemId);
     }
 
     /// <summary>
@@ -533,6 +644,7 @@ public class RfqService
     {
         var item = await GetRequestQuoteItemByIdAsync(requestQuoteItemId);
 
+		_logger.LogDebug("UpdateRequestQuoteItemAsync(requestQuoteItemId={RequestQuoteItemId},quantity={Quantity},unitPrice={UnitPrice}): item → {Item}", requestQuoteItemId, quantity, unitPrice, item);
         if (item == null)
             return;
 
@@ -553,10 +665,14 @@ public class RfqService
     /// The task result contains the request a quote item</returns>
     public async Task<RequestQuoteItem> InsertRequestQuoteItemAsync(RequestQuoteItem requestQuoteItem)
     {
+		_logger.LogDebug(">>> Entering InsertRequestQuoteItemAsync(requestQuoteItem={RequestQuoteItem})", requestQuoteItem);
         LogNote(requestQuoteItem, string.Format(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.RequestItemCreated"), await GetCurrentCustomerEmailAsync()));
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("InsertRequestQuoteItemAsync(requestQuoteItem)={RequestQuoteItem}: save query executed in {Arg1} ms", requestQuoteItem, __logStart.ElapsedMilliseconds);
         await _requestQuoteItemRepository.InsertAsync(requestQuoteItem);
 
+		_logger.LogDebug("<<< Exiting InsertRequestQuoteItemAsync(requestQuoteItem={RequestQuoteItem})", requestQuoteItem);
         return requestQuoteItem;
     }
 
@@ -574,6 +690,7 @@ public class RfqService
     /// </returns>
     public async Task<Quote> CreateQuoteAsync(int customerId)
     {
+		_logger.LogDebug(">>> Entering CreateQuoteAsync(customerId={CustomerId})", customerId);
         if (customerId <= 0)
             return null;
 
@@ -584,6 +701,7 @@ public class RfqService
             CustomerId = customerId
         };
 
+		_logger.LogDebug("<<< Exiting CreateQuoteAsync(customerId={CustomerId})", customerId);
         return await InsertQuoteAsync(requestQuote);
     }
 
@@ -594,7 +712,11 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteQuotesByIdsAsync(ICollection<int> ids)
     {
+		_logger.LogDebug(">>> Entering DeleteQuotesByIdsAsync(ids={Ids})", ids);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _quoteRepository.DeleteAsync(await _quoteRepository.GetByIdsAsync(ids.ToArray()));
+		_logger.LogInformation("DeleteQuotesByIdsAsync(ids)={Ids}: external service call took {Arg1} ms", ids, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteQuotesByIdsAsync(ids={Ids})", ids);
     }
 
     /// <summary>
@@ -612,11 +734,15 @@ public class RfqService
     /// </returns>
     public async Task<IPagedList<Quote>> SearchQuotesAsync(int quoteStatusId, DateTime? createdOnFrom, DateTime? createdOnTo, string customerEmail, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering SearchQuotesAsync(quoteStatusId={QuoteStatusId},createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerEmail={CustomerEmail},pageIndex={PageIndex},pageSize={PageSize})", quoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var quotes = await _quoteRepository.GetAllPagedAsync(query =>
         {
             if (createdOnFrom.HasValue)
                 query = query.Where(l => createdOnFrom.Value <= l.CreatedOnUtc);
 
+			_logger.LogDebug("SearchQuotesAsync(quoteStatusId={QuoteStatusId},createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerEmail={CustomerEmail},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", quoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize, query);
+			_logger.LogInformation("SearchQuotesAsync(quoteStatusId,createdOnFrom,createdOnTo,customerEmail,pageIndex,pageSize)={QuoteStatusId},{CreatedOnFrom},{CreatedOnTo},{CustomerEmail},{PageIndex},{PageSize}: find query executed in {Arg6} ms", quoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
             if (createdOnTo.HasValue)
                 query = query.Where(l => createdOnTo.Value >= l.CreatedOnUtc);
 
@@ -638,6 +764,7 @@ public class RfqService
         foreach (var quote in quotes)
             await CheckIsQuoteExpiredAsync(quote);
 
+		_logger.LogDebug("<<< Exiting SearchQuotesAsync(quoteStatusId={QuoteStatusId},createdOnFrom={CreatedOnFrom},createdOnTo={CreatedOnTo},customerEmail={CustomerEmail},pageIndex={PageIndex},pageSize={PageSize})", quoteStatusId, createdOnFrom, createdOnTo, customerEmail, pageIndex, pageSize);
         return quotes;
     }
 
@@ -651,8 +778,10 @@ public class RfqService
     /// </returns>
     public async Task<int> CreateQuoteByRequestAsync(int requestQuoteId)
     {
+		_logger.LogDebug(">>> Entering CreateQuoteByRequestAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         var requestQuote = await GetRequestQuoteByIdAsync(requestQuoteId);
 
+		_logger.LogDebug("CreateQuoteByRequestAsync(requestQuoteId={RequestQuoteId}): requestQuote → {RequestQuote}", requestQuoteId, requestQuote);
         if (requestQuote == null)
             return 0;
 
@@ -668,6 +797,7 @@ public class RfqService
         await InsertQuoteAsync(quote);
 
         var items = await GetRequestQuoteItemsAsync(requestQuoteId);
+		_logger.LogDebug("CreateQuoteByRequestAsync(requestQuoteId={RequestQuoteId}): items → {Items}", requestQuoteId, items);
 
         await InsertQuoteItemsAsync(items.Select(item => new QuoteItem
         {
@@ -683,8 +813,10 @@ public class RfqService
 
         await ChangeAndLogRequestQuoteStatusAsync(requestQuote, RequestQuoteStatus.QuoteIsCreated);
         requestQuote.QuoteId = quote.Id;
+		_logger.LogDebug("CreateQuoteByRequestAsync(requestQuoteId={RequestQuoteId}): requestQuote.QuoteId → {Arg1}", requestQuoteId, requestQuote.QuoteId);
         await UpdateRequestQuoteAsync(requestQuote);
 
+		_logger.LogDebug("<<< Exiting CreateQuoteByRequestAsync(requestQuoteId={RequestQuoteId})", requestQuoteId);
         return quote.Id;
     }
 
@@ -698,6 +830,8 @@ public class RfqService
     /// </returns>
     public async Task<Quote> GetQuoteByIdAsync(int quoteId)
     {
+		_logger.LogDebug(">>> Entering GetQuoteByIdAsync(quoteId={QuoteId})", quoteId);
+		_logger.LogDebug("<<< Exiting GetQuoteByIdAsync(quoteId={QuoteId})", quoteId);
         return await CheckIsQuoteExpiredAsync(await _quoteRepository.GetByIdAsync(quoteId));
     }
 
@@ -709,6 +843,7 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ChangeAndLogQuoteStatusAsync(Quote quote, QuoteStatus newStatus)
     {
+		_logger.LogDebug(">>> Entering ChangeAndLogQuoteStatusAsync(quote={Quote},newStatus={NewStatus})", quote, newStatus);
         if (quote.Status == newStatus)
             return;
 
@@ -718,6 +853,8 @@ public class RfqService
 
         LogNote(quote, note);
         quote.Status = newStatus;
+		_logger.LogDebug("ChangeAndLogQuoteStatusAsync(quote={Quote},newStatus={NewStatus}): quote.Status → {Arg2}", quote, newStatus, quote.Status);
+		_logger.LogDebug("<<< Exiting ChangeAndLogQuoteStatusAsync(quote={Quote},newStatus={NewStatus})", quote, newStatus);
     }
 
     /// <summary>
@@ -737,11 +874,15 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteQuoteAsync(int quoteId)
     {
+		_logger.LogDebug(">>> Entering DeleteQuoteAsync(quoteId={QuoteId})", quoteId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var quote = await GetQuoteByIdAsync(quoteId);
 
+		_logger.LogDebug("DeleteQuoteAsync(quoteId={QuoteId}): quote → {Quote}", quoteId, quote);
         if (quote == null)
             return;
 
+		_logger.LogInformation("DeleteQuoteAsync(quoteId)={QuoteId}: delete query executed in {Arg1} ms", quoteId, __logStart.ElapsedMilliseconds);
         await _quoteRepository.DeleteAsync(quote);
 
         if (quote.RequestQuoteId is null or 0)
@@ -749,13 +890,19 @@ public class RfqService
 
         var requestQuote = await _requestQuoteRepository.GetByIdAsync(quote.RequestQuoteId);
 
+		_logger.LogDebug("DeleteQuoteAsync(quoteId={QuoteId}): requestQuote → {RequestQuote}", quoteId, requestQuote);
+		_logger.LogInformation("DeleteQuoteAsync(quoteId)={QuoteId}: find query executed in {Arg1} ms", quoteId, __logStart.ElapsedMilliseconds);
         if (requestQuote == null)
             return;
 
         requestQuote.QuoteId = null;
+		_logger.LogDebug("DeleteQuoteAsync(quoteId={QuoteId}): requestQuote.QuoteId → {Arg1}", quoteId, requestQuote.QuoteId);
+		_logger.LogDebug("DeleteQuoteAsync(quoteId={QuoteId}): requestQuote.Status → {Arg1}", quoteId, requestQuote.Status);
         requestQuote.Status = RequestQuoteStatus.Submitted;
 
         await UpdateRequestQuoteAsync(requestQuote);
+		_logger.LogInformation("DeleteQuoteAsync(quoteId)={QuoteId}: external service call took {Arg1} ms", quoteId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteQuoteAsync(quoteId={QuoteId})", quoteId);
     }
 
     /// <summary>
@@ -765,13 +912,18 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task CreateShoppingCartAsync(int quoteId)
     {
+		_logger.LogDebug(">>> Entering CreateShoppingCartAsync(quoteId={QuoteId})", quoteId);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("CreateShoppingCartAsync(quoteId={QuoteId}): customer → {Customer}", quoteId, customer);
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.ENABLE_SHOPPING_CART, customer))
+			_logger.LogWarning("Throwing NopException from CreateShoppingCartAsync(quoteId={QuoteId})", quoteId);
             throw new NopException("Shopping cart is disabled");
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("CreateShoppingCartAsync(quoteId={QuoteId}): store → {Store}", quoteId, store);
         var quoteItems = await GetQuoteItemsAsync(quoteId);
+		_logger.LogDebug("CreateShoppingCartAsync(quoteId={QuoteId}): quoteItems → {QuoteItems}", quoteId, quoteItems);
 
         await _shoppingCartService.ClearShoppingCartAsync(customer, store.Id);
 
@@ -796,8 +948,14 @@ public class RfqService
                 CustomerId = customer.Id
             };
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             await _sciRepository.InsertAsync(shoppingCartItem, false);
             quoteItem.ShoppingCartItemId = shoppingCartItem.Id;
+			_logger.LogDebug("CreateShoppingCartAsync(quoteId={QuoteId}): quoteItem.ShoppingCartItemId → {Arg1}", quoteId, quoteItem.ShoppingCartItemId);
+			_logger.LogInformation("CreateShoppingCartAsync(quoteId)={QuoteId}: save query executed in {Arg1} ms", quoteId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug(">>> Entering GetQuoteItemsAsync(quoteId={QuoteId})", quoteId);
+			_logger.LogInformation("GetQuoteItemsAsync(quoteId)={QuoteId}: database query executed in {Arg1} ms", quoteId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetQuoteItemsAsync(quoteId={QuoteId})", quoteId);
         }
 
         await UpdateQuoteItemsAsync(quoteItems);
@@ -806,6 +964,7 @@ public class RfqService
         if (!customer.HasShoppingCartItems)
         {
             customer.HasShoppingCartItems = true;
+			_logger.LogDebug("CreateShoppingCartAsync(quoteId={QuoteId}): customer.HasShoppingCartItems → {Arg1}", quoteId, customer.HasShoppingCartItems);
             await _customerService.UpdateCustomerAsync(customer);
         }
     }
@@ -822,15 +981,20 @@ public class RfqService
     /// The task result contains the quote item</returns>
     public async Task<QuoteItem> InsertQuoteItemAsync(QuoteItem quoteItem)
     {
+		_logger.LogDebug(">>> Entering InsertQuoteItemAsync(quoteItem={QuoteItem})", quoteItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _quoteItemRepository.InsertAsync(quoteItem);
 
         var quote = await GetQuoteByIdAsync(quoteItem.QuoteId);
+		_logger.LogDebug("InsertQuoteItemAsync(quoteItem={QuoteItem}): quote → {Quote}", quoteItem, quote);
+		_logger.LogInformation("InsertQuoteItemAsync(quoteItem)={QuoteItem}: save query executed in {Arg1} ms", quoteItem, __logStart.ElapsedMilliseconds);
         var note = string.Format(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.QuoteItemAdded"),
             quoteItem.Id, await GetCurrentCustomerEmailAsync());
 
         LogNote(quote, note);
         await UpdateQuoteAsync(quote);
 
+		_logger.LogDebug("<<< Exiting InsertQuoteItemAsync(quoteItem={QuoteItem})", quoteItem);
         return quoteItem;
     }
 
@@ -844,6 +1008,8 @@ public class RfqService
     /// </returns>
     public async Task<List<QuoteItem>> GetQuoteItemsAsync(int quoteId)
     {
+		_logger.LogDebug(">>> Entering GetQuoteItemsAsync(quoteId={QuoteId})", quoteId);
+		_logger.LogDebug("<<< Exiting GetQuoteItemsAsync(quoteId={QuoteId})", quoteId);
         return await _quoteItemRepository.Table
             .Where(p => p.QuoteId == quoteId)
             .ToListAsync();
@@ -859,6 +1025,8 @@ public class RfqService
     /// </returns>
     public async Task<QuoteItem> GetQuoteItemByIdAsync(int quoteItemId)
     {
+		_logger.LogDebug(">>> Entering GetQuoteItemByIdAsync(quoteItemId={QuoteItemId})", quoteItemId);
+		_logger.LogDebug("<<< Exiting GetQuoteItemByIdAsync(quoteItemId={QuoteItemId})", quoteItemId);
         return await _quoteItemRepository.GetByIdAsync(quoteItemId, _ => default);
     }
 
@@ -869,18 +1037,26 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteQuoteItemAsync(int quoteItemId)
     {
+		_logger.LogDebug(">>> Entering DeleteQuoteItemAsync(quoteItemId={QuoteItemId})", quoteItemId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var item = await GetQuoteItemByIdAsync(quoteItemId);
 
+		_logger.LogDebug("DeleteQuoteItemAsync(quoteItemId={QuoteItemId}): item → {Item}", quoteItemId, item);
         if (item == null)
             return;
+			_logger.LogInformation("DeleteQuoteItemAsync(quoteItemId)={QuoteItemId}: delete query executed in {Arg1} ms", quoteItemId, __logStart.ElapsedMilliseconds);
 
         await _quoteItemRepository.DeleteAsync(item);
 
         var quote = await GetQuoteByIdAsync(item.QuoteId);
+		_logger.LogDebug("DeleteQuoteItemAsync(quoteItemId={QuoteItemId}): quote → {Quote}", quoteItemId, quote);
         var note = string.Format(await _localizationService.GetResourceAsync("Plugins.Misc.RFQ.QuoteItemDeleted"), quoteItemId, await GetCurrentCustomerEmailAsync());
+		_logger.LogDebug("DeleteQuoteItemAsync(quoteItemId={QuoteItemId}): note → {Note}", quoteItemId, note);
 
         LogNote(quote, note);
         await UpdateQuoteAsync(quote);
+		_logger.LogInformation("DeleteQuoteItemAsync(quoteItemId)={QuoteItemId}: external service call took {Arg1} ms", quoteItemId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteQuoteItemAsync(quoteItemId={QuoteItemId})", quoteItemId);
     }
 
     /// <summary>
@@ -894,6 +1070,7 @@ public class RfqService
     {
         var item = await GetQuoteItemByIdAsync(quoteItemId);
 
+		_logger.LogDebug("UpdateQuoteItemAsync(quoteItemId={QuoteItemId},quantity={Quantity},unitPrice={UnitPrice}): item → {Item}", quoteItemId, quantity, unitPrice, item);
         if (item == null)
             return;
 
@@ -916,6 +1093,8 @@ public class RfqService
     /// </returns>
     public async Task<QuoteItem> GetQuoteItemByShoppingCartItemIdAsync(int shoppingCartItemId)
     {
+		_logger.LogDebug(">>> Entering GetQuoteItemByShoppingCartItemIdAsync(shoppingCartItemId=<redacted>)");
+		_logger.LogDebug("<<< Exiting GetQuoteItemByShoppingCartItemIdAsync(shoppingCartItemId=<redacted>)");
         return await _quoteItemRepository.Table.FirstOrDefaultAsync(qi => qi.ShoppingCartItemId == shoppingCartItemId);
     }
 
@@ -929,6 +1108,8 @@ public class RfqService
     /// </returns>
     public async Task<List<QuoteItem>> GetQuoteItemsByShoppingCartItemIdsAsync(IList<int> shoppingCartItemIds)
     {
+		_logger.LogDebug(">>> Entering GetQuoteItemsByShoppingCartItemIdsAsync(shoppingCartItemIds=<redacted>)");
+		_logger.LogDebug("<<< Exiting GetQuoteItemsByShoppingCartItemIdsAsync(shoppingCartItemIds=<redacted>)");
         return await _quoteItemRepository.Table.Where(qi => qi.ShoppingCartItemId.HasValue && shoppingCartItemIds.Contains(qi.ShoppingCartItemId.Value)).ToListAsync();
     }
 
@@ -939,7 +1120,9 @@ public class RfqService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateQuoteItemsAsync(List<QuoteItem> quoteItems)
     {
+		_logger.LogDebug(">>> Entering UpdateQuoteItemsAsync(quoteItems={QuoteItems})", quoteItems);
         await _quoteItemRepository.UpdateAsync(quoteItems);
+		_logger.LogDebug("<<< Exiting UpdateQuoteItemsAsync(quoteItems={QuoteItems})", quoteItems);
     }
 
     #endregion

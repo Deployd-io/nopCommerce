@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Nop.Core.Events;
 using Nop.Core.Infrastructure;
 using Nop.Web.Framework.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Components;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Components;
 /// </summary>
 public abstract partial class NopViewComponent : ViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Returns a result which will render the partial view with name <paramref name="viewName"/>.
     /// </summary>
@@ -19,10 +21,13 @@ public abstract partial class NopViewComponent : ViewComponent
     /// <returns>A <see cref="ViewViewComponentResult"/>.</returns>
     public new ViewViewComponentResult View<TModel>(string viewName, TModel model)
     {
+		_logger.LogDebug(">>> Entering View(viewName={ViewName},model={Model})", viewName, model);
         var eventPublisher = EngineContext.Current.Resolve<IEventPublisher>();
         eventPublisher.ModelPrepared(model);
+		_logger.LogDebug("View(viewName={ViewName},model={Model}): eventPublisher → {EventPublisher}", viewName, model, eventPublisher);
 
         //invoke the base method
+		_logger.LogDebug("<<< Exiting View(viewName={ViewName},model={Model})", viewName, model);
         return base.View(viewName, model);
     }
 
@@ -35,6 +40,7 @@ public abstract partial class NopViewComponent : ViewComponent
     {
         var eventPublisher = EngineContext.Current.Resolve<IEventPublisher>();
         eventPublisher.ModelPrepared(model);
+		_logger.LogDebug("View(model={Model}): eventPublisher → {EventPublisher}", model, eventPublisher);
 
         //invoke the base method
         return base.View(model);

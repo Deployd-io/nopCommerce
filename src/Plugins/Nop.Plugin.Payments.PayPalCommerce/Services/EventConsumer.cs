@@ -16,6 +16,7 @@ using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Menu;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Customer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Services;
 
@@ -23,6 +24,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Services;
 /// Represents the plugin event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     BaseAdminMenuCreatedEventConsumer,
     IConsumer<CustomerPermanentlyDeleted>,
     IConsumer<ModelPreparedEvent<BaseNopModel>>,
@@ -58,15 +60,26 @@ public class EventConsumer :
         IPluginManager<IPlugin> pluginManager,
         IWorkContext workContext) : base(pluginManager)
     {
+		_logger.LogDebug(">>> Entering EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext})", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext);
         _adminMenu = adminMenu;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _adminMenu → {_adminMenu}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _adminMenu);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _genericAttributeService → {_genericAttributeService}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _genericAttributeService);
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _httpContextAccessor → {_httpContextAccessor}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _httpContextAccessor);
         _localizationService = localizationService;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _localizationService → {_localizationService}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _localizationService);
         _shipmentService = shipmentService;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _shipmentService → {_shipmentService}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _shipmentService);
         _serviceManager = serviceManager;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _serviceManager → {_serviceManager}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _serviceManager);
         _settings = settings;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _settings → {_settings}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _settings);
         _permissionService = permissionService;
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _permissionService → {_permissionService}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _permissionService);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext})", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext);
+		_logger.LogDebug("EventConsumer(adminMenu={AdminMenu},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shipmentService={ShipmentService},serviceManager={ServiceManager},settings={Settings},permissionService={PermissionService},pluginManager={PluginManager},workContext={WorkContext}): _workContext → {_workContext}", adminMenu, genericAttributeService, httpContextAccessor, localizationService, shipmentService, serviceManager, settings, permissionService, pluginManager, workContext, _workContext);
     }
 
     #endregion
@@ -82,6 +95,8 @@ public class EventConsumer :
     /// </returns>
     protected override async Task<bool> CheckAccessAsync()
     {
+		_logger.LogDebug(">>> Entering CheckAccessAsync()");
+		_logger.LogDebug("<<< Exiting CheckAccessAsync()");
         return await _permissionService.AuthorizeAsync(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS);
     }
 
@@ -95,8 +110,10 @@ public class EventConsumer :
     /// </returns>
     protected override async Task<AdminMenuItem> GetAdminMenuItemAsync(IPlugin plugin)
     {
+		_logger.LogDebug(">>> Entering GetAdminMenuItemAsync(plugin={Plugin})", plugin);
         var descriptor = plugin.PluginDescriptor;
 
+		_logger.LogDebug("<<< Exiting GetAdminMenuItemAsync(plugin={Plugin})", plugin);
         return new AdminMenuItem
         {
             Visible = true,
@@ -138,6 +155,9 @@ public class EventConsumer :
     {
         //delete customer's payment tokens
         await _serviceManager.DeletePaymentTokensAsync(_settings, eventMessage.CustomerId);
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): Title → {Title}", eventMessage, Title);
     }
 
     /// <summary>
@@ -164,7 +184,9 @@ public class EventConsumer :
 
         //add a new menu item in the customer navigation
         var orderItem = navigationModel.CustomerNavigationItems.FirstOrDefault(item => item.Tab == (int)CustomerNavigationEnum.Orders);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): orderItem → {OrderItem}", eventMessage, orderItem);
         var position = navigationModel.CustomerNavigationItems.IndexOf(orderItem) + 1;
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): position → {Position}", eventMessage, position);
         navigationModel.CustomerNavigationItems.Insert(position, new()
         {
             RouteName = PayPalCommerceDefaults.Route.PaymentTokens,
@@ -172,6 +194,9 @@ public class EventConsumer :
             Tab = PayPalCommerceDefaults.PaymentTokensMenuTab,
             Title = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.PaymentTokens")
         });
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): ItemClass → {ItemClass}", eventMessage, ItemClass);
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): Tab → {Tab}", eventMessage, Tab);
+			_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): RouteName → {RouteName}", eventMessage, RouteName);
     }
 
     /// <summary>

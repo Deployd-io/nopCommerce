@@ -13,6 +13,7 @@ using Nop.Services.Common;
 using Nop.Services.Customers;
 using Nop.Services.Localization;
 using Nop.Services.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Authentication.External;
 
@@ -21,6 +22,7 @@ namespace Nop.Services.Authentication.External;
 /// </summary>
 public partial class ExternalAuthenticationService : IExternalAuthenticationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -61,22 +63,40 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
         IWorkflowMessageService workflowMessageService,
         LocalizationSettings localizationSettings)
     {
+		_logger.LogDebug(">>> Entering ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings})", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings);
         _customerSettings = customerSettings;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _customerSettings → {_customerSettings}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _customerSettings);
         _externalAuthenticationSettings = externalAuthenticationSettings;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _externalAuthenticationSettings → {_externalAuthenticationSettings}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _externalAuthenticationSettings);
         _actionContextAccessor = actionContextAccessor;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _actionContextAccessor → {_actionContextAccessor}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _actionContextAccessor);
         _authenticationPluginManager = authenticationPluginManager;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _authenticationPluginManager → {_authenticationPluginManager}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _authenticationPluginManager);
         _customerRegistrationService = customerRegistrationService;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _customerRegistrationService → {_customerRegistrationService}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _customerRegistrationService);
         _customerService = customerService;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _customerService → {_customerService}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _customerService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _eventPublisher → {_eventPublisher}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _eventPublisher);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _genericAttributeService → {_genericAttributeService}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _genericAttributeService);
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _httpContextAccessor → {_httpContextAccessor}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _httpContextAccessor);
         _localizationService = localizationService;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _localizationService → {_localizationService}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _localizationService);
         _externalAuthenticationRecordRepository = externalAuthenticationRecordRepository;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _externalAuthenticationRecordRepository → {_externalAuthenticationRecordRepository}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _externalAuthenticationRecordRepository);
         _storeContext = storeContext;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _storeContext → {_storeContext}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _storeContext);
         _urlHelperFactory = urlHelperFactory;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _urlHelperFactory → {_urlHelperFactory}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _urlHelperFactory);
         _workContext = workContext;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _workContext → {_workContext}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _workContext);
         _workflowMessageService = workflowMessageService;
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _workflowMessageService → {_workflowMessageService}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _workflowMessageService);
         _localizationSettings = localizationSettings;
+		_logger.LogDebug("<<< Exiting ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings})", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings);
+		_logger.LogDebug("ExternalAuthenticationService(customerSettings={CustomerSettings},externalAuthenticationSettings={ExternalAuthenticationSettings},actionContextAccessor={ActionContextAccessor},authenticationPluginManager={AuthenticationPluginManager},customerRegistrationService={CustomerRegistrationService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},externalAuthenticationRecordRepository={ExternalAuthenticationRecordRepository},storeContext={StoreContext},urlHelperFactory={UrlHelperFactory},workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", customerSettings, externalAuthenticationSettings, actionContextAccessor, authenticationPluginManager, customerRegistrationService, customerService, eventPublisher, genericAttributeService, httpContextAccessor, localizationService, externalAuthenticationRecordRepository, storeContext, urlHelperFactory, workContext, workflowMessageService, localizationSettings, _localizationSettings);
     }
 
     #endregion
@@ -95,6 +115,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     protected virtual async Task<IActionResult> AuthenticateExistingUserAsync(Customer associatedUser, Customer currentLoggedInUser, string returnUrl)
     {
+		_logger.LogDebug(">>> Entering AuthenticateExistingUserAsync(associatedUser={AssociatedUser},currentLoggedInUser={CurrentLoggedInUser},returnUrl={ReturnUrl})", associatedUser, currentLoggedInUser, returnUrl);
         //log in guest user
         if (currentLoggedInUser == null)
             return await _customerRegistrationService.SignInCustomerAsync(associatedUser, returnUrl);
@@ -107,6 +128,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
             }, returnUrl);
 
         //or the user try to log in as himself. bit weird
+		_logger.LogDebug("<<< Exiting AuthenticateExistingUserAsync(associatedUser={AssociatedUser},currentLoggedInUser={CurrentLoggedInUser},returnUrl={ReturnUrl})", associatedUser, currentLoggedInUser, returnUrl);
         return SuccessfulAuthentication(returnUrl);
     }
 
@@ -122,6 +144,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     protected virtual async Task<IActionResult> AuthenticateNewUserAsync(Customer currentLoggedInUser, ExternalAuthenticationParameters parameters, string returnUrl)
     {
+		_logger.LogDebug(">>> Entering AuthenticateNewUserAsync(currentLoggedInUser={CurrentLoggedInUser},parameters={Parameters},returnUrl={ReturnUrl})", currentLoggedInUser, parameters, returnUrl);
         //associate external account with logged-in user
         if (currentLoggedInUser != null)
         {
@@ -149,6 +172,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     protected virtual async Task<IActionResult> RegisterNewUserAsync(ExternalAuthenticationParameters parameters, string returnUrl)
     {
+		_logger.LogDebug(">>> Entering RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl})", parameters, returnUrl);
         //check whether the specified email has been already registered
         if (await _customerService.GetCustomerByEmailAsync(parameters.Email) != null)
         {
@@ -163,7 +187,9 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
 
         //create registration request
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): customer → {Customer}", parameters, returnUrl, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): store → {Store}", parameters, returnUrl, store);
         var registrationRequest = new CustomerRegistrationRequest(customer,
             parameters.Email, parameters.Email,
             CommonHelper.GenerateRandomDigitCode(20),
@@ -173,6 +199,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
 
         //whether registration request has been completed successfully
         var registrationResult = await _customerRegistrationService.RegisterCustomerAsync(registrationRequest);
+		_logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): registrationResult → {RegistrationResult}", parameters, returnUrl, registrationResult);
         if (!registrationResult.Success)
             return await ErrorAuthenticationAsync(registrationResult.Errors, returnUrl);
 
@@ -191,6 +218,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
 
         //authenticate
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("RegisterNewUserAsync(parameters={Parameters},returnUrl={ReturnUrl}): currentLanguage → {CurrentLanguage}", parameters, returnUrl, currentLanguage);
         if (registrationIsApproved)
         {
             await _workflowMessageService.SendCustomerWelcomeMessageAsync(customer, currentLanguage.Id);
@@ -198,6 +226,8 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
             //raise event       
             await _eventPublisher.PublishAsync(new CustomerActivatedEvent(customer));
 
+			_logger.LogDebug(">>> Entering ErrorAuthenticationAsync(errors={Errors},returnUrl={ReturnUrl})", errors, returnUrl);
+			_logger.LogDebug("<<< Exiting ErrorAuthenticationAsync(errors={Errors},returnUrl={ReturnUrl})", errors, returnUrl);
             return await _customerRegistrationService.SignInCustomerAsync(customer, returnUrl, true);
         }
 
@@ -215,6 +245,10 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
         if (_customerSettings.UserRegistrationType == UserRegistrationType.AdminApproval)
             return new RedirectToRouteResult(NopRouteNames.Standard.REGISTER_RESULT, new { resultId = (int)UserRegistrationType.AdminApproval, returnUrl });
 
+		_logger.LogDebug(">>> Entering AssociateExternalAccountWithUserAsync(customer={Customer},parameters={Parameters})", customer, parameters);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogDebug("<<< Exiting AssociateExternalAccountWithUserAsync(customer={Customer},parameters={Parameters})", customer, parameters);
+		_logger.LogInformation("AssociateExternalAccountWithUserAsync(customer,parameters)={Customer},{Parameters}: save query executed in {Arg2} ms", customer, parameters, __logStart.ElapsedMilliseconds);
         return await ErrorAuthenticationAsync(new[] { "Error on registration" }, returnUrl);
     }
 
@@ -247,8 +281,10 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>Result of an authentication</returns>
     protected virtual IActionResult SuccessfulAuthentication(string returnUrl)
     {
+		_logger.LogDebug(">>> Entering SuccessfulAuthentication(returnUrl={ReturnUrl})", returnUrl);
         var urlHelper = _urlHelperFactory.GetUrlHelper(_actionContextAccessor.ActionContext);
 
+		_logger.LogDebug("SuccessfulAuthentication(returnUrl={ReturnUrl}): urlHelper → {UrlHelper}", returnUrl, urlHelper);
         //redirect to the return URL if it's specified
         if (!string.IsNullOrEmpty(returnUrl) && urlHelper.IsLocalUrl(returnUrl))
             return new RedirectResult(returnUrl);
@@ -273,18 +309,23 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<IActionResult> AuthenticateAsync(ExternalAuthenticationParameters parameters, string returnUrl = null)
     {
+		_logger.LogDebug(">>> Entering AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl})", parameters, returnUrl);
         ArgumentNullException.ThrowIfNull(parameters);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): customer → {Customer}", parameters, returnUrl, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): store → {Store}", parameters, returnUrl, store);
         if (!await _authenticationPluginManager.IsPluginActiveAsync(parameters.ProviderSystemName, customer, store.Id))
             return await ErrorAuthenticationAsync(new[] { "External authentication method cannot be loaded" }, returnUrl);
 
         //get current logged-in user
         var currentLoggedInUser = await _customerService.IsRegisteredAsync(customer) ? customer : null;
+		_logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): currentLoggedInUser → {CurrentLoggedInUser}", parameters, returnUrl, currentLoggedInUser);
 
         //authenticate associated user if already exists
         var associatedUser = await GetUserByExternalAuthenticationParametersAsync(parameters);
+		_logger.LogDebug("AuthenticateAsync(parameters={Parameters},returnUrl={ReturnUrl}): associatedUser → {AssociatedUser}", parameters, returnUrl, associatedUser);
         if (associatedUser != null)
             return await AuthenticateExistingUserAsync(associatedUser, currentLoggedInUser, returnUrl);
 
@@ -304,6 +345,11 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<ExternalAuthenticationRecord> GetExternalAuthenticationRecordByIdAsync(int externalAuthenticationRecordId)
     {
+		_logger.LogDebug(">>> Entering GetExternalAuthenticationRecordByIdAsync(externalAuthenticationRecordId={ExternalAuthenticationRecordId})", externalAuthenticationRecordId);
+		_logger.LogDebug("<<< Exiting GetExternalAuthenticationRecordByIdAsync(externalAuthenticationRecordId={ExternalAuthenticationRecordId})", externalAuthenticationRecordId);
+		_logger.LogDebug(">>> Entering GetUserByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
+		_logger.LogInformation("GetUserByExternalAuthenticationParametersAsync(parameters)={Parameters}: database query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetUserByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
         return await _externalAuthenticationRecordRepository.GetByIdAsync(externalAuthenticationRecordId, cache => default, useShortTermCache: true);
     }
 
@@ -317,10 +363,13 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<IList<ExternalAuthenticationRecord>> GetCustomerExternalAuthenticationRecordsAsync(Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetCustomerExternalAuthenticationRecordsAsync(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         var associationRecords = _externalAuthenticationRecordRepository.Table.Where(ear => ear.CustomerId == customer.Id);
+		_logger.LogDebug("GetCustomerExternalAuthenticationRecordsAsync(customer={Customer}): associationRecords → {AssociationRecords}", customer, associationRecords);
 
+		_logger.LogDebug("<<< Exiting GetCustomerExternalAuthenticationRecordsAsync(customer={Customer})", customer);
         return await associationRecords.ToListAsync();
     }
 
@@ -331,9 +380,13 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteExternalAuthenticationRecordAsync(ExternalAuthenticationRecord externalAuthenticationRecord)
     {
+		_logger.LogDebug(">>> Entering DeleteExternalAuthenticationRecordAsync(externalAuthenticationRecord={ExternalAuthenticationRecord})", externalAuthenticationRecord);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(externalAuthenticationRecord);
 
         await _externalAuthenticationRecordRepository.DeleteAsync(externalAuthenticationRecord, false);
+		_logger.LogInformation("DeleteExternalAuthenticationRecordAsync(externalAuthenticationRecord)={ExternalAuthenticationRecord}: external service call took {Arg1} ms", externalAuthenticationRecord, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteExternalAuthenticationRecordAsync(externalAuthenticationRecord={ExternalAuthenticationRecord})", externalAuthenticationRecord);
     }
 
     /// <summary>
@@ -346,11 +399,15 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// </returns>
     public virtual async Task<ExternalAuthenticationRecord> GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(ExternalAuthenticationParameters parameters)
     {
+		_logger.LogDebug(">>> Entering GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
         ArgumentNullException.ThrowIfNull(parameters);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var associationRecord = await _externalAuthenticationRecordRepository.Table.FirstOrDefaultAsync(record =>
             record.ExternalIdentifier.Equals(parameters.ExternalIdentifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
+			_logger.LogInformation("GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(parameters)={Parameters}: database query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
 
+		_logger.LogDebug("<<< Exiting GetExternalAuthenticationRecordByExternalAuthenticationParametersAsync(parameters={Parameters})", parameters);
         return associationRecord;
     }
 
@@ -375,6 +432,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
         };
 
         await _externalAuthenticationRecordRepository.InsertAsync(externalAuthenticationRecord, false);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
     }
 
     /// <summary>
@@ -389,6 +447,7 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     {
         ArgumentNullException.ThrowIfNull(parameters);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var associationRecord = await _externalAuthenticationRecordRepository.Table.FirstOrDefaultAsync(record =>
             record.ExternalIdentifier.Equals(parameters.ExternalIdentifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
         if (associationRecord == null)
@@ -404,13 +463,17 @@ public partial class ExternalAuthenticationService : IExternalAuthenticationServ
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveAssociationAsync(ExternalAuthenticationParameters parameters)
     {
+		_logger.LogDebug(">>> Entering RemoveAssociationAsync(parameters={Parameters})", parameters);
         ArgumentNullException.ThrowIfNull(parameters);
 
         var associationRecord = await _externalAuthenticationRecordRepository.Table.FirstOrDefaultAsync(record =>
             record.ExternalIdentifier.Equals(parameters.ExternalIdentifier) && record.ProviderSystemName.Equals(parameters.ProviderSystemName));
+			_logger.LogInformation("RemoveAssociationAsync(parameters)={Parameters}: database query executed in {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
 
         if (associationRecord != null)
             await _externalAuthenticationRecordRepository.DeleteAsync(associationRecord, false);
+			_logger.LogInformation("RemoveAssociationAsync(parameters)={Parameters}: external service call took {Arg1} ms", parameters, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting RemoveAssociationAsync(parameters={Parameters})", parameters);
     }
 
 

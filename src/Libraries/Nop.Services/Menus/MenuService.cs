@@ -4,6 +4,7 @@ using Nop.Data;
 using Nop.Services.Catalog;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Menus;
 
@@ -12,6 +13,7 @@ namespace Nop.Services.Menus;
 /// </summary>
 public partial class MenuService : IMenuService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -30,11 +32,18 @@ public partial class MenuService : IMenuService
         IStoreMappingService storeMappingService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext})", aclService, menuRepository, menuItemRepository, workContext);
         _aclService = aclService;
+		_logger.LogDebug("MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext}): _aclService → {_aclService}", aclService, menuRepository, menuItemRepository, workContext, _aclService);
         _menuRepository = menuRepository;
+		_logger.LogDebug("MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext}): _menuRepository → {_menuRepository}", aclService, menuRepository, menuItemRepository, workContext, _menuRepository);
         _menuItemRepository = menuItemRepository;
+		_logger.LogDebug("MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext}): _menuItemRepository → {_menuItemRepository}", aclService, menuRepository, menuItemRepository, workContext, _menuItemRepository);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext}): _storeMappingService → {_storeMappingService}", aclService, menuRepository, menuItemRepository, workContext, _storeMappingService);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext})", aclService, menuRepository, menuItemRepository, workContext);
+		_logger.LogDebug("MenuService(aclService={AclService},menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},storeMappingService=<redacted>,workContext={WorkContext}): _workContext → {_workContext}", aclService, menuRepository, menuItemRepository, workContext, _workContext);
     }
 
     #endregion
@@ -55,6 +64,7 @@ public partial class MenuService : IMenuService
         int parentId = 0,
         bool ignoreMenuItemWithoutExistingParent = false)
     {
+		_logger.LogDebug(">>> Entering SortMenuItemsForTree(menuItemsByParentId={MenuItemsByParentId},parentId={ParentId},ignoreMenuItemWithoutExistingParent={IgnoreMenuItemWithoutExistingParent})", menuItemsByParentId, parentId, ignoreMenuItemWithoutExistingParent);
         ArgumentNullException.ThrowIfNull(menuItemsByParentId);
 
         var remaining = parentId > 0
@@ -87,6 +97,7 @@ public partial class MenuService : IMenuService
 
         foreach (var orphan in orphans)
             yield return orphan;
+			_logger.LogDebug("<<< Exiting SortMenuItemsForTree(menuItemsByParentId={MenuItemsByParentId},parentId={ParentId},ignoreMenuItemWithoutExistingParent={IgnoreMenuItemWithoutExistingParent})", menuItemsByParentId, parentId, ignoreMenuItemWithoutExistingParent);
     }
 
     #endregion
@@ -102,6 +113,10 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task DeleteMenuAsync(Menu menu)
     {
+		_logger.LogDebug(">>> Entering DeleteMenuAsync(menu={Menu})", menu);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteMenuAsync(menu)={Menu}: external service call took {Arg1} ms", menu, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteMenuAsync(menu={Menu})", menu);
         return _menuRepository.DeleteAsync(menu);
     }
 
@@ -124,10 +139,15 @@ public partial class MenuService : IMenuService
         int pageIndex = 0,
         int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetAllMenusAsync(menuType={MenuType},storeId={StoreId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", menuType, storeId, showHidden, pageIndex, pageSize);
         return await _menuRepository.GetAllPagedAsync(async query =>
         {
+			_logger.LogDebug("GetAllMenusAsync(menuType={MenuType},storeId={StoreId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", menuType, storeId, showHidden, pageIndex, pageSize, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (menuType is not null)
                 query = query.Where(m => m.MenuTypeId == (int)menuType);
+				_logger.LogDebug("<<< Exiting GetAllMenusAsync(menuType={MenuType},storeId={StoreId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", menuType, storeId, showHidden, pageIndex, pageSize);
+				_logger.LogInformation("GetAllMenusAsync(menuType,storeId,showHidden,pageIndex,pageSize)={MenuType},{StoreId},{ShowHidden},{PageIndex},{PageSize}: find query executed in {Arg5} ms", menuType, storeId, showHidden, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
             if (!showHidden)
             {
@@ -162,6 +182,8 @@ public partial class MenuService : IMenuService
     /// </returns>
     public virtual Task<Menu> GetMenuByIdAsync(int menuId)
     {
+		_logger.LogDebug(">>> Entering GetMenuByIdAsync(menuId={MenuId})", menuId);
+		_logger.LogDebug("<<< Exiting GetMenuByIdAsync(menuId={MenuId})", menuId);
         return _menuRepository.GetByIdAsync(menuId, cache => default, includeDeleted: false);
     }
 
@@ -172,6 +194,8 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task InsertMenuAsync(Menu menu)
     {
+		_logger.LogDebug(">>> Entering InsertMenuAsync(menu={Menu})", menu);
+		_logger.LogDebug("<<< Exiting InsertMenuAsync(menu={Menu})", menu);
         return _menuRepository.InsertAsync(menu);
     }
 
@@ -182,6 +206,8 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task UpdateMenuAsync(Menu menu)
     {
+		_logger.LogDebug(">>> Entering UpdateMenuAsync(menu={Menu})", menu);
+		_logger.LogDebug("<<< Exiting UpdateMenuAsync(menu={Menu})", menu);
         return _menuRepository.UpdateAsync(menu);
     }
 
@@ -196,22 +222,32 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteMenuItemAsync(MenuItem menuItem)
     {
+		_logger.LogDebug(">>> Entering DeleteMenuItemAsync(menuItem={MenuItem})", menuItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (menuItem is null)
             return;
 
         await deleteChildrenRecursive(menuItem.Id);
         await _menuItemRepository.DeleteAsync(menuItem);
 
+		_logger.LogInformation("DeleteMenuItemAsync(menuItem)={MenuItem}: external service call took {Arg1} ms", menuItem, __logStart.ElapsedMilliseconds);
+		_logger.LogInformation("DeleteMenuItemAsync(menuItem)={MenuItem}: delete query executed in {Arg1} ms", menuItem, __logStart.ElapsedMilliseconds);
         async Task deleteChildrenRecursive(int parentId)
         {
+			_logger.LogDebug(">>> Entering deleteChildrenRecursive(parentId={ParentId})", parentId);
             var children = await GetAllMenuItemsAsync(parentMenuItemId: parentId, showHidden: true);
+			_logger.LogDebug("deleteChildrenRecursive(parentId={ParentId}): children → {Children}", parentId, children);
 
             foreach (var child in children)
             {
                 await deleteChildrenRecursive(child.Id);
                 await _menuItemRepository.DeleteAsync(child);
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
             }
+			_logger.LogInformation("deleteChildrenRecursive(parentId)={ParentId}: delete query executed in {Arg1} ms", parentId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting deleteChildrenRecursive(parentId={ParentId})", parentId);
         }
+		_logger.LogDebug("<<< Exiting DeleteMenuItemAsync(menuItem={MenuItem})", menuItem);
     }
 
     /// <summary>
@@ -224,6 +260,8 @@ public partial class MenuService : IMenuService
     /// </returns>
     public virtual Task<MenuItem> GetMenuItemByIdAsync(int menuItemId)
     {
+		_logger.LogDebug(">>> Entering GetMenuItemByIdAsync(menuItemId={MenuItemId})", menuItemId);
+		_logger.LogDebug("<<< Exiting GetMenuItemByIdAsync(menuItemId={MenuItemId})", menuItemId);
         return _menuItemRepository.GetByIdAsync(menuItemId, cache => default);
     }
 
@@ -234,6 +272,8 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task InsertMenuItemAsync(MenuItem menuItem)
     {
+		_logger.LogDebug(">>> Entering InsertMenuItemAsync(menuItem={MenuItem})", menuItem);
+		_logger.LogDebug("<<< Exiting InsertMenuItemAsync(menuItem={MenuItem})", menuItem);
         return _menuItemRepository.InsertAsync(menuItem);
     }
 
@@ -244,15 +284,18 @@ public partial class MenuService : IMenuService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateMenuItemAsync(MenuItem menuItem)
     {
+		_logger.LogDebug(">>> Entering UpdateMenuItemAsync(menuItem={MenuItem})", menuItem);
         ArgumentNullException.ThrowIfNull(menuItem);
 
         //validate hierarchy
         var parentMenuItem = await GetMenuItemByIdAsync(menuItem.ParentId);
+		_logger.LogDebug("UpdateMenuItemAsync(menuItem={MenuItem}): parentMenuItem → {ParentMenuItem}", menuItem, parentMenuItem);
         while (parentMenuItem != null)
         {
             if (menuItem.Id == parentMenuItem.Id)
             {
                 menuItem.ParentId = 0;
+				_logger.LogDebug("UpdateMenuItemAsync(menuItem={MenuItem}): menuItem.ParentId → {Arg1}", menuItem, menuItem.ParentId);
                 break;
             }
 
@@ -260,6 +303,8 @@ public partial class MenuService : IMenuService
         }
 
         await _menuItemRepository.UpdateAsync(menuItem);
+		_logger.LogInformation("UpdateMenuItemAsync(menuItem)={MenuItem}: update query executed in {Arg1} ms", menuItem, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting UpdateMenuItemAsync(menuItem={MenuItem})", menuItem);
     }
 
     /// <summary>
@@ -286,11 +331,16 @@ public partial class MenuService : IMenuService
         bool showHidden = false,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetAllMenuItemsAsync(menuId={MenuId},parentMenuItemId={ParentMenuItemId},storeId={StoreId},depth={Depth},treeSorting={TreeSorting},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", menuId, parentMenuItemId, storeId, depth, treeSorting, showHidden, pageIndex, pageSize);
         var menuItems = await _menuItemRepository.GetAllAsync(async query =>
         {
+			_logger.LogDebug("GetAllMenuItemsAsync(menuId={MenuId},parentMenuItemId={ParentMenuItemId},storeId={StoreId},depth={Depth},treeSorting={TreeSorting},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): menuItems → {MenuItems}", menuId, parentMenuItemId, storeId, depth, treeSorting, showHidden, pageIndex, pageSize, menuItems);
+			_logger.LogDebug("GetAllMenuItemsAsync(menuId={MenuId},parentMenuItemId={ParentMenuItemId},storeId={StoreId},depth={Depth},treeSorting={TreeSorting},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", menuId, parentMenuItemId, storeId, depth, treeSorting, showHidden, pageIndex, pageSize, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (menuId > 0)
                 query = query.Where(menuItem => menuItem.MenuId == menuId);
 
+			_logger.LogInformation("GetAllMenuItemsAsync(menuId,parentMenuItemId,storeId,depth,treeSorting,showHidden,pageIndex,pageSize)={MenuId},{ParentMenuItemId},{StoreId},{Depth},{TreeSorting},{ShowHidden},{PageIndex},{PageSize}: find query executed in {Arg8} ms", menuId, parentMenuItemId, storeId, depth, treeSorting, showHidden, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
             if (parentMenuItemId > 0)
                 query = query.Where(mi => mi.ParentId == parentMenuItemId);
 
@@ -300,6 +350,7 @@ public partial class MenuService : IMenuService
 
                 //apply ACL constraints
                 var customer = await _workContext.GetCurrentCustomerAsync();
+				_logger.LogDebug("GetAllMenuItemsAsync(menuId={MenuId},parentMenuItemId={ParentMenuItemId},storeId={StoreId},depth={Depth},treeSorting={TreeSorting},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): customer → {Customer}", menuId, parentMenuItemId, storeId, depth, treeSorting, showHidden, pageIndex, pageSize, customer);
                 query = await _aclService.ApplyAcl(query, customer);
             }
 
@@ -321,6 +372,7 @@ public partial class MenuService : IMenuService
             menuItems = SortMenuItemsForTree(menuItems.ToLookup(c => c.ParentId)).ToList();
 
         //paging
+		_logger.LogDebug("<<< Exiting GetAllMenuItemsAsync(menuId={MenuId},parentMenuItemId={ParentMenuItemId},storeId={StoreId},depth={Depth},treeSorting={TreeSorting},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", menuId, parentMenuItemId, storeId, depth, treeSorting, showHidden, pageIndex, pageSize);
         return new PagedList<MenuItem>(menuItems, pageIndex, pageSize);
     }
 
@@ -335,6 +387,7 @@ public partial class MenuService : IMenuService
     /// </returns>
     public virtual IEnumerable<MenuItem> FilterMenuItemsByDepth(IEnumerable<MenuItem> menuItems, int parentId = 0, int depthLimit = 1)
     {
+		_logger.LogDebug(">>> Entering FilterMenuItemsByDepth(menuItems={MenuItems},parentId={ParentId},depthLimit={DepthLimit})", menuItems, parentId, depthLimit);
         ArgumentNullException.ThrowIfNull(menuItems);
 
         if (depthLimit == 0)
@@ -349,6 +402,7 @@ public partial class MenuService : IMenuService
             foreach (var child in FilterMenuItemsByDepth(menuItems, item.Id, depthLimit).OrderBy(item => item.DisplayOrder))
                 yield return child;
         }
+		_logger.LogDebug("<<< Exiting FilterMenuItemsByDepth(menuItems={MenuItems},parentId={ParentId},depthLimit={DepthLimit})", menuItems, parentId, depthLimit);
     }
 
     #endregion

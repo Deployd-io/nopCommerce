@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CountryModelFactory : ICountryModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -31,11 +33,18 @@ public partial class CountryModelFactory : ICountryModelFactory
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
         IStateProvinceService stateProvinceService)
     {
+		_logger.LogDebug(">>> Entering CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService})", countryService, localizationService, localizedModelFactory, stateProvinceService);
         _countryService = countryService;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService}): _countryService → {_countryService}", countryService, localizationService, localizedModelFactory, stateProvinceService, _countryService);
         _localizationService = localizationService;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService}): _localizationService → {_localizationService}", countryService, localizationService, localizedModelFactory, stateProvinceService, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService}): _localizedModelFactory → {_localizedModelFactory}", countryService, localizationService, localizedModelFactory, stateProvinceService, _localizedModelFactory);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", countryService, localizationService, localizedModelFactory, stateProvinceService, _storeMappingSupportedModelFactory);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService}): _stateProvinceService → {_stateProvinceService}", countryService, localizationService, localizedModelFactory, stateProvinceService, _stateProvinceService);
+		_logger.LogDebug("<<< Exiting CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},storeMappingSupportedModelFactory=<redacted>,stateProvinceService={StateProvinceService})", countryService, localizationService, localizedModelFactory, stateProvinceService);
     }
 
     #endregion
@@ -50,15 +59,18 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// <returns>State and province search model</returns>
     protected virtual StateProvinceSearchModel PrepareStateProvinceSearchModel(StateProvinceSearchModel searchModel, Country country)
     {
+		_logger.LogDebug(">>> Entering PrepareStateProvinceSearchModel(searchModel={SearchModel},country={Country})", searchModel, country);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(country);
 
         searchModel.CountryId = country.Id;
+		_logger.LogDebug("PrepareStateProvinceSearchModel(searchModel={SearchModel},country={Country}): searchModel.CountryId → {Arg2}", searchModel, country, searchModel.CountryId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareStateProvinceSearchModel(searchModel={SearchModel},country={Country})", searchModel, country);
         return searchModel;
     }
 
@@ -76,11 +88,13 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual Task<CountrySearchModel> PrepareCountrySearchModelAsync(CountrySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCountrySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCountrySearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -94,10 +108,12 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual async Task<CountryListModel> PrepareCountryListModelAsync(CountrySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCountryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get countries
         var countries = (await _countryService.GetAllCountriesAsync(showHidden: true)).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareCountryListModelAsync(searchModel={SearchModel}): countries → {Countries}", searchModel, countries);
 
         //prepare list model
         var model = await new CountryListModel().PrepareToGridAsync(searchModel, countries, () =>
@@ -106,6 +122,7 @@ public partial class CountryModelFactory : ICountryModelFactory
             return countries.SelectAwait(async country =>
             {
                 var countryModel = country.ToModel<CountryModel>();
+				_logger.LogDebug("PrepareCountryListModelAsync(searchModel={SearchModel}): countryModel → {CountryModel}", searchModel, countryModel);
 
                 countryModel.NumberOfStates = (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country.Id))?.Count ?? 0;
 
@@ -113,6 +130,7 @@ public partial class CountryModelFactory : ICountryModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCountryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -128,6 +146,7 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual async Task<CountryModel> PrepareCountryModelAsync(CountryModel model, Country country, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCountryModelAsync(model={Model},country={Country},excludeProperties={ExcludeProperties})", model, country, excludeProperties);
         Func<CountryLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (country != null)
@@ -136,6 +155,7 @@ public partial class CountryModelFactory : ICountryModelFactory
             if (model == null)
             {
                 model = country.ToModel<CountryModel>();
+				_logger.LogDebug("PrepareCountryModelAsync(model={Model},country={Country},excludeProperties={ExcludeProperties}): model → {Model1}", model, country, excludeProperties, model);
                 model.NumberOfStates = (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country.Id))?.Count ?? 0;
             }
 
@@ -153,6 +173,9 @@ public partial class CountryModelFactory : ICountryModelFactory
         if (country == null)
         {
             model.Published = true;
+			_logger.LogDebug("PrepareCountryModelAsync(model={Model},country={Country},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, country, excludeProperties, model.Published);
+			_logger.LogDebug("PrepareCountryModelAsync(model={Model},country={Country},excludeProperties={ExcludeProperties}): model.AllowsBilling → {Arg3}", model, country, excludeProperties, model.AllowsBilling);
+			_logger.LogDebug("PrepareCountryModelAsync(model={Model},country={Country},excludeProperties={ExcludeProperties}): model.AllowsShipping → {Arg3}", model, country, excludeProperties, model.AllowsShipping);
             model.AllowsBilling = true;
             model.AllowsShipping = true;
         }
@@ -164,6 +187,7 @@ public partial class CountryModelFactory : ICountryModelFactory
         //prepare available stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, country, excludeProperties);
 
+		_logger.LogDebug("<<< Exiting PrepareCountryModelAsync(model={Model},country={Country},excludeProperties={ExcludeProperties})", model, country, excludeProperties);
         return model;
     }
 
@@ -178,17 +202,20 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual async Task<StateProvinceListModel> PrepareStateProvinceListModelAsync(StateProvinceSearchModel searchModel, Country country)
     {
+		_logger.LogDebug(">>> Entering PrepareStateProvinceListModelAsync(searchModel={SearchModel},country={Country})", searchModel, country);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(country);
 
         //get comments
         var states = (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country.Id, showHidden: true)).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareStateProvinceListModelAsync(searchModel={SearchModel},country={Country}): states → {States}", searchModel, country, states);
 
         //prepare list model
         var model = new StateProvinceListModel().PrepareToGrid(searchModel, states, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareStateProvinceListModelAsync(searchModel={SearchModel},country={Country})", searchModel, country);
             return states.Select(state => state.ToModel<StateProvinceModel>());
         });
 
@@ -209,6 +236,7 @@ public partial class CountryModelFactory : ICountryModelFactory
     public virtual async Task<StateProvinceModel> PrepareStateProvinceModelAsync(StateProvinceModel model,
         Country country, StateProvince state, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareStateProvinceModelAsync(model={Model},country={Country},state={State},excludeProperties={ExcludeProperties})", model, country, state, excludeProperties);
         Func<StateProvinceLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (state != null)
@@ -224,15 +252,18 @@ public partial class CountryModelFactory : ICountryModelFactory
         }
 
         model.CountryId = country.Id;
+		_logger.LogDebug("PrepareStateProvinceModelAsync(model={Model},country={Country},state={State},excludeProperties={ExcludeProperties}): model.CountryId → {Arg4}", model, country, state, excludeProperties, model.CountryId);
 
         //set default values for the new model
         if (state == null)
             model.Published = true;
+			_logger.LogDebug("PrepareStateProvinceModelAsync(model={Model},country={Country},state={State},excludeProperties={ExcludeProperties}): model.Published → {Arg4}", model, country, state, excludeProperties, model.Published);
 
         //prepare localized models
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareStateProvinceModelAsync(model={Model},country={Country},state={State},excludeProperties={ExcludeProperties})", model, country, state, excludeProperties);
         return model;
     }
 

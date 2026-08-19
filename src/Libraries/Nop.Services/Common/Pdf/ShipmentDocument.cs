@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using PdfRpt.Core.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -8,15 +9,19 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public partial class ShipmentDocument : PdfDocument<ProductItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     private PdfGrid CreateDefaultHeader()
     {
+		_logger.LogDebug(">>> Entering CreateDefaultHeader()");
         var headerTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
 
+		_logger.LogDebug("CreateDefaultHeader(): headerTable → {HeaderTable}", headerTable);
         headerTable.AddCell(BuildPdfPCell<ShipmentDocument>(source => OrderNumberText, OrderNumberText));
         headerTable.AddCell(BuildPdfPCell<ShipmentDocument>(source => ShipmentNumberText, ShipmentNumberText));
 
+		_logger.LogDebug("<<< Exiting CreateDefaultHeader()");
         return headerTable;
     }
 
@@ -30,6 +35,7 @@ public partial class ShipmentDocument : PdfDocument<ProductItem>
     /// <param name="pdfStreamOutput">Stream for PDF output</param>
     public override void Generate(Stream pdfStreamOutput)
     {
+		_logger.LogDebug(">>> Entering Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
         Document
             .MainTablePreferences(table =>
             {
@@ -58,6 +64,7 @@ public partial class ShipmentDocument : PdfDocument<ProductItem>
                 events.PdfDoc.Add(BuildAddressTable<ShipmentDocument>(p => p.Address, Address));
             }))
             .Generate(builder => builder.AsPdfStream(pdfStreamOutput, closeStream: false));
+			_logger.LogDebug("<<< Exiting Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
     }
 
     #endregion

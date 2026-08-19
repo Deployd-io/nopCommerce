@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Security;
@@ -7,14 +8,18 @@ namespace Nop.Web.Areas.Admin.Models.Security;
 /// </summary>
 public partial record PermissionConfigurationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PermissionConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering PermissionConfigurationModel()");
         PermissionCategorySearchModel = new PermissionCategorySearchModel
         {
+			_logger.LogDebug("PermissionConfigurationModel(): PermissionCategorySearchModel → {PermissionCategorySearchModel}", PermissionCategorySearchModel);
             Length = int.MaxValue
         };
+		_logger.LogDebug("<<< Exiting PermissionConfigurationModel()");
     }
 
     #endregion

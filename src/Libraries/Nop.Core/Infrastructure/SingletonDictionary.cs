@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Infrastructure;
 
 /// <summary>
@@ -7,9 +8,12 @@
 /// <typeparam name="TValue">The type of value.</typeparam>
 public partial class SingletonDictionary<TKey, TValue> : Singleton<IDictionary<TKey, TValue>>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     static SingletonDictionary()
     {
+		_logger.LogDebug(">>> Entering SingletonDictionary()");
         Singleton<Dictionary<TKey, TValue>>.Instance = new Dictionary<TKey, TValue>();
+		_logger.LogDebug("<<< Exiting SingletonDictionary()");
     }
 
     /// <summary>

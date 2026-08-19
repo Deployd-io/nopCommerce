@@ -1,5 +1,6 @@
 ﻿using Nop.Data;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Infrastructure;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Infrastructure;
 /// </summary>
 public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -16,8 +18,10 @@ public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
     /// <param name="endpointRouteBuilder">Route builder</param>
     public virtual void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		_logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         var lang = GetLanguageRoutePattern();
 
+		_logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         //default routes
         //these routes are not generic, they are just default to map requests that don't match other patterns, 
         //but we define them here since this route provider is with the lowest priority, to allow to add additional routes before them
@@ -35,9 +39,11 @@ public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
 
         //generic routes (actually routing is processed later in SlugRouteTransformer)
         var genericCatalogPattern = $"{lang}/{{{NopRoutingDefaults.RouteValue.CatalogSeName}}}/{{{NopRoutingDefaults.RouteValue.SeName}}}";
+		_logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): genericCatalogPattern → {GenericCatalogPattern}", endpointRouteBuilder, genericCatalogPattern);
         endpointRouteBuilder.MapDynamicControllerRoute<SlugRouteTransformer>(genericCatalogPattern);
 
         var genericPattern = $"{lang}/{{{NopRoutingDefaults.RouteValue.SeName}}}";
+		_logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): genericPattern → {GenericPattern}", endpointRouteBuilder, genericPattern);
         endpointRouteBuilder.MapDynamicControllerRoute<SlugRouteTransformer>(genericPattern);
 
         //routes for not found slugs
@@ -97,6 +103,7 @@ public partial class GenericUrlRouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: NopRoutingDefaults.RouteName.Generic.ProductTag,
             pattern: genericPattern,
             defaults: new { controller = "Catalog", action = "ProductsByTag" });
+			_logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     #endregion

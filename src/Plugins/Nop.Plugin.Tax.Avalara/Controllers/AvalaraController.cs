@@ -18,6 +18,7 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
@@ -26,6 +27,7 @@ namespace Nop.Plugin.Tax.Avalara.Controllers;
 [AutoValidateAntiforgeryToken]
 public class AvalaraController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -60,19 +62,34 @@ public class AvalaraController : BasePluginController
         ISettingService settingService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext})", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext);
         _avalaraTaxManager = avalaraTaxManager;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _avalaraTaxManager → {_avalaraTaxManager}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _avalaraTaxManager);
         _avalaraTaxSettings = avalaraTaxSettings;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _avalaraTaxSettings → {_avalaraTaxSettings}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _avalaraTaxSettings);
         _currencySettings = currencySettings;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _currencySettings → {_currencySettings}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _currencySettings);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _baseAdminModelFactory → {_baseAdminModelFactory}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _baseAdminModelFactory);
         _countryService = countryService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _countryService → {_countryService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _countryService);
         _currencyService = currencyService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _currencyService → {_currencyService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _currencyService);
         _customerService = customerService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _customerService → {_customerService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _customerService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _genericAttributeService → {_genericAttributeService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _localizationService → {_localizationService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _notificationService → {_notificationService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _permissionService → {_permissionService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _settingService → {_settingService}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _settingService);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext})", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext);
+		_logger.LogDebug("AvalaraController(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},currencySettings={CurrencySettings},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _workContext → {_workContext}", avalaraTaxManager, avalaraTaxSettings, currencySettings, baseAdminModelFactory, countryService, currencyService, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _workContext);
     }
 
     #endregion
@@ -82,8 +99,10 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Configure(string testTaxResult = null)
     {
+		_logger.LogDebug(">>> Entering Configure(testTaxResult={TestTaxResult})", testTaxResult);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): customer → {Customer}", testTaxResult, customer);
         var model = new ConfigurationModel
         {
             AccountId = _avalaraTaxSettings.AccountId,
@@ -114,6 +133,7 @@ public class AvalaraController : BasePluginController
 
         //prepare available customer roles
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): availableRoles → {AvailableRoles}", testTaxResult, availableRoles);
         model.AvailableCustomerRoles = availableRoles.Select(role => new SelectListItem
         {
             Text = role.Name,
@@ -142,6 +162,7 @@ public class AvalaraController : BasePluginController
 
         //get active account companies
         var activeCompanies = model.IsConfigured ? await _avalaraTaxManager.GetAccountCompaniesAsync() : null;
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): activeCompanies → {ActiveCompanies}", testTaxResult, activeCompanies);
         if (activeCompanies?.Any() ?? false)
         {
             model.Companies = activeCompanies.OrderBy(company => company.isDefault ?? false ? 0 : 1).Select(company => new SelectListItem
@@ -152,10 +173,12 @@ public class AvalaraController : BasePluginController
         }
 
         var defaultCompanyCode = _avalaraTaxSettings.CompanyCode;
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): defaultCompanyCode → {DefaultCompanyCode}", testTaxResult, defaultCompanyCode);
         if (!model.Companies.Any())
         {
             //add the special item for 'there are no companies' with empty guid value
             var noCompaniesText = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.Company.NotExist");
+			_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): noCompaniesText → {NoCompaniesText}", testTaxResult, noCompaniesText);
             model.Companies.Add(new SelectListItem { Text = noCompaniesText, Value = Guid.Empty.ToString() });
             defaultCompanyCode = Guid.Empty.ToString();
         }
@@ -164,6 +187,10 @@ public class AvalaraController : BasePluginController
 
         //set the default company
         var selectedCompany = activeCompanies?.FirstOrDefault(company => company.companyCode.Equals(defaultCompanyCode));
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): selectedCompany → {SelectedCompany}", testTaxResult, selectedCompany);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): model.CompanyCode → {Arg1}", testTaxResult, model.CompanyCode);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): _avalaraTaxSettings.CompanyCode → {Arg1}", testTaxResult, _avalaraTaxSettings.CompanyCode);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): _avalaraTaxSettings.CompanyId → {Arg1}", testTaxResult, _avalaraTaxSettings.CompanyId);
         model.CompanyCode = defaultCompanyCode;
         _avalaraTaxSettings.CompanyCode = defaultCompanyCode;
         _avalaraTaxSettings.CompanyId = selectedCompany?.id;
@@ -171,6 +198,7 @@ public class AvalaraController : BasePluginController
 
         //display warning in case of company currency differ from the primary store currency
         var primaryCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogDebug("Configure(testTaxResult={TestTaxResult}): primaryCurrency → {PrimaryCurrency}", testTaxResult, primaryCurrency);
         if (!selectedCompany?.baseCurrencyCode?.Equals(primaryCurrency?.CurrencyCode, StringComparison.InvariantCultureIgnoreCase) ?? false)
         {
             var warning = string.Format(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.Company.Currency.Warning"),
@@ -178,6 +206,7 @@ public class AvalaraController : BasePluginController
             _notificationService.WarningNotification(warning);
         }
 
+		_logger.LogDebug("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Tax.Avalara/Views/Configuration/Configure.cshtml", model);
     }
 
@@ -216,15 +245,18 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> SaveItemClassification(ConfigurationModel model)
     {
+		_logger.LogDebug(">>> Entering SaveItemClassification(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         _avalaraTaxSettings.SelectedCountryIds = model.SelectedCountryIds.ToList();
         _avalaraTaxSettings.UseItemClassification = model.UseItemClassification;
+		_logger.LogDebug("SaveItemClassification(model={Model}): _avalaraTaxSettings.UseItemClassification → {Arg1}", model, _avalaraTaxSettings.UseItemClassification);
         await _settingService.SaveSettingAsync(_avalaraTaxSettings);
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		_logger.LogDebug("<<< Exiting SaveItemClassification(model={Model})", model);
         return await Configure();
     }
 
@@ -233,11 +265,14 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> CheckCredentials()
     {
+		_logger.LogDebug(">>> Entering CheckCredentials()");
         //verify credentials
         var credentials = await _avalaraTaxManager.PingAsync();
+		_logger.LogDebug("CheckCredentials(): credentials → {Credentials}", credentials);
         if (credentials?.authenticated ?? false)
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Configuration.Credentials.Verified");
+			_logger.LogDebug("CheckCredentials(): locale → {Locale}", locale);
             _notificationService.SuccessNotification(locale);
         }
         else
@@ -248,6 +283,7 @@ public class AvalaraController : BasePluginController
 
         //check certificate setup status
         var status = await _avalaraTaxManager.GetCertificateSetupStatusAsync();
+		_logger.LogDebug("CheckCredentials(): status → {Status}", status);
         if (status is null)
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Configuration.Certificates.NotProvisioned");
@@ -264,6 +300,7 @@ public class AvalaraController : BasePluginController
             _notificationService.SuccessNotification(locale);
         }
 
+		_logger.LogDebug("<<< Exiting CheckCredentials()");
         return await Configure();
     }
 
@@ -272,11 +309,14 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> RequestCertificateSetup()
     {
+		_logger.LogDebug(">>> Entering RequestCertificateSetup()");
         //request the certificate setup and display current status
         var status = await _avalaraTaxManager.GetCertificateSetupStatusAsync(true);
+		_logger.LogDebug("RequestCertificateSetup(): status → {Status}", status);
         if (status is null)
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Configuration.Certificates.NotProvisioned");
+			_logger.LogDebug("RequestCertificateSetup(): locale → {Locale}", locale);
             _notificationService.ErrorNotification(locale);
         }
         else if (status == false)
@@ -290,6 +330,7 @@ public class AvalaraController : BasePluginController
             _notificationService.SuccessNotification(locale);
         }
 
+		_logger.LogDebug("<<< Exiting RequestCertificateSetup()");
         return await Configure();
     }
 
@@ -298,6 +339,7 @@ public class AvalaraController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> TestTaxRequest(ConfigurationModel model)
     {
+		_logger.LogDebug(">>> Entering TestTaxRequest(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
@@ -312,6 +354,7 @@ public class AvalaraController : BasePluginController
         });
 
         var testTaxResult = string.Empty;
+		_logger.LogDebug("TestTaxRequest(model={Model}): testTaxResult → {TestTaxResult}", model, testTaxResult);
         if (transaction?.totalTax != null)
         {
             //display tax rates by jurisdictions
@@ -326,11 +369,13 @@ public class AvalaraController : BasePluginController
         else
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.TestTax.Error"));
 
+		_logger.LogDebug("<<< Exiting TestTaxRequest(model={Model})", model);
         return await Configure(testTaxResult);
     }
 
     public async Task<IActionResult> ChangeOriginAddressType(int typeId)
     {
+		_logger.LogDebug(">>> Entering ChangeOriginAddressType(typeId={TypeId})", typeId);
         var message = (TaxOriginAddressType)typeId switch
         {
             TaxOriginAddressType.ShippingOrigin => string.Format(await _localizationService
@@ -340,18 +385,22 @@ public class AvalaraController : BasePluginController
             _ => null
         };
 
+		_logger.LogDebug("<<< Exiting ChangeOriginAddressType(typeId={TypeId})", typeId);
         return Json(new { Result = message });
     }
 
     public async Task<IActionResult> ChangeEnableCertificates(bool enabled)
     {
+		_logger.LogDebug(">>> Entering ChangeEnableCertificates(enabled={Enabled})", enabled);
         var message = string.Empty;
         if (enabled)
         {
             var locale = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Fields.EnableCertificates.Warning");
+			_logger.LogDebug("ChangeEnableCertificates(enabled={Enabled}): locale → {Locale}", enabled, locale);
             message = string.Format(locale, Url.Action("CustomerUser", "Setting"));
         }
 
+		_logger.LogDebug("<<< Exiting ChangeEnableCertificates(enabled={Enabled})", enabled);
         return Json(new { Result = message });
     }
 

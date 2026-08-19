@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -10,11 +11,15 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record GdprLogSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GdprLogSearchModel()
     {
+		_logger.LogDebug(">>> Entering GdprLogSearchModel()");
         AvailableRequestTypes = new List<SelectListItem>();
+		_logger.LogDebug("GdprLogSearchModel(): AvailableRequestTypes → {AvailableRequestTypes}", AvailableRequestTypes);
+		_logger.LogDebug("<<< Exiting GdprLogSearchModel()");
     }
 
     #endregion

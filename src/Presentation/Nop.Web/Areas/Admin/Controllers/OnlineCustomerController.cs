@@ -3,11 +3,13 @@ using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class OnlineCustomerController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerModelFactory _customerModelFactory;
@@ -20,8 +22,12 @@ public partial class OnlineCustomerController : BaseAdminController
     public OnlineCustomerController(ICustomerModelFactory customerModelFactory,
         IPermissionService permissionService)
     {
+		_logger.LogDebug(">>> Entering OnlineCustomerController(customerModelFactory={CustomerModelFactory},permissionService={PermissionService})", customerModelFactory, permissionService);
         _customerModelFactory = customerModelFactory;
         _permissionService = permissionService;
+		_logger.LogDebug("OnlineCustomerController(customerModelFactory={CustomerModelFactory},permissionService={PermissionService}): _permissionService → {_permissionService}", customerModelFactory, permissionService, _permissionService);
+		_logger.LogDebug("OnlineCustomerController(customerModelFactory={CustomerModelFactory},permissionService={PermissionService}): _customerModelFactory → {_customerModelFactory}", customerModelFactory, permissionService, _customerModelFactory);
+		_logger.LogDebug("<<< Exiting OnlineCustomerController(customerModelFactory={CustomerModelFactory},permissionService={PermissionService})", customerModelFactory, permissionService);
     }
 
     #endregion
@@ -31,9 +37,13 @@ public partial class OnlineCustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _customerModelFactory.PrepareOnlineCustomerSearchModelAsync(new OnlineCustomerSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
