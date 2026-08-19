@@ -63,18 +63,31 @@ public partial class BrevoManager
         IWorkContext workContext)
     {
         _countryService = countryService;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _countryService → {_countryService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _countryService);
         _customerService = customerService;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _customerService → {_customerService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _customerService);
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _emailAccountService → {_emailAccountService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _emailAccountService);
         _languageService = languageService;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _languageService → {_languageService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _languageService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext})", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext);
         _newsLetterSubscriptionService = newsLetterSubscriptionService;
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _newsLetterSubscriptionService → {_newsLetterSubscriptionService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _newsLetterSubscriptionService);
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _nopUrlHelper → {_nopUrlHelper}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _nopUrlHelper);
         _settingService = settingService;
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _settingService → {_settingService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _settingService);
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _stateProvinceService → {_stateProvinceService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _stateProvinceService);
         _storeService = storeService;
         _webHelper = webHelper;
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _storeService → {_storeService}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _storeService);
+		_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _webHelper);
+		_logger.LogDebug("<<< Exiting BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext})", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext);
         _workContext = workContext;
     }
+	_logger.LogDebug("BrevoManager(countryService={CountryService},customerService={CustomerService},emailAccountService={EmailAccountService},languageService={LanguageService},logger={Logger},newsLetterSubscriptionService={NewsLetterSubscriptionService},nopUrlHelper={NopUrlHelper},settingService={SettingService},stateProvinceService={StateProvinceService},storeService={StoreService},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", countryService, customerService, emailAccountService, languageService, logger, newsLetterSubscriptionService, nopUrlHelper, settingService, stateProvinceService, storeService, webHelper, workContext, _workContext);
 
     #endregion
 
@@ -123,9 +136,12 @@ public partial class BrevoManager
     /// </returns>
     protected async Task<TClient> CreateApiClientAsync<TClient>(Func<Configuration, TClient> clientCtor) where TClient : IApiAccessor
     {
+		_logger.LogDebug(">>> Entering CreateApiClientAsync(clientCtor={ClientCtor})", clientCtor);
         //check whether plugin is configured to request services (validate API key)
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>();
+		_logger.LogDebug("CreateApiClientAsync(clientCtor={ClientCtor}): brevoSettings → {BrevoSettings}", clientCtor, brevoSettings);
         if (!IsConfigured(brevoSettings))
+			_logger.LogWarning("Throwing NopException from CreateApiClientAsync(clientCtor={ClientCtor})", clientCtor);
             throw new NopException("Plugin not configured");
 
         var apiConfiguration = new Configuration()
@@ -139,6 +155,7 @@ public partial class BrevoManager
             UserAgent = BrevoDefaults.UserAgent
         };
 
+		_logger.LogDebug("<<< Exiting CreateApiClientAsync(clientCtor={ClientCtor})", clientCtor);
         return clientCtor(apiConfiguration);
     }
 
@@ -165,12 +182,15 @@ public partial class BrevoManager
             List<Customer> customers = null;
             async Task<List<Customer>> getCustomersAsync()
             {
+				_logger.LogDebug(">>> Entering getCustomersAsync()");
                 customers ??= (await _customerService.GetAllCustomersAsync()).ToList();
+				_logger.LogDebug("<<< Exiting getCustomersAsync()");
                 return customers;
             }
 
             async Task<string> getNamesAsync()
             {
+				_logger.LogDebug(">>> Entering getNamesAsync()");
                 switch (await GetAccountLanguageAsync())
                 {
                     case BrevoAccountLanguage.French:
@@ -199,9 +219,11 @@ public partial class BrevoManager
                             $"{BrevoDefaults.LastNameSpanishServiceAttribute};";
 
                     default:
+							_logger.LogDebug("<<< Exiting getNamesAsync()");
                         return
                             $"{BrevoDefaults.FirstNameServiceAttribute};" +
                             $"{BrevoDefaults.LastNameServiceAttribute};";
+							_logger.LogDebug("<<< Exiting GetAccountLanguageAsync()");
                 }
             }
 
@@ -493,17 +515,21 @@ public partial class BrevoManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async System.Threading.Tasks.Task SubscribeAsync(NewsLetterSubscription subscription)
     {
+		_logger.LogDebug(">>> Entering SubscribeAsync(subscription={Subscription})", subscription);
         try
         {
             //try to get list id
             var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>();
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): brevoSettings → {BrevoSettings}", subscription, brevoSettings);
             if (!brevoSettings.SubscriptionTypeMappings.TryGetValue(subscription.TypeId, out var listId) || listId == 0)
                 return;
 
             //create API client
             var client = await CreateApiClientAsync(config => new ContactsApi(config));
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): client → {Client}", subscription, client);
 
             GetExtendedContactDetails contactObject = null;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): contactObject → {ContactObject}", subscription, contactObject);
             try
             {
                 contactObject = await client.GetContactInfoAsync(subscription.Email);
@@ -519,23 +545,39 @@ public partial class BrevoManager
 
             //prepare attributes
             var firstName = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): firstName → {FirstName}", subscription, firstName);
             var lastName = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): lastName → {LastName}", subscription, lastName);
             var phone = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): phone → {Phone}", subscription, phone);
             var sms = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): sms → {Sms}", subscription, sms);
             var countryName = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): countryName → {CountryName}", subscription, countryName);
             var gender = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): gender → {Gender}", subscription, gender);
             var dateOfBirth = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): dateOfBirth → {DateOfBirth}", subscription, dateOfBirth);
             var company = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): company → {Company}", subscription, company);
             var address1 = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): address1 → {Address1}", subscription, address1);
             var address2 = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): address2 → {Address2}", subscription, address2);
             var zipCode = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): zipCode → {ZipCode}", subscription, zipCode);
             var city = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): city → {City}", subscription, city);
             var county = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): county → {County}", subscription, county);
             var state = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): state → {State}", subscription, state);
             var fax = string.Empty;
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): fax → {Fax}", subscription, fax);
             Language language = null;
 
             var customer = await _customerService.GetCustomerByEmailAsync(subscription.Email);
+			_logger.LogDebug("SubscribeAsync(subscription={Subscription}): customer → {Customer}", subscription, customer);
             if (customer != null)
             {
                 firstName = customer.FirstName;
@@ -543,6 +585,7 @@ public partial class BrevoManager
                 phone = customer.Phone;
                 var countryId = customer.CountryId;
                 var country = await _countryService.GetCountryByIdAsync(countryId);
+				_logger.LogDebug("SubscribeAsync(subscription={Subscription}): country → {Country}", subscription, country);
                 countryName = country?.Name;
                 var countryIsoCode = country?.NumericIsoCode ?? 0;
                 if (countryIsoCode > 0 && !string.IsNullOrEmpty(phone))
@@ -612,6 +655,7 @@ public partial class BrevoManager
                 case BrevoAccountLanguage.English:
                     attributes.Add(BrevoDefaults.FirstNameServiceAttribute, firstName);
                     attributes.Add(BrevoDefaults.LastNameServiceAttribute, lastName);
+					_logger.LogDebug(">>> Entering GetAccountLanguageAsync()");
                     break;
             }
 
@@ -644,6 +688,7 @@ public partial class BrevoManager
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
         }
+		_logger.LogDebug("<<< Exiting SubscribeAsync(subscription={Subscription})", subscription);
     }
 
     /// <summary>
@@ -653,15 +698,18 @@ public partial class BrevoManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async System.Threading.Tasks.Task UnsubscribeAsync(NewsLetterSubscription subscription)
     {
+		_logger.LogDebug(">>> Entering UnsubscribeAsync(subscription={Subscription})", subscription);
         try
         {
             //try to get list id
             var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>();
+			_logger.LogDebug("UnsubscribeAsync(subscription={Subscription}): brevoSettings → {BrevoSettings}", subscription, brevoSettings);
             if (!brevoSettings.SubscriptionTypeMappings.TryGetValue(subscription.TypeId, out var listId) || listId == 0)
                 return;
 
             //create API client
             var client = await CreateApiClientAsync(config => new ContactsApi(config));
+			_logger.LogDebug("UnsubscribeAsync(subscription={Subscription}): client → {Client}", subscription, client);
 
             //update contact
             var updateContact = new UpdateContact
@@ -675,6 +723,7 @@ public partial class BrevoManager
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
         }
+		_logger.LogDebug("<<< Exiting UnsubscribeAsync(subscription={Subscription})", subscription);
     }
 
     /// <summary>
@@ -684,10 +733,13 @@ public partial class BrevoManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async System.Threading.Tasks.Task HandleWebhookAsync(Microsoft.AspNetCore.Http.HttpRequest request)
     {
+		_logger.LogDebug(">>> Entering HandleWebhookAsync(request={Request})", request);
         await HandleFunctionAsync(async () =>
         {
             using var streamReader = new StreamReader(request.Body);
+			_logger.LogDebug("HandleWebhookAsync(request={Request}): streamReader → {StreamReader}", request, streamReader);
             var requestContent = await streamReader.ReadToEndAsync();
+			_logger.LogDebug("HandleWebhookAsync(request={Request}): requestContent → {RequestContent}", request, requestContent);
 
             //parse string to JSON object
             var unsubscriber = JsonConvert
@@ -698,10 +750,12 @@ public partial class BrevoManager
 
             //get subscriptions by email
             var subscriptions = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(unsubscriber.email, isActive: true);
+			_logger.LogDebug("HandleWebhookAsync(request={Request}): subscriptions → {Subscriptions}", request, subscriptions);
             if (!subscriptions.Any())
                 return true;
 
             var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>();
+			_logger.LogDebug("HandleWebhookAsync(request={Request}): brevoSettings → {BrevoSettings}", request, brevoSettings);
             foreach (var mapping in brevoSettings.SubscriptionTypeMappings)
             {
                 var typeId = mapping.Key;
@@ -714,10 +768,12 @@ public partial class BrevoManager
 
                 //update subscription
                 subscription.Active = false;
+				_logger.LogDebug("HandleWebhookAsync(request={Request}): subscription.Active → {Arg1}", request, subscription.Active);
                 await _newsLetterSubscriptionService.UpdateNewsLetterSubscriptionAsync(subscription);
                 await _logger.InformationAsync($"{BrevoDefaults.SystemName} unsubscription: email '{subscription.Email}', subscription type #{subscription.TypeId}");
             }
 
+		_logger.LogDebug("<<< Exiting HandleWebhookAsync(request={Request})", request);
             return true;
         });
     }
@@ -731,13 +787,16 @@ public partial class BrevoManager
     /// </returns>
     public async Task<int> GetUnsubscribeWebHookIdAsync()
     {
+		_logger.LogDebug(">>> Entering GetUnsubscribeWebHookIdAsync()");
         try
         {
             //create API client
             var client = await CreateApiClientAsync(config => new WebhooksApi(config));
+			_logger.LogDebug("GetUnsubscribeWebHookIdAsync(): client → {Client}", client);
 
             //check whether webhook already exist
             var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>();
+			_logger.LogDebug("GetUnsubscribeWebHookIdAsync(): brevoSettings → {BrevoSettings}", brevoSettings);
             if (brevoSettings.UnsubscribeWebhookId != 0)
             {
                 await client.GetWebhookAsync(brevoSettings.UnsubscribeWebhookId);
@@ -746,9 +805,11 @@ public partial class BrevoManager
 
             //or create new one
             var notificationUrl = _nopUrlHelper.RouteUrl(BrevoDefaults.UnsubscribeContactRoute, null, _webHelper.GetCurrentRequestProtocol());
+			_logger.LogDebug("GetUnsubscribeWebHookIdAsync(): notificationUrl → {NotificationUrl}", notificationUrl);
             var webhook = new CreateWebhook(notificationUrl, "Unsubscribe event webhook",
                 [CreateWebhook.EventsEnum.Unsubscribed], CreateWebhook.TypeEnum.Transactional);
             var result = await client.CreateWebhookAsync(webhook);
+			_logger.LogDebug("GetUnsubscribeWebHookIdAsync(): result → {Result}", result);
 
             return (int)result.Id;
         }
@@ -756,6 +817,7 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting GetUnsubscribeWebHookIdAsync()");
             return 0;
         }
     }
@@ -767,20 +829,24 @@ public partial class BrevoManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async System.Threading.Tasks.Task UpdateContactAfterCompletingOrderAsync(Core.Domain.Orders.Order order)
     {
+		_logger.LogDebug(">>> Entering UpdateContactAfterCompletingOrderAsync(order={Order})", order);
         try
         {
             ArgumentNullException.ThrowIfNull(order);
 
             var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+			_logger.LogDebug("UpdateContactAfterCompletingOrderAsync(order={Order}): customer → {Customer}", order, customer);
             if (customer.Email is null)
                 return;
 
             //create API client
             var client = await CreateApiClientAsync(config => new ContactsApi(config));
+			_logger.LogDebug("UpdateContactAfterCompletingOrderAsync(order={Order}): client → {Client}", order, client);
 
             try
             {
                 var contactInfo = await client.GetContactInfoAsync(customer.Email);
+				_logger.LogDebug("UpdateContactAfterCompletingOrderAsync(order={Order}): contactInfo → {ContactInfo}", order, contactInfo);
             }
             catch (ApiException apiException)
             {
@@ -812,6 +878,7 @@ public partial class BrevoManager
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
         }
+		_logger.LogDebug("<<< Exiting UpdateContactAfterCompletingOrderAsync(order={Order})", order);
     }
 
     #endregion
@@ -825,7 +892,9 @@ public partial class BrevoManager
     /// <returns>Result</returns>
     public static bool IsConfigured(BrevoSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConfigured(settings={Settings})", settings);
         //API key is required to request remote services
+		_logger.LogDebug("<<< Exiting IsConfigured(settings={Settings})", settings);
         return !string.IsNullOrEmpty(settings?.ApiKey);
     }
 
@@ -874,13 +943,17 @@ public partial class BrevoManager
     /// <returns>True if partner successfully set; otherwise false</returns>
     public async Task<bool> SetPartnerAsync()
     {
+		_logger.LogDebug(">>> Entering SetPartnerAsync()");
         try
         {
             var stores = (await _storeService.GetAllStoresAsync()).ToList();
+			_logger.LogDebug("SetPartnerAsync(): stores → {Stores}", stores);
             var storeCredentials = new Dictionary<string, string>();
+			_logger.LogDebug("SetPartnerAsync(): storeCredentials → {StoreCredentials}", storeCredentials);
             foreach (var store in stores)
             {
                 var bSettings = await _settingService.LoadSettingAsync<BrevoSettings>(store.Id);
+				_logger.LogDebug("SetPartnerAsync(): bSettings → {BSettings}", bSettings);
                 var apiKey = bSettings.ApiKey;
                 if (!string.IsNullOrEmpty(apiKey) && !storeCredentials.Where(s => s.Value == apiKey).Any())
                     storeCredentials.Add(store.Url, apiKey);
@@ -899,9 +972,14 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug(">>> Entering HttpBrevoClientAsync(storeUrl={StoreUrl},apiKey=<redacted>)", storeUrl);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("HttpBrevoClientAsync(storeUrl,apiKey)={StoreUrl},{ApiKey}: external service call {StoreUrl1} took {Arg3} ms", storeUrl, apiKey, storeUrl, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting HttpBrevoClientAsync(storeUrl={StoreUrl},apiKey=<redacted>)", storeUrl);
             return false;
         }
 
+		_logger.LogDebug("<<< Exiting SetPartnerAsync()");
         return true;
 
         async System.Threading.Tasks.Task HttpBrevoClientAsync(string storeUrl, string apiKey)
@@ -933,10 +1011,14 @@ public partial class BrevoManager
             };
 
             var requestString = JsonConvert.SerializeObject(requestObject);
+			_logger.LogDebug("HttpBrevoClientAsync(storeUrl={StoreUrl},apiKey=<redacted>): requestString → {RequestString}", storeUrl, requestString);
             var requestContent = new StringContent(requestString, Encoding.Default, MimeTypes.ApplicationJson);
+			_logger.LogDebug("HttpBrevoClientAsync(storeUrl={StoreUrl},apiKey=<redacted>): requestContent → {RequestContent}", storeUrl, requestContent);
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "partner/information") { Content = requestContent };
+			_logger.LogDebug("HttpBrevoClientAsync(storeUrl={StoreUrl},apiKey=<redacted>): requestMessage → {RequestMessage}", storeUrl, requestMessage);
 
             var httpResponse = await httpClient.SendAsync(requestMessage);
+			_logger.LogDebug("HttpBrevoClientAsync(storeUrl={StoreUrl},apiKey=<redacted>): httpResponse → {HttpResponse}", storeUrl, httpResponse);
             httpResponse.EnsureSuccessStatusCode();
         }
     }
@@ -1026,13 +1108,17 @@ public partial class BrevoManager
     /// </returns>
     public async Task<BrevoAccountLanguage> GetAccountLanguageAsync()
     {
+		_logger.LogDebug(">>> Entering GetAccountLanguageAsync()");
         try
         {
             //create API client
             var client = await CreateApiClientAsync(config => new ContactsApi(config));
+			_logger.LogDebug("GetAccountLanguageAsync(): client → {Client}", client);
 
             var attributes = await client.GetAttributesAsync();
+			_logger.LogDebug("GetAccountLanguageAsync(): attributes → {Attributes}", attributes);
             var allAttribytes = attributes.Attributes.Select(s => s.Name).ToList();
+			_logger.LogDebug("GetAccountLanguageAsync(): allAttribytes → {AllAttribytes}", allAttribytes);
 
             var defaultNameAttributes = new List<string>
             {
@@ -1090,6 +1176,7 @@ public partial class BrevoManager
             };
             //create attributes that are not already on account
             var newAttributes = new List<(CategoryEnum category, string Name, string Value, CreateAttribute.TypeEnum? Type)>();
+			_logger.LogDebug("GetAccountLanguageAsync(): newAttributes → {NewAttributes}", newAttributes);
             foreach (var attribute in initialAttributes)
             {
                 if (!allAttribytes.Contains(attribute.Name))
@@ -1104,6 +1191,8 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting GetAccountLanguageAsync()");
+			_logger.LogDebug("<<< Exiting CreateAttributesAsync(attributes={Attributes})", attributes);
             return BrevoAccountLanguage.English;
         }
     }
@@ -1117,13 +1206,17 @@ public partial class BrevoManager
     /// </returns>
     public async Task<string> PrepareAttributesAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareAttributesAsync()");
         try
         {
             //create API client
             var client = await CreateApiClientAsync(config => new ContactsApi(config));
+			_logger.LogDebug("PrepareAttributesAsync(): client → {Client}", client);
 
             var attributes = await client.GetAttributesAsync();
+			_logger.LogDebug("PrepareAttributesAsync(): attributes → {Attributes}", attributes);
             var attributeNames = attributes.Attributes.Select(s => s.Name).ToList();
+			_logger.LogDebug("PrepareAttributesAsync(): attributeNames → {AttributeNames}", attributeNames);
 
             //prepare attributes to create
             var initialAttributes = new List<(CategoryEnum category, string Name, string Value, CreateAttribute.TypeEnum? Type)>
@@ -1156,6 +1249,7 @@ public partial class BrevoManager
 
             //create attributes that are not already on account
             var newAttributes = new List<(CategoryEnum category, string Name, string Value, CreateAttribute.TypeEnum? Type)>();
+			_logger.LogDebug("PrepareAttributesAsync(): newAttributes → {NewAttributes}", newAttributes);
             foreach (var attribute in initialAttributes)
             {
                 if (!attributeNames.Contains(attribute.Name))
@@ -1168,6 +1262,7 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting PrepareAttributesAsync()");
             return exception.Message;
         }
     }
@@ -1182,18 +1277,22 @@ public partial class BrevoManager
     /// </returns>
     public async Task<string> PrepareTransactionalAttributesAsync(IList<string> tokens)
     {
+		_logger.LogDebug(">>> Entering PrepareTransactionalAttributesAsync(tokens=<redacted>)");
         try
         {
             //create API client
             var client = await CreateApiClientAsync(config => new ContactsApi(config));
+			_logger.LogDebug("PrepareTransactionalAttributesAsync(tokens=<redacted>): client → {Client}", client);
 
             //get already existing transactional attributes
             var attributes = await client.GetAttributesAsync();
+			_logger.LogDebug("PrepareTransactionalAttributesAsync(tokens=<redacted>): attributes → {Attributes}", attributes);
             var transactionalAttributes = attributes.Attributes
                 .Where(attribute => attribute.Category == CategoryEnum.Transactional).ToList();
 
             //bring tokens to attributes format
             tokens = tokens.Select(token => token.Replace("%", "").Replace(".", "_").Replace("(s)", "-s-").ToUpperInvariant()).ToList();
+			_logger.LogDebug("PrepareTransactionalAttributesAsync(tokens=<redacted>): tokens → {Tokens1}", tokens);
 
             //get attributes that are not already on account
             tokens = tokens.Except(transactionalAttributes.Select(attribute => attribute.Name)).ToList();
@@ -1202,6 +1301,7 @@ public partial class BrevoManager
 
             //prepare attributes to create
             var newAttributes = new List<(CategoryEnum category, string Name, string Value, CreateAttribute.TypeEnum? Type)>();
+			_logger.LogDebug("PrepareTransactionalAttributesAsync(tokens=<redacted>): newAttributes → {NewAttributes}", newAttributes);
             foreach (var token in tokens)
             {
                 newAttributes.Add((CategoryEnum.Transactional, token, null, CreateAttribute.TypeEnum.Text));
@@ -1213,6 +1313,7 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting PrepareTransactionalAttributesAsync(tokens=<redacted>)");
             return exception.Message;
         }
     }
@@ -1316,10 +1417,12 @@ public partial class BrevoManager
     /// </returns>
     public async Task<int?> GetTemplateIdAsync(int? templateId, MessageTemplate message, EmailAccount emailAccount)
     {
+		_logger.LogDebug(">>> Entering GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount})", templateId, message, emailAccount);
         try
         {
             //create API client
             var client = await CreateApiClientAsync(config => new TransactionalEmailsApi(config));
+			_logger.LogDebug("GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount}): client → {Client}", templateId, message, emailAccount, client);
 
             //check whether email template already exists
             if (templateId > 0)
@@ -1330,18 +1433,22 @@ public partial class BrevoManager
 
             //or create new one
             if (emailAccount == null)
+				_logger.LogWarning("Throwing NopException from GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount})", templateId, message, emailAccount);
                 throw new NopException("Email account not configured");
 
             //the original body and subject of the email template are the same as that of the message template
             var body = message.Body.Replace("%if", "\"if\"").Replace("endif%", "\"endif\"");
+			_logger.LogDebug("GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount}): body → {Body}", templateId, message, emailAccount, body);
             body = SpecialCharRegex().Replace(body, x => $"{{{{ params.{x.ToString().Replace("%", "").Replace(".", "_").ToUpperInvariant()} }}}}");
             var subject = message.Subject.Replace("%if", "\"if\"").Replace("endif%", "\"endif\"");
+			_logger.LogDebug("GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount}): subject → {Subject}", templateId, message, emailAccount, subject);
             subject = SpecialCharRegex().Replace(subject, x => $"{{{{ params.{x.ToString().Replace("%", "").Replace(".", "_").ToUpperInvariant()} }}}}");
 
             //create email template
             var createSmtpTemplate = new CreateSmtpTemplate(sender: new CreateSmtpTemplateSender(emailAccount.DisplayName, emailAccount.Email),
                 templateName: message.Name, htmlContent: body, subject: subject, isActive: true);
             var emailTemplate = await client.CreateSmtpTemplateAsync(createSmtpTemplate);
+			_logger.LogDebug("GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount}): emailTemplate → {EmailTemplate}", templateId, message, emailAccount, emailTemplate);
 
             return (int?)emailTemplate.Id;
         }
@@ -1349,6 +1456,7 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting GetTemplateIdAsync(templateId={TemplateId},message={Message},emailAccount={EmailAccount})", templateId, message, emailAccount);
             return null;
         }
     }
@@ -1363,21 +1471,27 @@ public partial class BrevoManager
     /// </returns>
     public async Task<QueuedEmail> GetQueuedEmailFromTemplateAsync(int templateId)
     {
+		_logger.LogDebug(">>> Entering GetQueuedEmailFromTemplateAsync(templateId={TemplateId})", templateId);
         try
         {
             //create API client
             var client = await CreateApiClientAsync(config => new TransactionalEmailsApi(config));
+			_logger.LogDebug("GetQueuedEmailFromTemplateAsync(templateId={TemplateId}): client → {Client}", templateId, client);
 
             if (templateId == 0)
+				_logger.LogWarning("Throwing NopException from GetQueuedEmailFromTemplateAsync(templateId={TemplateId})", templateId);
                 throw new NopException("Message template is empty");
 
             //get template
             var template = await client.GetSmtpTemplateAsync(templateId);
+			_logger.LogDebug("GetQueuedEmailFromTemplateAsync(templateId={TemplateId}): template → {Template}", templateId, template);
 
             //bring attributes to tokens format
             var subject = ParamsRegex().Replace(template.Subject, x => $"%{x.ToString().Replace("{", "").Replace("}", "").Replace("params.", "").Replace("_", ".").Trim()}%");
+			_logger.LogDebug("GetQueuedEmailFromTemplateAsync(templateId={TemplateId}): subject → {Subject}", templateId, subject);
             subject = subject.Replace("\"if\"", "%if").Replace("\"endif\"", "endif%");
             var body = ParamsRegex().Replace(template.HtmlContent, x => $"%{x.ToString().Replace("{", "").Replace("}", "").Replace("params.", "").Replace("_", ".").Trim()}%");
+			_logger.LogDebug("GetQueuedEmailFromTemplateAsync(templateId={TemplateId}): body → {Body}", templateId, body);
             body = body.Replace("\"if\"", "%if").Replace("\"endif\"", "endif%");
 
             //map template to queued email
@@ -1393,6 +1507,7 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo email sending error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+			_logger.LogDebug("<<< Exiting GetQueuedEmailFromTemplateAsync(templateId={TemplateId})", templateId);
             return null;
         }
     }
@@ -1410,8 +1525,10 @@ public partial class BrevoManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async System.Threading.Tasks.Task SendSMSAsync(string to, string from, string text)
     {
+		_logger.LogDebug(">>> Entering SendSMSAsync(to={To},from={From},text={Text})", to, from, text);
         //whether SMS notifications enabled
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>();
+		_logger.LogDebug("SendSMSAsync(to={To},from={From},text={Text}): brevoSettings → {BrevoSettings}", to, from, text, brevoSettings);
         if (!brevoSettings.UseSmsNotifications)
             return;
 
@@ -1419,16 +1536,20 @@ public partial class BrevoManager
         {
             //check number and text
             if (string.IsNullOrEmpty(to) || string.IsNullOrEmpty(text))
+				_logger.LogWarning("Throwing NopException from SendSMSAsync(to={To},from={From},text={Text})", to, from, text);
                 throw new NopException("Phone number or SMS text is empty");
 
             //create API client
             var client = await CreateApiClientAsync(config => new TransactionalSMSApi(config));
+			_logger.LogDebug("SendSMSAsync(to={To},from={From},text={Text}): client → {Client}", to, from, text, client);
 
             //create SMS data
             var transactionalSms = new SendTransacSms(sender: from, recipient: to, content: text, type: SendTransacSms.TypeEnum.Transactional);
+			_logger.LogDebug("SendSMSAsync(to={To},from={From},text={Text}): transactionalSms → {TransactionalSms}", to, from, text, transactionalSms);
 
             //send SMS
             var sms = await client.SendTransacSmsAsync(transactionalSms);
+			_logger.LogDebug("SendSMSAsync(to={To},from={From},text={Text}): sms → {Sms}", to, from, text, sms);
             await _logger.InformationAsync($"Brevo SMS sent: {sms?.Reference ?? $"credits remaining {sms?.RemainingCredits?.ToString()}"}");
         }
         catch (Exception exception)
@@ -1436,6 +1557,7 @@ public partial class BrevoManager
             //log full error
             await _logger.ErrorAsync($"Brevo SMS sending error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
         }
+		_logger.LogDebug("<<< Exiting SendSMSAsync(to={To},from={From},text={Text})", to, from, text);
     }
 
     /// <summary>
@@ -1447,14 +1569,17 @@ public partial class BrevoManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> SendSMSCampaignAsync(int listId, string from, string text)
     {
+		_logger.LogDebug(">>> Entering SendSMSCampaignAsync(listId={ListId},from={From},text={Text})", listId, from, text);
         try
         {
             //check list and text
             if (listId == 0 || string.IsNullOrEmpty(text) || string.IsNullOrEmpty(from))
+				_logger.LogWarning("Throwing NopException from SendSMSCampaignAsync(listId={ListId},from={From},text={Text})", listId, from, text);
                 throw new NopException("List or SMS text or sender name is empty");
 
             //create API client
             var client = await CreateApiClientAsync(config => new SMSCampaignsApi(config));
+			_logger.LogDebug("SendSMSCampaignAsync(listId={ListId},from={From},text={Text}): client → {Client}", listId, from, text, client);
 
             //create SMS campaign
             var campaign = await client.CreateSmsCampaignAsync(new CreateSmsCampaign(name: CommonHelper.EnsureMaximumLength(text, 20),
@@ -1467,6 +1592,7 @@ public partial class BrevoManager
         {
             //log full error
             await _logger.ErrorAsync($"Brevo SMS sending error: {exception.Message}.", exception, await _workContext.GetCurrentCustomerAsync());
+		_logger.LogDebug("<<< Exiting SendSMSCampaignAsync(listId={ListId},from={From},text={Text})", listId, from, text);
             return exception.Message;
         }
 

@@ -11,6 +11,7 @@ using Nop.Services.Html;
 using Nop.Services.Localization;
 using Nop.Services.Media;
 using Nop.Services.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -19,6 +20,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeParser<CheckoutAttribute, CheckoutAttributeValue> _checkoutAttributeParser;
@@ -47,16 +49,28 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
         IWebHelper webHelper,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext})", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext);
         _checkoutAttributeParser = checkoutAttributeParser;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _checkoutAttributeParser → {_checkoutAttributeParser}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _checkoutAttributeParser);
         _checkoutAttributeService = checkoutAttributeService;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _checkoutAttributeService → {_checkoutAttributeService}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _checkoutAttributeService);
         _currencyService = currencyService;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _currencyService → {_currencyService}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _currencyService);
         _downloadService = downloadService;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _downloadService → {_downloadService}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _downloadService);
         _htmlFormatter = htmlFormatter;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _htmlFormatter → {_htmlFormatter}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _htmlFormatter);
         _localizationService = localizationService;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _localizationService → {_localizationService}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _localizationService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _priceFormatter → {_priceFormatter}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _priceFormatter);
         _taxService = taxService;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _taxService → {_taxService}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _taxService);
         _webHelper = webHelper;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _webHelper);
         _workContext = workContext;
+		_logger.LogDebug("CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext, _workContext);
+		_logger.LogDebug("<<< Exiting CheckoutAttributeFormatter(checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},currencyService={CurrencyService},downloadService={DownloadService},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},priceFormatter={PriceFormatter},taxService={TaxService},webHelper={WebHelper},workContext={WorkContext})", checkoutAttributeParser, checkoutAttributeService, currencyService, downloadService, htmlFormatter, localizationService, priceFormatter, taxService, webHelper, workContext);
     }
 
     #endregion
@@ -83,17 +97,23 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
         bool renderPrices = true,
         bool allowHyperlinks = true)
     {
+		_logger.LogDebug(">>> Entering FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks})", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks);
         var result = new StringBuilder();
+		_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): result → {Result}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, result);
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): currentLanguage → {CurrentLanguage}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, currentLanguage);
         var attributes = await _checkoutAttributeParser.ParseAttributesAsync(attributesXml);
+		_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): attributes → {Attributes}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, attributes);
         for (var i = 0; i < attributes.Count; i++)
         {
             var attribute = attributes[i];
             var valuesStr = _checkoutAttributeParser.ParseValues(attributesXml, attribute.Id);
+			_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): valuesStr → {ValuesStr}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, valuesStr);
             for (var j = 0; j < valuesStr.Count; j++)
             {
                 var valueStr = valuesStr[j];
                 var formattedAttribute = string.Empty;
+				_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): formattedAttribute → {FormattedAttribute}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, formattedAttribute);
                 if (!attribute.ShouldHaveValues)
                 {
                     //no values
@@ -101,6 +121,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                     {
                         //multiline textbox
                         var attributeName = await _localizationService.GetLocalizedAsync(attribute, a => a.Name, currentLanguage.Id);
+						_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): attributeName → {AttributeName}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, attributeName);
                         //encode (if required)
                         if (htmlEncode)
                             attributeName = WebUtility.HtmlEncode(attributeName);
@@ -111,11 +132,14 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                     {
                         //file upload
                         _ = Guid.TryParse(valueStr, out var downloadGuid);
+						_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): _ → {_}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, _);
                         var download = await _downloadService.GetDownloadByGuidAsync(downloadGuid);
+						_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): download → {Download}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, download);
                         if (download != null)
                         {
                             string attributeText;
                             var fileName = $"{download.Filename ?? download.DownloadGuid.ToString()}{download.Extension}";
+							_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): fileName → {FileName}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, fileName);
                             //encode (if required)
                             if (htmlEncode)
                                 fileName = WebUtility.HtmlEncode(fileName);
@@ -123,6 +147,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                             {
                                 //hyperlinks are allowed
                                 var downloadLink = $"{_webHelper.GetStoreLocation()}download/getfileupload/?downloadId={download.DownloadGuid}";
+								_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): downloadLink → {DownloadLink}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, downloadLink);
                                 attributeText = $"<a href=\"{downloadLink}\" class=\"fileuploadattribute\">{fileName}</a>";
                             }
                             else
@@ -152,6 +177,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                     if (int.TryParse(valueStr, out var attributeValueId))
                     {
                         var attributeValue = await _checkoutAttributeService.GetAttributeValueByIdAsync(attributeValueId);
+						_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): attributeValue → {AttributeValue}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, attributeValue);
 
                         if (attributeValue != null)
                         {
@@ -159,7 +185,9 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
                             if (renderPrices)
                             {
                                 var priceAdjustmentBase = (await _taxService.GetCheckoutAttributePriceAsync(attribute, attributeValue, customer)).price;
+								_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): priceAdjustmentBase → {PriceAdjustmentBase}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, priceAdjustmentBase);
                                 var priceAdjustment = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(priceAdjustmentBase, await _workContext.GetWorkingCurrencyAsync());
+								_logger.LogDebug("FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks}): priceAdjustment → {PriceAdjustment}", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks, priceAdjustment);
                                 if (priceAdjustmentBase > 0)
                                 {
                                     formattedAttribute += string.Format(
@@ -184,6 +212,7 @@ public partial class CheckoutAttributeFormatter : ICheckoutAttributeFormatter
             }
         }
 
+		_logger.LogDebug("<<< Exiting FormatAttributesAsync(attributesXml={AttributesXml},customer={Customer},separator={Separator},htmlEncode={HtmlEncode},renderPrices={RenderPrices},allowHyperlinks={AllowHyperlinks})", attributesXml, customer, separator, htmlEncode, renderPrices, allowHyperlinks);
         return result.ToString();
     }
 

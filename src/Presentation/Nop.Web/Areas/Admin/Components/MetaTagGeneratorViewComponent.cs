@@ -2,6 +2,7 @@
 using Nop.Core.Domain.ArtificialIntelligence;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Components;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Components;
 /// </summary>
 public partial class MetaTagsGeneratorViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Filds
 
     protected readonly ArtificialIntelligenceSettings _artificialIntelligenceSettings;
@@ -20,7 +22,10 @@ public partial class MetaTagsGeneratorViewComponent : NopViewComponent
 
     public MetaTagsGeneratorViewComponent(ArtificialIntelligenceSettings artificialIntelligenceSettings)
     {
+		_logger.LogDebug(">>> Entering MetaTagsGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings})", artificialIntelligenceSettings);
         _artificialIntelligenceSettings = artificialIntelligenceSettings;
+		_logger.LogDebug("MetaTagsGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings}): _artificialIntelligenceSettings → {_artificialIntelligenceSettings}", artificialIntelligenceSettings, _artificialIntelligenceSettings);
+		_logger.LogDebug("<<< Exiting MetaTagsGeneratorViewComponent(artificialIntelligenceSettings={ArtificialIntelligenceSettings})", artificialIntelligenceSettings);
     }
 
     #endregion
@@ -29,6 +34,7 @@ public partial class MetaTagsGeneratorViewComponent : NopViewComponent
 
     public IViewComponentResult Invoke(MetaTagsGeneratorModel model)
     {
+		_logger.LogDebug(">>> Entering Invoke(model={Model})", model);
         if (!_artificialIntelligenceSettings.Enabled)
             return Content(string.Empty);
 
@@ -36,6 +42,7 @@ public partial class MetaTagsGeneratorViewComponent : NopViewComponent
             !_artificialIntelligenceSettings.AllowMetaKeywordsGeneration &&
             !_artificialIntelligenceSettings.AllowMetaDescriptionGeneration)
         {
+		_logger.LogDebug("<<< Exiting Invoke(model={Model})", model);
             return Content(string.Empty);
         }
 

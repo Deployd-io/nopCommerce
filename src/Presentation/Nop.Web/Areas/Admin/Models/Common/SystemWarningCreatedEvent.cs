@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Areas.Admin.Models.Common;
 
 /// <summary>
@@ -5,11 +6,15 @@
 /// </summary>
 public partial class SystemWarningCreatedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public SystemWarningCreatedEvent()
     {
+		_logger.LogDebug(">>> Entering SystemWarningCreatedEvent()");
         SystemWarnings = new List<SystemWarningModel>();
+		_logger.LogDebug("SystemWarningCreatedEvent(): SystemWarnings → {SystemWarnings}", SystemWarnings);
+		_logger.LogDebug("<<< Exiting SystemWarningCreatedEvent()");
     }
 
     #endregion

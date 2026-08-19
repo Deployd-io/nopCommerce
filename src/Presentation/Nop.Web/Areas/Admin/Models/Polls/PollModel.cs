@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Polls;
 
@@ -10,14 +11,21 @@ namespace Nop.Web.Areas.Admin.Models.Polls;
 /// </summary>
 public partial record PollModel : BaseNopEntityModel, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PollModel()
     {
+		_logger.LogDebug(">>> Entering PollModel()");
         AvailableLanguages = new List<SelectListItem>();
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("PollModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("PollModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("PollModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         PollAnswerSearchModel = new PollAnswerSearchModel();
+		_logger.LogDebug("PollModel(): PollAnswerSearchModel → {PollAnswerSearchModel}", PollAnswerSearchModel);
+		_logger.LogDebug("<<< Exiting PollModel()");
     }
 
     #endregion

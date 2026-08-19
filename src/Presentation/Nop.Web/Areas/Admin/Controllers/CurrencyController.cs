@@ -13,11 +13,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CurrencyController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -44,15 +46,26 @@ public partial class CurrencyController : BaseAdminController
         ISettingService settingService,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>)", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService);
         _currencySettings = currencySettings;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _currencySettings → {_currencySettings}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _currencySettings);
         _currencyModelFactory = currencyModelFactory;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _currencyModelFactory → {_currencyModelFactory}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _currencyModelFactory);
         _currencyService = currencyService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _currencyService → {_currencyService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _currencyService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _customerActivityService → {_customerActivityService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _customerActivityService);
         _localizationService = localizationService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _localizationService → {_localizationService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _localizedEntityService → {_localizedEntityService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _notificationService → {_notificationService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _notificationService);
         _settingService = settingService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _settingService → {_settingService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _settingService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>): _storeMappingService → {_storeMappingService}", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService, _storeMappingService);
+		_logger.LogDebug("<<< Exiting CurrencyController(currencySettings={CurrencySettings},currencyModelFactory={CurrencyModelFactory},currencyService={CurrencyService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},settingService={SettingService},storeMappingService=<redacted>)", currencySettings, currencyModelFactory, currencyService, customerActivityService, localizationService, localizedEntityService, notificationService, settingService);
     }
 
     #endregion
@@ -61,10 +74,12 @@ public partial class CurrencyController : BaseAdminController
 
     protected virtual async Task UpdateLocalesAsync(Currency currency, CurrencyModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalesAsync(currency={Currency},model={Model})", currency, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(currency, x => x.Name, localized.Name, localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateLocalesAsync(currency={Currency},model={Model})", currency, model);
     }
 
     #endregion
@@ -73,14 +88,18 @@ public partial class CurrencyController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
+		_logger.LogDebug("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> List(bool liveRates = false)
     {
+		_logger.LogDebug(">>> Entering List(liveRates={LiveRates})", liveRates);
         var model = new CurrencySearchModel();
 
+		_logger.LogDebug("List(liveRates={LiveRates}): model → {Model}", liveRates, model);
         try
         {
             //prepare model
@@ -88,9 +107,11 @@ public partial class CurrencyController : BaseAdminController
         }
         catch (Exception e)
         {
+			_logger.LogError("Exception in List(liveRates={LiveRates}): {Arg1}", liveRates, e.Message);
             await _notificationService.ErrorNotificationAsync(e);
         }
 
+		_logger.LogDebug("<<< Exiting List(model={Model})", model);
         return View(model);
     }
 
@@ -110,9 +131,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> ListGrid(CurrencySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ListGrid(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _currencyModelFactory.PrepareCurrencyListModelAsync(searchModel);
+		_logger.LogDebug("ListGrid(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ListGrid(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -120,17 +144,22 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> ApplyRates(IEnumerable<CurrencyExchangeRateModel> rateModels)
     {
+		_logger.LogDebug(">>> Entering ApplyRates(rateModels={RateModels})", rateModels);
         foreach (var rate in rateModels)
         {
             var currency = await _currencyService.GetCurrencyByCodeAsync(rate.CurrencyCode);
+			_logger.LogDebug("ApplyRates(rateModels={RateModels}): currency → {Currency}", rateModels, currency);
             if (currency == null)
                 continue;
 
             currency.Rate = rate.Rate;
+			_logger.LogDebug("ApplyRates(rateModels={RateModels}): currency.Rate → {Arg1}", rateModels, currency.Rate);
+			_logger.LogDebug("ApplyRates(rateModels={RateModels}): currency.UpdatedOnUtc → {Arg1}", rateModels, currency.UpdatedOnUtc);
             currency.UpdatedOnUtc = DateTime.UtcNow;
             await _currencyService.UpdateCurrencyAsync(currency);
         }
 
+		_logger.LogDebug("<<< Exiting ApplyRates(rateModels={RateModels})", rateModels);
         return Json(new { result = true });
     }
 
@@ -138,9 +167,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> MarkAsPrimaryExchangeRateCurrency(int id)
     {
+		_logger.LogDebug(">>> Entering MarkAsPrimaryExchangeRateCurrency(id={Id})", id);
         _currencySettings.PrimaryExchangeRateCurrencyId = id;
         await _settingService.SaveSettingAsync(_currencySettings);
+		_logger.LogDebug("MarkAsPrimaryExchangeRateCurrency(id={Id}): _currencySettings.PrimaryExchangeRateCurrencyId → {Arg1}", id, _currencySettings.PrimaryExchangeRateCurrencyId);
 
+		_logger.LogDebug("<<< Exiting MarkAsPrimaryExchangeRateCurrency(id={Id})", id);
         return Json(new { result = true });
     }
 
@@ -148,9 +180,12 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> MarkAsPrimaryStoreCurrency(int id)
     {
+		_logger.LogDebug(">>> Entering MarkAsPrimaryStoreCurrency(id={Id})", id);
         _currencySettings.PrimaryStoreCurrencyId = id;
         await _settingService.SaveSettingAsync(_currencySettings);
+		_logger.LogDebug("MarkAsPrimaryStoreCurrency(id={Id}): _currencySettings.PrimaryStoreCurrencyId → {Arg1}", id, _currencySettings.PrimaryStoreCurrencyId);
 
+		_logger.LogDebug("<<< Exiting MarkAsPrimaryStoreCurrency(id={Id})", id);
         return Json(new { result = true });
     }
 
@@ -161,9 +196,13 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _currencyModelFactory.PrepareCurrencyModelAsync(new CurrencyModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -206,14 +245,19 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a currency with the specified id
         var currency = await _currencyService.GetCurrencyByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): currency → {Currency}", id, currency);
         if (currency == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _currencyModelFactory.PrepareCurrencyModelAsync(null, currency);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -269,14 +313,17 @@ public partial class CurrencyController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_CURRENCIES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a currency with the specified id
         var currency = await _currencyService.GetCurrencyByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): currency → {Currency}", id, currency);
         if (currency == null)
             return RedirectToAction("List");
 
         try
         {
             if (currency.Id == _currencySettings.PrimaryStoreCurrencyId)
+				_logger.LogWarning("Throwing NopException from Delete(id={Id})", id);
                 throw new NopException(await _localizationService.GetResourceAsync("Admin.Configuration.Currencies.CantDeletePrimary"));
 
             if (currency.Id == _currencySettings.PrimaryExchangeRateCurrencyId)
@@ -284,6 +331,7 @@ public partial class CurrencyController : BaseAdminController
 
             //ensure we have at least one published currency
             var allCurrencies = await _currencyService.GetAllCurrenciesAsync();
+			_logger.LogDebug("Delete(id={Id}): allCurrencies → {AllCurrencies}", id, allCurrencies);
             if (allCurrencies.Count == 1 && allCurrencies[0].Id == currency.Id)
             {
                 _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Currencies.PublishedCurrencyRequired"));
@@ -302,7 +350,9 @@ public partial class CurrencyController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, exc.getMessage());
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = currency.Id });
         }
     }

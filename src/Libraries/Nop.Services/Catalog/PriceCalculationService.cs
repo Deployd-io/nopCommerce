@@ -7,6 +7,7 @@ using Nop.Core.Domain.Stores;
 using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Discounts;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -15,6 +16,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class PriceCalculationService : IPriceCalculationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -43,16 +45,28 @@ public partial class PriceCalculationService : IPriceCalculationService
         IProductService productService,
         IStaticCacheManager staticCacheManager)
     {
+		_logger.LogDebug(">>> Entering PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager})", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _catalogSettings → {_catalogSettings}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _catalogSettings);
         _currencySettings = currencySettings;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _currencySettings → {_currencySettings}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _currencySettings);
         _categoryService = categoryService;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _categoryService → {_categoryService}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _categoryService);
         _currencyService = currencyService;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _currencyService → {_currencyService}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _currencyService);
         _customerService = customerService;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _customerService → {_customerService}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _customerService);
         _discountService = discountService;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _discountService → {_discountService}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _discountService);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _manufacturerService → {_manufacturerService}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _manufacturerService);
         _productAttributeParser = productAttributeParser;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _productAttributeParser → {_productAttributeParser}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _productAttributeParser);
         _productService = productService;
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _productService → {_productService}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _productService);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("<<< Exiting PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager})", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager);
+		_logger.LogDebug("PriceCalculationService(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},categoryService={CategoryService},currencyService={CurrencyService},customerService={CustomerService},discountService={DiscountService},manufacturerService={ManufacturerService},productAttributeParser={ProductAttributeParser},productService={ProductService},staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", catalogSettings, currencySettings, categoryService, currencyService, customerService, discountService, manufacturerService, productAttributeParser, productService, staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -70,17 +84,20 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAppliedToProductAsync(Product product, Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
             return allowedDiscounts;
 
         var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
+		_logger.LogDebug("GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer}): couponCodesToValidate → {CouponCodesToValidate}", product, customer, couponCodesToValidate);
 
         foreach (var discount in await _discountService.GetAppliedDiscountsAsync(product))
             if (discount.DiscountType == DiscountType.AssignedToSkus &&
                 (await _discountService.ValidateDiscountAsync(discount, customer, couponCodesToValidate)).IsValid)
                 allowedDiscounts.Add(discount);
 
+		_logger.LogDebug("<<< Exiting GetAllowedDiscountsAppliedToProductAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -95,6 +112,7 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAppliedToCategoriesAsync(Product product, Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
             return allowedDiscounts;
@@ -104,9 +122,11 @@ public partial class PriceCalculationService : IPriceCalculationService
         {
             //load identifier of categories with this discount applied to
             var discountCategoryIds = await _categoryService.GetAppliedCategoryIdsAsync(discount, customer);
+			_logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): discountCategoryIds → {DiscountCategoryIds}", product, customer, discountCategoryIds);
 
             //compare with categories of this product
             var productCategoryIds = new List<int>();
+			_logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): productCategoryIds → {ProductCategoryIds}", product, customer, productCategoryIds);
             if (discountCategoryIds.Any())
             {
                 productCategoryIds = (await _categoryService
@@ -116,6 +136,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
 
             var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
+			_logger.LogDebug("GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer}): couponCodesToValidate → {CouponCodesToValidate}", product, customer, couponCodesToValidate);
 
             foreach (var categoryId in productCategoryIds)
             {
@@ -128,6 +149,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetAllowedDiscountsAppliedToCategoriesAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -142,6 +164,7 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAppliedToManufacturersAsync(Product product, Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
             return allowedDiscounts;
@@ -150,9 +173,11 @@ public partial class PriceCalculationService : IPriceCalculationService
         {
             //load identifier of manufacturers with this discount applied to
             var discountManufacturerIds = await _manufacturerService.GetAppliedManufacturerIdsAsync(discount, customer);
+			_logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): discountManufacturerIds → {DiscountManufacturerIds}", product, customer, discountManufacturerIds);
 
             //compare with manufacturers of this product
             var productManufacturerIds = new List<int>();
+			_logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): productManufacturerIds → {ProductManufacturerIds}", product, customer, productManufacturerIds);
             if (discountManufacturerIds.Any())
             {
                 productManufacturerIds =
@@ -163,6 +188,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
 
             var couponCodesToValidate = await _customerService.ParseAppliedDiscountCouponCodesAsync(customer);
+			_logger.LogDebug("GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer}): couponCodesToValidate → {CouponCodesToValidate}", product, customer, couponCodesToValidate);
 
             foreach (var manufacturerId in productManufacturerIds)
             {
@@ -175,6 +201,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetAllowedDiscountsAppliedToManufacturersAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -189,6 +216,7 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     protected virtual async Task<IList<Discount>> GetAllowedDiscountsAsync(Product product, Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetAllowedDiscountsAsync(product={Product},customer={Customer})", product, customer);
         var allowedDiscounts = new List<Discount>();
         if (_catalogSettings.IgnoreDiscounts)
             return allowedDiscounts;
@@ -208,6 +236,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             if (!_discountService.ContainsDiscount(allowedDiscounts, discount))
                 allowedDiscounts.Add(discount);
 
+		_logger.LogDebug("<<< Exiting GetAllowedDiscountsAsync(product={Product},customer={Customer})", product, customer);
         return allowedDiscounts;
     }
 
@@ -413,10 +442,12 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     public virtual async Task<decimal> GetProductCostAsync(Product product, string attributesXml)
     {
+		_logger.LogDebug(">>> Entering GetProductCostAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         ArgumentNullException.ThrowIfNull(product);
 
         var cost = product.ProductCost;
         var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(attributesXml);
+		_logger.LogDebug("GetProductCostAsync(product={Product},attributesXml={AttributesXml}): attributeValues → {AttributeValues}", product, attributesXml, attributeValues);
         foreach (var attributeValue in attributeValues)
         {
             switch (attributeValue.AttributeValueType)
@@ -428,6 +459,7 @@ public partial class PriceCalculationService : IPriceCalculationService
                 case AttributeValueType.AssociatedToProduct:
                     //bundled product
                     var associatedProduct = await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId);
+					_logger.LogDebug("GetProductCostAsync(product={Product},attributesXml={AttributesXml}): associatedProduct → {AssociatedProduct}", product, attributesXml, associatedProduct);
                     if (associatedProduct != null)
                         cost += associatedProduct.ProductCost * attributeValue.Quantity;
                     break;
@@ -436,6 +468,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetProductCostAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         return cost;
     }
 
@@ -459,9 +492,11 @@ public partial class PriceCalculationService : IPriceCalculationService
         decimal? productPrice = null,
         int quantity = 1)
     {
+		_logger.LogDebug(">>> Entering GetProductAttributeValuePriceAdjustmentAsync(product={Product},value={Value},customer={Customer},store={Store},productPrice={ProductPrice},quantity={Quantity})", product, value, customer, store, productPrice, quantity);
         ArgumentNullException.ThrowIfNull(value);
 
         var adjustment = decimal.Zero;
+		_logger.LogDebug("GetProductAttributeValuePriceAdjustmentAsync(product={Product},value={Value},customer={Customer},store={Store},productPrice={ProductPrice},quantity={Quantity}): adjustment → {Adjustment}", product, value, customer, store, productPrice, quantity, adjustment);
         switch (value.AttributeValueType)
         {
             case AttributeValueType.Simple:
@@ -470,6 +505,7 @@ public partial class PriceCalculationService : IPriceCalculationService
                 {
                     if (!productPrice.HasValue)
                         productPrice = (await GetFinalPriceAsync(product, customer, store, quantity: quantity)).finalPrice;
+						_logger.LogDebug("GetProductAttributeValuePriceAdjustmentAsync(product={Product},value={Value},customer={Customer},store={Store},productPrice={ProductPrice},quantity={Quantity}): productPrice → {ProductPrice1}", product, value, customer, store, productPrice, quantity, productPrice);
 
                     adjustment = (decimal)((float)productPrice * (float)value.PriceAdjustment / 100f);
                 }
@@ -482,6 +518,7 @@ public partial class PriceCalculationService : IPriceCalculationService
             case AttributeValueType.AssociatedToProduct:
                 //bundled product
                 var associatedProduct = await _productService.GetProductByIdAsync(value.AssociatedProductId);
+				_logger.LogDebug("GetProductAttributeValuePriceAdjustmentAsync(product={Product},value={Value},customer={Customer},store={Store},productPrice={ProductPrice},quantity={Quantity}): associatedProduct → {AssociatedProduct}", product, value, customer, store, productPrice, quantity, associatedProduct);
                 if (associatedProduct != null)
                     adjustment = (await GetFinalPriceAsync(associatedProduct, customer, store)).finalPrice * value.Quantity;
 
@@ -490,6 +527,7 @@ public partial class PriceCalculationService : IPriceCalculationService
                 break;
         }
 
+		_logger.LogDebug("<<< Exiting GetProductAttributeValuePriceAdjustmentAsync(product={Product},value={Value},customer={Customer},store={Store},productPrice={ProductPrice},quantity={Quantity})", product, value, customer, store, productPrice, quantity);
         return adjustment;
     }
 
@@ -504,11 +542,13 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// </returns>
     public virtual async Task<decimal> RoundPriceAsync(decimal value, Currency currency = null)
     {
+		_logger.LogDebug(">>> Entering RoundPriceAsync(value={Value},currency={Currency})", value, currency);
         //we use this method because some currencies (e.g. Hungarian Forint or Swiss Franc) use non-standard rules for rounding
         //you can implement any rounding logic here
 
         currency ??= await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
 
+		_logger.LogDebug("<<< Exiting RoundPriceAsync(value={Value},currency={Currency})", value, currency);
         return Round(value, currency.RoundingType);
     }
 
@@ -520,9 +560,12 @@ public partial class PriceCalculationService : IPriceCalculationService
     /// <returns>Rounded value</returns>
     public virtual decimal Round(decimal value, RoundingType roundingType)
     {
+		_logger.LogDebug(">>> Entering Round(value={Value},roundingType={RoundingType})", value, roundingType);
         //default round (Rounding001)
         var rez = Math.Round(value, 2);
+		_logger.LogDebug("Round(value={Value},roundingType={RoundingType}): rez → {Rez}", value, roundingType, rez);
         var fractionPart = (rez - Math.Truncate(rez)) * 10;
+		_logger.LogDebug("Round(value={Value},roundingType={RoundingType}): fractionPart → {FractionPart}", value, roundingType, fractionPart);
 
         //cash rounding not needed
         if (fractionPart == 0)
@@ -582,6 +625,7 @@ public partial class PriceCalculationService : IPriceCalculationService
                 break;
         }
 
+		_logger.LogDebug("<<< Exiting Round(value={Value},roundingType={RoundingType})", value, roundingType);
         return rez;
     }
 

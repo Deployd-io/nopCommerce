@@ -4,20 +4,24 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo460;
 
 [NopUpdateMigration("2023-07-26 14:00:10", "4.60", UpdateMigrationType.Localization)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
 
         var (languageId, languages) = this.GetLanguageData();
 
@@ -150,12 +154,14 @@ public class LocalizationMigration : MigrationBase
             ["Admin.Configuration.Settings.Catalog.DisplayAllPicturesOnCatalogPages"] = "Display all pictures on catalog pages",
             ["Admin.Configuration.Settings.Catalog.DisplayAllPicturesOnCatalogPages.Hint"] = "Check to display all pictures on catalog pages.",
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             //#3511
             ["Admin.Configuration.Settings.Catalog.NewProductsAllowCustomersToSelectPageSize"] = "'New products' page. Allow customers to select page size",
             ["Admin.Configuration.Settings.Catalog.NewProductsAllowCustomersToSelectPageSize.Hint"] = "'New products' page. Check to allow customers to select the page size from a predefined list of options.",
             ["Admin.Configuration.Settings.Catalog.NewProductsPageSizeOptions"] = "'New products' page. Page size options",
             ["Admin.Configuration.Settings.Catalog.NewProductsPageSizeOptions.Hint"] = "'New products' page. Comma separated list of page size options (e.g. 10, 5, 15, 20). First option is the default page size if none are selected.",
 
+			_logger.LogInformation("Up(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
             //#5123
             ["Admin.Catalog.Products.Pictures.Fields.Picture.Hint"] = "You can choose multiple images to upload at once. If the picture size exceeds your stores max image size setting, it will be automatically resized.",
             ["Common.FileUploader.Upload.Files"] = "Upload files",
@@ -396,11 +402,14 @@ public class LocalizationMigration : MigrationBase
         }, languages, localizationService);
 
         #endregion
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

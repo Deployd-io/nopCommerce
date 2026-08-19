@@ -2,6 +2,7 @@
 using Nop.Core.Events;
 using Nop.Services.Configuration;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Infrastructure.Cache;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Infrastructure.Cache;
 /// </summary>
 public class FixedByWeightByTotalEventConsumer : IConsumer<EntityDeletedEvent<ShippingMethod>>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ISettingService _settingService;
@@ -20,7 +22,10 @@ public class FixedByWeightByTotalEventConsumer : IConsumer<EntityDeletedEvent<Sh
 
     public FixedByWeightByTotalEventConsumer(ISettingService settingService)
     {
+		_logger.LogDebug(">>> Entering FixedByWeightByTotalEventConsumer(settingService={SettingService})", settingService);
         _settingService = settingService;
+		_logger.LogDebug("FixedByWeightByTotalEventConsumer(settingService={SettingService}): _settingService → {_settingService}", settingService, _settingService);
+		_logger.LogDebug("<<< Exiting FixedByWeightByTotalEventConsumer(settingService={SettingService})", settingService);
     }
 
     #endregion
@@ -34,14 +39,17 @@ public class FixedByWeightByTotalEventConsumer : IConsumer<EntityDeletedEvent<Sh
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(EntityDeletedEvent<ShippingMethod> eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         var shippingMethod = eventMessage?.Entity;
         if (shippingMethod == null)
             return;
 
         //delete saved fixed rate if exists
         var setting = await _settingService.GetSettingAsync(string.Format(FixedByWeightByTotalDefaults.FIXED_RATE_SETTINGS_KEY, shippingMethod.Id));
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): setting → {Setting}", eventMessage, setting);
         if (setting != null)
             await _settingService.DeleteSettingAsync(setting);
+			_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

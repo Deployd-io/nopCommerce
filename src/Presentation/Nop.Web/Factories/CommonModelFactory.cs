@@ -29,6 +29,7 @@ using Nop.Web.Framework.Themes;
 using Nop.Web.Framework.UI;
 using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -37,6 +38,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class CommonModelFactory : ICommonModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -146,14 +148,19 @@ public partial class CommonModelFactory : ICommonModelFactory
 
     private async Task<bool> IsHomePageAsync()
     {
+		_logger.LogDebug(">>> Entering IsHomePageAsync()");
         var storeLocationUri = new Uri(_webHelper.GetStoreLocation().TrimEnd('/'));
         var currentPageUri = new Uri(_webHelper.GetThisPageUrl(false).TrimEnd('/'));
+		_logger.LogDebug("IsHomePageAsync(): currentPageUri → {CurrentPageUri}", currentPageUri);
+		_logger.LogDebug("IsHomePageAsync(): storeLocationUri → {StoreLocationUri}", storeLocationUri);
 
         if (!_localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
             return storeLocationUri.Equals(currentPageUri);
 
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("IsHomePageAsync(): currentLanguage → {CurrentLanguage}", currentLanguage);
 
+		_logger.LogDebug("<<< Exiting IsHomePageAsync()");
         return Uri.TryCreate(storeLocationUri, currentLanguage.UniqueSeoCode, out var result) && result.Equals(currentPageUri);
     }
 
@@ -166,11 +173,15 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     protected virtual async Task<int> GetUnreadPrivateMessagesAsync()
     {
+		_logger.LogDebug(">>> Entering GetUnreadPrivateMessagesAsync()");
         var result = 0;
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetUnreadPrivateMessagesAsync(): customer → {Customer}", customer);
+		_logger.LogDebug("GetUnreadPrivateMessagesAsync(): result → {Result}", result);
         if (_forumSettings.AllowPrivateMessages && !await _customerService.IsGuestAsync(customer))
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("GetUnreadPrivateMessagesAsync(): store → {Store}", store);
             var privateMessages = await _forumService.GetAllPrivateMessagesAsync(store.Id,
                 0, customer.Id, false, null, false, string.Empty, 0, 1);
 
@@ -180,6 +191,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetUnreadPrivateMessagesAsync()");
         return result;
     }
 
@@ -196,8 +208,11 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<LogoModel> PrepareLogoModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareLogoModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var model = new LogoModel
+		_logger.LogDebug("PrepareLogoModelAsync(): store → {Store}", store);
         {
             StoreName = await _localizationService.GetLocalizedAsync(store, x => x.Name)
         };
@@ -207,6 +222,7 @@ public partial class CommonModelFactory : ICommonModelFactory
         model.LogoPath = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var logo = string.Empty;
+			_logger.LogDebug("PrepareLogoModelAsync(): logo → {Logo}", logo);
             var logoPictureId = _storeInformationSettings.LogoPictureId;
 
             if (logoPictureId > 0)
@@ -217,12 +233,15 @@ public partial class CommonModelFactory : ICommonModelFactory
                 //use default logo
                 var pathBase = _httpContextAccessor.HttpContext.Request.PathBase.Value ?? string.Empty;
                 var storeLocation = _mediaSettings.UseAbsoluteImagePath ? _webHelper.GetStoreLocation() : $"{pathBase}/";
+				_logger.LogDebug("PrepareLogoModelAsync(): storeLocation → {StoreLocation}", storeLocation);
                 logo = $"{storeLocation}Themes/{await _themeContext.GetWorkingThemeNameAsync()}/Content/images/logo.png";
             }
 
             return logo;
         });
 
+		_logger.LogInformation("PrepareLogoModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareLogoModelAsync()");
         return model;
     }
 
@@ -235,11 +254,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<LanguageSelectorModel> PrepareLanguageSelectorModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareLanguageSelectorModelAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var availableLanguages = (await _languageService
                 .GetAllLanguagesAsync(storeId: store.Id))
             .Select(x => new LanguageModel
             {
+				_logger.LogDebug("PrepareLanguageSelectorModelAsync(): store → {Store}", store);
                 Id = x.Id,
                 Name = x.Name,
                 FlagImageFileName = x.FlagImageFileName,
@@ -252,6 +273,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             UseImages = _localizationSettings.UseImagesForLanguageSelection
         };
 
+		_logger.LogDebug("<<< Exiting PrepareLanguageSelectorModelAsync()");
         return model;
     }
 
@@ -264,11 +286,14 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<CurrencySelectorModel> PrepareCurrencySelectorModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareCurrencySelectorModelAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var availableCurrencies = await (await _currencyService
                 .GetAllCurrenciesAsync(storeId: store.Id))
             .SelectAwait(async x =>
             {
+				_logger.LogDebug("PrepareCurrencySelectorModelAsync(): store → {Store}", store);
                 //currency char
                 var currencySymbol = !string.IsNullOrEmpty(x.DisplayLocale)
                     ? new RegionInfo(x.DisplayLocale).CurrencySymbol
@@ -284,6 +309,7 @@ public partial class CommonModelFactory : ICommonModelFactory
 
                 return currencyModel;
             }).ToListAsync();
+			_logger.LogInformation("PrepareCurrencySelectorModelAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         var model = new CurrencySelectorModel
         {
@@ -292,6 +318,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             DisplayCurrencySymbol = _currencySettings.DisplayCurrencySymbolInCurrencySelector,
         };
 
+		_logger.LogDebug("<<< Exiting PrepareCurrencySelectorModelAsync()");
         return model;
     }
 
@@ -304,11 +331,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<TaxTypeSelectorModel> PrepareTaxTypeSelectorModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareTaxTypeSelectorModelAsync()");
         var model = new TaxTypeSelectorModel
         {
             CurrentTaxType = await _workContext.GetTaxDisplayTypeAsync()
         };
 
+		_logger.LogDebug("<<< Exiting PrepareTaxTypeSelectorModelAsync()");
         return model;
     }
 
@@ -321,12 +350,18 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<HeaderLinksModel> PrepareHeaderLinksModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareHeaderLinksModelAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareHeaderLinksModelAsync(): store → {Store}", store);
+		_logger.LogDebug("PrepareHeaderLinksModelAsync(): customer → {Customer}", customer);
 
         var unreadMessageCount = await GetUnreadPrivateMessagesAsync();
+		_logger.LogDebug("PrepareHeaderLinksModelAsync(): unreadMessageCount → {UnreadMessageCount}", unreadMessageCount);
         var unreadMessage = string.Empty;
+		_logger.LogDebug("PrepareHeaderLinksModelAsync(): unreadMessage → {UnreadMessage}", unreadMessage);
         var alertMessage = string.Empty;
+		_logger.LogDebug("PrepareHeaderLinksModelAsync(): alertMessage → {AlertMessage}", alertMessage);
         if (unreadMessageCount > 0)
         {
             unreadMessage = string.Format(await _localizationService.GetResourceAsync("PrivateMessages.TotalUnread"), unreadMessageCount);
@@ -363,6 +398,7 @@ public partial class CommonModelFactory : ICommonModelFactory
                 .Sum(item => item.Quantity);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareHeaderLinksModelAsync()");
         return model;
     }
 
@@ -375,8 +411,10 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<AdminHeaderLinksModel> PrepareAdminHeaderLinksModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareAdminHeaderLinksModelAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("PrepareAdminHeaderLinksModelAsync(): customer → {Customer}", customer);
         var model = new AdminHeaderLinksModel
         {
             ImpersonatedCustomerName = await _customerService.IsRegisteredAsync(customer) ? await _customerService.FormatUsernameAsync(customer) : string.Empty,
@@ -385,6 +423,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             EditPageUrl = _nopHtmlHelper.GetEditPageUrl()
         };
 
+		_logger.LogDebug("<<< Exiting PrepareAdminHeaderLinksModelAsync()");
         return model;
     }
 
@@ -397,6 +436,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<SocialModel> PrepareSocialModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareSocialModelAsync()");
         var model = new SocialModel
         {
             FacebookLink = _storeInformationSettings.FacebookLink,
@@ -407,6 +447,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             NewsEnabled = _newsSettings.Enabled,
         };
 
+		_logger.LogDebug("<<< Exiting PrepareSocialModelAsync()");
         return model;
     }
 
@@ -419,6 +460,8 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<FooterModel> PrepareFooterModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareFooterModelAsync()");
+		_logger.LogDebug("<<< Exiting PrepareFooterModelAsync()");
         return new FooterModel
         {
             StoreName = await _localizationService.GetLocalizedAsync(await _storeContext.GetCurrentStoreAsync(), x => x.Name),
@@ -439,18 +482,24 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<ContactUsModel> PrepareContactUsModelAsync(ContactUsModel model, bool excludeProperties)
     {
+		_logger.LogDebug(">>> Entering PrepareContactUsModelAsync(model={Model},excludeProperties={ExcludeProperties})", model, excludeProperties);
         ArgumentNullException.ThrowIfNull(model);
 
         if (!excludeProperties)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("PrepareContactUsModelAsync(model={Model},excludeProperties={ExcludeProperties}): customer → {Customer}", model, excludeProperties, customer);
+			_logger.LogDebug("PrepareContactUsModelAsync(model={Model},excludeProperties={ExcludeProperties}): model.Email → {Arg2}", model, excludeProperties, model.Email);
             model.Email = customer.Email;
             model.FullName = await _customerService.GetCustomerFullNameAsync(customer);
         }
 
         model.SubjectEnabled = _commonSettings.SubjectFieldOnContactUsForm;
+		_logger.LogDebug("PrepareContactUsModelAsync(model={Model},excludeProperties={ExcludeProperties}): model.SubjectEnabled → {Arg2}", model, excludeProperties, model.SubjectEnabled);
+		_logger.LogDebug("PrepareContactUsModelAsync(model={Model},excludeProperties={ExcludeProperties}): model.DisplayCaptcha → {Arg2}", model, excludeProperties, model.DisplayCaptcha);
         model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnContactUsPage;
 
+		_logger.LogDebug("<<< Exiting PrepareContactUsModelAsync(model={Model},excludeProperties={ExcludeProperties})", model, excludeProperties);
         return model;
     }
 
@@ -466,6 +515,7 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<ContactVendorModel> PrepareContactVendorModelAsync(ContactVendorModel model, Vendor vendor, bool excludeProperties)
     {
+		_logger.LogDebug(">>> Entering PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties})", model, vendor, excludeProperties);
         ArgumentNullException.ThrowIfNull(model);
 
         ArgumentNullException.ThrowIfNull(vendor);
@@ -473,15 +523,21 @@ public partial class CommonModelFactory : ICommonModelFactory
         if (!excludeProperties)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): customer → {Customer}", model, vendor, excludeProperties, customer);
+			_logger.LogDebug("PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.Email → {Arg3}", model, vendor, excludeProperties, model.Email);
             model.Email = customer.Email;
             model.FullName = await _customerService.GetCustomerFullNameAsync(customer);
         }
 
         model.SubjectEnabled = _commonSettings.SubjectFieldOnContactUsForm;
+		_logger.LogDebug("PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.SubjectEnabled → {Arg3}", model, vendor, excludeProperties, model.SubjectEnabled);
+		_logger.LogDebug("PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.DisplayCaptcha → {Arg3}", model, vendor, excludeProperties, model.DisplayCaptcha);
+		_logger.LogDebug("PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties}): model.VendorId → {Arg3}", model, vendor, excludeProperties, model.VendorId);
         model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnContactUsPage;
         model.VendorId = vendor.Id;
         model.VendorName = await _localizationService.GetLocalizedAsync(vendor, x => x.Name);
 
+		_logger.LogDebug("<<< Exiting PrepareContactVendorModelAsync(model={Model},vendor={Vendor},excludeProperties={ExcludeProperties})", model, vendor, excludeProperties);
         return model;
     }
 
@@ -494,9 +550,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<StoreThemeSelectorModel> PrepareStoreThemeSelectorModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareStoreThemeSelectorModelAsync()");
         var model = new StoreThemeSelectorModel();
 
+		_logger.LogDebug("PrepareStoreThemeSelectorModelAsync(): model → {Model}", model);
+		_logger.LogDebug("PrepareStoreThemeSelectorModelAsync(): model.CurrentStoreTheme → {Arg0}", model.CurrentStoreTheme);
         var currentTheme = await _themeProvider.GetThemeBySystemNameAsync(await _themeContext.GetWorkingThemeNameAsync());
+		_logger.LogDebug("PrepareStoreThemeSelectorModelAsync(): currentTheme → {CurrentTheme}", currentTheme);
         model.CurrentStoreTheme = new StoreThemeModel
         {
             Name = currentTheme?.SystemName,
@@ -509,6 +569,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             Title = x.FriendlyName
         }).ToList();
 
+		_logger.LogDebug("<<< Exiting PrepareStoreThemeSelectorModelAsync()");
         return model;
     }
 
@@ -521,11 +582,13 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual Task<FaviconAndAppIconsModel> PrepareFaviconAndAppIconsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareFaviconAndAppIconsModelAsync()");
         var model = new FaviconAndAppIconsModel
         {
             HeadCode = _commonSettings.FaviconAndAppIconsHeadCode
         };
 
+		_logger.LogDebug("<<< Exiting PrepareFaviconAndAppIconsModelAsync()");
         return Task.FromResult(model);
     }
 
@@ -538,14 +601,18 @@ public partial class CommonModelFactory : ICommonModelFactory
     /// </returns>
     public virtual async Task<string> PrepareRobotsTextFileAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareRobotsTextFileAsync()");
         var sb = new StringBuilder();
 
+		_logger.LogDebug("PrepareRobotsTextFileAsync(): sb → {Sb}", sb);
         //if robots.custom.txt exists, let's use it instead of hard-coded data below
         var robotsFilePath = _fileProvider.Combine(_fileProvider.MapPath("~/wwwroot"), RobotsTxtDefaults.RobotsCustomFileName);
+		_logger.LogDebug("PrepareRobotsTextFileAsync(): robotsFilePath → {RobotsFilePath}", robotsFilePath);
         if (_fileProvider.FileExists(robotsFilePath))
         {
             //the robots.txt file exists
             var robotsFileContent = await _fileProvider.ReadAllTextAsync(robotsFilePath, Encoding.UTF8);
+			_logger.LogDebug("PrepareRobotsTextFileAsync(): robotsFileContent → {RobotsFileContent}", robotsFileContent);
             sb.Append(robotsFileContent);
         }
         else
@@ -572,6 +639,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             if (_localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
             {
                 var store = await _storeContext.GetCurrentStoreAsync();
+				_logger.LogDebug("PrepareRobotsTextFileAsync(): store → {Store}", store);
                 //URLs are localizable. Append SEO code
                 foreach (var language in await _languageService.GetAllLanguagesAsync(storeId: store.Id))
                     if (_robotsTxtSettings.DisallowLanguages.Contains(language.Id))
@@ -589,6 +657,7 @@ public partial class CommonModelFactory : ICommonModelFactory
 
             //load and add robots.txt additions to the end of file.
             var robotsAdditionsFile = _fileProvider.Combine(_fileProvider.MapPath("~/wwwroot"), RobotsTxtDefaults.RobotsAdditionsFileName);
+			_logger.LogDebug("PrepareRobotsTextFileAsync(): robotsAdditionsFile → {RobotsAdditionsFile}", robotsAdditionsFile);
             if (_fileProvider.FileExists(robotsAdditionsFile))
             {
                 sb.AppendLine();
@@ -597,6 +666,7 @@ public partial class CommonModelFactory : ICommonModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting PrepareRobotsTextFileAsync()");
         return sb.ToString();
     }
 

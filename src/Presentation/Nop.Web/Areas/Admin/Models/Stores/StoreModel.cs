@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Stores;
 
@@ -10,12 +11,17 @@ namespace Nop.Web.Areas.Admin.Models.Stores;
 /// </summary>
 public partial record StoreModel : BaseNopEntityModel, ILocalizedModel<StoreLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public StoreModel()
     {
+		_logger.LogDebug(">>> Entering StoreModel()");
         Locales = new List<StoreLocalizedModel>();
         AvailableLanguages = new List<SelectListItem>();
+		_logger.LogDebug("StoreModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+		_logger.LogDebug("StoreModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("<<< Exiting StoreModel()");
     }
 
     #endregion

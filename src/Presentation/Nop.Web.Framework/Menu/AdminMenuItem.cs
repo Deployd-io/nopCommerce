@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Web.Framework.Menu;
 
 /// <summary>
@@ -5,6 +6,7 @@
 /// </summary>
 public partial class AdminMenuItem
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected IList<string> _permissionNames;
@@ -19,7 +21,10 @@ public partial class AdminMenuItem
     /// </summary>
     public AdminMenuItem()
     {
+		_logger.LogDebug(">>> Entering AdminMenuItem()");
         ChildNodes = new List<AdminMenuItem>();
+		_logger.LogDebug("AdminMenuItem(): ChildNodes → {ChildNodes}", ChildNodes);
+		_logger.LogDebug("<<< Exiting AdminMenuItem()");
     }
 
     #endregion
@@ -35,8 +40,10 @@ public partial class AdminMenuItem
     /// <returns>True if a new menu item has been inserted</returns>
     protected virtual bool Insert(string itemSystemName, AdminMenuItem newMenuItem, bool before)
     {
+		_logger.LogDebug(">>> Entering Insert(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem},before={Before})", itemSystemName, newMenuItem, before);
         var position = 0;
         var inserted = false;
+		_logger.LogDebug("Insert(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem},before={Before}): inserted → {Inserted}", itemSystemName, newMenuItem, before, inserted);
 
         foreach (var adminMenuItem in ChildNodes.ToList())
             if (!adminMenuItem.SystemName.Equals(itemSystemName))
@@ -59,6 +66,7 @@ public partial class AdminMenuItem
                 break;
         }
 
+		_logger.LogDebug("<<< Exiting Insert(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem},before={Before})", itemSystemName, newMenuItem, before);
         return inserted;
     }
 
@@ -73,6 +81,8 @@ public partial class AdminMenuItem
     /// <returns>Result</returns>
     public bool ContainsSystemName(string systemName)
     {
+		_logger.LogDebug(">>> Entering ContainsSystemName(systemName={SystemName})", systemName);
+		_logger.LogDebug("<<< Exiting ContainsSystemName(systemName={SystemName})", systemName);
         return GetItemBySystemName(systemName) is not null;
     }
 
@@ -83,6 +93,7 @@ public partial class AdminMenuItem
     /// <returns>Menu item if found, otherwise null</returns>
     public AdminMenuItem GetItemBySystemName(string systemName)
     {
+		_logger.LogDebug(">>> Entering GetItemBySystemName(systemName={SystemName})", systemName);
         if (string.IsNullOrEmpty(systemName))
             return null;
 
@@ -97,6 +108,8 @@ public partial class AdminMenuItem
     /// <returns>True if a new menu item has been inserted</returns>
     public virtual bool InsertBefore(string itemSystemName, AdminMenuItem newMenuItem)
     {
+		_logger.LogDebug(">>> Entering InsertBefore(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
+		_logger.LogDebug("<<< Exiting InsertBefore(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
         return Insert(itemSystemName, newMenuItem, true);
     }
 
@@ -108,6 +121,8 @@ public partial class AdminMenuItem
     /// <returns>True if a new menu item has been inserted</returns>
     public virtual bool InsertAfter(string itemSystemName, AdminMenuItem newMenuItem)
     {
+		_logger.LogDebug(">>> Entering InsertAfter(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
+		_logger.LogDebug("<<< Exiting InsertAfter(itemSystemName={ItemSystemName},newMenuItem={NewMenuItem})", itemSystemName, newMenuItem);
         return Insert(itemSystemName, newMenuItem, false);
     }
 

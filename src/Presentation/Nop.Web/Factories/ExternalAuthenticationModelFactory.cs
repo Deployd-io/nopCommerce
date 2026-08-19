@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Services.Authentication.External;
 using Nop.Web.Models.Customer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ExternalAuthenticationModelFactory : IExternalAuthenticationModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAuthenticationPluginManager _authenticationPluginManager;
@@ -23,9 +25,14 @@ public partial class ExternalAuthenticationModelFactory : IExternalAuthenticatio
         IStoreContext storeContext,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering ExternalAuthenticationModelFactory(authenticationPluginManager={AuthenticationPluginManager},storeContext={StoreContext},workContext={WorkContext})", authenticationPluginManager, storeContext, workContext);
         _authenticationPluginManager = authenticationPluginManager;
         _storeContext = storeContext;
+		_logger.LogDebug("ExternalAuthenticationModelFactory(authenticationPluginManager={AuthenticationPluginManager},storeContext={StoreContext},workContext={WorkContext}): _storeContext → {_storeContext}", authenticationPluginManager, storeContext, workContext, _storeContext);
+		_logger.LogDebug("ExternalAuthenticationModelFactory(authenticationPluginManager={AuthenticationPluginManager},storeContext={StoreContext},workContext={WorkContext}): _authenticationPluginManager → {_authenticationPluginManager}", authenticationPluginManager, storeContext, workContext, _authenticationPluginManager);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting ExternalAuthenticationModelFactory(authenticationPluginManager={AuthenticationPluginManager},storeContext={StoreContext},workContext={WorkContext})", authenticationPluginManager, storeContext, workContext);
+		_logger.LogDebug("ExternalAuthenticationModelFactory(authenticationPluginManager={AuthenticationPluginManager},storeContext={StoreContext},workContext={WorkContext}): _workContext → {_workContext}", authenticationPluginManager, storeContext, workContext, _workContext);
     }
 
     #endregion
@@ -41,8 +48,11 @@ public partial class ExternalAuthenticationModelFactory : IExternalAuthenticatio
     /// </returns>
     public virtual async Task<List<ExternalAuthenticationMethodModel>> PrepareExternalMethodsModelAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareExternalMethodsModelAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
 
+		_logger.LogDebug("PrepareExternalMethodsModelAsync(): store → {Store}", store);
+		_logger.LogDebug("<<< Exiting PrepareExternalMethodsModelAsync()");
         return (await _authenticationPluginManager
                 .LoadActivePluginsAsync(await _workContext.GetCurrentCustomerAsync(), store.Id))
             .Select(authenticationMethod => new ExternalAuthenticationMethodModel

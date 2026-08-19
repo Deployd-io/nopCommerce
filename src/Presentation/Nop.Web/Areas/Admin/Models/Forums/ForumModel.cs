@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Forums;
 
@@ -8,11 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Forums;
 /// </summary>
 public partial record ForumModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ForumModel()
     {
+		_logger.LogDebug(">>> Entering ForumModel()");
         ForumGroups = new List<ForumGroupModel>();
+		_logger.LogDebug("ForumModel(): ForumGroups → {ForumGroups}", ForumGroups);
+		_logger.LogDebug("<<< Exiting ForumModel()");
     }
 
     #endregion
