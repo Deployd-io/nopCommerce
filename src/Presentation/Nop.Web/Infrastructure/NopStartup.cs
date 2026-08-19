@@ -3,6 +3,7 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Helpers;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Infrastructure.Installation;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Infrastructure;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Infrastructure;
 /// </summary>
 public partial class NopStartup : INopStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Add and configure any of the middleware
     /// </summary>
@@ -18,6 +20,7 @@ public partial class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		_logger.LogDebug(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //installation localization service
         services.AddScoped<IInstallationLocalizationService, InstallationLocalizationService>();
 
@@ -115,6 +118,7 @@ public partial class NopStartup : INopStartup
 
         //helpers classes
         services.AddScoped<ISummernoteHelper, SummernoteHelper>();
+		_logger.LogDebug("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -123,6 +127,8 @@ public partial class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+	_logger.LogDebug(">>> Entering Configure(application={Application})", application);
+	_logger.LogDebug("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

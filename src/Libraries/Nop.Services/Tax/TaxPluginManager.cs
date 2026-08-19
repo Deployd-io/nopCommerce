@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Tax;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Tax;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Tax;
 /// </summary>
 public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly TaxSettings _taxSettings;
@@ -22,7 +24,10 @@ public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginM
         IPluginService pluginService,
         TaxSettings taxSettings) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering TaxPluginManager(customerService={CustomerService},pluginService={PluginService},taxSettings={TaxSettings})", customerService, pluginService, taxSettings);
         _taxSettings = taxSettings;
+		_logger.LogDebug("TaxPluginManager(customerService={CustomerService},pluginService={PluginService},taxSettings={TaxSettings}): _taxSettings → {_taxSettings}", customerService, pluginService, taxSettings, _taxSettings);
+		_logger.LogDebug("<<< Exiting TaxPluginManager(customerService={CustomerService},pluginService={PluginService},taxSettings={TaxSettings})", customerService, pluginService, taxSettings);
     }
 
     #endregion
@@ -40,6 +45,8 @@ public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginM
     /// </returns>
     public virtual async Task<ITaxProvider> LoadPrimaryPluginAsync(Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		_logger.LogDebug("<<< Exiting LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadPrimaryPluginAsync(_taxSettings.ActiveTaxProviderSystemName, customer, storeId);
     }
 
@@ -50,6 +57,8 @@ public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginM
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(ITaxProvider taxProvider)
     {
+		_logger.LogDebug(">>> Entering IsPluginActive(taxProvider={TaxProvider})", taxProvider);
+		_logger.LogDebug("<<< Exiting IsPluginActive(taxProvider={TaxProvider})", taxProvider);
         return IsPluginActive(taxProvider, [_taxSettings.ActiveTaxProviderSystemName]);
     }
 
@@ -65,7 +74,10 @@ public partial class TaxPluginManager : PluginManager<ITaxProvider>, ITaxPluginM
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var taxProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): taxProvider → {TaxProvider}", systemName, customer, storeId, taxProvider);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(taxProvider);
     }
 

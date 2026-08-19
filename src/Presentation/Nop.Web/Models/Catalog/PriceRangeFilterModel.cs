@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
@@ -7,6 +8,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record PriceRangeFilterModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -33,8 +35,12 @@ public partial record PriceRangeFilterModel : BaseNopModel
     /// </summary>
     public PriceRangeFilterModel()
     {
+		_logger.LogDebug(">>> Entering PriceRangeFilterModel()");
         SelectedPriceRange = new PriceRangeModel();
         AvailablePriceRange = new PriceRangeModel();
+		_logger.LogDebug("PriceRangeFilterModel(): AvailablePriceRange → {AvailablePriceRange}", AvailablePriceRange);
+		_logger.LogDebug("PriceRangeFilterModel(): SelectedPriceRange → {SelectedPriceRange}", SelectedPriceRange);
+		_logger.LogDebug("<<< Exiting PriceRangeFilterModel()");
     }
 
     #endregion

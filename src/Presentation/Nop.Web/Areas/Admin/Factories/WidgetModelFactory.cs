@@ -3,6 +3,7 @@ using Nop.Services.Cms;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Cms;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class WidgetModelFactory : IWidgetModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IWidgetPluginManager _widgetPluginManager;
@@ -23,8 +25,12 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     public WidgetModelFactory(IWidgetPluginManager widgetPluginManager,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering WidgetModelFactory(widgetPluginManager={WidgetPluginManager},workContext={WorkContext})", widgetPluginManager, workContext);
         _widgetPluginManager = widgetPluginManager;
         _workContext = workContext;
+		_logger.LogDebug("WidgetModelFactory(widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _workContext → {_workContext}", widgetPluginManager, workContext, _workContext);
+		_logger.LogDebug("WidgetModelFactory(widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _widgetPluginManager → {_widgetPluginManager}", widgetPluginManager, workContext, _widgetPluginManager);
+		_logger.LogDebug("<<< Exiting WidgetModelFactory(widgetPluginManager={WidgetPluginManager},workContext={WorkContext})", widgetPluginManager, workContext);
     }
 
     #endregion
@@ -41,11 +47,13 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     /// </returns>
     public virtual Task<WidgetSearchModel> PrepareWidgetSearchModelAsync(WidgetSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareWidgetSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareWidgetSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -59,6 +67,7 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     /// </returns>
     public virtual async Task<WidgetListModel> PrepareWidgetListModelAsync(WidgetSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareWidgetListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get widgets
@@ -73,6 +82,7 @@ public partial class WidgetModelFactory : IWidgetModelFactory
             {
                 //fill in model values from the entity
                 var widgetMethodModel = widget.ToPluginModel<WidgetModel>();
+				_logger.LogDebug("PrepareWidgetListModelAsync(searchModel={SearchModel}): widgetMethodModel → {WidgetMethodModel}", searchModel, widgetMethodModel);
 
                 //fill in additional values (not existing in the entity)
                 widgetMethodModel.IsActive = _widgetPluginManager.IsPluginActive(widget);
@@ -82,6 +92,7 @@ public partial class WidgetModelFactory : IWidgetModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareWidgetListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

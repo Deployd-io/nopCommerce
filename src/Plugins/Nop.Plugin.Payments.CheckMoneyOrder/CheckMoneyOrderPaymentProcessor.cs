@@ -7,6 +7,7 @@ using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Services.Payments;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.CheckMoneyOrder;
 
@@ -15,6 +16,7 @@ namespace Nop.Plugin.Payments.CheckMoneyOrder;
 /// </summary>
 public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CheckMoneyOrderPaymentSettings _checkMoneyOrderPaymentSettings;
@@ -35,12 +37,20 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
         IShoppingCartService shoppingCartService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper})", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper);
         _checkMoneyOrderPaymentSettings = checkMoneyOrderPaymentSettings;
+		_logger.LogDebug("CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper}): _checkMoneyOrderPaymentSettings → {_checkMoneyOrderPaymentSettings}", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper, _checkMoneyOrderPaymentSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper}): _localizationService → {_localizationService}", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper, _localizationService);
         _orderTotalCalculationService = orderTotalCalculationService;
+		_logger.LogDebug("CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper}): _orderTotalCalculationService → {_orderTotalCalculationService}", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper, _orderTotalCalculationService);
         _settingService = settingService;
+		_logger.LogDebug("CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper}): _settingService → {_settingService}", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper, _settingService);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper}): _shoppingCartService → {_shoppingCartService}", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper, _shoppingCartService);
         _webHelper = webHelper;
+		_logger.LogDebug("<<< Exiting CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper})", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper);
+		_logger.LogDebug("CheckMoneyOrderPaymentProcessor(checkMoneyOrderPaymentSettings={CheckMoneyOrderPaymentSettings},localizationService={LocalizationService},orderTotalCalculationService={OrderTotalCalculationService},settingService={SettingService},shoppingCartService=<redacted>,webHelper={WebHelper}): _webHelper → {_webHelper}", checkMoneyOrderPaymentSettings, localizationService, orderTotalCalculationService, settingService, webHelper, _webHelper);
     }
 
     #endregion
@@ -57,6 +67,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
+		_logger.LogDebug("<<< Exiting ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.FromResult(new ProcessPaymentResult());
     }
 
@@ -67,7 +79,9 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public Task PostProcessPaymentAsync(PostProcessPaymentRequest postProcessPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         //nothing
+		_logger.LogDebug("<<< Exiting PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         return Task.CompletedTask;
     }
 
@@ -81,6 +95,7 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public async Task<bool> HidePaymentMethodAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering HidePaymentMethodAsync(cart={Cart})", cart);
         //you can put any logic here
         //for example, hide this payment method if all products in the cart are downloadable
         //or hide this payment method if current customer is from certain country
@@ -101,6 +116,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
+		_logger.LogDebug("<<< Exiting GetAdditionalHandlingFeeAsync(cart={Cart})", cart);
         return await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
             _checkMoneyOrderPaymentSettings.AdditionalFee, _checkMoneyOrderPaymentSettings.AdditionalFeePercentage);
     }
@@ -115,6 +132,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<CapturePaymentResult> CaptureAsync(CapturePaymentRequest capturePaymentRequest)
     {
+		_logger.LogDebug(">>> Entering CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
+		_logger.LogDebug("<<< Exiting CaptureAsync(capturePaymentRequest={CapturePaymentRequest})", capturePaymentRequest);
         return Task.FromResult(new CapturePaymentResult { Errors = new[] { "Capture method not supported" } });
     }
 
@@ -128,6 +147,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<RefundPaymentResult> RefundAsync(RefundPaymentRequest refundPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
+		_logger.LogDebug("<<< Exiting RefundAsync(refundPaymentRequest={RefundPaymentRequest})", refundPaymentRequest);
         return Task.FromResult(new RefundPaymentResult { Errors = new[] { "Refund method not supported" } });
     }
 
@@ -141,6 +162,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<VoidPaymentResult> VoidAsync(VoidPaymentRequest voidPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
+		_logger.LogDebug("<<< Exiting VoidAsync(voidPaymentRequest={VoidPaymentRequest})", voidPaymentRequest);
         return Task.FromResult(new VoidPaymentResult { Errors = new[] { "Void method not supported" } });
     }
 
@@ -154,6 +177,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
+		_logger.LogDebug("<<< Exiting ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return Task.FromResult(new ProcessPaymentResult { Errors = new[] { "Recurring payment not supported" } });
     }
 
@@ -167,6 +192,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
+		_logger.LogDebug("<<< Exiting CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         return Task.FromResult(new CancelRecurringPaymentResult { Errors = new[] { "Recurring payment not supported" } });
     }
 
@@ -180,9 +207,11 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<bool> CanRePostProcessPaymentAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CanRePostProcessPaymentAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         //it's not a redirection payment method. So we always return false
+		_logger.LogDebug("<<< Exiting CanRePostProcessPaymentAsync(order={Order})", order);
         return Task.FromResult(false);
     }
 
@@ -196,6 +225,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<IList<string>> ValidatePaymentFormAsync(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ValidatePaymentFormAsync(form={Form})", form);
+		_logger.LogDebug("<<< Exiting ValidatePaymentFormAsync(form={Form})", form);
         return Task.FromResult<IList<string>>(new List<string>());
     }
 
@@ -209,6 +240,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </returns>
     public Task<ProcessPaymentRequest> GetPaymentInfoAsync(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering GetPaymentInfoAsync(form={Form})", form);
+		_logger.LogDebug("<<< Exiting GetPaymentInfoAsync(form={Form})", form);
         return Task.FromResult(new ProcessPaymentRequest());
     }
 
@@ -217,6 +250,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
+		_logger.LogDebug("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/PaymentCheckMoneyOrder/Configure";
     }
 
@@ -226,6 +261,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>View component type</returns>
     public Type GetPublicViewComponent()
     {
+		_logger.LogDebug(">>> Entering GetPublicViewComponent()");
+		_logger.LogDebug("<<< Exiting GetPublicViewComponent()");
         return typeof(CheckMoneyOrderViewComponent);
     }
 
@@ -235,6 +272,7 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //settings
         var settings = new CheckMoneyOrderPaymentSettings
         {
@@ -257,6 +295,7 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -265,6 +304,7 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<CheckMoneyOrderPaymentSettings>();
 
@@ -272,6 +312,7 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Payment.CheckMoneyOrder");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     /// <summary>
@@ -284,6 +325,8 @@ public class CheckMoneyOrderPaymentProcessor : BasePlugin, IPaymentMethod
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetPaymentMethodDescriptionAsync()
     {
+		_logger.LogDebug(">>> Entering GetPaymentMethodDescriptionAsync()");
+		_logger.LogDebug("<<< Exiting GetPaymentMethodDescriptionAsync()");
         return await _localizationService.GetResourceAsync("Plugins.Payment.CheckMoneyOrder.PaymentMethodDescription");
     }
 

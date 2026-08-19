@@ -220,6 +220,8 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<string> PrepareMessagesAmountAsync(ButtonPlacement placement, Customer customer, string currencyCode, int? productId)
     {
+		_logger.LogDebug(">>> Entering PrepareMessagesAmountAsync(placement={Placement},customer={Customer},currencyCode={CurrencyCode},productId={ProductId})", placement, customer, currencyCode, productId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //cache result during HTTP request
         return await _shortTermCacheManager.GetAsync(async () =>
         {
@@ -238,10 +240,13 @@ public class PayPalCommerceServiceManager
                     => (await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart, null, usePaymentMethodAdditionalFee: false))
                         .shoppingCartTotal ?? subTotal,
                 _ => (decimal?)null
+				_logger.LogDebug("PrepareMessagesAmountAsync(placement={Placement},customer={Customer},currencyCode={CurrencyCode},productId={ProductId}): ButtonPlacement.Cart → {Arg4}", placement, customer, currencyCode, productId, ButtonPlacement.Cart);
             };
 
             return amount is not null ? PrepareMoney(amount.Value, currencyCode).Value : null;
         }, new($"{PayPalCommerceDefaults.SystemName}.Messages.Amount-{productId ?? 0}"));
+		_logger.LogInformation("PrepareMessagesAmountAsync(placement,customer,currencyCode,productId)={Placement},{Customer},{CurrencyCode},{ProductId}: external service call took {Arg4} ms", placement, customer, currencyCode, productId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareMessagesAmountAsync(placement={Placement},customer={Customer},currencyCode={CurrencyCode},productId={ProductId})", placement, customer, currencyCode, productId);
     }
 
     #endregion
@@ -256,7 +261,10 @@ public class PayPalCommerceServiceManager
     /// <returns>Money object</returns>
     private static Money PrepareMoney(decimal value, string currencyCode)
     {
+		_logger.LogDebug(">>> Entering PrepareMoney(value={Value},currencyCode={CurrencyCode})", value, currencyCode);
         var format = PayPalCommerceDefaults.CurrenciesWithoutDecimals.Contains(currencyCode.ToUpper()) ? "0" : "0.00";
+		_logger.LogDebug("PrepareMoney(value={Value},currencyCode={CurrencyCode}): format → {Format}", value, currencyCode, format);
+		_logger.LogDebug("<<< Exiting PrepareMoney(value={Value},currencyCode={CurrencyCode})", value, currencyCode);
         return new()
         {
             CurrencyCode = currencyCode,
@@ -271,6 +279,8 @@ public class PayPalCommerceServiceManager
     /// <returns>Decimal value</returns>
     private static decimal ConvertMoney(Money amount)
     {
+		_logger.LogDebug(">>> Entering ConvertMoney(amount={Amount})", amount);
+		_logger.LogDebug("<<< Exiting ConvertMoney(amount={Amount})", amount);
         return decimal.TryParse(amount?.Value, NumberStyles.Any, CultureInfo.InvariantCulture, out var value) ? value : decimal.Zero;
     }
 
@@ -285,24 +295,32 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<CartDetails> PrepareCartDetailsAsync(ButtonPlacement placement, bool withShipping = true)
     {
+		_logger.LogDebug(">>> Entering PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>)", placement);
         //get the primary store currency
         var currencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): currencyCode → {CurrencyCode}", placement, currencyCode);
         if (string.IsNullOrEmpty(currencyCode))
+			_logger.LogWarning("Throwing NopException from PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>)", placement);
             throw new NopException("Primary store currency not set");
 
         //get customer shopping cart
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): customer → {Customer}", placement, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): store → {Store}", placement, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): cart → {Cart}", placement, cart);
         if (!cart.Any())
             throw new NopException("Shopping cart is empty");
 
         //get billing address
         var billingAddress = await _addressService.GetAddressByIdAsync(customer.BillingAddressId ?? 0);
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): billingAddress → {BillingAddress}", placement, billingAddress);
         if (placement == ButtonPlacement.PaymentMethod && billingAddress is null)
             throw new NopException("Customer billing address not set");
 
         var shippingIsRequired = await _shoppingCartService.ShoppingCartRequiresShippingAsync(cart);
+		_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): shippingIsRequired → {ShippingIsRequired}", placement, shippingIsRequired);
 
         var details = new CartDetails
         {
@@ -321,8 +339,12 @@ public class PayPalCommerceServiceManager
         //get shipping details
         details.ShippingOption = await _genericAttributeService
             .GetAttributeAsync<NopShippingOption>(customer, NopCustomerDefaults.SelectedShippingOptionAttribute, store.Id);
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): details.ShippingOption → {Arg2}", placement, details.ShippingOption);
         details.PickupPoint = await _genericAttributeService
             .GetAttributeAsync<PickupPoint>(customer, NopCustomerDefaults.SelectedPickupPointAttribute, store.Id);
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): details.PickupPoint → {Arg2}", placement, details.PickupPoint);
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): details.IsPickup → {Arg2}", placement, details.IsPickup);
+			_logger.LogDebug("PrepareCartDetailsAsync(placement={Placement},withShipping=<redacted>): details.ShippingAddress → {Arg2}", placement, details.ShippingAddress);
         details.IsPickup = _shippingSettings.AllowPickupInStore && details.PickupPoint is not null;
         details.ShippingAddress = details.IsPickup ? new NopAddress
         {
@@ -351,9 +373,12 @@ public class PayPalCommerceServiceManager
     /// <returns>Experience context</returns>
     private ExperienceContext PrepareOrderContext(PayPalCommerceSettings settings, CartDetails details, string orderGuid, bool isApplePay = false)
     {
+		_logger.LogDebug(">>> Entering PrepareOrderContext(settings={Settings},details={Details},orderGuid={OrderGuid},isApplePay={IsApplePay})", settings, details, orderGuid, isApplePay);
         var protocol = _webHelper.GetCurrentRequestProtocol();
 
+		_logger.LogDebug("PrepareOrderContext(settings={Settings},details={Details},orderGuid={OrderGuid},isApplePay={IsApplePay}): protocol → {Protocol}", settings, details, orderGuid, isApplePay, protocol);
         var shippingPreference = ShippingPreferenceType.NO_SHIPPING.ToString().ToUpper();
+		_logger.LogDebug("PrepareOrderContext(settings={Settings},details={Details},orderGuid={OrderGuid},isApplePay={IsApplePay}): shippingPreference → {ShippingPreference}", settings, details, orderGuid, isApplePay, shippingPreference);
         if (details.ShippingIsRequired)
         {
             shippingPreference = details.Placement == ButtonPlacement.PaymentMethod && !isApplePay
@@ -361,6 +386,7 @@ public class PayPalCommerceServiceManager
                 : ShippingPreferenceType.GET_FROM_FILE.ToString().ToUpper();
         }
 
+		_logger.LogDebug("<<< Exiting PrepareOrderContext(settings={Settings},details={Details},orderGuid={OrderGuid},isApplePay={IsApplePay})", settings, details, orderGuid, isApplePay);
         return new()
         {
             //Locale = null, //PayPal auto detects this
@@ -390,8 +416,16 @@ public class PayPalCommerceServiceManager
     /// <returns>Experience context</returns>
     private ExperienceContext PrepareRecurringPaymentContext(CartDetails details)
     {
+		_logger.LogDebug(">>> Entering PrepareRecurringPaymentContext(details={Details})", details);
         var protocol = _webHelper.GetCurrentRequestProtocol();
 
+		_logger.LogDebug("PrepareRecurringPaymentContext(details={Details}): protocol → {Protocol}", details, protocol);
+		_logger.LogDebug("PrepareRecurringPaymentContext(details={Details}): ShippingPreference → {ShippingPreference}", details, ShippingPreference);
+		_logger.LogDebug("PrepareRecurringPaymentContext(details={Details}): CancelUrl → {CancelUrl}", details, CancelUrl);
+		_logger.LogDebug("PrepareRecurringPaymentContext(details={Details}): BrandName → {BrandName}", details, BrandName);
+		_logger.LogDebug("PrepareRecurringPaymentContext(details={Details}): PaymentMethodPreference → {PaymentMethodPreference}", details, PaymentMethodPreference);
+		_logger.LogDebug("PrepareRecurringPaymentContext(details={Details}): ReturnUrl → {ReturnUrl}", details, ReturnUrl);
+		_logger.LogDebug("<<< Exiting PrepareRecurringPaymentContext(details={Details})", details);
         return new()
         {
             BrandName = CommonHelper.EnsureMaximumLength(details.Store.Name, 127),
@@ -415,11 +449,13 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<Payer> PrepareBillingDetailsAsync(PayPalCommerceSettings settings, CartDetails details)
     {
+		_logger.LogDebug(">>> Entering PrepareBillingDetailsAsync(settings={Settings},details={Details})", settings, details);
         var customer = details.Customer;
         var address = details.BillingAddress;
         var isPaymentMethodPage = details.Placement == ButtonPlacement.PaymentMethod;
 
         var email = CommonHelper.EnsureMaximumLength(isPaymentMethodPage ? address.Email : customer.Email, 254);
+		_logger.LogDebug("PrepareBillingDetailsAsync(settings={Settings},details={Details}): email → {Email}", settings, details, email);
         var name = new Name
         {
             GivenName = CommonHelper.EnsureMaximumLength(isPaymentMethodPage ? address.FirstName : customer.FirstName, 140),
@@ -430,7 +466,9 @@ public class PayPalCommerceServiceManager
         //    ? (!string.IsNullOrEmpty(address.PhoneNumber) ? new Phone { PhoneNumber = new() { NationalNumber = CommonHelper.EnsureMaximumLength(CommonHelper.EnsureNumericOnly(address.PhoneNumber), 14) } } : null)
         //    : !string.IsNullOrEmpty(customer.Phone) ? new Phone { PhoneNumber = new() { NationalNumber = CommonHelper.EnsureMaximumLength(CommonHelper.EnsureNumericOnly(customer.Phone), 14) } } : null;
         var birthDate = customer.DateOfBirth?.ToString("yyyy-MM-dd");
+		_logger.LogDebug("PrepareBillingDetailsAsync(settings={Settings},details={Details}): birthDate → {BirthDate}", settings, details, birthDate);
         var country = await _countryService.GetCountryByIdAsync(isPaymentMethodPage ? address.CountryId ?? 0 : customer.CountryId);
+		_logger.LogDebug("PrepareBillingDetailsAsync(settings={Settings},details={Details}): country → {Country}", settings, details, country);
         var state = await _stateProvinceService
             .GetStateProvinceByIdAsync(isPaymentMethodPage ? address.StateProvinceId ?? 0 : customer.StateProvinceId);
         var billingAddress = new Address
@@ -449,7 +487,11 @@ public class PayPalCommerceServiceManager
 
         //try to get Vault customer id
         var id = settings.UseVault ? await GetVaultCustomerIdAsync(settings, customer.Id) : null;
+		_logger.LogDebug("PrepareBillingDetailsAsync(settings={Settings},details={Details}): id → {Id}", settings, details, id);
 
+		_logger.LogDebug("PrepareBillingDetailsAsync(settings={Settings},details={Details}): Name → {Name}", settings, details, Name);
+		_logger.LogDebug("PrepareBillingDetailsAsync(settings={Settings},details={Details}): Address → {Address}", settings, details, Address);
+		_logger.LogDebug("<<< Exiting PrepareBillingDetailsAsync(settings={Settings},details={Details})", settings, details);
         return new()
         {
             Id = id,
@@ -471,19 +513,26 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<List<Item>> PrepareOrderItemsAsync(CartDetails details)
     {
+		_logger.LogDebug(">>> Entering PrepareOrderItemsAsync(details={Details})", details);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //cart items
         var items = await details.Cart.SelectAwait(async item =>
         {
             var product = await _productService.GetProductByIdAsync(item.ProductId);
+			_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): product → {Product}", details, product);
             if (product is null)
                 return null;
 
             var sku = await _productService.FormatSkuAsync(product, item.AttributesXml);
+			_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): sku → {Sku}", details, sku);
             var url = await _nopUrlHelper.RouteGenericUrlAsync(product, _webHelper.GetCurrentRequestProtocol());
+			_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): url → {Url}", details, url);
 
             var picture = await _pictureService.GetProductPictureAsync(product, item.AttributesXml);
+			_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): picture → {Picture}", details, picture);
             //PayPal doesn't currently support WebP images
             var ext = await _pictureService.GetFileExtensionFromMimeTypeAsync(picture?.MimeType);
+			_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): ext → {Ext}", details, ext);
             var (imageUrl, _) = ext != "webp" ? await _pictureService.GetPictureUrlAsync(picture) : default;
 
             var (itemSubTotal, itemDiscount, _, _) = await _shoppingCartService.GetSubTotalAsync(item, true);
@@ -504,11 +553,13 @@ public class PayPalCommerceServiceManager
                 UnitAmount = PrepareMoney(unitPriceExclTax, details.CurrencyCode)
             };
         }).Where(item => item is not null).ToListAsync();
+		_logger.LogInformation("PrepareOrderItemsAsync(details)={Details}: database query executed in {Arg1} ms", details, __logStart.ElapsedMilliseconds);
 
         //and checkout attributes
         var checkoutAttributes = await _genericAttributeService
             .GetAttributeAsync<string>(details.Customer, NopCustomerDefaults.CheckoutAttributes, details.Store.Id);
         var checkoutAttributeValues = _checkoutAttributeParser.ParseAttributeValues(checkoutAttributes);
+		_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): checkoutAttributeValues → {CheckoutAttributeValues}", details, checkoutAttributeValues);
         await foreach (var (attribute, values) in checkoutAttributeValues)
         {
             await foreach (var attributeValue in values)
@@ -523,9 +574,14 @@ public class PayPalCommerceServiceManager
                     Quantity = 1.ToString(),
                     UnitAmount = PrepareMoney(attributePriceExclTax, details.CurrencyCode)
                 });
+					_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): Quantity → {Quantity}", details, Quantity);
+					_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): Name → {Name}", details, Name);
+					_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): Description → {Description}", details, Description);
+					_logger.LogDebug("PrepareOrderItemsAsync(details={Details}): UnitAmount → {UnitAmount}", details, UnitAmount);
             }
         }
 
+		_logger.LogDebug("<<< Exiting PrepareOrderItemsAsync(details={Details})", details);
         return items;
     }
 
@@ -540,11 +596,14 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<OrderMoney> PrepareOrderMoneyAsync(CartDetails details, List<Item> items)
     {
+		_logger.LogDebug(">>> Entering PrepareOrderMoneyAsync(details={Details},items={Items})", details, items);
         //in some rare cases we need an additional item to adjust the order total
         //this can happen due to complex discounts or a large order and related to rounding in calculations
         //PayPal uses two decimal places, while nopCommerce can use more complex types of rounding (configured for each currency separately) 
         var adjustmentName = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Order.Adjustment.Name");
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): adjustmentName → {AdjustmentName}", details, items, adjustmentName);
         var adjustmentDescription = await _localizationService.GetResourceAsync("Plugins.Payments.PayPalCommerce.Order.Adjustment.Description");
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): adjustmentDescription → {AdjustmentDescription}", details, items, adjustmentDescription);
         if (items.FirstOrDefault(item => adjustmentName.Equals(item.Name) && adjustmentDescription.Equals(item.Description)) is Item adjustmentItem)
             items.Remove(adjustmentItem);
 
@@ -553,24 +612,32 @@ public class PayPalCommerceServiceManager
         if (total is null)
         {
             if (details.Placement == ButtonPlacement.PaymentMethod)
+				_logger.LogWarning("Throwing NopException from PrepareOrderMoneyAsync(details={Details},items={Items})", details, items);
                 throw new NopException("Shopping cart total couldn't be calculated now");
 
             //on product and cart pages the total is not yet calculated, so use subtotal here
             var (_, _, subTotal, _, _) = await _orderTotalCalculationService.GetShoppingCartSubTotalAsync(details.Cart, includingTax: false);
             total = subTotal;
         }
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): total → {Total}", details, items, total);
         var orderTotal = PrepareMoney(total.Value, details.CurrencyCode);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): orderTotal → {OrderTotal}", details, items, orderTotal);
 
         var (shippingTotal, _, _) = await _orderTotalCalculationService
             .GetShoppingCartShippingTotalAsync(details.Cart, includingTax: _taxSettings.ShippingPriceIncludesTax);
         var orderShippingTotal = PrepareMoney(shippingTotal ?? decimal.Zero, details.CurrencyCode);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): orderShippingTotal → {OrderShippingTotal}", details, items, orderShippingTotal);
 
         var (taxTotal, _) = await _orderTotalCalculationService.GetTaxTotalAsync(details.Cart, usePaymentMethodAdditionalFee: false);
         var orderTaxTotal = PrepareMoney(taxTotal, details.CurrencyCode);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): orderTaxTotal → {OrderTaxTotal}", details, items, orderTaxTotal);
 
         var itemAdjustment = decimal.Zero;
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): itemAdjustment → {ItemAdjustment}", details, items, itemAdjustment);
         var itemTotal = items.Sum(item => ConvertMoney(item.UnitAmount) * int.Parse(item.Quantity));
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): itemTotal → {ItemTotal}", details, items, itemTotal);
         var discountTotal = itemTotal + ConvertMoney(orderTaxTotal) + ConvertMoney(orderShippingTotal) - ConvertMoney(orderTotal);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): discountTotal → {DiscountTotal}", details, items, discountTotal);
         if (discountTotal < decimal.Zero)
         {
             itemAdjustment = -discountTotal;
@@ -578,12 +645,15 @@ public class PayPalCommerceServiceManager
             discountTotal = decimal.Zero;
         }
         var orderItemTotal = PrepareMoney(itemTotal, details.CurrencyCode);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): orderItemTotal → {OrderItemTotal}", details, items, orderItemTotal);
         var orderDiscount = PrepareMoney(discountTotal, details.CurrencyCode);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): orderDiscount → {OrderDiscount}", details, items, orderDiscount);
 
         //set adjustment item if needed
         if (itemAdjustment > decimal.Zero)
         {
             var unitAmount = PrepareMoney(itemAdjustment, details.CurrencyCode);
+			_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): unitAmount → {UnitAmount}", details, items, unitAmount);
             if (ConvertMoney(unitAmount) > decimal.Zero)
             {
                 items.Add(new()
@@ -592,10 +662,21 @@ public class PayPalCommerceServiceManager
                     Description = adjustmentDescription,
                     Quantity = 1.ToString(),
                     UnitAmount = unitAmount
+					_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): UnitAmount → {UnitAmount}", details, items, UnitAmount);
+					_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): Name → {Name}", details, items, Name);
+					_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): Quantity → {Quantity}", details, items, Quantity);
+					_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): Description → {Description}", details, items, Description);
                 });
             }
         }
 
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): Value → {Value}", details, items, Value);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): CurrencyCode → {CurrencyCode}", details, items, CurrencyCode);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): Discount → {Discount}", details, items, Discount);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): ItemTotal → {ItemTotal}", details, items, ItemTotal);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): Shipping → {Shipping}", details, items, Shipping);
+		_logger.LogDebug("PrepareOrderMoneyAsync(details={Details},items={Items}): TaxTotal → {TaxTotal}", details, items, TaxTotal);
+		_logger.LogDebug("<<< Exiting PrepareOrderMoneyAsync(details={Details},items={Items})", details, items);
         return new()
         {
             CurrencyCode = details.CurrencyCode,
@@ -622,6 +703,7 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<Shipping> PrepareShippingDetailsAsync(CartDetails details, string selectedOptionId, bool isApplePay = false)
     {
+		_logger.LogDebug(">>> Entering PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay})", details, selectedOptionId, isApplePay);
         if (!details.ShippingIsRequired)
             return null;
 
@@ -629,6 +711,7 @@ public class PayPalCommerceServiceManager
         var fullName = shippingAddress is not null && !details.IsPickup
             ? await _customerService.GetCustomerFullNameAsync(new() { FirstName = shippingAddress.FirstName, LastName = shippingAddress.LastName })
             : null;
+			_logger.LogDebug("PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay}): fullName → {FullName}", details, selectedOptionId, isApplePay, fullName);
         if (string.IsNullOrEmpty(fullName))
             fullName = await _customerService.GetCustomerFullNameAsync(details.Customer);
 
@@ -658,15 +741,18 @@ public class PayPalCommerceServiceManager
             shipping.Type = details.IsPickup
                 ? ShippingType.SHIPPING.ToString().ToUpper() //PICKUP_IN_STORE option doesn't work for some reason
                 : ShippingType.SHIPPING.ToString().ToUpper();
+				_logger.LogDebug("PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay}): shipping.Type → {Arg3}", details, selectedOptionId, isApplePay, shipping.Type);
 
             return shipping;
         }
 
         var (shippingOptions, pickupPoints) = await PrepareShippingOptionsAsync(details);
         if (!shippingOptions?.Any() ?? true)
+			_logger.LogWarning("Throwing NopException from PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay})", details, selectedOptionId, isApplePay);
             throw new NopException("No available shipping options");
 
         var selectedShippingOption = shippingOptions.FirstOrDefault();
+		_logger.LogDebug("PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay}): selectedShippingOption → {SelectedShippingOption}", details, selectedOptionId, isApplePay, selectedShippingOption);
         if (!string.IsNullOrEmpty(selectedOptionId))
         {
             var existingOption = shippingOptions
@@ -687,13 +773,17 @@ public class PayPalCommerceServiceManager
                 string.Equals(point.ProviderSystemName, selectedShippingOption.ShippingRateComputationMethodSystemName));
 
             details.IsPickup = true;
+			_logger.LogDebug("PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay}): details.IsPickup → {Arg3}", details, selectedOptionId, isApplePay, details.IsPickup);
+			_logger.LogDebug("PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay}): details.PickupPoint → {Arg3}", details, selectedOptionId, isApplePay, details.PickupPoint);
             details.PickupPoint = pickupPoint;
 
             //if the shipping option type is set to PICKUP, then the full name should start with S2S meaning ship to store (for example, S2S My Store)
             if (details.IsPickup && details.PickupPoint is not null)
                 shipping.Name.FullName = $"S2S {details.PickupPoint.Name}";
+				_logger.LogDebug("<<< Exiting GetShippingOptionNameAsync(option={Option})", option);
         }
         details.ShippingOption = selectedShippingOption;
+		_logger.LogDebug("PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay}): details.ShippingOption → {Arg3}", details, selectedOptionId, isApplePay, details.ShippingOption);
 
         //save selected options in attributes
         await _genericAttributeService
@@ -703,12 +793,14 @@ public class PayPalCommerceServiceManager
 
         async Task<ShippingOption> convertOptionAsync(NopShippingOption option)
         {
+			_logger.LogDebug(">>> Entering convertOptionAsync(option={Option})", option);
             var (adjustedShippingRate, _) = await _orderTotalCalculationService
                 .AdjustShippingRateAsync(option.Rate, details.Cart, option.IsPickupInStore);
             //var (rate, _) = await _taxService.GetShippingPriceAsync(adjustedShippingRate, details.Customer);
             //PayPal currently handles taxable shipping incorrectly, so we display shipping rates without tax, but it'll be included to tax total
             var rate = adjustedShippingRate;
 
+			_logger.LogDebug("<<< Exiting convertOptionAsync(option={Option})", option);
             return new ShippingOption
             {
                 Id = CommonHelper.EnsureMaximumLength(option.Name, 127),
@@ -731,6 +823,7 @@ public class PayPalCommerceServiceManager
             ?? shipping.Options.First())
             .Selected = true;
 
+		_logger.LogDebug("<<< Exiting PrepareShippingDetailsAsync(details={Details},selectedOptionId={SelectedOptionId},isApplePay={IsApplePay})", details, selectedOptionId, isApplePay);
         return shipping;
     }
 
@@ -774,6 +867,8 @@ public class PayPalCommerceServiceManager
                         TransitDays = point.TransitDays
                     }).ToListAsync());
                     pickupPoints.AddRange(pickupPointsResponse.PickupPoints);
+					_logger.LogDebug(">>> Entering GetShippingOptionNameAsync(option={Option})", option);
+					_logger.LogDebug("<<< Exiting GetShippingOptionNameAsync(option={Option})", option);
                 }
             }
         }
@@ -812,12 +907,15 @@ public class PayPalCommerceServiceManager
         (string City, string State, string Country, string PostalCode) selectedAddress,
         (string Id, string Type) selectedOption)
     {
+		_logger.LogDebug(">>> Entering PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption})", details, email, selectedAddress, selectedOption);
         //change shipping address when customer selects another one
         if (!string.IsNullOrEmpty(selectedAddress.City) && !string.IsNullOrEmpty(selectedAddress.State) &&
             !string.IsNullOrEmpty(selectedAddress.Country) && !string.IsNullOrEmpty(selectedAddress.PostalCode))
         {
             var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(selectedAddress.Country);
+			_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): country → {Country}", details, email, selectedAddress, selectedOption, country);
             var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(selectedAddress.State, country?.Id);
+			_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): state → {State}", details, email, selectedAddress, selectedOption, state);
             var newShippingAddress = await PrepareCustomerAddressAsync(details.Customer, new()
             {
                 Email = email ?? details.Customer.Email,
@@ -825,12 +923,20 @@ public class PayPalCommerceServiceManager
                 StateProvinceId = state?.Id,
                 CountryId = country?.Id,
                 ZipPostalCode = selectedAddress.PostalCode
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): City → {City}", details, email, selectedAddress, selectedOption, City);
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): CountryId → {CountryId}", details, email, selectedAddress, selectedOption, CountryId);
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): ZipPostalCode → {ZipPostalCode}", details, email, selectedAddress, selectedOption, ZipPostalCode);
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): StateProvinceId → {StateProvinceId}", details, email, selectedAddress, selectedOption, StateProvinceId);
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): Email → {Email1}", details, email, selectedAddress, selectedOption, Email);
             });
             if (newShippingAddress.Id != details.Customer.ShippingAddressId)
             {
                 details.Customer.ShippingAddressId = newShippingAddress.Id;
                 await _customerService.UpdateCustomerAsync(details.Customer);
             }
+			_logger.LogDebug(">>> Entering PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress})", customer, newAddress);
+			_logger.LogDebug("PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress}): query → {Query}", customer, newAddress);
+			_logger.LogDebug("<<< Exiting PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress})", customer, newAddress);
         }
 
         //change shipping option when customer selects another one
@@ -841,7 +947,9 @@ public class PayPalCommerceServiceManager
             if (shippingOption is not null)
             {
                 var type = shippingOption.IsPickupInStore ? ShippingType.PICKUP.ToString() : ShippingType.SHIPPING.ToString();
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): type → {Type}", details, email, selectedAddress, selectedOption, type);
                 selectedOption = (shippingOption.Name, type);
+				_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): selectedOption → {SelectedOption1}", details, email, selectedAddress, selectedOption, selectedOption);
             }
         }
 
@@ -856,7 +964,9 @@ public class PayPalCommerceServiceManager
             return null;
 
         var shipping = await PrepareShippingDetailsAsync(details, selectedOption.Id);
+		_logger.LogDebug("PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption}): shipping → {Shipping}", details, email, selectedAddress, selectedOption, shipping);
 
+		_logger.LogDebug("<<< Exiting PrepareUpdatedShippingAsync(details={Details},email={Email},selectedAddress={SelectedAddress},selectedOption={SelectedOption})", details, email, selectedAddress, selectedOption);
         return shipping;
     }
 
@@ -872,9 +982,13 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<PurchaseUnit> PreparePurchaseUnitAsync(PayPalCommerceSettings settings, CartDetails details, string orderGuid)
     {
+		_logger.LogDebug(">>> Entering PreparePurchaseUnitAsync(settings={Settings},details={Details},orderGuid={OrderGuid})", settings, details, orderGuid);
         var shipping = await PrepareShippingDetailsAsync(details, details.ShippingOption?.Name);
         var items = await PrepareOrderItemsAsync(details);
+		_logger.LogDebug("PreparePurchaseUnitAsync(settings={Settings},details={Details},orderGuid={OrderGuid}): items → {Items}", settings, details, orderGuid, items);
         var orderAmount = await PrepareOrderMoneyAsync(details, items);
+		_logger.LogDebug("PreparePurchaseUnitAsync(settings={Settings},details={Details},orderGuid={OrderGuid}): orderAmount → {OrderAmount}", settings, details, orderGuid, orderAmount);
+		_logger.LogDebug("PreparePurchaseUnitAsync(settings={Settings},details={Details},orderGuid={OrderGuid}): shipping → {Shipping}", settings, details, orderGuid, shipping);
         var cardData = new CardData
         {
             Level2 = new() { InvoiceId = CommonHelper.EnsureMaximumLength(orderGuid, 127) },
@@ -888,6 +1002,7 @@ public class PayPalCommerceServiceManager
             },
         };
 
+		_logger.LogDebug("<<< Exiting PreparePurchaseUnitAsync(settings={Settings},details={Details},orderGuid={OrderGuid})", settings, details, orderGuid);
         return new PurchaseUnit
         {
             CustomId = CommonHelper.EnsureMaximumLength(orderGuid, 127),
@@ -909,6 +1024,7 @@ public class PayPalCommerceServiceManager
     /// <returns>List of patch objects</returns>
     private static List<Patch<object>> PreparePatches(PurchaseUnit purchaseUnit)
     {
+		_logger.LogDebug(">>> Entering PreparePatches(purchaseUnit={PurchaseUnit})", purchaseUnit);
         var patches = new List<Patch<object>>
         {
             new()
@@ -938,6 +1054,7 @@ public class PayPalCommerceServiceManager
                 Op = PatchOpType.REPLACE.ToString().ToLower(),
                 Path = "/purchase_units/@reference_id=='default'/shipping/name",
                 Value = purchaseUnit.Shipping.Name
+				_logger.LogDebug("PreparePatches(purchaseUnit={PurchaseUnit}): Value → {Value}", purchaseUnit, Value);
             });
         }
         if (purchaseUnit.Shipping?.Address is not null)
@@ -982,8 +1099,11 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<NopAddress> PrepareCustomerAddressAsync(Customer customer, NopAddress newAddress)
     {
+		_logger.LogDebug(">>> Entering PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress})", customer, newAddress);
         var customerAddresses = await _customerService.GetAddressesByCustomerIdAsync(customer.Id);
         var query = customerAddresses.AsQueryable();
+		_logger.LogDebug("PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress}): query → {Query}", customer, newAddress, query);
+		_logger.LogDebug("PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress}): customerAddresses → {CustomerAddresses}", customer, newAddress, customerAddresses);
         if (!string.IsNullOrEmpty(newAddress.Email))
             query = query.Where(address => string.Equals(address.Email, newAddress.Email));
         if (!string.IsNullOrEmpty(newAddress.FirstName))
@@ -1004,6 +1124,7 @@ public class PayPalCommerceServiceManager
             query = query.Where(address => string.Equals(address.ZipPostalCode, newAddress.ZipPostalCode));
 
         var existingAddress = query.FirstOrDefault();
+		_logger.LogDebug("PrepareCustomerAddressAsync(customer={Customer},newAddress={NewAddress}): existingAddress → {ExistingAddress}", customer, newAddress, existingAddress);
         if (existingAddress is not null)
             return existingAddress;
 
@@ -1023,6 +1144,8 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<string> GetShippingOptionNameAsync(NopShippingOption option)
     {
+		_logger.LogDebug(">>> Entering GetShippingOptionNameAsync(option={Option})", option);
+		_logger.LogDebug("<<< Exiting GetShippingOptionNameAsync(option={Option})", option);
         return option.IsPickupInStore
             ? (string.IsNullOrEmpty(option.Name)
             ? await _localizationService.GetResourceAsync("Checkout.PickupPoints.NullName")
@@ -1045,8 +1168,10 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<List<PayPalToken>> PreparePaymentTokensAsync(PayPalCommerceSettings settings, IList<PayPalToken> tokens)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentTokensAsync(settings={Settings},tokens=<redacted>)", settings);
         var paymentTokens = new List<PaymentToken>();
 
+		_logger.LogDebug("PreparePaymentTokensAsync(settings={Settings},tokens=<redacted>): paymentTokens → {PaymentTokens}", settings, paymentTokens);
         foreach (var token in tokens)
         {
             if (string.IsNullOrEmpty(token.VaultCustomerId))
@@ -1077,6 +1202,7 @@ public class PayPalCommerceServiceManager
                 : "N/A"));
             paymentToken.Expiration = existingToken.PaymentSource?.Card is not null ? existingToken.PaymentSource.Card.Expiry : "N/A";
 
+		_logger.LogDebug("<<< Exiting PreparePaymentTokensAsync(settings={Settings},tokens=<redacted>)", settings);
             return paymentToken;
         }).Where(token => token is not null).ToList();
     }
@@ -1092,6 +1218,8 @@ public class PayPalCommerceServiceManager
     /// </returns>
     private async Task<string> GetVaultCustomerIdAsync(PayPalCommerceSettings settings, int customerId)
     {
+		_logger.LogDebug(">>> Entering GetVaultCustomerIdAsync(settings={Settings},customerId={CustomerId})", settings, customerId);
+		_logger.LogDebug("<<< Exiting GetVaultCustomerIdAsync(settings={Settings},customerId={CustomerId})", settings, customerId);
         return (await _tokenService.GetAllTokensAsync(settings.ClientId, customerId))
             .OrderBy(token => token.IsPrimaryMethod ? 0 : 1)
             .ThenBy(token => token.Id)
@@ -1110,6 +1238,8 @@ public class PayPalCommerceServiceManager
     /// <returns>SHA256 hash</returns>
     private static string GetSha256Hash(string stringToHash)
     {
+		_logger.LogDebug(">>> Entering GetSha256Hash(stringToHash=<redacted>)");
+		_logger.LogDebug("<<< Exiting GetSha256Hash(stringToHash=<redacted>)");
         return SHA256.HashData(Encoding.Default.GetBytes(stringToHash)).Aggregate(string.Empty, (current, next) => $"{current}{next:x2}");
     }
 
@@ -1147,7 +1277,9 @@ public class PayPalCommerceServiceManager
     /// <returns>Result</returns>
     public static bool IsConfigured(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConfigured(settings={Settings})", settings);
         //client id and secret are required to request remote services
+		_logger.LogDebug("<<< Exiting IsConfigured(settings={Settings})", settings);
         return !string.IsNullOrEmpty(settings?.ClientId) && !string.IsNullOrEmpty(settings.SecretKey);
     }
 
@@ -1158,7 +1290,9 @@ public class PayPalCommerceServiceManager
     /// <returns>Result</returns>
     public static bool IsConnected(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering IsConnected(settings={Settings})", settings);
         //webhook is required to accept notifications
+		_logger.LogDebug("<<< Exiting IsConnected(settings={Settings})", settings);
         return IsConfigured(settings) && !string.IsNullOrEmpty(settings.WebhookUrl);
     }
 
@@ -3055,15 +3189,20 @@ public class PayPalCommerceServiceManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteWebhookAsync(PayPalCommerceSettings settings)
     {
+		_logger.LogDebug(">>> Entering DeleteWebhookAsync(settings={Settings})", settings);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await HandleFunctionAsync(async () =>
         {
             if (!IsConnected(settings))
+				_logger.LogWarning("Throwing NopException from DeleteWebhookAsync(settings={Settings})", settings);
                 throw new NopException("Plugin not connected");
 
             var (webhook, _) = await GetWebhookAsync(settings, settings.WebhookUrl);
             if (webhook is not null)
                 await _httpClient.RequestAsync<DeleteWebhookRequest, EmptyResponse>(new() { WebhookId = webhook.Id }, settings);
 
+			_logger.LogInformation("DeleteWebhookAsync(settings)={Settings}: external service call took {Arg1} ms", settings, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteWebhookAsync(settings={Settings})", settings);
             return true;
         });
     }
@@ -3076,14 +3215,17 @@ public class PayPalCommerceServiceManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleWebhookAsync(PayPalCommerceSettings settings, Microsoft.AspNetCore.Http.HttpRequest request)
     {
+		_logger.LogDebug(">>> Entering HandleWebhookAsync(settings={Settings},request={Request})", settings, request);
         await HandleFunctionAsync(async () =>
         {
             //ensure that plugin is configured and connected
             if (!IsConnected(settings))
+				_logger.LogWarning("Throwing NopException from HandleWebhookAsync(settings={Settings},request={Request})", settings, request);
                 throw new NopException("Webhook error", new NopException("Plugin not connected"));
 
             //get request content
             var webhookEvent = string.Empty;
+			_logger.LogDebug("HandleWebhookAsync(settings={Settings},request={Request}): webhookEvent → {WebhookEvent}", settings, request, webhookEvent);
             using (var streamReader = new StreamReader(request.Body))
                 webhookEvent = await streamReader.ReadToEndAsync();
 
@@ -3094,6 +3236,8 @@ public class PayPalCommerceServiceManager
             //define a local function to validate the webhook event and get its resource
             async Task<IWebhookResource> getWebhookResource<TResource>() where TResource : class, IWebhookResource
             {
+				_logger.LogDebug(">>> Entering getWebhookResource()");
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
                 //verify webhook event data
                 var verifyRequest = new CreateWebhookSignatureRequest
                 {
@@ -3106,10 +3250,14 @@ public class PayPalCommerceServiceManager
                     WebhookEvent = new(webhookEvent)
                 };
                 var result = await _httpClient.RequestAsync<CreateWebhookSignatureRequest, CreateWebhookSignatureResponse>(verifyRequest, settings);
+				_logger.LogDebug("getWebhookResource(): result → {Result}", result);
+				_logger.LogInformation("getWebhookResource(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
 
                 if (result?.VerificationStatus?.ToUpper() != WebhookSignatureVerificationStatusType.SUCCESS.ToString())
+					_logger.LogWarning("Throwing NopException from getWebhookResource()");
                     throw new NopException("Webhook error", new NopException($"Webhook signature verification {result?.VerificationStatus}"));
 
+				_logger.LogDebug("<<< Exiting getWebhookResource()");
                 return JsonConvert.DeserializeObject<Event<TResource>>(webhookEvent)?.Resource;
             }
 
@@ -3370,6 +3518,7 @@ public class PayPalCommerceServiceManager
 
             await _orderService.UpdateOrderAsync(nopOrder);
 
+		_logger.LogDebug("<<< Exiting HandleWebhookAsync(settings={Settings},request={Request})", settings, request);
             return true;
         });
     }

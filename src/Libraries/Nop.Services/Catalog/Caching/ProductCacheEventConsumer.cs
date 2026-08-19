@@ -3,6 +3,7 @@ using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Services.Caching;
 using Nop.Services.Discounts;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog.Caching;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Catalog.Caching;
 /// </summary>
 public partial class ProductCacheEventConsumer : CacheEventConsumer<Product>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache data
     /// </summary>
@@ -19,6 +21,7 @@ public partial class ProductCacheEventConsumer : CacheEventConsumer<Product>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Product entity, EntityEventType entityEventType)
     {
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductManufacturersByProductPrefix, entity);
         await RemoveAsync(NopCatalogDefaults.ProductsHomepageCacheKey);
         await RemoveByPrefixAsync(NopCatalogDefaults.ProductPricePrefix, entity);
@@ -35,5 +38,6 @@ public partial class ProductCacheEventConsumer : CacheEventConsumer<Product>
         await RemoveAsync(NopDiscountDefaults.AppliedDiscountsCacheKey, nameof(Product), entity);
 
         await base.ClearCacheAsync(entity, entityEventType);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

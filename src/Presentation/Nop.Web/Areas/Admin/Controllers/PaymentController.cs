@@ -13,11 +13,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Models.Payments;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class PaymentController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -45,15 +47,26 @@ public partial class PaymentController : BaseAdminController
         ISettingService settingService,
         PaymentSettings paymentSettings)
     {
+		_logger.LogDebug(">>> Entering PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings})", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings);
         _countryService = countryService;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _countryService → {_countryService}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _countryService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _eventPublisher → {_eventPublisher}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _eventPublisher);
         _localizationService = localizationService;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _localizationService → {_localizationService}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _notificationService → {_notificationService}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _notificationService);
         _paymentModelFactory = paymentModelFactory;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _paymentModelFactory → {_paymentModelFactory}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _paymentModelFactory);
         _paymentPluginManager = paymentPluginManager;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _paymentPluginManager → {_paymentPluginManager}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _paymentPluginManager);
         _permissionService = permissionService;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _permissionService → {_permissionService}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _settingService → {_settingService}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _settingService);
         _paymentSettings = paymentSettings;
+		_logger.LogDebug("PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings}): _paymentSettings → {_paymentSettings}", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings, _paymentSettings);
+		_logger.LogDebug("<<< Exiting PaymentController(countryService={CountryService},eventPublisher={EventPublisher},localizationService={LocalizationService},notificationService={NotificationService},paymentModelFactory={PaymentModelFactory},paymentPluginManager={PaymentPluginManager},permissionService={PermissionService},settingService={SettingService},paymentSettings={PaymentSettings})", countryService, eventPublisher, localizationService, notificationService, paymentModelFactory, paymentPluginManager, permissionService, settingService, paymentSettings);
     }
 
     #endregion
@@ -62,6 +75,11 @@ public partial class PaymentController : BaseAdminController
 
     public virtual IActionResult PaymentMethods()
     {
+		_logger.LogDebug(">>> Entering PaymentMethods()");
+		_logger.LogDebug(">>> Entering Methods()");
+		_logger.LogDebug("<<< Exiting Methods()");
+		_logger.LogDebug("<<< Exiting Methods(searchModel={SearchModel})", searchModel);
+		_logger.LogDebug("<<< Exiting PaymentMethods()");
         return RedirectToAction("Methods");
     }
 
@@ -88,6 +106,7 @@ public partial class PaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public virtual async Task<IActionResult> MethodUpdate(PaymentMethodModel model)
     {
+		_logger.LogDebug(">>> Entering MethodUpdate(model={Model})", model);
         var pm = await _paymentPluginManager.LoadPluginBySystemNameAsync(model.SystemName);
         if (_paymentPluginManager.IsPluginActive(pm))
         {
@@ -110,6 +129,8 @@ public partial class PaymentController : BaseAdminController
 
         var pluginDescriptor = pm.PluginDescriptor;
         pluginDescriptor.FriendlyName = model.FriendlyName;
+		_logger.LogDebug("MethodUpdate(model={Model}): pluginDescriptor.FriendlyName → {Arg1}", model, pluginDescriptor.FriendlyName);
+		_logger.LogDebug("MethodUpdate(model={Model}): pluginDescriptor.DisplayOrder → {Arg1}", model, pluginDescriptor.DisplayOrder);
         pluginDescriptor.DisplayOrder = model.DisplayOrder;
 
         //update the description file
@@ -118,15 +139,19 @@ public partial class PaymentController : BaseAdminController
         //raise event
         await _eventPublisher.PublishAsync(new PluginUpdatedEvent(pluginDescriptor));
 
+		_logger.LogDebug("<<< Exiting MethodUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public virtual async Task<IActionResult> MethodRestrictions()
     {
+		_logger.LogDebug(">>> Entering MethodRestrictions()");
         //prepare model
         var model = await _paymentModelFactory.PreparePaymentMethodsModelAsync(new PaymentMethodsModel());
+		_logger.LogDebug("MethodRestrictions(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting MethodRestrictions()");
         return View(model);
     }
 
@@ -138,18 +163,23 @@ public partial class PaymentController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public virtual async Task<IActionResult> MethodRestrictionsSave(PaymentMethodsModel model, IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering MethodRestrictionsSave(model={Model},form={Form})", model, form);
         var paymentMethods = await _paymentPluginManager.LoadAllPluginsAsync();
         var countries = await _countryService.GetAllCountriesAsync(showHidden: true);
+		_logger.LogDebug("MethodRestrictionsSave(model={Model},form={Form}): countries → {Countries}", model, form, countries);
+		_logger.LogDebug("MethodRestrictionsSave(model={Model},form={Form}): paymentMethods → {PaymentMethods}", model, form, paymentMethods);
 
         foreach (var pm in paymentMethods)
         {
             var formKey = "restrict_" + pm.PluginDescriptor.SystemName;
+			_logger.LogDebug("MethodRestrictionsSave(model={Model},form={Form}): formKey → {FormKey}", model, form, formKey);
             var countryIdsToRestrict = (!StringValues.IsNullOrEmpty(form[formKey])
                     ? form[formKey].ToString().Split(_separator, StringSplitOptions.RemoveEmptyEntries).ToList()
                     : new List<string>())
                 .Select(x => Convert.ToInt32(x)).ToList();
 
             var newCountryIds = new List<int>();
+			_logger.LogDebug("MethodRestrictionsSave(model={Model},form={Form}): newCountryIds → {NewCountryIds}", model, form, newCountryIds);
             foreach (var c in countries)
             {
                 if (countryIdsToRestrict.Contains(c.Id))
@@ -163,6 +193,7 @@ public partial class PaymentController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Payment.MethodRestrictions.Updated"));
 
+		_logger.LogDebug("<<< Exiting MethodRestrictionsSave(model={Model},form={Form})", model, form);
         return RedirectToAction("MethodRestrictions");
     }
 

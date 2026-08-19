@@ -204,14 +204,17 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task BookReservedInventoryAsync(Shipment shipment, string message)
     {
+		_logger.LogDebug(">>> Entering BookReservedInventoryAsync(shipment={Shipment},message={Message})", shipment, message);
         foreach (var item in await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id))
         {
             var product = await _orderService.GetProductByOrderItemIdAsync(item.OrderItemId);
+			_logger.LogDebug("BookReservedInventoryAsync(shipment={Shipment},message={Message}): product → {Product}", shipment, message, product);
             if (product is null)
                 continue;
 
             await _productService.BookReservedInventoryAsync(product, item.WarehouseId, -item.Quantity, message);
         }
+		_logger.LogDebug("<<< Exiting BookReservedInventoryAsync(shipment={Shipment},message={Message})", shipment, message);
     }
 
     /// <summary>
@@ -222,17 +225,20 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ReverseBookedInventoryAsync(Order order, string message)
     {
+		_logger.LogDebug(">>> Entering ReverseBookedInventoryAsync(order={Order},message={Message})", order, message);
         foreach (var shipment in await _shipmentService.GetShipmentsByOrderIdAsync(order.Id))
         {
             foreach (var shipmentItem in await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id))
             {
                 var product = await _orderService.GetProductByOrderItemIdAsync(shipmentItem.OrderItemId);
+				_logger.LogDebug("ReverseBookedInventoryAsync(order={Order},message={Message}): product → {Product}", order, message, product);
                 if (product is null)
                     continue;
 
                 await _productService.ReverseBookedInventoryAsync(product, shipmentItem, message);
             }
         }
+		_logger.LogDebug("<<< Exiting ReverseBookedInventoryAsync(order={Order},message={Message})", order, message);
     }
 
     /// <summary>
@@ -243,14 +249,17 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ReturnOrderStockAsync(Order order, string message)
     {
+		_logger.LogDebug(">>> Entering ReturnOrderStockAsync(order={Order},message={Message})", order, message);
         foreach (var orderItem in await _orderService.GetOrderItemsAsync(order.Id))
         {
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogDebug("ReturnOrderStockAsync(order={Order},message={Message}): product → {Product}", order, message, product);
             if (product is null)
                 continue;
 
             await _productService.AdjustInventoryAsync(product, orderItem.Quantity, orderItem.AttributesXml, message);
         }
+		_logger.LogDebug("<<< Exiting ReturnOrderStockAsync(order={Order},message={Message})", order, message);
     }
 
     /// <summary>
@@ -261,6 +270,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task AddOrderNoteAsync(Order order, string note)
     {
+		_logger.LogDebug(">>> Entering AddOrderNoteAsync(order={Order},note={Note})", order, note);
         await _orderService.InsertOrderNoteAsync(new OrderNote
         {
             OrderId = order.Id,
@@ -268,6 +278,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             DisplayToCustomer = false,
             CreatedOnUtc = DateTime.UtcNow
         });
+		_logger.LogDebug("<<< Exiting AddOrderNoteAsync(order={Order},note={Note})", order, note);
     }
 
     /// <summary>
@@ -280,9 +291,12 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     protected virtual async Task<PlaceOrderContainer> PreparePlaceOrderDetailsAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PreparePlaceOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         var details = new PlaceOrderContainer();
 
+		_logger.LogDebug("PreparePlaceOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details → {Details}", processPaymentRequest, details);
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogDebug("PreparePlaceOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): currentCurrency → {CurrentCurrency}", processPaymentRequest, currentCurrency);
         await PrepareAndValidateCustomerAsync(details, processPaymentRequest, currentCurrency);
         await PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details, processPaymentRequest, currentCurrency);
         await PrepareAndValidateBillingAddressAsync(details);
@@ -291,8 +305,10 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //affiliate
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(details.Customer.AffiliateId);
+		_logger.LogDebug("PreparePlaceOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): affiliate → {Affiliate}", processPaymentRequest, affiliate);
         if (affiliate != null && affiliate.Active && !affiliate.Deleted)
             details.AffiliateId = affiliate.Id;
+			_logger.LogDebug("PreparePlaceOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.AffiliateId → {Arg1}", processPaymentRequest, details.AffiliateId);
 
         //tax display type
         details.CustomerTaxDisplayType = await _customerService.GetCustomerTaxDisplayTypeAsync(details.Customer);
@@ -304,6 +320,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         await PrepareAndValidateRecurringShoppingAsync(details, processPaymentRequest);
 
+		_logger.LogDebug("<<< Exiting PreparePlaceOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return details;
     }
 
@@ -316,12 +333,17 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <exception cref="NopException">Validation problems</exception>
     protected virtual async Task PrepareAndValidateRecurringShoppingAsync(PlaceOrderContainer details, ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PrepareAndValidateRecurringShoppingAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
         var (recurringCyclesError, recurringCycleLength, recurringCyclePeriod, recurringTotalCycles) = await _shoppingCartService.GetRecurringCycleInfoAsync(details.Cart);
 
         if (!string.IsNullOrEmpty(recurringCyclesError))
+			_logger.LogWarning("Throwing NopException from PrepareAndValidateRecurringShoppingAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
             throw new NopException(recurringCyclesError);
 
         processPaymentRequest.RecurringCycleLength = recurringCycleLength;
+		_logger.LogDebug("PrepareAndValidateRecurringShoppingAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): processPaymentRequest.RecurringCycleLength → {Arg2}", details, processPaymentRequest, processPaymentRequest.RecurringCycleLength);
+		_logger.LogDebug("PrepareAndValidateRecurringShoppingAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): processPaymentRequest.RecurringCyclePeriod → {Arg2}", details, processPaymentRequest, processPaymentRequest.RecurringCyclePeriod);
+		_logger.LogDebug("PrepareAndValidateRecurringShoppingAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): processPaymentRequest.RecurringTotalCycles → {Arg2}", details, processPaymentRequest, processPaymentRequest.RecurringTotalCycles);
         processPaymentRequest.RecurringCyclePeriod = recurringCyclePeriod;
         processPaymentRequest.RecurringTotalCycles = recurringTotalCycles;
     }
@@ -337,12 +359,15 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <exception cref="NopException">Validation problems</exception>
     protected virtual async Task PrepareAndValidateTotalsAsync(PlaceOrderContainer details, ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
         var (discountAmountInclTax, discountAmountExclTax, appliedDiscounts, subTotalWithoutDiscountInclTax,
                 subTotalWithoutDiscountExclTax, _, _, _) =
             await _orderTotalCalculationService.GetShoppingCartSubTotalsAsync(details.Cart);
 
         //sub total (incl tax)
         details.OrderSubTotalInclTax = subTotalWithoutDiscountInclTax;
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalInclTax → {Arg2}", details, processPaymentRequest, details.OrderSubTotalInclTax);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalDiscountInclTax → {Arg2}", details, processPaymentRequest, details.OrderSubTotalDiscountInclTax);
         details.OrderSubTotalDiscountInclTax = discountAmountInclTax;
 
         //discount history
@@ -352,15 +377,20 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //sub total (excl tax)
         details.OrderSubTotalExclTax = subTotalWithoutDiscountExclTax;
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalExclTax → {Arg2}", details, processPaymentRequest, details.OrderSubTotalExclTax);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalDiscountExclTax → {Arg2}", details, processPaymentRequest, details.OrderSubTotalDiscountExclTax);
         details.OrderSubTotalDiscountExclTax = discountAmountExclTax;
 
         //shipping total
         var (orderShippingTotalInclTax, orderShippingTotalExclTax, _, shippingTotalDiscounts) = await _orderTotalCalculationService.GetShoppingCartShippingTotalsAsync(details.Cart);
 
         if (!orderShippingTotalInclTax.HasValue || !orderShippingTotalExclTax.HasValue)
+			_logger.LogWarning("Throwing NopException from PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
             throw new NopException("Shipping total couldn't be calculated");
 
         details.OrderShippingTotalInclTax = orderShippingTotalInclTax.Value;
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderShippingTotalInclTax → {Arg2}", details, processPaymentRequest, details.OrderShippingTotalInclTax);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderShippingTotalExclTax → {Arg2}", details, processPaymentRequest, details.OrderShippingTotalExclTax);
         details.OrderShippingTotalExclTax = orderShippingTotalExclTax.Value;
 
         foreach (var disc in shippingTotalDiscounts)
@@ -369,6 +399,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //payment total
         var paymentAdditionalFee = await _paymentService.GetAdditionalHandlingFeeAsync(details.Cart, processPaymentRequest.PaymentMethodSystemName);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): paymentAdditionalFee → {PaymentAdditionalFee}", details, processPaymentRequest, paymentAdditionalFee);
         details.PaymentAdditionalFeeInclTax = (await _taxService.GetPaymentMethodAdditionalFeeAsync(paymentAdditionalFee, true, details.Customer)).price;
         details.PaymentAdditionalFeeExclTax = (await _taxService.GetPaymentMethodAdditionalFeeAsync(paymentAdditionalFee, false, details.Customer)).price;
 
@@ -379,6 +410,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         //VAT number
         if (_taxSettings.EuVatEnabled && details.Customer.VatNumberStatus == VatNumberStatus.Valid)
             details.VatNumber = details.Customer.VatNumber;
+			_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.VatNumber → {Arg2}", details, processPaymentRequest, details.VatNumber);
 
         //tax rates
         details.TaxRates = taxRatesDictionary.Aggregate(string.Empty, (current, next) =>
@@ -390,6 +422,11 @@ public partial class OrderProcessingService : IOrderProcessingService
             throw new NopException("Order total couldn't be calculated");
 
         details.OrderDiscountAmount = orderDiscountAmount;
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderDiscountAmount → {Arg2}", details, processPaymentRequest, details.OrderDiscountAmount);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.RedeemedRewardPoints → {Arg2}", details, processPaymentRequest, details.RedeemedRewardPoints);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.RedeemedRewardPointsAmount → {Arg2}", details, processPaymentRequest, details.RedeemedRewardPointsAmount);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.AppliedGiftCards → {Arg2}", details, processPaymentRequest, details.AppliedGiftCards);
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.OrderTotal → {Arg2}", details, processPaymentRequest, details.OrderTotal);
         details.RedeemedRewardPoints = redeemedRewardPoints;
         details.RedeemedRewardPointsAmount = redeemedRewardPointsAmount;
         details.AppliedGiftCards = appliedGiftCards;
@@ -401,6 +438,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 details.AppliedDiscounts.Add(disc);
 
         processPaymentRequest.OrderTotal = details.OrderTotal;
+		_logger.LogDebug("PrepareAndValidateTotalsAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): processPaymentRequest.OrderTotal → {Arg2}", details, processPaymentRequest, processPaymentRequest.OrderTotal);
     }
 
     /// <summary>
@@ -412,6 +450,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <exception cref="NopException">Validation problems</exception>
     protected virtual async Task PrepareAndValidateShippingInfoAsync(PlaceOrderContainer details, ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
         //shipping info
         if (await _shoppingCartService.ShoppingCartRequiresShippingAsync(details.Cart))
         {
@@ -420,9 +459,13 @@ public partial class OrderProcessingService : IOrderProcessingService
             if (_shippingSettings.AllowPickupInStore && pickupPoint != null)
             {
                 var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(pickupPoint.CountryCode);
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): country → {Country}", details, processPaymentRequest, country);
                 var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(pickupPoint.StateAbbreviation, country?.Id);
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): state → {State}", details, processPaymentRequest, state);
 
                 details.PickupInStore = true;
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.PickupInStore → {Arg2}", details, processPaymentRequest, details.PickupInStore);
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.PickupAddress → {Arg2}", details, processPaymentRequest, details.PickupAddress);
                 details.PickupAddress = new Address
                 {
                     Address1 = pickupPoint.Address,
@@ -437,9 +480,11 @@ public partial class OrderProcessingService : IOrderProcessingService
             else
             {
                 if (details.Customer.ShippingAddressId == null)
+					_logger.LogWarning("Throwing NopException from PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
                     throw new NopException("Shipping address is not provided");
 
                 var shippingAddress = await _customerService.GetCustomerShippingAddressAsync(details.Customer);
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): shippingAddress → {ShippingAddress}", details, processPaymentRequest, shippingAddress);
 
                 if (!CommonHelper.IsValidEmail(shippingAddress?.Email))
                     throw new NopException("Email is not valid");
@@ -456,13 +501,17 @@ public partial class OrderProcessingService : IOrderProcessingService
             if (shippingOption != null)
             {
                 details.ShippingMethodName = shippingOption.Name;
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.ShippingMethodName → {Arg2}", details, processPaymentRequest, details.ShippingMethodName);
+				_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.ShippingRateComputationMethodSystemName → {Arg2}", details, processPaymentRequest, details.ShippingRateComputationMethodSystemName);
                 details.ShippingRateComputationMethodSystemName = shippingOption.ShippingRateComputationMethodSystemName;
             }
 
             details.ShippingStatus = ShippingStatus.NotYetShipped;
+			_logger.LogDebug("PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest}): details.ShippingStatus → {Arg2}", details, processPaymentRequest, details.ShippingStatus);
         }
         else
             details.ShippingStatus = ShippingStatus.ShippingNotRequired;
+			_logger.LogDebug("<<< Exiting PrepareAndValidateShippingInfoAsync(details={Details},processPaymentRequest={ProcessPaymentRequest})", details, processPaymentRequest);
     }
 
     /// <summary>
@@ -475,6 +524,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <exception cref="NopException">Validation problems</exception>
     protected virtual async Task PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(PlaceOrderContainer details, ProcessPaymentRequest processPaymentRequest, Currency currentCurrency)
     {
+		_logger.LogDebug(">>> Entering PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency})", details, processPaymentRequest, currentCurrency);
         //checkout attributes
         details.CheckoutAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(details.Customer, NopCustomerDefaults.CheckoutAttributes, processPaymentRequest.StoreId);
         details.CheckoutAttributeDescription = await _checkoutAttributeFormatter.FormatAttributesAsync(details.CheckoutAttributesXml, details.Customer);
@@ -483,10 +533,12 @@ public partial class OrderProcessingService : IOrderProcessingService
         details.Cart = await _shoppingCartService.GetShoppingCartAsync(details.Customer, ShoppingCartType.ShoppingCart, processPaymentRequest.StoreId);
 
         if (!details.Cart.Any())
+			_logger.LogWarning("Throwing NopException from PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency})", details, processPaymentRequest, currentCurrency);
             throw new NopException("Cart is empty");
 
         //validate the entire shopping cart
         var warnings = await _shoppingCartService.GetShoppingCartWarningsAsync(details.Cart, details.CheckoutAttributesXml, true);
+		_logger.LogDebug("PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): warnings → {Warnings}", details, processPaymentRequest, currentCurrency, warnings);
         if (warnings.Any())
             throw new NopException(warnings.Aggregate(string.Empty, (current, next) => $"{current}{next};"));
 
@@ -494,6 +546,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         foreach (var sci in details.Cart)
         {
             var product = await _productService.GetProductByIdAsync(sci.ProductId);
+			_logger.LogDebug("PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): product → {Product}", details, processPaymentRequest, currentCurrency, product);
 
             var sciWarnings = await _shoppingCartService.GetShoppingCartItemWarningsAsync(details.Customer,
                 sci.ShoppingCartType, product, processPaymentRequest.StoreId, sci.AttributesXml,
@@ -506,15 +559,21 @@ public partial class OrderProcessingService : IOrderProcessingService
         if (!await ValidateMinOrderSubtotalAmountAsync(details.Cart))
         {
             var minOrderSubtotalAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(_orderSettings.MinOrderSubtotalAmount, currentCurrency);
+				_logger.LogDebug("PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): minOrderSubtotalAmount → {MinOrderSubtotalAmount}", details, processPaymentRequest, currentCurrency, minOrderSubtotalAmount);
             throw new NopException(string.Format(await _localizationService.GetResourceAsync("Checkout.MinOrderSubtotalAmount"),
                 await _priceFormatter.FormatPriceAsync(minOrderSubtotalAmount, true, false)));
+				_logger.LogDebug(">>> Entering ValidateMinOrderSubtotalAmountAsync(cart={Cart})", cart);
+				_logger.LogDebug("<<< Exiting ValidateMinOrderSubtotalAmountAsync(cart={Cart})", cart);
         }
 
         if (!await ValidateMinOrderTotalAmountAsync(details.Cart))
         {
             var minOrderTotalAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(_orderSettings.MinOrderTotalAmount, currentCurrency);
+				_logger.LogDebug("PrepareAndValidateShoppingCartAndCheckoutAttributesAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): minOrderTotalAmount → {MinOrderTotalAmount}", details, processPaymentRequest, currentCurrency, minOrderTotalAmount);
             throw new NopException(string.Format(await _localizationService.GetResourceAsync("Checkout.MinOrderTotalAmount"),
                 await _priceFormatter.FormatPriceAsync(minOrderTotalAmount, true, false)));
+				_logger.LogDebug(">>> Entering ValidateMinOrderTotalAmountAsync(cart={Cart})", cart);
+				_logger.LogDebug("<<< Exiting ValidateMinOrderTotalAmountAsync(cart={Cart})", cart);
         }
     }
 
@@ -526,10 +585,13 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <exception cref="NopException">Validation problems</exception>
     protected virtual async Task PrepareAndValidateBillingAddressAsync(PlaceOrderContainer details)
     {
+		_logger.LogDebug(">>> Entering PrepareAndValidateBillingAddressAsync(details={Details})", details);
         if (details.Customer.BillingAddressId is null)
+			_logger.LogWarning("Throwing NopException from PrepareAndValidateBillingAddressAsync(details={Details})", details);
             throw new NopException("Billing address is not provided");
 
         var billingAddress = await _customerService.GetCustomerBillingAddressAsync(details.Customer);
+		_logger.LogDebug("PrepareAndValidateBillingAddressAsync(details={Details}): billingAddress → {BillingAddress}", details, billingAddress);
 
         if (!CommonHelper.IsValidEmail(billingAddress?.Email))
             throw new NopException("Email is not valid");
@@ -550,19 +612,27 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <exception cref="NopException">Validation problems</exception>
     protected virtual async Task PrepareAndValidateCustomerAsync(PlaceOrderContainer details, ProcessPaymentRequest processPaymentRequest, Currency currentCurrency)
     {
+		_logger.LogDebug(">>> Entering PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency})", details, processPaymentRequest, currentCurrency);
         details.Customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
 
         if (details.Customer == null)
+			_logger.LogWarning("Throwing ArgumentException from PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency})", details, processPaymentRequest, currentCurrency);
             throw new ArgumentException("Customer is not set");
 
         //check whether customer is guest
         if (await _customerService.IsGuestAsync(details.Customer) && !_orderSettings.AnonymousCheckoutAllowed)
+			_logger.LogWarning("Throwing NopException from PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency})", details, processPaymentRequest, currentCurrency);
             throw new NopException("Anonymous checkout is not allowed");
 
         //customer currency
         var currencyTmp = await _currencyService.GetCurrencyByIdAsync(details.Customer.CurrencyId ?? 0);
+		_logger.LogDebug("PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): currencyTmp → {CurrencyTmp}", details, processPaymentRequest, currentCurrency, currencyTmp);
+		_logger.LogDebug("PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): details.CustomerCurrencyCode → {Arg3}", details, processPaymentRequest, currentCurrency, details.CustomerCurrencyCode);
+		_logger.LogDebug("PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): details.CustomerCurrencyRate → {Arg3}", details, processPaymentRequest, currentCurrency, details.CustomerCurrencyRate);
         var customerCurrency = currencyTmp != null && currencyTmp.Published && await _storeMappingService.AuthorizeAsync(currencyTmp) ? currencyTmp : currentCurrency;
+		_logger.LogDebug("PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): customerCurrency → {CustomerCurrency}", details, processPaymentRequest, currentCurrency, customerCurrency);
         var primaryStoreCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogDebug("PrepareAndValidateCustomerAsync(details={Details},processPaymentRequest={ProcessPaymentRequest},currentCurrency={CurrentCurrency}): primaryStoreCurrency → {PrimaryStoreCurrency}", details, processPaymentRequest, currentCurrency, primaryStoreCurrency);
         details.CustomerCurrencyCode = customerCurrency.CurrencyCode;
         details.CustomerCurrencyRate = customerCurrency.Rate / primaryStoreCurrency.Rate;
 
@@ -582,6 +652,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     protected virtual async Task<PlaceOrderContainer> PrepareRecurringOrderDetailsAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         var details = new PlaceOrderContainer
         {
             IsRecurringShoppingCart = true,
@@ -590,9 +661,11 @@ public partial class OrderProcessingService : IOrderProcessingService
         };
 
         if (details.InitialOrder == null)
+			_logger.LogWarning("Throwing ArgumentException from PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
             throw new ArgumentException("Initial order is not set for recurring payment");
 
         processPaymentRequest.PaymentMethodSystemName = details.InitialOrder.PaymentMethodSystemName;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): processPaymentRequest.PaymentMethodSystemName → {Arg1}", processPaymentRequest, processPaymentRequest.PaymentMethodSystemName);
 
         //customer
         details.Customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
@@ -601,15 +674,20 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //affiliate
         var affiliate = await _affiliateService.GetAffiliateByIdAsync(details.Customer.AffiliateId);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): affiliate → {Affiliate}", processPaymentRequest, affiliate);
         if (affiliate != null && affiliate.Active && !affiliate.Deleted)
             details.AffiliateId = affiliate.Id;
+			_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.AffiliateId → {Arg1}", processPaymentRequest, details.AffiliateId);
 
         //check whether customer is guest
         if (await _customerService.IsGuestAsync(details.Customer) && !_orderSettings.AnonymousCheckoutAllowed)
+			_logger.LogWarning("Throwing NopException from PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
             throw new NopException("Anonymous checkout is not allowed");
 
         //customer currency
         details.CustomerCurrencyCode = details.InitialOrder.CustomerCurrencyCode;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.CustomerCurrencyCode → {Arg1}", processPaymentRequest, details.CustomerCurrencyCode);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.CustomerCurrencyRate → {Arg1}", processPaymentRequest, details.CustomerCurrencyRate);
         details.CustomerCurrencyRate = details.InitialOrder.CurrencyRate;
 
         //customer language
@@ -622,6 +700,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             throw new NopException("Billing address is not available");
 
         var billingAddress = await _addressService.GetAddressByIdAsync(details.InitialOrder.BillingAddressId);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): billingAddress → {BillingAddress}", processPaymentRequest, billingAddress);
 
         details.BillingAddress = _addressService.CloneAddress(billingAddress);
         if (await _countryService.GetCountryByAddressAsync(billingAddress) is Country billingCountry && !billingCountry.AllowsBilling)
@@ -629,13 +708,20 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //checkout attributes
         details.CheckoutAttributesXml = details.InitialOrder.CheckoutAttributesXml;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.CheckoutAttributesXml → {Arg1}", processPaymentRequest, details.CheckoutAttributesXml);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.CheckoutAttributeDescription → {Arg1}", processPaymentRequest, details.CheckoutAttributeDescription);
         details.CheckoutAttributeDescription = details.InitialOrder.CheckoutAttributeDescription;
 
         //tax display type
         details.CustomerTaxDisplayType = details.InitialOrder.CustomerTaxDisplayType;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.CustomerTaxDisplayType → {Arg1}", processPaymentRequest, details.CustomerTaxDisplayType);
 
         //sub total
         details.OrderSubTotalInclTax = details.InitialOrder.OrderSubtotalInclTax;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalInclTax → {Arg1}", processPaymentRequest, details.OrderSubTotalInclTax);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalExclTax → {Arg1}", processPaymentRequest, details.OrderSubTotalExclTax);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalDiscountExclTax → {Arg1}", processPaymentRequest, details.OrderSubTotalDiscountExclTax);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderSubTotalDiscountInclTax → {Arg1}", processPaymentRequest, details.OrderSubTotalDiscountInclTax);
         details.OrderSubTotalExclTax = details.InitialOrder.OrderSubtotalExclTax;
         details.OrderSubTotalDiscountExclTax = details.InitialOrder.OrderSubTotalDiscountExclTax;
         details.OrderSubTotalDiscountInclTax = details.InitialOrder.OrderSubTotalDiscountInclTax;
@@ -644,6 +730,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         if (details.InitialOrder.ShippingStatus != ShippingStatus.ShippingNotRequired)
         {
             details.PickupInStore = details.InitialOrder.PickupInStore;
+			_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.PickupInStore → {Arg1}", processPaymentRequest, details.PickupInStore);
             if (!details.PickupInStore)
             {
                 if (!details.InitialOrder.ShippingAddressId.HasValue || await _addressService.GetAddressByIdAsync(details.InitialOrder.ShippingAddressId.Value) is not Address shippingAddress)
@@ -658,6 +745,9 @@ public partial class OrderProcessingService : IOrderProcessingService
                 details.PickupAddress = _addressService.CloneAddress(pickupAddress);
 
             details.ShippingMethodName = details.InitialOrder.ShippingMethod;
+			_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.ShippingMethodName → {Arg1}", processPaymentRequest, details.ShippingMethodName);
+			_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.ShippingRateComputationMethodSystemName → {Arg1}", processPaymentRequest, details.ShippingRateComputationMethodSystemName);
+			_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.ShippingStatus → {Arg1}", processPaymentRequest, details.ShippingStatus);
             details.ShippingRateComputationMethodSystemName = details.InitialOrder.ShippingRateComputationMethodSystemName;
             details.ShippingStatus = ShippingStatus.NotYetShipped;
         }
@@ -666,34 +756,46 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //shipping total
         details.OrderShippingTotalInclTax = details.InitialOrder.OrderShippingInclTax;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderShippingTotalInclTax → {Arg1}", processPaymentRequest, details.OrderShippingTotalInclTax);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderShippingTotalExclTax → {Arg1}", processPaymentRequest, details.OrderShippingTotalExclTax);
         details.OrderShippingTotalExclTax = details.InitialOrder.OrderShippingExclTax;
 
         //payment total
         details.PaymentAdditionalFeeInclTax = details.InitialOrder.PaymentMethodAdditionalFeeInclTax;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.PaymentAdditionalFeeInclTax → {Arg1}", processPaymentRequest, details.PaymentAdditionalFeeInclTax);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.PaymentAdditionalFeeExclTax → {Arg1}", processPaymentRequest, details.PaymentAdditionalFeeExclTax);
         details.PaymentAdditionalFeeExclTax = details.InitialOrder.PaymentMethodAdditionalFeeExclTax;
 
         //tax total
         details.OrderTaxTotal = details.InitialOrder.OrderTax;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderTaxTotal → {Arg1}", processPaymentRequest, details.OrderTaxTotal);
 
         //tax rates
         details.TaxRates = details.InitialOrder.TaxRates;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.TaxRates → {Arg1}", processPaymentRequest, details.TaxRates);
 
         //VAT number
         details.VatNumber = details.InitialOrder.VatNumber;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.VatNumber → {Arg1}", processPaymentRequest, details.VatNumber);
 
         //discount history (the same)
         foreach (var duh in await _discountService.GetAllDiscountUsageHistoryAsync(orderId: details.InitialOrder.Id))
         {
             var d = await _discountService.GetDiscountByIdAsync(duh.DiscountId);
+			_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): d → {D}", processPaymentRequest, d);
             if (d != null)
                 details.AppliedDiscounts.Add(d);
         }
 
         //order total
         details.OrderDiscountAmount = details.InitialOrder.OrderDiscount;
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderDiscountAmount → {Arg1}", processPaymentRequest, details.OrderDiscountAmount);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): details.OrderTotal → {Arg1}", processPaymentRequest, details.OrderTotal);
+		_logger.LogDebug("PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest}): processPaymentRequest.OrderTotal → {Arg1}", processPaymentRequest, processPaymentRequest.OrderTotal);
         details.OrderTotal = details.InitialOrder.OrderTotal;
         processPaymentRequest.OrderTotal = details.OrderTotal;
 
+		_logger.LogDebug("<<< Exiting PrepareRecurringOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return details;
     }
 
@@ -710,6 +812,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     protected virtual async Task<Order> SaveOrderDetailsAsync(ProcessPaymentRequest processPaymentRequest,
         ProcessPaymentResult processPaymentResult, PlaceOrderContainer details)
     {
+		_logger.LogDebug(">>> Entering SaveOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest},processPaymentResult={ProcessPaymentResult},details={Details})", processPaymentRequest, processPaymentResult, details);
         var order = new Order
         {
             StoreId = processPaymentRequest.StoreId,
@@ -765,21 +868,25 @@ public partial class OrderProcessingService : IOrderProcessingService
         };
 
         if (details.BillingAddress is null)
+			_logger.LogWarning("Throwing NopException from SaveOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest},processPaymentResult={ProcessPaymentResult},details={Details})", processPaymentRequest, processPaymentResult, details);
             throw new NopException("Billing address is not provided");
 
         await _addressService.InsertAddressAsync(details.BillingAddress);
         order.BillingAddressId = details.BillingAddress.Id;
+		_logger.LogDebug("SaveOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest},processPaymentResult={ProcessPaymentResult},details={Details}): order.BillingAddressId → {Arg3}", processPaymentRequest, processPaymentResult, details, order.BillingAddressId);
 
         if (details.PickupAddress != null)
         {
             await _addressService.InsertAddressAsync(details.PickupAddress);
             order.PickupAddressId = details.PickupAddress.Id;
+			_logger.LogDebug("SaveOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest},processPaymentResult={ProcessPaymentResult},details={Details}): order.PickupAddressId → {Arg3}", processPaymentRequest, processPaymentResult, details, order.PickupAddressId);
         }
 
         if (details.ShippingAddress != null)
         {
             await _addressService.InsertAddressAsync(details.ShippingAddress);
             order.ShippingAddressId = details.ShippingAddress.Id;
+			_logger.LogDebug("SaveOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest},processPaymentResult={ProcessPaymentResult},details={Details}): order.ShippingAddressId → {Arg3}", processPaymentRequest, processPaymentResult, details, order.ShippingAddressId);
         }
 
         await _orderService.InsertOrderAsync(order);
@@ -798,6 +905,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         await _orderService.UpdateOrderAsync(order);
 
+		_logger.LogDebug("<<< Exiting SaveOrderDetailsAsync(processPaymentRequest={ProcessPaymentRequest},processPaymentResult={ProcessPaymentResult},details={Details})", processPaymentRequest, processPaymentResult, details);
         return order;
     }
 
@@ -808,6 +916,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SendNotificationsAndSaveNotesAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering SendNotificationsAndSaveNotesAsync(order={Order})", order);
         //notes, messages
         await AddOrderNoteAsync(order, _workContext.OriginalCustomerIfImpersonated != null
             ? $"Order placed by a store owner ('{_workContext.OriginalCustomerIfImpersonated.Email}'. ID = {_workContext.OriginalCustomerIfImpersonated.Id}) impersonating the customer."
@@ -815,6 +924,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //send email notifications
         var orderPlacedStoreOwnerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderPlacedStoreOwnerNotificationAsync(order, _localizationSettings.DefaultAdminLanguageId);
+		_logger.LogDebug("SendNotificationsAndSaveNotesAsync(order={Order}): orderPlacedStoreOwnerNotificationQueuedEmailIds → {OrderPlacedStoreOwnerNotificationQueuedEmailIds}", order, orderPlacedStoreOwnerNotificationQueuedEmailIds);
         if (orderPlacedStoreOwnerNotificationQueuedEmailIds.Any())
             await AddOrderNoteAsync(order, $"\"Order placed\" email (to store owner) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedStoreOwnerNotificationQueuedEmailIds)}.");
 
@@ -828,19 +938,24 @@ public partial class OrderProcessingService : IOrderProcessingService
             await AddOrderNoteAsync(order, $"\"Order placed\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedCustomerNotificationQueuedEmailIds)}.");
 
         var vendors = await GetVendorsInOrderAsync(order);
+		_logger.LogDebug("SendNotificationsAndSaveNotesAsync(order={Order}): vendors → {Vendors}", order, vendors);
         foreach (var vendor in vendors)
         {
             var orderPlacedVendorNotificationQueuedEmailIds = await _workflowMessageService.SendOrderPlacedVendorNotificationAsync(order, vendor, _localizationSettings.DefaultAdminLanguageId);
+			_logger.LogDebug("SendNotificationsAndSaveNotesAsync(order={Order}): orderPlacedVendorNotificationQueuedEmailIds → {OrderPlacedVendorNotificationQueuedEmailIds}", order, orderPlacedVendorNotificationQueuedEmailIds);
             if (orderPlacedVendorNotificationQueuedEmailIds.Any())
                 await AddOrderNoteAsync(order, $"\"Order placed\" email (to vendor) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedVendorNotificationQueuedEmailIds)}.");
+				_logger.LogDebug("<<< Exiting GetVendorsInOrderAsync(order={Order})", order);
         }
 
         if (order.AffiliateId == 0)
             return;
 
         var orderPlacedAffiliateNotificationQueuedEmailIds = await _workflowMessageService.SendOrderPlacedAffiliateNotificationAsync(order, _localizationSettings.DefaultAdminLanguageId);
+		_logger.LogDebug("SendNotificationsAndSaveNotesAsync(order={Order}): orderPlacedAffiliateNotificationQueuedEmailIds → {OrderPlacedAffiliateNotificationQueuedEmailIds}", order, orderPlacedAffiliateNotificationQueuedEmailIds);
         if (orderPlacedAffiliateNotificationQueuedEmailIds.Any())
             await AddOrderNoteAsync(order, $"\"Order placed\" email (to affiliate) has been queued. Queued email identifiers: {string.Join(", ", orderPlacedAffiliateNotificationQueuedEmailIds)}.");
+			_logger.LogDebug("<<< Exiting SendNotificationsAndSaveNotesAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -850,9 +965,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task AwardRewardPointsAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering AwardRewardPointsAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogDebug("AwardRewardPointsAsync(order={Order}): customer → {Customer}", order, customer);
 
         var totalForRewardPoints = _orderTotalCalculationService
             .CalculateApplicableOrderTotalForRewardPoints(order.OrderShippingInclTax, order.OrderTotal);
@@ -870,21 +987,26 @@ public partial class OrderProcessingService : IOrderProcessingService
         if (_rewardPointsSettings.ActivationDelay > 0)
         {
             var delayPeriod = (RewardPointsActivatingDelayPeriod)_rewardPointsSettings.ActivationDelayPeriodId;
+			_logger.LogDebug("AwardRewardPointsAsync(order={Order}): delayPeriod → {DelayPeriod}", order, delayPeriod);
             var delayInHours = delayPeriod.ToHours(_rewardPointsSettings.ActivationDelay);
+			_logger.LogDebug("AwardRewardPointsAsync(order={Order}): delayInHours → {DelayInHours}", order, delayInHours);
             activatingDate = DateTime.UtcNow.AddHours(delayInHours);
         }
+		_logger.LogDebug("AwardRewardPointsAsync(order={Order}): activatingDate → {ActivatingDate}", order, activatingDate);
 
         //whether points validity is set
         DateTime? endDate = null;
         if (_rewardPointsSettings.PurchasesPointsValidity > 0)
             endDate = (activatingDate ?? DateTime.UtcNow).AddDays(_rewardPointsSettings.PurchasesPointsValidity.Value);
 
+		_logger.LogDebug("AwardRewardPointsAsync(order={Order}): endDate → {EndDate}", order, endDate);
         //add reward points
         order.RewardPointsHistoryEntryId = await _rewardPointService.AddRewardPointsHistoryEntryAsync(customer, points, order.StoreId,
             string.Format(await _localizationService.GetResourceAsync("RewardPoints.Message.EarnedForOrder"), order.CustomOrderNumber),
             activatingDate: activatingDate, endDate: endDate);
 
         await _orderService.UpdateOrderAsync(order);
+		_logger.LogDebug("<<< Exiting AwardRewardPointsAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -894,6 +1016,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ReduceRewardPointsAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering ReduceRewardPointsAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         //ensure that reward points were already earned for this order before
@@ -902,6 +1025,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //get appropriate history entry
         var rewardPointsHistoryEntry = await _rewardPointService.GetRewardPointsHistoryEntryByIdAsync(order.RewardPointsHistoryEntryId.Value);
+		_logger.LogDebug("ReduceRewardPointsAsync(order={Order}): rewardPointsHistoryEntry → {RewardPointsHistoryEntry}", order, rewardPointsHistoryEntry);
         if (rewardPointsHistoryEntry != null)
         {
             if (rewardPointsHistoryEntry.CreatedOnUtc > DateTime.UtcNow)
@@ -912,12 +1036,14 @@ public partial class OrderProcessingService : IOrderProcessingService
             else
             {
                 var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+				_logger.LogDebug("ReduceRewardPointsAsync(order={Order}): customer → {Customer}", order, customer);
 
                 //or reduce reward points if the entry already exists
                 await _rewardPointService.AddRewardPointsHistoryEntryAsync(customer, -rewardPointsHistoryEntry.Points, order.StoreId,
                     string.Format(await _localizationService.GetResourceAsync("RewardPoints.Message.ReducedForOrder"), order.CustomOrderNumber));
             }
         }
+		_logger.LogDebug("<<< Exiting ReduceRewardPointsAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -927,12 +1053,15 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ReturnBackRedeemedRewardPointsAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering ReturnBackRedeemedRewardPointsAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogDebug("ReturnBackRedeemedRewardPointsAsync(order={Order}): customer → {Customer}", order, customer);
 
         //were some reward points spend on the order
         var allRewardPoints = await _rewardPointService.GetRewardPointsHistoryAsync(order.CustomerId, order.StoreId, orderGuid: order.OrderGuid);
+		_logger.LogDebug("ReturnBackRedeemedRewardPointsAsync(order={Order}): allRewardPoints → {AllRewardPoints}", order, allRewardPoints);
         if (allRewardPoints?.Any() == true)
         {
             foreach (var rewardPoints in allRewardPoints)
@@ -942,6 +1071,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                     string.Format(await _localizationService.GetResourceAsync("RewardPoints.Message.ReturnedForOrder"), order.CustomOrderNumber));
             }
         }
+		_logger.LogDebug("<<< Exiting ReturnBackRedeemedRewardPointsAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -952,13 +1082,16 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SetActivatedValueForPurchasedGiftCardsAsync(Order order, bool activate)
     {
+		_logger.LogDebug(">>> Entering SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate})", order, activate);
         var giftCards = await _giftCardService.GetAllGiftCardsAsync(order.Id, isGiftCardActivated: !activate);
         foreach (var gc in giftCards)
         {
+		_logger.LogDebug("SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate}): giftCards → {GiftCards}", order, activate, giftCards);
             if (activate)
             {
                 //activate
                 var isRecipientNotified = gc.IsRecipientNotified;
+				_logger.LogDebug("SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate}): isRecipientNotified → {IsRecipientNotified}", order, activate, isRecipientNotified);
                 if (gc.GiftCardType == GiftCardType.Virtual)
                 {
                     //send email for virtual gift card
@@ -969,12 +1102,15 @@ public partial class OrderProcessingService : IOrderProcessingService
                                             (await _languageService.GetAllLanguagesAsync()).FirstOrDefault())
                                            ?? throw new Exception("No languages could be loaded");
                         var queuedEmailIds = await _workflowMessageService.SendGiftCardNotificationAsync(gc, customerLang.Id);
+						_logger.LogDebug("SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate}): queuedEmailIds → {QueuedEmailIds}", order, activate, queuedEmailIds);
                         if (queuedEmailIds.Any())
                             isRecipientNotified = true;
                     }
                 }
 
                 gc.IsGiftCardActivated = true;
+				_logger.LogDebug("SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate}): gc.IsGiftCardActivated → {Arg2}", order, activate, gc.IsGiftCardActivated);
+				_logger.LogDebug("SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate}): gc.IsRecipientNotified → {Arg2}", order, activate, gc.IsRecipientNotified);
                 gc.IsRecipientNotified = isRecipientNotified;
                 await _giftCardService.UpdateGiftCardAsync(gc);
             }
@@ -985,6 +1121,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 await _giftCardService.UpdateGiftCardAsync(gc);
             }
         }
+		_logger.LogDebug("<<< Exiting SetActivatedValueForPurchasedGiftCardsAsync(order={Order},activate={Activate})", order, activate);
     }
 
     /// <summary>
@@ -996,6 +1133,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SetOrderStatusAsync(Order order, OrderStatus os, bool notifyCustomer)
     {
+		_logger.LogDebug(">>> Entering SetOrderStatusAsync(order={Order},os={Os},notifyCustomer={NotifyCustomer})", order, os, notifyCustomer);
         ArgumentNullException.ThrowIfNull(order);
 
         var prevOrderStatus = order.OrderStatus;
@@ -1055,16 +1193,21 @@ public partial class OrderProcessingService : IOrderProcessingService
         {
             //notification
             var orderCancelledCustomerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderCancelledCustomerNotificationAsync(order, order.CustomerLanguageId);
+			_logger.LogDebug("SetOrderStatusAsync(order={Order},os={Os},notifyCustomer={NotifyCustomer}): orderCancelledCustomerNotificationQueuedEmailIds → {OrderCancelledCustomerNotificationQueuedEmailIds}", order, os, notifyCustomer, orderCancelledCustomerNotificationQueuedEmailIds);
             if (orderCancelledCustomerNotificationQueuedEmailIds.Any())
                 await AddOrderNoteAsync(order, $"\"Order cancelled\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", orderCancelledCustomerNotificationQueuedEmailIds)}.");
 
             var vendors = await GetVendorsInOrderAsync(order);
+			_logger.LogDebug("SetOrderStatusAsync(order={Order},os={Os},notifyCustomer={NotifyCustomer}): vendors → {Vendors}", order, os, notifyCustomer, vendors);
             foreach (var vendor in vendors)
             {
                 var orderCancelVendorNotificationQueuedEmailIds = await _workflowMessageService.SendOrderCancelledVendorNotificationAsync(order, vendor, _localizationSettings.DefaultAdminLanguageId);
+				_logger.LogDebug("SetOrderStatusAsync(order={Order},os={Os},notifyCustomer={NotifyCustomer}): orderCancelVendorNotificationQueuedEmailIds → {OrderCancelVendorNotificationQueuedEmailIds}", order, os, notifyCustomer, orderCancelVendorNotificationQueuedEmailIds);
 
                 if (orderCancelVendorNotificationQueuedEmailIds.Any())
                     await AddOrderNoteAsync(order, $"\"Order cancelled\" email (to vendor) has been queued. Queued email identifiers: {string.Join(", ", orderCancelVendorNotificationQueuedEmailIds)}.");
+					_logger.LogDebug(">>> Entering GetVendorsInOrderAsync(order={Order})", order);
+					_logger.LogDebug("<<< Exiting GetVendorsInOrderAsync(order={Order})", order);
             }
         }
 
@@ -1082,6 +1225,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         //gift cards deactivation
         if (_orderSettings.DeactivateGiftCardsAfterCancellingOrder && order.OrderStatus == OrderStatus.Cancelled)
             await SetActivatedValueForPurchasedGiftCardsAsync(order, false);
+			_logger.LogDebug("<<< Exiting SetOrderStatusAsync(order={Order},os={Os},notifyCustomer={NotifyCustomer})", order, os, notifyCustomer);
     }
 
     /// <summary>
@@ -1091,6 +1235,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ProcessOrderPaidAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering ProcessOrderPaidAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         //raise event
@@ -1113,13 +1258,16 @@ public partial class OrderProcessingService : IOrderProcessingService
                 await AddOrderNoteAsync(order, $"\"Order paid\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", orderPaidCustomerNotificationQueuedEmailIds)}.");
 
             var orderPaidStoreOwnerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderPaidStoreOwnerNotificationAsync(order, _localizationSettings.DefaultAdminLanguageId);
+			_logger.LogDebug("ProcessOrderPaidAsync(order={Order}): orderPaidStoreOwnerNotificationQueuedEmailIds → {OrderPaidStoreOwnerNotificationQueuedEmailIds}", order, orderPaidStoreOwnerNotificationQueuedEmailIds);
             if (orderPaidStoreOwnerNotificationQueuedEmailIds.Any())
                 await AddOrderNoteAsync(order, $"\"Order paid\" email (to store owner) has been queued. Queued email identifiers: {string.Join(", ", orderPaidStoreOwnerNotificationQueuedEmailIds)}.");
 
             var vendors = await GetVendorsInOrderAsync(order);
+			_logger.LogDebug("ProcessOrderPaidAsync(order={Order}): vendors → {Vendors}", order, vendors);
             foreach (var vendor in vendors)
             {
                 var orderPaidVendorNotificationQueuedEmailIds = await _workflowMessageService.SendOrderPaidVendorNotificationAsync(order, vendor, _localizationSettings.DefaultAdminLanguageId);
+				_logger.LogDebug("ProcessOrderPaidAsync(order={Order}): orderPaidVendorNotificationQueuedEmailIds → {OrderPaidVendorNotificationQueuedEmailIds}", order, orderPaidVendorNotificationQueuedEmailIds);
 
                 if (orderPaidVendorNotificationQueuedEmailIds.Any())
                     await AddOrderNoteAsync(order, $"\"Order paid\" email (to vendor) has been queued. Queued email identifiers: {string.Join(", ", orderPaidVendorNotificationQueuedEmailIds)}.");
@@ -1136,6 +1284,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //customer roles with "purchased with product" specified
         await ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(order, true);
+		_logger.LogDebug("<<< Exiting ProcessOrderPaidAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -1146,10 +1295,12 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(Order order, bool add)
     {
+		_logger.LogDebug(">>> Entering ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(order={Order},add={Add})", order, add);
         ArgumentNullException.ThrowIfNull(order);
 
         //purchased product identifiers
         var purchasedProductIds = new List<int>();
+		_logger.LogDebug("ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(order={Order},add={Add}): purchasedProductIds → {PurchasedProductIds}", order, add, purchasedProductIds);
         foreach (var orderItem in await _orderService.GetOrderItemsAsync(order.Id))
         {
             //standard items
@@ -1157,6 +1308,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
             //bundled (associated) products
             var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(orderItem.AttributesXml);
+			_logger.LogDebug("ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(order={Order},add={Add}): attributeValues → {AttributeValues}", order, add, attributeValues);
             foreach (var attributeValue in attributeValues)
                 if (attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
                     purchasedProductIds.Add(attributeValue.AssociatedProductId);
@@ -1172,6 +1324,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             return;
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogDebug("ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(order={Order},add={Add}): customer → {Customer}", order, add, customer);
 
         foreach (var customerRole in customerRoles)
             if (!await _customerService.IsInCustomerRoleAsync(customer, customerRole.SystemName))
@@ -1188,6 +1341,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                     //remove
                     await _customerService.RemoveCustomerRoleMappingAsync(customer, customerRole);
             }
+			_logger.LogDebug("<<< Exiting ProcessCustomerRolesWithPurchasedProductSpecifiedAsync(order={Order},add={Add})", order, add);
     }
 
     /// <summary>
@@ -1200,8 +1354,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     protected virtual async Task<IList<Vendor>> GetVendorsInOrderAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering GetVendorsInOrderAsync(order={Order})", order);
         var pIds = (await _orderService.GetOrderItemsAsync(order.Id)).Select(x => x.ProductId).ToArray();
 
+		_logger.LogDebug("GetVendorsInOrderAsync(order={Order}): pIds → {PIds}", order, pIds);
+		_logger.LogDebug("<<< Exiting GetVendorsInOrderAsync(order={Order})", order);
         return await _vendorService.GetVendorsByProductIdsAsync(pIds);
     }
 
@@ -1213,6 +1370,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CreateFirstRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest, Order order)
     {
+		_logger.LogDebug(">>> Entering CreateFirstRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest},order={Order})", processPaymentRequest, order);
         var rp = new RecurringPayment
         {
             CycleLength = processPaymentRequest.RecurringCycleLength,
@@ -1244,6 +1402,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             default:
                 break;
         }
+		_logger.LogDebug("<<< Exiting CreateFirstRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest},order={Order})", processPaymentRequest, order);
     }
 
     /// <summary>
@@ -1254,28 +1413,40 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task MoveShoppingCartItemsToOrderItemsAsync(PlaceOrderContainer details, Order order)
     {
+		_logger.LogDebug(">>> Entering MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order})", details, order);
         foreach (var sc in details.Cart)
         {
             var product = await _productService.GetProductByIdAsync(sc.ProductId);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): product → {Product}", details, order, product);
 
             //prices
             var scUnitPrice = (await _shoppingCartService.GetUnitPriceAsync(sc, true)).unitPrice;
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): scUnitPrice → {ScUnitPrice}", details, order, scUnitPrice);
             var (scSubTotal, discountAmount, scDiscounts, _) = await _shoppingCartService.GetSubTotalAsync(sc, true);
             var scUnitPriceInclTax = await _taxService.GetProductPriceAsync(product, scUnitPrice, true, details.Customer);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): scUnitPriceInclTax → {ScUnitPriceInclTax}", details, order, scUnitPriceInclTax);
             var scUnitPriceExclTax = await _taxService.GetProductPriceAsync(product, scUnitPrice, false, details.Customer);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): scUnitPriceExclTax → {ScUnitPriceExclTax}", details, order, scUnitPriceExclTax);
             var scSubTotalInclTax = await _taxService.GetProductPriceAsync(product, scSubTotal, true, details.Customer);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): scSubTotalInclTax → {ScSubTotalInclTax}", details, order, scSubTotalInclTax);
             var scSubTotalExclTax = await _taxService.GetProductPriceAsync(product, scSubTotal, false, details.Customer);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): scSubTotalExclTax → {ScSubTotalExclTax}", details, order, scSubTotalExclTax);
             var discountAmountInclTax = await _taxService.GetProductPriceAsync(product, discountAmount, true, details.Customer);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): discountAmountInclTax → {DiscountAmountInclTax}", details, order, discountAmountInclTax);
             var discountAmountExclTax = await _taxService.GetProductPriceAsync(product, discountAmount, false, details.Customer);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): discountAmountExclTax → {DiscountAmountExclTax}", details, order, discountAmountExclTax);
             foreach (var disc in scDiscounts)
                 if (!_discountService.ContainsDiscount(details.AppliedDiscounts, disc))
                     details.AppliedDiscounts.Add(disc);
 
             //attributes
             var store = await _storeService.GetStoreByIdAsync(sc.StoreId);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): store → {Store}", details, order, store);
             var attributeDescription = await _productAttributeFormatter.FormatAttributesAsync(product, sc.AttributesXml, details.Customer, store);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): attributeDescription → {AttributeDescription}", details, order, attributeDescription);
 
             var itemWeight = await _shippingService.GetShoppingCartItemWeightAsync(sc);
+			_logger.LogDebug("MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order}): itemWeight → {ItemWeight}", details, order, itemWeight);
 
             //save order item
             var orderItem = new OrderItem
@@ -1314,6 +1485,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         }
 
         await _shoppingCartService.ClearShoppingCartAsync(details.Customer, order.StoreId);
+		_logger.LogDebug("<<< Exiting MoveShoppingCartItemsToOrderItemsAsync(details={Details},order={Order})", details, order);
     }
 
     /// <summary>
@@ -1328,6 +1500,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task AddGiftCardsAsync(Product product, string attributesXml, int quantity, OrderItem orderItem, decimal? unitPriceExclTax = null, decimal? amount = null)
     {
+		_logger.LogDebug(">>> Entering AddGiftCardsAsync(product={Product},attributesXml={AttributesXml},quantity={Quantity},orderItem={OrderItem},unitPriceExclTax={UnitPriceExclTax},amount={Amount})", product, attributesXml, quantity, orderItem, unitPriceExclTax, amount);
         if (!product.IsGiftCard)
             return;
 
@@ -1351,6 +1524,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 CreatedOnUtc = DateTime.UtcNow
             });
         }
+		_logger.LogDebug("<<< Exiting AddGiftCardsAsync(product={Product},attributesXml={AttributesXml},quantity={Quantity},orderItem={OrderItem},unitPriceExclTax={UnitPriceExclTax},amount={Amount})", product, attributesXml, quantity, orderItem, unitPriceExclTax, amount);
     }
 
     /// <summary>
@@ -1364,24 +1538,28 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     protected virtual async Task<ProcessPaymentResult> GetProcessPaymentResultAsync(ProcessPaymentRequest processPaymentRequest, PlaceOrderContainer details)
     {
+		_logger.LogDebug(">>> Entering GetProcessPaymentResultAsync(processPaymentRequest={ProcessPaymentRequest},details={Details})", processPaymentRequest, details);
         //process payment
         ProcessPaymentResult processPaymentResult;
         //check if is payment workflow required
         if (await IsPaymentWorkflowRequiredAsync(details.Cart))
         {
             var customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
+			_logger.LogDebug("GetProcessPaymentResultAsync(processPaymentRequest={ProcessPaymentRequest},details={Details}): customer → {Customer}", processPaymentRequest, details, customer);
             var paymentMethod = await _paymentPluginManager
                                     .LoadPluginBySystemNameAsync(processPaymentRequest.PaymentMethodSystemName, customer, processPaymentRequest.StoreId)
                                 ?? throw new NopException("Payment method couldn't be loaded");
 
             //ensure that payment method is active
             if (!_paymentPluginManager.IsPluginActive(paymentMethod))
+				_logger.LogWarning("Throwing NopException from GetProcessPaymentResultAsync(processPaymentRequest={ProcessPaymentRequest},details={Details})", processPaymentRequest, details);
                 throw new NopException("Payment method is not active");
 
             if (details.IsRecurringShoppingCart)
             {
                 //recurring cart
                 processPaymentResult = (await _paymentService.GetRecurringPaymentTypeAsync(processPaymentRequest.PaymentMethodSystemName)) switch
+				_logger.LogDebug("GetProcessPaymentResultAsync(processPaymentRequest={ProcessPaymentRequest},details={Details}): processPaymentResult → {ProcessPaymentResult}", processPaymentRequest, details, processPaymentResult);
                 {
                     RecurringPaymentType.NotSupported => throw new NopException("Recurring payments are not supported by selected payment method"),
                     RecurringPaymentType.Manual or
@@ -1392,10 +1570,13 @@ public partial class OrderProcessingService : IOrderProcessingService
             else
                 //standard cart
                 processPaymentResult = await _paymentService.ProcessPaymentAsync(processPaymentRequest);
+				_logger.LogDebug(">>> Entering IsPaymentWorkflowRequiredAsync(cart={Cart},useRewardPoints={UseRewardPoints})", cart, useRewardPoints);
+				_logger.LogDebug("<<< Exiting IsPaymentWorkflowRequiredAsync(cart={Cart},useRewardPoints={UseRewardPoints})", cart, useRewardPoints);
         }
         else
             //payment is not required
             processPaymentResult = new ProcessPaymentResult { NewPaymentStatus = PaymentStatus.Paid };
+		_logger.LogDebug("<<< Exiting GetProcessPaymentResultAsync(processPaymentRequest={ProcessPaymentRequest},details={Details})", processPaymentRequest, details);
         return processPaymentResult;
     }
 
@@ -1407,6 +1588,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SaveGiftCardUsageHistoryAsync(PlaceOrderContainer details, Order order)
     {
+		_logger.LogDebug(">>> Entering SaveGiftCardUsageHistoryAsync(details={Details},order={Order})", details, order);
         if (details.AppliedGiftCards == null || !details.AppliedGiftCards.Any())
             return;
 
@@ -1418,6 +1600,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 UsedValue = agc.AmountCanBeUsed,
                 CreatedOnUtc = DateTime.UtcNow
             });
+			_logger.LogDebug("<<< Exiting SaveGiftCardUsageHistoryAsync(details={Details},order={Order})", details, order);
     }
 
     /// <summary>
@@ -1428,12 +1611,14 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SaveDiscountUsageHistoryAsync(PlaceOrderContainer details, Order order)
     {
+		_logger.LogDebug(">>> Entering SaveDiscountUsageHistoryAsync(details={Details},order={Order})", details, order);
         if (details.AppliedDiscounts == null || !details.AppliedDiscounts.Any())
             return;
 
         foreach (var discount in details.AppliedDiscounts)
         {
             var d = await _discountService.GetDiscountByIdAsync(discount.Id);
+			_logger.LogDebug("SaveDiscountUsageHistoryAsync(details={Details},order={Order}): d → {D}", details, order, d);
             if (d == null)
                 continue;
 
@@ -1444,6 +1629,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 CreatedOnUtc = DateTime.UtcNow
             });
         }
+		_logger.LogDebug("<<< Exiting SaveDiscountUsageHistoryAsync(details={Details},order={Order})", details, order);
     }
 
     /// <summary>
@@ -1454,10 +1640,13 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CheckAndSaveOrderStatusAsync(Order order, bool needOrderSave)
     {
+		_logger.LogDebug(">>> Entering CheckAndSaveOrderStatusAsync(order={Order},needOrderSave={NeedOrderSave})", order, needOrderSave);
         ArgumentNullException.ThrowIfNull(order);
 
         var completed = false;
+		_logger.LogDebug("CheckAndSaveOrderStatusAsync(order={Order},needOrderSave={NeedOrderSave}): completed → {Completed}", order, needOrderSave, completed);
         var isOrderSaved = !needOrderSave;
+		_logger.LogDebug("CheckAndSaveOrderStatusAsync(order={Order},needOrderSave={NeedOrderSave}): isOrderSaved → {IsOrderSaved}", order, needOrderSave, isOrderSaved);
 
         if (order.PaymentStatus == PaymentStatus.Paid)
         {
@@ -1465,6 +1654,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             {
                 //ensure that paid date is set
                 order.PaidDateUtc = DateTime.UtcNow;
+				_logger.LogDebug("CheckAndSaveOrderStatusAsync(order={Order},needOrderSave={NeedOrderSave}): order.PaidDateUtc → {Arg2}", order, needOrderSave, order.PaidDateUtc);
                 isOrderSaved = false;
             }
 
@@ -1513,6 +1703,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         if (!isOrderSaved)
             await _orderService.UpdateOrderAsync(order);
+			_logger.LogDebug("<<< Exiting CheckAndSaveOrderStatusAsync(order={Order},needOrderSave={NeedOrderSave})", order, needOrderSave);
     }
 
     #endregion
@@ -1526,7 +1717,9 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task CheckOrderStatusAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CheckOrderStatusAsync(order={Order})", order);
         await CheckAndSaveOrderStatusAsync(order, false);
+		_logger.LogDebug("<<< Exiting CheckOrderStatusAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -1539,18 +1732,23 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<PlaceOrderResult> PlaceOrderAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogDebug(">>> Entering PlaceOrderAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         ArgumentNullException.ThrowIfNull(processPaymentRequest);
 
         if (processPaymentRequest.OrderGuid == Guid.Empty)
+			_logger.LogWarning("Throwing Exception from PlaceOrderAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
             throw new Exception("Order GUID is not generated");
 
         //prepare order details
         var details = await PreparePlaceOrderDetailsAsync(processPaymentRequest);
+		_logger.LogDebug("PlaceOrderAsync(processPaymentRequest={ProcessPaymentRequest}): details → {Details}", processPaymentRequest, details);
 
         async Task<PlaceOrderResult> placeOrder(PlaceOrderContainer placeOrderContainer)
         {
+			_logger.LogDebug(">>> Entering placeOrder(placeOrderContainer={PlaceOrderContainer})", placeOrderContainer);
             var result = new PlaceOrderResult();
 
+			_logger.LogDebug("placeOrder(placeOrderContainer={PlaceOrderContainer}): result → {Result}", placeOrderContainer, result);
             try
             {
                 var processPaymentResult =
@@ -1562,6 +1760,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                     var order = await SaveOrderDetailsAsync(processPaymentRequest, processPaymentResult,
                         placeOrderContainer);
                     result.PlacedOrder = order;
+					_logger.LogDebug("placeOrder(placeOrderContainer={PlaceOrderContainer}): result.PlacedOrder → {Arg1}", placeOrderContainer, result.PlacedOrder);
 
                     //move shopping cart items to order items
                     await MoveShoppingCartItemsToOrderItemsAsync(placeOrderContainer, order);
@@ -1613,8 +1812,10 @@ public partial class OrderProcessingService : IOrderProcessingService
             var logError = result.Errors.Aggregate("Error while placing order. ",
                 (current, next) => $"{current}Error {result.Errors.IndexOf(next) + 1}: {next}. ");
             var customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
+			_logger.LogDebug("placeOrder(placeOrderContainer={PlaceOrderContainer}): customer → {Customer}", placeOrderContainer, customer);
             await _logger.ErrorAsync(logError, customer: customer);
 
+			_logger.LogDebug("<<< Exiting placeOrder(placeOrderContainer={PlaceOrderContainer})", placeOrderContainer);
             return result;
         }
 
@@ -1657,6 +1858,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             mutex.ReleaseMutex();
         }
 
+		_logger.LogDebug("<<< Exiting PlaceOrderAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return result;
     }
 
@@ -1667,6 +1869,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderTotalsAsync(UpdateOrderParameters updateOrderParameters)
     {
+		_logger.LogDebug(">>> Entering UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters})", updateOrderParameters);
         if (!_orderSettings.AutoUpdateOrderTotalsOnEditingOrder)
             return;
 
@@ -1682,11 +1885,14 @@ public partial class OrderProcessingService : IOrderProcessingService
         updateOrderParameters.Warnings.AddRange(await _shoppingCartService.GetShoppingCartWarningsAsync(restoredCart, string.Empty, false));
 
         var customer = await _customerService.GetCustomerByIdAsync(updatedOrder.CustomerId);
+		_logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters}): customer → {Customer}", updateOrderParameters, customer);
 
         if (!itemDeleted)
         {
             var product = await _productService.GetProductByIdAsync(updatedShoppingCartItem.ProductId);
+			_logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters}): product → {Product}", updateOrderParameters, product);
             var store = await _storeService.GetStoreByIdAsync(updatedShoppingCartItem.StoreId);
+			_logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters}): store → {Store}", updateOrderParameters, store);
 
             updateOrderParameters.Warnings.AddRange(await _shoppingCartService.GetShoppingCartItemWarningsAsync(customer, updatedShoppingCartItem.ShoppingCartType,
                 product, updatedOrder.StoreId, updatedShoppingCartItem.AttributesXml, updatedShoppingCartItem.CustomerEnteredPrice,
@@ -1734,12 +1940,14 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //discount usage history
         var discountUsageHistoryForOrder = await _discountService.GetAllDiscountUsageHistoryAsync(null, customer.Id, updatedOrder.Id);
+		_logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters}): discountUsageHistoryForOrder → {DiscountUsageHistoryForOrder}", updateOrderParameters, discountUsageHistoryForOrder);
         foreach (var discount in updateOrderParameters.AppliedDiscounts)
         {
             if (discountUsageHistoryForOrder.Any(history => history.DiscountId == discount.Id))
                 continue;
 
             var d = await _discountService.GetDiscountByIdAsync(discount.Id);
+			_logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters}): d → {D}", updateOrderParameters, d);
             if (d != null)
                 await _discountService.InsertDiscountUsageHistoryAsync(new DiscountUsageHistory
                 {
@@ -1768,7 +1976,9 @@ public partial class OrderProcessingService : IOrderProcessingService
 
             //get shopping cart item which has been updated
             var cartItem = cart.FirstOrDefault(shoppingCartItem => shoppingCartItem.Id == updatedOrderItemId);
+			_logger.LogDebug("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters}): cartItem → {CartItem}", updateOrderParameters, cartItem);
 
+			_logger.LogDebug("<<< Exiting UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters})", updateOrderParameters);
             return (cart, cartItem);
         }
     }
@@ -1780,6 +1990,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering DeleteOrderAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         //check whether the order wasn't cancelled before
@@ -1795,6 +2006,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
             //cancel recurring payments
             var recurringPayments = await _orderService.SearchRecurringPaymentsAsync(initialOrderId: order.Id);
+			_logger.LogDebug("DeleteOrderAsync(order={Order}): recurringPayments → {RecurringPayments}", order, recurringPayments);
             foreach (var rp in recurringPayments)
                 await CancelRecurringPaymentAsync(rp);
 
@@ -1815,6 +2027,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //now delete an order
         await _orderService.DeleteOrderAsync(order);
+		_logger.LogDebug("<<< Exiting DeleteOrderAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -1828,11 +2041,13 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<IEnumerable<string>> ProcessNextRecurringPaymentAsync(RecurringPayment recurringPayment, ProcessPaymentResult paymentResult = null)
     {
+		_logger.LogDebug(">>> Entering ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult})", recurringPayment, paymentResult);
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         try
         {
             if (!recurringPayment.IsActive)
+				_logger.LogWarning("Throwing NopException from ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult})", recurringPayment, paymentResult);
                 throw new NopException("Recurring payment is not active");
 
             var initialOrder = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId)
@@ -1860,6 +2075,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
             //prepare order details
             var details = await PrepareRecurringOrderDetailsAsync(processPaymentRequest);
+			_logger.LogDebug("ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): details → {Details}", recurringPayment, paymentResult, details);
 
             ProcessPaymentResult processPaymentResult;
             //skip payment workflow if order total equals zero
@@ -1887,12 +2103,14 @@ public partial class OrderProcessingService : IOrderProcessingService
                     }
                     catch
                     {
+						_logger.LogError("Exception in ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): {Arg2}", recurringPayment, paymentResult, exc.Message);
                         // ignored
                     }
                 }
 
                 //payment type
                 processPaymentResult = (await _paymentService.GetRecurringPaymentTypeAsync(processPaymentRequest.PaymentMethodSystemName)) switch
+				_logger.LogDebug("ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): processPaymentResult → {ProcessPaymentResult}", recurringPayment, paymentResult, processPaymentResult);
                 {
                     RecurringPaymentType.NotSupported => throw new NopException("Recurring payments are not supported by selected payment method"),
                     RecurringPaymentType.Manual => await _paymentService.ProcessRecurringPaymentAsync(processPaymentRequest),
@@ -1911,6 +2129,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             {
                 //save order details
                 var order = await SaveOrderDetailsAsync(processPaymentRequest, processPaymentResult, details);
+				_logger.LogDebug("ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): order → {Order}", recurringPayment, paymentResult, order);
 
                 foreach (var orderItem in await _orderService.GetOrderItemsAsync(details.InitialOrder.Id))
                 {
@@ -1941,6 +2160,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                     await _orderService.InsertOrderItemAsync(newOrderItem);
 
                     var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+					_logger.LogDebug("ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): product → {Product}", recurringPayment, paymentResult, product);
 
                     //gift cards
                     await AddGiftCardsAsync(product, orderItem.AttributesXml, orderItem.Quantity, newOrderItem, amount: orderItem.UnitPriceExclTax);
@@ -1967,6 +2187,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
                 //last payment succeeded
                 recurringPayment.LastPaymentFailed = false;
+				_logger.LogDebug("ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): recurringPayment.LastPaymentFailed → {Arg2}", recurringPayment, paymentResult, recurringPayment.LastPaymentFailed);
 
                 //next recurring payment
                 await _orderService.InsertRecurringPaymentHistoryAsync(new RecurringPaymentHistory
@@ -1997,9 +2218,15 @@ public partial class OrderProcessingService : IOrderProcessingService
             {
                 //cancel recurring payment
                 var errors = (await CancelRecurringPaymentAsync(recurringPayment)).ToList();
+				_logger.LogDebug("ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult}): errors → {Errors}", recurringPayment, paymentResult, errors);
                 foreach (var error in errors)
                 {
                     await _logger.ErrorAsync(error);
+					_logger.LogDebug(">>> Entering CancelRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+					_logger.LogDebug("CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): request.Order → {Arg1}", recurringPayment, request.Order);
+					_logger.LogDebug("CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): recurringPayment.IsActive → {Arg1}", recurringPayment, recurringPayment.IsActive);
+					_logger.LogError("Exception in CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): {Arg1}", recurringPayment, exc.getMessage());
+					_logger.LogDebug("<<< Exiting CancelRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
                 }
 
                 //notify a customer about cancelled payment
@@ -2009,6 +2236,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 //notify a customer about failed payment
                 await _workflowMessageService.SendRecurringPaymentFailedCustomerNotificationAsync(recurringPayment, initialOrder.CustomerLanguageId);
 
+			_logger.LogDebug("<<< Exiting ProcessNextRecurringPaymentAsync(recurringPayment={RecurringPayment},paymentResult={PaymentResult})", recurringPayment, paymentResult);
             return processPaymentResult.Errors;
         }
         catch (Exception exc)
@@ -2025,14 +2253,18 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<IList<string>> CancelRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogDebug(">>> Entering CancelRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         var initialOrder = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
+		_logger.LogDebug("CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): initialOrder → {InitialOrder}", recurringPayment, initialOrder);
         if (initialOrder == null)
             return new List<string> { "Initial order could not be loaded" };
 
         var request = new CancelRecurringPaymentRequest();
+		_logger.LogDebug("CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): request → {Request}", recurringPayment, request);
         CancelRecurringPaymentResult result = null;
+		_logger.LogDebug("CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): result → {Result}", recurringPayment, result);
         try
         {
             request.Order = initialOrder;
@@ -2060,6 +2292,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): {Arg1}", recurringPayment, exc.getMessage());
             result ??= new CancelRecurringPaymentResult();
             result.AddError($"Error: {exc.Message}. Full exception: {exc}");
         }
@@ -2087,7 +2320,9 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //log it
         var logError = $"Error cancelling recurring payment. Order #{initialOrder.Id}. Error: {error}";
+		_logger.LogDebug("CancelRecurringPaymentAsync(recurringPayment={RecurringPayment}): logError → {LogError}", recurringPayment, logError);
         await _logger.InsertLogAsync(LogLevel.Error, logError, logError);
+		_logger.LogDebug("<<< Exiting CancelRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
         return result.Errors;
     }
 
@@ -2102,6 +2337,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> CanCancelRecurringPaymentAsync(Customer customerToValidate, RecurringPayment recurringPayment)
     {
+		_logger.LogDebug(">>> Entering CanCancelRecurringPaymentAsync(customerToValidate={CustomerToValidate},recurringPayment={RecurringPayment})", customerToValidate, recurringPayment);
         if (recurringPayment is null)
             return false;
 
@@ -2109,10 +2345,12 @@ public partial class OrderProcessingService : IOrderProcessingService
             return false;
 
         var initialOrder = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
+		_logger.LogDebug("CanCancelRecurringPaymentAsync(customerToValidate={CustomerToValidate},recurringPayment={RecurringPayment}): initialOrder → {InitialOrder}", customerToValidate, recurringPayment, initialOrder);
         if (initialOrder is null)
             return false;
 
         var customer = await _customerService.GetCustomerByIdAsync(initialOrder.CustomerId);
+		_logger.LogDebug("CanCancelRecurringPaymentAsync(customerToValidate={CustomerToValidate},recurringPayment={RecurringPayment}): customer → {Customer}", customerToValidate, recurringPayment, customer);
         if (customer is null)
             return false;
 
@@ -2140,15 +2378,18 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> CanRetryLastRecurringPaymentAsync(Customer customer, RecurringPayment recurringPayment)
     {
+		_logger.LogDebug(">>> Entering CanRetryLastRecurringPaymentAsync(customer={Customer},recurringPayment={RecurringPayment})", customer, recurringPayment);
         if (recurringPayment == null || customer == null)
             return false;
 
         var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
+		_logger.LogDebug("CanRetryLastRecurringPaymentAsync(customer={Customer},recurringPayment={RecurringPayment}): order → {Order}", customer, recurringPayment, order);
 
         if (order is null)
             return false;
 
         var orderCustomer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogDebug("CanRetryLastRecurringPaymentAsync(customer={Customer},recurringPayment={RecurringPayment}): orderCustomer → {OrderCustomer}", customer, recurringPayment, orderCustomer);
 
         if (order.OrderStatus == OrderStatus.Cancelled)
             return false;
@@ -2170,17 +2411,21 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ShipAsync(Shipment shipment, bool notifyCustomer)
     {
+		_logger.LogDebug(">>> Entering ShipAsync(shipment={Shipment},notifyCustomer={NotifyCustomer})", shipment, notifyCustomer);
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("Order cannot be loaded");
+		_logger.LogDebug("ShipAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): order → {Order}", shipment, notifyCustomer, order);
 
         if (order.PickupInStore)
+			_logger.LogWarning("Throwing Exception from ShipAsync(shipment={Shipment},notifyCustomer={NotifyCustomer})", shipment, notifyCustomer);
             throw new Exception("This shipment is can't be shipped. The order has been placed with 'pickup in store' shipping option.");
 
         if (shipment.ShippedDateUtc.HasValue)
             throw new Exception("This shipment is already shipped");
 
         shipment.ShippedDateUtc = DateTime.UtcNow;
+		_logger.LogDebug("ShipAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): shipment.ShippedDateUtc → {Arg2}", shipment, notifyCustomer, shipment.ShippedDateUtc);
         await _shipmentService.UpdateShipmentAsync(shipment);
 
         //process products with "Multiple warehouse" support enabled
@@ -2200,6 +2445,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         {
             //notify customer
             var queuedEmailIds = await _workflowMessageService.SendShipmentSentCustomerNotificationAsync(shipment, order.CustomerLanguageId);
+			_logger.LogDebug("ShipAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): queuedEmailIds → {QueuedEmailIds}", shipment, notifyCustomer, queuedEmailIds);
             if (queuedEmailIds.Any())
                 await AddOrderNoteAsync(order, $"\"Shipped\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", queuedEmailIds)}.");
         }
@@ -2219,17 +2465,21 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ReadyForPickupAsync(Shipment shipment, bool notifyCustomer)
     {
+		_logger.LogDebug(">>> Entering ReadyForPickupAsync(shipment={Shipment},notifyCustomer={NotifyCustomer})", shipment, notifyCustomer);
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("Order cannot be loaded");
+		_logger.LogDebug("ReadyForPickupAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): order → {Order}", shipment, notifyCustomer, order);
 
         if (!order.PickupInStore)
+			_logger.LogWarning("Throwing Exception from ReadyForPickupAsync(shipment={Shipment},notifyCustomer={NotifyCustomer})", shipment, notifyCustomer);
             throw new Exception("This shipment is can't be marked as 'ready for pickup'. The order has been placed without 'pickup in store' shipping option.");
 
         if (shipment.ReadyForPickupDateUtc.HasValue)
             throw new Exception("This shipment is already marked as 'ready for pickup'");
 
         shipment.ReadyForPickupDateUtc = DateTime.UtcNow;
+		_logger.LogDebug("ReadyForPickupAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): shipment.ReadyForPickupDateUtc → {Arg2}", shipment, notifyCustomer, shipment.ReadyForPickupDateUtc);
         await _shipmentService.UpdateShipmentAsync(shipment);
 
         await AddOrderNoteAsync(order, $"Shipment# {shipment.Id} has been ready for pickup");
@@ -2237,6 +2487,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         if (notifyCustomer)
         {
             var queuedEmailIds = await _workflowMessageService.SendShipmentReadyForPickupNotificationAsync(shipment, order.CustomerLanguageId);
+			_logger.LogDebug("ReadyForPickupAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): queuedEmailIds → {QueuedEmailIds}", shipment, notifyCustomer, queuedEmailIds);
             if (queuedEmailIds.Any())
                 await AddOrderNoteAsync(order, $"\"Ready for pickup\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", queuedEmailIds)}.");
         }
@@ -2252,11 +2503,14 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeliverAsync(Shipment shipment, bool notifyCustomer)
     {
+		_logger.LogDebug(">>> Entering DeliverAsync(shipment={Shipment},notifyCustomer={NotifyCustomer})", shipment, notifyCustomer);
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("Order cannot be loaded");
+		_logger.LogDebug("DeliverAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): order → {Order}", shipment, notifyCustomer, order);
 
         if (!order.PickupInStore && !shipment.ShippedDateUtc.HasValue)
+			_logger.LogWarning("Throwing Exception from DeliverAsync(shipment={Shipment},notifyCustomer={NotifyCustomer})", shipment, notifyCustomer);
             throw new Exception("This shipment is not shipped yet");
 
         if (order.PickupInStore && !shipment.ReadyForPickupDateUtc.HasValue)
@@ -2266,6 +2520,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             throw new Exception("This shipment is already delivered");
 
         shipment.DeliveryDateUtc = DateTime.UtcNow;
+		_logger.LogDebug("DeliverAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): shipment.DeliveryDateUtc → {Arg2}", shipment, notifyCustomer, shipment.DeliveryDateUtc);
         await _shipmentService.UpdateShipmentAsync(shipment);
 
         if (!await _orderService.HasItemsToAddToShipmentAsync(order) &&
@@ -2291,6 +2546,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         {
             //send email notification
             var queuedEmailIds = await _workflowMessageService.SendShipmentDeliveredCustomerNotificationAsync(shipment, order.CustomerLanguageId);
+			_logger.LogDebug("DeliverAsync(shipment={Shipment},notifyCustomer={NotifyCustomer}): queuedEmailIds → {QueuedEmailIds}", shipment, notifyCustomer, queuedEmailIds);
             if (queuedEmailIds.Any())
                 await AddOrderNoteAsync(order, $"\"Delivered\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", queuedEmailIds)}.");
         }
@@ -2309,6 +2565,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A value indicating whether cancel is allowed</returns>
     public virtual bool CanCancelOrder(Order order)
     {
+		_logger.LogDebug(">>> Entering CanCancelOrder(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderStatus == OrderStatus.Cancelled)
@@ -2325,9 +2582,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task CancelOrderAsync(Order order, bool notifyCustomer)
     {
+		_logger.LogDebug(">>> Entering CancelOrderAsync(order={Order},notifyCustomer={NotifyCustomer})", order, notifyCustomer);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!CanCancelOrder(order))
+			_logger.LogWarning("Throwing NopException from CancelOrderAsync(order={Order},notifyCustomer={NotifyCustomer})", order, notifyCustomer);
             throw new NopException("Cannot do cancel for order.");
 
         //cancel order
@@ -2335,6 +2594,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //notify store owner
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("CancelOrderAsync(order={Order},notifyCustomer={NotifyCustomer}): currentCustomer → {CurrentCustomer}", order, notifyCustomer, currentCustomer);
         if (order.CustomerId == currentCustomer.Id)
             await _workflowMessageService.SendOrderCancelledStoreOwnerNotificationAsync(order, _localizationSettings.DefaultAdminLanguageId);
 
@@ -2350,6 +2610,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //cancel recurring payments
         var recurringPayments = await _orderService.SearchRecurringPaymentsAsync(initialOrderId: order.Id);
+		_logger.LogDebug("CancelOrderAsync(order={Order},notifyCustomer={NotifyCustomer}): recurringPayments → {RecurringPayments}", order, notifyCustomer, recurringPayments);
         foreach (var rp in recurringPayments)
             await CancelRecurringPaymentAsync(rp);
 
@@ -2368,6 +2629,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A value indicating whether order can be marked as authorized</returns>
     public virtual bool CanMarkOrderAsAuthorized(Order order)
     {
+		_logger.LogDebug(">>> Entering CanMarkOrderAsAuthorized(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderStatus == OrderStatus.Cancelled)
@@ -2386,6 +2648,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task MarkAsAuthorizedAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering MarkAsAuthorizedAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         order.PaymentStatusId = (int)PaymentStatus.Authorized;
@@ -2398,6 +2661,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //check order status
         await CheckOrderStatusAsync(order);
+		_logger.LogDebug("<<< Exiting MarkAsAuthorizedAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -2410,6 +2674,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> CanCaptureAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CanCaptureAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderStatus == OrderStatus.Cancelled ||
@@ -2420,6 +2685,15 @@ public partial class OrderProcessingService : IOrderProcessingService
             await _paymentService.SupportCaptureAsync(order.PaymentMethodSystemName))
             return true;
 
+		_logger.LogDebug(">>> Entering CaptureAsync(order={Order})", order);
+		_logger.LogDebug("CaptureAsync(order={Order}): request → {Request}", order, request);
+		_logger.LogDebug("CaptureAsync(order={Order}): request.Order → {Arg1}", order, request.Order);
+		_logger.LogDebug("CaptureAsync(order={Order}): order.CaptureTransactionId → {Arg1}", order, order.CaptureTransactionId);
+		_logger.LogDebug("CaptureAsync(order={Order}): order.CaptureTransactionResult → {Arg1}", order, order.CaptureTransactionResult);
+		_logger.LogDebug("CaptureAsync(order={Order}): order.PaymentStatus → {Arg1}", order, order.PaymentStatus);
+		_logger.LogDebug("CaptureAsync(order={Order}): order.PaidDateUtc → {Arg1}", order, order.PaidDateUtc);
+		_logger.LogDebug("<<< Exiting CaptureAsync(order={Order})", order);
+		_logger.LogDebug("<<< Exiting CanCaptureAsync(order={Order})", order);
         return false;
     }
 
@@ -2501,6 +2775,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A value indicating whether order can be marked as paid</returns>
     public virtual bool CanMarkOrderAsPaid(Order order)
     {
+		_logger.LogDebug(">>> Entering CanMarkOrderAsPaid(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderStatus == OrderStatus.Cancelled)
@@ -2521,13 +2796,16 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task MarkOrderAsPaidAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering MarkOrderAsPaidAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!CanMarkOrderAsPaid(order))
+			_logger.LogWarning("Throwing NopException from MarkOrderAsPaidAsync(order={Order})", order);
             throw new NopException("You can't mark this order as paid");
 
         order.PaymentStatusId = (int)PaymentStatus.Paid;
         order.PaidDateUtc = DateTime.UtcNow;
+		_logger.LogDebug("MarkOrderAsPaidAsync(order={Order}): order.PaidDateUtc → {Arg1}", order, order.PaidDateUtc);
         await _orderService.UpdateOrderAsync(order);
 
         //add a note
@@ -2549,6 +2827,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> CanRefundAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CanRefundAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderTotal == decimal.Zero)
@@ -2566,6 +2845,15 @@ public partial class OrderProcessingService : IOrderProcessingService
             await _paymentService.SupportRefundAsync(order.PaymentMethodSystemName))
             return true;
 
+		_logger.LogDebug(">>> Entering RefundAsync(order={Order})", order);
+		_logger.LogDebug("RefundAsync(order={Order}): request → {Request}", order, request);
+		_logger.LogDebug("RefundAsync(order={Order}): request.Order → {Arg1}", order, request.Order);
+		_logger.LogDebug("RefundAsync(order={Order}): request.AmountToRefund → {Arg1}", order, request.AmountToRefund);
+		_logger.LogDebug("RefundAsync(order={Order}): request.IsPartialRefund → {Arg1}", order, request.IsPartialRefund);
+		_logger.LogDebug("RefundAsync(order={Order}): order.RefundedAmount → {Arg1}", order, order.RefundedAmount);
+		_logger.LogDebug("RefundAsync(order={Order}): order.PaymentStatus → {Arg1}", order, order.PaymentStatus);
+		_logger.LogDebug("<<< Exiting RefundAsync(order={Order})", order);
+		_logger.LogDebug("<<< Exiting CanRefundAsync(order={Order})", order);
         return false;
     }
 
@@ -2656,6 +2944,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A value indicating whether order can be marked as refunded</returns>
     public virtual bool CanRefundOffline(Order order)
     {
+		_logger.LogDebug(">>> Entering CanRefundOffline(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderTotal == decimal.Zero)
@@ -2682,9 +2971,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RefundOfflineAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering RefundOfflineAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!CanRefundOffline(order))
+			_logger.LogWarning("Throwing NopException from RefundOfflineAsync(order={Order})", order);
             throw new NopException("You can't refund this order");
 
         //amout to refund
@@ -2695,6 +2986,8 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //update order info
         order.RefundedAmount = totalAmountRefunded;
+		_logger.LogDebug("RefundOfflineAsync(order={Order}): order.RefundedAmount → {Arg1}", order, order.RefundedAmount);
+		_logger.LogDebug("RefundOfflineAsync(order={Order}): order.PaymentStatus → {Arg1}", order, order.PaymentStatus);
         order.PaymentStatus = PaymentStatus.Refunded;
         await _orderService.UpdateOrderAsync(order);
 
@@ -2709,10 +3002,12 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //notifications
         var orderRefundedStoreOwnerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderRefundedStoreOwnerNotificationAsync(order, amountToRefund, _localizationSettings.DefaultAdminLanguageId);
+		_logger.LogDebug("RefundOfflineAsync(order={Order}): orderRefundedStoreOwnerNotificationQueuedEmailIds → {OrderRefundedStoreOwnerNotificationQueuedEmailIds}", order, orderRefundedStoreOwnerNotificationQueuedEmailIds);
         if (orderRefundedStoreOwnerNotificationQueuedEmailIds.Any())
             await AddOrderNoteAsync(order, $"\"Order refunded\" email (to store owner) has been queued. Queued email identifiers: {string.Join(", ", orderRefundedStoreOwnerNotificationQueuedEmailIds)}.");
 
         var orderRefundedCustomerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderRefundedCustomerNotificationAsync(order, amountToRefund, order.CustomerLanguageId);
+		_logger.LogDebug("RefundOfflineAsync(order={Order}): orderRefundedCustomerNotificationQueuedEmailIds → {OrderRefundedCustomerNotificationQueuedEmailIds}", order, orderRefundedCustomerNotificationQueuedEmailIds);
         if (orderRefundedCustomerNotificationQueuedEmailIds.Any())
             await AddOrderNoteAsync(order, $"\"Order refunded\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", orderRefundedCustomerNotificationQueuedEmailIds)}.");
     }
@@ -2728,6 +3023,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> CanPartiallyRefundAsync(Order order, decimal amountToRefund)
     {
+		_logger.LogDebug(">>> Entering CanPartiallyRefundAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderTotal == decimal.Zero)
@@ -2749,6 +3045,10 @@ public partial class OrderProcessingService : IOrderProcessingService
             await _paymentService.SupportPartiallyRefundAsync(order.PaymentMethodSystemName))
             return true;
 
+		_logger.LogDebug(">>> Entering PartiallyRefundAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
+		_logger.LogDebug("PartiallyRefundAsync(order={Order},amountToRefund={AmountToRefund}): order.RefundedAmount → {Arg2}", order, amountToRefund, order.RefundedAmount);
+		_logger.LogDebug("<<< Exiting PartiallyRefundAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
+		_logger.LogDebug("<<< Exiting CanPartiallyRefundAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
         return false;
     }
 
@@ -2843,6 +3143,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A value indicating whether order can be marked as partially refunded</returns>
     public virtual bool CanPartiallyRefundOffline(Order order, decimal amountToRefund)
     {
+		_logger.LogDebug(">>> Entering CanPartiallyRefundOffline(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderTotal == decimal.Zero)
@@ -2874,9 +3175,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PartiallyRefundOfflineAsync(Order order, decimal amountToRefund)
     {
+		_logger.LogDebug(">>> Entering PartiallyRefundOfflineAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!CanPartiallyRefundOffline(order, amountToRefund))
+			_logger.LogWarning("Throwing NopException from PartiallyRefundOfflineAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
             throw new NopException("You can't partially refund (offline) this order");
 
         //total amount refunded
@@ -2884,6 +3187,7 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //update order info
         order.RefundedAmount = totalAmountRefunded;
+		_logger.LogDebug("PartiallyRefundOfflineAsync(order={Order},amountToRefund={AmountToRefund}): order.RefundedAmount → {Arg2}", order, amountToRefund, order.RefundedAmount);
         //mark payment status as 'Refunded' if the order total amount is fully refunded
         order.PaymentStatus = order.OrderTotal == totalAmountRefunded ? PaymentStatus.Refunded : PaymentStatus.PartiallyRefunded;
         await _orderService.UpdateOrderAsync(order);
@@ -2899,10 +3203,12 @@ public partial class OrderProcessingService : IOrderProcessingService
 
         //notifications
         var orderRefundedStoreOwnerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderRefundedStoreOwnerNotificationAsync(order, amountToRefund, _localizationSettings.DefaultAdminLanguageId);
+		_logger.LogDebug("PartiallyRefundOfflineAsync(order={Order},amountToRefund={AmountToRefund}): orderRefundedStoreOwnerNotificationQueuedEmailIds → {OrderRefundedStoreOwnerNotificationQueuedEmailIds}", order, amountToRefund, orderRefundedStoreOwnerNotificationQueuedEmailIds);
         if (orderRefundedStoreOwnerNotificationQueuedEmailIds.Any())
             await AddOrderNoteAsync(order, $"\"Order refunded\" email (to store owner) has been queued. Queued email identifiers: {string.Join(", ", orderRefundedStoreOwnerNotificationQueuedEmailIds)}.");
 
         var orderRefundedCustomerNotificationQueuedEmailIds = await _workflowMessageService.SendOrderRefundedCustomerNotificationAsync(order, amountToRefund, order.CustomerLanguageId);
+		_logger.LogDebug("PartiallyRefundOfflineAsync(order={Order},amountToRefund={AmountToRefund}): orderRefundedCustomerNotificationQueuedEmailIds → {OrderRefundedCustomerNotificationQueuedEmailIds}", order, amountToRefund, orderRefundedCustomerNotificationQueuedEmailIds);
         if (orderRefundedCustomerNotificationQueuedEmailIds.Any())
             await AddOrderNoteAsync(order, $"\"Order refunded\" email (to customer) has been queued. Queued email identifiers: {string.Join(", ", orderRefundedCustomerNotificationQueuedEmailIds)}.");
     }
@@ -2917,6 +3223,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> CanVoidAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CanVoidAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderTotal == decimal.Zero)
@@ -2930,6 +3237,12 @@ public partial class OrderProcessingService : IOrderProcessingService
             await _paymentService.SupportVoidAsync(order.PaymentMethodSystemName))
             return true;
 
+		_logger.LogDebug(">>> Entering VoidAsync(order={Order})", order);
+		_logger.LogDebug("VoidAsync(order={Order}): request → {Request}", order, request);
+		_logger.LogDebug("VoidAsync(order={Order}): request.Order → {Arg1}", order, request.Order);
+		_logger.LogDebug("VoidAsync(order={Order}): order.PaymentStatus → {Arg1}", order, order.PaymentStatus);
+		_logger.LogDebug("<<< Exiting VoidAsync(order={Order})", order);
+		_logger.LogDebug("<<< Exiting CanVoidAsync(order={Order})", order);
         return false;
     }
 
@@ -3005,6 +3318,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A value indicating whether order can be marked as voided</returns>
     public virtual bool CanVoidOffline(Order order)
     {
+		_logger.LogDebug(">>> Entering CanVoidOffline(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.OrderTotal == decimal.Zero)
@@ -3027,9 +3341,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task VoidOfflineAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering VoidOfflineAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!CanVoidOffline(order))
+			_logger.LogWarning("Throwing NopException from VoidOfflineAsync(order={Order})", order);
             throw new NopException("You can't void this order");
 
         order.PaymentStatusId = (int)PaymentStatus.Voided;
@@ -3055,16 +3371,20 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<IList<string>> ReOrderAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering ReOrderAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogDebug("ReOrderAsync(order={Order}): customer → {Customer}", order, customer);
 
         var warnings = new List<string>();
+		_logger.LogDebug("ReOrderAsync(order={Order}): warnings → {Warnings}", order, warnings);
 
         //move shopping cart items (if possible)
         foreach (var orderItem in await _orderService.GetOrderItemsAsync(order.Id))
         {
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogDebug("ReOrderAsync(order={Order}): product → {Product}", order, product);
 
             warnings.AddRange(await _shoppingCartService.AddToCartAsync(customer, product,
                 ShoppingCartType.ShoppingCart, order.StoreId,
@@ -3078,6 +3398,7 @@ public partial class OrderProcessingService : IOrderProcessingService
         //comment the code below if you want to disable this functionality
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.CheckoutAttributes, order.CheckoutAttributesXml, order.StoreId);
 
+		_logger.LogDebug("<<< Exiting ReOrderAsync(order={Order})", order);
         return warnings;
     }
 
@@ -3091,6 +3412,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> IsReturnRequestAllowedAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering IsReturnRequestAllowedAsync(order={Order})", order);
         if (!_orderSettings.ReturnRequestsEnabled)
             return false;
 
@@ -3105,11 +3427,13 @@ public partial class OrderProcessingService : IOrderProcessingService
         if (_orderSettings.NumberOfDaysReturnRequestAvailable > 0)
         {
             var daysPassed = (DateTime.UtcNow - order.CreatedOnUtc).TotalDays;
+			_logger.LogDebug("IsReturnRequestAllowedAsync(order={Order}): daysPassed → {DaysPassed}", order, daysPassed);
             if (daysPassed >= _orderSettings.NumberOfDaysReturnRequestAvailable)
                 return false;
         }
 
         var returnRequestAvailability = await _returnRequestService.GetReturnRequestAvailabilityAsync(order.Id);
+		_logger.LogDebug("IsReturnRequestAllowedAsync(order={Order}): returnRequestAvailability → {ReturnRequestAvailability}", order, returnRequestAvailability);
         if (returnRequestAvailability == null)
             return false;
 
@@ -3126,6 +3450,7 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> ValidateMinOrderSubtotalAmountAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering ValidateMinOrderSubtotalAmountAsync(cart={Cart})", cart);
         ArgumentNullException.ThrowIfNull(cart);
 
         //min order amount sub-total validation
@@ -3151,12 +3476,14 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> ValidateMinOrderTotalAmountAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogDebug(">>> Entering ValidateMinOrderTotalAmountAsync(cart={Cart})", cart);
         ArgumentNullException.ThrowIfNull(cart);
 
         if (!cart.Any() || _orderSettings.MinOrderTotalAmount <= decimal.Zero)
             return true;
 
         var shoppingCartTotalBase = (await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart)).shoppingCartTotal;
+		_logger.LogDebug("ValidateMinOrderTotalAmountAsync(cart={Cart}): shoppingCartTotalBase → {ShoppingCartTotalBase}", cart, shoppingCartTotalBase);
 
         if (shoppingCartTotalBase.HasValue && shoppingCartTotalBase.Value < _orderSettings.MinOrderTotalAmount)
             return false;
@@ -3175,12 +3502,15 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<bool> IsPaymentWorkflowRequiredAsync(IList<ShoppingCartItem> cart, bool? useRewardPoints = null)
     {
+		_logger.LogDebug(">>> Entering IsPaymentWorkflowRequiredAsync(cart={Cart},useRewardPoints={UseRewardPoints})", cart, useRewardPoints);
         ArgumentNullException.ThrowIfNull(cart);
 
         var result = true;
+		_logger.LogDebug("IsPaymentWorkflowRequiredAsync(cart={Cart},useRewardPoints={UseRewardPoints}): result → {Result}", cart, useRewardPoints, result);
 
         //check whether order total equals zero
         var shoppingCartTotalBase = (await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart, useRewardPoints: useRewardPoints, usePaymentMethodAdditionalFee: false)).shoppingCartTotal;
+		_logger.LogDebug("IsPaymentWorkflowRequiredAsync(cart={Cart},useRewardPoints={UseRewardPoints}): shoppingCartTotalBase → {ShoppingCartTotalBase}", cart, useRewardPoints, shoppingCartTotalBase);
 
         if (shoppingCartTotalBase is decimal.Zero)
             result = false;
@@ -3195,17 +3525,20 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<DateTime?> GetNextPaymentDateAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogDebug(">>> Entering GetNextPaymentDateAsync(recurringPayment={RecurringPayment})", recurringPayment);
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         if (!recurringPayment.IsActive)
             return null;
 
         var historyCollection = await _orderService.GetRecurringPaymentHistoryAsync(recurringPayment);
+		_logger.LogDebug("GetNextPaymentDateAsync(recurringPayment={RecurringPayment}): historyCollection → {HistoryCollection}", recurringPayment, historyCollection);
         if (historyCollection.Count >= recurringPayment.TotalCycles)
             return null;
 
         //result
         DateTime? result = null;
+		_logger.LogDebug("GetNextPaymentDateAsync(recurringPayment={RecurringPayment}): result → {Result}", recurringPayment, result);
 
         //calculate next payment date
         if (historyCollection.Any())
@@ -3225,6 +3558,7 @@ public partial class OrderProcessingService : IOrderProcessingService
                 result = recurringPayment.StartDateUtc;
         }
 
+		_logger.LogDebug("<<< Exiting GetNextPaymentDateAsync(recurringPayment={RecurringPayment})", recurringPayment);
         return result;
     }
 
@@ -3235,14 +3569,18 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<int> GetCyclesRemainingAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogDebug(">>> Entering GetCyclesRemainingAsync(recurringPayment={RecurringPayment})", recurringPayment);
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         var historyCollection = await _orderService.GetRecurringPaymentHistoryAsync(recurringPayment);
+		_logger.LogDebug("GetCyclesRemainingAsync(recurringPayment={RecurringPayment}): historyCollection → {HistoryCollection}", recurringPayment, historyCollection);
 
         var result = recurringPayment.TotalCycles - historyCollection.Count;
+		_logger.LogDebug("GetCyclesRemainingAsync(recurringPayment={RecurringPayment}): result → {Result}", recurringPayment, result);
         if (result < 0)
             result = 0;
 
+		_logger.LogDebug("<<< Exiting GetCyclesRemainingAsync(recurringPayment={RecurringPayment})", recurringPayment);
         return result;
     }
 
@@ -3255,10 +3593,15 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// </returns>
     public virtual async Task<ProcessPaymentRequest> GetProcessPaymentRequestAsync()
     {
+		_logger.LogDebug(">>> Entering GetProcessPaymentRequestAsync()");
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetProcessPaymentRequestAsync(): store → {Store}", store);
         var json = await _genericAttributeService.GetAttributeAsync<string>(customer, NopCustomerDefaults.ProcessPaymentRequestAttribute, store.Id);
+		_logger.LogDebug("GetProcessPaymentRequestAsync(): json → {Json}", json);
+		_logger.LogDebug("GetProcessPaymentRequestAsync(): customer → {Customer}", customer);
 
+		_logger.LogDebug("<<< Exiting GetProcessPaymentRequestAsync()");
         return string.IsNullOrEmpty(json) ? null : JsonConvert.DeserializeObject<ProcessPaymentRequest>(json);
     }
 
@@ -3270,8 +3613,11 @@ public partial class OrderProcessingService : IOrderProcessingService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetProcessPaymentRequestAsync(ProcessPaymentRequest processPaymentRequest, bool useNewOrderGuid = false)
     {
+		_logger.LogDebug(">>> Entering SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid})", processPaymentRequest, useNewOrderGuid);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid}): store → {Store}", processPaymentRequest, useNewOrderGuid, store);
+		_logger.LogDebug("SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid}): customer → {Customer}", processPaymentRequest, useNewOrderGuid, customer);
 
         if (processPaymentRequest is null)
         {
@@ -3286,6 +3632,7 @@ public partial class OrderProcessingService : IOrderProcessingService
             //this way a payment gateway can prevent security issues such as credit card brute-force attacks
             //in order to avoid any possible limitations by payment gateway we reset GUID periodically
             var previousPaymentRequest = await GetProcessPaymentRequestAsync();
+			_logger.LogDebug("SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid}): previousPaymentRequest → {PreviousPaymentRequest}", processPaymentRequest, useNewOrderGuid, previousPaymentRequest);
 
             //set previous order GUID (if exists)
             if (previousPaymentRequest is { OrderGuidGeneratedOnUtc: not null })
@@ -3294,13 +3641,17 @@ public partial class OrderProcessingService : IOrderProcessingService
                 if (interval.TotalSeconds < _paymentSettings.RegenerateOrderGuidInterval)
                 {
                     processPaymentRequest.OrderGuid = previousPaymentRequest.OrderGuid;
+					_logger.LogDebug("SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid}): processPaymentRequest.OrderGuid → {Arg2}", processPaymentRequest, useNewOrderGuid, processPaymentRequest.OrderGuid);
+					_logger.LogDebug("SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid}): processPaymentRequest.OrderGuidGeneratedOnUtc → {Arg2}", processPaymentRequest, useNewOrderGuid, processPaymentRequest.OrderGuidGeneratedOnUtc);
                     processPaymentRequest.OrderGuidGeneratedOnUtc = previousPaymentRequest.OrderGuidGeneratedOnUtc;
                 }
             }
         }
 
         var json = JsonConvert.SerializeObject(processPaymentRequest);
+		_logger.LogDebug("SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid}): json → {Json}", processPaymentRequest, useNewOrderGuid, json);
         await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.ProcessPaymentRequestAttribute, json, store.Id);
+		_logger.LogDebug("<<< Exiting SetProcessPaymentRequestAsync(processPaymentRequest={ProcessPaymentRequest},useNewOrderGuid={UseNewOrderGuid})", processPaymentRequest, useNewOrderGuid);
     }
 
     #endregion
@@ -3314,9 +3665,14 @@ public partial class OrderProcessingService : IOrderProcessingService
     {
         public PlaceOrderContainer()
         {
+			_logger.LogDebug(">>> Entering PlaceOrderContainer()");
             Cart = new List<ShoppingCartItem>();
             AppliedDiscounts = new List<Discount>();
+			_logger.LogDebug("PlaceOrderContainer(): AppliedDiscounts → {AppliedDiscounts}", AppliedDiscounts);
+			_logger.LogDebug("PlaceOrderContainer(): Cart → {Cart}", Cart);
             AppliedGiftCards = new List<AppliedGiftCard>();
+			_logger.LogDebug("PlaceOrderContainer(): AppliedGiftCards → {AppliedGiftCards}", AppliedGiftCards);
+			_logger.LogDebug("<<< Exiting PlaceOrderContainer()");
         }
 
         /// <summary>

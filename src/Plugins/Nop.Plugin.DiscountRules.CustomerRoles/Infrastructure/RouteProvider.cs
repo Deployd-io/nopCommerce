@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Routing;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.DiscountRules.CustomerRoles.Infrastructure;
 
@@ -10,15 +11,18 @@ namespace Nop.Plugin.DiscountRules.CustomerRoles.Infrastructure;
 /// </summary>
 public class RouteProvider : IRouteProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Register routes
     /// </summary>
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		_logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(name: DiscountRequirementDefaults.ConfigurationRouteName,
             pattern: "Admin/DiscountRulesCustomerRoles/Configure",
             defaults: new { controller = "DiscountRulesCustomerRoles", action = "Configure", area = AreaNames.ADMIN });
+			_logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

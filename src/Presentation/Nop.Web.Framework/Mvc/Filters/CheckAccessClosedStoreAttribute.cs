@@ -7,6 +7,7 @@ using Nop.Core.Http;
 using Nop.Data;
 using Nop.Services.Security;
 using Nop.Services.Topics;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -23,8 +25,12 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public CheckAccessClosedStoreAttribute(bool ignore = false) : base(typeof(CheckAccessClosedStoreFilter))
     {
+		_logger.LogDebug(">>> Entering CheckAccessClosedStoreAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		_logger.LogDebug("CheckAccessClosedStoreAttribute(ignore={Ignore}): Arguments → {Arguments}", ignore, Arguments);
+		_logger.LogDebug("CheckAccessClosedStoreAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
+		_logger.LogDebug("<<< Exiting CheckAccessClosedStoreAttribute(ignore={Ignore})", ignore);
     }
 
     #endregion
@@ -63,11 +69,18 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
             ITopicService topicService,
             StoreInformationSettings storeInformationSettings)
         {
+			_logger.LogDebug(">>> Entering CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings})", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings);
             _ignoreFilter = ignoreFilter;
+			_logger.LogDebug("CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings, _ignoreFilter);
             _permissionService = permissionService;
+			_logger.LogDebug("CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings}): _permissionService → {_permissionService}", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings, _permissionService);
             _storeContext = storeContext;
+			_logger.LogDebug("CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings}): _storeContext → {_storeContext}", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings, _storeContext);
             _topicService = topicService;
+			_logger.LogDebug("CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings}): _topicService → {_topicService}", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings, _topicService);
             _storeInformationSettings = storeInformationSettings;
+			_logger.LogDebug("<<< Exiting CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings})", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings);
+			_logger.LogDebug("CheckAccessClosedStoreFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService},storeContext={StoreContext},topicService={TopicService},storeInformationSettings={StoreInformationSettings}): _storeInformationSettings → {_storeInformationSettings}", ignoreFilter, permissionService, storeContext, topicService, storeInformationSettings, _storeInformationSettings);
         }
 
         #endregion
@@ -81,6 +94,7 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckAccessClosedStoreAsync(ActionExecutingContext context)
         {
+			_logger.LogDebug(">>> Entering CheckAccessClosedStoreAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -116,12 +130,14 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
                 //get identifiers of topics are accessible when a store is closed
 
                 var store = await _storeContext.GetCurrentStoreAsync();
+				_logger.LogDebug("CheckAccessClosedStoreAsync(context={Context}): store → {Store}", context, store);
                 var allowedTopicIds = (await _topicService.GetAllTopicsAsync(store.Id))
                     .Where(topic => topic.AccessibleWhenStoreClosed)
                     .Select(topic => topic.Id);
 
                 //check whether requested topic is allowed
                 var requestedTopicId = context.RouteData.Values["topicId"] as int?;
+				_logger.LogDebug("CheckAccessClosedStoreAsync(context={Context}): requestedTopicId → {RequestedTopicId}", context, requestedTopicId);
                 if (requestedTopicId.HasValue && allowedTopicIds.Contains(requestedTopicId.Value))
                     return;
             }
@@ -132,6 +148,7 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
 
             //store is closed and no access, so redirect to 'StoreClosed' page
             context.Result = new RedirectToRouteResult(NopRouteNames.Standard.STORE_CLOSED, null);
+			_logger.LogDebug("<<< Exiting CheckAccessClosedStoreAsync(context={Context})", context);
         }
 
         #endregion
@@ -146,9 +163,11 @@ public sealed class CheckAccessClosedStoreAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckAccessClosedStoreAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

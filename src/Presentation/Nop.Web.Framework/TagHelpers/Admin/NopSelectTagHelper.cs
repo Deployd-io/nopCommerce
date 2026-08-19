@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Core.Domain.Common;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-select", TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopSelectTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -34,8 +36,12 @@ public partial class NopSelectTagHelper : TagHelper
 
     public NopSelectTagHelper(AdminAreaSettings adminAreaSettings, IHtmlHelper htmlHelper)
     {
+		_logger.LogDebug(">>> Entering NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper})", adminAreaSettings, htmlHelper);
         _adminAreaSettings = adminAreaSettings;
         _htmlHelper = htmlHelper;
+		_logger.LogDebug("NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", adminAreaSettings, htmlHelper, _htmlHelper);
+		_logger.LogDebug("NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper}): _adminAreaSettings → {_adminAreaSettings}", adminAreaSettings, htmlHelper, _adminAreaSettings);
+		_logger.LogDebug("<<< Exiting NopSelectTagHelper(adminAreaSettings={AdminAreaSettings},htmlHelper={HtmlHelper})", adminAreaSettings, htmlHelper);
     }
 
     #endregion
@@ -50,6 +56,7 @@ public partial class NopSelectTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -70,6 +77,7 @@ public partial class NopSelectTagHelper : TagHelper
 
         //get htmlAttributes object
         var htmlAttributes = new Dictionary<string, object>();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): htmlAttributes → {HtmlAttributes}", context, output, htmlAttributes);
         var attributes = context.AllAttributes;
         foreach (var attribute in attributes)
         {
@@ -88,6 +96,7 @@ public partial class NopSelectTagHelper : TagHelper
         if (!string.IsNullOrEmpty(tagName))
         {
             var templateName = "Select";
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): templateName → {TemplateName}", context, output, templateName);
 
             if (bool.TryParse(IsMultiple, out var multiple) && multiple)
                 templateName = $"Multi{templateName}";
@@ -114,6 +123,7 @@ public partial class NopSelectTagHelper : TagHelper
 
             output.Content.SetHtmlContent(await selectList.RenderHtmlContentAsync());
         }
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

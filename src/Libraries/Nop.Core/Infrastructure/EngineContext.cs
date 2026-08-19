@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using System.Runtime.CompilerServices;
 
 namespace Nop.Core.Infrastructure;
@@ -7,6 +8,7 @@ namespace Nop.Core.Infrastructure;
 /// </summary>
 public partial class EngineContext
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -15,7 +17,9 @@ public partial class EngineContext
     [MethodImpl(MethodImplOptions.Synchronized)]
     public static IEngine Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //create NopEngine as engine
+		_logger.LogDebug("<<< Exiting Create()");
         return Singleton<IEngine>.Instance ?? (Singleton<IEngine>.Instance = new NopEngine());
     }
 
@@ -26,7 +30,9 @@ public partial class EngineContext
     /// <remarks>Only use this method if you know what you're doing.</remarks>
     public static void Replace(IEngine engine)
     {
+		_logger.LogDebug(">>> Entering Replace(engine={Engine})", engine);
         Singleton<IEngine>.Instance = engine;
+		_logger.LogDebug("<<< Exiting Replace(engine={Engine})", engine);
     }
 
     #endregion

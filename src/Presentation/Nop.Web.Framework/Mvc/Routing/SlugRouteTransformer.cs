@@ -15,6 +15,7 @@ using Nop.Services.Catalog;
 using Nop.Services.Localization;
 using Nop.Services.Seo;
 using Nop.Web.Framework.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Routing;
 
@@ -23,6 +24,7 @@ namespace Nop.Web.Framework.Mvc.Routing;
 /// </summary>
 public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -47,14 +49,24 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         IUrlRecordService urlRecordService,
         LocalizationSettings localizationSettings)
     {
+		_logger.LogDebug(">>> Entering SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings})", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _catalogSettings → {_catalogSettings}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _catalogSettings);
         _categoryService = categoryService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _categoryService → {_categoryService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _categoryService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _eventPublisher → {_eventPublisher}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _eventPublisher);
         _languageService = languageService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _languageService → {_languageService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _languageService);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _manufacturerService → {_manufacturerService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _manufacturerService);
         _storeContext = storeContext;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _storeContext → {_storeContext}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _storeContext);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _urlRecordService → {_urlRecordService}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _urlRecordService);
         _localizationSettings = localizationSettings;
+		_logger.LogDebug("SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings, _localizationSettings);
+		_logger.LogDebug("<<< Exiting SlugRouteTransformer(catalogSettings={CatalogSettings},categoryService={CategoryService},eventPublisher={EventPublisher},languageService={LanguageService},manufacturerService={ManufacturerService},storeContext={StoreContext},urlRecordService={UrlRecordService},localizationSettings={LocalizationSettings})", catalogSettings, categoryService, eventPublisher, languageService, manufacturerService, storeContext, urlRecordService, localizationSettings);
     }
 
     #endregion
@@ -71,6 +83,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SingleSlugRoutingAsync(HttpContext httpContext, RouteValueDictionary values, UrlRecord urlRecord, string catalogPath)
     {
+		_logger.LogDebug(">>> Entering SingleSlugRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath})", httpContext, values, urlRecord, catalogPath);
         //if URL record is not active let's find the latest one
         var slug = urlRecord.IsActive
             ? urlRecord.Slug
@@ -90,12 +103,15 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         if (_localizationSettings.SeoFriendlyUrlsForLanguagesEnabled && values.TryGetValue(NopRoutingDefaults.RouteValue.Language, out var langValue))
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("SingleSlugRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): store → {Store}", httpContext, values, urlRecord, catalogPath, store);
             var languages = await _languageService.GetAllLanguagesAsync(storeId: store.Id);
+			_logger.LogDebug("SingleSlugRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): languages → {Languages}", httpContext, values, urlRecord, catalogPath, languages);
             var language = languages
                 .FirstOrDefault(lang => lang.UniqueSeoCode.Equals(langValue?.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 ?? languages.FirstOrDefault();
 
             var slugLocalized = await _urlRecordService.GetSeNameAsync(urlRecord.EntityId, urlRecord.EntityName, language.Id, true, false);
+			_logger.LogDebug("SingleSlugRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): slugLocalized → {SlugLocalized}", httpContext, values, urlRecord, catalogPath, slugLocalized);
             if (!string.IsNullOrEmpty(slugLocalized) && !slugLocalized.Equals(slug, StringComparison.InvariantCultureIgnoreCase))
             {
                 //redirect to the page for current language
@@ -137,6 +153,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 
             case var name when name.Equals(nameof(Topic), StringComparison.InvariantCultureIgnoreCase):
                 RouteToAction(values, "Topic", "TopicDetails", slug, (NopRoutingDefaults.RouteValue.TopicId, urlRecord.EntityId));
+				_logger.LogDebug("<<< Exiting SingleSlugRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath})", httpContext, values, urlRecord, catalogPath);
                 return;
         }
     }
@@ -154,6 +171,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// </returns>
     protected virtual async Task<bool> TryProductCatalogRoutingAsync(HttpContext httpContext, RouteValueDictionary values, UrlRecord urlRecord, string catalogPath)
     {
+		_logger.LogDebug(">>> Entering TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath})", httpContext, values, urlRecord, catalogPath);
         //ensure it's a product URL record
         if (!urlRecord.EntityName.Equals(nameof(Product), StringComparison.InvariantCultureIgnoreCase))
             return false;
@@ -171,18 +189,25 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 
         //try to get active catalog (e.g. category or manufacturer) seName for the product
         var catalogSeName = string.Empty;
+		_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): catalogSeName → {CatalogSeName}", httpContext, values, urlRecord, catalogPath, catalogSeName);
         var isCategoryProductUrl = _catalogSettings.ProductUrlStructureTypeId == (int)ProductUrlStructureType.CategoryProduct;
+		_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): isCategoryProductUrl → {IsCategoryProductUrl}", httpContext, values, urlRecord, catalogPath, isCategoryProductUrl);
         if (isCategoryProductUrl)
         {
             var productCategory = (await _categoryService.GetProductCategoriesByProductIdAsync(urlRecord.EntityId)).FirstOrDefault();
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): productCategory → {ProductCategory}", httpContext, values, urlRecord, catalogPath, productCategory);
             var category = await _categoryService.GetCategoryByIdAsync(productCategory?.CategoryId ?? 0);
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): category → {Category}", httpContext, values, urlRecord, catalogPath, category);
             catalogSeName = category is not null ? await _urlRecordService.GetSeNameAsync(category) : string.Empty;
         }
         var isManufacturerProductUrl = _catalogSettings.ProductUrlStructureTypeId == (int)ProductUrlStructureType.ManufacturerProduct;
+		_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): isManufacturerProductUrl → {IsManufacturerProductUrl}", httpContext, values, urlRecord, catalogPath, isManufacturerProductUrl);
         if (isManufacturerProductUrl)
         {
             var productManufacturer = (await _manufacturerService.GetProductManufacturersByProductIdAsync(urlRecord.EntityId)).FirstOrDefault();
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): productManufacturer → {ProductManufacturer}", httpContext, values, urlRecord, catalogPath, productManufacturer);
             var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(productManufacturer?.ManufacturerId ?? 0);
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): manufacturer → {Manufacturer}", httpContext, values, urlRecord, catalogPath, manufacturer);
             catalogSeName = manufacturer is not null ? await _urlRecordService.GetSeNameAsync(manufacturer) : string.Empty;
         }
         if (string.IsNullOrEmpty(catalogSeName))
@@ -190,6 +215,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 
         //get URL record by the specified catalog path
         var catalogUrlRecord = await _urlRecordService.GetBySlugAsync(catalogPath);
+		_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): catalogUrlRecord → {CatalogUrlRecord}", httpContext, values, urlRecord, catalogPath, catalogUrlRecord);
         if (catalogUrlRecord is null ||
             (isCategoryProductUrl && !catalogUrlRecord.EntityName.Equals(nameof(Category), StringComparison.InvariantCultureIgnoreCase)) ||
             (isManufacturerProductUrl && !catalogUrlRecord.EntityName.Equals(nameof(Manufacturer), StringComparison.InvariantCultureIgnoreCase)) ||
@@ -204,19 +230,25 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         if (_localizationSettings.SeoFriendlyUrlsForLanguagesEnabled && values.TryGetValue(NopRoutingDefaults.RouteValue.Language, out var langValue))
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): store → {Store}", httpContext, values, urlRecord, catalogPath, store);
             var languages = await _languageService.GetAllLanguagesAsync(storeId: store.Id);
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): languages → {Languages}", httpContext, values, urlRecord, catalogPath, languages);
             var language = languages
                 .FirstOrDefault(lang => lang.UniqueSeoCode.Equals(langValue?.ToString(), StringComparison.InvariantCultureIgnoreCase))
                 ?? languages.FirstOrDefault();
 
             var slugLocalized = await _urlRecordService.GetSeNameAsync(urlRecord.EntityId, urlRecord.EntityName, language.Id, true, false);
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): slugLocalized → {SlugLocalized}", httpContext, values, urlRecord, catalogPath, slugLocalized);
             var catalogSlugLocalized = await _urlRecordService.GetSeNameAsync(catalogUrlRecord.EntityId, catalogUrlRecord.EntityName, language.Id, true, false);
+			_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): catalogSlugLocalized → {CatalogSlugLocalized}", httpContext, values, urlRecord, catalogPath, catalogSlugLocalized);
             if ((!string.IsNullOrEmpty(slugLocalized) && !slugLocalized.Equals(slug, StringComparison.InvariantCultureIgnoreCase)) ||
                 (!string.IsNullOrEmpty(catalogSlugLocalized) && !catalogSlugLocalized.Equals(catalogUrlRecord.Slug, StringComparison.InvariantCultureIgnoreCase)))
             {
                 //redirect to localized URL for the current language
                 var activeSlug = !string.IsNullOrEmpty(slugLocalized) ? slugLocalized : slug;
+				_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): activeSlug → {ActiveSlug}", httpContext, values, urlRecord, catalogPath, activeSlug);
                 var activeCatalogSlug = !string.IsNullOrEmpty(catalogSlugLocalized) ? catalogSlugLocalized : catalogUrlRecord.Slug;
+				_logger.LogDebug("TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath}): activeCatalogSlug → {ActiveCatalogSlug}", httpContext, values, urlRecord, catalogPath, activeCatalogSlug);
                 InternalRedirect(httpContext, values, $"/{language.UniqueSeoCode}/{activeCatalogSlug}/{activeSlug}", false);
                 return true;
             }
@@ -234,6 +266,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         //all is ok, so select the appropriate action
         RouteToAction(values, "Product", "ProductDetails", slug,
             (NopRoutingDefaults.RouteValue.ProductId, urlRecord.EntityId), (NopRoutingDefaults.RouteValue.CatalogSeName, catalogSeName));
+		_logger.LogDebug("<<< Exiting TryProductCatalogRoutingAsync(httpContext={HttpContext},values={Values},urlRecord={UrlRecord},catalogPath={CatalogPath})", httpContext, values, urlRecord, catalogPath);
         return true;
     }
 
@@ -246,11 +279,13 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// <param name="permanent">Whether the redirect should be permanent</param>
     protected virtual void InternalRedirect(HttpContext httpContext, RouteValueDictionary values, string path, bool permanent)
     {
+		_logger.LogDebug(">>> Entering InternalRedirect(httpContext={HttpContext},values={Values},path={Path},permanent={Permanent})", httpContext, values, path, permanent);
         values[NopRoutingDefaults.RouteValue.Controller] = "Common";
         values[NopRoutingDefaults.RouteValue.Action] = "InternalRedirect";
         values[NopRoutingDefaults.RouteValue.Url] = $"{httpContext.Request.PathBase}{path}{httpContext.Request.QueryString}";
         values[NopRoutingDefaults.RouteValue.PermanentRedirect] = permanent;
         httpContext.Items[NopHttpDefaults.GenericRouteInternalRedirect] = true;
+		_logger.LogDebug("<<< Exiting InternalRedirect(httpContext={HttpContext},values={Values},path={Path},permanent={Permanent})", httpContext, values, path, permanent);
     }
 
     /// <summary>
@@ -263,6 +298,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// <param name="parameters">Action parameters</param>
     protected virtual void RouteToAction(RouteValueDictionary values, string controller, string action, string slug, params (string Key, object Value)[] parameters)
     {
+		_logger.LogDebug(">>> Entering RouteToAction(values={Values},controller={Controller},action={Action},slug={Slug},parameters={Parameters})", values, controller, action, slug, parameters);
         values[NopRoutingDefaults.RouteValue.Controller] = controller;
         values[NopRoutingDefaults.RouteValue.Action] = action;
         values[NopRoutingDefaults.RouteValue.SeName] = slug;
@@ -270,6 +306,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         {
             values[key] = value;
         }
+		_logger.LogDebug("<<< Exiting RouteToAction(values={Values},controller={Controller},action={Action},slug={Slug},parameters={Parameters})", values, controller, action, slug, parameters);
     }
 
     #endregion
@@ -287,8 +324,10 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
     /// </returns>
     public override async ValueTask<RouteValueDictionary> TransformAsync(HttpContext httpContext, RouteValueDictionary routeValues)
     {
+		_logger.LogDebug(">>> Entering TransformAsync(httpContext={HttpContext},routeValues={RouteValues})", httpContext, routeValues);
         //get values to transform for action selection
         var values = new RouteValueDictionary(routeValues);
+		_logger.LogDebug("TransformAsync(httpContext={HttpContext},routeValues={RouteValues}): values → {Values}", httpContext, routeValues, values);
 
         if (!values.TryGetValue(NopRoutingDefaults.RouteValue.SeName, out var slug) || slug is null)
             return values;
@@ -299,6 +338,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
 
         //allow third-party handlers to select an action by the found URL record
         var routingEvent = new GenericRoutingEvent(httpContext, values, urlRecord);
+		_logger.LogDebug("TransformAsync(httpContext={HttpContext},routeValues={RouteValues}): routingEvent → {RoutingEvent}", httpContext, routeValues, routingEvent);
         await _eventPublisher.PublishAsync(routingEvent);
         if (routingEvent.StopProcessing)
             return values;
@@ -313,6 +353,7 @@ public partial class SlugRouteTransformer : DynamicRouteValueTransformer
         //finally, select an action by the URL record only
         await SingleSlugRoutingAsync(httpContext, values, urlRecord, catalogPath);
 
+		_logger.LogDebug("<<< Exiting TransformAsync(httpContext={HttpContext},routeValues={RouteValues})", httpContext, routeValues);
         return values;
     }
 

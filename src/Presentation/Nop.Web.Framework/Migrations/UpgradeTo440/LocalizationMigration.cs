@@ -4,20 +4,24 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo440;
 
 [NopUpdateMigration("2020-06-10 00:00:00", "4.40", UpdateMigrationType.Localization)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>Collect the UP migration expressions</summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //do not use DI, because it produces exception on the installation process
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("Up(): localizationService → {LocalizationService}", localizationService);
 
         //use localizationService to add, update and delete localization resources
         localizationService.DeleteLocaleResources(new List<string>
@@ -762,11 +766,14 @@ public class LocalizationMigration : MigrationBase
             //#5429
             ["Search.NoResultsText"] = "Catalog.Products.NoResult"
         }, languages, localizationService);
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>Collects the DOWN migration expressions</summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Localization;
 using Nop.Core.Domain.Localization;
 using Nop.Core.Infrastructure;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Globalization;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Globalization;
 /// </summary>
 public partial class NopSeoUrlCultureProvider : RequestCultureProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Implements the provider to determine the culture of the given request
     /// </summary>
@@ -21,8 +23,10 @@ public partial class NopSeoUrlCultureProvider : RequestCultureProvider
     /// </returns>
     public override async Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
     {
+		_logger.LogDebug(">>> Entering DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
         var localizationSettings = EngineContext.Current.Resolve<LocalizationSettings>();
 
+		_logger.LogDebug("DetermineProviderCultureResult(httpContext={HttpContext}): localizationSettings → {LocalizationSettings}", httpContext, localizationSettings);
         if (!localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
             return await NullProviderCultureResult;
 
