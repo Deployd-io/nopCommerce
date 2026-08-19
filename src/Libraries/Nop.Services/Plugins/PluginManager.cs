@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Plugins;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Plugins;
 /// <typeparam name="TPlugin">Type of plugin</typeparam>
 public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlugin : class, IPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -23,8 +25,12 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     public PluginManager(ICustomerService customerService,
         IPluginService pluginService)
     {
+		_logger.LogDebug(">>> Entering PluginManager(customerService={CustomerService},pluginService={PluginService})", customerService, pluginService);
         _customerService = customerService;
         _pluginService = pluginService;
+		_logger.LogDebug("PluginManager(customerService={CustomerService},pluginService={PluginService}): _customerService → {_customerService}", customerService, pluginService, _customerService);
+		_logger.LogDebug("PluginManager(customerService={CustomerService},pluginService={PluginService}): _pluginService → {_pluginService}", customerService, pluginService, _pluginService);
+		_logger.LogDebug("<<< Exiting PluginManager(customerService={CustomerService},pluginService={PluginService})", customerService, pluginService);
     }
 
     #endregion
@@ -43,6 +49,8 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     protected virtual async Task<string> GetKeyAsync(Customer customer, int storeId, string systemName = null)
     {
+		_logger.LogDebug(">>> Entering GetKeyAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
+		_logger.LogDebug("<<< Exiting GetKeyAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         return $"{storeId}-{(customer != null ? string.Join(',', await _customerService.GetCustomerRoleIdsAsync(customer)) : null)}-{systemName}";
     }
 
@@ -58,10 +66,12 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     protected virtual async Task<TPlugin> LoadPrimaryPluginAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         //try to get a plugin by system name or return the first loaded one (it's necessary to have a primary active plugin)
         var plugin = await LoadPluginBySystemNameAsync(systemName, customer, storeId)
                      ?? (await LoadAllPluginsAsync(customer, storeId)).FirstOrDefault();
 
+		_logger.LogDebug("<<< Exiting LoadPrimaryPluginAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return plugin;
     }
 
@@ -80,11 +90,16 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     public virtual async Task<IList<TPlugin>> LoadAllPluginsAsync(Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadAllPluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         //get plugins and put them into the dictionary to avoid further loading
         var key = await GetKeyAsync(customer, storeId);
+		_logger.LogWarning("LoadAllPluginsAsync(customer={Customer},storeId={StoreId}): key → {Key}", customer, storeId, key);
         if (!_plugins.ContainsKey(key))
             _plugins.Add(key, await _pluginService.GetPluginsAsync<TPlugin>(customer: customer, storeId: storeId));
 
+		_logger.LogDebug("<<< Exiting LoadAllPluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		_logger.LogDebug(">>> Entering LoadPluginBySystemNameAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
+		_logger.LogDebug("<<< Exiting LoadPluginBySystemNameAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return _plugins[key];
     }
 
@@ -105,6 +120,7 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
 
         //try to get already loaded plugin
         var key = await GetKeyAsync(customer, storeId, systemName);
+		_logger.LogWarning("LoadPluginBySystemNameAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): key → {Key}", systemName, customer, storeId, key);
         if (_plugins.TryGetValue(key, out var value))
             return value.FirstOrDefault();
 
@@ -132,6 +148,7 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     public virtual async Task<IList<TPlugin>> LoadActivePluginsAsync(List<string> systemNames, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(systemNames={SystemNames},customer={Customer},storeId={StoreId})", systemNames, customer, storeId);
         if (systemNames == null)
             return new List<TPlugin>();
 
@@ -149,6 +166,7 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(TPlugin plugin, List<string> systemNames)
     {
+		_logger.LogDebug(">>> Entering IsPluginActive(plugin={Plugin},systemNames={SystemNames})", plugin, systemNames);
         if (plugin == null)
             return false;
 
@@ -167,6 +185,8 @@ public partial class PluginManager<TPlugin> : IPluginManager<TPlugin> where TPlu
     /// </returns>
     public virtual async Task<string> GetPluginLogoUrlAsync(TPlugin plugin)
     {
+		_logger.LogDebug(">>> Entering GetPluginLogoUrlAsync(plugin={Plugin})", plugin);
+		_logger.LogDebug("<<< Exiting GetPluginLogoUrlAsync(plugin={Plugin})", plugin);
         return await _pluginService.GetPluginLogoUrlAsync(plugin.PluginDescriptor);
     }
 

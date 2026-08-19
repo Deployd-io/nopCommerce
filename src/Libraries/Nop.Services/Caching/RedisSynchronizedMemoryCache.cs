@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Nop.Core.Caching;
 using Nop.Core.Configuration;
 using StackExchange.Redis;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Caching;
 
@@ -15,6 +16,7 @@ namespace Nop.Services.Caching;
 /// </remarks>
 public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected const string CLEAR_CACHE_EVENT_KEY = "__NOP_CLEAR_CACHE__";
@@ -41,20 +43,29 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
         ICacheKeyManager cacheKeyManager,
         AppSettings appSettings)
     {
+		_logger.LogDebug(">>> Entering RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings})", memoryCache, connectionWrapper, cacheKeyManager, appSettings);
         _processId = $"{Guid.NewGuid()}:{Environment.ProcessId}";
 
+		_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): _processId → {_processId}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, _processId);
         _memoryCache = memoryCache;
+		_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): _memoryCache → {_memoryCache}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, _memoryCache);
         _keyManager = cacheKeyManager;
+		_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): _keyManager → {_keyManager}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, _keyManager);
         _connection = connectionWrapper;
+		_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): _connection → {_connection}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, _connection);
 
         var publishIntervalMs = appSettings.Get<DistributedCacheConfig>().PublishIntervalMs;
+		_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): publishIntervalMs → {PublishIntervalMs}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, publishIntervalMs);
         if (publishIntervalMs > 0)
         {
             var timeSpan = TimeSpan.FromMilliseconds(publishIntervalMs);
+			_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): timeSpan → {TimeSpan}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, timeSpan);
             _timer = new(_ => PublishQueuedChangeEvents(), null, timeSpan, timeSpan);
         }
+		_logger.LogDebug("RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings}): _timer → {_timer}", memoryCache, connectionWrapper, cacheKeyManager, appSettings, _timer);
 
         Subscribe();
+		_logger.LogDebug("<<< Exiting RedisSynchronizedMemoryCache(memoryCache={MemoryCache},connectionWrapper={ConnectionWrapper},cacheKeyManager={CacheKeyManager},appSettings={AppSettings})", memoryCache, connectionWrapper, cacheKeyManager, appSettings);
     }
 
     #endregion
@@ -66,16 +77,20 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// </summary>
     protected virtual void Subscribe()
     {
+		_logger.LogDebug(">>> Entering Subscribe()");
         var channel = ChannelPrefix;
         var subscriber = _connection.GetSubscriber();
+		_logger.LogDebug("Subscribe(): subscriber → {Subscriber}", subscriber);
         subscriber.Subscribe(RedisChannel.Pattern(channel + "*"), (redisChannel, value) =>
         {
             var publisher = redisChannel.ToString().Replace(channel, "");
+			_logger.LogDebug("Subscribe(): publisher → {Publisher}", publisher);
 
             if (publisher == _processId)
                 return;
 
             var keys = JsonConvert.DeserializeObject<string[]>(value);
+			_logger.LogDebug("Subscribe(): keys → {Keys}", keys);
 
             if (keys == null)
                 return;
@@ -92,6 +107,7 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
                     if (key.StartsWith(REMOVE_BY_PREFIX_EVENT_KEY))
                     {
                         var prefix = key[..^2].Replace(REMOVE_BY_PREFIX_EVENT_KEY, string.Empty);
+						_logger.LogDebug("Subscribe(): prefix → {Prefix}", prefix);
 
                         foreach (var keyToDelete in _keyManager.RemoveByPrefix(prefix))
                             _memoryCache.Remove(keyToDelete);
@@ -103,6 +119,8 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
                     }
                 }
         });
+		_logger.LogDebug(">>> Entering PublishQueuedChangeEvents()");
+		_logger.LogDebug("<<< Exiting PublishQueuedChangeEvents()");
     }
 
     /// <summary>
@@ -116,12 +134,15 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <param name="key">The evicted cache key to be published</param>
     protected virtual void PublishChangeEvent(object key)
     {
+		_logger.LogDebug(">>> Entering PublishChangeEvent(key={Key})", key);
         var stringKey = key.ToString();
 
+		_logger.LogDebug("PublishChangeEvent(key={Key}): stringKey → {StringKey}", key, stringKey);
         if (_timer == null)
             BatchPublishChangeEvents(stringKey);
         else
             _messageQueue.Enqueue(stringKey);
+			_logger.LogDebug("<<< Exiting PublishChangeEvent(key={Key})", key);
     }
 
     /// <summary>
@@ -144,14 +165,17 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// </summary>
     protected virtual void BatchPublishChangeEvents(params string[] keys)
     {
+		_logger.LogDebug(">>> Entering BatchPublishChangeEvents(keys={Keys})", keys);
         if (keys.Length == 0)
             return;
 
         var subscriber = _connection.GetSubscriber();
+		_logger.LogDebug("BatchPublishChangeEvents(keys={Keys}): subscriber → {Subscriber}", keys, subscriber);
         subscriber.Publish(RedisChannel.Pattern( 
             $"{ChannelPrefix}{_processId}"),
             JsonConvert.SerializeObject(keys),
             CommandFlags.FireAndForget);
+			_logger.LogDebug("<<< Exiting BatchPublishChangeEvents(keys={Keys})", keys);
     }
 
     /// <summary>
@@ -163,6 +187,7 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <param name="state">The information that was passed when registering the callback.</param>
     protected virtual void OnEviction(object key, object value, EvictionReason reason, object state)
     {
+		_logger.LogDebug(">>> Entering OnEviction(key={Key},value={Value},reason={Reason},state={State})", key, value, reason, state);
         switch (reason)
         {
             case EvictionReason.Replaced:
@@ -173,6 +198,7 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
             default:
                 break;
         }
+		_logger.LogDebug("<<< Exiting OnEviction(key={Key},value={Value},reason={Reason},state={State})", key, value, reason, state);
     }
 
     #endregion
@@ -184,6 +210,8 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <returns>The newly created <see cref="T:Microsoft.Extensions.Caching.Memory.ICacheEntry" /> instance.</returns>
     public virtual ICacheEntry CreateEntry(object key)
     {
+		_logger.LogDebug(">>> Entering CreateEntry(key={Key})", key);
+		_logger.LogDebug("<<< Exiting CreateEntry(key={Key})", key);
         return _memoryCache.CreateEntry(key).RegisterPostEvictionCallback(OnEviction);
     }
 
@@ -193,10 +221,12 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <param name="key">An object identifying the entry.</param>
     public virtual void Remove(object key)
     {
+		_logger.LogDebug(">>> Entering Remove(key={Key})", key);
         _memoryCache.Remove(key);
 
         //publish event manually instead of through eviction callback to avoid feedback loops
         PublishChangeEvent(key);
+		_logger.LogDebug("<<< Exiting Remove(key={Key})", key);
     }
 
     /// <summary>
@@ -207,6 +237,8 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <returns>True if the key was found.</returns>
     public virtual bool TryGetValue(object key, out object value)
     {
+		_logger.LogDebug(">>> Entering TryGetValue(key={Key})", key);
+		_logger.LogDebug("<<< Exiting TryGetValue(key={Key})", key);
         return _memoryCache.TryGetValue(key, out value);
     }
 
@@ -216,8 +248,10 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task ClearCacheAsync()
     {
+		_logger.LogDebug(">>> Entering ClearCacheAsync()");
         BatchPublishChangeEvents(CLEAR_CACHE_EVENT_KEY);
 
+		_logger.LogDebug("<<< Exiting ClearCacheAsync()");
         return Task.CompletedTask;
     }
 
@@ -228,8 +262,10 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task RemoveByPrefixAsync(string prefix)
     {
+		_logger.LogDebug(">>> Entering RemoveByPrefixAsync(prefix={Prefix})", prefix);
         BatchPublishChangeEvents($"{REMOVE_BY_PREFIX_EVENT_KEY}{prefix}__");
 
+		_logger.LogDebug("<<< Exiting RemoveByPrefixAsync(prefix={Prefix})", prefix);
         return Task.CompletedTask;
     }
 
@@ -238,15 +274,19 @@ public partial class RedisSynchronizedMemoryCache : ISynchronizedMemoryCache
     /// </summary>
     public virtual void Dispose()
     {
+		_logger.LogDebug(">>> Entering Dispose()");
         if (!_disposed)
         {
             _timer?.Dispose();
             var subscriber = _connection.GetSubscriber();
+			_logger.LogDebug("Dispose(): subscriber → {Subscriber}", subscriber);
             subscriber.Unsubscribe(RedisChannel.Pattern(ChannelPrefix + "*"));
 
             _disposed = true;
+			_logger.LogDebug("Dispose(): _disposed → {_disposed}", _disposed);
         }
 
         GC.SuppressFinalize(this);
+		_logger.LogDebug("<<< Exiting Dispose()");
     }
 }

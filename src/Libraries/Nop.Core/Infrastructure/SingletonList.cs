@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Infrastructure;
 
 /// <summary>
@@ -6,9 +7,12 @@
 /// <typeparam name="T">The type of list to store.</typeparam>
 public partial class SingletonList<T> : Singleton<IList<T>>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     static SingletonList()
     {
+		_logger.LogDebug(">>> Entering SingletonList()");
         Singleton<IList<T>>.Instance = new List<T>();
+		_logger.LogDebug("<<< Exiting SingletonList()");
     }
 
     /// <summary>

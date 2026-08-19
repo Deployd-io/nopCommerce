@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Data;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -18,8 +20,12 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public AuthorizeAdminAttribute(bool ignore = false) : base(typeof(AuthorizeAdminFilter))
     {
+		_logger.LogDebug(">>> Entering AuthorizeAdminAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		_logger.LogDebug("AuthorizeAdminAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
+		_logger.LogDebug("AuthorizeAdminAttribute(ignore={Ignore}): Arguments → {Arguments}", ignore, Arguments);
+		_logger.LogDebug("<<< Exiting AuthorizeAdminAttribute(ignore={Ignore})", ignore);
     }
 
     #endregion
@@ -51,8 +57,12 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
 
         public AuthorizeAdminFilter(bool ignoreFilter, IPermissionService permissionService)
         {
+			_logger.LogDebug(">>> Entering AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
             _ignoreFilter = ignoreFilter;
             _permissionService = permissionService;
+			_logger.LogDebug("AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, permissionService, _ignoreFilter);
+			_logger.LogDebug("AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService}): _permissionService → {_permissionService}", ignoreFilter, permissionService, _permissionService);
+			_logger.LogDebug("<<< Exiting AuthorizeAdminFilter(ignoreFilter={IgnoreFilter},permissionService={PermissionService})", ignoreFilter, permissionService);
         }
 
         #endregion
@@ -66,6 +76,7 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task AuthorizeAdminAsync(AuthorizationFilterContext context)
         {
+			_logger.LogDebug(">>> Entering AuthorizeAdminAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -83,12 +94,15 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
                 return;
 
             //there is AdminAuthorizeFilter, so check access
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (context.Filters.Any(filter => filter is AuthorizeAdminFilter))
             {
                 //authorize permission of access to the admin area
                 if (!await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL))
                     context.Result = new ChallengeResult();
+					_logger.LogInformation("AuthorizeAdminAsync(context)={Context}: database query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
             }
+			_logger.LogDebug("<<< Exiting AuthorizeAdminAsync(context={Context})", context);
         }
 
         #endregion
@@ -102,7 +116,9 @@ public sealed class AuthorizeAdminAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await AuthorizeAdminAsync(context);
+			_logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

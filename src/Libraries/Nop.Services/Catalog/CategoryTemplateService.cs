@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class CategoryTemplateService : ICategoryTemplateService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<CategoryTemplate> _categoryTemplateRepository;
@@ -18,7 +20,10 @@ public partial class CategoryTemplateService : ICategoryTemplateService
 
     public CategoryTemplateService(IRepository<CategoryTemplate> categoryTemplateRepository)
     {
+		_logger.LogDebug(">>> Entering CategoryTemplateService(categoryTemplateRepository={CategoryTemplateRepository})", categoryTemplateRepository);
         _categoryTemplateRepository = categoryTemplateRepository;
+		_logger.LogDebug("CategoryTemplateService(categoryTemplateRepository={CategoryTemplateRepository}): _categoryTemplateRepository → {_categoryTemplateRepository}", categoryTemplateRepository, _categoryTemplateRepository);
+		_logger.LogDebug("<<< Exiting CategoryTemplateService(categoryTemplateRepository={CategoryTemplateRepository})", categoryTemplateRepository);
     }
 
     #endregion
@@ -32,7 +37,10 @@ public partial class CategoryTemplateService : ICategoryTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCategoryTemplateAsync(CategoryTemplate categoryTemplate)
     {
+		_logger.LogDebug(">>> Entering DeleteCategoryTemplateAsync(categoryTemplate={CategoryTemplate})", categoryTemplate);
+		_logger.LogInformation("DeleteCategoryTemplateAsync(categoryTemplate)={CategoryTemplate}: external service call took {Arg1} ms", categoryTemplate, __logStart.ElapsedMilliseconds);
         await _categoryTemplateRepository.DeleteAsync(categoryTemplate);
+		_logger.LogDebug("<<< Exiting DeleteCategoryTemplateAsync(categoryTemplate={CategoryTemplate})", categoryTemplate);
     }
 
     /// <summary>
@@ -44,13 +52,17 @@ public partial class CategoryTemplateService : ICategoryTemplateService
     /// </returns>
     public virtual async Task<IList<CategoryTemplate>> GetAllCategoryTemplatesAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllCategoryTemplatesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var templates = await _categoryTemplateRepository.GetAllAsync(query =>
         {
             return from pt in query
                 orderby pt.DisplayOrder, pt.Id
                 select pt;
+				_logger.LogInformation("GetAllCategoryTemplatesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		_logger.LogDebug("<<< Exiting GetAllCategoryTemplatesAsync()");
         return templates;
     }
 
@@ -64,6 +76,8 @@ public partial class CategoryTemplateService : ICategoryTemplateService
     /// </returns>
     public virtual async Task<CategoryTemplate> GetCategoryTemplateByIdAsync(int categoryTemplateId)
     {
+		_logger.LogDebug(">>> Entering GetCategoryTemplateByIdAsync(categoryTemplateId={CategoryTemplateId})", categoryTemplateId);
+		_logger.LogDebug("<<< Exiting GetCategoryTemplateByIdAsync(categoryTemplateId={CategoryTemplateId})", categoryTemplateId);
         return await _categoryTemplateRepository.GetByIdAsync(categoryTemplateId, cache => default);
     }
 
@@ -74,7 +88,9 @@ public partial class CategoryTemplateService : ICategoryTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCategoryTemplateAsync(CategoryTemplate categoryTemplate)
     {
+		_logger.LogDebug(">>> Entering InsertCategoryTemplateAsync(categoryTemplate={CategoryTemplate})", categoryTemplate);
         await _categoryTemplateRepository.InsertAsync(categoryTemplate);
+		_logger.LogDebug("<<< Exiting InsertCategoryTemplateAsync(categoryTemplate={CategoryTemplate})", categoryTemplate);
     }
 
     /// <summary>
@@ -84,7 +100,9 @@ public partial class CategoryTemplateService : ICategoryTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateCategoryTemplateAsync(CategoryTemplate categoryTemplate)
     {
+		_logger.LogDebug(">>> Entering UpdateCategoryTemplateAsync(categoryTemplate={CategoryTemplate})", categoryTemplate);
         await _categoryTemplateRepository.UpdateAsync(categoryTemplate);
+		_logger.LogDebug("<<< Exiting UpdateCategoryTemplateAsync(categoryTemplate={CategoryTemplate})", categoryTemplate);
     }
 
     #endregion

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Data.Migrations;
 
 /// <summary>
@@ -10,6 +11,7 @@
 ///</remarks>
 public partial class NopSchemaMigrationAttribute : NopMigrationAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Initializes a new instance of the NopSchemaMigrationAttribute class
     /// </summary>
@@ -20,6 +22,9 @@ public partial class NopSchemaMigrationAttribute : NopMigrationAttribute
         MigrationProcessType targetMigrationProcess = MigrationProcessType.Update) :
         base(dateTime, description, targetMigrationProcess)
     {
+		_logger.LogDebug(">>> Entering NopSchemaMigrationAttribute(dateTime={DateTime},description={Description},targetMigrationProcess={TargetMigrationProcess})", dateTime, description, targetMigrationProcess);
         IsSchemaMigration = true;
+		_logger.LogDebug("<<< Exiting NopSchemaMigrationAttribute(dateTime={DateTime},description={Description},targetMigrationProcess={TargetMigrationProcess})", dateTime, description, targetMigrationProcess);
+		_logger.LogDebug("NopSchemaMigrationAttribute(dateTime={DateTime},description={Description},targetMigrationProcess={TargetMigrationProcess}): IsSchemaMigration → {IsSchemaMigration}", dateTime, description, targetMigrationProcess, IsSchemaMigration);
     }
 }

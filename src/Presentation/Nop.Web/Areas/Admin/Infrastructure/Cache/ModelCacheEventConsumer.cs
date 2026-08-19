@@ -5,6 +5,7 @@ using Nop.Core.Domain.Vendors;
 using Nop.Core.Events;
 using Nop.Services.Events;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Infrastructure.Cache;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Cache;
 /// Model cache event consumer (used for caching of presentation layer models)
 /// </summary>
 public partial class ModelCacheEventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     //settings
     IConsumer<EntityUpdatedEvent<Setting>>,
     //categories
@@ -39,7 +41,10 @@ public partial class ModelCacheEventConsumer :
 
     public ModelCacheEventConsumer(IStaticCacheManager staticCacheManager)
     {
+		_logger.LogDebug(">>> Entering ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("ModelCacheEventConsumer(staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", staticCacheManager, _staticCacheManager);
+		_logger.LogDebug("<<< Exiting ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
     }
 
     #endregion
@@ -49,8 +54,10 @@ public partial class ModelCacheEventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(EntityUpdatedEvent<Setting> eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         //clear models which depend on settings
         await _staticCacheManager.RemoveAsync(NopModelCacheDefaults.OfficialNewsModelKey); //depends on AdminAreaSettings.HideAdvertisementsOnAdminArea
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     //categories

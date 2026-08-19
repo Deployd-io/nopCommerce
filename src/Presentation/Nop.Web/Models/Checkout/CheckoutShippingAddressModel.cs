@@ -1,15 +1,22 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Checkout;
 
 public partial record CheckoutShippingAddressModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CheckoutShippingAddressModel()
     {
+		_logger.LogDebug(">>> Entering CheckoutShippingAddressModel()");
         ExistingAddresses = new List<AddressModel>();
         InvalidExistingAddresses = new List<AddressModel>();
+		_logger.LogDebug("CheckoutShippingAddressModel(): InvalidExistingAddresses → {InvalidExistingAddresses}", InvalidExistingAddresses);
+		_logger.LogDebug("CheckoutShippingAddressModel(): ExistingAddresses → {ExistingAddresses}", ExistingAddresses);
         ShippingNewAddress = new AddressModel();
+		_logger.LogDebug("CheckoutShippingAddressModel(): ShippingNewAddress → {ShippingNewAddress}", ShippingNewAddress);
+		_logger.LogDebug("<<< Exiting CheckoutShippingAddressModel()");
     }
 
     public IList<AddressModel> ExistingAddresses { get; set; }

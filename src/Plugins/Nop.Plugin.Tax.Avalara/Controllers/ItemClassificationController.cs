@@ -16,11 +16,13 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
 public class ItemClassificationController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -49,16 +51,28 @@ public class ItemClassificationController : BaseAdminController
         ITaxPluginManager taxPluginManager,
         ItemClassificationService itemClassificationService)
     {
+		_logger.LogDebug(">>> Entering ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService})", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService);
         _avalaraTaxManager = avalaraTaxManager;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _avalaraTaxManager → {_avalaraTaxManager}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _avalaraTaxManager);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _baseAdminModelFactory → {_baseAdminModelFactory}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _baseAdminModelFactory);
         _countryService = countryService;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _countryService → {_countryService}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _countryService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _dateTimeHelper → {_dateTimeHelper}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _localizationService → {_localizationService}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _notificationService → {_notificationService}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _permissionService → {_permissionService}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _permissionService);
         _productService = productService;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _productService → {_productService}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _productService);
         _taxPluginManager = taxPluginManager;
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _taxPluginManager → {_taxPluginManager}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _taxPluginManager);
         _itemClassificationService = itemClassificationService;
+		_logger.LogDebug("<<< Exiting ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService})", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService);
+		_logger.LogDebug("ItemClassificationController(avalaraTaxManager={AvalaraTaxManager},baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},taxPluginManager={TaxPluginManager},itemClassificationService={ItemClassificationService}): _itemClassificationService → {_itemClassificationService}", avalaraTaxManager, baseAdminModelFactory, countryService, dateTimeHelper, localizationService, notificationService, permissionService, productService, taxPluginManager, itemClassificationService, _itemClassificationService);
     }
 
     #endregion
@@ -69,6 +83,7 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> List(ItemClassificationSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //get item classification
         var itemClassification = await _itemClassificationService.GetItemClassificationAsync(
             pageIndex: searchModel.Page - 1,
@@ -92,6 +107,7 @@ public class ItemClassificationController : BaseAdminController
             });
         });
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -99,13 +115,16 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Update(ItemClassificationModel model)
     {
+		_logger.LogDebug(">>> Entering Update(model={Model})", model);
         var item = await _itemClassificationService.GetItemClassificationByIdAsync(model.Id)
             ?? throw new ArgumentException("No record found");
 
         item.HSCode = model.HSCode;
+		_logger.LogDebug("Update(model={Model}): item.HSCode → {Arg1}", model, item.HSCode);
 
         await _itemClassificationService.UpdateItemClassificationAsync(item);
 
+		_logger.LogDebug("<<< Exiting Update(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -113,14 +132,17 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteSelected(List<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (!selectedIds?.Any() ?? true)
             return NoContent();
 
         var recordsToDelete = new List<int>();
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): recordsToDelete → {RecordsToDelete}", selectedIds, recordsToDelete);
 
         foreach (var id in selectedIds)
         {
             var item = await _itemClassificationService.GetItemClassificationByIdAsync(id);
+			_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): item → {Item}", selectedIds, item);
             if (item is null)
                 continue;
 
@@ -128,14 +150,17 @@ public class ItemClassificationController : BaseAdminController
         }
         await _itemClassificationService.DeleteItemsAsync(recordsToDelete);
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ClearAll()
     {
+		_logger.LogDebug(">>> Entering ClearAll()");
         await _itemClassificationService.ClearItemClassificationAsync();
 
+		_logger.LogDebug("<<< Exiting ClearAll()");
         return Json(new { Result = true });
     }
 
@@ -143,14 +168,18 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ProductToClassification()
     {
+		_logger.LogDebug(">>> Entering ProductToClassification()");
         var model = new AddProductToClassificationSearchModel();
         await _baseAdminModelFactory.PrepareProductTypesAsync(model.AvailableProductTypes);
+		_logger.LogDebug("ProductToClassification(): model → {Model}", model);
         await _baseAdminModelFactory.PrepareCategoriesAsync(model.AvailableCategories);
         await _baseAdminModelFactory.PrepareManufacturersAsync(model.AvailableManufacturers);
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores);
         await _baseAdminModelFactory.PrepareVendorsAsync(model.AvailableVendors);
         model.SetPopupGridPageSize();
 
+		_logger.LogDebug("<<< Exiting ProductToClassification()");
+		_logger.LogDebug("<<< Exiting ProductToClassification(model={Model})", model);
         return View("~/Plugins/Tax.Avalara/Views/ItemClassification/ProductToClassification.cshtml", model);
     }
 
@@ -159,6 +188,7 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ProductListToClassification(AddProductToClassificationSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductListToClassification(searchModel={SearchModel})", searchModel);
         var products = await _productService.SearchProductsAsync(showHidden: true,
             keywords: searchModel.SearchProductName,
             productType: searchModel.SearchProductTypeId > 0 ? (ProductType?)searchModel.SearchProductTypeId : null,
@@ -180,6 +210,7 @@ public class ItemClassificationController : BaseAdminController
             }).ToList();
         });
 
+		_logger.LogDebug("<<< Exiting ProductListToClassification(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -199,6 +230,7 @@ public class ItemClassificationController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> StartClassification()
     {
+		_logger.LogDebug(">>> Entering StartClassification()");
         var items = (await _itemClassificationService.GetItemClassificationAsync())
             .Where(x => string.IsNullOrEmpty(x.HSClassificationRequestId))
             .ToList();
@@ -218,6 +250,7 @@ public class ItemClassificationController : BaseAdminController
             }
         }
 
+		_logger.LogDebug("<<< Exiting StartClassification()");
         return Json(new { success = true, message = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.ItemClassification.Sync.Success") });
     }
 

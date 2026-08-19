@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,18 +10,28 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record AddSpecificationAttributeModel : BaseNopEntityModel, ILocalizedModel<AddSpecificationAttributeLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddSpecificationAttributeModel()
     {
+		_logger.LogDebug(">>> Entering AddSpecificationAttributeModel()");
         AvailableOptions = new List<SelectListItem>();
         AvailableAttributes = new List<SelectListItem>();
         ShowOnProductPage = true;
+		_logger.LogDebug("AddSpecificationAttributeModel(): AvailableOptions → {AvailableOptions}", AvailableOptions);
+		_logger.LogDebug("AddSpecificationAttributeModel(): AvailableAttributes → {AvailableAttributes}", AvailableAttributes);
+		_logger.LogDebug("AddSpecificationAttributeModel(): ShowOnProductPage → {ShowOnProductPage}", ShowOnProductPage);
         AttributeName = string.Empty;
         AttributeTypeName = string.Empty;
         Value = string.Empty;
+		_logger.LogDebug("AddSpecificationAttributeModel(): AttributeName → {AttributeName}", AttributeName);
+		_logger.LogDebug("AddSpecificationAttributeModel(): AttributeTypeName → {AttributeTypeName}", AttributeTypeName);
+		_logger.LogDebug("AddSpecificationAttributeModel(): Value → {Value}", Value);
         ValueRaw = string.Empty;
         Locales = new List<AddSpecificationAttributeLocalizedModel>();
+		_logger.LogDebug("AddSpecificationAttributeModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("<<< Exiting AddSpecificationAttributeModel()");
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Customers;
 using Nop.Services.Attributes;
 using Nop.Services.Caching;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Customers.Caching;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Customers.Caching;
 /// </summary>
 public partial class CustomerAttributeCacheEventConsumer : CacheEventConsumer<CustomerAttribute>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache data
     /// </summary>
@@ -16,6 +18,8 @@ public partial class CustomerAttributeCacheEventConsumer : CacheEventConsumer<Cu
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(CustomerAttribute entity)
     {
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveAsync(NopAttributeDefaults.AttributeValuesByAttributeCacheKey, nameof(CustomerAttribute), entity);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

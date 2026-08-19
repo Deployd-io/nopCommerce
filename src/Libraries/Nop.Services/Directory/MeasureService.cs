@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Core.Domain.Directory;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Directory;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Directory;
 /// </summary>
 public partial class MeasureService : IMeasureService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<MeasureDimension> _measureDimensionRepository;
@@ -23,9 +25,14 @@ public partial class MeasureService : IMeasureService
         IRepository<MeasureWeight> measureWeightRepository,
         MeasureSettings measureSettings)
     {
+		_logger.LogDebug(">>> Entering MeasureService(measureDimensionRepository={MeasureDimensionRepository},measureWeightRepository={MeasureWeightRepository},measureSettings={MeasureSettings})", measureDimensionRepository, measureWeightRepository, measureSettings);
         _measureDimensionRepository = measureDimensionRepository;
         _measureWeightRepository = measureWeightRepository;
+		_logger.LogDebug("MeasureService(measureDimensionRepository={MeasureDimensionRepository},measureWeightRepository={MeasureWeightRepository},measureSettings={MeasureSettings}): _measureWeightRepository → {_measureWeightRepository}", measureDimensionRepository, measureWeightRepository, measureSettings, _measureWeightRepository);
+		_logger.LogDebug("MeasureService(measureDimensionRepository={MeasureDimensionRepository},measureWeightRepository={MeasureWeightRepository},measureSettings={MeasureSettings}): _measureDimensionRepository → {_measureDimensionRepository}", measureDimensionRepository, measureWeightRepository, measureSettings, _measureDimensionRepository);
         _measureSettings = measureSettings;
+		_logger.LogDebug("MeasureService(measureDimensionRepository={MeasureDimensionRepository},measureWeightRepository={MeasureWeightRepository},measureSettings={MeasureSettings}): _measureSettings → {_measureSettings}", measureDimensionRepository, measureWeightRepository, measureSettings, _measureSettings);
+		_logger.LogDebug("<<< Exiting MeasureService(measureDimensionRepository={MeasureDimensionRepository},measureWeightRepository={MeasureWeightRepository},measureSettings={MeasureSettings})", measureDimensionRepository, measureWeightRepository, measureSettings);
     }
 
     #endregion
@@ -41,7 +48,11 @@ public partial class MeasureService : IMeasureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteMeasureDimensionAsync(MeasureDimension measureDimension)
     {
+		_logger.LogDebug(">>> Entering DeleteMeasureDimensionAsync(measureDimension={MeasureDimension})", measureDimension);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _measureDimensionRepository.DeleteAsync(measureDimension);
+		_logger.LogInformation("DeleteMeasureDimensionAsync(measureDimension)={MeasureDimension}: external service call took {Arg1} ms", measureDimension, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting DeleteMeasureDimensionAsync(measureDimension={MeasureDimension})", measureDimension);
     }
 
     /// <summary>
@@ -54,6 +65,8 @@ public partial class MeasureService : IMeasureService
     /// </returns>
     public virtual async Task<MeasureDimension> GetMeasureDimensionByIdAsync(int measureDimensionId)
     {
+		_logger.LogDebug(">>> Entering GetMeasureDimensionByIdAsync(measureDimensionId={MeasureDimensionId})", measureDimensionId);
+		_logger.LogDebug("<<< Exiting GetMeasureDimensionByIdAsync(measureDimensionId={MeasureDimensionId})", measureDimensionId);
         return await _measureDimensionRepository.GetByIdAsync(measureDimensionId, cache => default);
     }
 
@@ -67,10 +80,12 @@ public partial class MeasureService : IMeasureService
     /// </returns>
     public virtual async Task<MeasureDimension> GetMeasureDimensionBySystemKeywordAsync(string systemKeyword)
     {
+		_logger.LogDebug(">>> Entering GetMeasureDimensionBySystemKeywordAsync(systemKeyword={SystemKeyword})", systemKeyword);
         if (string.IsNullOrEmpty(systemKeyword))
             return null;
 
         var measureDimensions = await GetAllMeasureDimensionsAsync();
+		_logger.LogDebug("GetMeasureDimensionBySystemKeywordAsync(systemKeyword={SystemKeyword}): measureDimensions → {MeasureDimensions}", systemKeyword, measureDimensions);
         foreach (var measureDimension in measureDimensions)
             if (measureDimension.SystemKeyword.ToLowerInvariant() == systemKeyword.ToLowerInvariant())
                 return measureDimension;
@@ -86,13 +101,17 @@ public partial class MeasureService : IMeasureService
     /// </returns>
     public virtual async Task<IList<MeasureDimension>> GetAllMeasureDimensionsAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllMeasureDimensionsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var measureDimensions = await _measureDimensionRepository.GetAllAsync(query =>
         {
             return from md in query
                 orderby md.DisplayOrder, md.Id
                 select md;
+				_logger.LogInformation("GetAllMeasureDimensionsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		_logger.LogDebug("<<< Exiting GetAllMeasureDimensionsAsync()");
         return measureDimensions;
     }
 
@@ -103,7 +122,9 @@ public partial class MeasureService : IMeasureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertMeasureDimensionAsync(MeasureDimension measure)
     {
+		_logger.LogDebug(">>> Entering InsertMeasureDimensionAsync(measure={Measure})", measure);
         await _measureDimensionRepository.InsertAsync(measure);
+		_logger.LogDebug("<<< Exiting InsertMeasureDimensionAsync(measure={Measure})", measure);
     }
 
     /// <summary>
@@ -113,7 +134,9 @@ public partial class MeasureService : IMeasureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateMeasureDimensionAsync(MeasureDimension measure)
     {
+		_logger.LogDebug(">>> Entering UpdateMeasureDimensionAsync(measure={Measure})", measure);
         await _measureDimensionRepository.UpdateAsync(measure);
+		_logger.LogDebug("<<< Exiting UpdateMeasureDimensionAsync(measure={Measure})", measure);
     }
 
     /// <summary>
@@ -130,11 +153,13 @@ public partial class MeasureService : IMeasureService
     public virtual async Task<decimal> ConvertDimensionAsync(decimal value,
         MeasureDimension sourceMeasureDimension, MeasureDimension targetMeasureDimension, bool round = true)
     {
+		_logger.LogDebug(">>> Entering ConvertDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension},targetMeasureDimension={TargetMeasureDimension},round={Round})", value, sourceMeasureDimension, targetMeasureDimension, round);
         ArgumentNullException.ThrowIfNull(sourceMeasureDimension);
 
         ArgumentNullException.ThrowIfNull(targetMeasureDimension);
 
         var result = value;
+		_logger.LogDebug("ConvertDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension},targetMeasureDimension={TargetMeasureDimension},round={Round}): result → {Result}", value, sourceMeasureDimension, targetMeasureDimension, round, result);
         if (result != decimal.Zero && sourceMeasureDimension.Id != targetMeasureDimension.Id)
         {
             result = await ConvertToPrimaryMeasureDimensionAsync(result, sourceMeasureDimension);
@@ -144,6 +169,7 @@ public partial class MeasureService : IMeasureService
         if (round)
             result = Math.Round(result, 2);
 
+		_logger.LogDebug("<<< Exiting ConvertDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension},targetMeasureDimension={TargetMeasureDimension},round={Round})", value, sourceMeasureDimension, targetMeasureDimension, round);
         return result;
     }
 
@@ -159,18 +185,27 @@ public partial class MeasureService : IMeasureService
     public virtual async Task<decimal> ConvertFromPrimaryMeasureDimensionAsync(decimal value,
         MeasureDimension targetMeasureDimension)
     {
+		_logger.LogDebug(">>> Entering ConvertFromPrimaryMeasureDimensionAsync(value={Value},targetMeasureDimension={TargetMeasureDimension})", value, targetMeasureDimension);
         ArgumentNullException.ThrowIfNull(targetMeasureDimension);
 
         var result = value;
+		_logger.LogDebug("ConvertFromPrimaryMeasureDimensionAsync(value={Value},targetMeasureDimension={TargetMeasureDimension}): result → {Result}", value, targetMeasureDimension, result);
         var baseDimensionIn = await GetMeasureDimensionByIdAsync(_measureSettings.BaseDimensionId);
+		_logger.LogDebug("ConvertFromPrimaryMeasureDimensionAsync(value={Value},targetMeasureDimension={TargetMeasureDimension}): baseDimensionIn → {BaseDimensionIn}", value, targetMeasureDimension, baseDimensionIn);
         if (result == decimal.Zero || targetMeasureDimension.Id == baseDimensionIn.Id)
             return result;
 
         var exchangeRatio = targetMeasureDimension.Ratio;
         if (exchangeRatio == decimal.Zero)
+			_logger.LogWarning("Throwing NopException from ConvertFromPrimaryMeasureDimensionAsync(value={Value},targetMeasureDimension={TargetMeasureDimension})", value, targetMeasureDimension);
             throw new NopException($"Exchange ratio not set for dimension [{targetMeasureDimension.Name}]");
         result *= exchangeRatio;
 
+		_logger.LogDebug("<<< Exiting ConvertFromPrimaryMeasureDimensionAsync(value={Value},targetMeasureDimension={TargetMeasureDimension})", value, targetMeasureDimension);
+		_logger.LogDebug(">>> Entering ConvertToPrimaryMeasureDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension})", value, sourceMeasureDimension);
+		_logger.LogDebug("ConvertToPrimaryMeasureDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension}): result → {Result}", value, sourceMeasureDimension, result);
+		_logger.LogWarning("Throwing NopException from ConvertToPrimaryMeasureDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension})", value, sourceMeasureDimension);
+		_logger.LogDebug("<<< Exiting ConvertToPrimaryMeasureDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension})", value, sourceMeasureDimension);
         return result;
     }
 
@@ -190,11 +225,13 @@ public partial class MeasureService : IMeasureService
 
         var result = value;
         var baseDimensionIn = await GetMeasureDimensionByIdAsync(_measureSettings.BaseDimensionId);
+		_logger.LogDebug("ConvertToPrimaryMeasureDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension}): baseDimensionIn → {BaseDimensionIn}", value, sourceMeasureDimension, baseDimensionIn);
         if (result == decimal.Zero || sourceMeasureDimension.Id == baseDimensionIn.Id)
             return result;
 
         var exchangeRatio = sourceMeasureDimension.Ratio;
         if (exchangeRatio == decimal.Zero)
+			_logger.LogWarning("Throwing NopException from ConvertToPrimaryMeasureDimensionAsync(value={Value},sourceMeasureDimension={SourceMeasureDimension})", value, sourceMeasureDimension);
             throw new NopException($"Exchange ratio not set for dimension [{sourceMeasureDimension.Name}]");
         result /= exchangeRatio;
 
@@ -213,7 +250,10 @@ public partial class MeasureService : IMeasureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteMeasureWeightAsync(MeasureWeight measureWeight)
     {
+		_logger.LogDebug(">>> Entering DeleteMeasureWeightAsync(measureWeight={MeasureWeight})", measureWeight);
+		_logger.LogInformation("DeleteMeasureWeightAsync(measureWeight)={MeasureWeight}: external service call took {Arg1} ms", measureWeight, __logStart.ElapsedMilliseconds);
         await _measureWeightRepository.DeleteAsync(measureWeight);
+		_logger.LogDebug("<<< Exiting DeleteMeasureWeightAsync(measureWeight={MeasureWeight})", measureWeight);
     }
 
     /// <summary>
@@ -226,6 +266,8 @@ public partial class MeasureService : IMeasureService
     /// </returns>
     public virtual async Task<MeasureWeight> GetMeasureWeightByIdAsync(int measureWeightId)
     {
+		_logger.LogDebug(">>> Entering GetMeasureWeightByIdAsync(measureWeightId={MeasureWeightId})", measureWeightId);
+		_logger.LogDebug("<<< Exiting GetMeasureWeightByIdAsync(measureWeightId={MeasureWeightId})", measureWeightId);
         return await _measureWeightRepository.GetByIdAsync(measureWeightId, cache => default);
     }
 
@@ -239,10 +281,12 @@ public partial class MeasureService : IMeasureService
     /// </returns>
     public virtual async Task<MeasureWeight> GetMeasureWeightBySystemKeywordAsync(string systemKeyword)
     {
+		_logger.LogDebug(">>> Entering GetMeasureWeightBySystemKeywordAsync(systemKeyword={SystemKeyword})", systemKeyword);
         if (string.IsNullOrEmpty(systemKeyword))
             return null;
 
         var measureWeights = await GetAllMeasureWeightsAsync();
+		_logger.LogDebug("GetMeasureWeightBySystemKeywordAsync(systemKeyword={SystemKeyword}): measureWeights → {MeasureWeights}", systemKeyword, measureWeights);
         foreach (var measureWeight in measureWeights)
             if (measureWeight.SystemKeyword.ToLowerInvariant() == systemKeyword.ToLowerInvariant())
                 return measureWeight;
@@ -258,13 +302,17 @@ public partial class MeasureService : IMeasureService
     /// </returns>
     public virtual async Task<IList<MeasureWeight>> GetAllMeasureWeightsAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllMeasureWeightsAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var measureWeights = await _measureWeightRepository.GetAllAsync(query =>
         {
             return from mw in query
                 orderby mw.DisplayOrder, mw.Id
                 select mw;
+				_logger.LogInformation("GetAllMeasureWeightsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
+		_logger.LogDebug("<<< Exiting GetAllMeasureWeightsAsync()");
         return measureWeights;
     }
 
@@ -275,7 +323,9 @@ public partial class MeasureService : IMeasureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertMeasureWeightAsync(MeasureWeight measure)
     {
+		_logger.LogDebug(">>> Entering InsertMeasureWeightAsync(measure={Measure})", measure);
         await _measureWeightRepository.InsertAsync(measure);
+		_logger.LogDebug("<<< Exiting InsertMeasureWeightAsync(measure={Measure})", measure);
     }
 
     /// <summary>
@@ -285,7 +335,9 @@ public partial class MeasureService : IMeasureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateMeasureWeightAsync(MeasureWeight measure)
     {
+		_logger.LogDebug(">>> Entering UpdateMeasureWeightAsync(measure={Measure})", measure);
         await _measureWeightRepository.UpdateAsync(measure);
+		_logger.LogDebug("<<< Exiting UpdateMeasureWeightAsync(measure={Measure})", measure);
     }
 
     /// <summary>
@@ -302,11 +354,13 @@ public partial class MeasureService : IMeasureService
     public virtual async Task<decimal> ConvertWeightAsync(decimal value,
         MeasureWeight sourceMeasureWeight, MeasureWeight targetMeasureWeight, bool round = true)
     {
+		_logger.LogDebug(">>> Entering ConvertWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight},targetMeasureWeight={TargetMeasureWeight},round={Round})", value, sourceMeasureWeight, targetMeasureWeight, round);
         ArgumentNullException.ThrowIfNull(sourceMeasureWeight);
 
         ArgumentNullException.ThrowIfNull(targetMeasureWeight);
 
         var result = value;
+		_logger.LogDebug("ConvertWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight},targetMeasureWeight={TargetMeasureWeight},round={Round}): result → {Result}", value, sourceMeasureWeight, targetMeasureWeight, round, result);
         if (result != decimal.Zero && sourceMeasureWeight.Id != targetMeasureWeight.Id)
         {
             result = await ConvertToPrimaryMeasureWeightAsync(result, sourceMeasureWeight);
@@ -316,6 +370,7 @@ public partial class MeasureService : IMeasureService
         if (round)
             result = Math.Round(result, 2);
 
+		_logger.LogDebug("<<< Exiting ConvertWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight},targetMeasureWeight={TargetMeasureWeight},round={Round})", value, sourceMeasureWeight, targetMeasureWeight, round);
         return result;
     }
 
@@ -331,18 +386,27 @@ public partial class MeasureService : IMeasureService
     public virtual async Task<decimal> ConvertFromPrimaryMeasureWeightAsync(decimal value,
         MeasureWeight targetMeasureWeight)
     {
+		_logger.LogDebug(">>> Entering ConvertFromPrimaryMeasureWeightAsync(value={Value},targetMeasureWeight={TargetMeasureWeight})", value, targetMeasureWeight);
         ArgumentNullException.ThrowIfNull(targetMeasureWeight);
 
         var result = value;
+		_logger.LogDebug("ConvertFromPrimaryMeasureWeightAsync(value={Value},targetMeasureWeight={TargetMeasureWeight}): result → {Result}", value, targetMeasureWeight, result);
         var baseWeightIn = await GetMeasureWeightByIdAsync(_measureSettings.BaseWeightId);
+		_logger.LogDebug("ConvertFromPrimaryMeasureWeightAsync(value={Value},targetMeasureWeight={TargetMeasureWeight}): baseWeightIn → {BaseWeightIn}", value, targetMeasureWeight, baseWeightIn);
         if (result == decimal.Zero || targetMeasureWeight.Id == baseWeightIn.Id)
             return result;
 
         var exchangeRatio = targetMeasureWeight.Ratio;
         if (exchangeRatio == decimal.Zero)
+			_logger.LogWarning("Throwing NopException from ConvertFromPrimaryMeasureWeightAsync(value={Value},targetMeasureWeight={TargetMeasureWeight})", value, targetMeasureWeight);
             throw new NopException($"Exchange ratio not set for weight [{targetMeasureWeight.Name}]");
         result *= exchangeRatio;
 
+		_logger.LogDebug("<<< Exiting ConvertFromPrimaryMeasureWeightAsync(value={Value},targetMeasureWeight={TargetMeasureWeight})", value, targetMeasureWeight);
+		_logger.LogDebug(">>> Entering ConvertToPrimaryMeasureWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight})", value, sourceMeasureWeight);
+		_logger.LogDebug("ConvertToPrimaryMeasureWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight}): result → {Result}", value, sourceMeasureWeight, result);
+		_logger.LogWarning("Throwing NopException from ConvertToPrimaryMeasureWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight})", value, sourceMeasureWeight);
+		_logger.LogDebug("<<< Exiting ConvertToPrimaryMeasureWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight})", value, sourceMeasureWeight);
         return result;
     }
 
@@ -361,11 +425,13 @@ public partial class MeasureService : IMeasureService
 
         var result = value;
         var baseWeightIn = await GetMeasureWeightByIdAsync(_measureSettings.BaseWeightId);
+		_logger.LogDebug("ConvertToPrimaryMeasureWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight}): baseWeightIn → {BaseWeightIn}", value, sourceMeasureWeight, baseWeightIn);
         if (result == decimal.Zero || sourceMeasureWeight.Id == baseWeightIn.Id)
             return result;
 
         var exchangeRatio = sourceMeasureWeight.Ratio;
         if (exchangeRatio == decimal.Zero)
+			_logger.LogWarning("Throwing NopException from ConvertToPrimaryMeasureWeightAsync(value={Value},sourceMeasureWeight={SourceMeasureWeight})", value, sourceMeasureWeight);
             throw new NopException($"Exchange ratio not set for weight [{sourceMeasureWeight.Name}]");
         result /= exchangeRatio;
 

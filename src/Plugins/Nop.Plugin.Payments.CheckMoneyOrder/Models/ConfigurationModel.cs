@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.CheckMoneyOrder.Models;
 
@@ -7,7 +8,10 @@ public record ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationMo
 {
     public ConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering ConfigurationModel()");
         Locales = new List<ConfigurationLocalizedModel>();
+		_logger.LogDebug("ConfigurationModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("<<< Exiting ConfigurationModel()");
     }
 
     public int ActiveStoreScopeConfiguration { get; set; }
@@ -34,6 +38,7 @@ public record ConfigurationModel : BaseNopModel, ILocalizedModel<ConfigurationMo
 
     public class ConfigurationLocalizedModel : ILocalizedLocaleModel
     {
+		private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public int LanguageId { get; set; }
 
         [NopResourceDisplayName("Plugins.Payment.CheckMoneyOrder.DescriptionText")]

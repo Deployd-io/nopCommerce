@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Plugin.Widgets.FacebookPixel.Domain;
 
 /// <summary>
@@ -5,11 +6,15 @@
 /// </summary>
 public class CustomEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomEvent()
     {
+		_logger.LogDebug(">>> Entering CustomEvent()");
         WidgetZones = new List<string>();
+		_logger.LogDebug("CustomEvent(): WidgetZones → {WidgetZones}", WidgetZones);
+		_logger.LogDebug("<<< Exiting CustomEvent()");
     }
 
     #endregion

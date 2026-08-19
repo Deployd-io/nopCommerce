@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Services.Security;
 
 /// <summary>
@@ -5,15 +6,21 @@
 /// </summary>
 public partial class PermissionConfig
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PermissionConfig(string name, string systemName, string category, params string[] defaultCustomerRoles)
     {
+		_logger.LogDebug(">>> Entering PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles})", name, systemName, category, defaultCustomerRoles);
         Name = name;
         SystemName = systemName;
+		_logger.LogDebug("PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles}): Name → {Name1}", name, systemName, category, defaultCustomerRoles, Name);
+		_logger.LogDebug("PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles}): SystemName → {SystemName1}", name, systemName, category, defaultCustomerRoles, SystemName);
         Category = category;
 
+		_logger.LogDebug("PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles}): Category → {Category1}", name, systemName, category, defaultCustomerRoles, Category);
         DefaultCustomerRoles.AddRange(defaultCustomerRoles);
+		_logger.LogDebug("<<< Exiting PermissionConfig(name={Name},systemName={SystemName},category={Category},defaultCustomerRoles={DefaultCustomerRoles})", name, systemName, category, defaultCustomerRoles);
     }
 
     #endregion

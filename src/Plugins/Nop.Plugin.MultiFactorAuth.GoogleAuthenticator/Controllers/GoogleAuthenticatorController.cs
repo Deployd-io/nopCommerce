@@ -15,6 +15,7 @@ using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Controllers;
 
@@ -23,6 +24,7 @@ namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Controllers;
 [Area(AreaNames.ADMIN)]
 public class GoogleAuthenticatorController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly GoogleAuthenticatorService _googleAuthenticatorService;
@@ -50,15 +52,26 @@ public class GoogleAuthenticatorController : BasePluginController
         IWorkContext workContext
     )
     {
+		_logger.LogDebug(">>> Entering GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext})", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext);
         _googleAuthenticatorService = googleAuthenticatorService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _googleAuthenticatorService → {_googleAuthenticatorService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _googleAuthenticatorService);
         _googleAuthenticatorSettings = googleAuthenticatorSettings;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _googleAuthenticatorSettings → {_googleAuthenticatorSettings}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _googleAuthenticatorSettings);
         _customerService = customerService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _customerService → {_customerService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _customerService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _genericAttributeService → {_genericAttributeService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _localizationService → {_localizationService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _notificationService → {_notificationService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _permissionService → {_permissionService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _settingService → {_settingService}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _settingService);
         _workContext = workContext;
+		_logger.LogDebug("<<< Exiting GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext})", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext);
+		_logger.LogDebug("GoogleAuthenticatorController(googleAuthenticatorService={GoogleAuthenticatorService},googleAuthenticatorSettings={GoogleAuthenticatorSettings},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},workContext={WorkContext}): _workContext → {_workContext}", googleAuthenticatorService, googleAuthenticatorSettings, customerService, genericAttributeService, localizationService, notificationService, permissionService, settingService, workContext, _workContext);
     }
 
     #endregion
@@ -68,6 +81,7 @@ public class GoogleAuthenticatorController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //prepare model
         var model = new ConfigurationModel
         {
@@ -77,6 +91,8 @@ public class GoogleAuthenticatorController : BasePluginController
         model.GoogleAuthenticatorSearchModel.HideSearchBlock = await _genericAttributeService
             .GetAttributeAsync<bool>(await _workContext.GetCurrentCustomerAsync(), GoogleAuthenticatorDefaults.HideSearchBlockAttribute);
 
+		_logger.LogDebug("<<< Exiting Configure()");
+		_logger.LogDebug("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/MultiFactorAuth.GoogleAuthenticator/Views/Configure.cshtml", model);
     }
 
@@ -101,6 +117,7 @@ public class GoogleAuthenticatorController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_MULTIFACTOR_AUTHENTICATION_METHODS)]
     public async Task<IActionResult> GoogleAuthenticatorList(GoogleAuthenticatorSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering GoogleAuthenticatorList(searchModel={SearchModel})", searchModel);
         //get GoogleAuthenticator configuration records
         var configurations = await _googleAuthenticatorService.GetPagedConfigurationsAsync(searchModel.SearchEmail,
             searchModel.Page - 1, searchModel.PageSize);
@@ -115,17 +132,20 @@ public class GoogleAuthenticatorController : BasePluginController
             });
         });
 
+		_logger.LogDebug("<<< Exiting GoogleAuthenticatorList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [HttpPost]
     public async Task<IActionResult> GoogleAuthenticatorDelete(GoogleAuthenticatorModel model)
     {
+		_logger.LogDebug(">>> Entering GoogleAuthenticatorDelete(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         //delete configuration
         var configuration = await _googleAuthenticatorService.GetConfigurationByIdAsync(model.Id);
+		_logger.LogDebug("GoogleAuthenticatorDelete(model={Model}): configuration → {Configuration}", model, configuration);
 
         if (configuration == null)
             return new NullJsonResult();
@@ -138,6 +158,7 @@ public class GoogleAuthenticatorController : BasePluginController
         if (customer != null)
             await _genericAttributeService.SaveAttributeAsync(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute, string.Empty);
 
+		_logger.LogDebug("<<< Exiting GoogleAuthenticatorDelete(model={Model})", model);
         return new NullJsonResult();
     }
 

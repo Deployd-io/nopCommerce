@@ -63,22 +63,40 @@ public partial class TaxService : ITaxService
         TaxSettings taxSettings)
     {
         _addressSettings = addressSettings;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _addressSettings → {_addressSettings}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _addressSettings);
         _customerSettings = customerSettings;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _customerSettings → {_customerSettings}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _customerSettings);
         _addressService = addressService;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _addressService → {_addressService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _addressService);
         _checkVatService = checkVatService;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _checkVatService → {_checkVatService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _checkVatService);
         _countryService = countryService;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _countryService → {_countryService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _countryService);
         _customerService = customerService;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _customerService → {_customerService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _customerService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _eventPublisher → {_eventPublisher}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _eventPublisher);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _genericAttributeService → {_genericAttributeService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _genericAttributeService);
         _geoLookupService = geoLookupService;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _geoLookupService → {_geoLookupService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _geoLookupService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings})", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings);
         _stateProvinceService = stateProvinceService;
         _storeContext = storeContext;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _stateProvinceService → {_stateProvinceService}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _stateProvinceService);
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _storeContext → {_storeContext}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _storeContext);
         _taxPluginManager = taxPluginManager;
         _webHelper = webHelper;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _taxPluginManager → {_taxPluginManager}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _taxPluginManager);
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _webHelper → {_webHelper}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _webHelper);
         _workContext = workContext;
         _shippingSettings = shippingSettings;
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _workContext → {_workContext}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _workContext);
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _shippingSettings → {_shippingSettings}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _shippingSettings);
         _taxSettings = taxSettings;
+		_logger.LogDebug("<<< Exiting TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings})", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings);
+		_logger.LogDebug("TaxService(addressSettings={AddressSettings},customerSettings={CustomerSettings},addressService={AddressService},checkVatService={CheckVatService},countryService={CountryService},customerService={CustomerService},eventPublisher={EventPublisher},genericAttributeService={GenericAttributeService},geoLookupService={GeoLookupService},logger={Logger},stateProvinceService={StateProvinceService},storeContext={StoreContext},taxPluginManager={TaxPluginManager},webHelper={WebHelper},workContext={WorkContext},shippingSettings=<redacted>,taxSettings={TaxSettings}): _taxSettings → {_taxSettings}", addressSettings, customerSettings, addressService, checkVatService, countryService, customerService, eventPublisher, genericAttributeService, geoLookupService, logger, stateProvinceService, storeContext, taxPluginManager, webHelper, workContext, taxSettings, _taxSettings);
     }
 
     #endregion
@@ -94,8 +112,10 @@ public partial class TaxService : ITaxService
     /// </returns>
     protected virtual async Task<Address> LoadDefaultTaxAddressAsync()
     {
+		_logger.LogDebug(">>> Entering LoadDefaultTaxAddressAsync()");
         var addressId = _taxSettings.DefaultTaxAddressId;
 
+		_logger.LogDebug("<<< Exiting LoadDefaultTaxAddressAsync()");
         return await _addressService.GetAddressByIdAsync(addressId);
     }
 
@@ -109,11 +129,15 @@ public partial class TaxService : ITaxService
     /// </returns>
     protected virtual async Task<Address> LoadPickupPointTaxAddressAsync(PickupPoint pickupPoint)
     {
+		_logger.LogDebug(">>> Entering LoadPickupPointTaxAddressAsync(pickupPoint={PickupPoint})", pickupPoint);
         ArgumentNullException.ThrowIfNull(pickupPoint);
 
         var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(pickupPoint.CountryCode);
+		_logger.LogDebug("LoadPickupPointTaxAddressAsync(pickupPoint={PickupPoint}): country → {Country}", pickupPoint, country);
         var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(pickupPoint.StateAbbreviation, country?.Id);
+		_logger.LogDebug("LoadPickupPointTaxAddressAsync(pickupPoint={PickupPoint}): state → {State}", pickupPoint, state);
 
+		_logger.LogDebug("<<< Exiting LoadPickupPointTaxAddressAsync(pickupPoint={PickupPoint})", pickupPoint);
         return new Address
         {
             CountryId = country?.Id ?? 0,
@@ -138,9 +162,11 @@ public partial class TaxService : ITaxService
     /// </returns>
     protected virtual async Task<TaxRateRequest> PrepareTaxRateRequestAsync(Product product, int taxCategoryId, Customer customer, decimal price)
     {
+		_logger.LogDebug(">>> Entering PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price})", product, taxCategoryId, customer, price);
         ArgumentNullException.ThrowIfNull(customer);
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): store → {Store}", product, taxCategoryId, customer, price, store);
         var taxRateRequest = new TaxRateRequest
         {
             Customer = customer,
@@ -151,6 +177,7 @@ public partial class TaxService : ITaxService
         };
 
         var basedOn = _taxSettings.TaxBasedOn;
+		_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): basedOn → {BasedOn}", product, taxCategoryId, customer, price, basedOn);
 
         //tax is based on pickup point address
         if (_taxSettings.TaxBasedOnPickupPointAddress && _shippingSettings.AllowPickupInStore)
@@ -165,6 +192,7 @@ public partial class TaxService : ITaxService
         }
 
         var autodetectedCountry = false;
+		_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): autodetectedCountry → {AutodetectedCountry}", product, taxCategoryId, customer, price, autodetectedCountry);
         var detectedAddress = new Address
         {
             CreatedOnUtc = DateTime.UtcNow
@@ -176,12 +204,16 @@ public partial class TaxService : ITaxService
             if (_taxSettings.AutomaticallyDetectCountry)
             {
                 var ipAddress = _webHelper.GetCurrentIpAddress();
+				_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): ipAddress → {IpAddress}", product, taxCategoryId, customer, price, ipAddress);
                 var countryIsoCode = _geoLookupService.LookupCountryIsoCode(ipAddress);
+				_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): countryIsoCode → {CountryIsoCode}", product, taxCategoryId, customer, price, countryIsoCode);
                 var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(countryIsoCode);
+				_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): country → {Country}", product, taxCategoryId, customer, price, country);
 
                 if (country != null)
                 {
                     detectedAddress.CountryId = country.Id;
+					_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): detectedAddress.CountryId → {Arg4}", product, taxCategoryId, customer, price, detectedAddress.CountryId);
                     autodetectedCountry = true;
                 }
                 else
@@ -192,12 +224,14 @@ public partial class TaxService : ITaxService
         }
 
         taxRateRequest.Address = basedOn switch
+		_logger.LogDebug("PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price}): taxRateRequest.Address → {Arg4}", product, taxCategoryId, customer, price, taxRateRequest.Address);
         {
             TaxBasedOn.BillingAddress => autodetectedCountry ? detectedAddress : await _customerService.GetCustomerBillingAddressAsync(customer),
             TaxBasedOn.ShippingAddress => autodetectedCountry ? detectedAddress : await _customerService.GetCustomerShippingAddressAsync(customer),
             _ => await LoadDefaultTaxAddressAsync(),
         };
 
+		_logger.LogDebug("<<< Exiting PrepareTaxRateRequestAsync(product={Product},taxCategoryId={TaxCategoryId},customer={Customer},price={Price})", product, taxCategoryId, customer, price);
         return taxRateRequest;
     }
 
@@ -210,6 +244,7 @@ public partial class TaxService : ITaxService
     /// <returns>New price</returns>
     protected virtual decimal CalculatePrice(decimal price, decimal percent, bool increase)
     {
+		_logger.LogDebug(">>> Entering CalculatePrice(price={Price},percent={Percent},increase={Increase})", price, percent, increase);
         if (percent == decimal.Zero)
             return price;
 
@@ -219,6 +254,7 @@ public partial class TaxService : ITaxService
         else
             result = price - price / (100 + percent) * percent;
 
+		_logger.LogDebug("<<< Exiting CalculatePrice(price={Price},percent={Percent},increase={Increase})", price, percent, increase);
         return result;
     }
 
@@ -348,6 +384,7 @@ public partial class TaxService : ITaxService
     /// </returns>
     protected virtual async Task<bool> IsVatExemptAsync(Address address, Customer customer)
     {
+		_logger.LogDebug(">>> Entering IsVatExemptAsync(address={Address},customer={Customer})", address, customer);
         if (!_taxSettings.EuVatEnabled)
             return false;
 
@@ -355,6 +392,7 @@ public partial class TaxService : ITaxService
             return false;
 
         var country = await _countryService.GetCountryByIdAsync(address.CountryId ?? 0);
+		_logger.LogDebug("IsVatExemptAsync(address={Address},customer={Customer}): country → {Country}", address, customer, country);
         if (country == null)
             return false;
 
@@ -366,6 +404,7 @@ public partial class TaxService : ITaxService
         // returns true if this customer is VAT exempt because they are shipping within the EU but outside our shop country, they have supplied a validated VAT number, and the shop is configured to allow VAT exemption
         var customerVatStatus = (VatNumberStatus)customer.VatNumberStatusId;
 
+		_logger.LogDebug("<<< Exiting IsVatExemptAsync(address={Address},customer={Customer})", address, customer);
         return country.Id != _taxSettings.EuVatShopCountryId &&
                customerVatStatus == VatNumberStatus.Valid &&
                _taxSettings.EuVatAllowVatExemption;
@@ -513,6 +552,7 @@ public partial class TaxService : ITaxService
     /// </returns>
     public virtual async Task<bool> IsTaxExemptAsync(Product product, Customer customer)
     {
+		_logger.LogDebug(">>> Entering IsTaxExemptAsync(product={Product},customer={Customer})", product, customer);
         if (customer != null)
         {
             if (customer.IsTaxExempt)
@@ -733,9 +773,13 @@ public partial class TaxService : ITaxService
     /// </returns>
     public virtual async Task<TaxTotalResult> GetTaxTotalAsync(IList<ShoppingCartItem> cart, bool usePaymentMethodAdditionalFee = true)
     {
+		_logger.LogDebug(">>> Entering GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee})", cart, usePaymentMethodAdditionalFee);
         var customer = await _customerService.GetShoppingCartCustomerAsync(cart);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): store → {Store}", cart, usePaymentMethodAdditionalFee, store);
         var activeTaxProvider = await _taxPluginManager.LoadPrimaryPluginAsync(customer, store.Id);
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): activeTaxProvider → {ActiveTaxProvider}", cart, usePaymentMethodAdditionalFee, activeTaxProvider);
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): customer → {Customer}", cart, usePaymentMethodAdditionalFee, customer);
         if (activeTaxProvider == null)
             return null;
 
@@ -748,6 +792,7 @@ public partial class TaxService : ITaxService
             UsePaymentMethodAdditionalFee = usePaymentMethodAdditionalFee
         };
         var taxTotalResult = await activeTaxProvider.GetTaxTotalAsync(taxTotalRequest);
+		_logger.LogDebug("GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee}): taxTotalResult → {TaxTotalResult}", cart, usePaymentMethodAdditionalFee, taxTotalResult);
 
         //tax total is calculated, now consumers can adjust it
         await _eventPublisher.PublishAsync(new TaxTotalCalculatedEvent(taxTotalRequest, taxTotalResult));
@@ -761,6 +806,7 @@ public partial class TaxService : ITaxService
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetTaxTotalAsync(cart={Cart},usePaymentMethodAdditionalFee={UsePaymentMethodAdditionalFee})", cart, usePaymentMethodAdditionalFee);
         return taxTotalResult;
     }
 

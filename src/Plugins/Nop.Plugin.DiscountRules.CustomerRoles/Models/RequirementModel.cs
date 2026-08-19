@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.DiscountRules.CustomerRoles.Models;
 
 public class RequirementModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public RequirementModel()
     {
+		_logger.LogDebug(">>> Entering RequirementModel()");
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogDebug("RequirementModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
+		_logger.LogDebug("<<< Exiting RequirementModel()");
     }
 
     [NopResourceDisplayName("Plugins.DiscountRules.CustomerRoles.Fields.CustomerRole")]

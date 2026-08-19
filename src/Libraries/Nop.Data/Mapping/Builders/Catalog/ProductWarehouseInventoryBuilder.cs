@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Shipping;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Catalog;
 
@@ -10,6 +11,7 @@ namespace Nop.Data.Mapping.Builders.Catalog;
 /// </summary>
 public partial class ProductWarehouseInventoryBuilder : NopEntityBuilder<ProductWarehouseInventory>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -18,9 +20,11 @@ public partial class ProductWarehouseInventoryBuilder : NopEntityBuilder<Product
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogDebug(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ProductWarehouseInventory.ProductId)).AsInt32().ForeignKey<Product>()
             .WithColumn(nameof(ProductWarehouseInventory.WarehouseId)).AsInt32().ForeignKey<Warehouse>();
+			_logger.LogDebug("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

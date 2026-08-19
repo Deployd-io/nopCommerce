@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿namespace Nop.Core.Domain.Shipping;
 
 /// <summary>
@@ -5,11 +6,15 @@
 /// </summary>
 public partial class ShipmentCreatedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ShipmentCreatedEvent(Shipment shipment)
     {
+		_logger.LogDebug(">>> Entering ShipmentCreatedEvent(shipment={Shipment})", shipment);
         Shipment = shipment;
+		_logger.LogDebug("ShipmentCreatedEvent(shipment={Shipment}): Shipment → {Shipment1}", shipment, Shipment);
+		_logger.LogDebug("<<< Exiting ShipmentCreatedEvent(shipment={Shipment})", shipment);
     }
 
     #endregion

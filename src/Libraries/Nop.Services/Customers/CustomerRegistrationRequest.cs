@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 ﻿using Nop.Core.Domain.Customers;
 
 namespace Nop.Services.Customers;
@@ -7,6 +8,7 @@ namespace Nop.Services.Customers;
 /// </summary>
 public partial class CustomerRegistrationRequest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -23,13 +25,21 @@ public partial class CustomerRegistrationRequest
         int storeId,
         bool isApproved = true)
     {
+		_logger.LogDebug(">>> Entering CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved})", customer, email, username, storeId, isApproved);
         Customer = customer;
+		_logger.LogDebug("CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved}): Customer → {Customer1}", customer, email, username, storeId, isApproved, Customer);
         Email = email;
         Username = username;
         Password = password;
+		_logger.LogDebug("CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved}): Email → {Email1}", customer, email, username, storeId, isApproved, Email);
+		_logger.LogDebug("CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved}): Username → {Username1}", customer, email, username, storeId, isApproved, Username);
+		_logger.LogWarning("CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved}): Password → {Password1}", customer, email, username, storeId, isApproved, Password);
         PasswordFormat = passwordFormat;
         StoreId = storeId;
         IsApproved = isApproved;
+		_logger.LogDebug("CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved}): PasswordFormat → {PasswordFormat1}", customer, email, username, storeId, isApproved, PasswordFormat);
+		_logger.LogDebug("CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved}): StoreId → {StoreId1}", customer, email, username, storeId, isApproved, StoreId);
+		_logger.LogDebug("<<< Exiting CustomerRegistrationRequest(customer={Customer},email={Email},username={Username},password=<redacted>,passwordFormat=<redacted>,storeId={StoreId},isApproved={IsApproved})", customer, email, username, storeId, isApproved);
     }
 
     /// <summary>

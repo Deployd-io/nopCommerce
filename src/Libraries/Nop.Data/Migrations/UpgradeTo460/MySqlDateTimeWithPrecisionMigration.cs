@@ -16,16 +16,20 @@ using Nop.Core.Domain.ScheduleTasks;
 using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Vendors;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo460;
 
 [NopSchemaMigration("2023-07-28 08:00:00", "Update datetime type precision")]
 public class MySqlDateTimeWithPrecisionMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		_logger.LogDebug("Up(): dataSettings → {DataSettings}", dataSettings);
         //update the types only in MySql 
         if (dataSettings.DataProvider != DataProviderType.MySql)
             return;
@@ -338,5 +342,6 @@ public class MySqlDateTimeWithPrecisionMigration : ForwardOnlyMigration
         Alter.Table(NameCompatibilityManager.GetTableName(typeof(VendorNote)))
             .AlterColumn(NameCompatibilityManager.GetColumnName(typeof(VendorNote), nameof(VendorNote.CreatedOnUtc)))
             .AsCustom("datetime(6)");
+			_logger.LogDebug("<<< Exiting Up()");
     }
 }

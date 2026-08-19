@@ -13,6 +13,7 @@ using Nop.Services.Localization;
 using Nop.Services.Tax;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Components;
 
@@ -21,6 +22,7 @@ namespace Nop.Plugin.Tax.Avalara.Components;
 /// </summary>
 public class AddressValidationViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -49,16 +51,28 @@ public class AddressValidationViewComponent : NopViewComponent
         IWorkContext workContext,
         TaxSettings taxSettings)
     {
+		_logger.LogDebug(">>> Entering AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings})", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings);
         _avalaraTaxManager = avalaraTaxManager;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _avalaraTaxManager → {_avalaraTaxManager}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _avalaraTaxManager);
         _avalaraTaxSettings = avalaraTaxSettings;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _avalaraTaxSettings → {_avalaraTaxSettings}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _avalaraTaxSettings);
         _addressService = addressService;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _addressService → {_addressService}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _addressService);
         _countryService = countryService;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _countryService → {_countryService}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _countryService);
         _customerService = customerService;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _customerService → {_customerService}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _customerService);
         _localizationService = localizationService;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _localizationService → {_localizationService}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _localizationService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _stateProvinceService → {_stateProvinceService}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _stateProvinceService);
         _taxPluginManager = taxPluginManager;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _taxPluginManager → {_taxPluginManager}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _taxPluginManager);
         _workContext = workContext;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _workContext → {_workContext}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _workContext);
         _taxSettings = taxSettings;
+		_logger.LogDebug("AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings}): _taxSettings → {_taxSettings}", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings, _taxSettings);
+		_logger.LogDebug("<<< Exiting AddressValidationViewComponent(avalaraTaxManager={AvalaraTaxManager},avalaraTaxSettings={AvalaraTaxSettings},addressService={AddressService},countryService={CountryService},customerService={CustomerService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},taxPluginManager={TaxPluginManager},workContext={WorkContext},taxSettings={TaxSettings})", avalaraTaxManager, avalaraTaxSettings, addressService, countryService, customerService, localizationService, stateProvinceService, taxPluginManager, workContext, taxSettings);
     }
 
     #endregion
@@ -76,8 +90,10 @@ public class AddressValidationViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure that Avalara tax provider is active
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): customer → {Customer}", widgetZone, additionalData, customer);
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName, customer))
             return Content(string.Empty);
 
@@ -97,11 +113,13 @@ public class AddressValidationViewComponent : NopViewComponent
                 : null;
 
         var address = await _addressService.GetAddressByIdAsync(addressId ?? 0);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): address → {Address}", widgetZone, additionalData, address);
         if (address == null)
             return Content(string.Empty);
 
         //validate address
         var validationResult = await _avalaraTaxManager.ValidateAddressAsync(address);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validationResult → {ValidationResult}", widgetZone, additionalData, validationResult);
 
         //whether there are errors in validation result
         var errorDetails = validationResult?.messages?
@@ -125,12 +143,18 @@ public class AddressValidationViewComponent : NopViewComponent
 
         //get validated address info
         var validatedAddressInfo = validationResult.validatedAddresses.First();
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddressInfo → {ValidatedAddressInfo}", widgetZone, additionalData, validatedAddressInfo);
 
         //create new address as a copy of address to validate and with details of the validated one
         var validatedAddress = _addressService.CloneAddress(address);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress → {ValidatedAddress}", widgetZone, additionalData, validatedAddress);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.City → {Arg2}", widgetZone, additionalData, validatedAddress.City);
         validatedAddress.City = validatedAddressInfo.city;
         validatedAddress.CountryId = (await _countryService.GetCountryByTwoLetterIsoCodeAsync(validatedAddressInfo.country))?.Id;
         validatedAddress.Address1 = validatedAddressInfo.line1;
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.Address1 → {Arg2}", widgetZone, additionalData, validatedAddress.Address1);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.Address2 → {Arg2}", widgetZone, additionalData, validatedAddress.Address2);
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): validatedAddress.ZipPostalCode → {Arg2}", widgetZone, additionalData, validatedAddress.ZipPostalCode);
         validatedAddress.Address2 = validatedAddressInfo.line2;
         validatedAddress.ZipPostalCode = validatedAddressInfo.postalCode;
         validatedAddress.StateProvinceId = (await _stateProvinceService.GetStateProvinceByAbbreviationAsync(validatedAddressInfo.region, validatedAddress.CountryId))?.Id;
@@ -149,10 +173,13 @@ public class AddressValidationViewComponent : NopViewComponent
 
         //otherwise display to customer a confirmation dialog about address updating
         var model = new AddressValidationModel();
+		_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model → {Model}", widgetZone, additionalData, model);
         if (existingAddress == null)
         {
             await _addressService.InsertAddressAsync(validatedAddress);
             model.AddressId = validatedAddress.Id;
+			_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model.AddressId → {Arg2}", widgetZone, additionalData, model.AddressId);
+			_logger.LogDebug("InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData}): model.IsNewAddress → {Arg2}", widgetZone, additionalData, model.IsNewAddress);
             model.IsNewAddress = true;
         }
         else
@@ -170,6 +197,7 @@ public class AddressValidationViewComponent : NopViewComponent
         model.Message = string.Format(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.AddressValidation.Confirm"),
             await getAddressLineAsync(address), await getAddressLineAsync(existingAddress ?? validatedAddress));
 
+		_logger.LogDebug("<<< Exiting InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Tax.Avalara/Views/Checkout/AddressValidation.cshtml", model);
     }
 

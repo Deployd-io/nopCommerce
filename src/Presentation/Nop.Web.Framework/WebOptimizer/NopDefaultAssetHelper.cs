@@ -1,5 +1,6 @@
 ﻿using Nop.Core;
 using WebOptimizer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.WebOptimizer;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Framework.WebOptimizer;
 /// </summary>
 public partial class NopDefaultAssetHelper : INopAssetHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -16,6 +18,8 @@ public partial class NopDefaultAssetHelper : INopAssetHelper
     /// <param name="asset">Bundle</param>
     public string CacheBusting(IAsset asset)
     {
+		_logger.LogDebug(">>> Entering CacheBusting(asset={Asset})", asset);
+		_logger.LogDebug("<<< Exiting CacheBusting(asset={Asset})", asset);
         return asset.Route;
     }
 
@@ -26,6 +30,8 @@ public partial class NopDefaultAssetHelper : INopAssetHelper
     /// <param name="sourceFiles">A list of relative file names of the sources to optimize</param>
     public IAsset GetOrCreateCssAsset(string bundleKey, params string[] sourceFiles)
     {
+		_logger.LogDebug(">>> Entering GetOrCreateCssAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
+		_logger.LogDebug("<<< Exiting GetOrCreateCssAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
         return new DefaultAsset(bundleKey, MimeTypes.TextCss);
     }
 
@@ -36,6 +42,8 @@ public partial class NopDefaultAssetHelper : INopAssetHelper
     /// <param name="sourceFiles">A list of relative file names of the sources to optimize</param>
     public IAsset GetOrCreateJavaScriptAsset(string bundleKey, params string[] sourceFiles)
     {
+		_logger.LogDebug(">>> Entering GetOrCreateJavaScriptAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
+		_logger.LogDebug("<<< Exiting GetOrCreateJavaScriptAsset(bundleKey={BundleKey},sourceFiles={SourceFiles})", bundleKey, sourceFiles);
         return new DefaultAsset(bundleKey, MimeTypes.TextJavascript);
     }
 

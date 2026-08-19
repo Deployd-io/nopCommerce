@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -27,9 +29,14 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
         ILocalizedModelFactory localizedModelFactory,
         IReviewTypeService reviewTypeService)
     {
+		_logger.LogDebug(">>> Entering ReviewTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},reviewTypeService={ReviewTypeService})", localizationService, localizedModelFactory, reviewTypeService);
         _localizationService = localizationService;
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("ReviewTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},reviewTypeService={ReviewTypeService}): _localizedModelFactory → {_localizedModelFactory}", localizationService, localizedModelFactory, reviewTypeService, _localizedModelFactory);
+		_logger.LogDebug("ReviewTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},reviewTypeService={ReviewTypeService}): _localizationService → {_localizationService}", localizationService, localizedModelFactory, reviewTypeService, _localizationService);
         _reviewTypeService = reviewTypeService;
+		_logger.LogDebug("ReviewTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},reviewTypeService={ReviewTypeService}): _reviewTypeService → {_reviewTypeService}", localizationService, localizedModelFactory, reviewTypeService, _reviewTypeService);
+		_logger.LogDebug("<<< Exiting ReviewTypeModelFactory(localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},reviewTypeService={ReviewTypeService})", localizationService, localizedModelFactory, reviewTypeService);
     }
 
     #endregion
@@ -46,11 +53,13 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     /// </returns>
     public virtual Task<ReviewTypeSearchModel> PrepareReviewTypeSearchModelAsync(ReviewTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReviewTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareReviewTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -64,15 +73,18 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     /// </returns>
     public virtual async Task<ReviewTypeListModel> PrepareReviewTypeListModelAsync(ReviewTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareReviewTypeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get review types
         var reviewTypes = (await _reviewTypeService.GetAllReviewTypesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareReviewTypeListModelAsync(searchModel={SearchModel}): reviewTypes → {ReviewTypes}", searchModel, reviewTypes);
 
         //prepare list model
         var model = new ReviewTypeListModel().PrepareToGrid(searchModel, reviewTypes, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareReviewTypeListModelAsync(searchModel={SearchModel})", searchModel);
             return reviewTypes.Select(reviewType => reviewType.ToModel<ReviewTypeModel>());
         });
 
@@ -92,6 +104,7 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
     public virtual async Task<ReviewTypeModel> PrepareReviewTypeModelAsync(ReviewTypeModel model,
         ReviewType reviewType, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareReviewTypeModelAsync(model={Model},reviewType={ReviewType},excludeProperties={ExcludeProperties})", model, reviewType, excludeProperties);
         Func<ReviewTypeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (reviewType != null)
@@ -111,6 +124,7 @@ public partial class ReviewTypeModelFactory : IReviewTypeModelFactory
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareReviewTypeModelAsync(model={Model},reviewType={ReviewType},excludeProperties={ExcludeProperties})", model, reviewType, excludeProperties);
         return model;
     }
 

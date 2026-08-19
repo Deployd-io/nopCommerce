@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Authentication.External;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Authentication.External;
 /// </summary>
 public partial class AuthenticationPluginManager : PluginManager<IExternalAuthenticationMethod>, IAuthenticationPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ExternalAuthenticationSettings _externalAuthenticationSettings;
@@ -21,7 +23,10 @@ public partial class AuthenticationPluginManager : PluginManager<IExternalAuthen
         ICustomerService customerService,
         IPluginService pluginService) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering AuthenticationPluginManager(externalAuthenticationSettings={ExternalAuthenticationSettings},customerService={CustomerService},pluginService={PluginService})", externalAuthenticationSettings, customerService, pluginService);
         _externalAuthenticationSettings = externalAuthenticationSettings;
+		_logger.LogDebug("AuthenticationPluginManager(externalAuthenticationSettings={ExternalAuthenticationSettings},customerService={CustomerService},pluginService={PluginService}): _externalAuthenticationSettings → {_externalAuthenticationSettings}", externalAuthenticationSettings, customerService, pluginService, _externalAuthenticationSettings);
+		_logger.LogDebug("<<< Exiting AuthenticationPluginManager(externalAuthenticationSettings={ExternalAuthenticationSettings},customerService={CustomerService},pluginService={PluginService})", externalAuthenticationSettings, customerService, pluginService);
     }
 
     #endregion
@@ -39,6 +44,8 @@ public partial class AuthenticationPluginManager : PluginManager<IExternalAuthen
     /// </returns>
     public virtual async Task<IList<IExternalAuthenticationMethod>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+		_logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadActivePluginsAsync(_externalAuthenticationSettings.ActiveAuthenticationMethodSystemNames, customer, storeId);
     }
 
@@ -49,6 +56,8 @@ public partial class AuthenticationPluginManager : PluginManager<IExternalAuthen
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IExternalAuthenticationMethod authenticationMethod)
     {
+		_logger.LogDebug(">>> Entering IsPluginActive(authenticationMethod={AuthenticationMethod})", authenticationMethod);
+		_logger.LogDebug("<<< Exiting IsPluginActive(authenticationMethod={AuthenticationMethod})", authenticationMethod);
         return IsPluginActive(authenticationMethod, _externalAuthenticationSettings.ActiveAuthenticationMethodSystemNames);
     }
 
@@ -64,7 +73,10 @@ public partial class AuthenticationPluginManager : PluginManager<IExternalAuthen
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var authenticationMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): authenticationMethod → {AuthenticationMethod}", systemName, customer, storeId, authenticationMethod);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(authenticationMethod);
     }
 

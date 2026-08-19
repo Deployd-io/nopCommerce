@@ -4,6 +4,7 @@ using Microsoft.Extensions.Primitives;
 using Nop.Core.Domain.Attributes;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Attributes;
 
@@ -16,6 +17,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     where TAttribute : BaseAttribute
     where TAttributeValue : BaseAttributeValue
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<TAttribute, TAttributeValue> _attributeService;
@@ -32,11 +34,17 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     public AttributeParser(IAttributeService<TAttribute, TAttributeValue> attributeService,
         ILocalizationService localizationService)
     {
+		_logger.LogDebug(">>> Entering AttributeParser(attributeService={AttributeService},localizationService={LocalizationService})", attributeService, localizationService);
         _attributeName = typeof(TAttribute).Name;
         _attributeValueName = typeof(TAttributeValue).Name;
 
+		_logger.LogDebug("AttributeParser(attributeService={AttributeService},localizationService={LocalizationService}): _attributeName → {_attributeName}", attributeService, localizationService, _attributeName);
+		_logger.LogDebug("AttributeParser(attributeService={AttributeService},localizationService={LocalizationService}): _attributeValueName → {_attributeValueName}", attributeService, localizationService, _attributeValueName);
         _attributeService = attributeService;
         _localizationService = localizationService;
+		_logger.LogDebug("AttributeParser(attributeService={AttributeService},localizationService={LocalizationService}): _attributeService → {_attributeService}", attributeService, localizationService, _attributeService);
+		_logger.LogDebug("AttributeParser(attributeService={AttributeService},localizationService={LocalizationService}): _localizationService → {_localizationService}", attributeService, localizationService, _localizationService);
+		_logger.LogDebug("<<< Exiting AttributeParser(attributeService={AttributeService},localizationService={LocalizationService})", attributeService, localizationService);
     }
 
     #endregion
@@ -50,6 +58,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// <returns>Attribute values</returns>
     protected virtual async IAsyncEnumerable<TAttributeValue> GetValuesAsync(IList<string> valuesStr)
     {
+		_logger.LogDebug(">>> Entering GetValuesAsync(valuesStr={ValuesStr})", valuesStr);
         foreach (var valueStr in valuesStr)
         {
             if (string.IsNullOrEmpty(valueStr))
@@ -59,9 +68,11 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 continue;
 
             var value = await _attributeService.GetAttributeValueByIdAsync(id);
+			_logger.LogDebug("GetValuesAsync(valuesStr={ValuesStr}): value → {Value}", valuesStr, value);
             if (value != null)
                 yield return value;
         }
+		_logger.LogDebug("<<< Exiting GetValuesAsync(valuesStr={ValuesStr})", valuesStr);
     }
 
     #endregion
@@ -75,6 +86,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// <returns>Selected attribute identifiers</returns>
     public virtual IEnumerable<int> ParseAttributeIds(string attributesXml)
     {
+		_logger.LogDebug(">>> Entering ParseAttributeIds(attributesXml={AttributesXml})", attributesXml);
         var ids = new List<int>();
         if (string.IsNullOrEmpty(attributesXml))
             return ids;
@@ -82,9 +94,11 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
         try
         {
             var xmlDoc = new XmlDocument();
+			_logger.LogDebug("ParseAttributeIds(attributesXml={AttributesXml}): xmlDoc → {XmlDoc}", attributesXml, xmlDoc);
             xmlDoc.LoadXml(attributesXml);
 
             var nodes = xmlDoc.SelectNodes(@$"//Attributes/{_attributeName}");
+			_logger.LogDebug("ParseAttributeIds(attributesXml={AttributesXml}): nodes → {Nodes}", attributesXml, nodes);
 
             if (nodes == null)
                 return Enumerable.Empty<int>();
@@ -95,6 +109,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                     continue;
 
                 var str1 = node.Attributes["ID"].InnerText.Trim();
+				_logger.LogDebug("ParseAttributeIds(attributesXml={AttributesXml}): str1 → {Str1}", attributesXml, str1);
 
                 if (int.TryParse(str1, out var id))
                     ids.Add(id);
@@ -102,9 +117,11 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
         }
         catch
         {
+			_logger.LogError("Exception in ParseAttributeIds(attributesXml={AttributesXml}): {Arg1}", attributesXml, ex.Message);
             //ignore
         }
 
+		_logger.LogDebug("<<< Exiting ParseAttributeIds(attributesXml={AttributesXml})", attributesXml);
         return ids;
     }
 
@@ -118,18 +135,22 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<IList<TAttribute>> ParseAttributesAsync(string attributesXml)
     {
+		_logger.LogDebug(">>> Entering ParseAttributesAsync(attributesXml={AttributesXml})", attributesXml);
         var result = new List<TAttribute>();
         if (string.IsNullOrEmpty(attributesXml))
             return result;
 
         var ids = ParseAttributeIds(attributesXml);
+		_logger.LogDebug("ParseAttributesAsync(attributesXml={AttributesXml}): ids → {Ids}", attributesXml, ids);
         foreach (var id in ids)
         {
             var attribute = await _attributeService.GetAttributeByIdAsync(id);
+			_logger.LogDebug("ParseAttributesAsync(attributesXml={AttributesXml}): attribute → {Attribute}", attributesXml, attribute);
             if (attribute != null)
                 result.Add(attribute);
         }
 
+		_logger.LogDebug("<<< Exiting ParseAttributesAsync(attributesXml={AttributesXml})", attributesXml);
         return result;
     }
 
@@ -141,30 +162,37 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// <returns>Updated result (XML format)</returns>
     public virtual string RemoveAttribute(string attributesXml, int attributeId)
     {
+		_logger.LogDebug(">>> Entering RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId})", attributesXml, attributeId);
         var result = string.Empty;
 
+		_logger.LogDebug("RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): result → {Result}", attributesXml, attributeId, result);
         if (string.IsNullOrEmpty(attributesXml))
             return string.Empty;
 
         try
         {
             var xmlDoc = new XmlDocument();
+			_logger.LogDebug("RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): xmlDoc → {XmlDoc}", attributesXml, attributeId, xmlDoc);
 
             xmlDoc.LoadXml(attributesXml);
 
             var rootElement = (XmlElement)xmlDoc.SelectSingleNode(@"//Attributes");
+			_logger.LogDebug("RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): rootElement → {RootElement}", attributesXml, attributeId, rootElement);
 
             if (rootElement == null)
                 return string.Empty;
 
             XmlElement attributeElement = null;
+			_logger.LogDebug("RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): attributeElement → {AttributeElement}", attributesXml, attributeId, attributeElement);
             //find existing
             var childNodes = xmlDoc.SelectNodes($@"//Attributes/{_attributeName}");
+			_logger.LogDebug("RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): childNodes → {ChildNodes}", attributesXml, attributeId, childNodes);
 
             if (childNodes == null)
                 return string.Empty;
 
             var count = childNodes.Count;
+			_logger.LogDebug("RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): count → {Count}", attributesXml, attributeId, count);
 
             foreach (XmlElement childNode in childNodes)
             {
@@ -189,9 +217,11 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
         }
         catch
         {
+			_logger.LogError("Exception in RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId}): {Arg2}", attributesXml, attributeId, ex.Message);
             //ignore
         }
 
+		_logger.LogDebug("<<< Exiting RemoveAttribute(attributesXml={AttributesXml},attributeId={AttributeId})", attributesXml, attributeId);
         return result;
     }
 
@@ -203,6 +233,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// <returns>Attribute value</returns>
     public virtual IList<string> ParseValues(string attributesXml, int attributeId)
     {
+		_logger.LogDebug(">>> Entering ParseValues(attributesXml={AttributesXml},attributeId={AttributeId})", attributesXml, attributeId);
         var selectedAddressAttributeValues = new List<string>();
         if (string.IsNullOrEmpty(attributesXml))
             return selectedAddressAttributeValues;
@@ -210,9 +241,11 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
         try
         {
             var xmlDoc = new XmlDocument();
+			_logger.LogDebug("ParseValues(attributesXml={AttributesXml},attributeId={AttributeId}): xmlDoc → {XmlDoc}", attributesXml, attributeId, xmlDoc);
             xmlDoc.LoadXml(attributesXml);
 
             var nodeList1 = xmlDoc.SelectNodes(@$"//Attributes/{_attributeName}");
+			_logger.LogDebug("ParseValues(attributesXml={AttributesXml},attributeId={AttributeId}): nodeList1 → {NodeList1}", attributesXml, attributeId, nodeList1);
             if (nodeList1 == null)
                 return new List<string>();
 
@@ -222,6 +255,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                     continue;
 
                 var str1 = node1.Attributes["ID"].InnerText.Trim();
+				_logger.LogDebug("ParseValues(attributesXml={AttributesXml},attributeId={AttributeId}): str1 → {Str1}", attributesXml, attributeId, str1);
                 if (!int.TryParse(str1, out var id))
                     continue;
 
@@ -229,6 +263,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                     continue;
 
                 var nodeList2 = node1.SelectNodes(@$"{_attributeValueName}/Value");
+				_logger.LogDebug("ParseValues(attributesXml={AttributesXml},attributeId={AttributeId}): nodeList2 → {NodeList2}", attributesXml, attributeId, nodeList2);
 
                 if (nodeList2 == null)
                     continue;
@@ -236,15 +271,18 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 foreach (XmlNode node2 in nodeList2)
                 {
                     var value = node2.InnerText.Trim();
+					_logger.LogDebug("ParseValues(attributesXml={AttributesXml},attributeId={AttributeId}): value → {Value}", attributesXml, attributeId, value);
                     selectedAddressAttributeValues.Add(value);
                 }
             }
         }
         catch
         {
+			_logger.LogError("Exception in ParseValues(attributesXml={AttributesXml},attributeId={AttributeId}): {Arg2}", attributesXml, attributeId, ex.Message);
             //ignore
         }
 
+		_logger.LogDebug("<<< Exiting ParseValues(attributesXml={AttributesXml},attributeId={AttributeId})", attributesXml, attributeId);
         return selectedAddressAttributeValues;
     }
 
@@ -258,22 +296,29 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<IList<TAttributeValue>> ParseAttributeValuesAsync(string attributesXml)
     {
+		_logger.LogDebug(">>> Entering ParseAttributeValuesAsync(attributesXml={AttributesXml})", attributesXml);
         var values = new List<TAttributeValue>();
 
+		_logger.LogDebug("ParseAttributeValuesAsync(attributesXml={AttributesXml}): values → {Values}", attributesXml, values);
         if (string.IsNullOrEmpty(attributesXml))
             return values;
 
         var attributes = await ParseAttributesAsync(attributesXml);
+		_logger.LogDebug("ParseAttributeValuesAsync(attributesXml={AttributesXml}): attributes → {Attributes}", attributesXml, attributes);
         foreach (var attribute in attributes)
         {
             if (!attribute.ShouldHaveValues)
                 continue;
 
             var valuesStr = ParseValues(attributesXml, attribute.Id);
+			_logger.LogDebug("ParseAttributeValuesAsync(attributesXml={AttributesXml}): valuesStr → {ValuesStr}", attributesXml, valuesStr);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
             values.AddRange(await GetValuesAsync(valuesStr).ToArrayAsync());
+			_logger.LogInformation("ParseAttributeValuesAsync(attributesXml)={AttributesXml}: database query executed in {Arg1} ms", attributesXml, __logStart.ElapsedMilliseconds);
         }
 
+		_logger.LogDebug("<<< Exiting ParseAttributeValuesAsync(attributesXml={AttributesXml})", attributesXml);
         return values;
     }
 
@@ -309,20 +354,26 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// <returns>Attributes</returns>
     public virtual string AddAttribute(string attributesXml, TAttribute attribute, string value)
     {
+		_logger.LogDebug(">>> Entering AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value})", attributesXml, attribute, value);
         var result = string.Empty;
         try
+		_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): result → {Result}", attributesXml, attribute, value, result);
         {
             var xmlDoc = new XmlDocument();
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): xmlDoc → {XmlDoc}", attributesXml, attribute, value, xmlDoc);
             if (string.IsNullOrEmpty(attributesXml))
                 xmlDoc.AppendChild(xmlDoc.CreateElement("Attributes"));
             else
                 xmlDoc.LoadXml(attributesXml);
 
             var rootElement = (XmlElement)xmlDoc.SelectSingleNode(@"//Attributes")!;
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): rootElement → {RootElement}", attributesXml, attribute, value, rootElement);
 
             XmlElement attributeElement = null;
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): attributeElement → {AttributeElement}", attributesXml, attribute, value, attributeElement);
             //find existing
             var nodeList1 = xmlDoc.SelectNodes(@$"//Attributes/{_attributeName}");
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): nodeList1 → {NodeList1}", attributesXml, attribute, value, nodeList1);
 
             if (nodeList1 != null)
                 foreach (XmlNode node1 in nodeList1)
@@ -331,6 +382,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                         continue;
 
                     var str1 = node1.Attributes["ID"].InnerText.Trim();
+					_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): str1 → {Str1}", attributesXml, attribute, value, str1);
                     if (!int.TryParse(str1, out var id))
                         continue;
 
@@ -350,9 +402,12 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
             }
 
             var attributeValueElement = xmlDoc.CreateElement(_attributeValueName);
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): attributeValueElement → {AttributeValueElement}", attributesXml, attribute, value, attributeValueElement);
             attributeElement.AppendChild(attributeValueElement);
 
             var attributeValueValueElement = xmlDoc.CreateElement("Value");
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): attributeValueValueElement → {AttributeValueValueElement}", attributesXml, attribute, value, attributeValueValueElement);
+			_logger.LogDebug("AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): attributeValueValueElement.InnerText → {Arg3}", attributesXml, attribute, value, attributeValueValueElement.InnerText);
             attributeValueValueElement.InnerText = value;
             attributeValueElement.AppendChild(attributeValueValueElement);
 
@@ -360,9 +415,11 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
         }
         catch
         {
+			_logger.LogError("Exception in AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value}): {Arg3}", attributesXml, attribute, value, ex.Message);
             //ignore
         }
 
+		_logger.LogDebug("<<< Exiting AddAttribute(attributesXml={AttributesXml},attribute={Attribute},value={Value})", attributesXml, attribute, value);
         return result;
     }
 
@@ -376,13 +433,17 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<IList<string>> GetAttributeWarningsAsync(string attributesXml)
     {
+		_logger.LogDebug(">>> Entering GetAttributeWarningsAsync(attributesXml={AttributesXml})", attributesXml);
         var warnings = new List<string>();
 
+		_logger.LogDebug("GetAttributeWarningsAsync(attributesXml={AttributesXml}): warnings → {Warnings}", attributesXml, warnings);
         //ensure it's our attributes
         var attributes1 = await ParseAttributesAsync(attributesXml);
+		_logger.LogDebug("GetAttributeWarningsAsync(attributesXml={AttributesXml}): attributes1 → {Attributes1}", attributesXml, attributes1);
 
         //validate required attributes (whether they're chosen/selected/entered)
         var attributes2 = await _attributeService.GetAllAttributesAsync();
+		_logger.LogDebug("GetAttributeWarningsAsync(attributesXml={AttributesXml}): attributes2 → {Attributes2}", attributesXml, attributes2);
 
         foreach (var a2 in attributes2)
         {
@@ -390,6 +451,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 continue;
 
             var found = false;
+			_logger.LogDebug("GetAttributeWarningsAsync(attributesXml={AttributesXml}): found → {Found}", attributesXml, found);
             //selected attributes
             foreach (var a1 in attributes1)
             {
@@ -397,6 +459,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                     continue;
 
                 var valuesStr = ParseValues(attributesXml, a1.Id);
+				_logger.LogDebug("GetAttributeWarningsAsync(attributesXml={AttributesXml}): valuesStr → {ValuesStr}", attributesXml, valuesStr);
 
                 found = valuesStr.Any(str1 => !string.IsNullOrEmpty(str1.Trim()));
             }
@@ -406,10 +469,12 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
 
             //if not found
             var notFoundWarning = string.Format(await _localizationService.GetResourceAsync("ShoppingCart.SelectAttribute"), await _localizationService.GetLocalizedAsync(a2, a => a.Name));
+			_logger.LogDebug("GetAttributeWarningsAsync(attributesXml={AttributesXml}): notFoundWarning → {NotFoundWarning}", attributesXml, notFoundWarning);
 
             warnings.Add(notFoundWarning);
         }
 
+		_logger.LogDebug("<<< Exiting GetAttributeWarningsAsync(attributesXml={AttributesXml})", attributesXml);
         return warnings;
     }
 
@@ -424,13 +489,16 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<string> ParseCustomAttributesAsync(IFormCollection form, string attributeControlName)
     {
+		_logger.LogDebug(">>> Entering ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName})", form, attributeControlName);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = string.Empty;
+		_logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): attributesXml → {AttributesXml}", form, attributeControlName, attributesXml);
 
         foreach (var attribute in await _attributeService.GetAllAttributesAsync())
         {
             var controlId = string.Format(attributeControlName, attribute.Id);
+			_logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): controlId → {ControlId}", form, attributeControlName, controlId);
             var attributeValues = form[controlId];
             switch (attribute.AttributeControlType)
             {
@@ -454,6 +522,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 case AttributeControlType.ReadonlyCheckboxes:
                     //load read-only (already server-side selected) values
                     var readOnlyAttributeValues = await _attributeService.GetAttributeValuesAsync(attribute.Id);
+					_logger.LogDebug("ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName}): readOnlyAttributeValues → {ReadOnlyAttributeValues}", form, attributeControlName, readOnlyAttributeValues);
                     foreach (var readOnlyAttributeValue in readOnlyAttributeValues)
                     {
                         if (!readOnlyAttributeValue.IsPreSelected)
@@ -479,6 +548,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
             }
         }
 
+		_logger.LogDebug("<<< Exiting ParseCustomAttributesAsync(form={Form},attributeControlName={AttributeControlName})", form, attributeControlName);
         return attributesXml;
     }
 
@@ -493,6 +563,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
     /// </returns>
     public virtual async Task<bool?> IsConditionMetAsync(string conditionAttributeXml, string selectedAttributesXml)
     {
+		_logger.LogDebug(">>> Entering IsConditionMetAsync(conditionAttributeXml={ConditionAttributeXml},selectedAttributesXml={SelectedAttributesXml})", conditionAttributeXml, selectedAttributesXml);
         if (string.IsNullOrEmpty(conditionAttributeXml))
             //no condition
             return null;
@@ -525,6 +596,7 @@ public partial class AttributeParser<TAttribute, TAttributeValue> : IAttributePa
                 allFound = false;
         }
 
+		_logger.LogDebug("<<< Exiting IsConditionMetAsync(conditionAttributeXml={ConditionAttributeXml},selectedAttributesXml={SelectedAttributesXml})", conditionAttributeXml, selectedAttributesXml);
         return allFound;
     }
 

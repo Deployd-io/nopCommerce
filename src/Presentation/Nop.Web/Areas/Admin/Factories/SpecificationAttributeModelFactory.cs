@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class SpecificationAttributeModelFactory : ISpecificationAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -29,10 +31,16 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         ILocalizedModelFactory localizedModelFactory,
         ISpecificationAttributeService specificationAttributeService)
     {
+		_logger.LogDebug(">>> Entering SpecificationAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},specificationAttributeService={SpecificationAttributeService})", baseAdminModelFactory, localizationService, localizedModelFactory, specificationAttributeService);
         _baseAdminModelFactory = baseAdminModelFactory;
         _localizationService = localizationService;
+		_logger.LogDebug("SpecificationAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},specificationAttributeService={SpecificationAttributeService}): _localizationService → {_localizationService}", baseAdminModelFactory, localizationService, localizedModelFactory, specificationAttributeService, _localizationService);
+		_logger.LogDebug("SpecificationAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},specificationAttributeService={SpecificationAttributeService}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, localizationService, localizedModelFactory, specificationAttributeService, _baseAdminModelFactory);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("SpecificationAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},specificationAttributeService={SpecificationAttributeService}): _localizedModelFactory → {_localizedModelFactory}", baseAdminModelFactory, localizationService, localizedModelFactory, specificationAttributeService, _localizedModelFactory);
         _specificationAttributeService = specificationAttributeService;
+		_logger.LogDebug("SpecificationAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},specificationAttributeService={SpecificationAttributeService}): _specificationAttributeService → {_specificationAttributeService}", baseAdminModelFactory, localizationService, localizedModelFactory, specificationAttributeService, _specificationAttributeService);
+		_logger.LogDebug("<<< Exiting SpecificationAttributeModelFactory(baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},specificationAttributeService={SpecificationAttributeService})", baseAdminModelFactory, localizationService, localizedModelFactory, specificationAttributeService);
     }
 
     #endregion
@@ -48,15 +56,18 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     protected virtual SpecificationAttributeOptionSearchModel PrepareSpecificationAttributeOptionSearchModel(
         SpecificationAttributeOptionSearchModel searchModel, SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeOptionSearchModel(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(specificationAttribute);
 
         searchModel.SpecificationAttributeId = specificationAttribute.Id;
+		_logger.LogDebug("PrepareSpecificationAttributeOptionSearchModel(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): searchModel.SpecificationAttributeId → {Arg2}", searchModel, specificationAttribute, searchModel.SpecificationAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeOptionSearchModel(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         return searchModel;
     }
 
@@ -69,15 +80,18 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     protected virtual SpecificationAttributeProductSearchModel PrepareSpecificationAttributeProductSearchModel(
         SpecificationAttributeProductSearchModel searchModel, SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeProductSearchModel(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(specificationAttribute);
 
         searchModel.SpecificationAttributeId = specificationAttribute.Id;
+		_logger.LogDebug("PrepareSpecificationAttributeProductSearchModel(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): searchModel.SpecificationAttributeId → {Arg2}", searchModel, specificationAttribute, searchModel.SpecificationAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeProductSearchModel(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         return searchModel;
     }
 
@@ -95,11 +109,13 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual Task<SpecificationAttributeSearchModel> PrepareSpecificationAttributeSearchModelAsync(SpecificationAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -113,6 +129,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual async Task<SpecificationAttributeGroupListModel> PrepareSpecificationAttributeGroupListModelAsync(SpecificationAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeGroupListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get specification attribute groups
@@ -132,6 +149,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         var model = new SpecificationAttributeGroupListModel().PrepareToGrid(searchModel, specificationAttributeGroups, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeGroupListModelAsync(searchModel={SearchModel})", searchModel);
             return specificationAttributeGroups.Select(attribute => attribute.ToModel<SpecificationAttributeGroupModel>());
         });
 
@@ -151,6 +169,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     public virtual async Task<SpecificationAttributeGroupModel> PrepareSpecificationAttributeGroupModelAsync(SpecificationAttributeGroupModel model,
         SpecificationAttributeGroup specificationAttributeGroup, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeGroupModelAsync(model={Model},specificationAttributeGroup={SpecificationAttributeGroup},excludeProperties={ExcludeProperties})", model, specificationAttributeGroup, excludeProperties);
         Func<SpecificationAttributeGroupLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (specificationAttributeGroup != null)
@@ -169,6 +188,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeGroupModelAsync(model={Model},specificationAttributeGroup={SpecificationAttributeGroup},excludeProperties={ExcludeProperties})", model, specificationAttributeGroup, excludeProperties);
         return model;
     }
 
@@ -183,6 +203,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     /// </returns>
     public virtual async Task<SpecificationAttributeListModel> PrepareSpecificationAttributeListModelAsync(SpecificationAttributeSearchModel searchModel, SpecificationAttributeGroup group = null)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeListModelAsync(searchModel={SearchModel},group={Group})", searchModel, group);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get specification attributes
@@ -195,6 +216,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         var model = new SpecificationAttributeListModel().PrepareToGrid(searchModel, specificationAttributes, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeListModelAsync(searchModel={SearchModel},group={Group})", searchModel, group);
             return specificationAttributes.Select(attribute => attribute.ToModel<SpecificationAttributeModel>());
         });
 
@@ -214,6 +236,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     public virtual async Task<SpecificationAttributeModel> PrepareSpecificationAttributeModelAsync(SpecificationAttributeModel model,
         SpecificationAttribute specificationAttribute, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeModelAsync(model={Model},specificationAttribute={SpecificationAttribute},excludeProperties={ExcludeProperties})", model, specificationAttribute, excludeProperties);
         Func<SpecificationAttributeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (specificationAttribute != null)
@@ -243,6 +266,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
                 defaultItemText: await _localizationService.GetResourceAsync("Admin.Catalog.Attributes.SpecificationAttributes.SpecificationAttribute.Fields.SpecificationAttributeGroup.None"));
         }
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeModelAsync(model={Model},specificationAttribute={SpecificationAttribute},excludeProperties={ExcludeProperties})", model, specificationAttribute, excludeProperties);
         return model;
     }
 
@@ -258,6 +282,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     public virtual async Task<SpecificationAttributeOptionListModel> PrepareSpecificationAttributeOptionListModelAsync(
         SpecificationAttributeOptionSearchModel searchModel, SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeOptionListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(specificationAttribute);
@@ -273,15 +298,18 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             {
                 //fill in model values from the entity
                 var optionModel = option.ToModel<SpecificationAttributeOptionModel>();
+				_logger.LogDebug("PrepareSpecificationAttributeOptionListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): optionModel → {OptionModel}", searchModel, specificationAttribute, optionModel);
 
                 //in order to save performance to do not check whether a product is deleted, etc
                 optionModel.NumberOfAssociatedProducts = await _specificationAttributeService
                     .GetProductSpecificationAttributeCountAsync(specificationAttributeOptionId: option.Id);
+					_logger.LogDebug("PrepareSpecificationAttributeOptionListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): optionModel.NumberOfAssociatedProducts → {Arg2}", searchModel, specificationAttribute, optionModel.NumberOfAssociatedProducts);
 
                 return optionModel;
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeOptionListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         return model;
     }
 
@@ -300,6 +328,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         SpecificationAttribute specificationAttribute, SpecificationAttributeOption specificationAttributeOption,
         bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeOptionModelAsync(model={Model},specificationAttribute={SpecificationAttribute},specificationAttributeOption={SpecificationAttributeOption},excludeProperties={ExcludeProperties})", model, specificationAttribute, specificationAttributeOption, excludeProperties);
         ArgumentNullException.ThrowIfNull(specificationAttribute);
 
         Func<SpecificationAttributeOptionLocalizedModel, int, Task> localizedModelConfiguration = null;
@@ -319,11 +348,13 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
         }
 
         model.SpecificationAttributeId = specificationAttribute.Id;
+		_logger.LogDebug("PrepareSpecificationAttributeOptionModelAsync(model={Model},specificationAttribute={SpecificationAttribute},specificationAttributeOption={SpecificationAttributeOption},excludeProperties={ExcludeProperties}): model.SpecificationAttributeId → {Arg4}", model, specificationAttribute, specificationAttributeOption, excludeProperties, model.SpecificationAttributeId);
 
         //prepare localized models
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeOptionModelAsync(model={Model},specificationAttribute={SpecificationAttribute},specificationAttributeOption={SpecificationAttributeOption},excludeProperties={ExcludeProperties})", model, specificationAttribute, specificationAttributeOption, excludeProperties);
         return model;
     }
 
@@ -339,6 +370,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
     public virtual async Task<SpecificationAttributeProductListModel> PrepareSpecificationAttributeProductListModelAsync(
         SpecificationAttributeProductSearchModel searchModel, SpecificationAttribute specificationAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareSpecificationAttributeProductListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(specificationAttribute);
@@ -355,6 +387,10 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             return products.Select(product =>
             {
                 var specificationAttributeProductModel = product.ToModel<SpecificationAttributeProductModel>();
+				_logger.LogDebug("PrepareSpecificationAttributeProductListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): specificationAttributeProductModel → {SpecificationAttributeProductModel}", searchModel, specificationAttribute, specificationAttributeProductModel);
+				_logger.LogDebug("PrepareSpecificationAttributeProductListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): specificationAttributeProductModel.ProductId → {Arg2}", searchModel, specificationAttribute, specificationAttributeProductModel.ProductId);
+				_logger.LogDebug("PrepareSpecificationAttributeProductListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): specificationAttributeProductModel.ProductName → {Arg2}", searchModel, specificationAttribute, specificationAttributeProductModel.ProductName);
+				_logger.LogDebug("PrepareSpecificationAttributeProductListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute}): specificationAttributeProductModel.SpecificationAttributeId → {Arg2}", searchModel, specificationAttribute, specificationAttributeProductModel.SpecificationAttributeId);
                 specificationAttributeProductModel.ProductId = product.Id;
                 specificationAttributeProductModel.ProductName = product.Name;
                 specificationAttributeProductModel.SpecificationAttributeId = specificationAttribute.Id;
@@ -363,6 +399,7 @@ public partial class SpecificationAttributeModelFactory : ISpecificationAttribut
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareSpecificationAttributeProductListModelAsync(searchModel={SearchModel},specificationAttribute={SpecificationAttribute})", searchModel, specificationAttribute);
         return model;
     }
 

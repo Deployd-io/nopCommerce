@@ -4,6 +4,7 @@ using Nop.Services.Logging;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Logging;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ActivityLogModelFactory : IActivityLogModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -28,10 +30,16 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
         ICustomerService customerService,
         IDateTimeHelper dateTimeHelper)
     {
+		_logger.LogDebug(">>> Entering ActivityLogModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerActivityService={CustomerActivityService},customerService={CustomerService},dateTimeHelper={DateTimeHelper})", baseAdminModelFactory, customerActivityService, customerService, dateTimeHelper);
         _baseAdminModelFactory = baseAdminModelFactory;
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("ActivityLogModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerActivityService={CustomerActivityService},customerService={CustomerService},dateTimeHelper={DateTimeHelper}): _customerActivityService → {_customerActivityService}", baseAdminModelFactory, customerActivityService, customerService, dateTimeHelper, _customerActivityService);
+		_logger.LogDebug("ActivityLogModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerActivityService={CustomerActivityService},customerService={CustomerService},dateTimeHelper={DateTimeHelper}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, customerActivityService, customerService, dateTimeHelper, _baseAdminModelFactory);
         _customerService = customerService;
+		_logger.LogDebug("ActivityLogModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerActivityService={CustomerActivityService},customerService={CustomerService},dateTimeHelper={DateTimeHelper}): _customerService → {_customerService}", baseAdminModelFactory, customerActivityService, customerService, dateTimeHelper, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ActivityLogModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerActivityService={CustomerActivityService},customerService={CustomerService},dateTimeHelper={DateTimeHelper}): _dateTimeHelper → {_dateTimeHelper}", baseAdminModelFactory, customerActivityService, customerService, dateTimeHelper, _dateTimeHelper);
+		_logger.LogDebug("<<< Exiting ActivityLogModelFactory(baseAdminModelFactory={BaseAdminModelFactory},customerActivityService={CustomerActivityService},customerService={CustomerService},dateTimeHelper={DateTimeHelper})", baseAdminModelFactory, customerActivityService, customerService, dateTimeHelper);
     }
 
     #endregion
@@ -47,10 +55,14 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     protected virtual async Task<IList<ActivityLogTypeModel>> PrepareActivityLogTypeModelsAsync()
     {
+		_logger.LogDebug(">>> Entering PrepareActivityLogTypeModelsAsync()");
         //prepare available activity log types
         var availableActivityTypes = await _customerActivityService.GetAllActivityTypesAsync();
+		_logger.LogDebug("PrepareActivityLogTypeModelsAsync(): availableActivityTypes → {AvailableActivityTypes}", availableActivityTypes);
         var models = availableActivityTypes.Select(activityType => activityType.ToModel<ActivityLogTypeModel>()).ToList();
+		_logger.LogDebug("PrepareActivityLogTypeModelsAsync(): models → {Models}", models);
 
+		_logger.LogDebug("<<< Exiting PrepareActivityLogTypeModelsAsync()");
         return models;
     }
 
@@ -68,6 +80,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     public virtual async Task<ActivityLogTypeSearchModel> PrepareActivityLogTypeSearchModelAsync(ActivityLogTypeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareActivityLogTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.ActivityLogTypeListModel = await PrepareActivityLogTypeModelsAsync();
@@ -75,6 +88,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
         //prepare grid
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareActivityLogTypeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -88,6 +102,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     public virtual async Task<ActivityLogSearchModel> PrepareActivityLogSearchModelAsync(ActivityLogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareActivityLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available activity log types
@@ -96,6 +111,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
         //prepare grid
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareActivityLogSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -109,6 +125,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
     /// </returns>
     public virtual async Task<ActivityLogListModel> PrepareActivityLogListModelAsync(ActivityLogSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareActivityLogListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter log
@@ -129,13 +146,16 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
 
         //prepare list model
         var customerIds = activityLog.GroupBy(logItem => logItem.CustomerId).Select(logItem => logItem.Key);
+		_logger.LogDebug("PrepareActivityLogListModelAsync(searchModel={SearchModel}): customerIds → {CustomerIds}", searchModel, customerIds);
         var activityLogCustomers = await _customerService.GetCustomersByIdsAsync(customerIds.ToArray());
+		_logger.LogDebug("PrepareActivityLogListModelAsync(searchModel={SearchModel}): activityLogCustomers → {ActivityLogCustomers}", searchModel, activityLogCustomers);
         var model = await new ActivityLogListModel().PrepareToGridAsync(searchModel, activityLog, () =>
         {
             return activityLog.SelectAwait(async logItem =>
             {
                 //fill in model values from the entity
                 var logItemModel = logItem.ToModel<ActivityLogModel>();
+				_logger.LogDebug("PrepareActivityLogListModelAsync(searchModel={SearchModel}): logItemModel → {LogItemModel}", searchModel, logItemModel);
                 logItemModel.ActivityLogTypeName = (await _customerActivityService.GetActivityTypeByIdAsync(logItem.ActivityLogTypeId))?.Name;
 
                 logItemModel.CustomerEmail = activityLogCustomers?.FirstOrDefault(x => x.Id == logItem.CustomerId)?.Email;
@@ -147,6 +167,7 @@ public partial class ActivityLogModelFactory : IActivityLogModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareActivityLogListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
