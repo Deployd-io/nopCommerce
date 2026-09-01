@@ -7,6 +7,7 @@ using Nop.Plugin.Misc.Omnisend.Services;
 using Nop.Services.Common;
 using Nop.Services.Events;
 using Nop.Web.Framework.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Infrastructure;
 
@@ -33,6 +34,7 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
     IConsumer<OrderVoidedEvent>,
     IConsumer<PageRenderingEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IGenericAttributeService _genericAttributeService;
@@ -49,9 +51,13 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
         OmnisendService omnisendService,
         OmnisendSettings settings)
     {
+		_logger.LogDebug(">>> Entering EventConsumer(genericAttributeService={GenericAttributeService},omnisendEventsService={OmnisendEventsService},omnisendService={OmnisendService},settings={Settings})", genericAttributeService, omnisendEventsService, omnisendService, settings);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("EventConsumer(genericAttributeService={GenericAttributeService},omnisendEventsService={OmnisendEventsService},omnisendService={OmnisendService},settings={Settings}): _genericAttributeService → {_genericAttributeService}", genericAttributeService, omnisendEventsService, omnisendService, settings, _genericAttributeService);
         _omnisendEventsService = omnisendEventsService;
+		_logger.LogDebug("EventConsumer(genericAttributeService={GenericAttributeService},omnisendEventsService={OmnisendEventsService},omnisendService={OmnisendService},settings={Settings}): _omnisendEventsService → {_omnisendEventsService}", genericAttributeService, omnisendEventsService, omnisendService, settings, _omnisendEventsService);
         _omnisendService = omnisendService;
+		_logger.LogDebug("EventConsumer(genericAttributeService={GenericAttributeService},omnisendEventsService={OmnisendEventsService},omnisendService={OmnisendService},settings={Settings}): _omnisendService → {_omnisendService}", genericAttributeService, omnisendEventsService, omnisendService, settings, _omnisendService);
         _settings = settings;
     }
 
@@ -66,6 +72,7 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(CustomerLoggedinEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!_omnisendService.IsConfigured)
             return;
 
@@ -73,9 +80,11 @@ internal class EventConsumer : IConsumer<CustomerLoggedinEvent>,
             return;
 
         var script = _settings.IdentifyContactScript.Replace(OmnisendDefaults.Email, eventMessage.Customer.Email);
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): script → {Script}", eventMessage, script);
 
         await _genericAttributeService.SaveAttributeAsync(eventMessage.Customer,
             OmnisendDefaults.IdentifyContactAttribute, script);
+			_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

@@ -6,6 +6,7 @@ using Nop.Core.Domain.Localization;
 using Nop.Core.Domain.Seo;
 using Nop.Data;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Seo;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Seo;
 /// </summary>
 public partial class UrlRecordService : IUrlRecordService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected static readonly Dictionary<char, string> _seoCharacterTable;
@@ -37,18 +39,29 @@ public partial class UrlRecordService : IUrlRecordService
         LocalizationSettings localizationSettings,
         SeoSettings seoSettings)
     {
+		_logger.LogDebug(">>> Entering UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings})", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings);
         _languageService = languageService;
+		_logger.LogDebug("UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings}): _languageService → {_languageService}", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings, _languageService);
         _urlRecordRepository = urlRecordRepository;
+		_logger.LogDebug("UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings}): _urlRecordRepository → {_urlRecordRepository}", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings, _urlRecordRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings}): _staticCacheManager → {_staticCacheManager}", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings, _staticCacheManager);
         _workContext = workContext;
+		_logger.LogDebug("UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings}): _workContext → {_workContext}", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings, _workContext);
         _localizationSettings = localizationSettings;
+		_logger.LogDebug("UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings}): _localizationSettings → {_localizationSettings}", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings, _localizationSettings);
         _seoSettings = seoSettings;
+		_logger.LogDebug("UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings}): _seoSettings → {_seoSettings}", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings, _seoSettings);
+		_logger.LogDebug(">>> Entering UrlRecordService()");
+		_logger.LogDebug("<<< Exiting UrlRecordService(languageService={LanguageService},urlRecordRepository={UrlRecordRepository},staticCacheManager={StaticCacheManager},workContext={WorkContext},localizationSettings={LocalizationSettings},seoSettings={SeoSettings})", languageService, urlRecordRepository, staticCacheManager, workContext, localizationSettings, seoSettings);
+		_logger.LogDebug("<<< Exiting UrlRecordService()");
     }
 
     static UrlRecordService()
     {
         _okChars = new HashSet<char>("abcdefghijklmnopqrstuvwxyz1234567890 _-");
 
+		_logger.LogDebug("UrlRecordService(): _okChars → {_okChars}", _okChars);
         // stores unicode characters and their "normalized"
         // values to a hash table. Character codes are referenced
         // by hex numbers because that's the most common way to
@@ -57,6 +70,7 @@ public partial class UrlRecordService : IUrlRecordService
         // upper-case comments are identifiers from the Unicode database. 
         // lower- and mixed-case comments are the author's
         _seoCharacterTable = new Dictionary<char, string>
+		_logger.LogDebug("UrlRecordService(): _seoCharacterTable → {_seoCharacterTable}", _seoCharacterTable);
         {
             { '\u0041', "A" },
             { '\u0042', "B" },
@@ -1108,6 +1122,7 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteUrlRecordsAsync(IList<UrlRecord> urlRecords)
     {
+		_logger.LogDebug(">>> Entering DeleteUrlRecordsAsync(urlRecords={UrlRecords})", urlRecords);
         await _urlRecordRepository.DeleteAsync(urlRecords);
     }
 
@@ -1121,6 +1136,8 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<IList<UrlRecord>> GetUrlRecordsByIdsAsync(int[] urlRecordIds)
     {
+		_logger.LogDebug(">>> Entering GetUrlRecordsByIdsAsync(urlRecordIds={UrlRecordIds})", urlRecordIds);
+		_logger.LogInformation("GetUrlRecordsByIdsAsync(urlRecordIds)={UrlRecordIds}: find query executing", urlRecordIds);
         return await _urlRecordRepository.GetByIdsAsync(urlRecordIds, _ => default);
     }
 
@@ -1131,6 +1148,7 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertUrlRecordAsync(UrlRecord urlRecord)
     {
+		_logger.LogDebug(">>> Entering InsertUrlRecordAsync(urlRecord={UrlRecord})", urlRecord);
         await _urlRecordRepository.InsertAsync(urlRecord);
     }
 
@@ -1141,6 +1159,7 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateUrlRecordAsync(UrlRecord urlRecord)
     {
+		_logger.LogDebug(">>> Entering UpdateUrlRecordAsync(urlRecord={UrlRecord})", urlRecord);
         await _urlRecordRepository.UpdateAsync(urlRecord);
     }
 
@@ -1154,6 +1173,7 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<UrlRecord> GetBySlugAsync(string slug)
     {
+		_logger.LogDebug(">>> Entering GetBySlugAsync(slug={Slug})", slug);
         if (string.IsNullOrEmpty(slug))
             return null;
 
@@ -1181,6 +1201,7 @@ public partial class UrlRecordService : IUrlRecordService
                         orderby ur.IsActive descending, ur.Id
                         select ur;
 
+		_logger.LogDebug("<<< Exiting GetBySlugAsync(slug={Slug})", slug);
             return await query.FirstOrDefaultAsync();
         });
     }
@@ -1202,6 +1223,9 @@ public partial class UrlRecordService : IUrlRecordService
     {
         var urlRecords = (await _urlRecordRepository.GetAllAsync(query => query.OrderBy(ur => ur.Slug), _ => default))
             .AsEnumerable();
+			_logger.LogDebug(">>> Entering GetAllUrlRecordsAsync(slug={Slug},languageId={LanguageId},isActive={IsActive},pageIndex={PageIndex},pageSize={PageSize})", slug, languageId, isActive, pageIndex, pageSize);
+			_logger.LogDebug("<<< Exiting GetAllUrlRecordsAsync(slug={Slug},languageId={LanguageId},isActive={IsActive},pageIndex={PageIndex},pageSize={PageSize})", slug, languageId, isActive, pageIndex, pageSize);
+			_logger.LogInformation("GetAllUrlRecordsAsync(slug,languageId,isActive,pageIndex,pageSize)={Slug},{LanguageId},{IsActive},{PageIndex},{PageSize}: find query executed in {Arg5} ms", slug, languageId, isActive, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
         if (!string.IsNullOrWhiteSpace(slug))
             urlRecords = urlRecords.Where(ur => ur.Slug.Contains(slug));
@@ -1213,6 +1237,7 @@ public partial class UrlRecordService : IUrlRecordService
             urlRecords = urlRecords.Where(ur => ur.IsActive == isActive);
 
         var result = urlRecords.ToList();
+		_logger.LogDebug("GetAllUrlRecordsAsync(slug={Slug},languageId={LanguageId},isActive={IsActive},pageIndex={PageIndex},pageSize={PageSize}): result → {Result}", slug, languageId, isActive, pageIndex, pageSize, result);
 
         return new PagedList<UrlRecord>(result, pageIndex, pageSize);
     }
@@ -1229,6 +1254,8 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<string> GetActiveSlugAsync(int entityId, string entityName, int languageId)
     {
+		_logger.LogDebug(">>> Entering GetActiveSlugAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId})", entityId, entityName, languageId);
+		_logger.LogInformation("GetActiveSlugAsync(entityId,entityName,languageId)={EntityId},{EntityName},{LanguageId}: database query executing", entityId, entityName, languageId);
         if (_localizationSettings.LoadAllUrlRecordsOnStartup)
         {
             //value tuples aren't json-serializable by default, so we use a string key
@@ -1260,6 +1287,7 @@ public partial class UrlRecordService : IUrlRecordService
                         select ur.Slug;
 
             //little hack here. nulls aren't cacheable so set it to ""
+		_logger.LogDebug("<<< Exiting GetActiveSlugAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId})", entityId, entityName, languageId);
             return await query.FirstOrDefaultAsync() ?? string.Empty;
         });
     }
@@ -1274,10 +1302,12 @@ public partial class UrlRecordService : IUrlRecordService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveSlugAsync<T>(T entity, string slug, int languageId) where T : BaseEntity, ISlugSupported
     {
+		_logger.LogDebug(">>> Entering SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId})", entity, slug, languageId);
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityId = entity.Id;
         var entityName = entity.GetType().Name;
+		_logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): entityName → {EntityName}", entity, slug, languageId, entityName);
 
         var query = from ur in _urlRecordRepository.Table
                     where ur.EntityId == entityId &&
@@ -1285,8 +1315,12 @@ public partial class UrlRecordService : IUrlRecordService
                         ur.LanguageId == languageId
                     orderby ur.Id descending
                     select ur;
+					var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var allUrlRecords = await query.ToListAsync();
         var activeUrlRecord = allUrlRecords.FirstOrDefault(x => x.IsActive);
+		_logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): allUrlRecords → {AllUrlRecords}", entity, slug, languageId, allUrlRecords);
+		_logger.LogInformation("SaveSlugAsync(entity,slug,languageId)={Entity},{Slug},{LanguageId}: database query executed in {Arg3} ms", entity, slug, languageId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): activeUrlRecord → {ActiveUrlRecord}", entity, slug, languageId, activeUrlRecord);
         UrlRecord nonActiveRecordWithSpecifiedSlug;
 
         if (activeUrlRecord == null && !string.IsNullOrWhiteSpace(slug))
@@ -1295,10 +1329,12 @@ public partial class UrlRecordService : IUrlRecordService
             nonActiveRecordWithSpecifiedSlug = allUrlRecords
                 .FirstOrDefault(
                     x => x.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase) && !x.IsActive);
+					_logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): nonActiveRecordWithSpecifiedSlug → {NonActiveRecordWithSpecifiedSlug}", entity, slug, languageId, nonActiveRecordWithSpecifiedSlug);
             if (nonActiveRecordWithSpecifiedSlug != null)
             {
                 //mark non-active record as active
                 nonActiveRecordWithSpecifiedSlug.IsActive = true;
+				_logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): nonActiveRecordWithSpecifiedSlug.IsActive → {Arg3}", entity, slug, languageId, nonActiveRecordWithSpecifiedSlug.IsActive);
                 await UpdateUrlRecordAsync(nonActiveRecordWithSpecifiedSlug);
             }
             else
@@ -1320,6 +1356,7 @@ public partial class UrlRecordService : IUrlRecordService
         {
             //disable the previous active URL record
             activeUrlRecord.IsActive = false;
+			_logger.LogDebug("SaveSlugAsync(entity={Entity},slug={Slug},languageId={LanguageId}): activeUrlRecord.IsActive → {Arg3}", entity, slug, languageId, activeUrlRecord.IsActive);
             await UpdateUrlRecordAsync(activeUrlRecord);
         }
 
@@ -1379,9 +1416,11 @@ public partial class UrlRecordService : IUrlRecordService
     public virtual async Task<string> GetSeNameAsync<T>(T entity, int? languageId = null, bool returnDefaultValue = true,
         bool ensureTwoPublishedLanguages = true) where T : BaseEntity, ISlugSupported
     {
+		_logger.LogDebug(">>> Entering GetSeNameAsync(entity={Entity},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue},ensureTwoPublishedLanguages={EnsureTwoPublishedLanguages})", entity, languageId, returnDefaultValue, ensureTwoPublishedLanguages);
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityName = entity.GetType().Name;
+		_logger.LogDebug("GetSeNameAsync(entity={Entity},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue},ensureTwoPublishedLanguages={EnsureTwoPublishedLanguages}): entityName → {EntityName}", entity, languageId, returnDefaultValue, ensureTwoPublishedLanguages, entityName);
 
         return await GetSeNameAsync(entity.Id, entityName, languageId ?? (await _workContext.GetWorkingLanguageAsync()).Id, returnDefaultValue, ensureTwoPublishedLanguages);
     }
@@ -1401,16 +1440,20 @@ public partial class UrlRecordService : IUrlRecordService
     public virtual async Task<string> GetSeNameAsync(int entityId, string entityName, int? languageId = null,
         bool returnDefaultValue = true, bool ensureTwoPublishedLanguages = true)
     {
+		_logger.LogDebug(">>> Entering GetSeNameAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue},ensureTwoPublishedLanguages={EnsureTwoPublishedLanguages})", entityId, entityName, languageId, returnDefaultValue, ensureTwoPublishedLanguages);
         languageId ??= (await _workContext.GetWorkingLanguageAsync()).Id;
         var result = string.Empty;
+		_logger.LogDebug("GetSeNameAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue},ensureTwoPublishedLanguages={EnsureTwoPublishedLanguages}): result → {Result}", entityId, entityName, languageId, returnDefaultValue, ensureTwoPublishedLanguages, result);
 
         if (languageId > 0)
         {
             //ensure that we have at least two published languages
             var loadLocalizedValue = true;
+			_logger.LogDebug("GetSeNameAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue},ensureTwoPublishedLanguages={EnsureTwoPublishedLanguages}): loadLocalizedValue → {LoadLocalizedValue}", entityId, entityName, languageId, returnDefaultValue, ensureTwoPublishedLanguages, loadLocalizedValue);
             if (ensureTwoPublishedLanguages)
             {
                 var totalPublishedLanguages = (await _languageService.GetAllLanguagesAsync()).Count;
+				_logger.LogDebug("GetSeNameAsync(entityId={EntityId},entityName={EntityName},languageId={LanguageId},returnDefaultValue={ReturnDefaultValue},ensureTwoPublishedLanguages={EnsureTwoPublishedLanguages}): totalPublishedLanguages → {TotalPublishedLanguages}", entityId, entityName, languageId, returnDefaultValue, ensureTwoPublishedLanguages, totalPublishedLanguages);
                 loadLocalizedValue = totalPublishedLanguages >= 2;
             }
 
@@ -1451,6 +1494,7 @@ public partial class UrlRecordService : IUrlRecordService
         var seName = WhitespaceHyphenRegex().Replace(sb.ToString(), "-");
         seName = UnderscoreRegex().Replace(seName, "_");
 
+		_logger.LogDebug("<<< Exiting GetSeNameAsync(name={Name},convertNonWesternChars={ConvertNonWesternChars},allowUnicodeCharsInUrls={AllowUnicodeCharsInUrls})", name, convertNonWesternChars, allowUnicodeCharsInUrls);
         return Task.FromResult(seName);
     }
 
@@ -1467,10 +1511,13 @@ public partial class UrlRecordService : IUrlRecordService
     /// </returns>
     public virtual async Task<string> ValidateSeNameAsync<T>(T entity, string seName, string name, bool ensureNotEmpty) where T : BaseEntity, ISlugSupported
     {
+		_logger.LogDebug(">>> Entering ValidateSeNameAsync(entity={Entity},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty})", entity, seName, name, ensureNotEmpty);
         ArgumentNullException.ThrowIfNull(entity);
 
         var entityName = entity.GetType().Name;
+		_logger.LogDebug("ValidateSeNameAsync(entity={Entity},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): entityName → {EntityName}", entity, seName, name, ensureNotEmpty, entityName);
 
+		_logger.LogDebug("<<< Exiting ValidateSeNameAsync(entity={Entity},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty})", entity, seName, name, ensureNotEmpty);
         return await ValidateSeNameAsync(entity.Id, entityName, seName, name, ensureNotEmpty);
     }
 
@@ -1491,6 +1538,7 @@ public partial class UrlRecordService : IUrlRecordService
         //use name if seName is not specified
         if (string.IsNullOrWhiteSpace(seName) && !string.IsNullOrWhiteSpace(name))
             seName = name;
+			_logger.LogDebug("ValidateSeNameAsync(entityId={EntityId},entityName={EntityName},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): seName → {SeName1}", entityId, entityName, seName, name, ensureNotEmpty, seName);
 
         //validation
         seName = await GetSeNameAsync(seName, _seoSettings.ConvertNonWesternChars, _seoSettings.AllowUnicodeCharsInUrls);
@@ -1511,15 +1559,20 @@ public partial class UrlRecordService : IUrlRecordService
         //ensure this seName is not reserved yet
         var i = 2;
         var tempSeName = seName;
+		_logger.LogDebug("ValidateSeNameAsync(entityId={EntityId},entityName={EntityName},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): tempSeName → {TempSeName}", entityId, entityName, seName, name, ensureNotEmpty, tempSeName);
         while (true)
         {
             //check whether such slug already exists (and that is not the current entity)
             var urlRecord = await GetBySlugAsync(tempSeName);
+			_logger.LogDebug("ValidateSeNameAsync(entityId={EntityId},entityName={EntityName},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): urlRecord → {UrlRecord}", entityId, entityName, seName, name, ensureNotEmpty, urlRecord);
             var reserved1 = urlRecord != null && !(urlRecord.EntityId == entityId && urlRecord.EntityName.Equals(entityName, StringComparison.InvariantCultureIgnoreCase));
+			_logger.LogDebug("ValidateSeNameAsync(entityId={EntityId},entityName={EntityName},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): reserved1 → {Reserved1}", entityId, entityName, seName, name, ensureNotEmpty, reserved1);
             //and it's not in the list of reserved slugs
             var reserved2 = _seoSettings.ReservedUrlRecordSlugs.Contains(tempSeName, StringComparer.InvariantCultureIgnoreCase);
+			_logger.LogDebug("ValidateSeNameAsync(entityId={EntityId},entityName={EntityName},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): reserved2 → {Reserved2}", entityId, entityName, seName, name, ensureNotEmpty, reserved2);
             //and it's not equal to a language code
             var reserved3 = (await _languageService.GetAllLanguagesAsync(true)).Any(language => language.UniqueSeoCode.Equals(tempSeName, StringComparison.InvariantCultureIgnoreCase));
+			_logger.LogDebug("ValidateSeNameAsync(entityId={EntityId},entityName={EntityName},seName={SeName},name={Name},ensureNotEmpty={EnsureNotEmpty}): reserved3 → {Reserved3}", entityId, entityName, seName, name, ensureNotEmpty, reserved3);
             if (!reserved1 && !reserved2 && !reserved3)
                 break;
 

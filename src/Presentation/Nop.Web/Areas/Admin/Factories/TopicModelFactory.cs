@@ -10,6 +10,7 @@ using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -18,6 +19,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class TopicModelFactory : ITopicModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -44,15 +46,25 @@ public partial class TopicModelFactory : ITopicModelFactory
         IUrlRecordService urlRecordService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper})", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _catalogSettings → {_catalogSettings}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _catalogSettings);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _baseAdminModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _localizationService → {_localizationService}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _localizedModelFactory → {_localizedModelFactory}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _localizedModelFactory);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _nopUrlHelper → {_nopUrlHelper}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _nopUrlHelper);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _storeMappingSupportedModelFactory);
         _topicService = topicService;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _topicService → {_topicService}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _topicService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _urlRecordService → {_urlRecordService}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _urlRecordService);
         _webHelper = webHelper;
+		_logger.LogDebug("TopicModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},nopUrlHelper={NopUrlHelper},storeMappingSupportedModelFactory=<redacted>,topicService={TopicService},urlRecordService={UrlRecordService},webHelper={WebHelper}): _webHelper → {_webHelper}", catalogSettings, baseAdminModelFactory, localizationService, localizedModelFactory, nopUrlHelper, topicService, urlRecordService, webHelper, _webHelper);
     }
 
     #endregion
@@ -69,6 +81,7 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicSearchModel> PrepareTopicSearchModelAsync(TopicSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareTopicSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -79,6 +92,7 @@ public partial class TopicModelFactory : ITopicModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareTopicSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -92,6 +106,7 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicListModel> PrepareTopicListModelAsync(TopicSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareTopicListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get topics
@@ -101,6 +116,7 @@ public partial class TopicModelFactory : ITopicModelFactory
             ignoreAcl: true);
 
         var pagedTopics = topics.ToPagedList(searchModel);
+		_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): pagedTopics → {PagedTopics}", searchModel, pagedTopics);
 
         //prepare grid model
         var model = await new TopicListModel().PrepareToGridAsync(searchModel, pagedTopics, () =>
@@ -109,9 +125,11 @@ public partial class TopicModelFactory : ITopicModelFactory
             {
                 //fill in model values from the entity
                 var topicModel = topic.ToModel<TopicModel>();
+				_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): topicModel → {TopicModel}", searchModel, topicModel);
 
                 //little performance optimization: ensure that "Body" is not returned
                 topicModel.Body = string.Empty;
+				_logger.LogDebug("PrepareTopicListModelAsync(searchModel={SearchModel}): topicModel.Body → {Arg1}", searchModel, topicModel.Body);
 
                 topicModel.SeName = await _urlRecordService.GetSeNameAsync(topic, 0, true, false);
 
@@ -124,6 +142,7 @@ public partial class TopicModelFactory : ITopicModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareTopicListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -139,6 +158,7 @@ public partial class TopicModelFactory : ITopicModelFactory
     /// </returns>
     public virtual async Task<TopicModel> PrepareTopicModelAsync(TopicModel model, Topic topic, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareTopicModelAsync(model={Model},topic={Topic},excludeProperties={ExcludeProperties})", model, topic, excludeProperties);
         Func<TopicLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (topic != null)
@@ -147,6 +167,7 @@ public partial class TopicModelFactory : ITopicModelFactory
             if (model == null)
             {
                 model = topic.ToModel<TopicModel>();
+				_logger.LogDebug("PrepareTopicModelAsync(model={Model},topic={Topic},excludeProperties={ExcludeProperties}): model → {Model1}", model, topic, excludeProperties, model);
                 model.SeName = await _urlRecordService.GetSeNameAsync(topic, 0, true, false);
             }
 
@@ -168,6 +189,8 @@ public partial class TopicModelFactory : ITopicModelFactory
         if (topic == null)
         {
             model.DisplayOrder = 1;
+			_logger.LogDebug("PrepareTopicModelAsync(model={Model},topic={Topic},excludeProperties={ExcludeProperties}): model.DisplayOrder → {Arg3}", model, topic, excludeProperties, model.DisplayOrder);
+			_logger.LogDebug("PrepareTopicModelAsync(model={Model},topic={Topic},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, topic, excludeProperties, model.Published);
             model.Published = true;
         }
 
@@ -181,6 +204,7 @@ public partial class TopicModelFactory : ITopicModelFactory
         //prepare model stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, topic, excludeProperties);
 
+		_logger.LogDebug("<<< Exiting PrepareTopicModelAsync(model={Model},topic={Topic},excludeProperties={ExcludeProperties})", model, topic, excludeProperties);
         return model;
     }
 

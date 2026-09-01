@@ -3,6 +3,7 @@ using Nop.Core;
 using Nop.Core.Domain.Stores;
 using Nop.Services.Stores;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Factories;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Factories;
 /// </summary>
 public partial class StoreMappingSupportedModelFactory : IStoreMappingSupportedModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IStoreMappingService _storeMappingService;
@@ -23,7 +25,9 @@ public partial class StoreMappingSupportedModelFactory : IStoreMappingSupportedM
     public StoreMappingSupportedModelFactory(IStoreMappingService storeMappingService,
         IStoreService storeService)
     {
+		_logger.LogDebug(">>> Entering StoreMappingSupportedModelFactory(storeMappingService=<redacted>,storeService={StoreService})", storeService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("StoreMappingSupportedModelFactory(storeMappingService=<redacted>,storeService={StoreService}): _storeMappingService → {_storeMappingService}", storeService, _storeMappingService);
         _storeService = storeService;
     }
 
@@ -39,16 +43,19 @@ public partial class StoreMappingSupportedModelFactory : IStoreMappingSupportedM
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareModelStoresAsync<TModel>(TModel model) where TModel : IStoreMappingSupportedModel
     {
+		_logger.LogDebug(">>> Entering PrepareModelStoresAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available stores
         var availableStores = await _storeService.GetAllStoresAsync();
+		_logger.LogDebug("PrepareModelStoresAsync(model={Model}): availableStores → {AvailableStores}", model, availableStores);
         model.AvailableStores = availableStores.Select(store => new SelectListItem
         {
             Text = store.Name,
             Value = store.Id.ToString(),
             Selected = model.SelectedStoreIds.Contains(store.Id)
         }).ToList();
+		_logger.LogDebug("<<< Exiting PrepareModelStoresAsync(model={Model})", model);
     }
 
     /// <summary>

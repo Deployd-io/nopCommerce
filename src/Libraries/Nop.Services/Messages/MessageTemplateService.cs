@@ -3,6 +3,7 @@ using Nop.Core.Domain.Messages;
 using Nop.Data;
 using Nop.Services.Localization;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class MessageTemplateService : IMessageTemplateService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IStaticCacheManager _staticCacheManager;
@@ -32,12 +34,19 @@ public partial class MessageTemplateService : IMessageTemplateService
         IRepository<MessageTemplate> messageTemplateRepository,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>)", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>): _staticCacheManager → {_staticCacheManager}", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository, _staticCacheManager);
         _languageService = languageService;
+		_logger.LogDebug("MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>): _languageService → {_languageService}", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>): _localizationService → {_localizationService}", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>): _localizedEntityService → {_localizedEntityService}", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository, _localizedEntityService);
         _messageTemplateRepository = messageTemplateRepository;
+		_logger.LogDebug("MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>): _messageTemplateRepository → {_messageTemplateRepository}", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository, _messageTemplateRepository);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("MessageTemplateService(staticCacheManager={StaticCacheManager},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateRepository={MessageTemplateRepository},storeMappingService=<redacted>): _storeMappingService → {_storeMappingService}", staticCacheManager, languageService, localizationService, localizedEntityService, messageTemplateRepository, _storeMappingService);
     }
 
     #endregion
@@ -51,6 +60,7 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		_logger.LogDebug(">>> Entering DeleteMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         await _messageTemplateRepository.DeleteAsync(messageTemplate);
     }
 
@@ -61,6 +71,7 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		_logger.LogDebug(">>> Entering InsertMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         await _messageTemplateRepository.InsertAsync(messageTemplate);
     }
 
@@ -71,6 +82,7 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		_logger.LogDebug(">>> Entering UpdateMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         await _messageTemplateRepository.UpdateAsync(messageTemplate);
     }
 
@@ -84,6 +96,8 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<MessageTemplate> GetMessageTemplateByIdAsync(int messageTemplateId)
     {
+		_logger.LogDebug(">>> Entering GetMessageTemplateByIdAsync(messageTemplateId={MessageTemplateId})", messageTemplateId);
+		_logger.LogInformation("GetMessageTemplateByIdAsync(messageTemplateId)={MessageTemplateId}: find query executing", messageTemplateId);
         return await _messageTemplateRepository.GetByIdAsync(messageTemplateId, cache => default);
     }
 
@@ -98,10 +112,14 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<IList<MessageTemplate>> GetMessageTemplatesByNameAsync(string messageTemplateName, int? storeId = null)
     {
+		_logger.LogDebug(">>> Entering GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrWhiteSpace(messageTemplateName))
+			_logger.LogWarning("Throwing ArgumentException from GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
             throw new ArgumentException(nameof(messageTemplateName));
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopMessageDefaults.MessageTemplatesByNameCacheKey, messageTemplateName, storeId);
+		_logger.LogWarning("GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId}): key → {Key}", messageTemplateName, storeId, key);
 
         return await _staticCacheManager.GetAsync(key, async () =>
         {
@@ -114,9 +132,13 @@ public partial class MessageTemplateService : IMessageTemplateService
                 templatesQuery = await _storeMappingService.ApplyStoreMapping(templatesQuery, storeId.Value);
             }
 
+			_logger.LogInformation("GetMessageTemplatesByNameAsync(messageTemplateName,storeId)={MessageTemplateName},{StoreId}: external service call took {Arg2} ms", messageTemplateName, storeId, __logStart.ElapsedMilliseconds);
             return await templatesQuery.OrderBy(messageTemplate => messageTemplate.Id)
             .ToListAsync();
+			var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetMessageTemplatesByNameAsync(messageTemplateName,storeId)={MessageTemplateName},{StoreId}: database query executed in {Arg2} ms", messageTemplateName, storeId, __logStartDb.ElapsedMilliseconds);
         });
+		_logger.LogDebug("<<< Exiting GetMessageTemplatesByNameAsync(messageTemplateName={MessageTemplateName},storeId={StoreId})", messageTemplateName, storeId);
     }
 
     /// <summary>
@@ -132,10 +154,15 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<IList<MessageTemplate>> GetAllMessageTemplatesAsync(int storeId, string keywords = null, bool? isActive = null, int emailAccountId = 0)
     {
+		_logger.LogDebug(">>> Entering GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId})", storeId, keywords, isActive, emailAccountId);
         var messageTemplates = await _messageTemplateRepository.GetAllAsync(async query =>
         {
+			_logger.LogDebug("GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId}): query → {Query}", storeId, keywords, isActive, emailAccountId, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             //apply store mapping constraints
             query = await _storeMappingService.ApplyStoreMapping(query, storeId);
+			_logger.LogDebug("GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId}): messageTemplates → {MessageTemplates}", storeId, keywords, isActive, emailAccountId, messageTemplates);
+			_logger.LogInformation("GetAllMessageTemplatesAsync(storeId,keywords,isActive,emailAccountId)={StoreId},{Keywords},{IsActive},{EmailAccountId}: find query executed in {Arg4} ms", storeId, keywords, isActive, emailAccountId, __logStart.ElapsedMilliseconds);
 
             if (isActive.HasValue)
                 query = query.Where(mt => mt.IsActive == isActive);
@@ -151,6 +178,7 @@ public partial class MessageTemplateService : IMessageTemplateService
                 || (x.Body?.Contains(keywords, StringComparison.InvariantCultureIgnoreCase) ?? false)
                 || (x.Name?.Contains(keywords, StringComparison.InvariantCultureIgnoreCase) ?? false)).ToList();
 
+		_logger.LogDebug("<<< Exiting GetAllMessageTemplatesAsync(storeId={StoreId},keywords={Keywords},isActive={IsActive},emailAccountId={EmailAccountId})", storeId, keywords, isActive, emailAccountId);
         return messageTemplates;
     }
 
@@ -164,6 +192,7 @@ public partial class MessageTemplateService : IMessageTemplateService
     /// </returns>
     public virtual async Task<MessageTemplate> CopyMessageTemplateAsync(MessageTemplate messageTemplate)
     {
+		_logger.LogDebug(">>> Entering CopyMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         ArgumentNullException.ThrowIfNull(messageTemplate);
 
         var mtCopy = new MessageTemplate
@@ -183,32 +212,39 @@ public partial class MessageTemplateService : IMessageTemplateService
         await InsertMessageTemplateAsync(mtCopy);
 
         var languages = await _languageService.GetAllLanguagesAsync(true);
+		_logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): languages → {Languages}", messageTemplate, languages);
 
         //localization
         foreach (var lang in languages)
         {
             var bccEmailAddresses = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.BccEmailAddresses, lang.Id, false, false);
+			_logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): bccEmailAddresses → {BccEmailAddresses}", messageTemplate, bccEmailAddresses);
             if (!string.IsNullOrEmpty(bccEmailAddresses))
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.BccEmailAddresses, bccEmailAddresses, lang.Id);
 
             var subject = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.Subject, lang.Id, false, false);
+			_logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): subject → {Subject}", messageTemplate, subject);
             if (!string.IsNullOrEmpty(subject))
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.Subject, subject, lang.Id);
 
             var body = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.Body, lang.Id, false, false);
+			_logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): body → {Body}", messageTemplate, body);
             if (!string.IsNullOrEmpty(body))
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.Body, body, lang.Id);
 
             var emailAccountId = await _localizationService.GetLocalizedAsync(messageTemplate, x => x.EmailAccountId, lang.Id, false, false);
+			_logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): emailAccountId → {EmailAccountId}", messageTemplate, emailAccountId);
             if (emailAccountId > 0)
                 await _localizedEntityService.SaveLocalizedValueAsync(mtCopy, x => x.EmailAccountId, emailAccountId, lang.Id);
         }
 
         //store mapping
         var selectedStoreIds = await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate);
+		_logger.LogDebug("CopyMessageTemplateAsync(messageTemplate={MessageTemplate}): selectedStoreIds → {SelectedStoreIds}", messageTemplate, selectedStoreIds);
         foreach (var id in selectedStoreIds)
             await _storeMappingService.InsertStoreMappingAsync(mtCopy, id);
 
+		_logger.LogDebug("<<< Exiting CopyMessageTemplateAsync(messageTemplate={MessageTemplate})", messageTemplate);
         return mtCopy;
     }
 

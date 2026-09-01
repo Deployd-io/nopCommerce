@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Localization;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Localization;
 /// </summary>
 public partial record LocaleResourceSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public LocaleResourceSearchModel()
     {
+		_logger.LogDebug(">>> Entering LocaleResourceSearchModel()");
         AddResourceString = new LocaleResourceModel();
+		_logger.LogDebug("LocaleResourceSearchModel(): AddResourceString → {AddResourceString}", AddResourceString);
     }
 
     #endregion

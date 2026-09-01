@@ -8,6 +8,7 @@ using Nop.Web.Areas.Admin.Models.Polls;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -16,6 +17,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class PollModelFactory : IPollModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -36,12 +38,19 @@ public partial class PollModelFactory : IPollModelFactory
         IPollService pollService,
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory)
     {
+		_logger.LogDebug(">>> Entering PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>)", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>): _catalogSettings → {_catalogSettings}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService, _catalogSettings);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService, _baseAdminModelFactory);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>): _dateTimeHelper → {_dateTimeHelper}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService, _dateTimeHelper);
         _languageService = languageService;
+		_logger.LogDebug("PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>): _languageService → {_languageService}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService, _languageService);
         _pollService = pollService;
+		_logger.LogDebug("PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>): _pollService → {_pollService}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService, _pollService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("PollModelFactory(catalogSettings={CatalogSettings},baseAdminModelFactory={BaseAdminModelFactory},dateTimeHelper={DateTimeHelper},languageService={LanguageService},pollService={PollService},storeMappingSupportedModelFactory=<redacted>): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", catalogSettings, baseAdminModelFactory, dateTimeHelper, languageService, pollService, _storeMappingSupportedModelFactory);
     }
 
     #endregion
@@ -56,15 +65,18 @@ public partial class PollModelFactory : IPollModelFactory
     /// <returns>Poll answer search model</returns>
     protected virtual PollAnswerSearchModel PreparePollAnswerSearchModel(PollAnswerSearchModel searchModel, Poll poll)
     {
+		_logger.LogDebug(">>> Entering PreparePollAnswerSearchModel(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(poll);
 
         searchModel.PollId = poll.Id;
+		_logger.LogDebug("PreparePollAnswerSearchModel(searchModel={SearchModel},poll={Poll}): searchModel.PollId → {Arg2}", searchModel, poll, searchModel.PollId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PreparePollAnswerSearchModel(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         return searchModel;
     }
 
@@ -82,6 +94,7 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollSearchModel> PreparePollSearchModelAsync(PollSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePollSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -92,6 +105,7 @@ public partial class PollModelFactory : IPollModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PreparePollSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -105,6 +119,7 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollListModel> PreparePollListModelAsync(PollSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePollListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get polls
@@ -119,6 +134,7 @@ public partial class PollModelFactory : IPollModelFactory
             {
                 //fill in model values from the entity
                 var pollModel = poll.ToModel<PollModel>();
+				_logger.LogDebug("PreparePollListModelAsync(searchModel={SearchModel}): pollModel → {PollModel}", searchModel, pollModel);
 
                 //convert dates to the user time
                 if (poll.StartDateUtc.HasValue)
@@ -133,6 +149,7 @@ public partial class PollModelFactory : IPollModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PreparePollListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -148,12 +165,15 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollModel> PreparePollModelAsync(PollModel model, Poll poll, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PreparePollModelAsync(model={Model},poll={Poll},excludeProperties={ExcludeProperties})", model, poll, excludeProperties);
         if (poll != null)
         {
             //fill in model values from the entity
             model ??= poll.ToModel<PollModel>();
 
             model.StartDateUtc = poll.StartDateUtc;
+			_logger.LogDebug("PreparePollModelAsync(model={Model},poll={Poll},excludeProperties={ExcludeProperties}): model.StartDateUtc → {Arg3}", model, poll, excludeProperties, model.StartDateUtc);
+			_logger.LogDebug("PreparePollModelAsync(model={Model},poll={Poll},excludeProperties={ExcludeProperties}): model.EndDateUtc → {Arg3}", model, poll, excludeProperties, model.EndDateUtc);
             model.EndDateUtc = poll.EndDateUtc;
 
             //prepare nested search model
@@ -164,6 +184,8 @@ public partial class PollModelFactory : IPollModelFactory
         if (poll == null)
         {
             model.Published = true;
+			_logger.LogDebug("PreparePollModelAsync(model={Model},poll={Poll},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, poll, excludeProperties, model.Published);
+			_logger.LogDebug("PreparePollModelAsync(model={Model},poll={Poll},excludeProperties={ExcludeProperties}): model.ShowOnHomepage → {Arg3}", model, poll, excludeProperties, model.ShowOnHomepage);
             model.ShowOnHomepage = true;
         }
 
@@ -173,6 +195,7 @@ public partial class PollModelFactory : IPollModelFactory
         //prepare available stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, poll, excludeProperties);
 
+		_logger.LogDebug("<<< Exiting PreparePollModelAsync(model={Model},poll={Poll},excludeProperties={ExcludeProperties})", model, poll, excludeProperties);
         return model;
     }
 
@@ -187,17 +210,20 @@ public partial class PollModelFactory : IPollModelFactory
     /// </returns>
     public virtual async Task<PollAnswerListModel> PreparePollAnswerListModelAsync(PollAnswerSearchModel searchModel, Poll poll)
     {
+		_logger.LogDebug(">>> Entering PreparePollAnswerListModelAsync(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(poll);
 
         //get poll answers
         var pollAnswers = await _pollService.GetPollAnswerByPollAsync(poll.Id, searchModel.Page - 1, searchModel.PageSize);
+		_logger.LogDebug("PreparePollAnswerListModelAsync(searchModel={SearchModel},poll={Poll}): pollAnswers → {PollAnswers}", searchModel, poll, pollAnswers);
 
         //prepare list model
         var model = new PollAnswerListModel().PrepareToGrid(searchModel, pollAnswers,
             () => pollAnswers.Select(pollAnswer => pollAnswer.ToModel<PollAnswerModel>()));
 
+		_logger.LogDebug("<<< Exiting PreparePollAnswerListModelAsync(searchModel={SearchModel},poll={Poll})", searchModel, poll);
         return model;
     }
 

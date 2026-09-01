@@ -9,6 +9,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.Manual.Controllers;
 
@@ -17,6 +18,7 @@ namespace Nop.Plugin.Payments.Manual.Controllers;
 [AutoValidateAntiforgeryToken]
 public class PaymentManualController : BasePaymentController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -35,11 +37,17 @@ public class PaymentManualController : BasePaymentController
         ISettingService settingService,
         IStoreContext storeContext)
     {
+		_logger.LogDebug(">>> Entering PaymentManualController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext})", localizationService, notificationService, permissionService, settingService, storeContext);
         _localizationService = localizationService;
+		_logger.LogDebug("PaymentManualController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _localizationService → {_localizationService}", localizationService, notificationService, permissionService, settingService, storeContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("PaymentManualController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _notificationService → {_notificationService}", localizationService, notificationService, permissionService, settingService, storeContext, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("PaymentManualController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _permissionService → {_permissionService}", localizationService, notificationService, permissionService, settingService, storeContext, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("PaymentManualController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _settingService → {_settingService}", localizationService, notificationService, permissionService, settingService, storeContext, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("PaymentManualController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _storeContext → {_storeContext}", localizationService, notificationService, permissionService, settingService, storeContext, _storeContext);
     }
 
     #endregion
@@ -49,9 +57,12 @@ public class PaymentManualController : BasePaymentController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PAYMENT_METHODS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
         var manualPaymentSettings = await _settingService.LoadSettingAsync<ManualPaymentSettings>(storeScope);
+		_logger.LogDebug("Configure(): manualPaymentSettings → {ManualPaymentSettings}", manualPaymentSettings);
 
         var model = new ConfigurationModel
         {
@@ -68,6 +79,8 @@ public class PaymentManualController : BasePaymentController
             model.AdditionalFeePercentage_OverrideForStore = await _settingService.SettingExistsAsync(manualPaymentSettings, x => x.AdditionalFeePercentage, storeScope);
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
+		_logger.LogDebug("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Payments.Manual/Views/Configure.cshtml", model);
     }
 

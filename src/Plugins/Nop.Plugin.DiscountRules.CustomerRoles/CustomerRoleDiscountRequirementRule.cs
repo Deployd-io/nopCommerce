@@ -5,11 +5,13 @@ using Nop.Services.Discounts;
 using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.DiscountRules.CustomerRoles;
 
 public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirementRule
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -30,12 +32,19 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
         ISettingService settingService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper})", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper);
         _customerService = customerService;
+		_logger.LogDebug("CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper}): _customerService → {_customerService}", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper, _customerService);
         _discountService = discountService;
+		_logger.LogDebug("CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper}): _discountService → {_discountService}", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper, _discountService);
         _localizationService = localizationService;
+		_logger.LogDebug("CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper}): _localizationService → {_localizationService}", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper, _localizationService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper}): _nopUrlHelper → {_nopUrlHelper}", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper, _nopUrlHelper);
         _settingService = settingService;
+		_logger.LogDebug("CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper}): _settingService → {_settingService}", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper, _settingService);
         _webHelper = webHelper;
+		_logger.LogDebug("CustomerRoleDiscountRequirementRule(discountService={DiscountService},customerService={CustomerService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},webHelper={WebHelper}): _webHelper → {_webHelper}", discountService, customerService, localizationService, nopUrlHelper, settingService, webHelper, _webHelper);
     }
 
     #endregion
@@ -52,22 +61,26 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// </returns>
     public async Task<DiscountRequirementValidationResult> CheckRequirementAsync(DiscountRequirementValidationRequest request)
     {
+		_logger.LogDebug(">>> Entering CheckRequirementAsync(request={Request})", request);
         ArgumentNullException.ThrowIfNull(request);
 
         //invalid by default
         var result = new DiscountRequirementValidationResult();
+		_logger.LogDebug("CheckRequirementAsync(request={Request}): result → {Result}", request, result);
 
         if (request.Customer == null)
             return result;
 
         //try to get saved restricted customer role identifier
         var restrictedRoleId = await _settingService.GetSettingByKeyAsync<int>(string.Format(DiscountRequirementDefaults.SettingsKey, request.DiscountRequirementId));
+		_logger.LogDebug("CheckRequirementAsync(request={Request}): restrictedRoleId → {RestrictedRoleId}", request, restrictedRoleId);
         if (restrictedRoleId == 0)
             return result;
 
         //result is valid if the customer belongs to the restricted role
         result.IsValid = (await _customerService.GetCustomerRolesAsync(request.Customer)).Any(role => role.Id == restrictedRoleId);
 
+		_logger.LogDebug("<<< Exiting CheckRequirementAsync(request={Request})", request);
         return result;
     }
 
@@ -79,6 +92,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>URL</returns>
     public string GetConfigurationUrl(int discountId, int? discountRequirementId)
     {
+		_logger.LogDebug(">>> Entering GetConfigurationUrl(discountId={DiscountId},discountRequirementId={DiscountRequirementId})", discountId, discountRequirementId);
         return _nopUrlHelper.RouteUrl(DiscountRequirementDefaults.ConfigurationRouteName,
             new { discountId = discountId, discountRequirementId = discountRequirementId }, _webHelper.GetCurrentRequestProtocol());
     }
@@ -89,6 +103,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //locales
         await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
         {
@@ -100,6 +115,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -108,6 +124,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //discount requirements
         var discountRequirements = (await _discountService.GetAllDiscountRequirementsAsync())
             .Where(discountRequirement => discountRequirement.DiscountRequirementRuleSystemName == DiscountRequirementDefaults.SystemName);
@@ -120,6 +137,7 @@ public class CustomerRoleDiscountRequirementRule : BasePlugin, IDiscountRequirem
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.DiscountRules.CustomerRoles");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

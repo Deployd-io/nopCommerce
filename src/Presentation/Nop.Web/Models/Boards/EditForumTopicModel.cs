@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Forums;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Boards;
 
 public partial record EditForumTopicModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public EditForumTopicModel()
     {
+		_logger.LogDebug(">>> Entering EditForumTopicModel()");
         TopicPriorities = new List<SelectListItem>();
+		_logger.LogDebug("EditForumTopicModel(): TopicPriorities → {TopicPriorities}", TopicPriorities);
     }
 
     #endregion

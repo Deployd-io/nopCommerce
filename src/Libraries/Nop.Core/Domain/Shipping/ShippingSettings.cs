@@ -1,4 +1,5 @@
-﻿using Nop.Core.Configuration;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Shipping;
 
@@ -7,9 +8,12 @@ namespace Nop.Core.Domain.Shipping;
 /// </summary>
 public partial class ShippingSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ShippingSettings()
     {
+		_logger.LogDebug(">>> Entering ShippingSettings()");
         ActiveShippingRateComputationMethodSystemNames = new List<string>();
+		_logger.LogDebug("ShippingSettings(): ActiveShippingRateComputationMethodSystemNames → {ActiveShippingRateComputationMethodSystemNames}", ActiveShippingRateComputationMethodSystemNames);
         ActivePickupPointProviderSystemNames = new List<string>();
     }
 

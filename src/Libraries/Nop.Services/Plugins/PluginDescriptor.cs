@@ -3,6 +3,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Plugins;
 
@@ -11,13 +12,18 @@ namespace Nop.Services.Plugins;
 /// </summary>
 public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, IComparable<PluginDescriptor>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PluginDescriptor()
     {
+		_logger.LogDebug(">>> Entering PluginDescriptor()");
         SupportedVersions = new List<string>();
+		_logger.LogDebug("PluginDescriptor(): SupportedVersions → {SupportedVersions}", SupportedVersions);
         LimitedToStores = new List<int>();
+		_logger.LogDebug("PluginDescriptor(): LimitedToStores → {LimitedToStores}", LimitedToStores);
         LimitedToCustomerRoles = new List<int>();
+		_logger.LogDebug("PluginDescriptor(): LimitedToCustomerRoles → {LimitedToCustomerRoles}", LimitedToCustomerRoles);
         DependsOn = new List<string>();
     }
 
@@ -32,16 +38,19 @@ public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, I
     /// <returns>Plugin descriptor</returns>
     public static PluginDescriptor GetPluginDescriptorFromText(string text)
     {
+		_logger.LogDebug(">>> Entering GetPluginDescriptorFromText(text={Text})", text);
         if (string.IsNullOrEmpty(text))
             return new PluginDescriptor();
 
         //get plugin descriptor from the JSON file
         var descriptor = JsonConvert.DeserializeObject<PluginDescriptor>(text);
+		_logger.LogDebug("GetPluginDescriptorFromText(text={Text}): descriptor → {Descriptor}", text, descriptor);
 
         //nopCommerce 2.00 didn't have 'SupportedVersions' parameter, so let's set it to "2.00"
         if (!descriptor.SupportedVersions.Any())
             descriptor.SupportedVersions.Add("2.00");
 
+		_logger.LogDebug("<<< Exiting GetPluginDescriptorFromText(text={Text})", text);
         return descriptor;
     }
 
@@ -52,14 +61,18 @@ public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, I
     /// <returns>Plugin instance</returns>
     public virtual TPlugin Instance<TPlugin>() where TPlugin : class, IPlugin
     {
+		_logger.LogDebug(">>> Entering Instance()");
         //try to resolve plugin as unregistered service
         var instance = EngineContext.Current.ResolveUnregistered(PluginType);
+		_logger.LogDebug("Instance(): instance → {Instance}", instance);
 
         //try to get typed instance
         var typedInstance = instance as TPlugin;
         if (typedInstance != null)
             typedInstance.PluginDescriptor = this;
+			_logger.LogDebug("Instance(): typedInstance.PluginDescriptor → {Arg0}", typedInstance.PluginDescriptor);
 
+		_logger.LogDebug("<<< Exiting Instance()");
         return typedInstance;
     }
 
@@ -70,6 +83,7 @@ public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, I
     /// <returns>An integer that indicates whether this instance precedes, follows, or appears in the same position in the sort order as the specified parameter</returns>
     public int CompareTo(PluginDescriptor other)
     {
+		_logger.LogDebug(">>> Entering CompareTo(other={Other})", other);
         if (DisplayOrder != other.DisplayOrder)
             return DisplayOrder.CompareTo(other.DisplayOrder);
 
@@ -82,6 +96,7 @@ public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, I
     /// <returns>Value of the FriendlyName</returns>
     public override string ToString()
     {
+		_logger.LogDebug(">>> Entering ToString()");
         return FriendlyName;
     }
 
@@ -90,6 +105,7 @@ public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, I
     /// </summary>
     public virtual void Save()
     {
+		_logger.LogDebug(">>> Entering Save()");
         //since plugins are loaded before IoC initialization using the default provider,
         //in order to avoid possible problems we use CommonHelper.DefaultFileProvider
         //instead of the main file provider
@@ -97,14 +113,17 @@ public partial class PluginDescriptor : PluginDescriptorBaseInfo, IDescriptor, I
 
         //get the description file path
         if (OriginalAssemblyFile == null)
+			_logger.LogWarning("Throwing Exception from Save()");
             throw new Exception($"Cannot load original assembly path for {SystemName} plugin.");
 
         var filePath = fileProvider.Combine(fileProvider.GetDirectoryName(OriginalAssemblyFile), NopPluginDefaults.DescriptionFileName);
+		_logger.LogDebug("Save(): filePath → {FilePath}", filePath);
         if (!fileProvider.FileExists(filePath))
             throw new Exception($"Description file for {SystemName} plugin does not exist. {filePath}");
 
         //save the file
         var text = JsonConvert.SerializeObject(this, Formatting.Indented);
+		_logger.LogDebug("Save(): text → {Text}", text);
         fileProvider.WriteAllText(filePath, text, Encoding.UTF8);
     }
 

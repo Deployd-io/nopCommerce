@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Directory;
 using Nop.Data;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Directory;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Directory;
 /// </summary>
 public partial class CurrencyService : ICurrencyService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -26,9 +28,13 @@ public partial class CurrencyService : ICurrencyService
         IRepository<Currency> currencyRepository,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering CurrencyService(currencySettings={CurrencySettings},exchangeRatePluginManager={ExchangeRatePluginManager},currencyRepository={CurrencyRepository},storeMappingService=<redacted>)", currencySettings, exchangeRatePluginManager, currencyRepository);
         _currencySettings = currencySettings;
+		_logger.LogDebug("CurrencyService(currencySettings={CurrencySettings},exchangeRatePluginManager={ExchangeRatePluginManager},currencyRepository={CurrencyRepository},storeMappingService=<redacted>): _currencySettings → {_currencySettings}", currencySettings, exchangeRatePluginManager, currencyRepository, _currencySettings);
         _exchangeRatePluginManager = exchangeRatePluginManager;
+		_logger.LogDebug("CurrencyService(currencySettings={CurrencySettings},exchangeRatePluginManager={ExchangeRatePluginManager},currencyRepository={CurrencyRepository},storeMappingService=<redacted>): _exchangeRatePluginManager → {_exchangeRatePluginManager}", currencySettings, exchangeRatePluginManager, currencyRepository, _exchangeRatePluginManager);
         _currencyRepository = currencyRepository;
+		_logger.LogDebug("CurrencyService(currencySettings={CurrencySettings},exchangeRatePluginManager={ExchangeRatePluginManager},currencyRepository={CurrencyRepository},storeMappingService=<redacted>): _currencyRepository → {_currencyRepository}", currencySettings, exchangeRatePluginManager, currencyRepository, _currencyRepository);
         _storeMappingService = storeMappingService;
     }
 
@@ -45,6 +51,7 @@ public partial class CurrencyService : ICurrencyService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCurrencyAsync(Currency currency)
     {
+		_logger.LogDebug(">>> Entering DeleteCurrencyAsync(currency={Currency})", currency);
         await _currencyRepository.DeleteAsync(currency);
     }
 
@@ -58,6 +65,8 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<Currency> GetCurrencyByIdAsync(int currencyId)
     {
+		_logger.LogDebug(">>> Entering GetCurrencyByIdAsync(currencyId={CurrencyId})", currencyId);
+		_logger.LogInformation("GetCurrencyByIdAsync(currencyId)={CurrencyId}: find query executing", currencyId);
         return await _currencyRepository.GetByIdAsync(currencyId, cache => default);
     }
 
@@ -71,6 +80,7 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<Currency> GetCurrencyByCodeAsync(string currencyCode)
     {
+		_logger.LogDebug(">>> Entering GetCurrencyByCodeAsync(currencyCode={CurrencyCode})", currencyCode);
         if (string.IsNullOrEmpty(currencyCode))
             return null;
 
@@ -91,11 +101,15 @@ public partial class CurrencyService : ICurrencyService
     {
         var currencies = await _currencyRepository.GetAllAsync(query =>
         {
+			_logger.LogDebug(">>> Entering GetAllCurrenciesAsync(showHidden={ShowHidden},storeId={StoreId})", showHidden, storeId);
             if (!showHidden)
                 query = query.Where(c => c.Published);
 
+			_logger.LogInformation("GetAllCurrenciesAsync(showHidden,storeId)={ShowHidden},{StoreId}: find query executed in {Arg2} ms", showHidden, storeId, __logStart.ElapsedMilliseconds);
             query = query.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Id);
 
+			_logger.LogInformation("GetAllCurrenciesAsync(showHidden,storeId)={ShowHidden},{StoreId}: database query executed in {Arg2} ms", showHidden, storeId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetAllCurrenciesAsync(showHidden={ShowHidden},storeId={StoreId})", showHidden, storeId);
             return query;
         }, cache => cache.PrepareKeyForDefaultCache(NopDirectoryDefaults.CurrenciesAllCacheKey, showHidden));
 
@@ -115,6 +129,7 @@ public partial class CurrencyService : ICurrencyService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCurrencyAsync(Currency currency)
     {
+		_logger.LogDebug(">>> Entering InsertCurrencyAsync(currency={Currency})", currency);
         await _currencyRepository.InsertAsync(currency);
     }
 
@@ -125,6 +140,7 @@ public partial class CurrencyService : ICurrencyService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateCurrencyAsync(Currency currency)
     {
+		_logger.LogDebug(">>> Entering UpdateCurrencyAsync(currency={Currency})", currency);
         await _currencyRepository.UpdateAsync(currency);
     }
 
@@ -142,12 +158,14 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<IList<ExchangeRate>> GetCurrencyLiveRatesAsync(string currencyCode = null)
     {
+		_logger.LogDebug(">>> Entering GetCurrencyLiveRatesAsync(currencyCode={CurrencyCode})", currencyCode);
         var exchangeRateProvider = await _exchangeRatePluginManager.LoadPrimaryPluginAsync()
                                    ?? throw new Exception("Active exchange rate provider cannot be loaded");
 
         currencyCode ??= (await GetCurrencyByIdAsync(_currencySettings.PrimaryExchangeRateCurrencyId))?.CurrencyCode
                          ?? throw new NopException("Primary exchange rate currency is not set");
 
+		_logger.LogDebug("<<< Exiting GetCurrencyLiveRatesAsync(currencyCode={CurrencyCode})", currencyCode);
         return await exchangeRateProvider.GetCurrencyLiveRatesAsync(currencyCode);
     }
 
@@ -159,6 +177,7 @@ public partial class CurrencyService : ICurrencyService
     /// <returns>Converted value</returns>
     public virtual decimal ConvertCurrency(decimal amount, decimal exchangeRate)
     {
+		_logger.LogDebug(">>> Entering ConvertCurrency(amount={Amount},exchangeRate={ExchangeRate})", amount, exchangeRate);
         if (amount != decimal.Zero && exchangeRate != decimal.Zero)
             return amount * exchangeRate;
 
@@ -176,11 +195,15 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<decimal> ConvertToPrimaryStoreCurrencyAsync(decimal amount, Currency sourceCurrencyCode)
     {
+		_logger.LogDebug(">>> Entering ConvertToPrimaryStoreCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode})", amount, sourceCurrencyCode);
         ArgumentNullException.ThrowIfNull(sourceCurrencyCode);
 
         var primaryStoreCurrency = await GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogDebug("ConvertToPrimaryStoreCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode}): primaryStoreCurrency → {PrimaryStoreCurrency}", amount, sourceCurrencyCode, primaryStoreCurrency);
         var result = await ConvertCurrencyAsync(amount, sourceCurrencyCode, primaryStoreCurrency);
+		_logger.LogDebug("ConvertToPrimaryStoreCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode}): result → {Result}", amount, sourceCurrencyCode, result);
 
+		_logger.LogDebug("<<< Exiting ConvertToPrimaryStoreCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode})", amount, sourceCurrencyCode);
         return result;
     }
 
@@ -195,9 +218,15 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<decimal> ConvertFromPrimaryStoreCurrencyAsync(decimal amount, Currency targetCurrencyCode)
     {
+		_logger.LogDebug(">>> Entering ConvertFromPrimaryStoreCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode})", amount, targetCurrencyCode);
         var primaryStoreCurrency = await GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
         var result = await ConvertCurrencyAsync(amount, primaryStoreCurrency, targetCurrencyCode);
+		_logger.LogDebug("ConvertFromPrimaryStoreCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode}): result → {Result}", amount, targetCurrencyCode, result);
+		_logger.LogDebug("ConvertFromPrimaryStoreCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode}): primaryStoreCurrency → {PrimaryStoreCurrency}", amount, targetCurrencyCode, primaryStoreCurrency);
 
+		_logger.LogDebug("<<< Exiting ConvertFromPrimaryStoreCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode})", amount, targetCurrencyCode);
+		_logger.LogDebug(">>> Entering ConvertCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode},targetCurrencyCode={TargetCurrencyCode})", amount, sourceCurrencyCode, targetCurrencyCode);
+		_logger.LogDebug("<<< Exiting ConvertCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode},targetCurrencyCode={TargetCurrencyCode})", amount, sourceCurrencyCode, targetCurrencyCode);
         return result;
     }
 
@@ -218,6 +247,7 @@ public partial class CurrencyService : ICurrencyService
         ArgumentNullException.ThrowIfNull(targetCurrencyCode);
 
         var result = amount;
+		_logger.LogDebug("ConvertCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode},targetCurrencyCode={TargetCurrencyCode}): result → {Result}", amount, sourceCurrencyCode, targetCurrencyCode, result);
 
         if (result == decimal.Zero || sourceCurrencyCode.Id == targetCurrencyCode.Id)
             return result;
@@ -238,19 +268,24 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<decimal> ConvertToPrimaryExchangeRateCurrencyAsync(decimal amount, Currency sourceCurrencyCode)
     {
+		_logger.LogDebug(">>> Entering ConvertToPrimaryExchangeRateCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode})", amount, sourceCurrencyCode);
         ArgumentNullException.ThrowIfNull(sourceCurrencyCode);
 
         var primaryExchangeRateCurrency = await GetCurrencyByIdAsync(_currencySettings.PrimaryExchangeRateCurrencyId) ?? throw new Exception("Primary exchange rate currency cannot be loaded");
+		_logger.LogDebug("ConvertToPrimaryExchangeRateCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode}): primaryExchangeRateCurrency → {PrimaryExchangeRateCurrency}", amount, sourceCurrencyCode, primaryExchangeRateCurrency);
 
         var result = amount;
+		_logger.LogDebug("ConvertToPrimaryExchangeRateCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode}): result → {Result}", amount, sourceCurrencyCode, result);
         if (result == decimal.Zero || sourceCurrencyCode.Id == primaryExchangeRateCurrency.Id)
             return result;
 
         var exchangeRate = sourceCurrencyCode.Rate;
         if (exchangeRate == decimal.Zero)
+			_logger.LogWarning("Throwing NopException from ConvertToPrimaryExchangeRateCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode})", amount, sourceCurrencyCode);
             throw new NopException($"Exchange rate not found for currency [{sourceCurrencyCode.Name}]");
         result /= exchangeRate;
 
+		_logger.LogDebug("<<< Exiting ConvertToPrimaryExchangeRateCurrencyAsync(amount={Amount},sourceCurrencyCode={SourceCurrencyCode})", amount, sourceCurrencyCode);
         return result;
     }
 
@@ -265,19 +300,24 @@ public partial class CurrencyService : ICurrencyService
     /// </returns>
     public virtual async Task<decimal> ConvertFromPrimaryExchangeRateCurrencyAsync(decimal amount, Currency targetCurrencyCode)
     {
+		_logger.LogDebug(">>> Entering ConvertFromPrimaryExchangeRateCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode})", amount, targetCurrencyCode);
         ArgumentNullException.ThrowIfNull(targetCurrencyCode);
 
         var primaryExchangeRateCurrency = await GetCurrencyByIdAsync(_currencySettings.PrimaryExchangeRateCurrencyId) ?? throw new Exception("Primary exchange rate currency cannot be loaded");
+		_logger.LogDebug("ConvertFromPrimaryExchangeRateCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode}): primaryExchangeRateCurrency → {PrimaryExchangeRateCurrency}", amount, targetCurrencyCode, primaryExchangeRateCurrency);
 
         var result = amount;
+		_logger.LogDebug("ConvertFromPrimaryExchangeRateCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode}): result → {Result}", amount, targetCurrencyCode, result);
         if (result == decimal.Zero || targetCurrencyCode.Id == primaryExchangeRateCurrency.Id)
             return result;
 
         var exchangeRate = targetCurrencyCode.Rate;
         if (exchangeRate == decimal.Zero)
+			_logger.LogWarning("Throwing NopException from ConvertFromPrimaryExchangeRateCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode})", amount, targetCurrencyCode);
             throw new NopException($"Exchange rate not found for currency [{targetCurrencyCode.Name}]");
         result *= exchangeRate;
 
+		_logger.LogDebug("<<< Exiting ConvertFromPrimaryExchangeRateCurrencyAsync(amount={Amount},targetCurrencyCode={TargetCurrencyCode})", amount, targetCurrencyCode);
         return result;
     }
 

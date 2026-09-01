@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Shipping;
 
@@ -8,12 +9,16 @@ namespace Nop.Web.Areas.Admin.Models.Shipping;
 /// </summary>
 public partial record ShippingMethodRestrictionModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ShippingMethodRestrictionModel()
     {
+		_logger.LogDebug(">>> Entering ShippingMethodRestrictionModel()");
         AvailableShippingMethods = new List<ShippingMethodModel>();
+		_logger.LogDebug("ShippingMethodRestrictionModel(): AvailableShippingMethods → {AvailableShippingMethods}", AvailableShippingMethods);
         AvailableCountries = new List<CountryModel>();
+		_logger.LogDebug("ShippingMethodRestrictionModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         Restricted = new Dictionary<int, IDictionary<int, bool>>();
     }
 

@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -10,13 +11,18 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductAttributeCombinationModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductAttributeCombinationModel()
     {
+		_logger.LogDebug(">>> Entering ProductAttributeCombinationModel()");
         ProductAttributes = new List<ProductAttributeModel>();
+		_logger.LogDebug("ProductAttributeCombinationModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
         ProductPictureModels = new List<ProductPictureModel>();
+		_logger.LogDebug("ProductAttributeCombinationModel(): ProductPictureModels → {ProductPictureModels}", ProductPictureModels);
         Warnings = new List<string>();
+		_logger.LogDebug("ProductAttributeCombinationModel(): Warnings → {Warnings}", Warnings);
         PictureIds = new List<int>();
     }
 
@@ -73,7 +79,9 @@ public partial record ProductAttributeCombinationModel : BaseNopEntityModel
     {
         public ProductAttributeModel()
         {
+			_logger.LogDebug(">>> Entering ProductAttributeModel()");
             Values = new List<ProductAttributeValueModel>();
+			_logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductAttributeId { get; set; }

@@ -15,6 +15,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -22,6 +23,7 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
     /// </summary>
     public ValidateHoneypotAttribute() : base(typeof(ValidateHoneypotFilter))
     {
+	_logger.LogDebug(">>> Entering ValidateHoneypotAttribute()");
     }
 
     #endregion
@@ -33,6 +35,7 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
     /// </summary>
     private class ValidateHoneypotFilter : IAsyncAuthorizationFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly ILocalizationService _localizationService;
@@ -50,8 +53,12 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
             SecuritySettings securitySettings)
         {
             _localizationService = localizationService;
+			_logger.LogDebug("ValidateHoneypotFilter(localizationService={LocalizationService},logger={Logger},webHelper={WebHelper},securitySettings={SecuritySettings}): _localizationService → {_localizationService}", localizationService, logger, webHelper, securitySettings, _localizationService);
             _logger = logger;
+			_logger.LogDebug(">>> Entering ValidateHoneypotFilter(localizationService={LocalizationService},logger={Logger},webHelper={WebHelper},securitySettings={SecuritySettings})", localizationService, logger, webHelper, securitySettings);
             _webHelper = webHelper;
+			_logger.LogDebug("ValidateHoneypotFilter(localizationService={LocalizationService},logger={Logger},webHelper={WebHelper},securitySettings={SecuritySettings}): _webHelper → {_webHelper}", localizationService, logger, webHelper, securitySettings, _webHelper);
+			_logger.LogDebug("<<< Exiting ValidateHoneypotFilter(localizationService={LocalizationService},logger={Logger},webHelper={WebHelper},securitySettings={SecuritySettings})", localizationService, logger, webHelper, securitySettings);
             _securitySettings = securitySettings;
         }
 
@@ -66,6 +73,7 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidateHoneypotAsync(AuthorizationFilterContext context)
         {
+			_logger.LogDebug(">>> Entering ValidateHoneypotAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -77,6 +85,7 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
 
             //try get honeypot input value 
             var inputValue = await context.HttpContext.Request.GetFormValueAsync(_securitySettings.HoneypotInputName);
+			_logger.LogDebug("ValidateHoneypotAsync(context={Context}): inputValue → {InputValue}", context, inputValue);
 
             //if exists, bot is caught
             if (!StringValues.IsNullOrEmpty(inputValue))
@@ -87,8 +96,10 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
 
                 //and redirect to the original page
                 var page = _webHelper.GetThisPageUrl(true);
+				_logger.LogDebug("ValidateHoneypotAsync(context={Context}): page → {Page}", context, page);
                 context.Result = new RedirectResult(page);
             }
+			_logger.LogDebug("<<< Exiting ValidateHoneypotAsync(context={Context})", context);
         }
 
         #endregion
@@ -102,7 +113,9 @@ public sealed class ValidateHoneypotAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await ValidateHoneypotAsync(context);
+			_logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

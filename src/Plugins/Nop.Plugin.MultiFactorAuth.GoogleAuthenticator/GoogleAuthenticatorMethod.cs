@@ -5,6 +5,7 @@ using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator;
 
@@ -13,6 +14,7 @@ namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator;
 /// </summary>
 public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationMethod
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -29,9 +31,13 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
         ISettingService settingService,
         IStoreContext storeContext)
     {
+		_logger.LogDebug(">>> Entering GoogleAuthenticatorMethod(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},storeContext={StoreContext})", localizationService, nopUrlHelper, settingService, storeContext);
         _localizationService = localizationService;
+		_logger.LogDebug("GoogleAuthenticatorMethod(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},storeContext={StoreContext}): _localizationService → {_localizationService}", localizationService, nopUrlHelper, settingService, storeContext, _localizationService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("GoogleAuthenticatorMethod(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},storeContext={StoreContext}): _nopUrlHelper → {_nopUrlHelper}", localizationService, nopUrlHelper, settingService, storeContext, _nopUrlHelper);
         _settingService = settingService;
+		_logger.LogDebug("GoogleAuthenticatorMethod(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},storeContext={StoreContext}): _settingService → {_settingService}", localizationService, nopUrlHelper, settingService, storeContext, _settingService);
         _storeContext = storeContext;
     }
 
@@ -44,6 +50,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(GoogleAuthenticatorDefaults.ConfigurationRouteName);
     }
 
@@ -53,6 +60,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
     /// <returns>View component name</returns>
     public Type GetPublicViewComponent()
     {
+		_logger.LogDebug(">>> Entering GetPublicViewComponent()");
         return typeof(GAAuthenticationViewComponent);
     }
 
@@ -62,6 +70,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
     /// <returns>View component name</returns>
     public Type GetVerificationViewComponent()
     {
+		_logger.LogDebug(">>> Entering GetVerificationViewComponent()");
         return typeof(GAVerificationViewComponent);
     }
 
@@ -71,8 +80,10 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         //settings
+		_logger.LogDebug("InstallAsync(): store → {Store}", store);
         await _settingService.SaveSettingAsync(new GoogleAuthenticatorSettings
         {
             BusinessPrefix = store.Name,
@@ -113,6 +124,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -121,6 +133,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<GoogleAuthenticatorSettings>();
 
@@ -128,6 +141,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.MultiFactorAuth.GoogleAuthenticator");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     /// <summary>
@@ -136,6 +150,7 @@ public class GoogleAuthenticatorMethod : BasePlugin, IMultiFactorAuthenticationM
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetDescriptionAsync()
     {
+		_logger.LogDebug(">>> Entering GetDescriptionAsync()");
         return await _localizationService
             .GetResourceAsync(
                 "Plugins.MultiFactorAuth.GoogleAuthenticator.MultiFactorAuthenticationMethodDescription");

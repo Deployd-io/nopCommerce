@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.UI.Paging;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record CatalogProductsModel : BasePageableModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -91,12 +93,19 @@ public partial record CatalogProductsModel : BasePageableModel
 
     public CatalogProductsModel()
     {
+		_logger.LogDebug(">>> Entering CatalogProductsModel()");
         PriceRangeFilter = new PriceRangeFilterModel();
+		_logger.LogDebug("CatalogProductsModel(): PriceRangeFilter → {PriceRangeFilter}", PriceRangeFilter);
         SpecificationFilter = new SpecificationFilterModel();
+		_logger.LogDebug("CatalogProductsModel(): SpecificationFilter → {SpecificationFilter}", SpecificationFilter);
         ManufacturerFilter = new ManufacturerFilterModel();
+		_logger.LogDebug("CatalogProductsModel(): ManufacturerFilter → {ManufacturerFilter}", ManufacturerFilter);
         AvailableSortOptions = new List<SelectListItem>();
+		_logger.LogDebug("CatalogProductsModel(): AvailableSortOptions → {AvailableSortOptions}", AvailableSortOptions);
         AvailableViewModes = new List<SelectListItem>();
+		_logger.LogDebug("CatalogProductsModel(): AvailableViewModes → {AvailableViewModes}", AvailableViewModes);
         PageSizeOptions = new List<SelectListItem>();
+		_logger.LogDebug("CatalogProductsModel(): PageSizeOptions → {PageSizeOptions}", PageSizeOptions);
         Products = new List<ProductOverviewModel>();
     }
 

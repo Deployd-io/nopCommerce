@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Home;
 
@@ -7,11 +8,14 @@ namespace Nop.Web.Areas.Admin.Models.Home;
 /// </summary>
 public partial record NopCommerceNewsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NopCommerceNewsModel()
     {
+		_logger.LogDebug(">>> Entering NopCommerceNewsModel()");
         Items = new List<NopCommerceNewsDetailsModel>();
+		_logger.LogDebug("NopCommerceNewsModel(): Items → {Items}", Items);
     }
 
     #endregion

@@ -4,6 +4,7 @@ using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -14,26 +15,39 @@ public partial record CategoryModel : BaseNopEntityModel, IAclSupportedModel, ID
     ITranslationSupportedModel, ILocalizedModel<CategoryLocalizedModel>, IStoreMappingSupportedModel,
     IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CategoryModel()
     {
+		_logger.LogDebug(">>> Entering CategoryModel()");
         if (PageSize < 1)
         {
             PageSize = 5;
+			_logger.LogDebug("CategoryModel(): PageSize → {PageSize}", PageSize);
         }
+		_logger.LogDebug("<<< Exiting CategoryModel()");
 
         Locales = new List<CategoryLocalizedModel>();
         AvailableCategoryTemplates = new List<SelectListItem>();
         AvailableCategories = new List<SelectListItem>();
         AvailableDiscounts = new List<SelectListItem>();
         SelectedDiscountIds = new List<int>();
+		_logger.LogDebug("CategoryModel(): SelectedDiscountIds → {SelectedDiscountIds}", SelectedDiscountIds);
+		_logger.LogDebug("CategoryModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("CategoryModel(): AvailableCategoryTemplates → {AvailableCategoryTemplates}", AvailableCategoryTemplates);
+		_logger.LogDebug("CategoryModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
+		_logger.LogDebug("CategoryModel(): AvailableDiscounts → {AvailableDiscounts}", AvailableDiscounts);
 
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogDebug("CategoryModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogDebug("CategoryModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("CategoryModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("CategoryModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         CategoryProductSearchModel = new CategoryProductSearchModel();
     }

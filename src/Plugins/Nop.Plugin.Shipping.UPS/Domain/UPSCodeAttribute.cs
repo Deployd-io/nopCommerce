@@ -9,7 +9,9 @@ public class UPSCodeAttribute : Attribute
 
     public UPSCodeAttribute(string codeValue)
     {
+		logger.LogDebug(">>> Entering UPSCodeAttribute(codeValue={CodeValue})", codeValue);
         Code = codeValue;
+		logger.LogDebug("UPSCodeAttribute(codeValue={CodeValue}): Code → {Code}", codeValue, Code);
     }
 
     #endregion

@@ -1,14 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Nop.Web.Models.JsonLD;
 
 public partial record JsonLdForumTopicModel : JsonLdModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public JsonLdForumTopicModel()
     {
+		_logger.LogDebug(">>> Entering JsonLdForumTopicModel()");
         Comments = new List<JsonLdForumTopicCommentModel>();
+		_logger.LogDebug("JsonLdForumTopicModel(): Comments → {Comments}", Comments);
         InteractionStatistic = new List<JsonLdInteractionStatisticModel>();
     }
 

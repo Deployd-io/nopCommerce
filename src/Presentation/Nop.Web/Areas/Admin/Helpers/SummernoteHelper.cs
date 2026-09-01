@@ -2,6 +2,7 @@
 using Nop.Core.Caching;
 using Nop.Core.Infrastructure;
 using Nop.Web.Areas.Admin.Infrastructure.Cache;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Helpers;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Helpers;
 /// </summary>
 public partial class SummernoteHelper : ISummernoteHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly INopFileProvider _nopFileProvider;
     protected readonly IStaticCacheManager _staticCacheManager;
     protected readonly IWorkContext _workContext;
@@ -19,8 +21,11 @@ public partial class SummernoteHelper : ISummernoteHelper
         IStaticCacheManager staticCacheManager, 
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering SummernoteHelper(nopFileProvider={NopFileProvider},staticCacheManager={StaticCacheManager},workContext={WorkContext})", nopFileProvider, staticCacheManager, workContext);
         _nopFileProvider = nopFileProvider;
+		_logger.LogDebug("SummernoteHelper(nopFileProvider={NopFileProvider},staticCacheManager={StaticCacheManager},workContext={WorkContext}): _nopFileProvider → {_nopFileProvider}", nopFileProvider, staticCacheManager, workContext, _nopFileProvider);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("SummernoteHelper(nopFileProvider={NopFileProvider},staticCacheManager={StaticCacheManager},workContext={WorkContext}): _staticCacheManager → {_staticCacheManager}", nopFileProvider, staticCacheManager, workContext, _staticCacheManager);
         _workContext = workContext;
     }
 
@@ -33,8 +38,11 @@ public partial class SummernoteHelper : ISummernoteHelper
     /// </returns>
     public virtual async Task<string> GetRichEditorLanguageAsync()
     {
+		_logger.LogDebug(">>> Entering GetRichEditorLanguageAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var languageCulture = (await _workContext.GetWorkingLanguageAsync()).LanguageCulture;
 
+		_logger.LogDebug("GetRichEditorLanguageAsync(): languageCulture → {LanguageCulture}", languageCulture);
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.SummernoteLanguageKey,
             languageCulture);
 
@@ -46,5 +54,7 @@ public partial class SummernoteHelper : ISummernoteHelper
 
             return fileExists ? languageCulture : string.Empty;
         });
+		_logger.LogInformation("GetRichEditorLanguageAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetRichEditorLanguageAsync()");
     }
 }

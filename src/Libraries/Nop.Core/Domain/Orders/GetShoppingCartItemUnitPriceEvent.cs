@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Discounts;
 using Nop.Core.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Domain.Orders;
 
@@ -8,6 +9,7 @@ namespace Nop.Core.Domain.Orders;
 /// </summary>
 public partial class GetShoppingCartItemUnitPriceEvent : IStopProcessingEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -15,7 +17,9 @@ public partial class GetShoppingCartItemUnitPriceEvent : IStopProcessingEvent
     /// <param name="includeDiscounts">A value indicating whether include discounts or not for price computation</param>
     public GetShoppingCartItemUnitPriceEvent(ShoppingCartItem shoppingCartItem, bool includeDiscounts)
     {
+		_logger.LogDebug(">>> Entering GetShoppingCartItemUnitPriceEvent(shoppingCartItem=<redacted>,includeDiscounts={IncludeDiscounts})", includeDiscounts);
         ShoppingCartItem = shoppingCartItem;
+		_logger.LogDebug("GetShoppingCartItemUnitPriceEvent(shoppingCartItem=<redacted>,includeDiscounts={IncludeDiscounts}): ShoppingCartItem → {ShoppingCartItem1}", includeDiscounts, ShoppingCartItem);
         IncludeDiscounts = includeDiscounts;
     }
 

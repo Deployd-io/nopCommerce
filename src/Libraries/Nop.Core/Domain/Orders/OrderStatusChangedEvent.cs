@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Domain.Orders;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Domain.Orders;
 
 /// <summary>
 /// Order status changed event
 /// </summary>
 public partial class OrderStatusChangedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -12,7 +14,9 @@ public partial class OrderStatusChangedEvent
     /// <param name="previousOrderStatus">Previous order status</param>
     public OrderStatusChangedEvent(Order order, OrderStatus previousOrderStatus)
     {
+		_logger.LogDebug(">>> Entering OrderStatusChangedEvent(order={Order},previousOrderStatus={PreviousOrderStatus})", order, previousOrderStatus);
         Order = order;
+		_logger.LogDebug("OrderStatusChangedEvent(order={Order},previousOrderStatus={PreviousOrderStatus}): Order → {Order1}", order, previousOrderStatus, Order);
         PreviousOrderStatus = previousOrderStatus;
     }
 

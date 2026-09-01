@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ProductTemplateService : IProductTemplateService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<ProductTemplate> _productTemplateRepository;
@@ -18,7 +20,9 @@ public partial class ProductTemplateService : IProductTemplateService
 
     public ProductTemplateService(IRepository<ProductTemplate> productTemplateRepository)
     {
+		_logger.LogDebug(">>> Entering ProductTemplateService(productTemplateRepository={ProductTemplateRepository})", productTemplateRepository);
         _productTemplateRepository = productTemplateRepository;
+		_logger.LogDebug("ProductTemplateService(productTemplateRepository={ProductTemplateRepository}): _productTemplateRepository → {_productTemplateRepository}", productTemplateRepository, _productTemplateRepository);
     }
 
     #endregion
@@ -32,6 +36,7 @@ public partial class ProductTemplateService : IProductTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductTemplateAsync(ProductTemplate productTemplate)
     {
+		_logger.LogDebug(">>> Entering DeleteProductTemplateAsync(productTemplate={ProductTemplate})", productTemplate);
         await _productTemplateRepository.DeleteAsync(productTemplate);
     }
 
@@ -46,9 +51,12 @@ public partial class ProductTemplateService : IProductTemplateService
     {
         var templates = await _productTemplateRepository.GetAllAsync(query =>
         {
+			_logger.LogDebug(">>> Entering GetAllProductTemplatesAsync()");
             return from pt in query
                 orderby pt.DisplayOrder, pt.Id
                 select pt;
+			_logger.LogDebug("<<< Exiting GetAllProductTemplatesAsync()");
+				_logger.LogInformation("GetAllProductTemplatesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
         return templates;
@@ -64,6 +72,8 @@ public partial class ProductTemplateService : IProductTemplateService
     /// </returns>
     public virtual async Task<ProductTemplate> GetProductTemplateByIdAsync(int productTemplateId)
     {
+		_logger.LogDebug(">>> Entering GetProductTemplateByIdAsync(productTemplateId={ProductTemplateId})", productTemplateId);
+		_logger.LogInformation("GetProductTemplateByIdAsync(productTemplateId)={ProductTemplateId}: find query executing", productTemplateId);
         return await _productTemplateRepository.GetByIdAsync(productTemplateId, cache => default);
     }
 
@@ -74,6 +84,7 @@ public partial class ProductTemplateService : IProductTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductTemplateAsync(ProductTemplate productTemplate)
     {
+		_logger.LogDebug(">>> Entering InsertProductTemplateAsync(productTemplate={ProductTemplate})", productTemplate);
         await _productTemplateRepository.InsertAsync(productTemplate);
     }
 
@@ -84,6 +95,7 @@ public partial class ProductTemplateService : IProductTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductTemplateAsync(ProductTemplate productTemplate)
     {
+		_logger.LogDebug(">>> Entering UpdateProductTemplateAsync(productTemplate={ProductTemplate})", productTemplate);
         await _productTemplateRepository.UpdateAsync(productTemplate);
     }
 

@@ -18,6 +18,7 @@ namespace Nop.Web.Framework.Infrastructure;
 /// </summary>
 public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILogger _logger;
@@ -41,11 +42,18 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
         IThemeProvider themeProvider)
     {
         _logger = logger;
+		_logger.LogDebug(">>> Entering AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider})", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider);
         _migrationManager = migrationManager;
+		_logger.LogDebug("AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider}): _migrationManager → {_migrationManager}", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider, _migrationManager);
         _permissionService = permissionService;
         _pluginService = pluginService;
+		_logger.LogDebug("AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider}): _permissionService → {_permissionService}", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider, _permissionService);
+		_logger.LogDebug("AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider}): _pluginService → {_pluginService}", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider, _pluginService);
         _settingService = settingService;
         _taskScheduler = taskScheduler;
+		_logger.LogDebug("AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider}): _settingService → {_settingService}", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider, _settingService);
+		_logger.LogDebug("AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider}): _taskScheduler → {_taskScheduler}", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider, _taskScheduler);
+		_logger.LogDebug("<<< Exiting AppStartedConsumer(logger={Logger},migrationManager={MigrationManager},permissionService={PermissionService},pluginService={PluginService},settingService={SettingService},taskScheduler={TaskScheduler},themeProvider={ThemeProvider})", logger, migrationManager, permissionService, pluginService, settingService, taskScheduler, themeProvider);
         _themeProvider = themeProvider;
     }
 
@@ -60,6 +68,7 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(AppStartedEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -78,6 +87,7 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
 
         //update nopCommerce core and db
         var assembly = Assembly.GetAssembly(typeof(ApplicationBuilderExtensions));
+		_logger.LogDebug("HandleEventAsync(eventMessage={EventMessage}): assembly → {Assembly}", eventMessage, assembly);
         _migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
         assembly = Assembly.GetAssembly(typeof(IMigrationManager));
         _migrationManager.ApplyUpMigrations(assembly, MigrationProcessType.Update);
@@ -87,6 +97,7 @@ public partial class AppStartedConsumer : IConsumer<AppStartedEvent>
         await _taskScheduler.StartSchedulerAsync();
 
         await _settingService.TryGetLicenseAsync();
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

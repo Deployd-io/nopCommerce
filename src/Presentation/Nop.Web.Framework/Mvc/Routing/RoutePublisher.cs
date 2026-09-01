@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Routing;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Routing;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Framework.Mvc.Routing;
 /// </summary>
 public partial class RoutePublisher : IRoutePublisher
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     /// <summary>
@@ -25,7 +27,9 @@ public partial class RoutePublisher : IRoutePublisher
     /// <param name="typeFinder">Type finder</param>
     public RoutePublisher(ITypeFinder typeFinder)
     {
+		_logger.LogDebug(">>> Entering RoutePublisher(typeFinder={TypeFinder})", typeFinder);
         _typeFinder = typeFinder;
+		_logger.LogDebug("RoutePublisher(typeFinder={TypeFinder}): _typeFinder → {_typeFinder}", typeFinder, _typeFinder);
     }
 
     #endregion
@@ -38,8 +42,10 @@ public partial class RoutePublisher : IRoutePublisher
     /// <param name="endpointRouteBuilder">Route builder</param>
     public virtual void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		_logger.LogDebug(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         //find route providers provided by other assemblies
         var routeProviders = _typeFinder.FindClassesOfType<IRouteProvider>();
+		_logger.LogDebug("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): routeProviders → {RouteProviders}", endpointRouteBuilder, routeProviders);
 
         //create and sort instances of route providers
         var instances = routeProviders
@@ -49,6 +55,7 @@ public partial class RoutePublisher : IRoutePublisher
         //register all provided routes
         foreach (var routeProvider in instances)
             routeProvider.RegisterRoutes(endpointRouteBuilder);
+			_logger.LogDebug("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     #endregion

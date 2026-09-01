@@ -1,5 +1,6 @@
 ﻿using Nop.Core.ComponentModel;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping;
 
@@ -8,6 +9,7 @@ namespace Nop.Data.Mapping;
 /// </summary>
 public static partial class NameCompatibilityManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private static readonly Dictionary<Type, string> _tableNames = new();
@@ -22,6 +24,7 @@ public static partial class NameCompatibilityManager
 
     private static void Initialize()
     {
+		_logger.LogDebug(">>> Entering Initialize()");
         //perform with locked access to resources
         using (new ReaderWriteLockDisposable(_locker))
         {
@@ -29,8 +32,10 @@ public static partial class NameCompatibilityManager
                 return;
 
             var typeFinder = Singleton<ITypeFinder>.Instance;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var compatibilities = typeFinder.FindClassesOfType<INameCompatibility>()
                 ?.Select(type => EngineContext.Current.ResolveUnregistered(type) as INameCompatibility).ToList() ?? new List<INameCompatibility>();
+				_logger.LogInformation("Initialize(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
             compatibilities.AddRange(AdditionalNameCompatibilities.Select(type => EngineContext.Current.ResolveUnregistered(type) as INameCompatibility));
 
@@ -52,6 +57,7 @@ public static partial class NameCompatibilityManager
 
             _isInitialized = true;
         }
+		_logger.LogDebug("<<< Exiting Initialize()");
     }
 
     #endregion
@@ -65,9 +71,11 @@ public static partial class NameCompatibilityManager
     /// <returns>Table name</returns>
     public static string GetTableName(Type type)
     {
+		_logger.LogDebug(">>> Entering GetTableName(type={Type})", type);
         if (!_isInitialized)
             Initialize();
 
+		_logger.LogDebug("<<< Exiting GetTableName(type={Type})", type);
         return _tableNames.TryGetValue(type, out var value) ? value : type.Name;
     }
 
@@ -79,9 +87,11 @@ public static partial class NameCompatibilityManager
     /// <returns>Column name</returns>
     public static string GetColumnName(Type type, string propertyName)
     {
+		_logger.LogDebug(">>> Entering GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
         if (!_isInitialized)
             Initialize();
 
+		_logger.LogDebug("<<< Exiting GetColumnName(type={Type},propertyName={PropertyName})", type, propertyName);
         return _columnName.ContainsKey((type, propertyName)) ? _columnName[(type, propertyName)] : propertyName;
     }
 

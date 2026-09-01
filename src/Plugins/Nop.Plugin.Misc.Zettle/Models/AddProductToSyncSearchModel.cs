@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Models;
 
@@ -9,14 +10,20 @@ namespace Nop.Plugin.Misc.Zettle.Models;
 /// </summary>
 public record AddProductToSyncSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToSyncSearchModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToSyncSearchModel()");
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToSyncSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToSyncSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToSyncSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToSyncSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
     }
 

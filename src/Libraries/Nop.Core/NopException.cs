@@ -1,15 +1,19 @@
-﻿namespace Nop.Core;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core;
 
 /// <summary>
 /// Represents errors that occur during application execution
 /// </summary>
 public partial class NopException : Exception
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Initializes a new instance of the Exception class.
     /// </summary>
     public NopException()
     {
+	_logger.LogDebug(">>> Entering NopException()");
+	_logger.LogDebug("<<< Exiting NopException(message={Message})", message);
     }
 
     /// <summary>
@@ -19,6 +23,7 @@ public partial class NopException : Exception
     public NopException(string message)
         : base(message)
     {
+		_logger.LogDebug("<<< Exiting NopException(message={Message})", message);
     }
 
     /// <summary>

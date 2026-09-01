@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<VendorAttribute, VendorAttributeValue> _vendorAttributeService;
@@ -27,8 +29,11 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
         ILocalizationService localizationService,
         ILocalizedModelFactory localizedModelFactory)
     {
+		_logger.LogDebug(">>> Entering VendorAttributeModelFactory(vendorAttributeService={VendorAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory})", vendorAttributeService, localizationService, localizedModelFactory);
         _vendorAttributeService = vendorAttributeService;
+		_logger.LogDebug("VendorAttributeModelFactory(vendorAttributeService={VendorAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory}): _vendorAttributeService → {_vendorAttributeService}", vendorAttributeService, localizationService, localizedModelFactory, _vendorAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("VendorAttributeModelFactory(vendorAttributeService={VendorAttributeService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory}): _localizationService → {_localizationService}", vendorAttributeService, localizationService, localizedModelFactory, _localizationService);
         _localizedModelFactory = localizedModelFactory;
     }
 
@@ -45,15 +50,18 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     protected virtual VendorAttributeValueSearchModel PrepareVendorAttributeValueSearchModel(VendorAttributeValueSearchModel searchModel,
         VendorAttribute vendorAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeValueSearchModel(searchModel={SearchModel},vendorAttribute={VendorAttribute})", searchModel, vendorAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(vendorAttribute);
 
         searchModel.VendorAttributeId = vendorAttribute.Id;
+		_logger.LogDebug("PrepareVendorAttributeValueSearchModel(searchModel={SearchModel},vendorAttribute={VendorAttribute}): searchModel.VendorAttributeId → {Arg2}", searchModel, vendorAttribute, searchModel.VendorAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeValueSearchModel(searchModel={SearchModel},vendorAttribute={VendorAttribute})", searchModel, vendorAttribute);
         return searchModel;
     }
 
@@ -71,11 +79,13 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     /// </returns>
     public virtual Task<VendorAttributeSearchModel> PrepareVendorAttributeSearchModelAsync(VendorAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -89,10 +99,12 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     /// </returns>
     public virtual async Task<VendorAttributeListModel> PrepareVendorAttributeListModelAsync(VendorAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get vendor attributes
         var vendorAttributes = (await _vendorAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareVendorAttributeListModelAsync(searchModel={SearchModel}): vendorAttributes → {VendorAttributes}", searchModel, vendorAttributes);
 
         //prepare list model
         var model = await new VendorAttributeListModel().PrepareToGridAsync(searchModel, vendorAttributes, () =>
@@ -101,6 +113,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
             {
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<VendorAttributeModel>();
+				_logger.LogDebug("PrepareVendorAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
 
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
@@ -109,6 +122,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -125,6 +139,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     public virtual async Task<VendorAttributeModel> PrepareVendorAttributeModelAsync(VendorAttributeModel model,
         VendorAttribute vendorAttribute, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeModelAsync(model={Model},vendorAttribute={VendorAttribute},excludeProperties={ExcludeProperties})", model, vendorAttribute, excludeProperties);
         Func<VendorAttributeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (vendorAttribute != null)
@@ -146,6 +161,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeModelAsync(model={Model},vendorAttribute={VendorAttribute},excludeProperties={ExcludeProperties})", model, vendorAttribute, excludeProperties);
         return model;
     }
 
@@ -161,17 +177,20 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     public virtual async Task<VendorAttributeValueListModel> PrepareVendorAttributeValueListModelAsync(VendorAttributeValueSearchModel searchModel,
         VendorAttribute vendorAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeValueListModelAsync(searchModel={SearchModel},vendorAttribute={VendorAttribute})", searchModel, vendorAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(vendorAttribute);
 
         //get vendor attribute values
         var vendorAttributeValues = (await _vendorAttributeService.GetAttributeValuesAsync(vendorAttribute.Id)).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareVendorAttributeValueListModelAsync(searchModel={SearchModel},vendorAttribute={VendorAttribute}): vendorAttributeValues → {VendorAttributeValues}", searchModel, vendorAttribute, vendorAttributeValues);
 
         //prepare list model
         var model = new VendorAttributeValueListModel().PrepareToGrid(searchModel, vendorAttributeValues, () =>
         {
             //fill in model values from the entity
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeValueListModelAsync(searchModel={SearchModel},vendorAttribute={VendorAttribute})", searchModel, vendorAttribute);
             return vendorAttributeValues.Select(value => value.ToModel<VendorAttributeValueModel>());
         });
 
@@ -192,6 +211,7 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
     public virtual async Task<VendorAttributeValueModel> PrepareVendorAttributeValueModelAsync(VendorAttributeValueModel model,
         VendorAttribute vendorAttribute, VendorAttributeValue vendorAttributeValue, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareVendorAttributeValueModelAsync(model={Model},vendorAttribute={VendorAttribute},vendorAttributeValue={VendorAttributeValue},excludeProperties={ExcludeProperties})", model, vendorAttribute, vendorAttributeValue, excludeProperties);
         ArgumentNullException.ThrowIfNull(vendorAttribute);
 
         Func<VendorAttributeValueLocalizedModel, int, Task> localizedModelConfiguration = null;
@@ -209,11 +229,13 @@ public partial class VendorAttributeModelFactory : IVendorAttributeModelFactory
         }
 
         model.AttributeId = vendorAttribute.Id;
+		_logger.LogDebug("PrepareVendorAttributeValueModelAsync(model={Model},vendorAttribute={VendorAttribute},vendorAttributeValue={VendorAttributeValue},excludeProperties={ExcludeProperties}): model.AttributeId → {Arg4}", model, vendorAttribute, vendorAttributeValue, excludeProperties, model.AttributeId);
 
         //prepare localized models
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareVendorAttributeValueModelAsync(model={Model},vendorAttribute={VendorAttribute},vendorAttributeValue={VendorAttributeValue},excludeProperties={ExcludeProperties})", model, vendorAttribute, vendorAttributeValue, excludeProperties);
         return model;
     }
 

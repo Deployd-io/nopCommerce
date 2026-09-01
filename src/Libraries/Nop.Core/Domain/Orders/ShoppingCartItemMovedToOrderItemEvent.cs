@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Domain.Orders;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Domain.Orders;
 
 /// <summary>
 /// Order item created by shopping cart item event
 /// </summary>
 public partial class ShoppingCartItemMovedToOrderItemEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -12,7 +14,9 @@ public partial class ShoppingCartItemMovedToOrderItemEvent
     /// <param name="shoppingCartItem">Shopping cart item</param>
     public ShoppingCartItemMovedToOrderItemEvent(ShoppingCartItem shoppingCartItem, OrderItem orderItem)
     {
+		_logger.LogDebug(">>> Entering ShoppingCartItemMovedToOrderItemEvent(shoppingCartItem=<redacted>,orderItem={OrderItem})", orderItem);
         ShoppingCartItem = shoppingCartItem;
+		_logger.LogDebug("ShoppingCartItemMovedToOrderItemEvent(shoppingCartItem=<redacted>,orderItem={OrderItem}): ShoppingCartItem → {ShoppingCartItem1}", orderItem, ShoppingCartItem);
         OrderItem = orderItem;
     }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Plugins;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Plugins;
 /// </summary>
 public partial record PluginSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PluginSearchModel()
     {
+		_logger.LogDebug(">>> Entering PluginSearchModel()");
         AvailableLoadModes = new List<SelectListItem>();
+		_logger.LogDebug("PluginSearchModel(): AvailableLoadModes → {AvailableLoadModes}", AvailableLoadModes);
         AvailableGroups = new List<SelectListItem>();
     }
 

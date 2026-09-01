@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -10,13 +11,18 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record ShipmentSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ShipmentSearchModel()
     {
+		_logger.LogDebug(">>> Entering ShipmentSearchModel()");
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogDebug("ShipmentSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
+		_logger.LogDebug("ShipmentSearchModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogDebug("ShipmentSearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
         ShipmentItemSearchModel = new ShipmentItemSearchModel();
     }
 

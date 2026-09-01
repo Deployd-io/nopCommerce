@@ -1,10 +1,12 @@
-﻿namespace Nop.Services.Messages;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Services.Messages;
 
 /// <summary>
 /// Represents token
 /// </summary>
 public sealed partial class Token
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -14,6 +16,9 @@ public sealed partial class Token
     /// <param name="value">Value</param>
     public Token(string key, object value) : this(key, value, false)
     {
+	_logger.LogDebug(">>> Entering Token(key={Key},value={Value})", key, value);
+	_logger.LogDebug(">>> Entering Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded})", key, value, neverHtmlEncoded);
+	_logger.LogDebug("<<< Exiting Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded})", key, value, neverHtmlEncoded);
     }
 
     /// <summary>
@@ -25,8 +30,11 @@ public sealed partial class Token
     public Token(string key, object value, bool neverHtmlEncoded)
     {
         Key = key;
+		_logger.LogDebug("<<< Exiting Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded})", key, value, neverHtmlEncoded);
+		_logger.LogWarning("Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded}): Key → {Key1}", key, value, neverHtmlEncoded, Key);
         Value = value;
         NeverHtmlEncoded = neverHtmlEncoded;
+		_logger.LogDebug("Token(key={Key},value={Value},neverHtmlEncoded={NeverHtmlEncoded}): Value → {Value1}", key, value, neverHtmlEncoded, Value);
     }
 
     #endregion
@@ -58,6 +66,7 @@ public sealed partial class Token
     /// <returns>String value</returns>
     public override string ToString()
     {
+		_logger.LogDebug(">>> Entering ToString()");
         return $"{Key}: {Value}";
     }
 

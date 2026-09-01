@@ -5,17 +5,21 @@ using Nop.Core.Domain.Logging;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Vendors;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo440;
 
 [NopUpdateMigration("2020-06-10 00:00:00", "4.40", UpdateMigrationType.Data)]
 public class DataMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly INopDataProvider _dataProvider;
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		_logger.LogDebug(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
     }
 
     /// <summary>
@@ -23,6 +27,7 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         // new permission
         if (!_dataProvider.GetTable<PermissionRecord>().Any(pr => string.Compare(pr.SystemName, "AccessProfiling", StringComparison.InvariantCultureIgnoreCase) == 0))
         {
@@ -50,6 +55,7 @@ public class DataMigration : Migration
         }
 
         var activityLogTypeTable = _dataProvider.GetTable<ActivityLogType>();
+		_logger.LogDebug("Up(): activityLogTypeTable → {ActivityLogTypeTable}", activityLogTypeTable);
 
         if (!activityLogTypeTable.Any(alt => string.Compare(alt.SystemKeyword, "AddNewSpecAttributeGroup", StringComparison.InvariantCultureIgnoreCase) == 0))
             _dataProvider.InsertEntity(
@@ -109,12 +115,16 @@ public class DataMigration : Migration
 
         //issue-3852
         var tableName = nameof(RewardPointsHistory);
+		_logger.LogDebug("Up(): tableName → {TableName}", tableName);
         var rph = Schema.Table(tableName);
+		_logger.LogDebug("Up(): rph → {Rph}", rph);
         var columnName = "UsedWithOrder_Id";
+		_logger.LogDebug("Up(): columnName → {ColumnName}", columnName);
 
         if (rph.Column(columnName).Exists())
         {
             var constraintName = "RewardPointsHistory_UsedWithOrder";
+			_logger.LogDebug("Up(): constraintName → {ConstraintName}", constraintName);
 
             if (rph.Constraint(constraintName).Exists())
                 Delete.UniqueConstraint(constraintName).FromTable(tableName);
@@ -124,6 +134,7 @@ public class DataMigration : Migration
 
         //#3353
         var productAttributeCombinationTableName = NameCompatibilityManager.GetTableName(typeof(ProductAttributeCombination));
+		_logger.LogDebug("Up(): productAttributeCombinationTableName → {ProductAttributeCombinationTableName}", productAttributeCombinationTableName);
 
         //add column
         if (!Schema.Table(productAttributeCombinationTableName).Column(nameof(ProductAttributeCombination.MinStockQuantity)).Exists())
@@ -134,11 +145,15 @@ public class DataMigration : Migration
 
         //#276 AJAX filters
         var categoryTableName = NameCompatibilityManager.GetTableName(typeof(Category));
+		_logger.LogDebug("Up(): categoryTableName → {CategoryTableName}", categoryTableName);
         var manufacturerTableName = NameCompatibilityManager.GetTableName(typeof(Manufacturer));
+		_logger.LogDebug("Up(): manufacturerTableName → {ManufacturerTableName}", manufacturerTableName);
         var vendorTableName = NameCompatibilityManager.GetTableName(typeof(Vendor));
+		_logger.LogDebug("Up(): vendorTableName → {VendorTableName}", vendorTableName);
 
         //remove column
         var priceRangesColumnName = "PriceRanges";
+		_logger.LogDebug("Up(): priceRangesColumnName → {PriceRangesColumnName}", priceRangesColumnName);
 
         if (Schema.Table(categoryTableName).Column(priceRangesColumnName).Exists())
             Delete.Column(priceRangesColumnName).FromTable(categoryTableName);
@@ -148,6 +163,7 @@ public class DataMigration : Migration
 
         //add column
         var priceRangeFilteringColumnName = "PriceRangeFiltering";
+		_logger.LogDebug("Up(): priceRangeFilteringColumnName → {PriceRangeFilteringColumnName}", priceRangeFilteringColumnName);
 
         if (!Schema.Table(categoryTableName).Column(priceRangeFilteringColumnName).Exists())
         {
@@ -169,6 +185,7 @@ public class DataMigration : Migration
 
         //add column
         var priceFromColumnName = "PriceFrom";
+		_logger.LogDebug("Up(): priceFromColumnName → {PriceFromColumnName}", priceFromColumnName);
 
         if (!Schema.Table(categoryTableName).Column(priceFromColumnName).Exists())
         {
@@ -190,6 +207,7 @@ public class DataMigration : Migration
 
         //add column
         var priceToColumnName = "PriceTo";
+		_logger.LogDebug("Up(): priceToColumnName → {PriceToColumnName}", priceToColumnName);
 
         if (!Schema.Table(categoryTableName).Column(priceToColumnName).Exists())
         {
@@ -211,6 +229,7 @@ public class DataMigration : Migration
 
         //add column
         var manuallyPriceRangeColumnName = "ManuallyPriceRange";
+		_logger.LogDebug("Up(): manuallyPriceRangeColumnName → {ManuallyPriceRangeColumnName}", manuallyPriceRangeColumnName);
 
         if (!Schema.Table(categoryTableName).Column(manuallyPriceRangeColumnName).Exists())
         {
@@ -229,10 +248,13 @@ public class DataMigration : Migration
             Alter.Table(vendorTableName)
                 .AddColumn(manuallyPriceRangeColumnName).AsBoolean().NotNullable().SetExistingRowsTo(false);
         }
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 }

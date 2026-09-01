@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record GdprSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GdprSettingsModel()
     {
+		_logger.LogDebug(">>> Entering GdprSettingsModel()");
         GdprConsentSearchModel = new GdprConsentSearchModel();
+		_logger.LogDebug("GdprSettingsModel(): GdprConsentSearchModel → {GdprConsentSearchModel}", GdprConsentSearchModel);
     }
 
     #endregion

@@ -1,4 +1,5 @@
-﻿using Nop.Core.Configuration;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Customers;
 
@@ -7,12 +8,15 @@ namespace Nop.Core.Domain.Customers;
 /// </summary>
 public partial class ExternalAuthenticationSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Constructor
     /// </summary>
     public ExternalAuthenticationSettings()
     {
+		_logger.LogDebug(">>> Entering ExternalAuthenticationSettings()");
         ActiveAuthenticationMethodSystemNames = new List<string>();
+		_logger.LogDebug("ExternalAuthenticationSettings(): ActiveAuthenticationMethodSystemNames → {ActiveAuthenticationMethodSystemNames}", ActiveAuthenticationMethodSystemNames);
     }
 
     /// <summary>

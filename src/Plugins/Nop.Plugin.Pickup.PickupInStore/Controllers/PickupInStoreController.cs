@@ -15,6 +15,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Controllers;
 
@@ -23,6 +24,7 @@ namespace Nop.Plugin.Pickup.PickupInStore.Controllers;
 [AutoValidateAntiforgeryToken]
 public class PickupInStoreController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -49,15 +51,25 @@ public class PickupInStoreController : BasePluginController
         IStoreService storeService,
         AddressSettings customerSettings)
     {
+		_logger.LogDebug(">>> Entering PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings})", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings);
         _addressService = addressService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _addressService → {_addressService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _addressService);
         _countryService = countryService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _countryService → {_countryService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _countryService);
         _localizationService = localizationService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _localizationService → {_localizationService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _localizationService);
         _permissionService = permissionService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _permissionService → {_permissionService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _permissionService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _stateProvinceService → {_stateProvinceService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _stateProvinceService);
         _storePickupPointModelFactory = storePickupPointModelFactory;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _storePickupPointModelFactory → {_storePickupPointModelFactory}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _storePickupPointModelFactory);
         _storePickupPointService = storePickupPointService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _storePickupPointService → {_storePickupPointService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _storePickupPointService);
         _storeService = storeService;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _storeService → {_storeService}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _storeService);
         _addressSettings = customerSettings;
+		_logger.LogDebug("PickupInStoreController(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},permissionService={PermissionService},stateProvinceService={StateProvinceService},storePickupPointModelFactory={StorePickupPointModelFactory},storePickupPointService={StorePickupPointService},storeService={StoreService},customerSettings={CustomerSettings}): _addressSettings → {_addressSettings}", addressService, countryService, localizationService, permissionService, stateProvinceService, storePickupPointModelFactory, storePickupPointService, storeService, customerSettings, _addressSettings);
     }
 
     #endregion
@@ -67,9 +79,12 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //prepare model
         var model = await _storePickupPointModelFactory.PrepareStorePickupPointSearchModelAsync(new StorePickupPointSearchModel());
+		_logger.LogDebug("Configure(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Configure()");
         return View("~/Plugins/Pickup.PickupInStore/Views/Configure.cshtml", model);
     }
 
@@ -77,15 +92,19 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> List(StorePickupPointSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _storePickupPointModelFactory.PrepareStorePickupPointListModelAsync(searchModel);
+		_logger.LogDebug("List(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         var model = new StorePickupPointModel
         {
             Address = new AddressModel()
@@ -110,6 +129,8 @@ public class PickupInStoreController : BasePluginController
         foreach (var store in await _storeService.GetAllStoresAsync())
             model.AvailableStores.Add(new SelectListItem { Text = store.Name, Value = store.Id.ToString() });
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model})", model);
         return View("~/Plugins/Pickup.PickupInStore/Views/Create.cshtml", model);
     }
 
@@ -152,6 +173,7 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         var pickupPoint = await _storePickupPointService.GetStorePickupPointByIdAsync(id);
         if (pickupPoint == null)
             return RedirectToAction("Configure");
@@ -171,9 +193,11 @@ public class PickupInStoreController : BasePluginController
         };
 
         var address = await _addressService.GetAddressByIdAsync(pickupPoint.AddressId);
+		_logger.LogDebug("Edit(id={Id}): address → {Address}", id, address);
         if (address != null)
         {
             model.Address = new AddressModel
+			_logger.LogDebug("Edit(id={Id}): model.Address → {Arg1}", id, model.Address);
             {
                 Address1 = address.Address1,
                 City = address.City,
@@ -203,6 +227,8 @@ public class PickupInStoreController : BasePluginController
         foreach (var store in await _storeService.GetAllStoresAsync())
             model.AvailableStores.Add(new SelectListItem { Text = store.Name, Value = store.Id.ToString(), Selected = store.Id == model.StoreId });
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model})", model);
         return View("~/Plugins/Pickup.PickupInStore/Views/Edit.cshtml", model);
     }
 
@@ -250,16 +276,19 @@ public class PickupInStoreController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         var pickupPoint = await _storePickupPointService.GetStorePickupPointByIdAsync(id);
         if (pickupPoint == null)
             return RedirectToAction("Configure");
 
         var address = await _addressService.GetAddressByIdAsync(pickupPoint.AddressId);
+		_logger.LogDebug("Delete(id={Id}): address → {Address}", id, address);
         if (address != null)
             await _addressService.DeleteAddressAsync(address);
 
         await _storePickupPointService.DeleteStorePickupPointAsync(pickupPoint);
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return new NullJsonResult();
     }
 

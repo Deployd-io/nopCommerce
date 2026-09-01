@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class ReturnRequestService : IReturnRequestService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<ReturnRequest> _returnRequestRepository;
@@ -28,11 +30,17 @@ public partial class ReturnRequestService : IReturnRequestService
         IRepository<OrderItem> orderItemRepository,
         IRepository<Product> productRepository)
     {
+		_logger.LogDebug(">>> Entering ReturnRequestService(returnRequestRepository={ReturnRequestRepository},returnRequestActionRepository={ReturnRequestActionRepository},returnRequestReasonRepository={ReturnRequestReasonRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository})", returnRequestRepository, returnRequestActionRepository, returnRequestReasonRepository, orderItemRepository, productRepository);
         _returnRequestRepository = returnRequestRepository;
+		_logger.LogDebug("ReturnRequestService(returnRequestRepository={ReturnRequestRepository},returnRequestActionRepository={ReturnRequestActionRepository},returnRequestReasonRepository={ReturnRequestReasonRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository}): _returnRequestRepository → {_returnRequestRepository}", returnRequestRepository, returnRequestActionRepository, returnRequestReasonRepository, orderItemRepository, productRepository, _returnRequestRepository);
         _returnRequestActionRepository = returnRequestActionRepository;
+		_logger.LogDebug("ReturnRequestService(returnRequestRepository={ReturnRequestRepository},returnRequestActionRepository={ReturnRequestActionRepository},returnRequestReasonRepository={ReturnRequestReasonRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository}): _returnRequestActionRepository → {_returnRequestActionRepository}", returnRequestRepository, returnRequestActionRepository, returnRequestReasonRepository, orderItemRepository, productRepository, _returnRequestActionRepository);
         _returnRequestReasonRepository = returnRequestReasonRepository;
+		_logger.LogDebug("ReturnRequestService(returnRequestRepository={ReturnRequestRepository},returnRequestActionRepository={ReturnRequestActionRepository},returnRequestReasonRepository={ReturnRequestReasonRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository}): _returnRequestReasonRepository → {_returnRequestReasonRepository}", returnRequestRepository, returnRequestActionRepository, returnRequestReasonRepository, orderItemRepository, productRepository, _returnRequestReasonRepository);
         _orderItemRepository = orderItemRepository;
+		_logger.LogDebug("ReturnRequestService(returnRequestRepository={ReturnRequestRepository},returnRequestActionRepository={ReturnRequestActionRepository},returnRequestReasonRepository={ReturnRequestReasonRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository}): _orderItemRepository → {_orderItemRepository}", returnRequestRepository, returnRequestActionRepository, returnRequestReasonRepository, orderItemRepository, productRepository, _orderItemRepository);
         _productRepository = productRepository;
+		_logger.LogDebug("ReturnRequestService(returnRequestRepository={ReturnRequestRepository},returnRequestActionRepository={ReturnRequestActionRepository},returnRequestReasonRepository={ReturnRequestReasonRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository}): _productRepository → {_productRepository}", returnRequestRepository, returnRequestActionRepository, returnRequestReasonRepository, orderItemRepository, productRepository, _productRepository);
     }
 
     #endregion
@@ -46,6 +54,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReturnRequestAsync(ReturnRequest returnRequest)
     {
+		_logger.LogDebug(">>> Entering DeleteReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
         await _returnRequestRepository.DeleteAsync(returnRequest);
     }
 
@@ -59,6 +68,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<ReturnRequest> GetReturnRequestByIdAsync(int returnRequestId)
     {
+		_logger.LogDebug(">>> Entering GetReturnRequestByIdAsync(returnRequestId={ReturnRequestId})", returnRequestId);
         return await _returnRequestRepository.GetByIdAsync(returnRequestId);
     }
 
@@ -83,6 +93,7 @@ public partial class ReturnRequestService : IReturnRequestService
         int orderItemId = 0, string customNumber = "", ReturnRequestStatus? rs = null, DateTime? createdFromUtc = null,
         DateTime? createdToUtc = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
     {
+		_logger.LogDebug(">>> Entering SearchReturnRequestsAsync(storeId={StoreId},customerId={CustomerId},orderItemId={OrderItemId},customNumber={CustomNumber},rs={Rs},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", storeId, customerId, orderItemId, customNumber, rs, createdFromUtc, createdToUtc, pageIndex, pageSize, getOnlyTotalCount);
         var query = _returnRequestRepository.Table;
         if (storeId > 0)
             query = query.Where(rr => storeId == rr.StoreId);
@@ -91,6 +102,7 @@ public partial class ReturnRequestService : IReturnRequestService
         if (rs.HasValue)
         {
             var returnStatusId = (int)rs.Value;
+			_logger.LogDebug("SearchReturnRequestsAsync(storeId={StoreId},customerId={CustomerId},orderItemId={OrderItemId},customNumber={CustomNumber},rs={Rs},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): returnStatusId → {ReturnStatusId}", storeId, customerId, orderItemId, customNumber, rs, createdFromUtc, createdToUtc, pageIndex, pageSize, getOnlyTotalCount, returnStatusId);
             query = query.Where(rr => rr.ReturnRequestStatusId == returnStatusId);
         }
 
@@ -108,7 +120,9 @@ public partial class ReturnRequestService : IReturnRequestService
         query = query.OrderByDescending(rr => rr.CreatedOnUtc).ThenByDescending(rr => rr.Id);
 
         var returnRequests = await query.ToPagedListAsync(pageIndex, pageSize, getOnlyTotalCount);
+		_logger.LogDebug("SearchReturnRequestsAsync(storeId={StoreId},customerId={CustomerId},orderItemId={OrderItemId},customNumber={CustomNumber},rs={Rs},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): returnRequests → {ReturnRequests}", storeId, customerId, orderItemId, customNumber, rs, createdFromUtc, createdToUtc, pageIndex, pageSize, getOnlyTotalCount, returnRequests);
 
+		_logger.LogDebug("<<< Exiting SearchReturnRequestsAsync(storeId={StoreId},customerId={CustomerId},orderItemId={OrderItemId},customNumber={CustomNumber},rs={Rs},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", storeId, customerId, orderItemId, customNumber, rs, createdFromUtc, createdToUtc, pageIndex, pageSize, getOnlyTotalCount);
         return returnRequests;
     }
 
@@ -119,11 +133,14 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>The <see cref="Task"/> containing the <see cref="ReturnRequestAvailability"/></returns>
     public virtual async Task<ReturnRequestAvailability> GetReturnRequestAvailabilityAsync(int orderId)
     {
+		_logger.LogDebug(">>> Entering GetReturnRequestAvailabilityAsync(orderId={OrderId})", orderId);
         var result = new ReturnRequestAvailability();
 
+		_logger.LogDebug("GetReturnRequestAvailabilityAsync(orderId={OrderId}): result → {Result}", orderId, result);
         if (orderId > 0)
         {
             var cancelledStatusId = (int)ReturnRequestStatus.Cancelled;
+			_logger.LogDebug("GetReturnRequestAvailabilityAsync(orderId={OrderId}): cancelledStatusId → {CancelledStatusId}", orderId, cancelledStatusId);
             var requestedOrderItemsForReturn =
                 from rr in _returnRequestRepository.Table
                 where rr.ReturnRequestStatusId != cancelledStatusId
@@ -136,6 +153,7 @@ public partial class ReturnRequestService : IReturnRequestService
                     OrderItemId = g.Key.OrderItemId,
                     RequestedQuantityForReturn = g.Sum(rr => rr.Quantity)
                 };
+					_logger.LogDebug("GetReturnRequestAvailabilityAsync(orderId={OrderId}): OrderItemId → {OrderItemId}", orderId, OrderItemId);
 
             var query =
                 from oi in _orderItemRepository.Table
@@ -153,9 +171,12 @@ public partial class ReturnRequestService : IReturnRequestService
                     OrderItem = oi
                 };
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetReturnRequestAvailabilityAsync(orderId)={OrderId}: database query executed in {Arg1} ms", orderId, __logStart.ElapsedMilliseconds);
             result.ReturnableOrderItems = await query.ToListAsync();
         }
 
+		_logger.LogDebug("<<< Exiting GetReturnRequestAvailabilityAsync(orderId={OrderId})", orderId);
         return result;
     }
 
@@ -166,6 +187,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReturnRequestActionAsync(ReturnRequestAction returnRequestAction)
     {
+		_logger.LogDebug(">>> Entering DeleteReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
         await _returnRequestActionRepository.DeleteAsync(returnRequestAction);
     }
 
@@ -178,12 +200,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<IList<ReturnRequestAction>> GetAllReturnRequestActionsAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllReturnRequestActionsAsync()");
         return await _returnRequestActionRepository.GetAllAsync(query =>
         {
+			_logger.LogInformation("GetAllReturnRequestActionsAsync(): find query executing");
             return from rra in query
                 orderby rra.DisplayOrder, rra.Id
                 select rra;
         }, cache => default);
+		_logger.LogDebug("<<< Exiting GetAllReturnRequestActionsAsync()");
     }
 
     /// <summary>
@@ -196,6 +221,8 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<ReturnRequestAction> GetReturnRequestActionByIdAsync(int returnRequestActionId)
     {
+		_logger.LogDebug(">>> Entering GetReturnRequestActionByIdAsync(returnRequestActionId={ReturnRequestActionId})", returnRequestActionId);
+		_logger.LogInformation("GetReturnRequestActionByIdAsync(returnRequestActionId)={ReturnRequestActionId}: find query executing", returnRequestActionId);
         return await _returnRequestActionRepository.GetByIdAsync(returnRequestActionId, cache => default);
     }
 
@@ -206,6 +233,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReturnRequestAsync(ReturnRequest returnRequest)
     {
+		_logger.LogDebug(">>> Entering InsertReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
         await _returnRequestRepository.InsertAsync(returnRequest);
     }
 
@@ -216,6 +244,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReturnRequestActionAsync(ReturnRequestAction returnRequestAction)
     {
+		_logger.LogDebug(">>> Entering InsertReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
         await _returnRequestActionRepository.InsertAsync(returnRequestAction);
     }
 
@@ -226,6 +255,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReturnRequestAsync(ReturnRequest returnRequest)
     {
+		_logger.LogDebug(">>> Entering UpdateReturnRequestAsync(returnRequest={ReturnRequest})", returnRequest);
         await _returnRequestRepository.UpdateAsync(returnRequest);
     }
 
@@ -236,6 +266,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReturnRequestActionAsync(ReturnRequestAction returnRequestAction)
     {
+		_logger.LogDebug(">>> Entering UpdateReturnRequestActionAsync(returnRequestAction={ReturnRequestAction})", returnRequestAction);
         await _returnRequestActionRepository.UpdateAsync(returnRequestAction);
     }
 
@@ -246,6 +277,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteReturnRequestReasonAsync(ReturnRequestReason returnRequestReason)
     {
+		_logger.LogDebug(">>> Entering DeleteReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
         await _returnRequestReasonRepository.DeleteAsync(returnRequestReason);
     }
 
@@ -258,12 +290,15 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<IList<ReturnRequestReason>> GetAllReturnRequestReasonsAsync()
     {
+		_logger.LogDebug(">>> Entering GetAllReturnRequestReasonsAsync()");
         return await _returnRequestReasonRepository.GetAllAsync(query =>
         {
+			_logger.LogInformation("GetAllReturnRequestReasonsAsync(): find query executing");
             return from rra in query
                 orderby rra.DisplayOrder, rra.Id
                 select rra;
         }, cache => default);
+		_logger.LogDebug("<<< Exiting GetAllReturnRequestReasonsAsync()");
     }
 
     /// <summary>
@@ -276,6 +311,8 @@ public partial class ReturnRequestService : IReturnRequestService
     /// </returns>
     public virtual async Task<ReturnRequestReason> GetReturnRequestReasonByIdAsync(int returnRequestReasonId)
     {
+		_logger.LogDebug(">>> Entering GetReturnRequestReasonByIdAsync(returnRequestReasonId={ReturnRequestReasonId})", returnRequestReasonId);
+		_logger.LogInformation("GetReturnRequestReasonByIdAsync(returnRequestReasonId)={ReturnRequestReasonId}: find query executing", returnRequestReasonId);
         return await _returnRequestReasonRepository.GetByIdAsync(returnRequestReasonId, cache => default);
     }
 
@@ -286,6 +323,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertReturnRequestReasonAsync(ReturnRequestReason returnRequestReason)
     {
+		_logger.LogDebug(">>> Entering InsertReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
         await _returnRequestReasonRepository.InsertAsync(returnRequestReason);
     }
 
@@ -296,6 +334,7 @@ public partial class ReturnRequestService : IReturnRequestService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateReturnRequestReasonAsync(ReturnRequestReason returnRequestReason)
     {
+		_logger.LogDebug(">>> Entering UpdateReturnRequestReasonAsync(returnRequestReason={ReturnRequestReason})", returnRequestReason);
         await _returnRequestReasonRepository.UpdateAsync(returnRequestReason);
     }
 

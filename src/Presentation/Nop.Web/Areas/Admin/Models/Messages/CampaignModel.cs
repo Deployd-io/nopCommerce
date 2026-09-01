@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Messages;
 
@@ -10,14 +11,20 @@ namespace Nop.Web.Areas.Admin.Models.Messages;
 /// </summary>
 public partial record CampaignModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CampaignModel()
     {
+		_logger.LogDebug(">>> Entering CampaignModel()");
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("CampaignModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogDebug("CampaignModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         AvailableNewsLetterSubscriptionTypes = new List<SelectListItem>();
+		_logger.LogDebug("CampaignModel(): AvailableNewsLetterSubscriptionTypes → {AvailableNewsLetterSubscriptionTypes}", AvailableNewsLetterSubscriptionTypes);
         AvailableEmailAccounts = new List<SelectListItem>();
+		_logger.LogDebug("CampaignModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
         CopyCampaignModel = new CopyCampaignModel();
     }
 

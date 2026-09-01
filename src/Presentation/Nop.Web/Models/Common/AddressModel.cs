@@ -3,16 +3,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Common;
 
 public partial record AddressModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AddressModel()
     {
+		_logger.LogDebug(">>> Entering AddressModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
         CustomAddressAttributes = new List<AddressAttributeModel>();
+		_logger.LogDebug("AddressModel(): CustomAddressAttributes → {CustomAddressAttributes}", CustomAddressAttributes);
+		_logger.LogDebug("AddressModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AddressFields = new KeyValuePair<AddressField, string>[7];
     }
 
@@ -91,9 +96,15 @@ public partial record AddressModel : BaseNopEntityModel
 
     public Address ToEntity(Address destination = null)
     {
+		_logger.LogDebug(">>> Entering ToEntity(destination={Destination})", destination);
         destination ??= new Address();
         
         destination.Id = Id;
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.Id → {Arg1}", destination, destination.Id);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.FirstName → {Arg1}", destination, destination.FirstName);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.LastName → {Arg1}", destination, destination.LastName);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.Email → {Arg1}", destination, destination.Email);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.Company → {Arg1}", destination, destination.Company);
         destination.FirstName = FirstName;
         destination.LastName = LastName;
         destination.Email = Email;
@@ -101,6 +112,13 @@ public partial record AddressModel : BaseNopEntityModel
         destination.CountryId = CountryId == 0 ? null : CountryId;
         destination.StateProvinceId = StateProvinceId == 0 ? null : StateProvinceId;
         destination.County = County;
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.County → {Arg1}", destination, destination.County);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.City → {Arg1}", destination, destination.City);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.Address1 → {Arg1}", destination, destination.Address1);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.Address2 → {Arg1}", destination, destination.Address2);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.ZipPostalCode → {Arg1}", destination, destination.ZipPostalCode);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.PhoneNumber → {Arg1}", destination, destination.PhoneNumber);
+		_logger.LogDebug("ToEntity(destination={Destination}): destination.FaxNumber → {Arg1}", destination, destination.FaxNumber);
         destination.City = City;
         destination.Address1 = Address1;
         destination.Address2 = Address2;
@@ -108,6 +126,7 @@ public partial record AddressModel : BaseNopEntityModel
         destination.PhoneNumber = PhoneNumber;
         destination.FaxNumber = FaxNumber;
 
+		_logger.LogDebug("<<< Exiting ToEntity(destination={Destination})", destination);
         return destination;
     }
 }

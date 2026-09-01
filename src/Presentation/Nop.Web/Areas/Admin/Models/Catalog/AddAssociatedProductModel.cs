@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -7,11 +8,14 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record AddAssociatedProductModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddAssociatedProductModel()
     {
+		_logger.LogDebug(">>> Entering AddAssociatedProductModel()");
         SelectedProductIds = new List<int>();
+		_logger.LogDebug("AddAssociatedProductModel(): SelectedProductIds → {SelectedProductIds}", SelectedProductIds);
     }
     #endregion
 

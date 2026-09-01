@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 namespace Nop.Core.Domain.Directory;
 
 /// <summary>
@@ -5,12 +6,15 @@ namespace Nop.Core.Domain.Directory;
 /// </summary>
 public partial class ExchangeRate
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Creates a new instance of the ExchangeRate class
     /// </summary>
     public ExchangeRate()
     {
+		_logger.LogDebug(">>> Entering ExchangeRate()");
         CurrencyCode = string.Empty;
+		_logger.LogDebug("ExchangeRate(): CurrencyCode → {CurrencyCode}", CurrencyCode);
         Rate = 1.0m;
     }
 
@@ -35,6 +39,7 @@ public partial class ExchangeRate
     /// <returns></returns>
     public override string ToString()
     {
+		_logger.LogDebug(">>> Entering ToString()");
         return $"{CurrencyCode} {Rate}";
     }
 }

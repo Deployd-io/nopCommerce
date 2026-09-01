@@ -20,11 +20,13 @@ using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class VendorController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ForumSettings _forumSettings;
@@ -66,22 +68,39 @@ public partial class VendorController : BaseAdminController
         IVendorModelFactory vendorModelFactory,
         IVendorService vendorService)
     {
+		_logger.LogDebug(">>> Entering VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService})", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService);
         _forumSettings = forumSettings;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _forumSettings → {_forumSettings}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _forumSettings);
         _addressService = addressService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _addressService → {_addressService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _addressService);
         _addressAttributeParser = addressAttributeParser;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _addressAttributeParser → {_addressAttributeParser}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _addressAttributeParser);
         _vendorAttributeParser = vendorAttributeParser;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _vendorAttributeParser → {_vendorAttributeParser}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _vendorAttributeParser);
         _vendorAttributeService = vendorAttributeService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _vendorAttributeService → {_vendorAttributeService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _vendorAttributeService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _customerActivityService → {_customerActivityService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _customerActivityService);
         _customerService = customerService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _customerService → {_customerService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _customerService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _genericAttributeService → {_genericAttributeService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _localizationService → {_localizationService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _localizedEntityService → {_localizedEntityService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _notificationService → {_notificationService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _permissionService → {_permissionService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _permissionService);
         _pictureService = pictureService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _pictureService → {_pictureService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _pictureService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _urlRecordService → {_urlRecordService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _urlRecordService);
         _vendorModelFactory = vendorModelFactory;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _vendorModelFactory → {_vendorModelFactory}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _vendorModelFactory);
         _vendorService = vendorService;
+		_logger.LogDebug("VendorController(forumSettings={ForumSettings},addressService={AddressService},addressAttributeParser={AddressAttributeParser},vendorAttributeParser={VendorAttributeParser},vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},pictureService={PictureService},urlRecordService={UrlRecordService},vendorModelFactory={VendorModelFactory},vendorService={VendorService}): _vendorService → {_vendorService}", forumSettings, addressService, addressAttributeParser, vendorAttributeParser, vendorAttributeService, customerActivityService, customerService, genericAttributeService, localizationService, localizedEntityService, notificationService, permissionService, pictureService, urlRecordService, vendorModelFactory, vendorService, _vendorService);
     }
 
     #endregion
@@ -90,13 +109,16 @@ public partial class VendorController : BaseAdminController
 
     protected virtual async Task UpdatePictureSeoNamesAsync(Vendor vendor)
     {
+		_logger.LogDebug(">>> Entering UpdatePictureSeoNamesAsync(vendor={Vendor})", vendor);
         var picture = await _pictureService.GetPictureByIdAsync(vendor.PictureId);
         if (picture != null)
             await _pictureService.SetSeoFilenameAsync(picture.Id, await _pictureService.GetPictureSeNameAsync(vendor.Name));
+			_logger.LogDebug("<<< Exiting UpdatePictureSeoNamesAsync(vendor={Vendor})", vendor);
     }
 
     protected virtual async Task UpdateLocalesAsync(Vendor vendor, VendorModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalesAsync(vendor={Vendor},model={Model})", vendor, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(vendor,
@@ -126,19 +148,24 @@ public partial class VendorController : BaseAdminController
 
             //search engine name
             var seName = await _urlRecordService.ValidateSeNameAsync(vendor, localized.SeName, localized.Name, false);
+			_logger.LogDebug("UpdateLocalesAsync(vendor={Vendor},model={Model}): seName → {SeName}", vendor, model, seName);
             await _urlRecordService.SaveSlugAsync(vendor, seName, localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateLocalesAsync(vendor={Vendor},model={Model})", vendor, model);
     }
 
     protected virtual async Task<string> ParseVendorAttributesAsync(IFormCollection form)
     {
+		_logger.LogDebug(">>> Entering ParseVendorAttributesAsync(form={Form})", form);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = string.Empty;
         var vendorAttributes = await _vendorAttributeService.GetAllAttributesAsync();
+		_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): vendorAttributes → {VendorAttributes}", form, vendorAttributes);
         foreach (var attribute in vendorAttributes)
         {
             var controlId = $"{NopVendorDefaults.VendorAttributePrefix}{attribute.Id}";
+			_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): controlId → {ControlId}", form, controlId);
             StringValues ctrlAttributes;
             switch (attribute.AttributeControlType)
             {
@@ -148,6 +175,7 @@ public partial class VendorController : BaseAdminController
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
                         var selectedAttributeId = int.Parse(ctrlAttributes);
+						_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): selectedAttributeId → {SelectedAttributeId}", form, selectedAttributeId);
                         if (selectedAttributeId > 0)
                             attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                                 attribute, selectedAttributeId.ToString());
@@ -171,6 +199,7 @@ public partial class VendorController : BaseAdminController
                 case AttributeControlType.ReadonlyCheckboxes:
                     //load read-only (already server-side selected) values
                     var attributeValues = await _vendorAttributeService.GetAttributeValuesAsync(attribute.Id);
+					_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): attributeValues → {AttributeValues}", form, attributeValues);
                     foreach (var selectedAttributeId in attributeValues
                                  .Where(v => v.IsPreSelected)
                                  .Select(v => v.Id)
@@ -187,6 +216,7 @@ public partial class VendorController : BaseAdminController
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
                         var enteredText = ctrlAttributes.ToString().Trim();
+						_logger.LogDebug("ParseVendorAttributesAsync(form={Form}): enteredText → {EnteredText}", form, enteredText);
                         attributesXml = _vendorAttributeParser.AddAttribute(attributesXml,
                             attribute, enteredText);
                     }
@@ -202,6 +232,7 @@ public partial class VendorController : BaseAdminController
             }
         }
 
+		_logger.LogDebug("<<< Exiting ParseVendorAttributesAsync(form={Form})", form);
         return attributesXml;
     }
 
@@ -215,6 +246,7 @@ public partial class VendorController : BaseAdminController
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorCustomerSearchModelAsync(new VendorCustomerSearchModel());
 
+		_logger.LogDebug("<<< Exiting AddCustomerToVendorPopup()");
         return View(model);
     }
 
@@ -239,23 +271,30 @@ public partial class VendorController : BaseAdminController
     [CheckPermission([StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE, StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE])]
     public virtual async Task<IActionResult> AddCustomerToVendorPopupList(VendorCustomerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering AddCustomerToVendorPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorCustomerListModelAsync(searchModel);
+		_logger.LogDebug("AddCustomerToVendorPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting AddCustomerToVendorPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorSearchModelAsync(new VendorSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -263,18 +302,25 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> List(VendorSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering List(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorListModelAsync(searchModel);
+		_logger.LogDebug("List(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorModelAsync(new VendorModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing},form={Form})", model, continueEditing, form);
         return View(model);
     }
 
@@ -344,17 +390,22 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): vendor → {Vendor}", id, vendor);
         if (vendor == null || vendor.Deleted)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorModelAsync(null, vendor);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
         if (!_forumSettings.AllowPrivateMessages && model.PmCustomerId > 0)
             _notificationService.WarningNotification("Private messages are disabled. Do not forget to enable them.");
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing},form={Form})", model, continueEditing, form);
         return View(model);
     }
 
@@ -464,13 +515,16 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): vendor → {Vendor}", id, vendor);
         if (vendor == null)
             return RedirectToAction("List");
 
         //clear associated customer references
         var associatedCustomers = await _customerService.GetAllCustomersAsync(vendorId: vendor.Id);
+		_logger.LogDebug("Delete(id={Id}): associatedCustomers → {AssociatedCustomers}", id, associatedCustomers);
         foreach (var customer in associatedCustomers)
         {
             customer.VendorId = 0;
@@ -486,6 +540,7 @@ public partial class VendorController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Vendors.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -497,24 +552,29 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_VIEW)]
     public virtual async Task<IActionResult> VendorNotesSelect(VendorNoteSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering VendorNotesSelect(searchModel={SearchModel})", searchModel);
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(searchModel.VendorId)
             ?? throw new ArgumentException("No vendor found with the specified id");
 
         //prepare model
         var model = await _vendorModelFactory.PrepareVendorNoteListModelAsync(searchModel, vendor);
+		_logger.LogDebug("VendorNotesSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting VendorNotesSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> VendorNoteAdd(int vendorId, string message)
     {
+		_logger.LogDebug(">>> Entering VendorNoteAdd(vendorId={VendorId},message={Message})", vendorId, message);
         if (string.IsNullOrEmpty(message))
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.Vendors.VendorNotes.Fields.Note.Validation"));
 
         //try to get a vendor with the specified id
         var vendor = await _vendorService.GetVendorByIdAsync(vendorId);
+		_logger.LogDebug("VendorNoteAdd(vendorId={VendorId},message={Message}): vendor → {Vendor}", vendorId, message, vendor);
         if (vendor == null)
             return ErrorJson("Vendor cannot be loaded");
 
@@ -525,6 +585,7 @@ public partial class VendorController : BaseAdminController
             VendorId = vendor.Id
         });
 
+		_logger.LogDebug("<<< Exiting VendorNoteAdd(vendorId={VendorId},message={Message})", vendorId, message);
         return Json(new { Result = true });
     }
 
@@ -532,12 +593,14 @@ public partial class VendorController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.VENDORS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> VendorNoteDelete(int id)
     {
+		_logger.LogDebug(">>> Entering VendorNoteDelete(id={Id})", id);
         //try to get a vendor note with the specified id
         var vendorNote = await _vendorService.GetVendorNoteByIdAsync(id)
             ?? throw new ArgumentException("No vendor note found with the specified id", nameof(id));
 
         await _vendorService.DeleteVendorNoteAsync(vendorNote);
 
+		_logger.LogDebug("<<< Exiting VendorNoteDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

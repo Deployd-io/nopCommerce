@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Areas.Admin.Models.Localization;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Common;
 /// </summary>
 public partial record LanguageSelectorModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public LanguageSelectorModel()
     {
+		_logger.LogDebug(">>> Entering LanguageSelectorModel()");
         AvailableLanguages = new List<LanguageModel>();
+		_logger.LogDebug("LanguageSelectorModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
     }
 
     #endregion

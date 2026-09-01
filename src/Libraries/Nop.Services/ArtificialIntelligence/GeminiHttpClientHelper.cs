@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.ArtificialIntelligence;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.ArtificialIntelligence;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.ArtificialIntelligence;
 /// </summary>
 public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -18,6 +20,7 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
     /// <param name="httpClient">HTTP client for configuration</param>
     public virtual void ConfigureClient(HttpClient httpClient)
     {
+		_logger.LogDebug(">>> Entering ConfigureClient(httpClient={HttpClient})", httpClient);
         httpClient.BaseAddress = new Uri(ArtificialIntelligenceDefaults.GeminiBaseApiUrl);
     }
 
@@ -29,6 +32,7 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
     /// <returns>Created HttpRequestMessage</returns>
     public virtual HttpRequestMessage CreateRequest(ArtificialIntelligenceSettings settings, string query)
     {
+		_logger.LogDebug(">>> Entering CreateRequest(settings={Settings},query={Query})", settings);
         var request = new HttpRequestMessage { Method = HttpMethod.Post };
         request.Headers.TryAddWithoutValidation(ArtificialIntelligenceDefaults.GeminiApiKeyHeader, settings.GeminiApiKey);
 
@@ -39,6 +43,7 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
 
         request.Content = new StringContent(data, Encoding.UTF8, MimeTypes.ApplicationJson);
 
+		_logger.LogDebug("<<< Exiting CreateRequest(settings={Settings},query={Query})", settings);
         return request;
     }
 
@@ -49,17 +54,21 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
     /// <returns>Generated text from artificial intelligence host</returns>
     public virtual string ParseResponse(string responseText)
     {
+		_logger.LogDebug(">>> Entering ParseResponse(responseText={ResponseText})", responseText);
         var response = JsonConvert.DeserializeAnonymousType(responseText,
             new
             {
                 candidates = new[]
+				_logger.LogDebug("ParseResponse(responseText={ResponseText}): candidates → {Candidates}", responseText, candidates);
                 {
                     new { content = new { parts = new [] { new { text = string.Empty } } } }
                 }
             });
 
         var result = response.candidates.Select(c => c.content.parts).FirstOrDefault();
+		_logger.LogDebug("ParseResponse(responseText={ResponseText}): result → {Result}", responseText, result);
 
+		_logger.LogDebug("<<< Exiting ParseResponse(responseText={ResponseText})", responseText);
         return result?[0].text ?? string.Empty;
     }
 

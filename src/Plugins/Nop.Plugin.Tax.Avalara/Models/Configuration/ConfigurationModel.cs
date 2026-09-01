@@ -6,6 +6,7 @@ using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Models.Configuration;
 
@@ -14,18 +15,28 @@ namespace Nop.Plugin.Tax.Avalara.Models.Configuration;
 /// </summary>
 public record ConfigurationModel : BaseNopModel, IAclSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering ConfigurationModel()");
         TestAddress = new AddressModel();
+		_logger.LogDebug("ConfigurationModel(): TestAddress → {TestAddress}", TestAddress);
         Companies = new List<SelectListItem>();
+		_logger.LogDebug("ConfigurationModel(): Companies → {Companies}", Companies);
         TaxOriginAddressTypes = new List<SelectListItem>();
+		_logger.LogDebug("ConfigurationModel(): TaxOriginAddressTypes → {TaxOriginAddressTypes}", TaxOriginAddressTypes);
         TaxTransactionLogSearchModel = new TaxTransactionLogSearchModel();
+		_logger.LogDebug("ConfigurationModel(): TaxTransactionLogSearchModel → {TaxTransactionLogSearchModel}", TaxTransactionLogSearchModel);
         ItemClassificationSearchModel = new ItemClassificationSearchModel();
+		_logger.LogDebug("ConfigurationModel(): ItemClassificationSearchModel → {ItemClassificationSearchModel}", ItemClassificationSearchModel);
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogDebug("ConfigurationModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogDebug("ConfigurationModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         SelectedCountryIds = new List<int>();
+		_logger.LogDebug("ConfigurationModel(): SelectedCountryIds → {SelectedCountryIds}", SelectedCountryIds);
         AvailableCountries = new List<SelectListItem>();
     }
 

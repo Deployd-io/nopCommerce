@@ -10,11 +10,13 @@ using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Services.Shipping.Pickup;
 using Nop.Services.Shipping.Tracking;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore;
 
 public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -37,13 +39,21 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
         IStorePickupPointService storePickupPointService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper})", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper);
         _addressService = addressService;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _addressService → {_addressService}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _addressService);
         _countryService = countryService;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _countryService → {_countryService}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _countryService);
         _localizationService = localizationService;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _localizationService → {_localizationService}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _localizationService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _stateProvinceService → {_stateProvinceService}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _stateProvinceService);
         _storeContext = storeContext;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _storeContext → {_storeContext}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _storeContext);
         _storePickupPointService = storePickupPointService;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _storePickupPointService → {_storePickupPointService}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _storePickupPointService);
         _webHelper = webHelper;
+		_logger.LogDebug("PickupInStoreProvider(addressService={AddressService},countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},storeContext={StoreContext},storePickupPointService={StorePickupPointService},webHelper={WebHelper}): _webHelper → {_webHelper}", addressService, countryService, localizationService, stateProvinceService, storeContext, storePickupPointService, webHelper, _webHelper);
     }
 
     #endregion
@@ -61,12 +71,16 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </returns>
     public async Task<GetPickupPointsResponse> GetPickupPointsAsync(IList<ShoppingCartItem> cart, Address address)
     {
+		_logger.LogDebug(">>> Entering GetPickupPointsAsync(cart={Cart},address={Address})", cart, address);
         var result = new GetPickupPointsResponse();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address}): store → {Store}", cart, address, store);
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address}): result → {Result}", cart, address, result);
 
         foreach (var point in await _storePickupPointService.GetAllStorePickupPointsAsync(store.Id))
         {
             var pointAddress = await _addressService.GetAddressByIdAsync(point.AddressId);
+			_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address}): pointAddress → {PointAddress}", cart, address, pointAddress);
             if (pointAddress == null)
                 continue;
 
@@ -94,6 +108,7 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
         if (!result.PickupPoints.Any())
             result.AddError(await _localizationService.GetResourceAsync("Plugins.Pickup.PickupInStore.NoPickupPoints"));
 
+		_logger.LogDebug("<<< Exiting GetPickupPointsAsync(cart={Cart},address={Address})", cart, address);
         return result;
     }
 
@@ -106,6 +121,7 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </returns>
     public Task<IShipmentTracker> GetShipmentTrackerAsync()
     {
+		_logger.LogDebug(">>> Entering GetShipmentTrackerAsync()");
         return Task.FromResult<IShipmentTracker>(null);
     }
 
@@ -114,6 +130,7 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/PickupInStore/Configure";
     }
 
@@ -123,9 +140,12 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //sample pickup point
         var country = await _countryService.GetCountryByThreeLetterIsoCodeAsync("USA");
+		_logger.LogDebug("InstallAsync(): country → {Country}", country);
         var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync("NY", country?.Id);
+		_logger.LogDebug("InstallAsync(): state → {State}", state);
 
         var address = new Address
         {
@@ -179,6 +199,7 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -187,10 +208,12 @@ public class PickupInStoreProvider : BasePlugin, IPickupPointProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Pickup.PickupInStore");
 
         await base.UninstallAsync();
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

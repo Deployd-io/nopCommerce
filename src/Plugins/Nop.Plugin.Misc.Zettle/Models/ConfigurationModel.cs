@@ -2,6 +2,7 @@
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Zettle.Models;
 
@@ -10,12 +11,16 @@ namespace Nop.Plugin.Misc.Zettle.Models;
 /// </summary>
 public record ConfigurationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering ConfigurationModel()");
         Account = new AccountModel();
+		_logger.LogDebug("ConfigurationModel(): Account → {Account}", Account);
         Import = new ImportModel();
+		_logger.LogDebug("ConfigurationModel(): Import → {Import}", Import);
         SyncRecordSearchModel = new SyncRecordSearchModel();
     }
 

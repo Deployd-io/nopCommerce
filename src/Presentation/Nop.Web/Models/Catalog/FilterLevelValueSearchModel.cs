@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -8,12 +9,16 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record FilterLevelValueSearchModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public FilterLevelValueSearchModel()
     {
+		_logger.LogDebug(">>> Entering FilterLevelValueSearchModel()");
         AvailableFilterLevel1Values = new List<SelectListItem>();
+		_logger.LogDebug("FilterLevelValueSearchModel(): AvailableFilterLevel1Values → {AvailableFilterLevel1Values}", AvailableFilterLevel1Values);
         AvailableFilterLevel2Values = new List<SelectListItem>();
+		_logger.LogDebug("FilterLevelValueSearchModel(): AvailableFilterLevel2Values → {AvailableFilterLevel2Values}", AvailableFilterLevel2Values);
         AvailableFilterLevel3Values = new List<SelectListItem>();
     }
 

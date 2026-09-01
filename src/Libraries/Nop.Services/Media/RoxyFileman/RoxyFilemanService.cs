@@ -2,11 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Nop.Core;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Media.RoxyFileman;
 
 public partial class RoxyFilemanService : IRoxyFilemanService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRoxyFilemanFileProvider _fileProvider;
@@ -20,7 +22,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
         IRoxyFilemanFileProvider fileProvider,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering RoxyFilemanService(fileProvider={FileProvider},workContext={WorkContext})", fileProvider, workContext);
         _fileProvider = fileProvider;
+		_logger.LogDebug("RoxyFilemanService(fileProvider={FileProvider},workContext={WorkContext}): _fileProvider → {_fileProvider}", fileProvider, workContext, _fileProvider);
         _workContext = workContext;
     }
 
@@ -37,18 +41,23 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// </returns>
     protected virtual bool CanHandleFile(string path)
     {
+		_logger.LogDebug(">>> Entering CanHandleFile(path={Path})", path);
         var result = false;
 
+		_logger.LogDebug("CanHandleFile(path={Path}): result → {Result}", path, result);
         var fileExtension = Path.GetExtension(path).Replace(".", string.Empty).ToLowerInvariant();
+		_logger.LogDebug("CanHandleFile(path={Path}): fileExtension → {FileExtension}", path, fileExtension);
 
         var roxyConfig = Singleton<RoxyFilemanConfig>.Instance;
 
         var forbiddenUploads = roxyConfig.FORBIDDEN_UPLOADS.Trim().ToLowerInvariant();
+		_logger.LogDebug("CanHandleFile(path={Path}): forbiddenUploads → {ForbiddenUploads}", path, forbiddenUploads);
 
         if (!string.IsNullOrEmpty(forbiddenUploads))
             result = !WhiteSpaceRegex().Split(forbiddenUploads).Contains(fileExtension);
 
         var allowedUploads = roxyConfig.ALLOWED_UPLOADS.Trim().ToLowerInvariant();
+		_logger.LogDebug("CanHandleFile(path={Path}): allowedUploads → {AllowedUploads}", path, allowedUploads);
         if (string.IsNullOrEmpty(allowedUploads))
             return result;
 
@@ -69,7 +78,10 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ConfigureAsync(string pathBase)
     {
+		_logger.LogDebug(">>> Entering ConfigureAsync(pathBase={PathBase})", pathBase);
         var currentLanguage = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogDebug("<<< Exiting ConfigureAsync(pathBase={PathBase})", pathBase);
+		_logger.LogDebug("ConfigureAsync(pathBase={PathBase}): currentLanguage → {CurrentLanguage}", pathBase, currentLanguage);
         await _fileProvider.GetOrCreateConfigurationAsync(pathBase, currentLanguage.UniqueSeoCode);
     }
 
@@ -83,7 +95,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="path">Path to the directory</param>
     public virtual void DeleteDirectory(string path)
     {
+		_logger.LogDebug(">>> Entering DeleteDirectory(path={Path})", path);
         _fileProvider.DeleteDirectory(path);
+		_logger.LogDebug("<<< Exiting DeleteDirectory(path={Path})", path);
     }
 
     /// <summary>
@@ -92,6 +106,7 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="path">Path to the directory</param>
     public virtual byte[] DownloadDirectory(string path)
     {
+		_logger.LogDebug(">>> Entering DownloadDirectory(path={Path})", path);
         return _fileProvider.CreateZipArchiveFromDirectory(path);
     }
 
@@ -102,7 +117,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="destinationPath">Path to the destination directory</param>
     public virtual void CopyDirectory(string sourcePath, string destinationPath)
     {
+		_logger.LogDebug(">>> Entering CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
         _fileProvider.CopyDirectory(sourcePath, destinationPath);
+		_logger.LogDebug("<<< Exiting CopyDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
     }
 
     /// <summary>
@@ -112,7 +129,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="name">Name of the new directory</param>
     public virtual void CreateDirectory(string parentDirectoryPath, string name)
     {
+		_logger.LogDebug(">>> Entering CreateDirectory(parentDirectoryPath={ParentDirectoryPath},name={Name})", parentDirectoryPath, name);
         _fileProvider.CreateDirectory(parentDirectoryPath, name);
+		_logger.LogDebug("<<< Exiting CreateDirectory(parentDirectoryPath={ParentDirectoryPath},name={Name})", parentDirectoryPath, name);
     }
 
     /// <summary>
@@ -122,8 +141,10 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <returns>List of directories</returns>
     public virtual IEnumerable<object> GetDirectoryList(string type)
     {
+		_logger.LogDebug(">>> Entering GetDirectoryList(type={Type})", type);
         var contents = _fileProvider.GetDirectories(type);
 
+		_logger.LogDebug("GetDirectoryList(type={Type}): contents → {Contents}", type, contents);
         var result = new List<object>() { new
         {
             p = "/",
@@ -141,6 +162,7 @@ public partial class RoxyFilemanService : IRoxyFilemanService
             });
         }
 
+		_logger.LogDebug("<<< Exiting GetDirectoryList(type={Type})", type);
         return result;
     }
 
@@ -151,7 +173,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="destinationPath">Path to the destination directory</param>
     public virtual void MoveDirectory(string sourcePath, string destinationPath)
     {
+		_logger.LogDebug(">>> Entering MoveDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
         if (destinationPath.IndexOf(sourcePath, StringComparison.InvariantCulture) == 0)
+			_logger.LogWarning("Throwing RoxyFilemanException from MoveDirectory(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
             throw new RoxyFilemanException("E_CannotMoveDirToChild");
 
         _fileProvider.DirectoryMove(sourcePath, destinationPath);
@@ -164,6 +188,8 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="type">Type of the files</param>
     public virtual IEnumerable<object> GetFiles(string directoryPath, string type)
     {
+		_logger.LogDebug(">>> Entering GetFiles(directoryPath={DirectoryPath},type={Type})", directoryPath, type);
+		_logger.LogDebug("<<< Exiting GetFiles(directoryPath={DirectoryPath},type={Type})", directoryPath, type);
         return _fileProvider.GetFiles(directoryPath, type?.Trim('#'))
             .Select(f => new
             {
@@ -182,7 +208,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="newName">New name of the directory</param>
     public virtual void RenameDirectory(string sourcePath, string newName)
     {
+		_logger.LogDebug(">>> Entering RenameDirectory(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
         _fileProvider.RenameDirectory(sourcePath, newName);
+		_logger.LogDebug("<<< Exiting RenameDirectory(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
     }
 
     /// <summary>
@@ -193,10 +221,12 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UploadFilesAsync(string directoryPath, IEnumerable<IFormFile> files)
     {
+		_logger.LogDebug(">>> Entering UploadFilesAsync(directoryPath={DirectoryPath},files={Files})", directoryPath, files);
         foreach (var formFile in files)
         {
             await _fileProvider.SaveFileAsync(directoryPath, formFile.FileName, formFile.ContentType, formFile.OpenReadStream());
         }
+		_logger.LogDebug("<<< Exiting UploadFilesAsync(directoryPath={DirectoryPath},files={Files})", directoryPath, files);
     }
 
     #endregion
@@ -210,7 +240,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="destinationPath">Path to the destination file</param>
     public virtual void CopyFile(string sourcePath, string destinationPath)
     {
+		_logger.LogDebug(">>> Entering CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
         _fileProvider.CopyFile(sourcePath, destinationPath);
+		_logger.LogDebug("<<< Exiting CopyFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
     }
 
     /// <summary>
@@ -220,6 +252,7 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="contentType">The resulting MIME type</param>
     public virtual byte[] CreateImageThumbnail(string path, string contentType)
     {
+		_logger.LogDebug(">>> Entering CreateImageThumbnail(path={Path},contentType={ContentType})", path, contentType);
         return _fileProvider.CreateImageThumbnail(path, contentType);
     }
 
@@ -229,7 +262,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="path">Path to the directory</param>
     public virtual void DeleteFile(string path)
     {
+		_logger.LogDebug(">>> Entering DeleteFile(path={Path})", path);
         _fileProvider.DeleteFile(path);
+		_logger.LogDebug("<<< Exiting DeleteFile(path={Path})", path);
     }
 
     /// <summary>
@@ -238,9 +273,13 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="path">Path to the file</param>
     public virtual (Stream stream, string name) GetFileStream(string path)
     {
+		_logger.LogDebug(">>> Entering GetFileStream(path={Path})", path);
         var file = _fileProvider.GetFileInfo(path);
 
+		_logger.LogDebug("GetFileStream(path={Path}): file → {File}", path, file);
         if (!file.Exists)
+			_logger.LogWarning("Throwing FileNotFoundException from GetFileStream(path={Path})", path);
+		_logger.LogDebug("<<< Exiting GetFileStream(path={Path})", path);
             throw new FileNotFoundException();
 
         return (file.CreateReadStream(), file.Name);
@@ -253,7 +292,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="destinationPath">Path to the destination file</param>
     public virtual void MoveFile(string sourcePath, string destinationPath)
     {
+		_logger.LogDebug(">>> Entering MoveFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
         if (!CanHandleFile(sourcePath) && !CanHandleFile(destinationPath))
+			_logger.LogWarning("Throwing RoxyFilemanException from MoveFile(sourcePath={SourcePath},destinationPath={DestinationPath})", sourcePath, destinationPath);
             throw new RoxyFilemanException("E_FileExtensionForbidden");
 
         _fileProvider.FileMove(sourcePath, destinationPath);
@@ -266,7 +307,9 @@ public partial class RoxyFilemanService : IRoxyFilemanService
     /// <param name="newName">New name of the file</param>
     public virtual void RenameFile(string sourcePath, string newName)
     {
+		_logger.LogDebug(">>> Entering RenameFile(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
         if (!CanHandleFile(sourcePath) && !CanHandleFile(newName))
+			_logger.LogWarning("Throwing RoxyFilemanException from RenameFile(sourcePath={SourcePath},newName={NewName})", sourcePath, newName);
             throw new RoxyFilemanException("E_FileExtensionForbidden");
 
         _fileProvider.RenameFile(sourcePath, newName);

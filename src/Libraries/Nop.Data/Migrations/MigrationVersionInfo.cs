@@ -1,5 +1,6 @@
 ﻿using FluentMigrator.Runner.VersionTableInfo;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -8,13 +9,18 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public partial class MigrationVersionInfo : BaseEntity, IVersionTableMetaData
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MigrationVersionInfo()
     {
+		_logger.LogDebug(">>> Entering MigrationVersionInfo()");
         TableName = nameof(MigrationVersionInfo);
+		_logger.LogDebug("MigrationVersionInfo(): TableName → {TableName}", TableName);
         ColumnName = nameof(Version);
+		_logger.LogDebug("MigrationVersionInfo(): ColumnName → {ColumnName}", ColumnName);
         DescriptionColumnName = nameof(Description);
+		_logger.LogDebug("MigrationVersionInfo(): DescriptionColumnName → {DescriptionColumnName}", DescriptionColumnName);
         AppliedOnColumnName = nameof(AppliedOn);
     }
 

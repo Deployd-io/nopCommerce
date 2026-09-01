@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerShoppingCartSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerShoppingCartSearchModel()
     {
+		_logger.LogDebug(">>> Entering CustomerShoppingCartSearchModel()");
         AvailableShoppingCartTypes = new List<SelectListItem>();
+		_logger.LogDebug("CustomerShoppingCartSearchModel(): AvailableShoppingCartTypes → {AvailableShoppingCartTypes}", AvailableShoppingCartTypes);
     }
 
     #endregion

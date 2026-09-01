@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Security;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Security;
 /// </summary>
 public partial record PermissionItemModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PermissionItemModel()
     {
+		_logger.LogDebug(">>> Entering PermissionItemModel()");
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogDebug("PermissionItemModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
     }
 

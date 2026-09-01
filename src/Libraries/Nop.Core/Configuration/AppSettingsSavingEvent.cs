@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Configuration;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Configuration;
 
 /// <summary>
 /// Represents the event that is raised when App Settings are saving
 /// </summary>
 public partial class AppSettingsSavingEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IList<IConfig> _configurations;
@@ -19,7 +21,9 @@ public partial class AppSettingsSavingEvent
     /// <param name="configurations">List of configuration to save</param>
     public AppSettingsSavingEvent(IList<IConfig> configurations)
     {
+		_logger.LogDebug(">>> Entering AppSettingsSavingEvent(configurations={Configurations})", configurations);
         _configurations = configurations;
+		_logger.LogDebug("AppSettingsSavingEvent(configurations={Configurations}): _configurations → {_configurations}", configurations, _configurations);
     }
 
     #endregion
@@ -32,10 +36,12 @@ public partial class AppSettingsSavingEvent
     /// <param name="config">Configuration to save</param>
     public virtual void AddConfig<TConfig>(TConfig config) where TConfig : class, IConfig
     {
+		_logger.LogDebug(">>> Entering AddConfig(config={Config})", config);
         if (_configurations.OfType<TConfig>().FirstOrDefault() is { } currentConfig)
             _configurations[_configurations.IndexOf(currentConfig)] = config;
         else
             _configurations.Add(config);
+			_logger.LogDebug("<<< Exiting AddConfig(config={Config})", config);
     }
 
     #endregion

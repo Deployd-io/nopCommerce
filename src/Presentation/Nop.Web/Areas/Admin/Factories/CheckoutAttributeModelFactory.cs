@@ -9,6 +9,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -45,16 +47,27 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
         MeasureSettings measureSettings)
     {
+		_logger.LogDebug(">>> Entering CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings})", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings);
         _currencySettings = currencySettings;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _currencySettings → {_currencySettings}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _currencySettings);
         _checkoutAttributeParser = checkoutAttributeParser;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _checkoutAttributeParser → {_checkoutAttributeParser}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _checkoutAttributeParser);
         _checkoutAttributeService = checkoutAttributeService;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _checkoutAttributeService → {_checkoutAttributeService}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _checkoutAttributeService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _baseAdminModelFactory → {_baseAdminModelFactory}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _baseAdminModelFactory);
         _currencyService = currencyService;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _currencyService → {_currencyService}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _currencyService);
         _localizationService = localizationService;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _localizationService → {_localizationService}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _localizedModelFactory → {_localizedModelFactory}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _localizedModelFactory);
         _measureService = measureService;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _measureService → {_measureService}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _measureService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _storeMappingSupportedModelFactory);
         _measureSettings = measureSettings;
+		_logger.LogDebug("CheckoutAttributeModelFactory(currencySettings={CurrencySettings},checkoutAttributeParser={CheckoutAttributeParser},checkoutAttributeService={CheckoutAttributeService},baseAdminModelFactory={BaseAdminModelFactory},currencyService={CurrencyService},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},measureService={MeasureService},storeMappingSupportedModelFactory=<redacted>,measureSettings={MeasureSettings}): _measureSettings → {_measureSettings}", currencySettings, checkoutAttributeParser, checkoutAttributeService, baseAdminModelFactory, currencyService, localizationService, localizedModelFactory, measureService, measureSettings, _measureSettings);
     }
 
     #endregion
@@ -69,6 +82,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareConditionAttributesModelAsync(ConditionModel model, CheckoutAttribute checkoutAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareConditionAttributesModelAsync(model={Model},checkoutAttribute={CheckoutAttribute})", model, checkoutAttribute);
         ArgumentNullException.ThrowIfNull(model);
 
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
@@ -77,11 +91,15 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
 
         //get selected checkout attribute
         var selectedAttribute = (await _checkoutAttributeParser.ParseAttributesAsync(checkoutAttribute.ConditionAttributeXml)).FirstOrDefault();
+		_logger.LogDebug("PrepareConditionAttributesModelAsync(model={Model},checkoutAttribute={CheckoutAttribute}): selectedAttribute → {SelectedAttribute}", model, checkoutAttribute, selectedAttribute);
+		_logger.LogDebug("PrepareConditionAttributesModelAsync(model={Model},checkoutAttribute={CheckoutAttribute}): model.SelectedAttributeId → {Arg2}", model, checkoutAttribute, model.SelectedAttributeId);
         model.SelectedAttributeId = selectedAttribute?.Id ?? 0;
 
         //get selected checkout attribute values identifiers
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var selectedValuesIds = await _checkoutAttributeParser
             .ParseAttributeValues(checkoutAttribute.ConditionAttributeXml).SelectMany(ta => ta.values.Select(v => v.Id)).ToListAsync();
+			_logger.LogInformation("PrepareConditionAttributesModelAsync(model,checkoutAttribute)={Model},{CheckoutAttribute}: find query executed in {Arg2} ms", model, checkoutAttribute, __logStart.ElapsedMilliseconds);
 
         //get available condition checkout attributes (ignore this attribute and non-combinable attributes)
         var availableConditionAttributes = (await _checkoutAttributeService.GetAllAttributesAsync())
@@ -99,6 +117,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
                 Selected = selectedAttribute?.Id == attribute.Id && selectedValuesIds.Contains(value.Id)
             }).ToList()
         }).ToListAsync();
+		_logger.LogDebug("<<< Exiting PrepareConditionAttributesModelAsync(model={Model},checkoutAttribute={CheckoutAttribute})", model, checkoutAttribute);
     }
 
     /// <summary>
@@ -110,15 +129,18 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     protected virtual CheckoutAttributeValueSearchModel PrepareCheckoutAttributeValueSearchModel(CheckoutAttributeValueSearchModel searchModel,
         CheckoutAttribute checkoutAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeValueSearchModel(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
 
         searchModel.CheckoutAttributeId = checkoutAttribute.Id;
+		_logger.LogDebug("PrepareCheckoutAttributeValueSearchModel(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute}): searchModel.CheckoutAttributeId → {Arg2}", searchModel, checkoutAttribute, searchModel.CheckoutAttributeId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeValueSearchModel(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         return searchModel;
     }
 
@@ -136,11 +158,13 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// </returns>
     public virtual Task<CheckoutAttributeSearchModel> PrepareCheckoutAttributeSearchModelAsync(CheckoutAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -154,10 +178,12 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     /// </returns>
     public virtual async Task<CheckoutAttributeListModel> PrepareCheckoutAttributeListModelAsync(CheckoutAttributeSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get checkout attributes
         var checkoutAttributes = (await _checkoutAttributeService.GetAllAttributesAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel}): checkoutAttributes → {CheckoutAttributes}", searchModel, checkoutAttributes);
 
         //prepare list model
         var model = await new CheckoutAttributeListModel().PrepareToGridAsync(searchModel, checkoutAttributes, () =>
@@ -166,6 +192,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             {
                 //fill in model values from the entity
                 var attributeModel = attribute.ToModel<CheckoutAttributeModel>();
+				_logger.LogDebug("PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel}): attributeModel → {AttributeModel}", searchModel, attributeModel);
 
                 //fill in additional values (not existing in the entity)
                 attributeModel.AttributeControlTypeName = await _localizationService.GetLocalizedEnumAsync(attribute.AttributeControlType);
@@ -174,6 +201,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -190,6 +218,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     public virtual async Task<CheckoutAttributeModel> PrepareCheckoutAttributeModelAsync(CheckoutAttributeModel model,
         CheckoutAttribute checkoutAttribute, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},excludeProperties={ExcludeProperties})", model, checkoutAttribute, excludeProperties);
         Func<CheckoutAttributeLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (checkoutAttribute != null)
@@ -211,6 +240,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             //whether to fill in some of properties
             if (!excludeProperties)
                 model.TaxCategoryId = checkoutAttribute.TaxCategoryId;
+				_logger.LogDebug("PrepareCheckoutAttributeModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},excludeProperties={ExcludeProperties}): model.TaxCategoryId → {Arg3}", model, checkoutAttribute, excludeProperties, model.TaxCategoryId);
 
             //prepare condition attributes model
             await PrepareConditionAttributesModelAsync(model.ConditionModel, checkoutAttribute);
@@ -218,6 +248,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
 
         //currently any checkout attribute can have condition
         model.ConditionAllowed = true;
+		_logger.LogDebug("PrepareCheckoutAttributeModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},excludeProperties={ExcludeProperties}): model.ConditionAllowed → {Arg3}", model, checkoutAttribute, excludeProperties, model.ConditionAllowed);
 
         //prepare localized models
         if (!excludeProperties)
@@ -229,6 +260,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
         //prepare model stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, checkoutAttribute, excludeProperties);
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},excludeProperties={ExcludeProperties})", model, checkoutAttribute, excludeProperties);
         return model;
     }
 
@@ -244,6 +276,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     public virtual async Task<CheckoutAttributeValueListModel> PrepareCheckoutAttributeValueListModelAsync(CheckoutAttributeValueSearchModel searchModel,
         CheckoutAttribute checkoutAttribute)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeValueListModelAsync(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
@@ -259,6 +292,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             {
                 //fill in model values from the entity
                 var checkoutAttributeValueModel = value.ToModel<CheckoutAttributeValueModel>();
+				_logger.LogDebug("PrepareCheckoutAttributeValueListModelAsync(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute}): checkoutAttributeValueModel → {CheckoutAttributeValueModel}", searchModel, checkoutAttribute, checkoutAttributeValueModel);
 
                 //fill in additional values (not existing in the entity)
                 checkoutAttributeValueModel.Name =
@@ -270,6 +304,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
             });
         });
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeValueListModelAsync(searchModel={SearchModel},checkoutAttribute={CheckoutAttribute})", searchModel, checkoutAttribute);
         return model;
     }
 
@@ -287,6 +322,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
     public virtual async Task<CheckoutAttributeValueModel> PrepareCheckoutAttributeValueModelAsync(CheckoutAttributeValueModel model,
         CheckoutAttribute checkoutAttribute, CheckoutAttributeValue checkoutAttributeValue, bool excludeProperties = false)
     {
+		_logger.LogDebug(">>> Entering PrepareCheckoutAttributeValueModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},checkoutAttributeValue={CheckoutAttributeValue},excludeProperties={ExcludeProperties})", model, checkoutAttribute, checkoutAttributeValue, excludeProperties);
         ArgumentNullException.ThrowIfNull(checkoutAttribute);
 
         Func<CheckoutAttributeValueLocalizedModel, int, Task> localizedModelConfiguration = null;
@@ -304,6 +340,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
         }
 
         model.AttributeId = checkoutAttribute.Id;
+		_logger.LogDebug("PrepareCheckoutAttributeValueModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},checkoutAttributeValue={CheckoutAttributeValue},excludeProperties={ExcludeProperties}): model.AttributeId → {Arg4}", model, checkoutAttribute, checkoutAttributeValue, excludeProperties, model.AttributeId);
         model.PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId)).CurrencyCode;
         model.BaseWeightIn = (await _measureService.GetMeasureWeightByIdAsync(_measureSettings.BaseWeightId)).Name;
         model.DisplayColorSquaresRgb = checkoutAttribute.AttributeControlType == AttributeControlType.ColorSquares;
@@ -312,6 +349,7 @@ public partial class CheckoutAttributeModelFactory : ICheckoutAttributeModelFact
         if (!excludeProperties)
             model.Locales = await _localizedModelFactory.PrepareLocalizedModelsAsync(localizedModelConfiguration);
 
+		_logger.LogDebug("<<< Exiting PrepareCheckoutAttributeValueModelAsync(model={Model},checkoutAttribute={CheckoutAttribute},checkoutAttributeValue={CheckoutAttributeValue},excludeProperties={ExcludeProperties})", model, checkoutAttribute, checkoutAttributeValue, excludeProperties);
         return model;
     }
 

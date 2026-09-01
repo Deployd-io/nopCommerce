@@ -1,19 +1,28 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
 public partial record MaintenanceModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public MaintenanceModel()
     {
+		_logger.LogDebug(">>> Entering MaintenanceModel()");
         DeleteGuests = new();
+		_logger.LogDebug("MaintenanceModel(): DeleteGuests → {DeleteGuests}", DeleteGuests);
         DeleteAbandonedCarts = new();
+		_logger.LogDebug("MaintenanceModel(): DeleteAbandonedCarts → {DeleteAbandonedCarts}", DeleteAbandonedCarts);
         DeleteExportedFiles = new();
+		_logger.LogDebug("MaintenanceModel(): DeleteExportedFiles → {DeleteExportedFiles}", DeleteExportedFiles);
         BackupFileSearchModel = new();
+		_logger.LogDebug("MaintenanceModel(): BackupFileSearchModel → {BackupFileSearchModel}", BackupFileSearchModel);
         DeleteAlreadySentQueuedEmails = new();
+		_logger.LogDebug("MaintenanceModel(): DeleteAlreadySentQueuedEmails → {DeleteAlreadySentQueuedEmails}", DeleteAlreadySentQueuedEmails);
         DeleteMinificationFiles = new();
+		_logger.LogDebug("MaintenanceModel(): DeleteMinificationFiles → {DeleteMinificationFiles}", DeleteMinificationFiles);
         DeleteThumbsFiles = new();
     }
 

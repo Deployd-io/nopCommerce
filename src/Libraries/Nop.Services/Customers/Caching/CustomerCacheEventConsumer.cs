@@ -2,6 +2,7 @@
 using Nop.Services.Caching;
 using Nop.Services.Events;
 using Nop.Services.Orders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Customers.Caching;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Customers.Caching;
 /// </summary>
 public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, IConsumer<CustomerPasswordChangedEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -19,7 +21,9 @@ public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, 
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task HandleEventAsync(CustomerPasswordChangedEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await RemoveAsync(NopCustomerServicesDefaults.CustomerPasswordLifetimeCacheKey, eventMessage.Password.CustomerId);
+		_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -30,6 +34,7 @@ public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, 
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Customer entity, EntityEventType entityEventType)
     {
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         if (entityEventType == EntityEventType.Delete)
         {
             await RemoveAsync(NopCustomerServicesDefaults.CustomerAddressesCacheKey, entity);
@@ -37,6 +42,9 @@ public partial class CustomerCacheEventConsumer : CacheEventConsumer<Customer>, 
         }
 
         await base.ClearCacheAsync(entity, entityEventType);
+		_logger.LogDebug(">>> Entering ClearCacheAsync(entity={Entity})", entity);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
+		_logger.LogDebug("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Orders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Tax;
 
@@ -8,11 +9,14 @@ namespace Nop.Services.Tax;
 /// </summary>
 public partial class TaxTotalRequest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public TaxTotalRequest()
     {
+		_logger.LogDebug(">>> Entering TaxTotalRequest()");
         ShoppingCart = new List<ShoppingCartItem>();
+		_logger.LogDebug("TaxTotalRequest(): ShoppingCart → {ShoppingCart}", ShoppingCart);
     }
 
     #endregion

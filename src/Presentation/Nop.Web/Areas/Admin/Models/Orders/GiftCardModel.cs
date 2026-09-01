@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record GiftCardModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GiftCardModel()
     {
+		_logger.LogDebug(">>> Entering GiftCardModel()");
         GiftCardUsageHistorySearchModel = new GiftCardUsageHistorySearchModel();
+		_logger.LogDebug("GiftCardModel(): GiftCardUsageHistorySearchModel → {GiftCardUsageHistorySearchModel}", GiftCardUsageHistorySearchModel);
     }
 
     #endregion

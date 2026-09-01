@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Topics;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Topics;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Topics;
 /// </summary>
 public partial class TopicTemplateService : ITopicTemplateService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<TopicTemplate> _topicTemplateRepository;
@@ -18,7 +20,9 @@ public partial class TopicTemplateService : ITopicTemplateService
 
     public TopicTemplateService(IRepository<TopicTemplate> topicTemplateRepository)
     {
+		_logger.LogDebug(">>> Entering TopicTemplateService(topicTemplateRepository={TopicTemplateRepository})", topicTemplateRepository);
         _topicTemplateRepository = topicTemplateRepository;
+		_logger.LogDebug("TopicTemplateService(topicTemplateRepository={TopicTemplateRepository}): _topicTemplateRepository → {_topicTemplateRepository}", topicTemplateRepository, _topicTemplateRepository);
     }
 
     #endregion
@@ -32,6 +36,7 @@ public partial class TopicTemplateService : ITopicTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTopicTemplateAsync(TopicTemplate topicTemplate)
     {
+		_logger.LogDebug(">>> Entering DeleteTopicTemplateAsync(topicTemplate={TopicTemplate})", topicTemplate);
         await _topicTemplateRepository.DeleteAsync(topicTemplate);
     }
 
@@ -46,9 +51,12 @@ public partial class TopicTemplateService : ITopicTemplateService
     {
         var templates = await _topicTemplateRepository.GetAllAsync(query =>
         {
+			_logger.LogDebug(">>> Entering GetAllTopicTemplatesAsync()");
             return from pt in query
                 orderby pt.DisplayOrder, pt.Id
                 select pt;
+			_logger.LogDebug("<<< Exiting GetAllTopicTemplatesAsync()");
+				_logger.LogInformation("GetAllTopicTemplatesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
         return templates;
@@ -64,6 +72,8 @@ public partial class TopicTemplateService : ITopicTemplateService
     /// </returns>
     public virtual async Task<TopicTemplate> GetTopicTemplateByIdAsync(int topicTemplateId)
     {
+		_logger.LogDebug(">>> Entering GetTopicTemplateByIdAsync(topicTemplateId={TopicTemplateId})", topicTemplateId);
+		_logger.LogInformation("GetTopicTemplateByIdAsync(topicTemplateId)={TopicTemplateId}: find query executing", topicTemplateId);
         return await _topicTemplateRepository.GetByIdAsync(topicTemplateId, cache => default);
     }
 
@@ -74,6 +84,7 @@ public partial class TopicTemplateService : ITopicTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTopicTemplateAsync(TopicTemplate topicTemplate)
     {
+		_logger.LogDebug(">>> Entering InsertTopicTemplateAsync(topicTemplate={TopicTemplate})", topicTemplate);
         await _topicTemplateRepository.InsertAsync(topicTemplate);
     }
 
@@ -84,6 +95,7 @@ public partial class TopicTemplateService : ITopicTemplateService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTopicTemplateAsync(TopicTemplate topicTemplate)
     {
+		_logger.LogDebug(">>> Entering UpdateTopicTemplateAsync(topicTemplate={TopicTemplate})", topicTemplate);
         await _topicTemplateRepository.UpdateAsync(topicTemplate);
     }
 

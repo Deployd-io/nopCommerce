@@ -8,6 +8,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers;
 
@@ -16,6 +17,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics.Controllers;
 [AutoValidateAntiforgeryToken]
 public class WidgetsGoogleAnalyticsController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -35,11 +37,17 @@ public class WidgetsGoogleAnalyticsController : BasePluginController
         ISettingService settingService,
         IStoreContext storeContext)
     {
+		_logger.LogDebug(">>> Entering WidgetsGoogleAnalyticsController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext})", localizationService, notificationService, permissionService, settingService, storeContext);
         _localizationService = localizationService;
+		_logger.LogDebug("WidgetsGoogleAnalyticsController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _localizationService → {_localizationService}", localizationService, notificationService, permissionService, settingService, storeContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("WidgetsGoogleAnalyticsController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _notificationService → {_notificationService}", localizationService, notificationService, permissionService, settingService, storeContext, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("WidgetsGoogleAnalyticsController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _permissionService → {_permissionService}", localizationService, notificationService, permissionService, settingService, storeContext, _permissionService);
         _settingService = settingService;
+		_logger.LogDebug("WidgetsGoogleAnalyticsController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _settingService → {_settingService}", localizationService, notificationService, permissionService, settingService, storeContext, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("WidgetsGoogleAnalyticsController(localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},storeContext={StoreContext}): _storeContext → {_storeContext}", localizationService, notificationService, permissionService, settingService, storeContext, _storeContext);
     }
 
     #endregion
@@ -49,9 +57,12 @@ public class WidgetsGoogleAnalyticsController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
         var googleAnalyticsSettings = await _settingService.LoadSettingAsync<GoogleAnalyticsSettings>(storeScope);
+		_logger.LogDebug("Configure(): googleAnalyticsSettings → {GoogleAnalyticsSettings}", googleAnalyticsSettings);
 
         var model = new ConfigurationModel
         {
@@ -76,6 +87,8 @@ public class WidgetsGoogleAnalyticsController : BasePluginController
             model.IncludeCustomerId_OverrideForStore = await _settingService.SettingExistsAsync(googleAnalyticsSettings, x => x.IncludeCustomerId, storeScope);
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
+		_logger.LogDebug("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Widgets.GoogleAnalytics/Views/Configure.cshtml", model);
     }
 

@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Messages;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Core.Domain.Messages;
 
 namespace Nop.Services.Messages;
 
@@ -7,6 +8,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class MessageTokensAddedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -14,7 +16,9 @@ public partial class MessageTokensAddedEvent
     /// <param name="tokens">Tokens</param>
     public MessageTokensAddedEvent(MessageTemplate message, IList<Token> tokens)
     {
+		_logger.LogDebug(">>> Entering MessageTokensAddedEvent(message={Message},tokens=<redacted>)", message);
         Message = message;
+		_logger.LogDebug("MessageTokensAddedEvent(message={Message},tokens=<redacted>): Message → {Message1}", message, Message);
         Tokens = tokens;
     }
 

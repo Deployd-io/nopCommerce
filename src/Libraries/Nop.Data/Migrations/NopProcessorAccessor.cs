@@ -1,6 +1,7 @@
 ﻿using FluentMigrator;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Processors;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -9,11 +10,14 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public class NopProcessorAccessor : IProcessorAccessor
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NopProcessorAccessor(IEnumerable<IMigrationProcessor> processors)
     {
+		_logger.LogDebug(">>> Entering NopProcessorAccessor(processors={Processors})", processors);
         ConfigureProcessor(processors.ToList());
+		_logger.LogDebug("<<< Exiting NopProcessorAccessor(processors={Processors})", processors);
     }
 
     #endregion
@@ -26,12 +30,16 @@ public class NopProcessorAccessor : IProcessorAccessor
     /// <param name="processors">Collection of migration processors</param>
     protected virtual void ConfigureProcessor(IList<IMigrationProcessor> processors)
     {
+		_logger.LogDebug(">>> Entering ConfigureProcessor(processors={Processors})", processors);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		_logger.LogDebug("ConfigureProcessor(processors={Processors}): dataSettings → {DataSettings}", processors, dataSettings);
         if (!processors.Any())
+			_logger.LogWarning("Throwing ProcessorFactoryNotFoundException from ConfigureProcessor(processors={Processors})", processors);
             throw new ProcessorFactoryNotFoundException("No migration processor registered.");
 
         Processor = dataSettings is null ? processors.FirstOrDefault() : dataSettings.DataProvider switch
+		_logger.LogDebug("ConfigureProcessor(processors={Processors}): Processor → {Processor}", processors, Processor);
         {
             DataProviderType.SqlServer => FindProcessor(processors, ProcessorIdConstants.SqlServer),
             DataProviderType.MySql => FindProcessor(processors, ProcessorIdConstants.MySql5),
@@ -50,11 +58,14 @@ public class NopProcessorAccessor : IProcessorAccessor
     protected IMigrationProcessor FindProcessor(IList<IMigrationProcessor> processors,
         string processorsId)
     {
+		_logger.LogDebug(">>> Entering FindProcessor(processors={Processors},processorsId={ProcessorsId})", processors, processorsId);
         if (processors.FirstOrDefault(p =>
                 p.DatabaseType.Equals(processorsId, StringComparison.OrdinalIgnoreCase) ||
                 p.DatabaseTypeAliases.Any(a => a.Equals(processorsId, StringComparison.OrdinalIgnoreCase))) is
             IMigrationProcessor processor)
         {
+			_logger.LogDebug("<<< Exiting FindProcessor(processors={Processors},processorsId={ProcessorsId})", processors, processorsId);
+			_logger.LogWarning("Throwing ProcessorFactoryNotFoundException from FindProcessor(processors={Processors},processorsId={ProcessorsId})", processors, processorsId);
             return processor;
         }
 

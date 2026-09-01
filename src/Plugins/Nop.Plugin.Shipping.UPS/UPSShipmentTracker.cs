@@ -19,7 +19,9 @@ public class UPSShipmentTracker : IShipmentTracker
 
     public UPSShipmentTracker(UPSService upsService)
     {
+		logger.LogDebug(">>> Entering UPSShipmentTracker(upsService={UpsService})", upsService);
         _upsService = upsService;
+		logger.LogDebug("UPSShipmentTracker(upsService={UpsService}): _upsService → {_upsService}", upsService, _upsService);
     }
 
     #endregion
@@ -37,6 +39,7 @@ public class UPSShipmentTracker : IShipmentTracker
     /// </returns>
     public Task<string> GetUrlAsync(string trackingNumber, Shipment shipment = null)
     {
+		logger.LogDebug(">>> Entering GetUrlAsync(trackingNumber={TrackingNumber},shipment={Shipment})", trackingNumber, shipment);
         return Task.FromResult($"https://www.ups.com/track?&tracknum={trackingNumber}");
     }
 
@@ -51,13 +54,16 @@ public class UPSShipmentTracker : IShipmentTracker
     /// </returns>
     public async Task<IList<ShipmentStatusEvent>> GetShipmentEventsAsync(string trackingNumber, Shipment shipment = null)
     {
+		logger.LogDebug(">>> Entering GetShipmentEventsAsync(trackingNumber={TrackingNumber},shipment={Shipment})", trackingNumber, shipment);
         var result = new List<ShipmentStatusEvent>();
 
+		logger.LogDebug("GetShipmentEventsAsync(trackingNumber={TrackingNumber},shipment={Shipment}): result → {Result}", trackingNumber, shipment, result);
         if (string.IsNullOrEmpty(trackingNumber))
             return result;
 
         result.AddRange(await _upsService.GetShipmentEventsAsync(trackingNumber));
 
+		logger.LogDebug("<<< Exiting GetShipmentEventsAsync(trackingNumber={TrackingNumber},shipment={Shipment})", trackingNumber, shipment);
         return result;
     }
 

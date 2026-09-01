@@ -2,6 +2,7 @@
 using Nop.Core.Caching;
 using Nop.Data;
 using Nop.Plugin.Shipping.FixedByWeightByTotal.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Services;
 
@@ -10,6 +11,7 @@ namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Services;
 /// </summary>
 public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FixedByWeightByTotalSettings _pluginSettings;
@@ -26,9 +28,13 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
         IShortTermCacheManager shortTermCacheManager,
         IStaticCacheManager staticCacheManager)
     {
+		_logger.LogDebug(">>> Entering ShippingByWeightByTotalService(pluginSettings={PluginSettings},sbwtRepository={SbwtRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager})", pluginSettings, sbwtRepository, shortTermCacheManager, staticCacheManager);
         _pluginSettings = pluginSettings;
+		_logger.LogDebug("ShippingByWeightByTotalService(pluginSettings={PluginSettings},sbwtRepository={SbwtRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager}): _pluginSettings → {_pluginSettings}", pluginSettings, sbwtRepository, shortTermCacheManager, staticCacheManager, _pluginSettings);
         _sbwtRepository = sbwtRepository;
+		_logger.LogDebug("ShippingByWeightByTotalService(pluginSettings={PluginSettings},sbwtRepository={SbwtRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager}): _sbwtRepository → {_sbwtRepository}", pluginSettings, sbwtRepository, shortTermCacheManager, staticCacheManager, _sbwtRepository);
         _shortTermCacheManager = shortTermCacheManager;
+		_logger.LogDebug("ShippingByWeightByTotalService(pluginSettings={PluginSettings},sbwtRepository={SbwtRepository},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager}): _shortTermCacheManager → {_shortTermCacheManager}", pluginSettings, sbwtRepository, shortTermCacheManager, staticCacheManager, _shortTermCacheManager);
         _staticCacheManager = staticCacheManager;
     }
 
@@ -58,10 +64,12 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     {
         var rez = await _shortTermCacheManager.GetAsync(async () => await _sbwtRepository.GetAllAsync(async query =>
         {
+			var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
             var data = _pluginSettings.LoadAllRecord
                 ? (await _shortTermCacheManager.GetAsync(async () => await _sbwtRepository.GetAllAsync(q => q), FixedByWeightByTotalDefaults.ShippingByWeightByTotalCacheKey, null, null, null, null, null, null)).AsQueryable()
                 : query;
 
+			_logger.LogDebug(">>> Entering GetRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip})", storeId, warehouseId, countryId, stateProvinceId, zip);
             //filter by shipping method
             data = shippingMethodId <= 0
                 ? data
@@ -88,6 +96,7 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
                 : data.Where(r => r.StateProvinceId == stateProvinceId || r.StateProvinceId == 0);
 
             zip = zip?.Trim() ?? string.Empty;
+			_logger.LogDebug("GetRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip}): zip → {Zip1}", storeId, warehouseId, countryId, stateProvinceId, zip, zip);
 
             //filter by zip
             data = string.IsNullOrEmpty(zip)
@@ -100,6 +109,9 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
                 .ThenBy(sbw => sbw.Zip)
                 .ThenBy(sbw => sbw.ShippingMethodId)
                 .ThenBy(sbw => sbw.WeightFrom)
+			_logger.LogInformation("GetRecordsAsync(shippingMethodId,storeId,warehouseId,countryId,stateProvinceId,zip)=<redacted>,{StoreId},{WarehouseId},{CountryId},{StateProvinceId},{Zip}: find query executed in {Arg6} ms", storeId, warehouseId, countryId, stateProvinceId, zip, __logStartDb.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip})", storeId, warehouseId, countryId, stateProvinceId, zip);
+			_logger.LogInformation("GetRecordsAsync(shippingMethodId,storeId,warehouseId,countryId,stateProvinceId,zip)=<redacted>,{StoreId},{WarehouseId},{CountryId},{StateProvinceId},{Zip}: external service call took {Arg6} ms", storeId, warehouseId, countryId, stateProvinceId, zip, __logStart.ElapsedMilliseconds);
                 .ThenBy(sbw => sbw.OrderSubtotalFrom);
 
             return data;
@@ -132,6 +144,7 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     public virtual async Task<IPagedList<ShippingByWeightByTotalRecord>> FindRecordsAsync(int shippingMethodId, int storeId, int warehouseId,
         int countryId, int stateProvinceId, string zip, decimal? weight, decimal? orderSubtotal, int pageIndex, int pageSize)
     {
+		_logger.LogDebug(">>> Entering FindRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip},weight={Weight},orderSubtotal={OrderSubtotal},pageIndex={PageIndex},pageSize={PageSize})", storeId, warehouseId, countryId, stateProvinceId, zip, weight, orderSubtotal, pageIndex, pageSize);
         //filter by weight
         var existingRates =
             (await GetRecordsAsync(shippingMethodId, storeId, warehouseId, countryId, stateProvinceId, zip))
@@ -150,7 +163,10 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
             .ThenBy(r => string.IsNullOrEmpty(r.Zip));
 
         var records = new PagedList<ShippingByWeightByTotalRecord>(existingRates.ToList(), pageIndex, pageSize);
+		_logger.LogDebug("FindRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip},weight={Weight},orderSubtotal={OrderSubtotal},pageIndex={PageIndex},pageSize={PageSize}): records → {Records}", storeId, warehouseId, countryId, stateProvinceId, zip, weight, orderSubtotal, pageIndex, pageSize, records);
 
+		_logger.LogDebug("<<< Exiting FindRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip},weight={Weight},orderSubtotal={OrderSubtotal},pageIndex={PageIndex},pageSize={PageSize})", storeId, warehouseId, countryId, stateProvinceId, zip, weight, orderSubtotal, pageIndex, pageSize);
+		_logger.LogDebug("<<< Exiting FindRecordsAsync(shippingMethodId=<redacted>,storeId={StoreId},warehouseId={WarehouseId},countryId={CountryId},stateProvinceId={StateProvinceId},zip={Zip},weight={Weight},orderSubtotal={OrderSubtotal})", storeId, warehouseId, countryId, stateProvinceId, zip, weight, orderSubtotal);
         return records;
     }
 
@@ -187,6 +203,7 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// </returns>
     public virtual async Task<ShippingByWeightByTotalRecord> GetByIdAsync(int shippingByWeightRecordId)
     {
+		_logger.LogDebug(">>> Entering GetByIdAsync(shippingByWeightRecordId=<redacted>)");
         return await _sbwtRepository.GetByIdAsync(shippingByWeightRecordId);
     }
 
@@ -197,8 +214,12 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShippingByWeightRecordAsync(ShippingByWeightByTotalRecord shippingByWeightRecord)
     {
+		_logger.LogDebug(">>> Entering InsertShippingByWeightRecordAsync(shippingByWeightRecord=<redacted>)");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _sbwtRepository.InsertAsync(shippingByWeightRecord, false);
 
+		_logger.LogDebug("<<< Exiting InsertShippingByWeightRecordAsync(shippingByWeightRecord=<redacted>)");
+		_logger.LogInformation("InsertShippingByWeightRecordAsync(shippingByWeightRecord)=<redacted>: save query executed in {Arg1} ms", __logStart.ElapsedMilliseconds);
         await _staticCacheManager.RemoveByPrefixAsync(FixedByWeightByTotalDefaults.ShippingByWeightByTotalCachePrefix);
     }
 
@@ -209,8 +230,12 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateShippingByWeightRecordAsync(ShippingByWeightByTotalRecord shippingByWeightRecord)
     {
+		_logger.LogDebug(">>> Entering UpdateShippingByWeightRecordAsync(shippingByWeightRecord=<redacted>)");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _sbwtRepository.UpdateAsync(shippingByWeightRecord, false);
 
+		_logger.LogDebug("<<< Exiting UpdateShippingByWeightRecordAsync(shippingByWeightRecord=<redacted>)");
+		_logger.LogInformation("UpdateShippingByWeightRecordAsync(shippingByWeightRecord)=<redacted>: update query executed in {Arg1} ms", __logStart.ElapsedMilliseconds);
         await _staticCacheManager.RemoveByPrefixAsync(FixedByWeightByTotalDefaults.ShippingByWeightByTotalCachePrefix);
     }
 
@@ -221,8 +246,12 @@ public class ShippingByWeightByTotalService : IShippingByWeightByTotalService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShippingByWeightRecordAsync(ShippingByWeightByTotalRecord shippingByWeightRecord)
     {
+		_logger.LogDebug(">>> Entering DeleteShippingByWeightRecordAsync(shippingByWeightRecord=<redacted>)");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _sbwtRepository.DeleteAsync(shippingByWeightRecord, false);
 
+		_logger.LogInformation("DeleteShippingByWeightRecordAsync(shippingByWeightRecord)=<redacted>: external service call took {Arg1} ms", __logStart.ElapsedMilliseconds);
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
         await _staticCacheManager.RemoveByPrefixAsync(FixedByWeightByTotalDefaults.ShippingByWeightByTotalCachePrefix);
     }
 

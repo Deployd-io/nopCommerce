@@ -1,12 +1,16 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.ShoppingCart;
 
 public partial record OrderTotalsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public OrderTotalsModel()
     {
+		_logger.LogDebug(">>> Entering OrderTotalsModel()");
         TaxRates = new List<TaxRate>();
+		_logger.LogDebug("OrderTotalsModel(): TaxRates → {TaxRates}", TaxRates);
         GiftCards = new List<GiftCard>();
     }
     public bool IsEditable { get; set; }

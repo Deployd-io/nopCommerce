@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -10,11 +11,14 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record AddRewardPointsToCustomerModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddRewardPointsToCustomerModel()
     {
+		_logger.LogDebug(">>> Entering AddRewardPointsToCustomerModel()");
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("AddRewardPointsToCustomerModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion

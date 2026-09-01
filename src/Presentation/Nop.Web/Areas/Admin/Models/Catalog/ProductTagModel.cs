@@ -1,6 +1,7 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductTagModel : BaseNopEntityModel, ILocalizedModel<ProductTagLocalizedModel>, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductTagModel()
     {
+		_logger.LogDebug(">>> Entering ProductTagModel()");
         Locales = new List<ProductTagLocalizedModel>();
+		_logger.LogDebug("ProductTagModel(): Locales → {Locales}", Locales);
     }
 
     #endregion

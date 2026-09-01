@@ -11,6 +11,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class NotificationService : INotificationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IHttpContextAccessor _httpContextAccessor;
@@ -28,8 +29,12 @@ public partial class NotificationService : INotificationService
         IWorkContext workContext)
     {
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("NotificationService(httpContextAccessor={HttpContextAccessor},logger={Logger},tempDataDictionaryFactory={TempDataDictionaryFactory},workContext={WorkContext}): _httpContextAccessor → {_httpContextAccessor}", httpContextAccessor, logger, tempDataDictionaryFactory, workContext, _httpContextAccessor);
         _logger = logger;
+		_logger.LogDebug(">>> Entering NotificationService(httpContextAccessor={HttpContextAccessor},logger={Logger},tempDataDictionaryFactory={TempDataDictionaryFactory},workContext={WorkContext})", httpContextAccessor, logger, tempDataDictionaryFactory, workContext);
         _tempDataDictionaryFactory = tempDataDictionaryFactory;
+		_logger.LogDebug("NotificationService(httpContextAccessor={HttpContextAccessor},logger={Logger},tempDataDictionaryFactory={TempDataDictionaryFactory},workContext={WorkContext}): _tempDataDictionaryFactory → {_tempDataDictionaryFactory}", httpContextAccessor, logger, tempDataDictionaryFactory, workContext, _tempDataDictionaryFactory);
+		_logger.LogDebug("<<< Exiting NotificationService(httpContextAccessor={HttpContextAccessor},logger={Logger},tempDataDictionaryFactory={TempDataDictionaryFactory},workContext={WorkContext})", httpContextAccessor, logger, tempDataDictionaryFactory, workContext);
         _workContext = workContext;
     }
 
@@ -46,8 +51,10 @@ public partial class NotificationService : INotificationService
     /// <param name="timeout">The time (in milliseconds), on which notification will close automatically; leave 0 if notification shouldn't close automatically</param>
     protected virtual void PrepareTempData(NotifyType type, string message, bool encode = true, int timeout = 0)
     {
+		_logger.LogDebug(">>> Entering PrepareTempData(type={Type},message={Message},encode={Encode},timeout={Timeout})", type, message, encode, timeout);
         var context = _httpContextAccessor.HttpContext;
         var tempData = _tempDataDictionaryFactory.GetTempData(context);
+		_logger.LogDebug("PrepareTempData(type={Type},message={Message},encode={Encode},timeout={Timeout}): tempData → {TempData}", type, message, encode, timeout, tempData);
 
         //Messages have stored in a serialized list
         var messages = tempData.TryGetValue(NopMessageDefaults.NotificationListKey, out var value) 
@@ -63,6 +70,7 @@ public partial class NotificationService : INotificationService
         });
 
         tempData[NopMessageDefaults.NotificationListKey] = JsonConvert.SerializeObject(messages);
+		_logger.LogDebug("<<< Exiting PrepareTempData(type={Type},message={Message},encode={Encode},timeout={Timeout})", type, message, encode, timeout);
     }
 
     /// <summary>
@@ -72,10 +80,13 @@ public partial class NotificationService : INotificationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task LogExceptionAsync(Exception exception)
     {
+		_logger.LogDebug(">>> Entering LogExceptionAsync(exception={Exception})", exception);
         if (exception == null)
             return;
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("LogExceptionAsync(exception={Exception}): customer → {Customer}", exception, customer);
         await _logger.ErrorAsync(exception.Message, exception, customer);
+		_logger.LogDebug("<<< Exiting LogExceptionAsync(exception={Exception})", exception);
     }
 
     #endregion
@@ -91,7 +102,9 @@ public partial class NotificationService : INotificationService
     /// <param name="timeout">The time (in milliseconds) on which notification will close automatically; leave 0 if notification shouldn't close automatically</param>
     public virtual void Notification(NotifyType type, string message, bool encode = true, int timeout = 0)
     {
+		_logger.LogDebug(">>> Entering Notification(type={Type},message={Message},encode={Encode},timeout={Timeout})", type, message, encode, timeout);
         PrepareTempData(type, message, encode, timeout);
+		_logger.LogDebug("<<< Exiting Notification(type={Type},message={Message},encode={Encode},timeout={Timeout})", type, message, encode, timeout);
     }
 
     /// <summary>
@@ -102,7 +115,9 @@ public partial class NotificationService : INotificationService
     /// <param name="timeout">The time (in milliseconds) on which notification will close automatically; leave 0 if notification shouldn't close automatically</param>
     public virtual void SuccessNotification(string message, bool encode = true, int timeout = 0)
     {
+		_logger.LogDebug(">>> Entering SuccessNotification(message={Message},encode={Encode},timeout={Timeout})", message, encode, timeout);
         PrepareTempData(NotifyType.Success, message, encode, timeout);
+		_logger.LogDebug("<<< Exiting SuccessNotification(message={Message},encode={Encode},timeout={Timeout})", message, encode, timeout);
     }
 
     /// <summary>
@@ -113,7 +128,9 @@ public partial class NotificationService : INotificationService
     /// <param name="timeout">The time (in milliseconds) on which notification will close automatically; leave 0 if notification shouldn't close automatically</param>
     public virtual void WarningNotification(string message, bool encode = true, int timeout = 0)
     {
+		_logger.LogDebug(">>> Entering WarningNotification(message={Message},encode={Encode},timeout={Timeout})", message, encode, timeout);
         PrepareTempData(NotifyType.Warning, message, encode, timeout);
+		_logger.LogDebug("<<< Exiting WarningNotification(message={Message},encode={Encode},timeout={Timeout})", message, encode, timeout);
     }
 
     /// <summary>
@@ -124,7 +141,9 @@ public partial class NotificationService : INotificationService
     /// <param name="timeout">The time (in milliseconds) on which notification will close automatically; leave 0 if notification shouldn't close automatically</param>
     public virtual void ErrorNotification(string message, bool encode = true, int timeout = 0)
     {
+		_logger.LogDebug(">>> Entering ErrorNotification(message={Message},encode={Encode},timeout={Timeout})", message, encode, timeout);
         PrepareTempData(NotifyType.Error, message, encode, timeout);
+		_logger.LogDebug("<<< Exiting ErrorNotification(message={Message},encode={Encode},timeout={Timeout})", message, encode, timeout);
     }
 
     /// <summary>
@@ -136,6 +155,7 @@ public partial class NotificationService : INotificationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ErrorNotificationAsync(Exception exception, bool logException = true, int timeout = 0)
     {
+		_logger.LogDebug(">>> Entering ErrorNotificationAsync(exception={Exception},logException={LogException},timeout={Timeout})", exception, logException, timeout);
         if (exception == null)
             return;
 
@@ -143,6 +163,7 @@ public partial class NotificationService : INotificationService
             await LogExceptionAsync(exception);
 
         ErrorNotification(exception.Message, timeout: timeout);
+		_logger.LogDebug("<<< Exiting ErrorNotificationAsync(exception={Exception},logException={LogException},timeout={Timeout})", exception, logException, timeout);
     }
 
     #endregion

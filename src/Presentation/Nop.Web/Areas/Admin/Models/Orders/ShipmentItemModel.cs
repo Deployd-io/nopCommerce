@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record ShipmentItemModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ShipmentItemModel()
     {
+		_logger.LogDebug(">>> Entering ShipmentItemModel()");
         AvailableWarehouses = new List<WarehouseInfo>();
+		_logger.LogDebug("ShipmentItemModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     #endregion

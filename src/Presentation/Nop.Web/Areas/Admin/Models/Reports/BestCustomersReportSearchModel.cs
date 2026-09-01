@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Services.Orders;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Reports;
 
@@ -11,12 +12,16 @@ namespace Nop.Web.Areas.Admin.Models.Reports;
 /// </summary>
 public partial record BestCustomersReportSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public BestCustomersReportSearchModel()
     {
+		_logger.LogDebug(">>> Entering BestCustomersReportSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
+		_logger.LogDebug("BestCustomersReportSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailablePaymentStatuses = new List<SelectListItem>();
+		_logger.LogDebug("BestCustomersReportSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableShippingStatuses = new List<SelectListItem>();
     }
 

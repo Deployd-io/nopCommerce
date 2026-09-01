@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Domain.Security;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Domain.Security;
 
 /// <summary>
 /// Security setting changed event
 /// </summary>
 public partial class SecuritySettingsChangedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -14,7 +16,9 @@ public partial class SecuritySettingsChangedEvent
     /// <param name="oldEncryptionPrivateKey">Previous encryption key value</param>
     public SecuritySettingsChangedEvent(SecuritySettings securitySettings, string oldEncryptionPrivateKey)
     {
+		_logger.LogDebug(">>> Entering SecuritySettingsChangedEvent(securitySettings={SecuritySettings},oldEncryptionPrivateKey=<redacted>)", securitySettings);
         SecuritySettings = securitySettings;
+		_logger.LogDebug("SecuritySettingsChangedEvent(securitySettings={SecuritySettings},oldEncryptionPrivateKey=<redacted>): SecuritySettings → {SecuritySettings1}", securitySettings, SecuritySettings);
         OldEncryptionPrivateKey = oldEncryptionPrivateKey;
     }
 
