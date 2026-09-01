@@ -1,13 +1,17 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
 public partial record SystemInfoModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SystemInfoModel()
     {
+		_logger.LogDebug(">>> Entering SystemInfoModel()");
         Headers = new List<HeaderModel>();
+		_logger.LogDebug("SystemInfoModel(): Headers → {Headers}", Headers);
         LoadedAssemblies = new List<LoadedAssembly>();
     }
 

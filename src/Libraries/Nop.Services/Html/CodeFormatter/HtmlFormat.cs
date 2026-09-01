@@ -22,6 +22,7 @@
 
 using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html.CodeFormatter;
 
@@ -37,6 +38,7 @@ namespace Nop.Services.Html.CodeFormatter;
 /// </remarks>
 public partial class HtmlFormat : SourceFormat
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly CSharpFormat _csf; //to format embedded C# code
     protected readonly JavaScriptFormat _jsf; //to format client-side JavaScript code
     protected readonly Regex _attributeRegex;
@@ -44,6 +46,7 @@ public partial class HtmlFormat : SourceFormat
     /// <summary/>
     public HtmlFormat()
     {
+		_logger.LogDebug(">>> Entering HtmlFormat()");
         const string regJavaScript = @"(?<=&lt;script(?:\s.*?)?&gt;).+?(?=&lt;/script&gt;)";
         const string regComment = @"&lt;!--.*?--&gt;";
         const string regAspTag = @"&lt;%@.*?%&gt;|&lt;%|%&gt;";
@@ -59,11 +62,15 @@ public partial class HtmlFormat : SourceFormat
                      + regAspTag + ")|(" + regAspCode + ")|("
                      + regTagDelimiter + ")|(" + regTagName + ")|("
                      + regAttributes + ")|(" + regEntity + ")";
+					_logger.LogDebug("<<< Exiting HtmlFormat()");
 
         CodeRegex = new Regex(regAll, RegexOptions.IgnoreCase | RegexOptions.Singleline);
         _attributeRegex = new Regex(regAttributeMatch, RegexOptions.Singleline);
 
+		_logger.LogDebug("HtmlFormat(): CodeRegex → {CodeRegex}", CodeRegex);
+		_logger.LogDebug("HtmlFormat(): _attributeRegex → {_attributeRegex}", _attributeRegex);
         _csf = new CSharpFormat();
+		_logger.LogDebug("HtmlFormat(): _csf → {_csf}", _csf);
         _jsf = new JavaScriptFormat();
     }
 

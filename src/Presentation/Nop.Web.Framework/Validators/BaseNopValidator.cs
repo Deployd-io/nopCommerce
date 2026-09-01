@@ -4,6 +4,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Data.Mapping;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.Validators;
 /// <typeparam name="TModel">Type of model being validated</typeparam>
 public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TModel> where TModel : class
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     /// <summary>
@@ -23,10 +25,13 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
     protected virtual void SetDatabaseValidationRules<TEntity>(params string[] filterStringPropertyNames)
         where TEntity : BaseEntity
     {
+		_logger.LogDebug(">>> Entering SetDatabaseValidationRules(filterStringPropertyNames={FilterStringPropertyNames})", filterStringPropertyNames);
         var entityDescriptor = NopMappingSchema.GetEntityDescriptor(typeof(TEntity));
 
+		_logger.LogDebug("SetDatabaseValidationRules(filterStringPropertyNames={FilterStringPropertyNames}): entityDescriptor → {EntityDescriptor}", filterStringPropertyNames, entityDescriptor);
         SetStringPropertiesMaxLength(entityDescriptor, filterStringPropertyNames);
         SetDecimalMaxValue(entityDescriptor);
+		_logger.LogDebug("<<< Exiting SetDatabaseValidationRules(filterStringPropertyNames={FilterStringPropertyNames})", filterStringPropertyNames);
     }
 
     /// <summary>
@@ -36,6 +41,7 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
     /// <param name="filterPropertyNames">Properties to skip</param>
     protected virtual void SetStringPropertiesMaxLength(NopEntityDescriptor entityDescriptor, params string[] filterPropertyNames)
     {
+		_logger.LogDebug(">>> Entering SetStringPropertiesMaxLength(entityDescriptor={EntityDescriptor},filterPropertyNames={FilterPropertyNames})", entityDescriptor, filterPropertyNames);
         if (entityDescriptor is null)
             return;
 
@@ -53,12 +59,15 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
         {
             MaxLength = field.Size!.Value,
             // We must using identifiers of the form @SomeName to avoid problems with parsing fields that match reserved words https://github.com/StefH/System.Linq.Dynamic.Core/wiki/Dynamic-Expressions#substitution-values
+			_logger.LogDebug("SetStringPropertiesMaxLength(entityDescriptor={EntityDescriptor},filterPropertyNames={FilterPropertyNames}): MaxLength → {MaxLength}", entityDescriptor, filterPropertyNames, MaxLength);
             Expression = DynamicExpressionParser.ParseLambda<TModel, string>(null, false, "@" + field.Name)
         }).ToList();
+			_logger.LogDebug("SetStringPropertiesMaxLength(entityDescriptor={EntityDescriptor},filterPropertyNames={FilterPropertyNames}): Expression → {Expression}", entityDescriptor, filterPropertyNames, Expression);
 
         //define string length validation rules
         foreach (var expression in maxLengthExpressions) 
             RuleFor(expression.Expression).Length(0, expression.MaxLength);
+			_logger.LogDebug("<<< Exiting SetStringPropertiesMaxLength(entityDescriptor={EntityDescriptor},filterPropertyNames={FilterPropertyNames})", entityDescriptor, filterPropertyNames);
     }
 
     /// <summary>
@@ -67,6 +76,7 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
     /// <param name="entityDescriptor">Entity descriptor</param>
     protected virtual void SetDecimalMaxValue(NopEntityDescriptor entityDescriptor)
     {
+		_logger.LogDebug(">>> Entering SetDecimalMaxValue(entityDescriptor={EntityDescriptor})", entityDescriptor);
         if (entityDescriptor is null)
             return;
 
@@ -90,12 +100,16 @@ public abstract partial class BaseNopValidator<TModel> : AbstractValidator<TMode
             MaxValue = (decimal)Math.Pow(10, field.Size!.Value - field.Precision!.Value),
             Expression = DynamicExpressionParser.ParseLambda<TModel, decimal>(null, false, field.Name)
         }).ToList();
+			_logger.LogDebug("SetDecimalMaxValue(entityDescriptor={EntityDescriptor}): MaxValue → {MaxValue}", entityDescriptor, MaxValue);
+			_logger.LogDebug("SetDecimalMaxValue(entityDescriptor={EntityDescriptor}): Expression → {Expression}", entityDescriptor, Expression);
 
         //define decimal validation rules
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogDebug("SetDecimalMaxValue(entityDescriptor={EntityDescriptor}): localizationService → {LocalizationService}", entityDescriptor, localizationService);
         foreach (var expression in maxValueExpressions)
             RuleFor(expression.Expression).IsDecimal(expression.MaxValue)
                 .WithMessageAwait(localizationService.GetResourceAsync("Admin.Common.Validation.Decimal.Max"), expression.MaxValue - 1);
+				_logger.LogDebug("<<< Exiting SetDecimalMaxValue(entityDescriptor={EntityDescriptor})", entityDescriptor);
     }
 
     #endregion

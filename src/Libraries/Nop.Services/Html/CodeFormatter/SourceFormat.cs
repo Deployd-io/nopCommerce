@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Html.CodeFormatter;
 
@@ -46,12 +47,17 @@ namespace Nop.Services.Html.CodeFormatter;
 /// </remarks>
 public abstract partial class SourceFormat
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary/>
     protected SourceFormat()
     {
+		_logger.LogDebug(">>> Entering SourceFormat()");
         TabSpaces = 4;
+		_logger.LogDebug("SourceFormat(): TabSpaces → {TabSpaces}", TabSpaces);
         LineNumbers = false;
+		_logger.LogDebug("SourceFormat(): LineNumbers → {LineNumbers}", LineNumbers);
         Alternate = false;
+		_logger.LogDebug("SourceFormat(): Alternate → {Alternate}", Alternate);
         EmbedStyleSheet = false;
     }
 
@@ -61,6 +67,7 @@ public abstract partial class SourceFormat
     /// <returns>A text <see cref="Stream"/> of the CSS definitions.</returns>
     public static Stream GetCssStream()
     {
+		_logger.LogDebug(">>> Entering GetCssStream()");
         return Assembly.GetExecutingAssembly().GetManifestResourceStream(
             "Manoli.Utils.CSharpFormat.csharp.css");
     }
@@ -71,7 +78,10 @@ public abstract partial class SourceFormat
     /// <returns>A string containing the CSS definitions.</returns>
     public static string GetCssString()
     {
+		_logger.LogDebug(">>> Entering GetCssString()");
         using var reader = new StreamReader(GetCssStream());
+		_logger.LogDebug("GetCssString(): reader → {Reader}", reader);
+		_logger.LogDebug("<<< Exiting GetCssString()");
         return reader.ReadToEnd();
     }
 
@@ -113,8 +123,13 @@ public abstract partial class SourceFormat
     /// <returns>A string containing the HTML formatted code.</returns>
     public string FormatCode(Stream source)
     {
+		_logger.LogDebug(">>> Entering FormatCode(source={Source})", source);
         using var reader = new StreamReader(source);
         var s = reader.ReadToEnd();
+		_logger.LogDebug("FormatCode(source={Source}): s → {S}", source, s);
+		_logger.LogDebug("FormatCode(source={Source}): reader → {Reader}", source, reader);
+		_logger.LogDebug("<<< Exiting FormatCode(source={Source})", source);
+		_logger.LogDebug("<<< Exiting FormatCode(source={Source},lineNumbers={LineNumbers},alternate={Alternate},embedStyleSheet={EmbedStyleSheet},subCode={SubCode})", source, lineNumbers, alternate, embedStyleSheet, subCode);
         return FormatCode(s, LineNumbers, Alternate, EmbedStyleSheet, false);
     }
 
@@ -133,6 +148,7 @@ public abstract partial class SourceFormat
     /// </summary>
     public string FormatSubCode(string source)
     {
+		_logger.LogDebug(">>> Entering FormatSubCode(source={Source})", source);
         return FormatCode(source, false, false, false, true);
     }
 

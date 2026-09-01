@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-alert", Attributes = ALERT_NAME_ID, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopAlertTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string ALERT_NAME_ID = "asp-alert-id";
@@ -30,7 +32,9 @@ public partial class NopAlertTagHelper : TagHelper
 
     public NopAlertTagHelper(IHtmlGenerator generator, IHtmlHelper htmlHelper)
     {
+		_logger.LogDebug(">>> Entering NopAlertTagHelper(generator={Generator},htmlHelper={HtmlHelper})", generator, htmlHelper);
         Generator = generator;
+		_logger.LogDebug("NopAlertTagHelper(generator={Generator},htmlHelper={HtmlHelper}): Generator → {Generator1}", generator, htmlHelper, Generator);
         _htmlHelper = htmlHelper;
     }
 
@@ -46,6 +50,7 @@ public partial class NopAlertTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -55,6 +60,7 @@ public partial class NopAlertTagHelper : TagHelper
         viewContextAware?.Contextualize(ViewContext);
 
         var modalId = await new HtmlString(AlertId + "-action-alert").RenderHtmlContentAsync();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): modalId → {ModalId}", context, output, modalId);
 
         var actionAlertModel = new ActionAlertModel()
         {
@@ -65,6 +71,8 @@ public partial class NopAlertTagHelper : TagHelper
 
         //tag details
         output.TagName = "div";
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
         output.TagMode = TagMode.StartTagAndEndTag;
 
         output.Attributes.Add("id", modalId);
@@ -74,16 +82,20 @@ public partial class NopAlertTagHelper : TagHelper
         output.Attributes.Add("aria-labelledby", $"{modalId}-title");
 
         var partialView = await _htmlHelper.PartialAsync("Alert", actionAlertModel);
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): partialView → {PartialView}", context, output, partialView);
         output.Content.SetHtmlContent(partialView);
 
         //modal script
         var script = new TagBuilder("script");
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): script → {Script}", context, output, script);
         script.InnerHtml.AppendHtml(
             "$(function() {" +
             $"$('#{AlertId}').attr(\"data-toggle\", \"modal\").attr(\"data-target\", \"#{modalId}\")" +
             "});");
         var scriptTag = await script.RenderHtmlContentAsync();
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): scriptTag → {ScriptTag}", context, output, scriptTag);
         output.PostContent.SetHtmlContent(scriptTag);
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

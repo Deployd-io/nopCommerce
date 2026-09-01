@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Models;
 
@@ -9,12 +10,16 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Models;
 /// </summary>
 public record CustomEventModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomEventModel()
     {
+		_logger.LogDebug(">>> Entering CustomEventModel()");
         WidgetZonesIds = new List<int>();
+		_logger.LogDebug("CustomEventModel(): WidgetZonesIds → {WidgetZonesIds}", WidgetZonesIds);
         WidgetZones = new List<string>();
+		_logger.LogDebug("CustomEventModel(): WidgetZones → {WidgetZones}", WidgetZones);
         AvailableWidgetZones = new List<SelectListItem>();
     }
 

@@ -11,11 +11,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Topics;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class TopicController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -41,14 +43,23 @@ public partial class TopicController : BaseAdminController
         ITopicService topicService,
         IUrlRecordService urlRecordService)
     {
+		_logger.LogDebug(">>> Entering TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService})", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _customerActivityService → {_customerActivityService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _customerActivityService);
         _localizationService = localizationService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _localizationService → {_localizationService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _localizedEntityService → {_localizedEntityService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _notificationService → {_notificationService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _notificationService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _storeMappingService → {_storeMappingService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _storeMappingService);
         _topicModelFactory = topicModelFactory;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _topicModelFactory → {_topicModelFactory}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _topicModelFactory);
         _topicService = topicService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _topicService → {_topicService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _topicService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("TopicController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},storeMappingService=<redacted>,topicModelFactory={TopicModelFactory},topicService={TopicService},urlRecordService={UrlRecordService}): _urlRecordService → {_urlRecordService}", customerActivityService, localizationService, localizedEntityService, notificationService, topicModelFactory, topicService, urlRecordService, _urlRecordService);
     }
 
     #endregion
@@ -57,6 +68,7 @@ public partial class TopicController : BaseAdminController
 
     protected virtual async Task UpdateLocalesAsync(Topic topic, TopicModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalesAsync(topic={Topic},model={Model})", topic, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(topic,
@@ -86,8 +98,10 @@ public partial class TopicController : BaseAdminController
 
             //search engine name
             var seName = await _urlRecordService.ValidateSeNameAsync(topic, localized.SeName, localized.Title, false);
+			_logger.LogDebug("UpdateLocalesAsync(topic={Topic},model={Model}): seName → {SeName}", topic, model, seName);
             await _urlRecordService.SaveSlugAsync(topic, seName, localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateLocalesAsync(topic={Topic},model={Model})", topic, model);
     }
 
     #endregion
@@ -96,15 +110,20 @@ public partial class TopicController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _topicModelFactory.PrepareTopicSearchModelAsync(new TopicSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -125,9 +144,13 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _topicModelFactory.PrepareTopicModelAsync(new TopicModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -175,14 +198,19 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a topic with the specified id
         var topic = await _topicService.GetTopicByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): topic → {Topic}", id, topic);
         if (topic == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _topicModelFactory.PrepareTopicModelAsync(null, topic);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -236,8 +264,10 @@ public partial class TopicController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.TOPICS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a topic with the specified id
         var topic = await _topicService.GetTopicByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): topic → {Topic}", id, topic);
         if (topic == null)
             return RedirectToAction("List");
 
@@ -249,6 +279,7 @@ public partial class TopicController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteTopic",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteTopic"), topic.Title ?? topic.SystemName), topic);
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 

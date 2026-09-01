@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Shipping;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Core.Domain.Shipping;
 
 namespace Nop.Services.Shipping;
 
@@ -7,9 +8,12 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class GetShippingOptionResponse : BaseNopResult
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public GetShippingOptionResponse()
     {
+		_logger.LogDebug(">>> Entering GetShippingOptionResponse()");
         ShippingOptions = new List<ShippingOption>();
+		_logger.LogDebug("GetShippingOptionResponse(): ShippingOptions → {ShippingOptions}", ShippingOptions);
     }
 
     /// <summary>

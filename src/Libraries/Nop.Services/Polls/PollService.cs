@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Polls;
 using Nop.Data;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Polls;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Polls;
 /// </summary>
 public partial class PollService : IPollService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<Poll> _pollRepository;
@@ -27,10 +29,15 @@ public partial class PollService : IPollService
         IRepository<PollVotingRecord> pollVotingRecordRepository,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering PollService(pollRepository={PollRepository},pollAnswerRepository={PollAnswerRepository},pollVotingRecordRepository={PollVotingRecordRepository},storeMappingService=<redacted>)", pollRepository, pollAnswerRepository, pollVotingRecordRepository);
         _pollRepository = pollRepository;
+		_logger.LogDebug("PollService(pollRepository={PollRepository},pollAnswerRepository={PollAnswerRepository},pollVotingRecordRepository={PollVotingRecordRepository},storeMappingService=<redacted>): _pollRepository → {_pollRepository}", pollRepository, pollAnswerRepository, pollVotingRecordRepository, _pollRepository);
         _pollAnswerRepository = pollAnswerRepository;
+		_logger.LogDebug("PollService(pollRepository={PollRepository},pollAnswerRepository={PollAnswerRepository},pollVotingRecordRepository={PollVotingRecordRepository},storeMappingService=<redacted>): _pollAnswerRepository → {_pollAnswerRepository}", pollRepository, pollAnswerRepository, pollVotingRecordRepository, _pollAnswerRepository);
         _pollVotingRecordRepository = pollVotingRecordRepository;
+		_logger.LogDebug("PollService(pollRepository={PollRepository},pollAnswerRepository={PollAnswerRepository},pollVotingRecordRepository={PollVotingRecordRepository},storeMappingService=<redacted>): _pollVotingRecordRepository → {_pollVotingRecordRepository}", pollRepository, pollAnswerRepository, pollVotingRecordRepository, _pollVotingRecordRepository);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("PollService(pollRepository={PollRepository},pollAnswerRepository={PollAnswerRepository},pollVotingRecordRepository={PollVotingRecordRepository},storeMappingService=<redacted>): _storeMappingService → {_storeMappingService}", pollRepository, pollAnswerRepository, pollVotingRecordRepository, _storeMappingService);
     }
 
     #endregion
@@ -47,6 +54,8 @@ public partial class PollService : IPollService
     /// </returns>
     public virtual async Task<Poll> GetPollByIdAsync(int pollId)
     {
+		_logger.LogDebug(">>> Entering GetPollByIdAsync(pollId={PollId})", pollId);
+		_logger.LogInformation("GetPollByIdAsync(pollId)={PollId}: find query executing", pollId);
         return await _pollRepository.GetByIdAsync(pollId, cache => default);
     }
 
@@ -68,8 +77,10 @@ public partial class PollService : IPollService
         bool loadShownOnHomepageOnly = false, string systemKeyword = null,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetPollsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden},loadShownOnHomepageOnly={LoadShownOnHomepageOnly},systemKeyword={SystemKeyword},pageIndex={PageIndex},pageSize={PageSize})", storeId, languageId, showHidden, loadShownOnHomepageOnly, systemKeyword, pageIndex, pageSize);
         var query = _pollRepository.Table;
 
+		_logger.LogDebug("GetPollsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden},loadShownOnHomepageOnly={LoadShownOnHomepageOnly},systemKeyword={SystemKeyword},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", storeId, languageId, showHidden, loadShownOnHomepageOnly, systemKeyword, pageIndex, pageSize, query);
         if (!showHidden || storeId > 0)
         {
             //apply store mapping constraints
@@ -101,6 +112,7 @@ public partial class PollService : IPollService
         query = query.OrderBy(poll => poll.DisplayOrder).ThenBy(poll => poll.Id);
 
         //return paged list of polls
+		_logger.LogDebug("<<< Exiting GetPollsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden},loadShownOnHomepageOnly={LoadShownOnHomepageOnly},systemKeyword={SystemKeyword},pageIndex={PageIndex},pageSize={PageSize})", storeId, languageId, showHidden, loadShownOnHomepageOnly, systemKeyword, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -111,6 +123,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePollAsync(Poll poll)
     {
+		_logger.LogDebug(">>> Entering DeletePollAsync(poll={Poll})", poll);
         await _pollRepository.DeleteAsync(poll);
     }
 
@@ -121,6 +134,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPollAsync(Poll poll)
     {
+		_logger.LogDebug(">>> Entering InsertPollAsync(poll={Poll})", poll);
         await _pollRepository.InsertAsync(poll);
     }
 
@@ -131,6 +145,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePollAsync(Poll poll)
     {
+		_logger.LogDebug(">>> Entering UpdatePollAsync(poll={Poll})", poll);
         await _pollRepository.UpdateAsync(poll);
     }
 
@@ -144,6 +159,8 @@ public partial class PollService : IPollService
     /// </returns>
     public virtual async Task<PollAnswer> GetPollAnswerByIdAsync(int pollAnswerId)
     {
+		_logger.LogDebug(">>> Entering GetPollAnswerByIdAsync(pollAnswerId={PollAnswerId})", pollAnswerId);
+		_logger.LogInformation("GetPollAnswerByIdAsync(pollAnswerId)={PollAnswerId}: find query executing", pollAnswerId);
         return await _pollAnswerRepository.GetByIdAsync(pollAnswerId, cache => default);
     }
 
@@ -154,6 +171,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePollAnswerAsync(PollAnswer pollAnswer)
     {
+		_logger.LogDebug(">>> Entering DeletePollAnswerAsync(pollAnswer={PollAnswer})", pollAnswer);
         await _pollAnswerRepository.DeleteAsync(pollAnswer);
     }
 
@@ -167,12 +185,15 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<IPagedList<PollAnswer>> GetPollAnswerByPollAsync(int pollId, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetPollAnswerByPollAsync(pollId={PollId},pageIndex={PageIndex},pageSize={PageSize})", pollId, pageIndex, pageSize);
         var query = _pollAnswerRepository.Table.Where(pa => pa.PollId == pollId);
 
+		_logger.LogDebug("GetPollAnswerByPollAsync(pollId={PollId},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", pollId, pageIndex, pageSize, query);
         //order records by display order
         query = query.OrderBy(pa => pa.DisplayOrder).ThenBy(pa => pa.Id);
 
         //return paged list of polls
+		_logger.LogDebug("<<< Exiting GetPollAnswerByPollAsync(pollId={PollId},pageIndex={PageIndex},pageSize={PageSize})", pollId, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -183,6 +204,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPollAnswerAsync(PollAnswer pollAnswer)
     {
+		_logger.LogDebug(">>> Entering InsertPollAnswerAsync(pollAnswer={PollAnswer})", pollAnswer);
         await _pollAnswerRepository.InsertAsync(pollAnswer);
     }
 
@@ -193,6 +215,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdatePollAnswerAsync(PollAnswer pollAnswer)
     {
+		_logger.LogDebug(">>> Entering UpdatePollAnswerAsync(pollAnswer={PollAnswer})", pollAnswer);
         await _pollAnswerRepository.UpdateAsync(pollAnswer);
     }
 
@@ -207,6 +230,7 @@ public partial class PollService : IPollService
     /// </returns>
     public virtual async Task<bool> AlreadyVotedAsync(int pollId, int customerId)
     {
+		_logger.LogDebug(">>> Entering AlreadyVotedAsync(pollId={PollId},customerId={CustomerId})", pollId, customerId);
         if (pollId == 0 || customerId == 0)
             return false;
 
@@ -216,6 +240,7 @@ public partial class PollService : IPollService
                 where pa.PollId == pollId && pvr.CustomerId == customerId
                 select pvr)
             .AnyAsync();
+		_logger.LogDebug("<<< Exiting AlreadyVotedAsync(pollId={PollId},customerId={CustomerId})", pollId, customerId);
         return result;
     }
 
@@ -226,6 +251,7 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertPollVotingRecordAsync(PollVotingRecord pollVotingRecord)
     {
+		_logger.LogDebug(">>> Entering InsertPollVotingRecordAsync(pollVotingRecord={PollVotingRecord})", pollVotingRecord);
         await _pollVotingRecordRepository.InsertAsync(pollVotingRecord);
     }
 
@@ -239,9 +265,12 @@ public partial class PollService : IPollService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<IPagedList<PollVotingRecord>> GetPollVotingRecordsByPollAnswerAsync(int pollAnswerId, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetPollVotingRecordsByPollAnswerAsync(pollAnswerId={PollAnswerId},pageIndex={PageIndex},pageSize={PageSize})", pollAnswerId, pageIndex, pageSize);
         var query = _pollVotingRecordRepository.Table.Where(pa => pa.PollAnswerId == pollAnswerId);
 
+		_logger.LogDebug("GetPollVotingRecordsByPollAnswerAsync(pollAnswerId={PollAnswerId},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", pollAnswerId, pageIndex, pageSize, query);
         //return paged list of poll voting records
+		_logger.LogDebug("<<< Exiting GetPollVotingRecordsByPollAnswerAsync(pollAnswerId={PollAnswerId},pageIndex={PageIndex},pageSize={PageSize})", pollAnswerId, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 

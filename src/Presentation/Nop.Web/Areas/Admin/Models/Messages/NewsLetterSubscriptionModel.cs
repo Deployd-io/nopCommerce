@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Messages;
 
@@ -10,12 +11,16 @@ namespace Nop.Web.Areas.Admin.Models.Messages;
 /// </summary>
 public partial record NewsLetterSubscriptionModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NewsLetterSubscriptionModel()
     {
+		_logger.LogDebug(">>> Entering NewsLetterSubscriptionModel()");
         AvailableNewsLetterSubscriptionTypes = new List<SelectListItem>();
+		_logger.LogDebug("NewsLetterSubscriptionModel(): AvailableNewsLetterSubscriptionTypes → {AvailableNewsLetterSubscriptionTypes}", AvailableNewsLetterSubscriptionTypes);
         AvailableNewsLetterSubscriptionStores = new List<SelectListItem>();
+		_logger.LogDebug("NewsLetterSubscriptionModel(): AvailableNewsLetterSubscriptionStores → {AvailableNewsLetterSubscriptionStores}", AvailableNewsLetterSubscriptionStores);
         AvailableNewsLetterSubscriptionLanguages = new List<SelectListItem>();
     }
 

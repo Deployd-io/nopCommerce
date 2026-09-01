@@ -7,12 +7,14 @@ using Nop.Data.Migrations;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Data;
 
 [NopMigration("2023-05-22 17:00:00", "Misc.Brevo 4.70.4. Rename Sendinblue to Brevo.", MigrationProcessType.Update)]
 public class BrevoMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -31,9 +33,13 @@ public class BrevoMigration : MigrationBase
         WidgetSettings widgetSettings
     )
     {
+		_logger.LogDebug(">>> Entering BrevoMigration(localizationService={LocalizationService},dataProvider={DataProvider},settingService={SettingService},widgetSettings={WidgetSettings})", localizationService, dataProvider, settingService, widgetSettings);
         _localizationService = localizationService;
+		_logger.LogDebug("BrevoMigration(localizationService={LocalizationService},dataProvider={DataProvider},settingService={SettingService},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", localizationService, dataProvider, settingService, widgetSettings, _localizationService);
         _dataProvider = dataProvider;
         _settingService = settingService;
+		_logger.LogDebug("BrevoMigration(localizationService={LocalizationService},dataProvider={DataProvider},settingService={SettingService},widgetSettings={WidgetSettings}): _dataProvider → {_dataProvider}", localizationService, dataProvider, settingService, widgetSettings, _dataProvider);
+		_logger.LogDebug("BrevoMigration(localizationService={LocalizationService},dataProvider={DataProvider},settingService={SettingService},widgetSettings={WidgetSettings}): _settingService → {_settingService}", localizationService, dataProvider, settingService, widgetSettings, _settingService);
         _widgetSettings = widgetSettings;
     }
 
@@ -46,6 +52,7 @@ public class BrevoMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogDebug(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -129,6 +136,7 @@ public class BrevoMigration : MigrationBase
         #region settings
 
         var sendinblueSettings = _dataProvider.GetTable<Setting>().Where(x => x.Name.StartsWith("sendinbluesettings.")).ToList();
+		_logger.LogDebug("Up(): sendinblueSettings → {SendinblueSettings}", sendinblueSettings);
         if (sendinblueSettings.Any())
         { 
             foreach (var setting in sendinblueSettings)
@@ -149,15 +157,19 @@ public class BrevoMigration : MigrationBase
         #region schedule task
 
         var sendinblueTask = _dataProvider.GetTable<ScheduleTask>().FirstOrDefault(x => x.Type == "Nop.Plugin.Misc.Sendinblue.Services.SynchronizationTask");
+		_logger.LogDebug("Up(): sendinblueTask → {SendinblueTask}", sendinblueTask);
         if (sendinblueTask != null)
         {
             sendinblueTask.Type = BrevoDefaults.SynchronizationTask;
+			_logger.LogDebug("Up(): sendinblueTask.Type → {Arg0}", sendinblueTask.Type);
+			_logger.LogDebug("Up(): sendinblueTask.Name → {Arg0}", sendinblueTask.Name);
             sendinblueTask.Name = BrevoDefaults.SynchronizationTaskName;
 
             _dataProvider.UpdateEntity(sendinblueTask);
         }
 
         #endregion
+		_logger.LogDebug("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -165,7 +177,9 @@ public class BrevoMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogDebug(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogDebug("<<< Exiting Down()");
     }
 
     #endregion

@@ -15,11 +15,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CountryController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -50,17 +52,29 @@ public partial class CountryController : BaseAdminController
         IStateProvinceService stateProvinceService,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>)", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService);
         _addressService = addressService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _addressService → {_addressService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _addressService);
         _countryModelFactory = countryModelFactory;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _countryModelFactory → {_countryModelFactory}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _countryModelFactory);
         _countryService = countryService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _countryService → {_countryService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _countryService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _customerActivityService → {_customerActivityService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _customerActivityService);
         _exportManager = exportManager;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _exportManager → {_exportManager}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _exportManager);
         _importManager = importManager;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _importManager → {_importManager}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _importManager);
         _localizationService = localizationService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _localizationService → {_localizationService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _localizedEntityService → {_localizedEntityService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _notificationService → {_notificationService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _notificationService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _stateProvinceService → {_stateProvinceService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _stateProvinceService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("CountryController(addressService={AddressService},countryModelFactory={CountryModelFactory},countryService={CountryService},customerActivityService={CustomerActivityService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},stateProvinceService={StateProvinceService},storeMappingService=<redacted>): _storeMappingService → {_storeMappingService}", addressService, countryModelFactory, countryService, customerActivityService, exportManager, importManager, localizationService, localizedEntityService, notificationService, stateProvinceService, _storeMappingService);
     }
 
     #endregion
@@ -69,6 +83,7 @@ public partial class CountryController : BaseAdminController
 
     protected virtual async Task UpdateLocalesAsync(Country country, CountryModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalesAsync(country={Country},model={Model})", country, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(country,
@@ -76,10 +91,12 @@ public partial class CountryController : BaseAdminController
                 localized.Name,
                 localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateLocalesAsync(country={Country},model={Model})", country, model);
     }
 
     protected virtual async Task UpdateLocalesAsync(StateProvince stateProvince, StateProvinceModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalesAsync(stateProvince={StateProvince},model={Model})", stateProvince, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(stateProvince,
@@ -87,6 +104,7 @@ public partial class CountryController : BaseAdminController
                 localized.Name,
                 localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateLocalesAsync(stateProvince={StateProvince},model={Model})", stateProvince, model);
     }
 
     #endregion
@@ -95,15 +113,19 @@ public partial class CountryController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _countryModelFactory.PrepareCountrySearchModelAsync(new CountrySearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
         return View(model);
     }
 
@@ -111,18 +133,25 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> CountryList(CountrySearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering CountryList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _countryModelFactory.PrepareCountryListModelAsync(searchModel);
+		_logger.LogDebug("CountryList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting CountryList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _countryModelFactory.PrepareCountryModelAsync(new CountryModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -163,14 +192,19 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): country → {Country}", id, country);
         if (country == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _countryModelFactory.PrepareCountryModelAsync(null, country);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -217,14 +251,17 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): country → {Country}", id, country);
         if (country == null)
             return RedirectToAction("List");
 
         try
         {
             if (await _addressService.GetAddressTotalByCountryIdAsync(country.Id) > 0)
+				_logger.LogWarning("Throwing NopException from Delete(id={Id})", id);
                 throw new NopException("The country can't be deleted. It has associated addresses");
 
             await _countryService.DeleteCountryAsync(country);
@@ -239,7 +276,9 @@ public partial class CountryController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = country.Id });
         }
     }
@@ -248,16 +287,19 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> PublishSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering PublishSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var countries = await _countryService.GetCountriesByIdsAsync([.. selectedIds]);
+		_logger.LogDebug("PublishSelected(selectedIds={SelectedIds}): countries → {Countries}", selectedIds, countries);
         foreach (var country in countries)
         {
             country.Published = true;
             await _countryService.UpdateCountryAsync(country);
         }
 
+		_logger.LogDebug("<<< Exiting PublishSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -265,16 +307,19 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> UnpublishSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering UnpublishSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var countries = await _countryService.GetCountriesByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("UnpublishSelected(selectedIds={SelectedIds}): countries → {Countries}", selectedIds, countries);
         foreach (var country in countries)
         {
             country.Published = false;
             await _countryService.UpdateCountryAsync(country);
         }
 
+		_logger.LogDebug("<<< Exiting UnpublishSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -286,27 +331,35 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> States(StateProvinceSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering States(searchModel={SearchModel})", searchModel);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(searchModel.CountryId)
             ?? throw new ArgumentException("No country found with the specified id");
 
         //prepare model
         var model = await _countryModelFactory.PrepareStateProvinceListModelAsync(searchModel, country);
+		_logger.LogDebug("States(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting States(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> StateCreatePopup(int countryId)
     {
+		_logger.LogDebug(">>> Entering StateCreatePopup(countryId={CountryId})", countryId);
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(countryId);
+		_logger.LogDebug("StateCreatePopup(countryId={CountryId}): country → {Country}", countryId, country);
         if (country == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _countryModelFactory.PrepareStateProvinceModelAsync(new StateProvinceModel(), country, null);
+		_logger.LogDebug("StateCreatePopup(countryId={CountryId}): model → {Model}", countryId, model);
 
+		_logger.LogDebug("<<< Exiting StateCreatePopup(countryId={CountryId})", countryId);
+		_logger.LogDebug("<<< Exiting StateCreatePopup(model={Model})", model);
         return View(model);
     }
 
@@ -346,19 +399,25 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> StateEditPopup(int id)
     {
+		_logger.LogDebug(">>> Entering StateEditPopup(id={Id})", id);
         //try to get a state with the specified id
         var state = await _stateProvinceService.GetStateProvinceByIdAsync(id);
+		_logger.LogDebug("StateEditPopup(id={Id}): state → {State}", id, state);
         if (state == null)
             return RedirectToAction("List");
 
         //try to get a country with the specified id
         var country = await _countryService.GetCountryByIdAsync(state.CountryId);
+		_logger.LogDebug("StateEditPopup(id={Id}): country → {Country}", id, country);
         if (country == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _countryModelFactory.PrepareStateProvinceModelAsync(null, country, state);
+		_logger.LogDebug("StateEditPopup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting StateEditPopup(id={Id})", id);
+		_logger.LogDebug("<<< Exiting StateEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -403,6 +462,7 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> StateDelete(int id)
     {
+		_logger.LogDebug(">>> Entering StateDelete(id={Id})", id);
         //try to get a state with the specified id
         var state = await _stateProvinceService.GetStateProvinceByIdAsync(id)
             ?? throw new ArgumentException("No state found with the specified id");
@@ -419,18 +479,22 @@ public partial class CountryController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteStateProvince",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteStateProvince"), state.Id), state);
 
+		_logger.LogDebug("<<< Exiting StateDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     public virtual async Task<IActionResult> GetStatesByCountryId(string countryId, bool? addSelectStateItem, bool? addAsterisk)
     {
+		_logger.LogDebug(">>> Entering GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk})", countryId, addSelectStateItem, addAsterisk);
         //permission validation is not required here
 
         // This action method gets called via an ajax request
         ArgumentException.ThrowIfNullOrEmpty(countryId);
 
         var country = await _countryService.GetCountryByIdAsync(Convert.ToInt32(countryId));
+		_logger.LogDebug("GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk}): country → {Country}", countryId, addSelectStateItem, addAsterisk, country);
         var states = country != null ? (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country.Id, showHidden: true)).ToList() : new List<StateProvince>();
+		_logger.LogDebug("GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk}): states → {States}", countryId, addSelectStateItem, addAsterisk, states);
         var result = (from s in states
             select new { id = s.Id, name = s.Name }).ToList();
         if (addAsterisk.HasValue && addAsterisk.Value)
@@ -471,6 +535,7 @@ public partial class CountryController : BaseAdminController
             }
         }
 
+		_logger.LogDebug("<<< Exiting GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem},addAsterisk={AddAsterisk})", countryId, addSelectStateItem, addAsterisk);
         return Json(result);
     }
 
@@ -481,11 +546,16 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> ExportCsv()
     {
+		_logger.LogDebug(">>> Entering ExportCsv()");
         var fileName = $"states_{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_{CommonHelper.GenerateRandomDigitCode(4)}.csv";
 
+		_logger.LogDebug("ExportCsv(): fileName → {FileName}", fileName);
         var states = await _stateProvinceService.GetStateProvincesAsync(true);
+		_logger.LogDebug("ExportCsv(): states → {States}", states);
         var result = await _exportManager.ExportStatesToTxtAsync(states);
+		_logger.LogDebug("ExportCsv(): result → {Result}", result);
 
+		_logger.LogDebug("<<< Exiting ExportCsv()");
         return File(Encoding.UTF8.GetBytes(result), MimeTypes.TextCsv, fileName);
     }
 
@@ -493,11 +563,13 @@ public partial class CountryController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_COUNTRIES)]
     public virtual async Task<IActionResult> ImportCsv(IFormFile importcsvfile)
     {
+		_logger.LogDebug(">>> Entering ImportCsv(importcsvfile={Importcsvfile})", importcsvfile);
         try
         {
             if (importcsvfile != null && importcsvfile.Length > 0)
             {
                 var count = await _importManager.ImportStatesFromTxtAsync(importcsvfile.OpenReadStream());
+				_logger.LogDebug("ImportCsv(importcsvfile={Importcsvfile}): count → {Count}", importcsvfile, count);
 
                 _notificationService.SuccessNotification(string.Format(await _localizationService.GetResourceAsync("Admin.Configuration.Countries.ImportSuccess"), count));
 
@@ -510,7 +582,9 @@ public partial class CountryController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ImportCsv(importcsvfile={Importcsvfile}): {Arg1}", importcsvfile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ImportCsv(importcsvfile={Importcsvfile})", importcsvfile);
             return RedirectToAction("List");
         }
     }

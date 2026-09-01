@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Areas.Admin.Models.Stores;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record StoreScopeConfigurationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public StoreScopeConfigurationModel()
     {
+		_logger.LogDebug(">>> Entering StoreScopeConfigurationModel()");
         Stores = new List<StoreModel>();
+		_logger.LogDebug("StoreScopeConfigurationModel(): Stores → {Stores}", Stores);
     }
 
     #endregion

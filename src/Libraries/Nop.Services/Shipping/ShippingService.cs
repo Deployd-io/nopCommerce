@@ -20,6 +20,7 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class ShippingService : IShippingService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -63,21 +64,38 @@ public partial class ShippingService : IShippingService
         ShoppingCartSettings shoppingCartSettings)
     {
         _addressService = addressService;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _addressService → {_addressService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _addressService);
         _checkoutAttributeParser = checkoutAttributeParser;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _checkoutAttributeParser → {_checkoutAttributeParser}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _checkoutAttributeParser);
         _countryService = countryService;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _countryService → {_countryService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _countryService);
         _customerService = customerService;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _customerService → {_customerService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _customerService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _genericAttributeService → {_genericAttributeService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _localizationService → {_localizationService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _localizationService);
         _logger = logger;
+		_logger.LogDebug(">>> Entering ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>)", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService);
         _pickupPluginManager = pickupPluginManager;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _pickupPluginManager → {_pickupPluginManager}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _pickupPluginManager);
         _priceCalculationService = priceCalculationService;
         _productAttributeParser = productAttributeParser;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _priceCalculationService → {_priceCalculationService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _priceCalculationService);
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _productAttributeParser → {_productAttributeParser}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _productAttributeParser);
         _productService = productService;
         _shippingPluginManager = shippingPluginManager;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _productService → {_productService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _productService);
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _shippingPluginManager → {_shippingPluginManager}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _shippingPluginManager);
         _stateProvinceService = stateProvinceService;
         _storeContext = storeContext;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _stateProvinceService → {_stateProvinceService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _stateProvinceService);
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _storeContext → {_storeContext}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _storeContext);
         _warehouseService = warehouseService;
         _shippingSettings = shippingSettings;
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _warehouseService → {_warehouseService}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _warehouseService);
+		_logger.LogDebug("ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>): _shippingSettings → {_shippingSettings}", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService, _shippingSettings);
+		_logger.LogDebug("<<< Exiting ShippingService(addressService={AddressService},checkoutAttributeParser={CheckoutAttributeParser},countryService={CountryService},customerService={CustomerService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},pickupPluginManager={PickupPluginManager},priceCalculationService={PriceCalculationService},productAttributeParser={ProductAttributeParser},productService={ProductService},shippingPluginManager=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},warehouseService={WarehouseService},shippingSettings=<redacted>,shoppingCartSettings=<redacted>)", addressService, checkoutAttributeParser, countryService, customerService, genericAttributeService, localizationService, logger, pickupPluginManager, priceCalculationService, productAttributeParser, productService, stateProvinceService, storeContext, warehouseService);
         _shoppingCartSettings = shoppingCartSettings;
     }
 
@@ -95,6 +113,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     protected virtual async Task<bool> AreMultipleItemsAsync(IList<GetShippingOptionRequest.PackageItem> items)
     {
+		_logger.LogDebug(">>> Entering AreMultipleItemsAsync(items={Items})", items);
         //no items
         if (!items.Any())
             return false;
@@ -105,6 +124,7 @@ public partial class ShippingService : IShippingService
 
         //or single item
         var singleItem = items.First();
+		_logger.LogDebug("AreMultipleItemsAsync(items={Items}): singleItem → {SingleItem}", items, singleItem);
 
         //but quantity more than one
         if (singleItem.GetQuantity() > 1)
@@ -119,6 +139,7 @@ public partial class ShippingService : IShippingService
             .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct);
 
         //whether to ship associated products
+		_logger.LogDebug("<<< Exiting AreMultipleItemsAsync(items={Items})", items);
         return await associatedAttributeValues.AnyAwaitAsync(async attributeValue =>
             (await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId))?.IsShipEnabled ?? false);
     }
@@ -182,9 +203,11 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<decimal> GetShoppingCartItemWeightAsync(ShoppingCartItem shoppingCartItem, bool ignoreFreeShippedItems = false)
     {
+		_logger.LogDebug(">>> Entering GetShoppingCartItemWeightAsync(shoppingCartItem=<redacted>,ignoreFreeShippedItems={IgnoreFreeShippedItems})", ignoreFreeShippedItems);
         ArgumentNullException.ThrowIfNull(shoppingCartItem);
 
         var product = await _productService.GetProductByIdAsync(shoppingCartItem.ProductId);
+		_logger.LogDebug("GetShoppingCartItemWeightAsync(shoppingCartItem=<redacted>,ignoreFreeShippedItems={IgnoreFreeShippedItems}): product → {Product}", ignoreFreeShippedItems, product);
 
         return await GetShoppingCartItemWeightAsync(product, shoppingCartItem.AttributesXml, ignoreFreeShippedItems);
     }
@@ -247,6 +270,7 @@ public partial class ShippingService : IShippingService
     public virtual async Task<decimal> GetTotalWeightAsync(GetShippingOptionRequest request,
         bool includeCheckoutAttributes = true, bool ignoreFreeShippedItems = false)
     {
+		_logger.LogDebug(">>> Entering GetTotalWeightAsync(request={Request},includeCheckoutAttributes={IncludeCheckoutAttributes},ignoreFreeShippedItems={IgnoreFreeShippedItems})", request, includeCheckoutAttributes, ignoreFreeShippedItems);
         ArgumentNullException.ThrowIfNull(request);
 
         var totalWeight = decimal.Zero;
@@ -259,13 +283,19 @@ public partial class ShippingService : IShippingService
         if (request.Customer is null || !includeCheckoutAttributes)
             return totalWeight;
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetTotalWeightAsync(request={Request},includeCheckoutAttributes={IncludeCheckoutAttributes},ignoreFreeShippedItems={IgnoreFreeShippedItems}): store → {Store}", request, includeCheckoutAttributes, ignoreFreeShippedItems, store);
         var checkoutAttributesXml = await _genericAttributeService.GetAttributeAsync<string>(request.Customer, NopCustomerDefaults.CheckoutAttributes, store.Id);
+		_logger.LogDebug("GetTotalWeightAsync(request={Request},includeCheckoutAttributes={IncludeCheckoutAttributes},ignoreFreeShippedItems={IgnoreFreeShippedItems}): checkoutAttributesXml → {CheckoutAttributesXml}", request, includeCheckoutAttributes, ignoreFreeShippedItems, checkoutAttributesXml);
         if (string.IsNullOrEmpty(checkoutAttributesXml))
             return totalWeight;
         var attributeValues = _checkoutAttributeParser.ParseAttributeValues(checkoutAttributesXml);
         foreach (var attributeValue in await attributeValues.SelectMany(x => x.values).ToListAsync())
             totalWeight += attributeValue.WeightAdjustment;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogInformation("GetTotalWeightAsync(request,includeCheckoutAttributes,ignoreFreeShippedItems)={Request},{IncludeCheckoutAttributes},{IgnoreFreeShippedItems}: database query executed in {Arg3} ms", request, includeCheckoutAttributes, ignoreFreeShippedItems, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("GetTotalWeightAsync(request={Request},includeCheckoutAttributes={IncludeCheckoutAttributes},ignoreFreeShippedItems={IgnoreFreeShippedItems}): attributeValues → {AttributeValues}", request, includeCheckoutAttributes, ignoreFreeShippedItems, attributeValues);
 
+		_logger.LogDebug("<<< Exiting GetTotalWeightAsync(request={Request},includeCheckoutAttributes={IncludeCheckoutAttributes},ignoreFreeShippedItems={IgnoreFreeShippedItems})", request, includeCheckoutAttributes, ignoreFreeShippedItems);
         return totalWeight;
     }
 
@@ -403,6 +433,8 @@ public partial class ShippingService : IShippingService
                     .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
                     .SelectAwait(async attributeValue => await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId)).ToListAsync();
                 product = associatedProducts.FirstOrDefault(associatedProduct => associatedProduct != null && associatedProduct.IsShipEnabled);
+				_logger.LogDebug(">>> Entering IsShipEnabledAsync(shoppingCartItem=<redacted>)");
+				_logger.LogDebug("<<< Exiting IsShipEnabledAsync(shoppingCartItem=<redacted>)");
             }
 
             if (product == null)
@@ -533,13 +565,16 @@ public partial class ShippingService : IShippingService
         Address shippingAddress, Customer customer = null, string allowedShippingRateComputationMethodSystemName = "",
         int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering GetShippingOptionsAsync(cart={Cart},shippingAddress=<redacted>,customer={Customer},allowedShippingRateComputationMethodSystemName=<redacted>,storeId={StoreId})", cart, customer, storeId);
         ArgumentNullException.ThrowIfNull(cart);
 
         var result = new GetShippingOptionResponse();
+		_logger.LogDebug("GetShippingOptionsAsync(cart={Cart},shippingAddress=<redacted>,customer={Customer},allowedShippingRateComputationMethodSystemName=<redacted>,storeId={StoreId}): result → {Result}", cart, customer, storeId, result);
 
         //create a package
         var (shippingOptionRequests, shippingFromMultipleLocations) = await CreateShippingOptionRequestsAsync(cart, shippingAddress, storeId);
         result.ShippingFromMultipleLocations = shippingFromMultipleLocations;
+		_logger.LogDebug("GetShippingOptionsAsync(cart={Cart},shippingAddress=<redacted>,customer={Customer},allowedShippingRateComputationMethodSystemName=<redacted>,storeId={StoreId}): result.ShippingFromMultipleLocations → {Arg5}", cart, customer, storeId, result.ShippingFromMultipleLocations);
 
         var shippingRateComputationMethods = await _shippingPluginManager
             .LoadActivePluginsAsync(customer, storeId, allowedShippingRateComputationMethodSystemName);
@@ -551,6 +586,7 @@ public partial class ShippingService : IShippingService
         {
             //request shipping options (separately for each package-request)
             IList<ShippingOption> srcmShippingOptions = null;
+			_logger.LogDebug("GetShippingOptionsAsync(cart={Cart},shippingAddress=<redacted>,customer={Customer},allowedShippingRateComputationMethodSystemName=<redacted>,storeId={StoreId}): srcmShippingOptions → {SrcmShippingOptions}", cart, customer, storeId, srcmShippingOptions);
             foreach (var shippingOptionRequest in shippingOptionRequests)
             {
                 var getShippingOptionResponse = await srcm.GetShippingOptionsAsync(shippingOptionRequest);
@@ -638,13 +674,17 @@ public partial class ShippingService : IShippingService
     public virtual async Task<GetPickupPointsResponse> GetPickupPointsAsync(IList<ShoppingCartItem> cart, Address address,
         Customer customer = null, string providerSystemName = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId})", cart, address, customer, providerSystemName, storeId);
         var result = new GetPickupPointsResponse();
 
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId}): result → {Result}", cart, address, customer, providerSystemName, storeId, result);
         var pickupPointsProviders = await _pickupPluginManager.LoadActivePluginsAsync(customer, storeId, providerSystemName);
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId}): pickupPointsProviders → {PickupPointsProviders}", cart, address, customer, providerSystemName, storeId, pickupPointsProviders);
         if (!pickupPointsProviders.Any())
             return result;
 
         var allPickupPoints = new List<PickupPoint>();
+		_logger.LogDebug("GetPickupPointsAsync(cart={Cart},address={Address},customer={Customer},providerSystemName={ProviderSystemName},storeId={StoreId}): allPickupPoints → {AllPickupPoints}", cart, address, customer, providerSystemName, storeId, allPickupPoints);
         foreach (var provider in pickupPointsProviders)
         {
             var pickPointsResponse = await provider.GetPickupPointsAsync(cart, address);
@@ -680,6 +720,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<bool> IsShipEnabledAsync(ShoppingCartItem shoppingCartItem)
     {
+		_logger.LogDebug(">>> Entering IsShipEnabledAsync(shoppingCartItem=<redacted>)");
         //whether the product requires shipping
         if (shoppingCartItem.ProductId != 0 && (await _productService.GetProductByIdAsync(shoppingCartItem.ProductId))?.IsShipEnabled == true)
             return true;
@@ -703,6 +744,7 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<bool> IsFreeShippingAsync(ShoppingCartItem shoppingCartItem)
     {
+		_logger.LogDebug(">>> Entering IsFreeShippingAsync(shoppingCartItem=<redacted>)");
         //first, check whether shipping is required
         if (!await IsShipEnabledAsync(shoppingCartItem))
             return true;
@@ -730,12 +772,14 @@ public partial class ShippingService : IShippingService
     /// </returns>
     public virtual async Task<decimal> GetAdditionalShippingChargeAsync(ShoppingCartItem shoppingCartItem)
     {
+		_logger.LogDebug(">>> Entering GetAdditionalShippingChargeAsync(shoppingCartItem=<redacted>)");
         //first, check whether shipping is free
         if (await IsFreeShippingAsync(shoppingCartItem))
             return decimal.Zero;
 
         //get additional shipping charge of the product
         var additionalShippingCharge = ((await _productService.GetProductByIdAsync(shoppingCartItem.ProductId))?.AdditionalShippingCharge ?? decimal.Zero) * shoppingCartItem.Quantity;
+		_logger.LogDebug("GetAdditionalShippingChargeAsync(shoppingCartItem=<redacted>): additionalShippingCharge → {AdditionalShippingCharge}", additionalShippingCharge);
 
         if (string.IsNullOrEmpty(shoppingCartItem.AttributesXml))
             return additionalShippingCharge;
@@ -745,6 +789,7 @@ public partial class ShippingService : IShippingService
             .Where(attributeValue => attributeValue.AttributeValueType == AttributeValueType.AssociatedToProduct)
             .SumAwaitAsync(async attributeValue => (await _productService.GetProductByIdAsync(attributeValue.AssociatedProductId))?.AdditionalShippingCharge ?? decimal.Zero);
 
+		_logger.LogDebug("<<< Exiting GetAdditionalShippingChargeAsync(shoppingCartItem=<redacted>)");
         return additionalShippingCharge;
     }
 

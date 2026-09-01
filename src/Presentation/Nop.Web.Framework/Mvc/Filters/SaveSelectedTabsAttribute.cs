@@ -4,6 +4,7 @@ using Nop.Core;
 using Nop.Core.Http.Extensions;
 using Nop.Data;
 using Nop.Web.Framework.Controllers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -21,8 +23,11 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
     /// <param name="persistForTheNextRequest">Whether a message should be persisted for the next request</param>
     public SaveSelectedTabAttribute(bool ignore = false, bool persistForTheNextRequest = true) : base(typeof(SaveSelectedTabFilter))
     {
+		_logger.LogDebug(">>> Entering SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest})", ignore, persistForTheNextRequest);
         PersistForTheNextRequest = persistForTheNextRequest;
+		_logger.LogDebug("SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest}): PersistForTheNextRequest → {PersistForTheNextRequest1}", ignore, persistForTheNextRequest, PersistForTheNextRequest);
         IgnoreFilter = ignore;
+		_logger.LogDebug("SaveSelectedTabAttribute(ignore={Ignore},persistForTheNextRequest={PersistForTheNextRequest}): IgnoreFilter → {IgnoreFilter}", ignore, persistForTheNextRequest, IgnoreFilter);
         Arguments = [ignore, persistForTheNextRequest];
     }
 
@@ -49,6 +54,7 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
     /// </summary>
     private class SaveSelectedTabFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly bool _ignoreFilter;
@@ -62,8 +68,11 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
         public SaveSelectedTabFilter(bool ignoreFilter, bool persistForTheNextRequest,
             IWebHelper webHelper)
         {
+			_logger.LogDebug(">>> Entering SaveSelectedTabFilter(ignoreFilter={IgnoreFilter},persistForTheNextRequest={PersistForTheNextRequest},webHelper={WebHelper})", ignoreFilter, persistForTheNextRequest, webHelper);
             _ignoreFilter = ignoreFilter;
+			_logger.LogDebug("SaveSelectedTabFilter(ignoreFilter={IgnoreFilter},persistForTheNextRequest={PersistForTheNextRequest},webHelper={WebHelper}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, persistForTheNextRequest, webHelper, _ignoreFilter);
             _persistForTheNextRequest = persistForTheNextRequest;
+			_logger.LogDebug("SaveSelectedTabFilter(ignoreFilter={IgnoreFilter},persistForTheNextRequest={PersistForTheNextRequest},webHelper={WebHelper}): _persistForTheNextRequest → {_persistForTheNextRequest}", ignoreFilter, persistForTheNextRequest, webHelper, _persistForTheNextRequest);
             _webHelper = webHelper;
         }
 
@@ -78,6 +87,7 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SaveSelectedTabAsync(ActionExecutingContext context)
         {
+			_logger.LogDebug(">>> Entering SaveSelectedTabAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in POST requests
@@ -106,6 +116,7 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
 
             if (context.Controller is BaseController controller)
                 await controller.SaveSelectedTabNameAsync(persistForTheNextRequest: persistForTheNextRequest);
+				_logger.LogDebug("<<< Exiting SaveSelectedTabAsync(context={Context})", context);
         }
 
         #endregion
@@ -120,8 +131,10 @@ public sealed class SaveSelectedTabAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await next();
             await SaveSelectedTabAsync(context);
+			_logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

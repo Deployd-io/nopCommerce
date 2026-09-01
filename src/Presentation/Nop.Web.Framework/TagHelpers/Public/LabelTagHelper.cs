@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Public;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.TagHelpers.Public;
 [HtmlTargetElement("label", Attributes = FOR_ATTRIBUTE_NAME)]
 public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelTagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -20,6 +22,7 @@ public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelT
 
     public LabelTagHelper(IHtmlGenerator generator) : base(generator)
     {
+	_logger.LogDebug(">>> Entering LabelTagHelper(generator={Generator})", generator);
     }
 
     #endregion
@@ -34,6 +37,7 @@ public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelT
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -41,6 +45,7 @@ public partial class LabelTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.LabelT
         output.Content.Append(Postfix);
 
         await base.ProcessAsync(context, output);
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

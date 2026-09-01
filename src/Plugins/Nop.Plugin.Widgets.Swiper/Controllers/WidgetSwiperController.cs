@@ -13,6 +13,7 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.Swiper.Controllers;
 
@@ -21,6 +22,7 @@ namespace Nop.Plugin.Widgets.Swiper.Controllers;
 [AutoValidateAntiforgeryToken]
 public class WidgetSwiperController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -39,11 +41,17 @@ public class WidgetSwiperController : BasePluginController
         ISettingService settingService,
         IStoreContext storeContext)
     {
+		_logger.LogDebug(">>> Entering WidgetSwiperController(localizationService={LocalizationService},notificationService={NotificationService},pictureService={PictureService},settingService={SettingService},storeContext={StoreContext})", localizationService, notificationService, pictureService, settingService, storeContext);
         _localizationService = localizationService;
+		_logger.LogDebug("WidgetSwiperController(localizationService={LocalizationService},notificationService={NotificationService},pictureService={PictureService},settingService={SettingService},storeContext={StoreContext}): _localizationService → {_localizationService}", localizationService, notificationService, pictureService, settingService, storeContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("WidgetSwiperController(localizationService={LocalizationService},notificationService={NotificationService},pictureService={PictureService},settingService={SettingService},storeContext={StoreContext}): _notificationService → {_notificationService}", localizationService, notificationService, pictureService, settingService, storeContext, _notificationService);
         _pictureService = pictureService;
+		_logger.LogDebug("WidgetSwiperController(localizationService={LocalizationService},notificationService={NotificationService},pictureService={PictureService},settingService={SettingService},storeContext={StoreContext}): _pictureService → {_pictureService}", localizationService, notificationService, pictureService, settingService, storeContext, _pictureService);
         _settingService = settingService;
+		_logger.LogDebug("WidgetSwiperController(localizationService={LocalizationService},notificationService={NotificationService},pictureService={PictureService},settingService={SettingService},storeContext={StoreContext}): _settingService → {_settingService}", localizationService, notificationService, pictureService, settingService, storeContext, _settingService);
         _storeContext = storeContext;
+		_logger.LogDebug("WidgetSwiperController(localizationService={LocalizationService},notificationService={NotificationService},pictureService={PictureService},settingService={SettingService},storeContext={StoreContext}): _storeContext → {_storeContext}", localizationService, notificationService, pictureService, settingService, storeContext, _storeContext);
     }
 
     #endregion
@@ -52,10 +60,13 @@ public class WidgetSwiperController : BasePluginController
 
     protected virtual async Task<List<Slide>> GetSlidesForStoreAsync(int storeId)
     {
+		_logger.LogDebug(">>> Entering GetSlidesForStoreAsync(storeId={StoreId})", storeId);
         var key = $"{nameof(SwiperSettings)}.{nameof(SwiperSettings.Slides)}";
 
+		_logger.LogWarning("GetSlidesForStoreAsync(storeId={StoreId}): key → {Key}", storeId, key);
         //load settings for a chosen store scope
         var slidesSetting = await _settingService.GetSettingByKeyAsync(key, string.Empty, storeId: storeId, loadSharedValueIfNotFound: false);
+		_logger.LogDebug("GetSlidesForStoreAsync(storeId={StoreId}): slidesSetting → {SlidesSetting}", storeId, slidesSetting);
 
         if (string.IsNullOrEmpty(slidesSetting))
             return new List<Slide>();
@@ -70,9 +81,12 @@ public class WidgetSwiperController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogDebug(">>> Entering Configure()");
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("Configure(): storeScope → {StoreScope}", storeScope);
         var sliderSettings = await _settingService.LoadSettingAsync<SwiperSettings>(storeScope);
+		_logger.LogDebug("Configure(): sliderSettings → {SliderSettings}", sliderSettings);
 
         var model = new ConfigurationModel
         {
@@ -92,6 +106,8 @@ public class WidgetSwiperController : BasePluginController
             model.LazyLoading_OverrideForStore = await _settingService.SettingExistsAsync(sliderSettings, x => x.LazyLoading, storeScope);
         }
 
+		_logger.LogDebug("<<< Exiting Configure()");
+		_logger.LogDebug("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Widgets.Swiper/Views/Configure.cshtml", model);
     }
 
@@ -132,14 +148,18 @@ public class WidgetSwiperController : BasePluginController
     [FormValueRequired("add-slide")]
     public virtual async Task<IActionResult> SlideAdd(SlidePictureModel model)
     {
+		_logger.LogDebug(">>> Entering SlideAdd(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("SlideAdd(model={Model}): storeScope → {StoreScope}", model, storeScope);
         var sliderSettings = await _settingService.LoadSettingAsync<SwiperSettings>(storeScope);
+		_logger.LogDebug("SlideAdd(model={Model}): sliderSettings → {SliderSettings}", model, sliderSettings);
 
         var slides = await GetSlidesForStoreAsync(storeScope);
+		_logger.LogDebug("SlideAdd(model={Model}): slides → {Slides}", model, slides);
 
         slides.Add(new()
         {
@@ -147,11 +167,16 @@ public class WidgetSwiperController : BasePluginController
             AltText = model.AltText,
             TitleText = model.TitleText,
             LinkUrl = model.LinkUrl
+			_logger.LogDebug("SlideAdd(model={Model}): PictureId → {PictureId}", model, PictureId);
+			_logger.LogDebug("SlideAdd(model={Model}): AltText → {AltText}", model, AltText);
+			_logger.LogDebug("SlideAdd(model={Model}): TitleText → {TitleText}", model, TitleText);
+			_logger.LogDebug("SlideAdd(model={Model}): LinkUrl → {LinkUrl}", model, LinkUrl);
         });
 
         sliderSettings.Slides = JsonConvert.SerializeObject(slides);
         await _settingService.SaveSettingOverridablePerStoreAsync(sliderSettings, x => x.Slides, true, storeScope);
 
+		_logger.LogDebug("<<< Exiting SlideAdd(model={Model})", model);
         return RedirectToAction(nameof(Configure));
     }
 
@@ -159,8 +184,11 @@ public class WidgetSwiperController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> SlideList(SlidesSearchModel slidesSearchModel)
     {
+		_logger.LogDebug(">>> Entering SlideList(slidesSearchModel={SlidesSearchModel})", slidesSearchModel);
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var slides = await GetSlidesForStoreAsync(storeScope);
+		_logger.LogDebug("SlideList(slidesSearchModel={SlidesSearchModel}): slides → {Slides}", slidesSearchModel, slides);
+		_logger.LogDebug("SlideList(slidesSearchModel={SlidesSearchModel}): storeScope → {StoreScope}", slidesSearchModel, storeScope);
 
         if (slides is null)
             return Json(new SlideListModel());
@@ -185,6 +213,7 @@ public class WidgetSwiperController : BasePluginController
                 });
         });
 
+		_logger.LogDebug("<<< Exiting SlideList(slidesSearchModel={SlidesSearchModel})", slidesSearchModel);
         return Json(model);
     }
 
@@ -192,10 +221,13 @@ public class WidgetSwiperController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> SlideDelete(int pictureId)
     {
+		_logger.LogDebug(">>> Entering SlideDelete(pictureId={PictureId})", pictureId);
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("SlideDelete(pictureId={PictureId}): storeScope → {StoreScope}", pictureId, storeScope);
 
         var slides = await GetSlidesForStoreAsync(storeScope);
+		_logger.LogDebug("SlideDelete(pictureId={PictureId}): slides → {Slides}", pictureId, slides);
 
         if (!slides?.Any() == true)
             return Json(slides);
@@ -204,12 +236,14 @@ public class WidgetSwiperController : BasePluginController
             return new NullJsonResult();
 
         var pic = await _pictureService.GetPictureByIdAsync(pictureId);
+		_logger.LogDebug("SlideDelete(pictureId={PictureId}): pic → {Pic}", pictureId, pic);
         if (pic is null)
             return new NullJsonResult();
 
         await _pictureService.DeletePictureAsync(pic);
 
         var sliderSettings = await _settingService.LoadSettingAsync<SwiperSettings>(storeScope);
+		_logger.LogDebug("SlideDelete(pictureId={PictureId}): sliderSettings → {SliderSettings}", pictureId, sliderSettings);
 
         if (!slides?.Any() == true)
         {
@@ -221,6 +255,7 @@ public class WidgetSwiperController : BasePluginController
             await _settingService.SaveSettingOverridablePerStoreAsync(sliderSettings, x => x.Slides, true, storeScope);
         }
 
+		_logger.LogDebug("<<< Exiting SlideDelete(pictureId={PictureId})", pictureId);
         return new NullJsonResult();
     }
 
@@ -228,10 +263,13 @@ public class WidgetSwiperController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> SlideEdit(SlidePictureModel model)
     {
+		_logger.LogDebug(">>> Entering SlideEdit(model={Model})", model);
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogDebug("SlideEdit(model={Model}): storeScope → {StoreScope}", model, storeScope);
 
         var slides = await GetSlidesForStoreAsync(storeScope);
+		_logger.LogDebug("SlideEdit(model={Model}): slides → {Slides}", model, slides);
         if (!slides?.Any() == true)
             return Content("No slides");
 
@@ -240,13 +278,18 @@ public class WidgetSwiperController : BasePluginController
             ?? throw new ArgumentException("No slides found with the specified picture id");
 
         slide.TitleText = model.TitleText;
+		_logger.LogDebug("SlideEdit(model={Model}): slide.TitleText → {Arg1}", model, slide.TitleText);
+		_logger.LogDebug("SlideEdit(model={Model}): slide.AltText → {Arg1}", model, slide.AltText);
+		_logger.LogDebug("SlideEdit(model={Model}): slide.LinkUrl → {Arg1}", model, slide.LinkUrl);
         slide.AltText = model.AltText;
         slide.LinkUrl = model.LinkUrl;
 
         var sliderSettings = await _settingService.LoadSettingAsync<SwiperSettings>(storeScope);
+		_logger.LogDebug("SlideEdit(model={Model}): sliderSettings → {SliderSettings}", model, sliderSettings);
         sliderSettings.Slides = JsonConvert.SerializeObject(slides);
         await _settingService.SaveSettingOverridablePerStoreAsync(sliderSettings, x => x.Slides, true, storeScope);
 
+		_logger.LogDebug("<<< Exiting SlideEdit(model={Model})", model);
         return new NullJsonResult();
     }
 

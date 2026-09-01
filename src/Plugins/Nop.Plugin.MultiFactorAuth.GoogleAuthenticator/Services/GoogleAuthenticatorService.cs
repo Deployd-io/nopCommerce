@@ -3,6 +3,7 @@ using Nop.Core;
 using Nop.Core.Caching;
 using Nop.Data;
 using Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Domains;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Services;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.MultiFactorAuth.GoogleAuthenticator.Services;
 /// </summary>
 public class GoogleAuthenticatorService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<GoogleAuthenticatorRecord> _repository;
@@ -29,10 +31,15 @@ public class GoogleAuthenticatorService
         IWorkContext workContext,
         GoogleAuthenticatorSettings googleAuthenticatorSettings)
     {
+		_logger.LogDebug(">>> Entering GoogleAuthenticatorService(repository={Repository},staticCacheManager={StaticCacheManager},workContext={WorkContext},googleAuthenticatorSettings={GoogleAuthenticatorSettings})", repository, staticCacheManager, workContext, googleAuthenticatorSettings);
         _repository = repository;
+		_logger.LogDebug("GoogleAuthenticatorService(repository={Repository},staticCacheManager={StaticCacheManager},workContext={WorkContext},googleAuthenticatorSettings={GoogleAuthenticatorSettings}): _repository → {_repository}", repository, staticCacheManager, workContext, googleAuthenticatorSettings, _repository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("GoogleAuthenticatorService(repository={Repository},staticCacheManager={StaticCacheManager},workContext={WorkContext},googleAuthenticatorSettings={GoogleAuthenticatorSettings}): _staticCacheManager → {_staticCacheManager}", repository, staticCacheManager, workContext, googleAuthenticatorSettings, _staticCacheManager);
         _workContext = workContext;
+		_logger.LogDebug("GoogleAuthenticatorService(repository={Repository},staticCacheManager={StaticCacheManager},workContext={WorkContext},googleAuthenticatorSettings={GoogleAuthenticatorSettings}): _workContext → {_workContext}", repository, staticCacheManager, workContext, googleAuthenticatorSettings, _workContext);
         _googleAuthenticatorSettings = googleAuthenticatorSettings;
+		_logger.LogDebug("GoogleAuthenticatorService(repository={Repository},staticCacheManager={StaticCacheManager},workContext={WorkContext},googleAuthenticatorSettings={GoogleAuthenticatorSettings}): _googleAuthenticatorSettings → {_googleAuthenticatorSettings}", repository, staticCacheManager, workContext, googleAuthenticatorSettings, _googleAuthenticatorSettings);
     }
     #endregion
 
@@ -45,9 +52,13 @@ public class GoogleAuthenticatorService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task InsertConfigurationAsync(GoogleAuthenticatorRecord configuration)
     {
+		_logger.LogDebug(">>> Entering InsertConfigurationAsync(configuration={Configuration})", configuration);
         ArgumentNullException.ThrowIfNull(configuration);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("InsertConfigurationAsync(configuration)={Configuration}: save query executed in {Arg1} ms", configuration, __logStart.ElapsedMilliseconds);
         await _repository.InsertAsync(configuration);
+		_logger.LogDebug("<<< Exiting InsertConfigurationAsync(configuration={Configuration})", configuration);
         await _staticCacheManager.RemoveByPrefixAsync(GoogleAuthenticatorDefaults.PrefixCacheKey);
     }
 
@@ -58,9 +69,13 @@ public class GoogleAuthenticatorService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task UpdateConfigurationAsync(GoogleAuthenticatorRecord configuration)
     {
+		_logger.LogDebug(">>> Entering UpdateConfigurationAsync(configuration={Configuration})", configuration);
         ArgumentNullException.ThrowIfNull(configuration);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("UpdateConfigurationAsync(configuration)={Configuration}: update query executed in {Arg1} ms", configuration, __logStart.ElapsedMilliseconds);
         await _repository.UpdateAsync(configuration);
+		_logger.LogDebug("<<< Exiting UpdateConfigurationAsync(configuration={Configuration})", configuration);
         await _staticCacheManager.RemoveByPrefixAsync(GoogleAuthenticatorDefaults.PrefixCacheKey);
     }
 
@@ -70,8 +85,13 @@ public class GoogleAuthenticatorService
     /// <param name="configuration">Configuration</param>
     internal async Task DeleteConfigurationAsync(GoogleAuthenticatorRecord configuration)
     {
+		_logger.LogDebug(">>> Entering DeleteConfigurationAsync(configuration={Configuration})", configuration);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(configuration);
 
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("DeleteConfigurationAsync(configuration)={Configuration}: external service call took {Arg1} ms", configuration, __logStart.ElapsedMilliseconds);
+		_logger.LogInformation("DeleteConfigurationAsync(configuration)={Configuration}: delete query executed in {Arg1} ms", configuration, __logStartDb.ElapsedMilliseconds);
         await _repository.DeleteAsync(configuration);
         await _staticCacheManager.RemoveByPrefixAsync(GoogleAuthenticatorDefaults.PrefixCacheKey);
     }
@@ -83,19 +103,24 @@ public class GoogleAuthenticatorService
     /// <returns>Configuration</returns>
     internal async Task<GoogleAuthenticatorRecord> GetConfigurationByIdAsync(int configurationId)
     {
+		_logger.LogDebug(">>> Entering GetConfigurationByIdAsync(configurationId={ConfigurationId})", configurationId);
         if (configurationId == 0)
             return null;
 
+		_logger.LogInformation("GetConfigurationByIdAsync(configurationId)={ConfigurationId}: external service call took {Arg1} ms", configurationId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetConfigurationByIdAsync(configurationId={ConfigurationId})", configurationId);
         return await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(GoogleAuthenticatorDefaults.ConfigurationCacheKey, configurationId), async () =>
             await _repository.GetByIdAsync(configurationId));
     }
 
     internal GoogleAuthenticatorRecord GetConfigurationByCustomerEmail(string email)
     {
+		_logger.LogDebug(">>> Entering GetConfigurationByCustomerEmail(email={Email})", email);
         if (string.IsNullOrEmpty(email))
             return null;
 
         var query = _repository.Table;
+		_logger.LogDebug("<<< Exiting GetConfigurationByCustomerEmail(email={Email})", email);
         return query.FirstOrDefault(record => record.Customer == email);
     }
 
@@ -115,11 +140,13 @@ public class GoogleAuthenticatorService
     /// </returns>
     public async Task<IPagedList<GoogleAuthenticatorRecord>> GetPagedConfigurationsAsync(string email = null, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetPagedConfigurationsAsync(email={Email},pageIndex={PageIndex},pageSize={PageSize})", email, pageIndex, pageSize);
         var query = _repository.Table;
         if (!string.IsNullOrWhiteSpace(email))
             query = query.Where(c => c.Customer.Contains(email));
         query = query.OrderBy(configuration => configuration.Id);
 
+		_logger.LogDebug("<<< Exiting GetPagedConfigurationsAsync(email={Email},pageIndex={PageIndex},pageSize={PageSize})", email, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -130,6 +157,7 @@ public class GoogleAuthenticatorService
     /// <returns></returns>
     public bool IsRegisteredCustomer(string customerEmail)
     {
+		_logger.LogDebug(">>> Entering IsRegisteredCustomer(customerEmail={CustomerEmail})", customerEmail);
         return GetConfigurationByCustomerEmail(customerEmail) != null;
     }
 
@@ -141,6 +169,7 @@ public class GoogleAuthenticatorService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task AddGoogleAuthenticatorAccountAsync(string customerEmail, string key)
     {
+		_logger.LogDebug(">>> Entering AddGoogleAuthenticatorAccountAsync(customerEmail={CustomerEmail},key={Key})", customerEmail, key);
         var account = new GoogleAuthenticatorRecord
         {
             Customer = customerEmail,
@@ -148,6 +177,7 @@ public class GoogleAuthenticatorService
         };
 
         await InsertConfigurationAsync(account);
+		_logger.LogDebug("<<< Exiting AddGoogleAuthenticatorAccountAsync(customerEmail={CustomerEmail},key={Key})", customerEmail, key);
     }
 
     /// <summary>
@@ -158,12 +188,15 @@ public class GoogleAuthenticatorService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateGoogleAuthenticatorAccountAsync(string customerEmail, string key)
     {
+		_logger.LogDebug(">>> Entering UpdateGoogleAuthenticatorAccountAsync(customerEmail={CustomerEmail},key={Key})", customerEmail, key);
         var account = GetConfigurationByCustomerEmail(customerEmail);
         if (account != null)
         {
             account.SecretKey = key;
+			_logger.LogDebug("UpdateGoogleAuthenticatorAccountAsync(customerEmail={CustomerEmail},key={Key}): account.SecretKey → {Arg2}", customerEmail, key, account.SecretKey);
             await UpdateConfigurationAsync(account);
         }
+		_logger.LogDebug("<<< Exiting UpdateGoogleAuthenticatorAccountAsync(customerEmail={CustomerEmail},key={Key})", customerEmail, key);
     }
 
     /// <summary>
@@ -176,8 +209,11 @@ public class GoogleAuthenticatorService
     /// </returns>
     public async Task<SetupCode> GenerateSetupCode(string secretkey)
     {
+		_logger.LogDebug(">>> Entering GenerateSetupCode(secretkey=<redacted>)");
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogDebug("GenerateSetupCode(secretkey=<redacted>): customer → {Customer}", customer);
+		_logger.LogDebug("<<< Exiting GenerateSetupCode(secretkey=<redacted>)");
         return TwoFactorAuthenticator.GenerateSetupCode(
             _googleAuthenticatorSettings.BusinessPrefix,
             customer.Email,
@@ -192,6 +228,7 @@ public class GoogleAuthenticatorService
     /// <returns></returns>
     public bool ValidateTwoFactorToken(string secretkey, string token)
     {
+		_logger.LogDebug(">>> Entering ValidateTwoFactorToken(secretkey=<redacted>,token=<redacted>)");
         return TwoFactorAuthenticator.ValidateTwoFactorPIN(secretkey, token);
     }
 

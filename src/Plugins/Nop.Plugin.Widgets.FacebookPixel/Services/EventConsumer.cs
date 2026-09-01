@@ -11,6 +11,7 @@ using Nop.Web.Framework;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Services;
 
@@ -18,6 +19,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Services;
 /// Represents plugin event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<CustomerRegisteredEvent>,
     IConsumer<EntityInsertedEvent<ShoppingCartItem>>,
     IConsumer<MessageTokensAddedEvent>,
@@ -38,7 +40,9 @@ public class EventConsumer :
     public EventConsumer(FacebookPixelService facebookPixelService,
         IHttpContextAccessor httpContextAccessor)
     {
+		_logger.LogDebug(">>> Entering EventConsumer(facebookPixelService={FacebookPixelService},httpContextAccessor={HttpContextAccessor})", facebookPixelService, httpContextAccessor);
         _facebookPixelService = facebookPixelService;
+		_logger.LogDebug("EventConsumer(facebookPixelService={FacebookPixelService},httpContextAccessor={HttpContextAccessor}): _facebookPixelService → {_facebookPixelService}", facebookPixelService, httpContextAccessor, _facebookPixelService);
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -55,6 +59,7 @@ public class EventConsumer :
     {
         if (eventMessage?.Entity != null)
             await _facebookPixelService.SendAddToCartEventAsync(eventMessage.Entity);
+			_logger.LogDebug("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -77,6 +82,7 @@ public class EventConsumer :
     {
         if (eventMessage?.Model is ProductDetailsModel productDetailsModel)
             await _facebookPixelService.SendViewContentEventAsync(productDetailsModel);
+			_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -86,6 +92,7 @@ public class EventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(PageRenderingEvent eventMessage)
     {
+		_logger.LogDebug(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         var routeName = eventMessage.GetRouteName() ?? string.Empty;
         if (routeName == NopRouteNames.Standard.CHECKOUT || routeName == NopRouteNames.Standard.CHECKOUT_ONE_PAGE)
             await _facebookPixelService.SendInitiateCheckoutEventAsync();

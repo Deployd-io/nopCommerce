@@ -42,13 +42,21 @@ public class UPSShippingController : BasePluginController
         UPSService upsService,
         UPSSettings upsSettings)
     {
+		logger.LogDebug(">>> Entering UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings})", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings);
         _localizationService = localizationService;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _localizationService → {_localizationService}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _localizationService);
         _measureService = measureService;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _measureService → {_measureService}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _measureService);
         _notificationService = notificationService;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _notificationService → {_notificationService}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _notificationService);
         _permissionService = permissionService;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _permissionService → {_permissionService}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _permissionService);
         _settingService = settingService;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _settingService → {_settingService}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _settingService);
         _upsService = upsService;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _upsService → {_upsService}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _upsService);
         _upsSettings = upsSettings;
+		logger.LogDebug("UPSShippingController(localizationService={LocalizationService},measureService={MeasureService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},upsService={UpsService},upsSettings={UpsSettings}): _upsSettings → {_upsSettings}", localizationService, measureService, notificationService, permissionService, settingService, upsService, upsSettings, _upsSettings);
     }
 
     #endregion
@@ -58,6 +66,7 @@ public class UPSShippingController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		logger.LogDebug(">>> Entering Configure()");
         //prepare common model
         var model = new UPSShippingModel
         {
@@ -96,6 +105,7 @@ public class UPSShippingController : BasePluginController
             .Select(item =>
             {
                 var serviceCode = _upsService.GetUpsCode((DeliveryService)int.Parse(item.Value));
+				logger.LogDebug("Configure(): serviceCode → {ServiceCode}", serviceCode);
                 return new SelectListItem($"UPS {item.Text?.TrimStart('_')}", serviceCode, servicesCodes.Contains(serviceCode));
             }).ToList();
         model.AvaliableWeightTypes = new List<SelectListItem> { new SelectListItem("LBS", "LBS"), new SelectListItem("KGS", "KGS") };
@@ -103,13 +113,17 @@ public class UPSShippingController : BasePluginController
 
         //check measures
         var weightSystemName = _upsSettings.WeightType switch { "LBS" => "lb", "KGS" => "kg", _ => null };
+		logger.LogDebug("Configure(): weightSystemName → {WeightSystemName}", weightSystemName);
         if (await _measureService.GetMeasureWeightBySystemKeywordAsync(weightSystemName) == null)
             _notificationService.ErrorNotification($"Could not load '{weightSystemName}' <a href=\"{Url.Action("List", "Measure")}\" target=\"_blank\">measure weight</a>", false);
 
         var dimensionSystemName = _upsSettings.DimensionsType switch { "IN" => "inches", "CM" => "centimeters", _ => null };
+		logger.LogDebug("Configure(): dimensionSystemName → {DimensionSystemName}", dimensionSystemName);
         if (await _measureService.GetMeasureDimensionBySystemKeywordAsync(dimensionSystemName) == null)
             _notificationService.ErrorNotification($"Could not load '{dimensionSystemName}' <a href=\"{Url.Action("List", "Measure")}\" target=\"_blank\">measure dimension</a>", false);
 
+		logger.LogDebug("<<< Exiting Configure()");
+		logger.LogDebug("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Shipping.UPS/Views/Configure.cshtml", model);
     }
 

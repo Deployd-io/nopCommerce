@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Core;
 using Nop.Core.Domain.Security;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -19,6 +21,7 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
     /// </summary>
     public ValidateIpAddressAttribute() : base(typeof(ValidateIpAddressFilter))
     {
+	_logger.LogDebug(">>> Entering ValidateIpAddressAttribute()");
     }
 
     #endregion
@@ -30,6 +33,7 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
     /// </summary>
     private class ValidateIpAddressFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly IWebHelper _webHelper;
@@ -42,7 +46,9 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
         public ValidateIpAddressFilter(IWebHelper webHelper,
             SecuritySettings securitySettings)
         {
+			_logger.LogDebug(">>> Entering ValidateIpAddressFilter(webHelper={WebHelper},securitySettings={SecuritySettings})", webHelper, securitySettings);
             _webHelper = webHelper;
+			_logger.LogDebug("ValidateIpAddressFilter(webHelper={WebHelper},securitySettings={SecuritySettings}): _webHelper → {_webHelper}", webHelper, securitySettings, _webHelper);
             _securitySettings = securitySettings;
         }
 
@@ -56,6 +62,7 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
         /// <param name="context">A context for action filters</param>
         private void ValidateIpAddress(ActionExecutingContext context)
         {
+			_logger.LogDebug(">>> Entering ValidateIpAddress(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.HttpContext.Request == null)
@@ -88,12 +95,14 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
 
             //whether current IP is allowed
             var currentIp = _webHelper.GetCurrentIpAddress();
+			_logger.LogDebug("ValidateIpAddress(context={Context}): currentIp → {CurrentIp}", context, currentIp);
 
             if (ipAddresses.Any(ip => ip.Equals(currentIp, StringComparison.InvariantCultureIgnoreCase)))
                 return;
 
             //redirect to 'Access denied' page
             context.Result = new RedirectToActionResult("AccessDenied", "Security", context.RouteData.Values);
+			_logger.LogDebug("<<< Exiting ValidateIpAddress(context={Context})", context);
         }
 
         #endregion
@@ -108,9 +117,11 @@ public sealed class ValidateIpAddressAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogDebug(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             ValidateIpAddress(context);
             if (context.Result == null)
                 await next();
+				_logger.LogDebug("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

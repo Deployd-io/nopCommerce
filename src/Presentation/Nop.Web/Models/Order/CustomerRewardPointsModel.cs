@@ -1,14 +1,18 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Order;
 
 public partial record CustomerRewardPointsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerRewardPointsModel()
     {
+		_logger.LogDebug(">>> Entering CustomerRewardPointsModel()");
         RewardPoints = new List<RewardPointsHistoryModel>();
+		_logger.LogDebug("CustomerRewardPointsModel(): RewardPoints → {RewardPoints}", RewardPoints);
     }
 
     public IList<RewardPointsHistoryModel> RewardPoints { get; set; }

@@ -1,13 +1,18 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Nop.Plugin.Tax.Avalara.ItemClassificationAPI;
 
 public class ItemClassificationModel
 {
+private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
 
     public ItemClassificationModel()
     {
+		_logger.LogDebug(">>> Entering ItemClassificationModel()");
         ClassificationParameters = new List<ClassificationParameters>();
+		_logger.LogDebug("ItemClassificationModel(): Parameters → {Parameters}", Parameters);
+		_logger.LogDebug("ItemClassificationModel(): ClassificationParameters → {ClassificationParameters}", ClassificationParameters);
         Parameters = new List<ClassificationParameters>();
     }
 

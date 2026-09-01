@@ -5,6 +5,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Directory;
 using Nop.Web.Areas.Admin.Models.Payments;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class PaymentModelFactory : IPaymentModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -29,9 +31,13 @@ public partial class PaymentModelFactory : IPaymentModelFactory
         IPaymentPluginManager paymentPluginManager,
         IStateProvinceService stateProvinceService)
     {
+		_logger.LogDebug(">>> Entering PaymentModelFactory(countryService={CountryService},localizationService={LocalizationService},paymentPluginManager={PaymentPluginManager},stateProvinceService={StateProvinceService})", countryService, localizationService, paymentPluginManager, stateProvinceService);
         _countryService = countryService;
+		_logger.LogDebug("PaymentModelFactory(countryService={CountryService},localizationService={LocalizationService},paymentPluginManager={PaymentPluginManager},stateProvinceService={StateProvinceService}): _countryService → {_countryService}", countryService, localizationService, paymentPluginManager, stateProvinceService, _countryService);
         _localizationService = localizationService;
+		_logger.LogDebug("PaymentModelFactory(countryService={CountryService},localizationService={LocalizationService},paymentPluginManager={PaymentPluginManager},stateProvinceService={StateProvinceService}): _localizationService → {_localizationService}", countryService, localizationService, paymentPluginManager, stateProvinceService, _localizationService);
         _paymentPluginManager = paymentPluginManager;
+		_logger.LogDebug("PaymentModelFactory(countryService={CountryService},localizationService={LocalizationService},paymentPluginManager={PaymentPluginManager},stateProvinceService={StateProvinceService}): _paymentPluginManager → {_paymentPluginManager}", countryService, localizationService, paymentPluginManager, stateProvinceService, _paymentPluginManager);
         _stateProvinceService = stateProvinceService;
     }
 
@@ -49,12 +55,14 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodsModel> PreparePaymentMethodsModelAsync(PaymentMethodsModel methodsModel)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodsModelAsync(methodsModel={MethodsModel})", methodsModel);
         ArgumentNullException.ThrowIfNull(methodsModel);
 
         //prepare nested search models
         await PreparePaymentMethodSearchModelAsync(methodsModel.PaymentsMethod);
         await PreparePaymentMethodRestrictionModelAsync(methodsModel.PaymentMethodRestriction);
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodsModelAsync(methodsModel={MethodsModel})", methodsModel);
         return methodsModel;
     }
 
@@ -68,10 +76,12 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodListModel> PreparePaymentMethodListModelAsync(PaymentMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get payment methods
         var paymentMethods = (await _paymentPluginManager.LoadAllPluginsAsync()).ToPagedList(searchModel);
+		_logger.LogDebug("PreparePaymentMethodListModelAsync(searchModel={SearchModel}): paymentMethods → {PaymentMethods}", searchModel, paymentMethods);
 
         //prepare grid model
         var model = await new PaymentMethodListModel().PrepareToGridAsync(searchModel, paymentMethods, () =>
@@ -80,6 +90,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
             {
                 //fill in model values from the entity
                 var paymentMethodModel = method.ToPluginModel<PaymentMethodModel>();
+				_logger.LogDebug("PreparePaymentMethodListModelAsync(searchModel={SearchModel}): paymentMethodModel → {PaymentMethodModel}", searchModel, paymentMethodModel);
 
                 //fill in additional values (not existing in the entity)
                 paymentMethodModel.IsActive = _paymentPluginManager.IsPluginActive(method);
@@ -92,6 +103,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
             });
         });
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -105,11 +117,13 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual Task<PaymentMethodSearchModel> PreparePaymentMethodSearchModelAsync(PaymentMethodSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -123,25 +137,32 @@ public partial class PaymentModelFactory : IPaymentModelFactory
     /// </returns>
     public virtual async Task<PaymentMethodRestrictionModel> PreparePaymentMethodRestrictionModelAsync(PaymentMethodRestrictionModel model)
     {
+		_logger.LogDebug(">>> Entering PreparePaymentMethodRestrictionModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var countries = await _countryService.GetAllCountriesAsync(showHidden: true);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         model.AvailableCountries = await countries.SelectAwait(async country =>
         {
+			_logger.LogDebug("PreparePaymentMethodRestrictionModelAsync(model={Model}): countries → {Countries}", model, countries);
             var countryModel = country.ToModel<CountryModel>();
+			_logger.LogDebug("PreparePaymentMethodRestrictionModelAsync(model={Model}): countryModel → {CountryModel}", model, countryModel);
             countryModel.NumberOfStates = (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country.Id))?.Count ?? 0;
 
             return countryModel;
         }).ToListAsync();
+		_logger.LogInformation("PreparePaymentMethodRestrictionModelAsync(model)={Model}: database query executed in {Arg1} ms", model, __logStart.ElapsedMilliseconds);
 
         foreach (var method in await _paymentPluginManager.LoadAllPluginsAsync())
         {
             var paymentMethodModel = method.ToPluginModel<PaymentMethodModel>();
+			_logger.LogDebug("PreparePaymentMethodRestrictionModelAsync(model={Model}): paymentMethodModel → {PaymentMethodModel}", model, paymentMethodModel);
             paymentMethodModel.RecurringPaymentType = await _localizationService.GetLocalizedEnumAsync(method.RecurringPaymentType);
 
             model.AvailablePaymentMethods.Add(paymentMethodModel);
 
             var restrictedCountries = await _paymentPluginManager.GetRestrictedCountryIdsAsync(method);
+			_logger.LogDebug("PreparePaymentMethodRestrictionModelAsync(model={Model}): restrictedCountries → {RestrictedCountries}", model, restrictedCountries);
             foreach (var country in countries)
             {
                 if (!model.Restricted.ContainsKey(method.PluginDescriptor.SystemName))
@@ -151,6 +172,7 @@ public partial class PaymentModelFactory : IPaymentModelFactory
             }
         }
 
+		_logger.LogDebug("<<< Exiting PreparePaymentMethodRestrictionModelAsync(model={Model})", model);
         return model;
     }
 

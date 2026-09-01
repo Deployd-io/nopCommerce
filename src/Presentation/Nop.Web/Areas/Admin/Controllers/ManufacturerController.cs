@@ -21,11 +21,13 @@ using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ManufacturerController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -64,21 +66,37 @@ public partial class ManufacturerController : BaseAdminController
         IUrlRecordService urlRecordService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext})", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _customerActivityService → {_customerActivityService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _customerActivityService);
         _discountService = discountService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _discountService → {_discountService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _discountService);
         _exportManager = exportManager;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _exportManager → {_exportManager}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _exportManager);
         _importManager = importManager;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _importManager → {_importManager}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _importManager);
         _localizationService = localizationService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _localizationService → {_localizationService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _localizedEntityService → {_localizedEntityService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _localizedEntityService);
         _manufacturerModelFactory = manufacturerModelFactory;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _manufacturerModelFactory → {_manufacturerModelFactory}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _manufacturerModelFactory);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _manufacturerService → {_manufacturerService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _manufacturerService);
         _notificationService = notificationService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _notificationService → {_notificationService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _notificationService);
         _pictureService = pictureService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _pictureService → {_pictureService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _pictureService);
         _productService = productService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _productService → {_productService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _productService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _storeMappingService → {_storeMappingService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _storeMappingService);
         _translationModelFactory = translationModelFactory;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _translationModelFactory → {_translationModelFactory}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _translationModelFactory);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _urlRecordService → {_urlRecordService}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _urlRecordService);
         _workContext = workContext;
+		_logger.LogDebug("ManufacturerController(customerActivityService={CustomerActivityService},discountService={DiscountService},exportManager={ExportManager},importManager={ImportManager},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerModelFactory={ManufacturerModelFactory},manufacturerService={ManufacturerService},notificationService={NotificationService},pictureService={PictureService},productService={ProductService},storeMappingService=<redacted>,translationModelFactory={TranslationModelFactory},urlRecordService={UrlRecordService},workContext={WorkContext}): _workContext → {_workContext}", customerActivityService, discountService, exportManager, importManager, localizationService, localizedEntityService, manufacturerModelFactory, manufacturerService, notificationService, pictureService, productService, translationModelFactory, urlRecordService, workContext, _workContext);
     }
 
     #endregion
@@ -87,6 +105,7 @@ public partial class ManufacturerController : BaseAdminController
 
     protected virtual async Task UpdateLocalesAsync(Manufacturer manufacturer, ManufacturerModel model)
     {
+		_logger.LogDebug(">>> Entering UpdateLocalesAsync(manufacturer={Manufacturer},model={Model})", manufacturer, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(manufacturer,
@@ -116,15 +135,19 @@ public partial class ManufacturerController : BaseAdminController
 
             //search engine name
             var seName = await _urlRecordService.ValidateSeNameAsync(manufacturer, localized.SeName, localized.Name, false);
+			_logger.LogDebug("UpdateLocalesAsync(manufacturer={Manufacturer},model={Model}): seName → {SeName}", manufacturer, model, seName);
             await _urlRecordService.SaveSlugAsync(manufacturer, seName, localized.LanguageId);
         }
+		_logger.LogDebug("<<< Exiting UpdateLocalesAsync(manufacturer={Manufacturer},model={Model})", manufacturer, model);
     }
 
     protected virtual async Task UpdatePictureSeoNamesAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering UpdatePictureSeoNamesAsync(manufacturer={Manufacturer})", manufacturer);
         var picture = await _pictureService.GetPictureByIdAsync(manufacturer.PictureId);
         if (picture != null)
             await _pictureService.SetSeoFilenameAsync(picture.Id, await _pictureService.GetPictureSeNameAsync(manufacturer.Name));
+			_logger.LogDebug("<<< Exiting UpdatePictureSeoNamesAsync(manufacturer={Manufacturer})", manufacturer);
     }
 
     #endregion
@@ -133,15 +156,20 @@ public partial class ManufacturerController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerSearchModelAsync(new ManufacturerSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -162,9 +190,13 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(new ManufacturerModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -226,14 +258,19 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): manufacturer → {Manufacturer}", id, manufacturer);
         if (manufacturer == null || manufacturer.Deleted)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(null, manufacturer);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -317,20 +354,25 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> PreTranslate(int itemId)
     {
+		_logger.LogDebug(">>> Entering PreTranslate(itemId={ItemId})", itemId);
         var translationModel = new TranslationModel();
 
+		_logger.LogDebug("PreTranslate(itemId={ItemId}): translationModel → {TranslationModel}", itemId, translationModel);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(itemId);
+		_logger.LogDebug("PreTranslate(itemId={ItemId}): manufacturer → {Manufacturer}", itemId, manufacturer);
         if (manufacturer == null || manufacturer.Deleted)
             return Json(translationModel);
 
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerModelAsync(null, manufacturer);
+		_logger.LogDebug("PreTranslate(itemId={ItemId}): model → {Model}", itemId, model);
 
         translationModel = await _translationModelFactory.PrepareTranslationModelAsync(model,
             (nameof(ManufacturerLocalizedModel.Name), false),
             (nameof(ManufacturerLocalizedModel.Description), true));
 
+		_logger.LogDebug("<<< Exiting PreTranslate(itemId={ItemId})", itemId);
         return Json(translationModel);
     }
 
@@ -338,8 +380,10 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): manufacturer → {Manufacturer}", id, manufacturer);
         if (manufacturer == null)
             return RedirectToAction("List");
 
@@ -351,6 +395,7 @@ public partial class ManufacturerController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Catalog.Manufacturers.Deleted"));
 
+		_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -358,16 +403,20 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogDebug(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         var manufacturers = await _manufacturerService.GetManufacturersByIdsAsync(selectedIds.ToArray());
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): manufacturers → {Manufacturers}", selectedIds, manufacturers);
         await _manufacturerService.DeleteManufacturersAsync(manufacturers);
 
         //activity log
         var activityLogFormat = await _localizationService.GetResourceAsync("ActivityLog.DeleteManufacturer");
+		_logger.LogDebug("DeleteSelected(selectedIds={SelectedIds}): activityLogFormat → {ActivityLogFormat}", selectedIds, activityLogFormat);
         await _customerActivityService.InsertActivitiesAsync("DeleteManufacturer", manufacturers, manufacturer => string.Format(activityLogFormat, manufacturer.Name));
 
+		_logger.LogDebug("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
@@ -378,15 +427,20 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXml()
     {
+		_logger.LogDebug(">>> Entering ExportXml()");
         try
         {
             var manufacturers = await _manufacturerService.GetAllManufacturersAsync(showHidden: true);
+			_logger.LogDebug("ExportXml(): manufacturers → {Manufacturers}", manufacturers);
             var xml = await _exportManager.ExportManufacturersToXmlAsync(manufacturers);
+			_logger.LogDebug("ExportXml(): xml → {Xml}", xml);
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", "manufacturers.xml");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXml(): {Arg0}", exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ExportXml()");
             return RedirectToAction("List");
         }
     }
@@ -394,15 +448,19 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXlsx()
     {
+		_logger.LogDebug(">>> Entering ExportXlsx()");
         try
         {
             var bytes = await _exportManager.ExportManufacturersToXlsxAsync((await _manufacturerService.GetAllManufacturersAsync(showHidden: true)).Where(p => !p.Deleted).ToList());
+			_logger.LogDebug("ExportXlsx(): bytes → {Bytes}", bytes);
 
             return File(bytes, MimeTypes.TextXlsx, "manufacturers.xlsx");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXlsx(): {Arg0}", exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ExportXlsx()");
             return RedirectToAction("List");
         }
     }
@@ -411,6 +469,7 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportFromXlsx(IFormFile importexcelfile)
     {
+		_logger.LogDebug(">>> Entering ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
         //a vendor cannot import manufacturers
         if (await _workContext.GetCurrentVendorAsync() != null)
             return AccessDeniedView();
@@ -432,7 +491,9 @@ public partial class ManufacturerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ImportFromXlsx(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogDebug("<<< Exiting ImportFromXlsx(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }
@@ -445,13 +506,16 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_VIEW)]
     public virtual async Task<IActionResult> ProductList(ManufacturerProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductList(searchModel={SearchModel})", searchModel);
         //try to get a manufacturer with the specified id
         var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(searchModel.ManufacturerId)
             ?? throw new ArgumentException("No manufacturer found with the specified id");
 
         //prepare model
         var model = await _manufacturerModelFactory.PrepareManufacturerProductListModelAsync(searchModel, manufacturer);
+		_logger.LogDebug("ProductList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ProductList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -459,14 +523,17 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductUpdate(ManufacturerProductModel model)
     {
+		_logger.LogDebug(">>> Entering ProductUpdate(model={Model})", model);
         //try to get a product manufacturer with the specified id
         var productManufacturer = await _manufacturerService.GetProductManufacturerByIdAsync(model.Id)
             ?? throw new ArgumentException("No product manufacturer mapping found with the specified id");
+			_logger.LogDebug("ProductUpdate(model={Model}): productManufacturer → {ProductManufacturer}", model, productManufacturer);
 
         //fill entity from model
         productManufacturer = model.ToEntity(productManufacturer);
         await _manufacturerService.UpdateProductManufacturerAsync(productManufacturer);
 
+		_logger.LogDebug("<<< Exiting ProductUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -474,6 +541,7 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductDelete(int id)
     {
+	_logger.LogDebug(">>> Entering ProductDelete(id={Id})", id);
 
         //try to get a product manufacturer with the specified id
         var productManufacturer = await _manufacturerService.GetProductManufacturerByIdAsync(id)
@@ -481,15 +549,20 @@ public partial class ManufacturerController : BaseAdminController
 
         await _manufacturerService.DeleteProductManufacturerAsync(productManufacturer);
 
+		_logger.LogDebug("<<< Exiting ProductDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopup(int manufacturerId)
     {
+		_logger.LogDebug(">>> Entering ProductAddPopup(manufacturerId={ManufacturerId})", manufacturerId);
         //prepare model
         var model = await _manufacturerModelFactory.PrepareAddProductToManufacturerSearchModelAsync(new AddProductToManufacturerSearchModel());
+		_logger.LogDebug("ProductAddPopup(manufacturerId={ManufacturerId}): model → {Model}", manufacturerId, model);
 
+		_logger.LogDebug("<<< Exiting ProductAddPopup(manufacturerId={ManufacturerId})", manufacturerId);
+		_logger.LogDebug("<<< Exiting ProductAddPopup(model={Model})", model);
         return View(model);
     }
 
@@ -497,9 +570,12 @@ public partial class ManufacturerController : BaseAdminController
     [CheckPermission(StandardPermission.Catalog.MANUFACTURER_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ProductAddPopupList(AddProductToManufacturerSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering ProductAddPopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _manufacturerModelFactory.PrepareAddProductToManufacturerListModelAsync(searchModel);
+		_logger.LogDebug("ProductAddPopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting ProductAddPopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

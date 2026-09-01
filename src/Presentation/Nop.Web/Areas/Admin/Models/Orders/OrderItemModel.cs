@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record OrderItemModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OrderItemModel()
     {
+		_logger.LogDebug(">>> Entering OrderItemModel()");
         PurchasedGiftCardIds = new List<int>();
+		_logger.LogDebug("OrderItemModel(): PurchasedGiftCardIds → {PurchasedGiftCardIds}", PurchasedGiftCardIds);
         ReturnRequests = new List<ReturnRequestBriefModel>();
     }
 

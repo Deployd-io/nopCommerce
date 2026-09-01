@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Core;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -14,6 +15,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-label", Attributes = FOR_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopLabelTagHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -32,8 +34,11 @@ public partial class NopLabelTagHelper : TagHelper
 
     public NopLabelTagHelper(IHtmlGenerator generator, ILocalizationService localizationService, IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext})", generator, localizationService, workContext);
         Generator = generator;
+		_logger.LogDebug("NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext}): Generator → {Generator1}", generator, localizationService, workContext, Generator);
         _localizationService = localizationService;
+		_logger.LogDebug("NopLabelTagHelper(generator={Generator},localizationService={LocalizationService},workContext={WorkContext}): _localizationService → {_localizationService}", generator, localizationService, workContext, _localizationService);
         _workContext = workContext;
     }
 
@@ -49,10 +54,12 @@ public partial class NopLabelTagHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(output);
 
         string resourceValue = null;
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): resourceValue → {ResourceValue}", context, output, resourceValue);
         string resourceName = null;
         var type = For.Metadata.ContainerType;
         var propertyName = For.Metadata.Name;
@@ -75,6 +82,8 @@ public partial class NopLabelTagHelper : TagHelper
         {
             //create a label wrapper
             output.TagName = "div";
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagName → {Arg2}", context, output, output.TagName);
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
             output.TagMode = TagMode.StartTagAndEndTag;
 
             //merge classes
@@ -90,6 +99,7 @@ public partial class NopLabelTagHelper : TagHelper
             if (DisplayHint && !string.IsNullOrEmpty(resourceName))
             {
                 var language = await _workContext.GetWorkingLanguageAsync();
+				_logger.LogDebug("ProcessAsync(context={Context},output={Output}): language → {Language}", context, output, language);
                 var hintResource = await _localizationService
                     .GetResourceAsync($"{resourceName}.Hint", language.Id, returnEmptyIfNotFound: true, logIfNotFound: false);
 
@@ -100,6 +110,7 @@ public partial class NopLabelTagHelper : TagHelper
                 }
             }
         }
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

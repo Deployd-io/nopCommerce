@@ -6,6 +6,7 @@ using Nop.Data;
 using Nop.Services.Customers;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Topics;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Topics;
 /// </summary>
 public partial class TopicService : ITopicService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -35,12 +37,19 @@ public partial class TopicService : ITopicService
         IStoreMappingService storeMappingService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext})", aclService, customerService, topicRepository, staticCacheManager, workContext);
         _aclService = aclService;
+		_logger.LogDebug("TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext}): _aclService → {_aclService}", aclService, customerService, topicRepository, staticCacheManager, workContext, _aclService);
         _customerService = customerService;
+		_logger.LogDebug("TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext}): _customerService → {_customerService}", aclService, customerService, topicRepository, staticCacheManager, workContext, _customerService);
         _topicRepository = topicRepository;
+		_logger.LogDebug("TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext}): _topicRepository → {_topicRepository}", aclService, customerService, topicRepository, staticCacheManager, workContext, _topicRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext}): _staticCacheManager → {_staticCacheManager}", aclService, customerService, topicRepository, staticCacheManager, workContext, _staticCacheManager);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext}): _storeMappingService → {_storeMappingService}", aclService, customerService, topicRepository, staticCacheManager, workContext, _storeMappingService);
         _workContext = workContext;
+		_logger.LogDebug("TopicService(aclService={AclService},customerService={CustomerService},topicRepository={TopicRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>,workContext={WorkContext}): _workContext → {_workContext}", aclService, customerService, topicRepository, staticCacheManager, workContext, _workContext);
     }
 
     #endregion
@@ -54,6 +63,7 @@ public partial class TopicService : ITopicService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTopicAsync(Topic topic)
     {
+		_logger.LogDebug(">>> Entering DeleteTopicAsync(topic={Topic})", topic);
         await _topicRepository.DeleteAsync(topic);
     }
 
@@ -67,6 +77,8 @@ public partial class TopicService : ITopicService
     /// </returns>
     public virtual async Task<Topic> GetTopicByIdAsync(int topicId)
     {
+		_logger.LogDebug(">>> Entering GetTopicByIdAsync(topicId={TopicId})", topicId);
+		_logger.LogInformation("GetTopicByIdAsync(topicId)={TopicId}: find query executing", topicId);
         return await _topicRepository.GetByIdAsync(topicId, cache => default);
     }
 
@@ -81,13 +93,18 @@ public partial class TopicService : ITopicService
     /// </returns>
     public virtual async Task<Topic> GetTopicBySystemNameAsync(string systemName, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId})", systemName, storeId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(systemName))
             return null;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId}): customer → {Customer}", systemName, storeId, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		_logger.LogDebug("GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId}): customerRoleIds → {CustomerRoleIds}", systemName, storeId, customerRoleIds);
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopTopicDefaults.TopicBySystemNameCacheKey, systemName, storeId, customerRoleIds);
+		_logger.LogDebug("GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId}): cacheKey → {CacheKey}", systemName, storeId, cacheKey);
 
         return await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
@@ -104,10 +121,14 @@ public partial class TopicService : ITopicService
             //apply ACL constraints
             query = await _aclService.ApplyAcl(query, customerRoleIds);
 
+			_logger.LogInformation("GetTopicBySystemNameAsync(systemName,storeId)={SystemName},{StoreId}: external service call took {Arg2} ms", systemName, storeId, __logStart.ElapsedMilliseconds);
             return await query.Where(t => t.SystemName == systemName)
                 .OrderBy(t => t.Id)
                 .FirstOrDefaultAsync();
+				var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("GetTopicBySystemNameAsync(systemName,storeId)={SystemName},{StoreId}: database query executed in {Arg2} ms", systemName, storeId, __logStartDb.ElapsedMilliseconds);
         });
+		_logger.LogDebug("<<< Exiting GetTopicBySystemNameAsync(systemName={SystemName},storeId={StoreId})", systemName, storeId);
     }
 
     /// <summary>
@@ -122,11 +143,16 @@ public partial class TopicService : ITopicService
     /// </returns>
     public virtual async Task<IList<Topic>> GetAllTopicsAsync(int storeId, bool ignoreAcl = false, bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden})", storeId, ignoreAcl, showHidden);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		_logger.LogDebug("GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden}): customerRoleIds → {CustomerRoleIds}", storeId, ignoreAcl, showHidden, customerRoleIds);
+		_logger.LogDebug("GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden}): customer → {Customer}", storeId, ignoreAcl, showHidden, customer);
 
         return await _topicRepository.GetAllAsync(async query =>
         {
+		_logger.LogInformation("GetAllTopicsAsync(storeId,ignoreAcl,showHidden)={StoreId},{IgnoreAcl},{ShowHidden}: find query executing", storeId, ignoreAcl, showHidden);
+		_logger.LogDebug("GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden}): query → {Query}", storeId, ignoreAcl, showHidden, query);
 
             if (!showHidden || storeId > 0)
             {
@@ -154,6 +180,7 @@ public partial class TopicService : ITopicService
                 ? cache.PrepareKeyForDefaultCache(NopTopicDefaults.TopicsAllCacheKey, storeId, showHidden)
                 : cache.PrepareKeyForDefaultCache(NopTopicDefaults.TopicsAllWithACLCacheKey, storeId, showHidden, customerRoleIds);
         });
+		_logger.LogDebug("<<< Exiting GetAllTopicsAsync(storeId={StoreId},ignoreAcl={IgnoreAcl},showHidden={ShowHidden})", storeId, ignoreAcl, showHidden);
     }
 
     /// <summary>
@@ -170,6 +197,7 @@ public partial class TopicService : ITopicService
     public virtual async Task<IList<Topic>> GetAllTopicsAsync(int storeId, string keywords,
         bool ignoreAcl = false, bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering GetAllTopicsAsync(storeId={StoreId},keywords={Keywords},ignoreAcl={IgnoreAcl},showHidden={ShowHidden})", storeId, keywords, ignoreAcl, showHidden);
         var topics = await GetAllTopicsAsync(storeId,
             ignoreAcl: ignoreAcl,
             showHidden: showHidden);
@@ -192,6 +220,7 @@ public partial class TopicService : ITopicService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTopicAsync(Topic topic)
     {
+		_logger.LogDebug(">>> Entering InsertTopicAsync(topic={Topic})", topic);
         await _topicRepository.InsertAsync(topic);
     }
 
@@ -203,6 +232,7 @@ public partial class TopicService : ITopicService
     /// <returns>Result</returns>
     public virtual bool TopicIsAvailable(Topic topic, DateTime? dateTime = null)
     {
+		_logger.LogDebug(">>> Entering TopicIsAvailable(topic={Topic},dateTime={DateTime})", topic, dateTime);
         ArgumentNullException.ThrowIfNull(topic);
 
         dateTime ??= DateTime.UtcNow;
@@ -223,6 +253,7 @@ public partial class TopicService : ITopicService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTopicAsync(Topic topic)
     {
+		_logger.LogDebug(">>> Entering UpdateTopicAsync(topic={Topic})", topic);
         await _topicRepository.UpdateAsync(topic);
     }
 

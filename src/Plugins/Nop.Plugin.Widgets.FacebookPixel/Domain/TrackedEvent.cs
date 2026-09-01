@@ -1,15 +1,19 @@
-﻿namespace Nop.Plugin.Widgets.FacebookPixel.Domain;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Plugin.Widgets.FacebookPixel.Domain;
 
 /// <summary>
 /// Represents tracked event details
 /// </summary>
 public class TrackedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public TrackedEvent()
     {
+		_logger.LogDebug(">>> Entering TrackedEvent()");
         EventObjects = new List<string>();
+		_logger.LogDebug("TrackedEvent(): EventObjects → {EventObjects}", EventObjects);
     }
 
     #endregion

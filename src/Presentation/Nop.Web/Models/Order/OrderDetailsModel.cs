@@ -4,22 +4,33 @@ using Nop.Services.Orders;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Order;
 
 public partial record OrderDetailsModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public OrderDetailsModel()
     {
+		_logger.LogDebug(">>> Entering OrderDetailsModel()");
         TaxRates = new List<TaxRate>();
         GiftCards = new List<GiftCard>();
         Items = new List<OrderItemModel>();
         OrderNotes = new List<OrderNote>();
+		_logger.LogDebug("OrderDetailsModel(): OrderNotes → {OrderNotes}", OrderNotes);
+		_logger.LogDebug("OrderDetailsModel(): TaxRates → {TaxRates}", TaxRates);
+		_logger.LogDebug("OrderDetailsModel(): GiftCards → {GiftCards}", GiftCards);
+		_logger.LogDebug("OrderDetailsModel(): Items → {Items}", Items);
         Shipments = new List<ShipmentBriefModel>();
+		_logger.LogDebug("OrderDetailsModel(): Shipments → {Shipments}", Shipments);
 
         BillingAddress = new AddressModel();
+		_logger.LogDebug("OrderDetailsModel(): BillingAddress → {BillingAddress}", BillingAddress);
         ShippingAddress = new AddressModel();
+		_logger.LogDebug("OrderDetailsModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
         PickupAddress = new AddressModel();
+		_logger.LogDebug("OrderDetailsModel(): PickupAddress → {PickupAddress}", PickupAddress);
 
         CustomValues = new CustomValues();
     }
@@ -95,9 +106,12 @@ public partial record OrderDetailsModel : BaseNopEntityModel
 
     public partial record OrderItemModel : BaseNopEntityModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public OrderItemModel()
         {
+			_logger.LogDebug(">>> Entering OrderItemModel()");
             Picture = new PictureModel();
+			_logger.LogDebug("OrderItemModel(): Picture → {Picture}", Picture);
         }
 
         public Guid OrderItemGuid { get; set; }

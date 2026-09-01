@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Messages;
 using Nop.Data;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class CampaignService : ICampaignService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -32,13 +34,21 @@ public partial class CampaignService : ICampaignService
         IStoreContext storeContext,
         ITokenizer tokenizer)
     {
+		_logger.LogDebug(">>> Entering CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>)", customerService, emailSender, queuedEmailService, campaignRepository, storeContext);
         _customerService = customerService;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _customerService → {_customerService}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _customerService);
         _emailSender = emailSender;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _emailSender → {_emailSender}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _emailSender);
         _messageTokenProvider = messageTokenProvider;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _messageTokenProvider → {_messageTokenProvider}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _messageTokenProvider);
         _queuedEmailService = queuedEmailService;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _queuedEmailService → {_queuedEmailService}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _queuedEmailService);
         _campaignRepository = campaignRepository;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _campaignRepository → {_campaignRepository}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _campaignRepository);
         _storeContext = storeContext;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _storeContext → {_storeContext}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _storeContext);
         _tokenizer = tokenizer;
+		_logger.LogDebug("CampaignService(customerService={CustomerService},emailSender={EmailSender},messageTokenProvider=<redacted>,queuedEmailService={QueuedEmailService},campaignRepository={CampaignRepository},storeContext={StoreContext},tokenizer=<redacted>): _tokenizer → {_tokenizer}", customerService, emailSender, queuedEmailService, campaignRepository, storeContext, _tokenizer);
     }
 
     #endregion
@@ -56,6 +66,7 @@ public partial class CampaignService : ICampaignService
     /// </returns>
     public virtual async Task<Campaign> CopyCampaignAsync(Campaign campaign, string newName)
     {
+		_logger.LogDebug(">>> Entering CopyCampaignAsync(campaign={Campaign},newName={NewName})", campaign, newName);
         ArgumentNullException.ThrowIfNull(campaign);
         ArgumentException.ThrowIfNullOrEmpty(newName);
 
@@ -70,8 +81,11 @@ public partial class CampaignService : ICampaignService
             CreatedOnUtc = DateTime.UtcNow
         };
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("CopyCampaignAsync(campaign,newName)={Campaign},{NewName}: save query executed in {Arg2} ms", campaign, newName, __logStart.ElapsedMilliseconds);
         await _campaignRepository.InsertAsync(campaignCopy);
 
+		_logger.LogDebug("<<< Exiting CopyCampaignAsync(campaign={Campaign},newName={NewName})", campaign, newName);
         return campaignCopy;
     }
 
@@ -82,6 +96,7 @@ public partial class CampaignService : ICampaignService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCampaignAsync(Campaign campaign)
     {
+		_logger.LogDebug(">>> Entering InsertCampaignAsync(campaign={Campaign})", campaign);
         await _campaignRepository.InsertAsync(campaign);
     }
 
@@ -92,6 +107,7 @@ public partial class CampaignService : ICampaignService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateCampaignAsync(Campaign campaign)
     {
+		_logger.LogDebug(">>> Entering UpdateCampaignAsync(campaign={Campaign})", campaign);
         await _campaignRepository.UpdateAsync(campaign);
     }
 
@@ -102,6 +118,7 @@ public partial class CampaignService : ICampaignService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCampaignAsync(Campaign campaign)
     {
+		_logger.LogDebug(">>> Entering DeleteCampaignAsync(campaign={Campaign})", campaign);
         await _campaignRepository.DeleteAsync(campaign);
     }
 
@@ -115,6 +132,8 @@ public partial class CampaignService : ICampaignService
     /// </returns>
     public virtual async Task<Campaign> GetCampaignByIdAsync(int campaignId)
     {
+		_logger.LogDebug(">>> Entering GetCampaignByIdAsync(campaignId={CampaignId})", campaignId);
+		_logger.LogInformation("GetCampaignByIdAsync(campaignId)={CampaignId}: find query executing", campaignId);
         return await _campaignRepository.GetByIdAsync(campaignId, cache => default);
     }
 
@@ -130,9 +149,12 @@ public partial class CampaignService : ICampaignService
     {
         var campaigns = await _campaignRepository.GetAllAsync(query =>
         {
+			_logger.LogDebug(">>> Entering GetAllCampaignsAsync(storeId={StoreId})", storeId);
             if (storeId > 0)
                 query = query.Where(c => c.StoreId == storeId);
 
+			_logger.LogInformation("GetAllCampaignsAsync(storeId)={StoreId}: find query executed in {Arg1} ms", storeId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetAllCampaignsAsync(storeId={StoreId})", storeId);
             query = query.OrderBy(c => c.CreatedOnUtc);
 
             return query;
@@ -154,6 +176,7 @@ public partial class CampaignService : ICampaignService
     public virtual async Task<int> SendCampaignAsync(Campaign campaign, EmailAccount emailAccount,
         IEnumerable<NewsLetterSubscription> subscriptions)
     {
+		_logger.LogDebug(">>> Entering SendCampaignAsync(campaign={Campaign},emailAccount={EmailAccount},subscriptions={Subscriptions})", campaign, emailAccount, subscriptions);
         ArgumentNullException.ThrowIfNull(campaign);
 
         ArgumentNullException.ThrowIfNull(emailAccount);
@@ -163,18 +186,22 @@ public partial class CampaignService : ICampaignService
         foreach (var subscription in subscriptions)
         {
             var customer = await _customerService.GetCustomerByEmailAsync(subscription.Email);
+			_logger.LogDebug("SendCampaignAsync(campaign={Campaign},emailAccount={EmailAccount},subscriptions={Subscriptions}): customer → {Customer}", campaign, emailAccount, subscriptions, customer);
             //ignore deleted or inactive customers when sending newsletter campaigns
             if (customer != null && (!customer.Active || customer.Deleted))
                 continue;
 
             var tokens = new List<Token>();
+			_logger.LogDebug("SendCampaignAsync(campaign={Campaign},emailAccount={EmailAccount},subscriptions={Subscriptions}): tokens → {Tokens}", campaign, emailAccount, subscriptions, tokens);
             await _messageTokenProvider.AddStoreTokensAsync(tokens, await _storeContext.GetCurrentStoreAsync(), emailAccount, subscription.LanguageId);
             await _messageTokenProvider.AddNewsLetterSubscriptionTokensAsync(tokens, subscription);
             if (customer != null)
                 await _messageTokenProvider.AddCustomerTokensAsync(tokens, customer);
 
             var subject = _tokenizer.Replace(campaign.Subject, tokens, false);
+			_logger.LogDebug("SendCampaignAsync(campaign={Campaign},emailAccount={EmailAccount},subscriptions={Subscriptions}): subject → {Subject}", campaign, emailAccount, subscriptions, subject);
             var body = _tokenizer.Replace(campaign.Body, tokens, true);
+			_logger.LogDebug("SendCampaignAsync(campaign={Campaign},emailAccount={EmailAccount},subscriptions={Subscriptions}): body → {Body}", campaign, emailAccount, subscriptions, body);
 
             var email = new QueuedEmail
             {
@@ -192,6 +219,7 @@ public partial class CampaignService : ICampaignService
             totalEmailsSent++;
         }
 
+		_logger.LogDebug("<<< Exiting SendCampaignAsync(campaign={Campaign},emailAccount={EmailAccount},subscriptions={Subscriptions})", campaign, emailAccount, subscriptions);
         return totalEmailsSent;
     }
 

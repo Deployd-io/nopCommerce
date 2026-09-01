@@ -12,11 +12,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CustomerRoleController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -41,14 +43,23 @@ public partial class CustomerRoleController : BaseAdminController
         IProductService productService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext})", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _customerActivityService → {_customerActivityService}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _customerActivityService);
         _customerRoleModelFactory = customerRoleModelFactory;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _customerRoleModelFactory → {_customerRoleModelFactory}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _customerRoleModelFactory);
         _customerService = customerService;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _customerService → {_customerService}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _customerService);
         _localizationService = localizationService;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _localizationService → {_localizationService}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _notificationService → {_notificationService}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _permissionService → {_permissionService}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _permissionService);
         _productService = productService;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _productService → {_productService}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _productService);
         _workContext = workContext;
+		_logger.LogDebug("CustomerRoleController(customerActivityService={CustomerActivityService},customerRoleModelFactory={CustomerRoleModelFactory},customerService={CustomerService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},productService={ProductService},workContext={WorkContext}): _workContext → {_workContext}", customerActivityService, customerRoleModelFactory, customerService, localizationService, notificationService, permissionService, productService, workContext, _workContext);
     }
 
     #endregion
@@ -57,15 +68,20 @@ public partial class CustomerRoleController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogDebug(">>> Entering Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMER_ROLES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogDebug(">>> Entering List()");
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleSearchModelAsync(new CustomerRoleSearchModel());
+		_logger.LogDebug("List(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting List()");
+		_logger.LogDebug("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -83,9 +99,13 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogDebug(">>> Entering Create()");
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleModelAsync(new CustomerRoleModel(), null);
+		_logger.LogDebug("Create(): model → {Model}", model);
 
+		_logger.LogDebug("<<< Exiting Create()");
+		_logger.LogDebug("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -119,14 +139,19 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogDebug(">>> Entering Edit(id={Id})", id);
         //try to get a customer role with the specified id
         var customerRole = await _customerService.GetCustomerRoleByIdAsync(id);
+		_logger.LogDebug("Edit(id={Id}): customerRole → {CustomerRole}", id, customerRole);
         if (customerRole == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleModelAsync(null, customerRole);
+		_logger.LogDebug("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogDebug("<<< Exiting Edit(id={Id})", id);
+		_logger.LogDebug("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -184,8 +209,10 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogDebug(">>> Entering Delete(id={Id})", id);
         //try to get a customer role with the specified id
         var customerRole = await _customerService.GetCustomerRoleByIdAsync(id);
+		_logger.LogDebug("Delete(id={Id}): customerRole → {CustomerRole}", id, customerRole);
         if (customerRole == null)
             return RedirectToAction("List");
 
@@ -203,7 +230,9 @@ public partial class CustomerRoleController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, exc.Message);
             _notificationService.ErrorNotification(exc.Message);
+			_logger.LogDebug("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = customerRole.Id });
         }
     }
@@ -215,6 +244,7 @@ public partial class CustomerRoleController : BaseAdminController
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleProductSearchModelAsync(new CustomerRoleProductSearchModel());
 
+		_logger.LogDebug("<<< Exiting AssociateProductToCustomerRolePopup()");
         return View(model);
     }
 
@@ -223,9 +253,12 @@ public partial class CustomerRoleController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_ACL)]
     public virtual async Task<IActionResult> AssociateProductToCustomerRolePopupList(CustomerRoleProductSearchModel searchModel)
     {
+		_logger.LogDebug(">>> Entering AssociateProductToCustomerRolePopupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _customerRoleModelFactory.PrepareCustomerRoleProductListModelAsync(searchModel);
+		_logger.LogDebug("AssociateProductToCustomerRolePopupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogDebug("<<< Exiting AssociateProductToCustomerRolePopupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 

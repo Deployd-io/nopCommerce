@@ -30,6 +30,7 @@ namespace Nop.Plugin.Tax.Avalara.Services;
 /// </summary>
 public class AvalaraTaxManager : IDisposable
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxSettings _avalaraTaxSettings;
@@ -139,10 +140,12 @@ public class AvalaraTaxManager : IDisposable
     /// <param name="args">Event args</param>
     protected async void OnCallCompleted(object sender, EventArgs args)
     {
+		_logger.LogDebug(">>> Entering OnCallCompleted(sender={Sender},args={Args})", sender, args);
         if (args is not AvaTaxCallEventArgs avaTaxCallEventArgs)
             return;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("OnCallCompleted(sender={Sender},args={Args}): customer → {Customer}", sender, args, customer);
 
         //log request results
         await _taxTransactionLogService.InsertTaxTransactionLogAsync(new TaxTransactionLog
@@ -154,6 +157,7 @@ public class AvalaraTaxManager : IDisposable
             CustomerId = customer.Id,
             CreatedDateUtc = DateTime.UtcNow
         });
+		_logger.LogDebug("<<< Exiting OnCallCompleted(sender={Sender},args={Args})", sender, args);
     }
 
     /// <summary>
@@ -162,6 +166,7 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>True if it's configured; otherwise false</returns>
     protected bool IsConfigured()
     {
+		_logger.LogDebug(">>> Entering IsConfigured()");
         return !string.IsNullOrEmpty(_avalaraTaxSettings.AccountId) && !string.IsNullOrEmpty(_avalaraTaxSettings.LicenseKey);
     }
 
@@ -226,16 +231,21 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>Created transaction</returns>
     protected TransactionModel CreateTransaction(CreateTransactionModel model)
     {
+		_logger.LogDebug(">>> Entering CreateTransaction(model={Model})", model);
         var transaction = ServiceClient.CreateTransaction(null, model)
             ?? throw new NopException("No response from the service");
 
         //whether there are any errors
         var errors = transaction.messages?.Where(m => !m.severity?.ToLower().Equals("success") ?? true).ToList() ?? [];
+		_logger.LogDebug("CreateTransaction(model={Model}): errors → {Errors}", model, errors);
 
         if (!errors.Any())
             return transaction;
 
         var message = errors.Aggregate(string.Empty, (error, message) => $"{error}{message.summary}{Environment.NewLine}");
+		_logger.LogWarning("Throwing NopException from CreateTransaction(model={Model})", model);
+		_logger.LogDebug("CreateTransaction(model={Model}): message → {Message}", model, message);
+		_logger.LogDebug("<<< Exiting CreateTransaction(model={Model})", model);
         throw new NopException(message);
     }
 
@@ -251,6 +261,7 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<CreateTransactionModel> PrepareTransactionModelAsync(Address address, string customerCode, DocumentType documentType)
     {
+		_logger.LogDebug(">>> Entering PrepareTransactionModelAsync(address={Address},customerCode={CustomerCode},documentType={DocumentType})", address, customerCode, documentType);
         var model = new CreateTransactionModel
         {
             customerCode = CommonHelper.EnsureMaximumLength(customerCode, 50),
@@ -273,15 +284,20 @@ public class AvalaraTaxManager : IDisposable
             _ => null
         };
         var shipFromAddress = await MapAddressAsync(originAddress);
+		_logger.LogDebug("PrepareTransactionModelAsync(address={Address},customerCode={CustomerCode},documentType={DocumentType}): shipFromAddress → {ShipFromAddress}", address, customerCode, documentType, shipFromAddress);
         var shipToAddress = await MapAddressAsync(address);
+		_logger.LogDebug("PrepareTransactionModelAsync(address={Address},customerCode={CustomerCode},documentType={DocumentType}): shipToAddress → {ShipToAddress}", address, customerCode, documentType, shipToAddress);
         if (shipFromAddress != null && shipToAddress != null)
         {
             model.addresses.shipFrom = shipFromAddress;
             model.addresses.shipTo = shipToAddress;
+			_logger.LogDebug(">>> Entering MapAddressAsync(address={Address})", address);
+			_logger.LogDebug("<<< Exiting MapAddressAsync(address={Address})", address);
         }
         else
             model.addresses.singleLocation = shipToAddress ?? shipFromAddress;
 
+		_logger.LogDebug("<<< Exiting PrepareTransactionModelAsync(address={Address},customerCode={CustomerCode},documentType={DocumentType})", address, customerCode, documentType);
         return model;
     }
 
@@ -294,8 +310,11 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task PrepareOrderAddressesAsync(Customer customer, Order order, int storeId)
     {
+		_logger.LogDebug(">>> Entering PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId})", customer, order, storeId);
         order.BillingAddressId = customer.BillingAddressId ?? 0;
         order.ShippingAddressId = customer.ShippingAddressId;
+		_logger.LogDebug("PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId}): order.ShippingAddressId → {Arg3}", customer, order, storeId, order.ShippingAddressId);
+		_logger.LogDebug("PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId}): order.BillingAddressId → {Arg3}", customer, order, storeId, order.BillingAddressId);
         if (_shippingSettings.AllowPickupInStore)
         {
             var pickupPoint = await _genericAttributeService
@@ -303,7 +322,9 @@ public class AvalaraTaxManager : IDisposable
             if (pickupPoint != null)
             {
                 var country = await _countryService.GetCountryByTwoLetterIsoCodeAsync(pickupPoint.CountryCode);
+				_logger.LogDebug("PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId}): country → {Country}", customer, order, storeId, country);
                 var state = await _stateProvinceService.GetStateProvinceByAbbreviationAsync(pickupPoint.StateAbbreviation, country?.Id);
+				_logger.LogDebug("PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId}): state → {State}", customer, order, storeId, state);
                 var pickupAddress = new Address
                 {
                     Address1 = pickupPoint.Address,
@@ -315,8 +336,10 @@ public class AvalaraTaxManager : IDisposable
                 };
                 await _addressService.InsertAddressAsync(pickupAddress);
                 order.PickupAddressId = pickupAddress.Id;
+				_logger.LogDebug("PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId}): order.PickupAddressId → {Arg3}", customer, order, storeId, order.PickupAddressId);
             }
         }
+		_logger.LogDebug("<<< Exiting PrepareOrderAddressesAsync(customer={Customer},order={Order},storeId={StoreId})", customer, order, storeId);
     }
 
     /// <summary>
@@ -329,8 +352,10 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<Address> GetTaxAddressAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering GetTaxAddressAsync(order={Order})", order);
         Address address = null;
 
+		_logger.LogDebug("GetTaxAddressAsync(order={Order}): address → {Address}", order, address);
         //tax is based on billing address
         if (_taxSettings.TaxBasedOn == TaxBasedOn.BillingAddress &&
             await _addressService.GetAddressByIdAsync(order.BillingAddressId) is Address billingAddress)
@@ -357,6 +382,7 @@ public class AvalaraTaxManager : IDisposable
         //or use default address for tax calculation
         address ??= await _addressService.GetAddressByIdAsync(_taxSettings.DefaultTaxAddressId);
 
+		_logger.LogDebug("<<< Exiting GetTaxAddressAsync(order={Order})", order);
         return address;
     }
 
@@ -370,6 +396,8 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<AddressLocationInfo> MapAddressAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering MapAddressAsync(address={Address})", address);
+		_logger.LogDebug("<<< Exiting MapAddressAsync(address={Address})", address);
         return address == null ? null : new AddressLocationInfo
         {
             city = CommonHelper.EnsureMaximumLength(address.City, 50),
@@ -393,8 +421,10 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<List<LineItemModel>> GetItemLinesAsync(Order order, IList<OrderItem> orderItems, int? countryId)
     {
+		_logger.LogDebug(">>> Entering GetItemLinesAsync(order={Order},orderItems={OrderItems},countryId={CountryId})", order, orderItems, countryId);
         //get purchased products details
         var items = await CreateLinesForOrderItemsAsync(order, orderItems, countryId);
+		_logger.LogDebug("GetItemLinesAsync(order={Order},orderItems={OrderItems},countryId={CountryId}): items → {Items}", order, orderItems, countryId, items);
 
         //set payment method additional fee as the separate item line
         if (order.PaymentMethodAdditionalFeeExclTax > decimal.Zero)
@@ -408,6 +438,7 @@ public class AvalaraTaxManager : IDisposable
         if (!string.IsNullOrEmpty(order.CheckoutAttributesXml))
             items.AddRange(await CreateLinesForCheckoutAttributesAsync(order));
 
+		_logger.LogDebug("<<< Exiting GetItemLinesAsync(order={Order},orderItems={OrderItems},countryId={CountryId})", order, orderItems, countryId);
         return items;
     }
 
@@ -423,10 +454,12 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<List<LineItemModel>> CreateLinesForOrderItemsAsync(Order order, IList<OrderItem> orderItems, int? countryId)
     {
+		_logger.LogDebug(">>> Entering CreateLinesForOrderItemsAsync(order={Order},orderItems={OrderItems},countryId={CountryId})", order, orderItems, countryId);
         var itemsClassification = countryId > 0
             ? (await _itemClassificationService.GetItemClassificationAsync(countryId)).ToList()
             : new();
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         return await orderItems.SelectAwait(async orderItem =>
         {
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
@@ -469,6 +502,10 @@ public class AvalaraTaxManager : IDisposable
 
             return item;
         }).ToListAsync();
+		_logger.LogInformation("CreateLinesForOrderItemsAsync(order,orderItems,countryId)={Order},{OrderItems},{CountryId}: database query executed in {Arg3} ms", order, orderItems, countryId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug(">>> Entering CreateLinesForCheckoutAttributesAsync(order={Order})", order);
+		_logger.LogInformation("CreateLinesForCheckoutAttributesAsync(order)={Order}: database query executed in {Arg1} ms", order, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting CreateLinesForCheckoutAttributesAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -481,6 +518,7 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<LineItemModel> CreateLineForPaymentMethodAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CreateLineForPaymentMethodAsync(order={Order})", order);
         var paymentItem = new LineItemModel
         {
             amount = order.PaymentMethodAdditionalFeeExclTax,
@@ -499,14 +537,17 @@ public class AvalaraTaxManager : IDisposable
         {
             //try to get tax code
             var paymentTaxCategory = await _taxCategoryService.GetTaxCategoryByIdAsync(_taxSettings.PaymentMethodAdditionalFeeTaxClassId);
+			_logger.LogDebug("CreateLineForPaymentMethodAsync(order={Order}): paymentTaxCategory → {PaymentTaxCategory}", order, paymentTaxCategory);
             paymentItem.taxCode = CommonHelper.EnsureMaximumLength(paymentTaxCategory?.Name, 25);
         }
         else
         {
             //if payment is non-taxable, set it as exempt
             paymentItem.exemptionCode = "Payment-fee-non-taxable";
+			_logger.LogDebug("CreateLineForPaymentMethodAsync(order={Order}): paymentItem.exemptionCode → {Arg1}", order, paymentItem.exemptionCode);
         }
 
+		_logger.LogDebug("<<< Exiting CreateLineForPaymentMethodAsync(order={Order})", order);
         return paymentItem;
     }
 
@@ -520,6 +561,7 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<LineItemModel> CreateLineForShippingAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CreateLineForShippingAsync(order={Order})", order);
         var shippingItem = new LineItemModel
         {
             amount = order.OrderShippingExclTax,
@@ -538,14 +580,17 @@ public class AvalaraTaxManager : IDisposable
         {
             //try to get tax code
             var shippingTaxCategory = await _taxCategoryService.GetTaxCategoryByIdAsync(_taxSettings.ShippingTaxClassId);
+			_logger.LogDebug("CreateLineForShippingAsync(order={Order}): shippingTaxCategory → {ShippingTaxCategory}", order, shippingTaxCategory);
             shippingItem.taxCode = CommonHelper.EnsureMaximumLength(shippingTaxCategory?.Name, 25);
         }
         else
         {
             //if shipping is non-taxable, set it as exempt
             shippingItem.exemptionCode = "Shipping-rate-non-taxable";
+			_logger.LogDebug("CreateLineForShippingAsync(order={Order}): shippingItem.exemptionCode → {Arg1}", order, shippingItem.exemptionCode);
         }
 
+		_logger.LogDebug("<<< Exiting CreateLineForShippingAsync(order={Order})", order);
         return shippingItem;
     }
 
@@ -561,8 +606,10 @@ public class AvalaraTaxManager : IDisposable
     {
         //get checkout attributes values
         var attributeValues = _checkoutAttributeParser.ParseAttributeValues(order.CheckoutAttributesXml);
+		_logger.LogDebug("CreateLinesForCheckoutAttributesAsync(order={Order}): attributeValues → {AttributeValues}", order, attributeValues);
         return await attributeValues.SelectManyAwait(async attributeWithValues =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             var attribute = attributeWithValues.attribute;
             return (await attributeWithValues.values.SelectAwait(async value =>
             {
@@ -613,16 +660,19 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<CreateTransactionModel> PrepareModelTaxExemptionAsync(CreateTransactionModel model, Customer customer)
     {
+		_logger.LogDebug(">>> Entering PrepareModelTaxExemptionAsync(model={Model},customer={Customer})", model, customer);
         if (customer.IsTaxExempt)
             model.exemptionNo = CommonHelper.EnsureMaximumLength($"Exempt-customer-#{customer.Id}", 25);
         else
         {
             var customerRole = (await _customerService.GetCustomerRolesAsync(customer)).FirstOrDefault(role => role.TaxExempt);
+			_logger.LogDebug("PrepareModelTaxExemptionAsync(model={Model},customer={Customer}): customerRole → {CustomerRole}", model, customer, customerRole);
             if (customerRole != null)
                 model.exemptionNo = CommonHelper.EnsureMaximumLength($"Exempt-{customerRole.Name}", 25);
         }
 
         var entityUseCode = await _genericAttributeService.GetAttributeAsync<string>(customer, AvalaraTaxDefaults.EntityUseCodeAttribute);
+		_logger.LogDebug("PrepareModelTaxExemptionAsync(model={Model},customer={Customer}): entityUseCode → {EntityUseCode}", model, customer, entityUseCode);
         if (!string.IsNullOrEmpty(entityUseCode))
             model.customerUsageType = CommonHelper.EnsureMaximumLength(entityUseCode, 25);
         else
@@ -631,8 +681,10 @@ public class AvalaraTaxManager : IDisposable
                 .SelectAwait(async customerRole => await _genericAttributeService.GetAttributeAsync<string>(customerRole, AvalaraTaxDefaults.EntityUseCodeAttribute))
                 .FirstOrDefaultAsync(code => !string.IsNullOrEmpty(code));
             model.customerUsageType = CommonHelper.EnsureMaximumLength(entityUseCode, 25);
+			_logger.LogInformation("PrepareModelTaxExemptionAsync(model,customer)={Model},{Customer}: database query executed in {Arg2} ms", model, customer, __logStart.ElapsedMilliseconds);
         }
 
+		_logger.LogDebug("<<< Exiting PrepareModelTaxExemptionAsync(model={Model},customer={Customer})", model, customer);
         return model;
     }
 
@@ -645,20 +697,25 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<List<TaxRate>> GetTaxRatesFromFileAsync()
     {
+		_logger.LogDebug(">>> Entering GetTaxRatesFromFileAsync()");
         //try to create file if doesn't exist
         var filePath = _fileProvider.MapPath(AvalaraTaxDefaults.TaxRatesFilePath);
+		_logger.LogDebug("GetTaxRatesFromFileAsync(): filePath → {FilePath}", filePath);
         if (!_fileProvider.FileExists(filePath))
             await DownloadTaxRatesAsync();
 
         if (!_fileProvider.FileExists(filePath))
+			_logger.LogWarning("Throwing NopException from GetTaxRatesFromFileAsync()");
             throw new NopException($"File {AvalaraTaxDefaults.TaxRatesFilePath} not found");
 
         //get file lines
         var text = await _fileProvider.ReadAllTextAsync(filePath, Encoding.UTF8);
+		_logger.LogDebug("GetTaxRatesFromFileAsync(): text → {Text}", text);
         if (string.IsNullOrEmpty(text))
             throw new NopException($"File {AvalaraTaxDefaults.TaxRatesFilePath} is empty");
 
         var lines = text.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+		_logger.LogDebug("GetTaxRatesFromFileAsync(): lines → {Lines}", lines);
         if (!lines.Any() || lines[0].Split(',').Length < 14)
             throw new NopException($"Unsupported file {AvalaraTaxDefaults.TaxRatesFilePath} structure");
 
@@ -668,6 +725,7 @@ public class AvalaraTaxManager : IDisposable
             try
             {
                 var values = line.Split(',', StringSplitOptions.TrimEntries);
+				_logger.LogDebug("GetTaxRatesFromFileAsync(): values → {Values}", values);
                 return new TaxRate
                 {
                     Zip = values[0], //ZIP_CODE
@@ -684,10 +742,12 @@ public class AvalaraTaxManager : IDisposable
             }
             catch
             {
+				_logger.LogError("Exception in GetTaxRatesFromFileAsync(): {Arg0}", exception.Message);
                 return null;
             }
         }).Where(taxRate => taxRate is not null).ToList();
 
+		_logger.LogDebug("<<< Exiting GetTaxRatesFromFileAsync()");
         return taxRates;
     }
 
@@ -697,7 +757,9 @@ public class AvalaraTaxManager : IDisposable
     /// <param name="address">Address to check</param>
     protected void CheckAddressDetails(AddressLocationInfo address)
     {
+		_logger.LogDebug(">>> Entering CheckAddressDetails(address={Address})", address);
         if (address is null)
+			_logger.LogWarning("Throwing NopException from CheckAddressDetails(address={Address})", address);
             throw new NopException("Address not set");
 
         //for international transactions, the two digit ISO country code is required to determine tax jurisdictions
@@ -716,6 +778,7 @@ public class AvalaraTaxManager : IDisposable
         if (!string.IsNullOrEmpty(address.line1) && !string.IsNullOrEmpty(address.city) && !string.IsNullOrEmpty(address.region))
             return;
 
+		_logger.LogDebug("<<< Exiting CheckAddressDetails(address={Address})", address);
         throw new NopException("Address is incomplete");
     }
 
@@ -735,6 +798,8 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<CustomerModel> CreateOrUpdateCustomerAsync(Customer customer, int companyId, bool customerExists)
     {
+		_logger.LogDebug(">>> Entering CreateOrUpdateCustomerAsync(customer={Customer},companyId={CompanyId},customerExists={CustomerExists})", customer, companyId, customerExists);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var defaultAddress = new Address
         {
             Address1 = customer.StreetAddress,
@@ -745,6 +810,7 @@ public class AvalaraTaxManager : IDisposable
             CountryId = customer.CountryId
         };
         var address = await MapAddressAsync(defaultAddress);
+		_logger.LogDebug("CreateOrUpdateCustomerAsync(customer={Customer},companyId={CompanyId},customerExists={CustomerExists}): address → {Address}", customer, companyId, customerExists, address);
         var model = new CustomerModel
         {
             companyId = companyId,
@@ -764,6 +830,8 @@ public class AvalaraTaxManager : IDisposable
             ? await ServiceClient.UpdateCustomerAsync(companyId, customer.Id.ToString(), model)
             : (await ServiceClient.CreateCustomersAsync(companyId, [model]))?.FirstOrDefault();
 
+		_logger.LogInformation("CreateOrUpdateCustomerAsync(customer,companyId,customerExists)={Customer},{CompanyId},{CustomerExists}: external service call took {Arg3} ms", customer, companyId, customerExists, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting CreateOrUpdateCustomerAsync(customer={Customer},companyId={CompanyId},customerExists={CustomerExists})", customer, companyId, customerExists);
         return customerDetails;
     }
 
@@ -781,27 +849,40 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     protected async Task<HSClassificationModel> CreateHSClassificationAsync(ItemClassification item)
     {
+		_logger.LogDebug(">>> Entering CreateHSClassificationAsync(item={Item})", item);
         var model = new HSClassificationModel();
         var itemModel = new ItemClassificationModel();
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): itemModel → {ItemModel}", item, itemModel);
         var product = await _productService.GetProductByIdAsync(item.ProductId);
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): product → {Product}", item, product);
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): model → {Model}", item, model);
 
         model.CountryOfDestination = (await _countryService.GetCountryByIdAsync(item.CountryId))?.TwoLetterIsoCode;
         model.Id = $"{product.Id}-{model.CountryOfDestination}";
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): model.Id → {Arg1}", item, model.Id);
 
         itemModel.CompanyId = _avalaraTaxSettings.CompanyId ?? 0;
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): itemModel.CompanyId → {Arg1}", item, itemModel.CompanyId);
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): itemModel.ItemCode → {Arg1}", item, itemModel.ItemCode);
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): itemModel.Description → {Arg1}", item, itemModel.Description);
         itemModel.ItemCode = product.Sku;
         itemModel.Description = $"{product.Name}. {product.ShortDescription}";
         itemModel.ParentCode = product.ParentGroupedProductId > 0 ? product.ParentGroupedProductId.ToString() : "";
         itemModel.Summary = product.FullDescription;
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): itemModel.Summary → {Arg1}", item, itemModel.Summary);
 
         //If the product belongs to several categories, then we will ignore it and take only the first one from the list,
         //since there is no way to transfer the entire list of categories where the product is included
         var productCategories = await _categoryService.GetProductCategoriesByProductIdAsync(item.ProductId);
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): productCategories → {ProductCategories}", item, productCategories);
         var category = await _categoryService.GetCategoryByIdAsync(productCategories[0].CategoryId);
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): category → {Category}", item, category);
         itemModel.ItemGroup = await _categoryService.GetFormattedBreadCrumbAsync(category, separator: ">");
 
         model.Item = itemModel;
+		_logger.LogDebug("CreateHSClassificationAsync(item={Item}): model.Item → {Arg1}", item, model.Item);
 
+		_logger.LogDebug("<<< Exiting CreateHSClassificationAsync(item={Item})", item);
         return model;
     }
 
@@ -822,6 +903,8 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<PingResultModel> PingAsync()
     {
+		_logger.LogDebug(">>> Entering PingAsync()");
+		_logger.LogDebug("<<< Exiting PingAsync()");
         return (await HandleFunctionAsync(() =>
             Task.FromResult(ServiceClient.Ping() ?? throw new NopException("No response from the service")))).Result;
     }
@@ -835,11 +918,13 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<List<CompanyModel>> GetAccountCompaniesAsync()
     {
+		_logger.LogDebug(">>> Entering GetAccountCompaniesAsync()");
         return (await HandleFunctionAsync(() =>
         {
             var result = ServiceClient.QueryCompanies(null, null, null, null, null)
                 ?? throw new NopException("No response from the service");
 
+		_logger.LogDebug("<<< Exiting GetAccountCompaniesAsync()");
             return Task.FromResult(result.value);
         })).Result;
     }
@@ -853,11 +938,13 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<List<EntityUseCodeModel>> GetEntityUseCodesAsync()
     {
+		_logger.LogDebug(">>> Entering GetEntityUseCodesAsync()");
         return (await HandleFunctionAsync(() =>
         {
             var result = ServiceClient.ListEntityUseCodes(null, null, null, null)
                 ?? throw new NopException("No response from the service");
 
+		_logger.LogDebug("<<< Exiting GetEntityUseCodesAsync()");
             return Task.FromResult(result.value);
         })).Result;
     }
@@ -891,6 +978,7 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync<int?>(async () =>
         {
+			_logger.LogDebug(">>> Entering ImportTaxCodesAsync()");
             //get Avalara pre-defined system tax codes (only active)
             var systemTaxCodes = await ServiceClient.ListTaxCodesAsync("isActive eq true", null, null, null)
                 ?? throw new NopException("No response from the service");
@@ -924,8 +1012,10 @@ public class AvalaraTaxManager : IDisposable
                 importedTaxCodesNumber++;
             }
 
+			_logger.LogDebug("<<< Exiting ImportTaxCodesAsync()");
             return importedTaxCodesNumber;
         })).Result;
+		_logger.LogInformation("ImportTaxCodesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -939,7 +1029,9 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync<int?>(async () =>
         {
+			_logger.LogDebug(">>> Entering ExportTaxCodesAsync()");
             if (string.IsNullOrEmpty(_avalaraTaxSettings.CompanyCode) || _avalaraTaxSettings.CompanyCode.Equals(Guid.Empty.ToString()))
+				_logger.LogWarning("Throwing NopException from ExportTaxCodesAsync()");
                 throw new NopException("Company not selected");
 
             //get selected company
@@ -963,6 +1055,8 @@ public class AvalaraTaxManager : IDisposable
                 taxCodeTypeId = CommonHelper.EnsureMaximumLength(await _genericAttributeService
                     .GetAttributeAsync<string>(taxCategory, AvalaraTaxDefaults.TaxCodeTypeAttribute) ?? "P", 2)
             }).Where(taxCode => !string.IsNullOrEmpty(taxCode.taxCode)).ToListAsync();
+					var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+					_logger.LogInformation("ExportTaxCodesAsync(): database query executed in {Arg0} ms", __logStartDb.ElapsedMilliseconds);
 
             //add Avalara pre-defined system tax codes
             var systemTaxCodesResult = await ServiceClient.ListTaxCodesAsync("isActive eq true", null, null, null)
@@ -987,8 +1081,10 @@ public class AvalaraTaxManager : IDisposable
             if (result.HasValue && result > 0)
                 return result.Value;
 
+			_logger.LogDebug("<<< Exiting ExportTaxCodesAsync()");
             return null;
         })).Result;
+		_logger.LogInformation("ExportTaxCodesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -1002,6 +1098,7 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync(async () =>
         {
+			_logger.LogDebug(">>> Entering DeleteSystemTaxCodesAsync()");
             //get Avalara pre-defined system tax codes (only active)
             var systemTaxCodesResult = await ServiceClient.ListTaxCodesAsync("isActive eq true", null, null, null)
                 ?? throw new NopException("No response from the service");
@@ -1015,17 +1112,22 @@ public class AvalaraTaxManager : IDisposable
                 .Where(taxCategory => systemTaxCodes.Contains(taxCategory.Name))
                 .Select(taxCategory => taxCategory.Id)
                 .ToListAsync();
+				var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogInformation("DeleteSystemTaxCodesAsync(): database query executed in {Arg0} ms", __logStartDb.ElapsedMilliseconds);
 
             //delete tax categories
             await _taxCategoryRepository.DeleteAsync(taxCategory => categoriesIds.Contains(taxCategory.Id));
+			_logger.LogInformation("DeleteSystemTaxCodesAsync(): delete query executed in {Arg0} ms", __logStartDb.ElapsedMilliseconds);
             await _staticCacheManager.RemoveByPrefixAsync(NopEntityCacheDefaults<TaxCategory>.Prefix);
 
             //delete generic attributes
             await _genericAttributeRepository
                 .DeleteAsync(attribute => attribute.KeyGroup == nameof(TaxCategory) && categoriesIds.Contains(attribute.EntityId));
 
+			_logger.LogDebug("<<< Exiting DeleteSystemTaxCodesAsync()");
             return true;
         })).Result;
+		_logger.LogInformation("DeleteSystemTaxCodesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -1034,12 +1136,16 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteAttributesAsync()
     {
+		_logger.LogDebug(">>> Entering DeleteAttributesAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await DeleteSystemTaxCodesAsync();
 
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
         await _genericAttributeRepository.DeleteAsync(attribute =>
             attribute.Key == AvalaraTaxDefaults.EntityUseCodeAttribute ||
             attribute.Key == AvalaraTaxDefaults.TaxCodeTypeAttribute ||
             attribute.Key == AvalaraTaxDefaults.TaxCodeDescriptionAttribute);
+			_logger.LogInformation("DeleteAttributesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -1053,7 +1159,9 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync<int?>(async () =>
         {
+			_logger.LogDebug(">>> Entering ExportProductsAsync(selectedIds={SelectedIds})", selectedIds);
             if (string.IsNullOrEmpty(_avalaraTaxSettings.CompanyCode) || _avalaraTaxSettings.CompanyCode.Equals(Guid.Empty.ToString()))
+				_logger.LogWarning("Throwing NopException from ExportProductsAsync(selectedIds={SelectedIds})", selectedIds);
                 throw new NopException("Company not selected");
 
             //get selected company
@@ -1124,6 +1232,8 @@ public class AvalaraTaxManager : IDisposable
             if (result.HasValue && result > 0)
                 return result.Value;
 
+			_logger.LogInformation("ExportProductsAsync(selectedIds)={SelectedIds}: external service call took {Arg1} ms", selectedIds, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting ExportProductsAsync(selectedIds={SelectedIds})", selectedIds);
             return null;
         })).Result;
     }
@@ -1142,6 +1252,9 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<AddressResolutionModel> ValidateAddressAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering ValidateAddressAsync(address={Address})", address);
+		_logger.LogInformation("ValidateAddressAsync(address)={Address}: external service call took {Arg1} ms", address, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting ValidateAddressAsync(address={Address})", address);
         return (await HandleFunctionAsync(async () => await ServiceClient.ResolveAddressPostAsync(new AddressValidationInfo
         {
             city = CommonHelper.EnsureMaximumLength(address.City, 50),
@@ -1168,6 +1281,7 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<TransactionModel> CreateTestTaxTransactionAsync(Address address)
     {
+		_logger.LogDebug(">>> Entering CreateTestTaxTransactionAsync(address={Address})", address);
         return (await HandleFunctionAsync(async () =>
         {
             if (_avalaraTaxSettings.UseTaxRateTables)
@@ -1175,6 +1289,7 @@ public class AvalaraTaxManager : IDisposable
                 var taxRates = await GetTaxRatesFromFileAsync();
                 var taxRate = taxRates.FirstOrDefault(record => address.ZipPostalCode?.StartsWith(record.Zip) ?? false);
                 if (taxRate?.TotalTax is null)
+					_logger.LogWarning("Throwing NopException from CreateTestTaxTransactionAsync(address={Address})", address);
                     throw new NopException($"No rate found for zip code {address.ZipPostalCode}");
 
                 var summary = new List<TransactionSummary>();
@@ -1191,6 +1306,8 @@ public class AvalaraTaxManager : IDisposable
             //create tax transaction for a simplified item and without saving 
             var model = await PrepareTransactionModelAsync(address, customer.Id.ToString(), DocumentType.SalesOrder);
             model.lines = [new LineItemModel { amount = 100, quantity = 1 }];
+			_logger.LogDebug("CreateTestTaxTransactionAsync(address={Address}): model.lines → {Arg1}", address, model.lines);
+		_logger.LogDebug("<<< Exiting CreateTestTaxTransactionAsync(address={Address})", address);
             return CreateTransaction(model);
         }, false)).Result;
     }
@@ -1371,6 +1488,7 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<TransactionModel> CreateOrderTaxTransactionAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering CreateOrderTaxTransactionAsync(order={Order})", order);
         return (await HandleFunctionAsync(async () =>
         {
             //prepare transaction model
@@ -1380,6 +1498,8 @@ public class AvalaraTaxManager : IDisposable
             model.email = CommonHelper.EnsureMaximumLength(customer.Email, 50);
             model.code = CommonHelper.EnsureMaximumLength(order.CustomOrderNumber, 50);
             model.commit = _avalaraTaxSettings.CommitTransactions;
+			_logger.LogDebug("CreateOrderTaxTransactionAsync(order={Order}): model.commit → {Arg1}", order, model.commit);
+			_logger.LogDebug("CreateOrderTaxTransactionAsync(order={Order}): model.discount → {Arg1}", order, model.discount);
             model.discount = order.OrderSubTotalDiscountExclTax;
 
             //set purchased item lines
@@ -1389,6 +1509,7 @@ public class AvalaraTaxManager : IDisposable
             //set whole request tax exemption
             await PrepareModelTaxExemptionAsync(model, customer);
 
+		_logger.LogDebug("<<< Exiting CreateOrderTaxTransactionAsync(order={Order})", order);
             return CreateTransaction(model);
         })).Result;
     }
@@ -1400,15 +1521,18 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task VoidTaxTransactionAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering VoidTaxTransactionAsync(order={Order})", order);
         await HandleFunctionAsync(() =>
         {
             if (string.IsNullOrEmpty(_avalaraTaxSettings.CompanyCode) || _avalaraTaxSettings.CompanyCode.Equals(Guid.Empty.ToString()))
+				_logger.LogWarning("Throwing NopException from VoidTaxTransactionAsync(order={Order})", order);
                 throw new NopException("Company not selected");
 
             var model = new VoidTransactionModel { code = VoidReasonCode.DocVoided };
             var transaction = ServiceClient.VoidTransaction(_avalaraTaxSettings.CompanyCode, order.CustomOrderNumber, null, null, model)
                 ?? throw new NopException("No response from the service");
 
+		_logger.LogDebug("<<< Exiting VoidTaxTransactionAsync(order={Order})", order);
             return Task.FromResult(transaction);
         });
     }
@@ -1420,15 +1544,18 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteTaxTransactionAsync(Order order)
     {
+		_logger.LogDebug(">>> Entering DeleteTaxTransactionAsync(order={Order})", order);
         await HandleFunctionAsync(() =>
         {
             if (string.IsNullOrEmpty(_avalaraTaxSettings.CompanyCode) || _avalaraTaxSettings.CompanyCode.Equals(Guid.Empty.ToString()))
+				_logger.LogWarning("Throwing NopException from DeleteTaxTransactionAsync(order={Order})", order);
                 throw new NopException("Company not selected");
 
             var model = new VoidTransactionModel { code = VoidReasonCode.DocDeleted };
             var transaction = ServiceClient.VoidTransaction(_avalaraTaxSettings.CompanyCode, order.CustomOrderNumber, null, null, model)
                 ?? throw new NopException("No response from the service");
 
+		_logger.LogDebug("<<< Exiting DeleteTaxTransactionAsync(order={Order})", order);
             return Task.FromResult(transaction);
         });
     }
@@ -1441,9 +1568,11 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task RefundTaxTransactionAsync(Order order, decimal amountToRefund)
     {
+		_logger.LogDebug(">>> Entering RefundTaxTransactionAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
         await HandleFunctionAsync(() =>
         {
             if (string.IsNullOrEmpty(_avalaraTaxSettings.CompanyCode) || _avalaraTaxSettings.CompanyCode.Equals(Guid.Empty.ToString()))
+				_logger.LogWarning("Throwing NopException from RefundTaxTransactionAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
                 throw new NopException("Company not selected");
 
             //first try to get saved tax transaction
@@ -1463,12 +1592,14 @@ public class AvalaraTaxManager : IDisposable
             if (isPartialRefund)
             {
                 model.refundType = RefundType.Percentage;
+				_logger.LogDebug("RefundTaxTransactionAsync(order={Order},amountToRefund={AmountToRefund}): model.refundType → {Arg2}", order, amountToRefund, model.refundType);
                 model.refundPercentage = amountToRefund / (order.OrderTotal - order.OrderTax) * 100;
             }
 
             transaction = ServiceClient.RefundTransaction(_avalaraTaxSettings.CompanyCode, transaction.code, null, null, null, model)
                 ?? throw new NopException("No response from the service");
 
+		_logger.LogDebug("<<< Exiting RefundTaxTransactionAsync(order={Order},amountToRefund={AmountToRefund})", order, amountToRefund);
             return Task.FromResult(transaction);
         });
     }
@@ -1479,14 +1610,17 @@ public class AvalaraTaxManager : IDisposable
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DownloadTaxRatesAsync()
     {
+		_logger.LogDebug(">>> Entering DownloadTaxRatesAsync()");
         await HandleFunctionAsync(async () =>
         {
             var file = ServiceClient.DownloadTaxRatesByZipCode(DateTime.UtcNow, null)
                 ?? throw new NopException("No response from the service");
 
             var filePath = _fileProvider.MapPath(AvalaraTaxDefaults.TaxRatesFilePath);
+			_logger.LogDebug("DownloadTaxRatesAsync(): filePath → {FilePath}", filePath);
             await _fileProvider.WriteAllBytesAsync(filePath, file.Data);
 
+		_logger.LogDebug("<<< Exiting DownloadTaxRatesAsync()");
             return true;
         });
     }
@@ -1507,7 +1641,9 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync<bool?>(async () =>
         {
+			_logger.LogDebug(">>> Entering GetCertificateSetupStatusAsync(request={Request})", request);
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from GetCertificateSetupStatusAsync(request={Request})", request);
                 throw new NopException("Company not selected");
 
             var provisionStatus = request
@@ -1518,6 +1654,8 @@ public class AvalaraTaxManager : IDisposable
             if (provisionStatus.status == CertCaptureProvisionStatus.NotProvisioned)
                 return default;
 
+			_logger.LogInformation("GetCertificateSetupStatusAsync(request)={Request}: external service call took {Arg1} ms", request, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting GetCertificateSetupStatusAsync(request={Request})", request);
             return provisionStatus.status == CertCaptureProvisionStatus.Provisioned;
         })).Result;
     }
@@ -1534,7 +1672,9 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync(async () =>
         {
+			_logger.LogDebug(">>> Entering CreateTokenAsync(customer={Customer})", customer);
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from CreateTokenAsync(customer={Customer})", customer);
                 throw new NopException("Company not selected");
 
             //no need to log the error if the customer is not created yet
@@ -1545,10 +1685,13 @@ public class AvalaraTaxManager : IDisposable
                     .GetCustomerAsync(_avalaraTaxSettings.CompanyId.Value, customer.Id.ToString(), null) is not null;
             }
             catch { }
+			_logger.LogError("Exception in CreateTokenAsync(customer={Customer}): {Arg1}", customer, exception.Message);
             if (!customerExists)
                 await CreateOrUpdateCustomerAsync(customer, _avalaraTaxSettings.CompanyId.Value, customerExists);
 
             var model = new CreateECommerceTokenInputModel { customerNumber = customer.Id.ToString() };
+			_logger.LogInformation("CreateTokenAsync(customer)={Customer}: external service call took {Arg1} ms", customer, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting CreateTokenAsync(customer={Customer})", customer);
             return (await ServiceClient.CreateECommerceTokenAsync(_avalaraTaxSettings.CompanyId.Value, model))?.token
                 ?? throw new NopException("Failed to get token");
         })).Result;
@@ -1565,11 +1708,14 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync(async () =>
         {
+			_logger.LogDebug(">>> Entering GetExposureZonesAsync()");
             var result = await ServiceClient.ListCertificateExposureZonesAsync(null, null, null, null)
                 ?? throw new NopException("Failed to get exposure zones");
 
+			_logger.LogDebug("<<< Exiting GetExposureZonesAsync()");
             return result.value;
         })).Result;
+		_logger.LogInformation("GetExposureZonesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -1613,10 +1759,14 @@ public class AvalaraTaxManager : IDisposable
     {
         return (await HandleFunctionAsync(async () =>
         {
+			_logger.LogDebug(">>> Entering DeleteCustomerAsync(customerId={CustomerId})", customerId);
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from DeleteCustomerAsync(customerId={CustomerId})", customerId);
                 throw new NopException("Company not selected");
 
             return await ServiceClient.DeleteCustomerAsync(_avalaraTaxSettings.CompanyId.Value, customerId.ToString())
+			_logger.LogInformation("DeleteCustomerAsync(customerId)={CustomerId}: external service call took {Arg1} ms", customerId, __logStart.ElapsedMilliseconds);
+			_logger.LogDebug("<<< Exiting DeleteCustomerAsync(customerId={CustomerId})", customerId);
                 ?? throw new NopException("Failed to delete customer");
         })).Result;
     }
@@ -1632,9 +1782,11 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<CertificateModel> GetValidCertificatesAsync(Customer customer, int storeId)
     {
+		_logger.LogDebug(">>> Entering GetValidCertificatesAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return (await HandleFunctionAsync(async () =>
         {
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from GetValidCertificatesAsync(customer={Customer},storeId={StoreId})", customer, storeId);
                 throw new NopException("Company not selected");
 
             //create dummy order to get selected address
@@ -1649,6 +1801,7 @@ public class AvalaraTaxManager : IDisposable
                 ?? throw new NopException("Failed to get customer's certificates");
 
             var exempt = string.Equals(exemptionStatus.status, "Exempt", StringComparison.InvariantCultureIgnoreCase);
+		_logger.LogDebug("<<< Exiting GetValidCertificatesAsync(customer={Customer},storeId={StoreId})", customer, storeId);
             return exempt ? exemptionStatus.certificate : null;
         })).Result;
     }
@@ -1663,15 +1816,18 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<List<CertificateModel>> GetCustomerCertificatesAsync(Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetCustomerCertificatesAsync(customer={Customer})", customer);
         return (await HandleFunctionAsync(async () =>
         {
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from GetCustomerCertificatesAsync(customer={Customer})", customer);
                 throw new NopException("Company not selected");
 
             var certificates = await ServiceClient
                 .ListCertificatesForCustomerAsync(_avalaraTaxSettings.CompanyId.Value, customer.Id.ToString(), null, null, null, null, null)
                 ?? throw new NopException("Failed to get customer's certificates");
 
+		_logger.LogDebug("<<< Exiting GetCustomerCertificatesAsync(customer={Customer})", customer);
             return certificates.value;
         })).Result;
     }
@@ -1686,15 +1842,18 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<FileResult> DownloadCertificateAsync(int certificateId)
     {
+		_logger.LogDebug(">>> Entering DownloadCertificateAsync(certificateId={CertificateId})", certificateId);
         return (await HandleFunctionAsync(() =>
         {
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from DownloadCertificateAsync(certificateId={CertificateId})", certificateId);
                 throw new NopException("Company not selected");
 
             var file = ServiceClient
                 .DownloadCertificateImage(_avalaraTaxSettings.CompanyId.Value, certificateId, null, CertificatePreviewType.Pdf)
                 ?? throw new NopException("Failed to download certificate");
 
+		_logger.LogDebug("<<< Exiting DownloadCertificateAsync(certificateId={CertificateId})", certificateId);
             return Task.FromResult(file);
         })).Result;
     }
@@ -1709,9 +1868,11 @@ public class AvalaraTaxManager : IDisposable
     /// </returns>
     public async Task<string> GetInvitationAsync(Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetInvitationAsync(customer={Customer})", customer);
         return (await HandleFunctionAsync(async () =>
         {
             if (_avalaraTaxSettings.CompanyId is null)
+				_logger.LogWarning("Throwing NopException from GetInvitationAsync(customer={Customer})", customer);
                 throw new NopException("Company not selected");
 
             //create invitation for customer
@@ -1724,6 +1885,7 @@ public class AvalaraTaxManager : IDisposable
                 ?.FirstOrDefault()?.invitation
                 ?? throw new NopException("Failed to get invitation");
 
+		_logger.LogDebug("<<< Exiting GetInvitationAsync(customer={Customer})", customer);
             return invitation.requestLink;
         })).Result;
     }
@@ -1768,15 +1930,20 @@ public class AvalaraTaxManager : IDisposable
     /// A task that represents the asynchronous operation</returns>
     public async Task HandleItemClassificationWebhookAsync(Microsoft.AspNetCore.Http.HttpRequest request)
     {
+		_logger.LogDebug(">>> Entering HandleItemClassificationWebhookAsync(request={Request})", request);
         await HandleFunctionAsync(async () =>
         {
             using var streamReader = new StreamReader(request.Body);
+			_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): streamReader → {StreamReader}", request, streamReader);
             var requestContent = await streamReader.ReadToEndAsync();
+			_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): requestContent → {RequestContent}", request, requestContent);
             if (string.IsNullOrEmpty(requestContent))
+				_logger.LogWarning("Throwing NopException from HandleItemClassificationWebhookAsync(request={Request})", request);
                 throw new NopException("Webhook request content is empty");
 
             //log request
             var stringBuilder = new StringBuilder();
+			_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): stringBuilder → {StringBuilder}", request, stringBuilder);
             stringBuilder.Append(nameof(request.Headers));
             foreach (var header in request.Headers)
             {
@@ -1790,17 +1957,22 @@ public class AvalaraTaxManager : IDisposable
 
             //get webhook message
             var message = JsonConvert.DeserializeObject<HSClassificationModel>(requestContent);
+			_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): message → {Message}", request, message);
             if (!string.IsNullOrEmpty(message.HsCode))
             {
                 var itemClassification = await _itemClassificationService.GetItemClassificationByRequestIdAsync(message.Id);
+				_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): itemClassification → {ItemClassification}", request, itemClassification);
                 if (itemClassification is not null)
                 {
                     itemClassification.HSCode = message.HsCode;
+					_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): itemClassification.HSCode → {Arg1}", request, itemClassification.HSCode);
+					_logger.LogDebug("HandleItemClassificationWebhookAsync(request={Request}): itemClassification.UpdatedOnUtc → {Arg1}", request, itemClassification.UpdatedOnUtc);
                     itemClassification.UpdatedOnUtc = DateTime.UtcNow;
                     await _itemClassificationService.UpdateItemClassificationAsync(itemClassification);
                 }
             }
 
+		_logger.LogDebug("<<< Exiting HandleItemClassificationWebhookAsync(request={Request})", request);
             return true;
         });
     }
@@ -1812,13 +1984,16 @@ public class AvalaraTaxManager : IDisposable
     /// </summary>
     public void Dispose()
     {
+		_logger.LogDebug(">>> Entering Dispose()");
         Dispose(true);
         GC.SuppressFinalize(this);
+		_logger.LogDebug("<<< Exiting Dispose()");
     }
 
     // Protected implementation of Dispose pattern.
     protected void Dispose(bool disposing)
     {
+		_logger.LogDebug(">>> Entering Dispose(disposing={Disposing})", disposing);
         if (_disposed)
             return;
 
@@ -1829,6 +2004,7 @@ public class AvalaraTaxManager : IDisposable
         }
 
         _disposed = true;
+		_logger.LogDebug("Dispose(disposing={Disposing}): _disposed → {_disposed}", disposing, _disposed);
     }
 
     #endregion

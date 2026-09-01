@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Components.Public;
 
@@ -8,6 +9,7 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Components.Public;
 /// </summary>
 public class PaymentInfoViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -21,6 +23,7 @@ public class PaymentInfoViewComponent : NopViewComponent
     /// </returns>
     public IViewComponentResult Invoke(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering Invoke(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         return View("~/Plugins/Payments.PayPalCommerce/Views/Public/PaymentInfo.cshtml");
     }
 

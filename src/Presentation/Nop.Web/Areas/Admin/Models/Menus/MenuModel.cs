@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Menus;
 
@@ -9,19 +10,27 @@ namespace Nop.Web.Areas.Admin.Models.Menus;
 /// </summary>
 public partial record MenuModel : BaseNopEntityModel, IAclSupportedModel, IStoreMappingSupportedModel, ILocalizedModel<MenuLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MenuModel()
     {
+		_logger.LogDebug(">>> Entering MenuModel()");
         AvailableMenuTypes = new List<SelectListItem>();
+		_logger.LogDebug("MenuModel(): AvailableMenuTypes → {AvailableMenuTypes}", AvailableMenuTypes);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
 
+		_logger.LogDebug("MenuModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         SelectedCustomerRoleIds = new List<int>();
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogDebug("MenuModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
+		_logger.LogDebug("MenuModel(): AvailableStores → {AvailableStores}", AvailableStores);
+		_logger.LogDebug("MenuModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
 
         MenuItemSearchModel = new();
+		_logger.LogDebug("MenuModel(): MenuItemSearchModel → {MenuItemSearchModel}", MenuItemSearchModel);
         Locales = new List<MenuLocalizedModel>();
     }
 

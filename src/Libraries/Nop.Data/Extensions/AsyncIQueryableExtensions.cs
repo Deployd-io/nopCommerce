@@ -1,11 +1,13 @@
 ﻿using System.Linq.Expressions;
 using LinqToDB;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace System.Linq;
 
 public static class AsyncIQueryableExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Determines whether all the elements of a sequence satisfy a condition
     /// </summary>
@@ -36,6 +38,8 @@ public static class AsyncIQueryableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static Task<bool> AnyAsync<TSource>(this IQueryable<TSource> source, Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering AnyAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("AnyAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.AnyAsync(source) : AsyncExtensions.AnyAsync(source, predicate);
     }
 
@@ -227,6 +231,7 @@ public static class AsyncIQueryableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static Task<bool> ContainsAsync<TSource>(this IQueryable<TSource> source, TSource item)
     {
+		_logger.LogDebug(">>> Entering ContainsAsync(source={Source},item={Item})", source, item);
         return AsyncExtensions.ContainsAsync(source, item);
     }
 
@@ -244,6 +249,8 @@ public static class AsyncIQueryableExtensions
     public static Task<int> CountAsync<TSource>(this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering CountAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("CountAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.CountAsync(source) : AsyncExtensions.CountAsync(source, predicate);
     }
 
@@ -260,6 +267,8 @@ public static class AsyncIQueryableExtensions
     public static Task<TSource> FirstAsync<TSource>(this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering FirstAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("FirstAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.FirstAsync(source) : AsyncExtensions.FirstAsync(source, predicate);
     }
 
@@ -276,6 +285,8 @@ public static class AsyncIQueryableExtensions
     public static Task<TSource> FirstOrDefaultAsync<TSource>(this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering FirstOrDefaultAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("FirstOrDefaultAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.FirstOrDefaultAsync(source) : AsyncExtensions.FirstOrDefaultAsync(source, predicate);
     }
 
@@ -294,6 +305,8 @@ public static class AsyncIQueryableExtensions
     public static Task<long> LongCountAsync<TSource>(this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering LongCountAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("LongCountAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.LongCountAsync(source) : AsyncExtensions.LongCountAsync(source, predicate);
     }
 
@@ -308,6 +321,7 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<TSource> MaxAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering MaxAsync(source={Source})", source);
         return AsyncExtensions.MaxAsync(source);
     }
 
@@ -340,6 +354,7 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<TSource> MinAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering MinAsync(source={Source})", source);
         return AsyncExtensions.MinAsync(source);
     }
 
@@ -375,6 +390,8 @@ public static class AsyncIQueryableExtensions
     public static Task<TSource> SingleAsync<TSource>(this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering SingleAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("SingleAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.SingleAsync(source) : AsyncExtensions.SingleAsync(source, predicate);
     }
 
@@ -394,6 +411,8 @@ public static class AsyncIQueryableExtensions
     public static Task<TSource> SingleOrDefaultAsync<TSource>(this IQueryable<TSource> source,
         Expression<Func<TSource, bool>> predicate = null)
     {
+		_logger.LogDebug(">>> Entering SingleOrDefaultAsync(source={Source},predicate={Predicate})", source, predicate);
+		_logger.LogDebug("SingleOrDefaultAsync(source={Source},predicate={Predicate}): predicate → {Predicate1}", source, predicate, predicate);
         return predicate == null ? AsyncExtensions.SingleOrDefaultAsync(source) : AsyncExtensions.SingleOrDefaultAsync(source, predicate);
     }
 
@@ -625,6 +644,7 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<List<TSource>> ToListAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering ToListAsync(source={Source})", source);
         return AsyncExtensions.ToListAsync(source);
     }
 
@@ -639,6 +659,7 @@ public static class AsyncIQueryableExtensions
     /// </returns>
     public static Task<TSource[]> ToArrayAsync<TSource>(this IQueryable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering ToArrayAsync(source={Source})", source);
         return AsyncExtensions.ToArrayAsync(source);
     }
 
@@ -652,19 +673,26 @@ public static class AsyncIQueryableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task<IPagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, bool getOnlyTotalCount = false)
     {
+		_logger.LogDebug(">>> Entering ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", source, pageIndex, pageSize, getOnlyTotalCount);
         if (source == null)
             return new PagedList<T>(new List<T>(), pageIndex, pageSize);
 
         //min allowed page size is 1
         pageSize = Math.Max(pageSize, 1);
+		_logger.LogDebug("ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): pageSize → {PageSize1}", source, pageIndex, pageSize, getOnlyTotalCount, pageSize);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var count = await source.CountAsync();
 
+		_logger.LogDebug("ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): count → {Count}", source, pageIndex, pageSize, getOnlyTotalCount, count);
+		_logger.LogInformation("ToPagedListAsync(source,pageIndex,pageSize,getOnlyTotalCount)={Source},{PageIndex},{PageSize},{GetOnlyTotalCount}: count query executed in {Arg4} ms", source, pageIndex, pageSize, getOnlyTotalCount, __logStart.ElapsedMilliseconds);
         var data = new List<T>();
 
+		_logger.LogDebug("ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): data → {Data}", source, pageIndex, pageSize, getOnlyTotalCount, data);
         if (!getOnlyTotalCount && count > 0)
             data.AddRange(await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync());
 
+		_logger.LogDebug("<<< Exiting ToPagedListAsync(source={Source},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", source, pageIndex, pageSize, getOnlyTotalCount);
         return new PagedList<T>(data, pageIndex, pageSize, count);
     }
 
@@ -676,6 +704,7 @@ public static class AsyncIQueryableExtensions
     /// <returns>A query that can be enumerated asynchronously.</returns>
     public static IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IQueryable<T> source)
     {
+		_logger.LogDebug(">>> Entering ToAsyncEnumerable(source={Source})", source);
         return AsyncExtensions.AsAsyncEnumerable(source);
     }
 }

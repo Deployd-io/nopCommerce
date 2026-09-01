@@ -3,6 +3,7 @@ using Nop.Services.Security;
 using Nop.Services.Tax;
 using Nop.Web.Framework.Components;
 using Nop.Web.Framework.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Components;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Tax.Avalara.Components;
 /// </summary>
 public class ExportItemsViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPermissionService _permissionService;
@@ -23,7 +25,9 @@ public class ExportItemsViewComponent : NopViewComponent
     public ExportItemsViewComponent(IPermissionService permissionService,
         ITaxPluginManager taxPluginManager)
     {
+		_logger.LogDebug(">>> Entering ExportItemsViewComponent(permissionService={PermissionService},taxPluginManager={TaxPluginManager})", permissionService, taxPluginManager);
         _permissionService = permissionService;
+		_logger.LogDebug("ExportItemsViewComponent(permissionService={PermissionService},taxPluginManager={TaxPluginManager}): _permissionService → {_permissionService}", permissionService, taxPluginManager, _permissionService);
         _taxPluginManager = taxPluginManager;
     }
 
@@ -42,6 +46,7 @@ public class ExportItemsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync(string widgetZone, object additionalData)
     {
+		_logger.LogDebug(">>> Entering InvokeAsync(widgetZone={WidgetZone},additionalData={AdditionalData})", widgetZone, additionalData);
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return Content(string.Empty);

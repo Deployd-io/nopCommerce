@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping.Pickup;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Shipping.Pickup;
 /// </summary>
 public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, IPickupPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ShippingSettings _shippingSettings;
@@ -22,7 +24,9 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
         IPluginService pluginService,
         ShippingSettings shippingSettings) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering PickupPluginManager(customerService={CustomerService},pluginService={PluginService},shippingSettings=<redacted>)", customerService, pluginService);
         _shippingSettings = shippingSettings;
+		_logger.LogDebug("PickupPluginManager(customerService={CustomerService},pluginService={PluginService},shippingSettings=<redacted>): _shippingSettings → {_shippingSettings}", customerService, pluginService, _shippingSettings);
     }
 
     #endregion
@@ -41,8 +45,10 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
     /// </returns>
     public virtual async Task<IList<IPickupPointProvider>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0, string systemName = null)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         var pickupPointProviders = await LoadActivePluginsAsync(_shippingSettings.ActivePickupPointProviderSystemNames, customer, storeId);
 
+		_logger.LogDebug("LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName}): pickupPointProviders → {PickupPointProviders}", customer, storeId, systemName, pickupPointProviders);
         //filter by passed system name
         if (!string.IsNullOrEmpty(systemName))
         {
@@ -51,6 +57,7 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
                 .ToList();
         }
 
+		_logger.LogDebug("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         return pickupPointProviders;
     }
 
@@ -61,6 +68,7 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IPickupPointProvider pickupPointProvider)
     {
+		_logger.LogDebug(">>> Entering IsPluginActive(pickupPointProvider={PickupPointProvider})", pickupPointProvider);
         return IsPluginActive(pickupPointProvider, _shippingSettings.ActivePickupPointProviderSystemNames);
     }
 
@@ -76,7 +84,10 @@ public partial class PickupPluginManager : PluginManager<IPickupPointProvider>, 
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var pickupPointProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): pickupPointProvider → {PickupPointProvider}", systemName, customer, storeId, pickupPointProvider);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(pickupPointProvider);
     }
 

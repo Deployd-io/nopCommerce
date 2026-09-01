@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Tax;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Tax;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Tax;
 /// </summary>
 public partial class TaxCategoryService : ITaxCategoryService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<TaxCategory> _taxCategoryRepository;
@@ -18,7 +20,9 @@ public partial class TaxCategoryService : ITaxCategoryService
 
     public TaxCategoryService(IRepository<TaxCategory> taxCategoryRepository)
     {
+		_logger.LogDebug(">>> Entering TaxCategoryService(taxCategoryRepository={TaxCategoryRepository})", taxCategoryRepository);
         _taxCategoryRepository = taxCategoryRepository;
+		_logger.LogDebug("TaxCategoryService(taxCategoryRepository={TaxCategoryRepository}): _taxCategoryRepository → {_taxCategoryRepository}", taxCategoryRepository, _taxCategoryRepository);
     }
 
     #endregion
@@ -32,6 +36,7 @@ public partial class TaxCategoryService : ITaxCategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteTaxCategoryAsync(TaxCategory taxCategory)
     {
+		_logger.LogDebug(">>> Entering DeleteTaxCategoryAsync(taxCategory={TaxCategory})", taxCategory);
         await _taxCategoryRepository.DeleteAsync(taxCategory);
     }
 
@@ -46,9 +51,12 @@ public partial class TaxCategoryService : ITaxCategoryService
     {
         var taxCategories = await _taxCategoryRepository.GetAllAsync(query =>
         {
+			_logger.LogDebug(">>> Entering GetAllTaxCategoriesAsync()");
             return from tc in query
                 orderby tc.DisplayOrder, tc.Id
                 select tc;
+			_logger.LogDebug("<<< Exiting GetAllTaxCategoriesAsync()");
+				_logger.LogInformation("GetAllTaxCategoriesAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }, cache => default);
 
         return taxCategories;
@@ -64,6 +72,8 @@ public partial class TaxCategoryService : ITaxCategoryService
     /// </returns>
     public virtual async Task<TaxCategory> GetTaxCategoryByIdAsync(int taxCategoryId)
     {
+		_logger.LogDebug(">>> Entering GetTaxCategoryByIdAsync(taxCategoryId={TaxCategoryId})", taxCategoryId);
+		_logger.LogInformation("GetTaxCategoryByIdAsync(taxCategoryId)={TaxCategoryId}: find query executing", taxCategoryId);
         return await _taxCategoryRepository.GetByIdAsync(taxCategoryId, cache => default);
     }
 
@@ -74,6 +84,7 @@ public partial class TaxCategoryService : ITaxCategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertTaxCategoryAsync(TaxCategory taxCategory)
     {
+		_logger.LogDebug(">>> Entering InsertTaxCategoryAsync(taxCategory={TaxCategory})", taxCategory);
         await _taxCategoryRepository.InsertAsync(taxCategory);
     }
 
@@ -84,6 +95,7 @@ public partial class TaxCategoryService : ITaxCategoryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateTaxCategoryAsync(TaxCategory taxCategory)
     {
+		_logger.LogDebug(">>> Entering UpdateTaxCategoryAsync(taxCategory={TaxCategory})", taxCategory);
         await _taxCategoryRepository.UpdateAsync(taxCategory);
     }
 

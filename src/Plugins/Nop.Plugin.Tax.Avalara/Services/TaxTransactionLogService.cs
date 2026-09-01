@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Data;
 using Nop.Plugin.Tax.Avalara.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Services;
 
@@ -9,6 +10,7 @@ namespace Nop.Plugin.Tax.Avalara.Services;
 /// </summary>
 public class TaxTransactionLogService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<TaxTransactionLog> _taxTransactionLogRepository;
@@ -19,7 +21,9 @@ public class TaxTransactionLogService
 
     public TaxTransactionLogService(IRepository<TaxTransactionLog> taxTransactionLogRepository)
     {
+		_logger.LogDebug(">>> Entering TaxTransactionLogService(taxTransactionLogRepository={TaxTransactionLogRepository})", taxTransactionLogRepository);
         _taxTransactionLogRepository = taxTransactionLogRepository;
+		_logger.LogDebug("TaxTransactionLogService(taxTransactionLogRepository={TaxTransactionLogRepository}): _taxTransactionLogRepository → {_taxTransactionLogRepository}", taxTransactionLogRepository, _taxTransactionLogRepository);
     }
 
     #endregion
@@ -42,8 +46,10 @@ public class TaxTransactionLogService
         DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetTaxTransactionLogAsync(customerId={CustomerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize})", customerId, createdFromUtc, createdToUtc, pageIndex, pageSize);
         //get all logs
         var query = _taxTransactionLogRepository.Table;
+		_logger.LogDebug("GetTaxTransactionLogAsync(customerId={CustomerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", customerId, createdFromUtc, createdToUtc, pageIndex, pageSize, query);
 
         //filter by customer
         if (customerId.HasValue)
@@ -59,6 +65,7 @@ public class TaxTransactionLogService
         query = query.OrderByDescending(logItem => logItem.CreatedDateUtc).ThenByDescending(logItem => logItem.Id);
 
         //return paged log
+		_logger.LogDebug("<<< Exiting GetTaxTransactionLogAsync(customerId={CustomerId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize})", customerId, createdFromUtc, createdToUtc, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -72,6 +79,7 @@ public class TaxTransactionLogService
     /// </returns>
     public async Task<TaxTransactionLog> GetTaxTransactionLogByIdAsync(int logItemId)
     {
+		_logger.LogDebug(">>> Entering GetTaxTransactionLogByIdAsync(logItemId={LogItemId})", logItemId);
         return await _taxTransactionLogRepository.GetByIdAsync(logItemId);
     }
 
@@ -82,8 +90,10 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task InsertTaxTransactionLogAsync(TaxTransactionLog logItem)
     {
+		_logger.LogDebug(">>> Entering InsertTaxTransactionLogAsync(logItem={LogItem})", logItem);
         ArgumentNullException.ThrowIfNull(logItem);
 
+		_logger.LogDebug("<<< Exiting InsertTaxTransactionLogAsync(logItem={LogItem})", logItem);
         await _taxTransactionLogRepository.InsertAsync(logItem, false);
     }
 
@@ -94,8 +104,10 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task UpdateTaxTransactionLogAsync(TaxTransactionLog logItem)
     {
+		_logger.LogDebug(">>> Entering UpdateTaxTransactionLogAsync(logItem={LogItem})", logItem);
         ArgumentNullException.ThrowIfNull(logItem);
 
+		_logger.LogDebug("<<< Exiting UpdateTaxTransactionLogAsync(logItem={LogItem})", logItem);
         await _taxTransactionLogRepository.UpdateAsync(logItem, false);
     }
 
@@ -106,7 +118,9 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteTaxTransactionLogAsync(TaxTransactionLog logItem)
     {
+		_logger.LogDebug(">>> Entering DeleteTaxTransactionLogAsync(logItem={LogItem})", logItem);
         await _taxTransactionLogRepository.DeleteAsync(logItem, false);
+		_logger.LogDebug("<<< Exiting DeleteTaxTransactionLogAsync(ids={Ids})", ids);
     }
 
     /// <summary>
@@ -116,6 +130,7 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteTaxTransactionLogAsync(int[] ids)
     {
+		_logger.LogDebug(">>> Entering DeleteTaxTransactionLogAsync(ids={Ids})", ids);
         await _taxTransactionLogRepository.DeleteAsync(logItem => ids.Contains(logItem.Id));
     }
 
@@ -125,6 +140,7 @@ public class TaxTransactionLogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ClearLogAsync()
     {
+		_logger.LogDebug(">>> Entering ClearLogAsync()");
         await _taxTransactionLogRepository.TruncateAsync();
     }
 

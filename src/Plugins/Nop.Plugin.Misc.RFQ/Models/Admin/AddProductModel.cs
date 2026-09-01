@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Models.Admin;
 
@@ -10,12 +11,16 @@ namespace Nop.Plugin.Misc.RFQ.Models.Admin;
 /// </summary>
 public record AddProductModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductModel()
     {
+		_logger.LogDebug(">>> Entering AddProductModel()");
         ProductAttributes = new List<ProductAttributeModel>();
+		_logger.LogDebug("AddProductModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
         GiftCard = new GiftCardModel();
+		_logger.LogDebug("AddProductModel(): GiftCard → {GiftCard}", GiftCard);
         Warnings = new List<string>();
     }
 
@@ -57,9 +62,12 @@ public record AddProductModel : BaseNopModel
 
     public record ProductAttributeModel : BaseNopEntityModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public ProductAttributeModel()
         {
+			_logger.LogDebug(">>> Entering ProductAttributeModel()");
             Values = new List<ProductAttributeValueModel>();
+			_logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductAttributeId { get; set; }

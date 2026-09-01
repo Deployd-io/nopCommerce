@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Directory;
 
@@ -9,14 +10,18 @@ namespace Nop.Web.Areas.Admin.Models.Directory;
 /// </summary>
 public partial record CurrencyModel : BaseNopEntityModel, ILocalizedModel<CurrencyLocalizedModel>, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CurrencyModel()
     {
+		_logger.LogDebug(">>> Entering CurrencyModel()");
         Locales = new List<CurrencyLocalizedModel>();
+		_logger.LogDebug("CurrencyModel(): Locales → {Locales}", Locales);
 
         SelectedStoreIds = new List<int>();
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("CurrencyModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
     }
 
     #endregion

@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.ItemClassificationAPI;
 
 public class GetHSClassificationRequestc : Request
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public GetHSClassificationRequestc(string hsClassificationId, string companyId)
     {
+		_logger.LogDebug(">>> Entering GetHSClassificationRequestc(hsClassificationId={HsClassificationId},companyId={CompanyId})", hsClassificationId, companyId);
         HSClassificationId = hsClassificationId;
+		_logger.LogDebug("GetHSClassificationRequestc(hsClassificationId={HsClassificationId},companyId={CompanyId}): HSClassificationId → {HSClassificationId}", hsClassificationId, companyId, HSClassificationId);
         CompanyId = companyId;
     }
 

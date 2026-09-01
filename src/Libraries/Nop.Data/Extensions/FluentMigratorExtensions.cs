@@ -12,6 +12,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Data.Mapping;
 using Nop.Data.Mapping.Builders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Extensions;
 
@@ -20,6 +21,7 @@ namespace Nop.Data.Extensions;
 /// </summary>
 public static class FluentMigratorExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region  Utils
 
     private const int DATE_TIME_PRECISION = 6;
@@ -38,13 +40,16 @@ public static class FluentMigratorExtensions
 
     private static void DefineByOwnType(string columnName, Type propType, CreateTableExpressionBuilder create, bool canBeNullable = false)
     {
+		_logger.LogDebug(">>> Entering DefineByOwnType(columnName={ColumnName},propType={PropType},create={Create},canBeNullable={CanBeNullable})", columnName, propType, create, canBeNullable);
         if (string.IsNullOrEmpty(columnName))
+			_logger.LogWarning("Throwing ArgumentException from DefineByOwnType(columnName={ColumnName},propType={PropType},create={Create},canBeNullable={CanBeNullable})", columnName, propType, create, canBeNullable);
             throw new ArgumentException("The column name cannot be empty");
 
         if (propType == typeof(string) || propType.FindInterfaces((t, o) => t.FullName?.Equals(o.ToString(), StringComparison.InvariantCultureIgnoreCase) ?? false, "System.Collections.IEnumerable").Length > 0)
             canBeNullable = true;
 
         var column = create.WithColumn(columnName);
+		_logger.LogDebug("DefineByOwnType(columnName={ColumnName},propType={PropType},create={Create},canBeNullable={CanBeNullable}): column → {Column}", columnName, propType, create, canBeNullable, column);
 
         TypeMapping[propType](column);
 
@@ -64,11 +69,14 @@ public static class FluentMigratorExtensions
     /// <returns>The migration runner builder</returns>
     public static IMigrationRunnerBuilder AddNopDbEngines(this IMigrationRunnerBuilder builder)
     {        
+		_logger.LogDebug(">>> Entering AddNopDbEngines(builder={Builder})", builder);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return builder.AddSqlServer().AddMySql5().AddPostgres92();
 
         var dataSettings = DataSettingsManager.LoadSettings();
+		_logger.LogDebug("AddNopDbEngines(builder={Builder}): dataSettings → {DataSettings}", builder, dataSettings);
 
+		_logger.LogDebug("<<< Exiting AddNopDbEngines(builder={Builder})", builder);
         return dataSettings.DataProvider switch
         {
             DataProviderType.MySql => builder.AddMySql5(),
@@ -83,8 +91,11 @@ public static class FluentMigratorExtensions
     /// </summary>
     public static ICreateTableColumnOptionOrWithColumnSyntax AsNopDateTime2(this ICreateTableColumnAsTypeSyntax syntax)
     {
+		_logger.LogDebug(">>> Entering AsNopDateTime2(syntax={Syntax})", syntax);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		_logger.LogDebug("AsNopDateTime2(syntax={Syntax}): dataSettings → {DataSettings}", syntax, dataSettings);
+		_logger.LogDebug("<<< Exiting AsNopDateTime2(syntax={Syntax})", syntax);
         return dataSettings.DataProvider switch
         {
             DataProviderType.MySql => syntax.AsCustom($"datetime({DATE_TIME_PRECISION})"),
@@ -140,8 +151,12 @@ public static class FluentMigratorExtensions
     /// <typeparam name="TEntity">Entity type</typeparam>
     public static void TableFor<TEntity>(this ICreateExpressionRoot expressionRoot) where TEntity : BaseEntity
     {
+		_logger.LogDebug(">>> Entering TableFor(expressionRoot={ExpressionRoot})", expressionRoot);
         var type = typeof(TEntity);
+		_logger.LogDebug("<<< Exiting TableFor(expressionRoot={ExpressionRoot})", expressionRoot);
         var builder = expressionRoot.Table(NameCompatibilityManager.GetTableName(type)) as CreateTableExpressionBuilder;
+		_logger.LogDebug("TableFor(expressionRoot={ExpressionRoot}): builder → {Builder}", expressionRoot, builder);
+		_logger.LogDebug("TableFor(expressionRoot={ExpressionRoot}): type → {Type}", expressionRoot, type);
         builder.RetrieveTableExpressions(type);
     }
 
@@ -152,6 +167,7 @@ public static class FluentMigratorExtensions
     /// <param name="type">Type of entity</param>
     public static void RetrieveTableExpressions(this CreateTableExpressionBuilder builder, Type type)
     {
+		_logger.LogDebug(">>> Entering RetrieveTableExpressions(builder={Builder},type={Type})", builder, type);
         var typeFinder = Singleton<ITypeFinder>.Instance
             .FindClassesOfType(typeof(IEntityBuilder))
             .FirstOrDefault(t => t.BaseType?.GetGenericArguments().Contains(type) ?? false);
@@ -173,6 +189,7 @@ public static class FluentMigratorExtensions
             };
             expression.Columns.Insert(0, pk);
             builder.CurrentColumn = pk;
+			_logger.LogDebug("RetrieveTableExpressions(builder={Builder},type={Type}): builder.CurrentColumn → {Arg2}", builder, type, builder.CurrentColumn);
         }
 
         var propertiesToAutoMap = type
@@ -186,13 +203,16 @@ public static class FluentMigratorExtensions
         foreach (var prop in propertiesToAutoMap)
         {
             var columnName = NameCompatibilityManager.GetColumnName(type, prop.Name);
+			_logger.LogDebug("RetrieveTableExpressions(builder={Builder},type={Type}): columnName → {ColumnName}", builder, type, columnName);
             var (propType, canBeNullable) = GetTypeToMap(prop.PropertyType);
             DefineByOwnType(columnName, propType, builder, canBeNullable);
         }
+		_logger.LogDebug("<<< Exiting RetrieveTableExpressions(builder={Builder},type={Type})", builder, type);
     }
 
     public static (Type propType, bool canBeNullable) GetTypeToMap(this Type type)
     {
+		_logger.LogDebug(">>> Entering GetTypeToMap(type={Type})", type);
         if (Nullable.GetUnderlyingType(type) is Type uType)
             return (uType, true);
 

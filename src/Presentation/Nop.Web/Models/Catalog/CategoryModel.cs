@@ -1,17 +1,24 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record CategoryModel : BaseNopEntityModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CategoryModel()
     {
+		_logger.LogDebug(">>> Entering CategoryModel()");
         PictureModel = new PictureModel();
+		_logger.LogDebug("CategoryModel(): PictureModel → {PictureModel}", PictureModel);
         FeaturedProducts = new List<ProductOverviewModel>();
+		_logger.LogDebug("CategoryModel(): FeaturedProducts → {FeaturedProducts}", FeaturedProducts);
         SubCategories = new List<SubCategoryModel>();
+		_logger.LogDebug("CategoryModel(): SubCategories → {SubCategories}", SubCategories);
         CategoryBreadcrumb = new List<CategoryModel>();
+		_logger.LogDebug("CategoryModel(): CategoryBreadcrumb → {CategoryBreadcrumb}", CategoryBreadcrumb);
         CatalogProductsModel = new CatalogProductsModel();
     }
 
@@ -39,9 +46,12 @@ public partial record CategoryModel : BaseNopEntityModel, IMetaTagsSupportedMode
 
     public partial record SubCategoryModel : BaseNopEntityModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public SubCategoryModel()
         {
+			_logger.LogDebug(">>> Entering SubCategoryModel()");
             PictureModel = new PictureModel();
+			_logger.LogDebug("SubCategoryModel(): PictureModel → {PictureModel}", PictureModel);
         }
 
         public string Name { get; set; }

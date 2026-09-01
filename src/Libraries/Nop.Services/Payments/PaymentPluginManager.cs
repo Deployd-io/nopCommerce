@@ -3,6 +3,7 @@ using Nop.Core.Domain.Payments;
 using Nop.Services.Configuration;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Payments;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Payments;
 /// </summary>
 public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaymentPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ISettingService _settingService;
@@ -25,7 +27,9 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
         ISettingService settingService,
         PaymentSettings paymentSettings) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering PaymentPluginManager(customerService={CustomerService},pluginService={PluginService},settingService={SettingService},paymentSettings={PaymentSettings})", customerService, pluginService, settingService, paymentSettings);
         _settingService = settingService;
+		_logger.LogDebug("PaymentPluginManager(customerService={CustomerService},pluginService={PluginService},settingService={SettingService},paymentSettings={PaymentSettings}): _settingService → {_settingService}", customerService, pluginService, settingService, paymentSettings, _settingService);
         _paymentSettings = paymentSettings;
     }
 
@@ -46,11 +50,13 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     public virtual async Task<IList<IPaymentMethod>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0,
         int countryId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},countryId={CountryId})", customer, storeId, countryId);
         var paymentMethods = await LoadActivePluginsAsync(_paymentSettings.ActivePaymentMethodSystemNames, customer, storeId);
 
         //filter by country
-        if (countryId > 0)
+        if (countryId > 0) {
             paymentMethods = await paymentMethods.WhereAwait(async method => !(await GetRestrictedCountryIdsAsync(method)).Contains(countryId)).ToListAsync();
+        }
 
         return paymentMethods;
     }
@@ -62,6 +68,7 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IPaymentMethod paymentMethod)
     {
+		_logger.LogDebug(">>> Entering IsPluginActive(paymentMethod={PaymentMethod})", paymentMethod);
         return IsPluginActive(paymentMethod, _paymentSettings.ActivePaymentMethodSystemNames);
     }
 
@@ -77,7 +84,10 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var paymentMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogDebug("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): paymentMethod → {PaymentMethod}", systemName, customer, storeId, paymentMethod);
+		_logger.LogDebug("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(paymentMethod);
     }
 
@@ -91,10 +101,13 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     /// </returns>
     public virtual async Task<IList<int>> GetRestrictedCountryIdsAsync(IPaymentMethod paymentMethod)
     {
+		_logger.LogDebug(">>> Entering GetRestrictedCountryIdsAsync(paymentMethod={PaymentMethod})", paymentMethod);
         ArgumentNullException.ThrowIfNull(paymentMethod);
 
         var settingKey = string.Format(NopPaymentDefaults.RestrictedCountriesSettingName, paymentMethod.PluginDescriptor.SystemName);
+		_logger.LogDebug("GetRestrictedCountryIdsAsync(paymentMethod={PaymentMethod}): settingKey → {SettingKey}", paymentMethod, settingKey);
 
+		_logger.LogDebug("<<< Exiting GetRestrictedCountryIdsAsync(paymentMethod={PaymentMethod})", paymentMethod);
         return await _settingService.GetSettingByKeyAsync<List<int>>(settingKey) ?? new List<int>();
     }
 
@@ -106,11 +119,14 @@ public partial class PaymentPluginManager : PluginManager<IPaymentMethod>, IPaym
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SaveRestrictedCountriesAsync(IPaymentMethod paymentMethod, IList<int> countryIds)
     {
+		_logger.LogDebug(">>> Entering SaveRestrictedCountriesAsync(paymentMethod={PaymentMethod},countryIds={CountryIds})", paymentMethod, countryIds);
         ArgumentNullException.ThrowIfNull(paymentMethod);
 
         var settingKey = string.Format(NopPaymentDefaults.RestrictedCountriesSettingName, paymentMethod.PluginDescriptor.SystemName);
+		_logger.LogDebug("SaveRestrictedCountriesAsync(paymentMethod={PaymentMethod},countryIds={CountryIds}): settingKey → {SettingKey}", paymentMethod, countryIds, settingKey);
 
         await _settingService.SetSettingAsync(settingKey, countryIds.ToList());
+		_logger.LogDebug("<<< Exiting SaveRestrictedCountriesAsync(paymentMethod={PaymentMethod},countryIds={CountryIds})", paymentMethod, countryIds);
     }
 
     #endregion

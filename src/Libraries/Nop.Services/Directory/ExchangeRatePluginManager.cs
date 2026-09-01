@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Directory;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Directory;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Directory;
 /// </summary>
 public partial class ExchangeRatePluginManager : PluginManager<IExchangeRateProvider>, IExchangeRatePluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -22,7 +24,9 @@ public partial class ExchangeRatePluginManager : PluginManager<IExchangeRateProv
         ICustomerService customerService,
         IPluginService pluginService) : base(customerService, pluginService)
     {
+		_logger.LogDebug(">>> Entering ExchangeRatePluginManager(currencySettings={CurrencySettings},customerService={CustomerService},pluginService={PluginService})", currencySettings, customerService, pluginService);
         _currencySettings = currencySettings;
+		_logger.LogDebug("ExchangeRatePluginManager(currencySettings={CurrencySettings},customerService={CustomerService},pluginService={PluginService}): _currencySettings → {_currencySettings}", currencySettings, customerService, pluginService, _currencySettings);
     }
 
     #endregion
@@ -40,6 +44,7 @@ public partial class ExchangeRatePluginManager : PluginManager<IExchangeRateProv
     /// </returns>
     public virtual async Task<IExchangeRateProvider> LoadPrimaryPluginAsync(Customer customer = null, int storeId = 0)
     {
+		_logger.LogDebug(">>> Entering LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadPrimaryPluginAsync(_currencySettings.ActiveExchangeRateProviderSystemName, customer, storeId);
     }
 
@@ -50,6 +55,7 @@ public partial class ExchangeRatePluginManager : PluginManager<IExchangeRateProv
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IExchangeRateProvider exchangeRateProvider)
     {
+		_logger.LogDebug(">>> Entering IsPluginActive(exchangeRateProvider={ExchangeRateProvider})", exchangeRateProvider);
         return IsPluginActive(exchangeRateProvider, [_currencySettings.ActiveExchangeRateProviderSystemName]);
     }
 

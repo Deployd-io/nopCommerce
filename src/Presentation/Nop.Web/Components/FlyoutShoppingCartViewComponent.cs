@@ -3,11 +3,13 @@ using Nop.Core.Domain.Orders;
 using Nop.Services.Security;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Components;
 
 public partial class FlyoutShoppingCartViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly IPermissionService _permissionService;
     protected readonly IShoppingCartModelFactory _shoppingCartModelFactory;
     protected readonly ShoppingCartSettings _shoppingCartSettings;
@@ -16,13 +18,17 @@ public partial class FlyoutShoppingCartViewComponent : NopViewComponent
         IShoppingCartModelFactory shoppingCartModelFactory,
         ShoppingCartSettings shoppingCartSettings)
     {
+		_logger.LogDebug(">>> Entering FlyoutShoppingCartViewComponent(permissionService={PermissionService},shoppingCartModelFactory=<redacted>,shoppingCartSettings=<redacted>)", permissionService);
         _permissionService = permissionService;
+		_logger.LogDebug("FlyoutShoppingCartViewComponent(permissionService={PermissionService},shoppingCartModelFactory=<redacted>,shoppingCartSettings=<redacted>): _permissionService → {_permissionService}", permissionService, _permissionService);
         _shoppingCartModelFactory = shoppingCartModelFactory;
+		_logger.LogDebug("FlyoutShoppingCartViewComponent(permissionService={PermissionService},shoppingCartModelFactory=<redacted>,shoppingCartSettings=<redacted>): _shoppingCartModelFactory → {_shoppingCartModelFactory}", permissionService, _shoppingCartModelFactory);
         _shoppingCartSettings = shoppingCartSettings;
     }
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		_logger.LogDebug(">>> Entering InvokeAsync()");
         if (!_shoppingCartSettings.MiniShoppingCartEnabled)
             return Content("");
 
@@ -30,6 +36,8 @@ public partial class FlyoutShoppingCartViewComponent : NopViewComponent
             return Content("");
 
         var model = await _shoppingCartModelFactory.PrepareMiniShoppingCartModelAsync();
+		_logger.LogDebug("InvokeAsync(): model → {Model}", model);
+		_logger.LogDebug("<<< Exiting InvokeAsync()");
         return View(model);
     }
 }

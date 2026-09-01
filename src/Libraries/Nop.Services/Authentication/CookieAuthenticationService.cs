@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Authentication;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Authentication;
 /// </summary>
 public partial class CookieAuthenticationService : IAuthenticationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -27,8 +29,11 @@ public partial class CookieAuthenticationService : IAuthenticationService
         ICustomerService customerService,
         IHttpContextAccessor httpContextAccessor)
     {
+		_logger.LogDebug(">>> Entering CookieAuthenticationService(customerSettings={CustomerSettings},customerService={CustomerService},httpContextAccessor={HttpContextAccessor})", customerSettings, customerService, httpContextAccessor);
         _customerSettings = customerSettings;
+		_logger.LogDebug("CookieAuthenticationService(customerSettings={CustomerSettings},customerService={CustomerService},httpContextAccessor={HttpContextAccessor}): _customerSettings → {_customerSettings}", customerSettings, customerService, httpContextAccessor, _customerSettings);
         _customerService = customerService;
+		_logger.LogDebug("CookieAuthenticationService(customerSettings={CustomerSettings},customerService={CustomerService},httpContextAccessor={HttpContextAccessor}): _customerService → {_customerService}", customerSettings, customerService, httpContextAccessor, _customerService);
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -44,10 +49,12 @@ public partial class CookieAuthenticationService : IAuthenticationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SignInAsync(Customer customer, bool isPersistent)
     {
+		_logger.LogDebug(">>> Entering SignInAsync(customer={Customer},isPersistent={IsPersistent})", customer, isPersistent);
         ArgumentNullException.ThrowIfNull(customer);
 
         //create claims for customer's username and email
         var claims = new List<Claim>();
+		_logger.LogDebug("SignInAsync(customer={Customer},isPersistent={IsPersistent}): claims → {Claims}", customer, isPersistent, claims);
 
         if (!string.IsNullOrEmpty(customer.Username))
             claims.Add(new Claim(ClaimTypes.Name, customer.Username, ClaimValueTypes.String, NopAuthenticationDefaults.ClaimsIssuer));
@@ -57,7 +64,9 @@ public partial class CookieAuthenticationService : IAuthenticationService
 
         //create principal for the current authentication scheme
         var userIdentity = new ClaimsIdentity(claims, NopAuthenticationDefaults.AuthenticationScheme);
+		_logger.LogDebug("SignInAsync(customer={Customer},isPersistent={IsPersistent}): userIdentity → {UserIdentity}", customer, isPersistent, userIdentity);
         var userPrincipal = new ClaimsPrincipal(userIdentity);
+		_logger.LogDebug("SignInAsync(customer={Customer},isPersistent={IsPersistent}): userPrincipal → {UserPrincipal}", customer, isPersistent, userPrincipal);
 
         //set value indicating whether session is persisted and the time at which the authentication was issued
         var authenticationProperties = new AuthenticationProperties
@@ -70,7 +79,9 @@ public partial class CookieAuthenticationService : IAuthenticationService
         await _httpContextAccessor.HttpContext.SignInAsync(NopAuthenticationDefaults.AuthenticationScheme, userPrincipal, authenticationProperties);
 
         //cache authenticated customer
+		_logger.LogDebug("<<< Exiting SignInAsync(customer={Customer},isPersistent={IsPersistent})", customer, isPersistent);
         _cachedCustomer = customer;
+		_logger.LogDebug("SignInAsync(customer={Customer},isPersistent={IsPersistent}): _cachedCustomer → {_cachedCustomer}", customer, isPersistent, _cachedCustomer);
     }
 
     /// <summary>
@@ -79,11 +90,14 @@ public partial class CookieAuthenticationService : IAuthenticationService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SignOutAsync()
     {
+		_logger.LogDebug(">>> Entering SignOutAsync()");
         //reset cached customer
         _cachedCustomer = null;
+		_logger.LogDebug("SignOutAsync(): _cachedCustomer → {_cachedCustomer}", _cachedCustomer);
 
         //and sign out from the current authentication scheme
         await _httpContextAccessor.HttpContext.SignOutAsync(NopAuthenticationDefaults.AuthenticationScheme);
+		_logger.LogDebug("<<< Exiting SignOutAsync()");
     }
 
     /// <summary>
@@ -95,16 +109,19 @@ public partial class CookieAuthenticationService : IAuthenticationService
     /// </returns>
     public virtual async Task<Customer> GetAuthenticatedCustomerAsync()
     {
+		_logger.LogDebug(">>> Entering GetAuthenticatedCustomerAsync()");
         //whether there is a cached customer
         if (_cachedCustomer != null)
             return _cachedCustomer;
 
         //try to get authenticated user identity
         var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync(NopAuthenticationDefaults.AuthenticationScheme);
+		_logger.LogDebug("GetAuthenticatedCustomerAsync(): authenticateResult → {AuthenticateResult}", authenticateResult);
         if (!authenticateResult.Succeeded)
             return null;
 
         Customer customer = null;
+		_logger.LogDebug("GetAuthenticatedCustomerAsync(): customer → {Customer}", customer);
         if (_customerSettings.UsernamesEnabled)
         {
             //try to get customer by username
@@ -138,6 +155,7 @@ public partial class CookieAuthenticationService : IAuthenticationService
         //cache authenticated customer
         _cachedCustomer = customer;
 
+		_logger.LogDebug("<<< Exiting GetAuthenticatedCustomerAsync()");
         return _cachedCustomer;
     }
 

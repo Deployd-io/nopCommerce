@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerRoleModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerRoleModel()
     {
+		_logger.LogDebug(">>> Entering CustomerRoleModel()");
         TaxDisplayTypeValues = new List<SelectListItem>();
+		_logger.LogDebug("CustomerRoleModel(): TaxDisplayTypeValues → {TaxDisplayTypeValues}", TaxDisplayTypeValues);
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,14 +10,20 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record AddProductToCategorySearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddProductToCategorySearchModel()
     {
+		_logger.LogDebug(">>> Entering AddProductToCategorySearchModel()");
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToCategorySearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToCategorySearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToCategorySearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogDebug("AddProductToCategorySearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableProductTypes = new List<SelectListItem>();
     }
 

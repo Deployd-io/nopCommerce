@@ -1,7 +1,9 @@
-﻿namespace System.Linq;
+﻿using Microsoft.Extensions.Logging;
+namespace System.Linq;
 
 public static class AsyncIEnumerableExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Projects each element of an async-enumerable sequence into a new form by applying
     /// an asynchronous selector function to each member of the source sequence and awaiting
@@ -21,6 +23,7 @@ public static class AsyncIEnumerableExtensions
     public static IAsyncEnumerable<TResult> SelectAwait<TSource, TResult>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<TResult>> predicate)
     {
+		_logger.LogDebug(">>> Entering SelectAwait(source={Source},predicate={Predicate})", source, predicate);
         return source.ToAsyncEnumerable().SelectAwait(predicate);
     }
 
@@ -40,6 +43,7 @@ public static class AsyncIEnumerableExtensions
     public static Task<TSource> FirstOrDefaultAwaitAsync<TSource>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<bool>> predicate)
     {
+		_logger.LogDebug(">>> Entering FirstOrDefaultAwaitAsync(source={Source},predicate={Predicate})", source, predicate);
         return source.ToAsyncEnumerable().FirstOrDefaultAwaitAsync(predicate).AsTask();
     }
 
@@ -57,6 +61,7 @@ public static class AsyncIEnumerableExtensions
     public static Task<bool> AllAwaitAsync<TSource>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<bool>> predicate)
     {
+		_logger.LogDebug(">>> Entering AllAwaitAsync(source={Source},predicate={Predicate})", source, predicate);
         return source.ToAsyncEnumerable().AllAwaitAsync(predicate).AsTask();
     }
 
@@ -78,7 +83,10 @@ public static class AsyncIEnumerableExtensions
     {
         async ValueTask<IAsyncEnumerable<TResult>> getAsyncEnumerable(TSource items)
         {
+			_logger.LogDebug(">>> Entering getAsyncEnumerable(items={Items})", items);
             var rez = await predicate(items);
+			_logger.LogDebug("getAsyncEnumerable(items={Items}): rez → {Rez}", items, rez);
+			_logger.LogDebug("<<< Exiting getAsyncEnumerable(items={Items})", items);
             return rez.ToAsyncEnumerable();
         }
 
@@ -101,6 +109,7 @@ public static class AsyncIEnumerableExtensions
     public static IAsyncEnumerable<TResult> SelectManyAwait<TSource, TResult>(this IEnumerable<TSource> source,
         Func<TSource, Task<IEnumerable<TResult>>> predicate)
     {
+		_logger.LogDebug(">>> Entering SelectManyAwait(source={Source},predicate={Predicate})", source, predicate);
         async ValueTask<IAsyncEnumerable<TResult>> getAsyncEnumerable(TSource items)
         {
             var rez = await predicate(items);
@@ -124,6 +133,7 @@ public static class AsyncIEnumerableExtensions
     public static IAsyncEnumerable<TSource> WhereAwait<TSource>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<bool>> predicate)
     {
+		_logger.LogDebug(">>> Entering WhereAwait(source={Source},predicate={Predicate})", source, predicate);
         return source.ToAsyncEnumerable().WhereAwait(predicate);
     }
 
@@ -141,6 +151,7 @@ public static class AsyncIEnumerableExtensions
     public static Task<bool> AnyAwaitAsync<TSource>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<bool>> predicate)
     {
+		_logger.LogDebug(">>> Entering AnyAwaitAsync(source={Source},predicate={Predicate})", source, predicate);
         return source.ToAsyncEnumerable().AnyAwaitAsync(predicate).AsTask();
     }
 
@@ -162,6 +173,7 @@ public static class AsyncIEnumerableExtensions
     public static Task<TSource> SingleOrDefaultAwaitAsync<TSource>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<bool>> predicate)
     {
+		_logger.LogDebug(">>> Entering SingleOrDefaultAwaitAsync(source={Source},predicate={Predicate})", source, predicate);
         return source.ToAsyncEnumerable().SingleOrDefaultAwaitAsync(predicate).AsTask();
     }
 
@@ -177,6 +189,7 @@ public static class AsyncIEnumerableExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static Task<List<TSource>> ToListAsync<TSource>(this IEnumerable<TSource> source)
     {
+		_logger.LogDebug(">>> Entering ToListAsync(source={Source})", source);
         return source.ToAsyncEnumerable().ToListAsync().AsTask();
     }
 
@@ -195,6 +208,7 @@ public static class AsyncIEnumerableExtensions
     public static IOrderedAsyncEnumerable<TSource> OrderByDescendingAwait<TSource, TKey>(
         this IEnumerable<TSource> source, Func<TSource, ValueTask<TKey>> keySelector)
     {
+		_logger.LogDebug(">>> Entering OrderByDescendingAwait(source={Source},keySelector={KeySelector})", source, keySelector);
         return source.ToAsyncEnumerable().OrderByDescendingAwait(keySelector);
     }
 
@@ -234,6 +248,7 @@ public static class AsyncIEnumerableExtensions
         this IEnumerable<TSource> source, TAccumulate seed,
         Func<TAccumulate, TSource, ValueTask<TAccumulate>> accumulator)
     {
+		_logger.LogDebug(">>> Entering AggregateAwaitAsync(source={Source},seed={Seed},accumulator={Accumulator})", source, seed, accumulator);
         return source.ToAsyncEnumerable().AggregateAwaitAsync(seed, accumulator);
     }
 
@@ -287,6 +302,7 @@ public static class AsyncIEnumerableExtensions
     public static ValueTask<decimal> SumAwaitAsync<TSource>(this IEnumerable<TSource> source,
         Func<TSource, ValueTask<decimal>> selector)
     {
+		_logger.LogDebug(">>> Entering SumAwaitAsync(source={Source},selector={Selector})", source, selector);
         return source.ToAsyncEnumerable().SumAwaitAsync(selector);
     }
 }

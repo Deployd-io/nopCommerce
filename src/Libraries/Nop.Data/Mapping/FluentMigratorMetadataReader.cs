@@ -5,6 +5,7 @@ using LinqToDB;
 using LinqToDB.Mapping;
 using LinqToDB.Metadata;
 using Nop.Core;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping;
 
@@ -13,10 +14,15 @@ namespace Nop.Data.Mapping;
 /// </summary>
 public partial class FluentMigratorMetadataReader : IMetadataReader
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     private static DataType DbTypeToDataType(DbType dbType)
     {
+		_logger.LogDebug(">>> Entering DbTypeToDataType(dbType={DbType})", dbType);
+		_logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.AnsiString → {Arg1}", dbType, DbType.AnsiString);
+		_logger.LogDebug("DbTypeToDataType(dbType={DbType}): DbType.AnsiStringFixedLength → {Arg1}", dbType, DbType.AnsiStringFixedLength);
+		_logger.LogDebug("<<< Exiting DbTypeToDataType(dbType={DbType})", dbType);
         return dbType switch
         {
             DbType.AnsiString => DataType.VarChar,
@@ -61,19 +67,23 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
     /// <returns>Array of mapping attributes.</returns>
     public MappingAttribute[] GetAttributes(Type type)
     {
+		_logger.LogDebug(">>> Entering GetAttributes(type={Type})", type);
         if (!type.IsSubclassOf(typeof(BaseEntity)))
             return [];
 
         var attribute = Types.GetOrAdd((type, null), _ =>
         {
             var entityDescriptor = NopMappingSchema.GetEntityDescriptor(type);
+			_logger.LogDebug("GetAttributes(type={Type}): entityDescriptor → {EntityDescriptor}", type, entityDescriptor);
 
             if (entityDescriptor is null)
                 return null;
 
+		_logger.LogDebug("<<< Exiting GetAttributes(type={Type})", type);
             return new TableAttribute() { Schema = entityDescriptor.SchemaName, Name = entityDescriptor.EntityName };
         });
 
+		_logger.LogDebug("<<< Exiting GetAttributes(type={Type},memberInfo={MemberInfo})", type, memberInfo);
         return [attribute];
     }
 
@@ -138,6 +148,7 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
     /// <returns>All dynamic columns defined on given type.</returns>
     public MemberInfo[] GetDynamicColumns(Type type)
     {
+		_logger.LogDebug(">>> Entering GetDynamicColumns(type={Type})", type);
         return [];
     }
 
@@ -149,6 +160,7 @@ public partial class FluentMigratorMetadataReader : IMetadataReader
     /// <returns>The object ID as string</returns>
     public string GetObjectID()
     {
+		_logger.LogDebug(">>> Entering GetObjectID()");
         return $".{nameof(FluentMigratorMetadataReader)}.";
     }
 

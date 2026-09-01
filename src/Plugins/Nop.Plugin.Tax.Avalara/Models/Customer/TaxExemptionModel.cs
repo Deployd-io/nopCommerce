@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Models.Customer;
 
@@ -9,11 +10,14 @@ namespace Nop.Plugin.Tax.Avalara.Models.Customer;
 /// </summary>
 public record TaxExemptionModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public TaxExemptionModel()
     {
+		_logger.LogDebug(">>> Entering TaxExemptionModel()");
         Certificates = new List<ExemptionCertificateModel>();
+		_logger.LogDebug("TaxExemptionModel(): Certificates → {Certificates}", Certificates);
         AvailableExposureZones = new List<SelectListItem>();
     }
 

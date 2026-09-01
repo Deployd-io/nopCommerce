@@ -1,10 +1,12 @@
-﻿namespace Nop.Services.Plugins;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Services.Plugins;
 
 /// <summary>
 /// Plugins uploaded event
 /// </summary>
 public partial class PluginsUploadedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -13,7 +15,9 @@ public partial class PluginsUploadedEvent
     /// <param name="uploadedPlugins">Uploaded plugins</param>
     public PluginsUploadedEvent(IList<PluginDescriptor> uploadedPlugins)
     {
+		_logger.LogDebug(">>> Entering PluginsUploadedEvent(uploadedPlugins={UploadedPlugins})", uploadedPlugins);
         UploadedPlugins = uploadedPlugins;
+		_logger.LogDebug("PluginsUploadedEvent(uploadedPlugins={UploadedPlugins}): UploadedPlugins → {UploadedPlugins1}", uploadedPlugins, UploadedPlugins);
     }
 
     #endregion

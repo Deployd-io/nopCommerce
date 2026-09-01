@@ -1,12 +1,16 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Checkout;
 
 public partial record CheckoutPickupPointsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CheckoutPickupPointsModel()
     {
+		_logger.LogDebug(">>> Entering CheckoutPickupPointsModel()");
         Warnings = new List<string>();
+		_logger.LogDebug("CheckoutPickupPointsModel(): Warnings → {Warnings}", Warnings);
         PickupPoints = new List<CheckoutPickupPointModel>();
     }
 

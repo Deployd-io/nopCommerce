@@ -5,6 +5,7 @@ using Nop.Services.Cms;
 using Nop.Services.Customers;
 using Nop.Web.Framework.Models.Cms;
 using Nop.Web.Framework.Themes;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.Factories;
 /// </summary>
 public partial class WidgetModelFactory : IWidgetModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -35,13 +37,21 @@ public partial class WidgetModelFactory : IWidgetModelFactory
         IWidgetPluginManager widgetPluginManager,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext})", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext);
         _customerService = customerService;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _customerService → {_customerService}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _customerService);
         _shortTermCacheManager = shortTermCacheManager;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _shortTermCacheManager → {_shortTermCacheManager}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _shortTermCacheManager);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _staticCacheManager → {_staticCacheManager}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _staticCacheManager);
         _storeContext = storeContext;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _storeContext → {_storeContext}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _storeContext);
         _themeContext = themeContext;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _themeContext → {_themeContext}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _themeContext);
         _widgetPluginManager = widgetPluginManager;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _widgetPluginManager → {_widgetPluginManager}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _widgetPluginManager);
         _workContext = workContext;
+		_logger.LogDebug("WidgetModelFactory(customerService={CustomerService},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},storeContext={StoreContext},themeContext={ThemeContext},widgetPluginManager={WidgetPluginManager},workContext={WorkContext}): _workContext → {_workContext}", customerService, shortTermCacheManager, staticCacheManager, storeContext, themeContext, widgetPluginManager, workContext, _workContext);
     }
 
     #endregion
@@ -60,10 +70,16 @@ public partial class WidgetModelFactory : IWidgetModelFactory
     /// </returns>
     public virtual async Task<List<RenderWidgetModel>> PrepareRenderWidgetModelAsync(string widgetZone, object additionalData = null, bool useCache = true)
     {
+		_logger.LogDebug(">>> Entering PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache})", widgetZone, additionalData, useCache);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var theme = await _themeContext.GetWorkingThemeNameAsync();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): theme → {Theme}", widgetZone, additionalData, useCache, theme);
+		_logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): customer → {Customer}", widgetZone, additionalData, useCache, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): customerRoleIds → {CustomerRoleIds}", widgetZone, additionalData, useCache, customerRoleIds);
+		_logger.LogDebug("PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache}): store → {Store}", widgetZone, additionalData, useCache, store);
 
         if (!useCache)
             return (await _widgetPluginManager.LoadActivePluginsAsync(customer, store.Id, widgetZone))
@@ -89,6 +105,8 @@ public partial class WidgetModelFactory : IWidgetModelFactory
             WidgetViewComponentArguments = new RouteValueDictionary { ["widgetZone"] = widgetZone, ["additionalData"] = additionalData }
         }).ToList();
 
+		_logger.LogInformation("PrepareRenderWidgetModelAsync(widgetZone,additionalData,useCache)={WidgetZone},{AdditionalData},{UseCache}: external service call took {Arg3} ms", widgetZone, additionalData, useCache, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting PrepareRenderWidgetModelAsync(widgetZone={WidgetZone},additionalData={AdditionalData},useCache={UseCache})", widgetZone, additionalData, useCache);
         return models;
     }
 

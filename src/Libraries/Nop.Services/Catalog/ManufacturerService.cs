@@ -8,6 +8,7 @@ using Nop.Services.Customers;
 using Nop.Services.Discounts;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -16,6 +17,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ManufacturerService : IManufacturerService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -50,19 +52,33 @@ public partial class ManufacturerService : IManufacturerService
         IStoreMappingService storeMappingService,
         IWorkContext workContext)
     {
+		_logger.LogDebug(">>> Entering ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext})", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext);
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _catalogSettings → {_catalogSettings}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _catalogSettings);
         _aclService = aclService;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _aclService → {_aclService}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _aclService);
         _categoryService = categoryService;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _categoryService → {_categoryService}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _categoryService);
         _customerService = customerService;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _customerService → {_customerService}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _customerService);
         _discountManufacturerMappingRepository = discountManufacturerMappingRepository;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _discountManufacturerMappingRepository → {_discountManufacturerMappingRepository}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _discountManufacturerMappingRepository);
         _manufacturerRepository = manufacturerRepository;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _manufacturerRepository → {_manufacturerRepository}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _manufacturerRepository);
         _productRepository = productRepository;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _productRepository → {_productRepository}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _productRepository);
         _productManufacturerRepository = productManufacturerRepository;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _productManufacturerRepository → {_productManufacturerRepository}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _productManufacturerRepository);
         _productCategoryRepository = productCategoryRepository;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _productCategoryRepository → {_productCategoryRepository}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _productCategoryRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _staticCacheManager → {_staticCacheManager}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _staticCacheManager);
         _storeContext = storeContext;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _storeContext → {_storeContext}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _storeContext);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _storeMappingService → {_storeMappingService}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _storeMappingService);
         _workContext = workContext;
+		_logger.LogDebug("ManufacturerService(catalogSettings={CatalogSettings},aclService={AclService},categoryService={CategoryService},customerService={CustomerService},discountManufacturerMappingRepository=<redacted>,manufacturerRepository={ManufacturerRepository},productRepository={ProductRepository},productManufacturerRepository={ProductManufacturerRepository},productCategoryRepository={ProductCategoryRepository},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,workContext={WorkContext}): _workContext → {_workContext}", catalogSettings, aclService, categoryService, customerService, manufacturerRepository, productRepository, productManufacturerRepository, productCategoryRepository, staticCacheManager, storeContext, workContext, _workContext);
     }
 
     #endregion
@@ -76,9 +92,15 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearDiscountManufacturerMappingAsync(Discount discount)
     {
+		_logger.LogDebug(">>> Entering ClearDiscountManufacturerMappingAsync(discount={Discount})", discount);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
+		_logger.LogDebug("<<< Exiting ClearDiscountManufacturerMappingAsync(discount={Discount})", discount);
+		_logger.LogInformation("ClearDiscountManufacturerMappingAsync(discount)={Discount}: external service call took {Arg1} ms", discount, __logStart.ElapsedMilliseconds);
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
         var mappings = _discountManufacturerMappingRepository.Table.Where(dcm => dcm.DiscountId == discount.Id);
+		_logger.LogDebug("ClearDiscountManufacturerMappingAsync(discount={Discount}): mappings → {Mappings}", discount, mappings);
 
         await _discountManufacturerMappingRepository.DeleteAsync(await mappings.ToListAsync());
     }
@@ -90,6 +112,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteManufacturerAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering DeleteManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
         await _manufacturerRepository.DeleteAsync(manufacturer);
     }
 
@@ -100,6 +123,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteManufacturersAsync(IList<Manufacturer> manufacturers)
     {
+		_logger.LogDebug(">>> Entering DeleteManufacturersAsync(manufacturers={Manufacturers})", manufacturers);
         await _manufacturerRepository.DeleteAsync(manufacturers);
     }
 
@@ -127,8 +151,11 @@ public partial class ManufacturerService : IManufacturerService
         bool showHidden = false,
         bool? overridePublished = null)
     {
+		_logger.LogDebug(">>> Entering GetAllManufacturersAsync(manufacturerName={ManufacturerName},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},overridePublished={OverridePublished})", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished);
         return await _manufacturerRepository.GetAllPagedAsync(async query =>
         {
+			_logger.LogInformation("GetAllManufacturersAsync(manufacturerName,storeId,pageIndex,pageSize,showHidden,overridePublished)={ManufacturerName},{StoreId},{PageIndex},{PageSize},{ShowHidden},{OverridePublished}: find query executing", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished);
+			_logger.LogDebug("GetAllManufacturersAsync(manufacturerName={ManufacturerName},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},overridePublished={OverridePublished}): query → {Query}", manufacturerName, storeId, pageIndex, pageSize, showHidden, overridePublished, query);
             if (!showHidden)
                 query = query.Where(m => m.Published);
             else if (overridePublished.HasValue)
@@ -167,6 +194,8 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<IList<int>> GetAppliedManufacturerIdsAsync(Discount discount, Customer customer)
     {
+		_logger.LogDebug(">>> Entering GetAppliedManufacturerIdsAsync(discount={Discount},customer={Customer})", discount, customer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(discount);
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopDiscountDefaults.ManufacturerIdsByDiscountCacheKey,
@@ -177,8 +206,13 @@ public partial class ManufacturerService : IManufacturerService
         var query = _discountManufacturerMappingRepository.Table.Where(dmm => dmm.DiscountId == discount.Id)
             .Select(dmm => dmm.EntityId);
 
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogInformation("GetAppliedManufacturerIdsAsync(discount,customer)={Discount},{Customer}: external service call took {Arg2} ms", discount, customer, __logStart.ElapsedMilliseconds);
+		_logger.LogInformation("GetAppliedManufacturerIdsAsync(discount,customer)={Discount},{Customer}: find query executed in {Arg2} ms", discount, customer, __logStartDb.ElapsedMilliseconds);
         var result = await _staticCacheManager.GetAsync(cacheKey, async () => await query.ToListAsync());
+		_logger.LogDebug("GetAppliedManufacturerIdsAsync(discount={Discount},customer={Customer}): result → {Result}", discount, customer, result);
 
+		_logger.LogDebug("<<< Exiting GetAppliedManufacturerIdsAsync(discount={Discount},customer={Customer})", discount, customer);
         return result;
     }
 
@@ -192,6 +226,8 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<Manufacturer> GetManufacturerByIdAsync(int manufacturerId)
     {
+		_logger.LogDebug(">>> Entering GetManufacturerByIdAsync(manufacturerId={ManufacturerId})", manufacturerId);
+		_logger.LogInformation("GetManufacturerByIdAsync(manufacturerId)={ManufacturerId}: find query executing", manufacturerId);
         return await _manufacturerRepository.GetByIdAsync(manufacturerId, cache => default);
     }
 
@@ -209,8 +245,10 @@ public partial class ManufacturerService : IManufacturerService
     public virtual async Task<IPagedList<Manufacturer>> GetManufacturersWithAppliedDiscountAsync(int? discountId = null,
         bool showHidden = false, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetManufacturersWithAppliedDiscountAsync(discountId={DiscountId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", discountId, showHidden, pageIndex, pageSize);
         var manufacturers = _manufacturerRepository.Table;
 
+		_logger.LogDebug("GetManufacturersWithAppliedDiscountAsync(discountId={DiscountId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): manufacturers → {Manufacturers}", discountId, showHidden, pageIndex, pageSize, manufacturers);
         if (discountId.HasValue)
             manufacturers = from manufacturer in manufacturers
                 join dmm in _discountManufacturerMappingRepository.Table on manufacturer.Id equals dmm.EntityId
@@ -222,6 +260,7 @@ public partial class ManufacturerService : IManufacturerService
 
         manufacturers = manufacturers.OrderBy(manufacturer => manufacturer.DisplayOrder).ThenBy(manufacturer => manufacturer.Id);
 
+		_logger.LogDebug("<<< Exiting GetManufacturersWithAppliedDiscountAsync(discountId={DiscountId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", discountId, showHidden, pageIndex, pageSize);
         return await manufacturers.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -235,12 +274,15 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<IList<Manufacturer>> GetManufacturersByCategoryIdAsync(int categoryId)
     {
+		_logger.LogDebug(">>> Entering GetManufacturersByCategoryIdAsync(categoryId={CategoryId})", categoryId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (categoryId <= 0)
             return new List<Manufacturer>();
 
         // get available products in category
         var productsQuery =
             from p in _productRepository.Table
+			_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): productsQuery → {ProductsQuery}", categoryId, productsQuery);
             where !p.Deleted && p.Published &&
                   (p.ParentGroupedProductId == 0 || p.VisibleIndividually) &&
                   (!p.AvailableStartDateTimeUtc.HasValue || p.AvailableStartDateTimeUtc <= DateTime.UtcNow) &&
@@ -248,8 +290,11 @@ public partial class ManufacturerService : IManufacturerService
             select p;
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): store → {Store}", categoryId, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): customer → {Customer}", categoryId, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): customerRoleIds → {CustomerRoleIds}", categoryId, customerRoleIds);
 
         //apply store mapping constraints
         productsQuery = await _storeMappingService.ApplyStoreMapping(productsQuery, store.Id);
@@ -268,6 +313,7 @@ public partial class ManufacturerService : IManufacturerService
             select pc;
 
         var manufacturerQuery = from m in _manufacturerRepository.Table
+			_logger.LogDebug("GetManufacturersByCategoryIdAsync(categoryId={CategoryId}): manufacturerQuery → {ManufacturerQuery}", categoryId, manufacturerQuery);
             where !m.Deleted && m.Published
             select m;
 
@@ -290,6 +336,9 @@ public partial class ManufacturerService : IManufacturerService
         var key = _staticCacheManager
             .PrepareKeyForDefaultCache(NopCatalogDefaults.ManufacturersByCategoryCacheKey, categoryId, store, customerRoleIds);
 
+		_logger.LogInformation("GetManufacturersByCategoryIdAsync(categoryId)={CategoryId}: find query executing", categoryId);
+		_logger.LogInformation("GetManufacturersByCategoryIdAsync(categoryId)={CategoryId}: external service call took {Arg1} ms", categoryId, __logStart.ElapsedMilliseconds);
+		_logger.LogDebug("<<< Exiting GetManufacturersByCategoryIdAsync(categoryId={CategoryId})", categoryId);
         return await _staticCacheManager.GetAsync(key, async () => await manufacturersQuery.Distinct().ToListAsync());
     }
 
@@ -303,6 +352,7 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<IList<Manufacturer>> GetManufacturersByIdsAsync(int[] manufacturerIds)
     {
+		_logger.LogDebug(">>> Entering GetManufacturersByIdsAsync(manufacturerIds={ManufacturerIds})", manufacturerIds);
         return await _manufacturerRepository.GetByIdsAsync(manufacturerIds, includeDeleted: false);
     }
 
@@ -313,6 +363,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertManufacturerAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering InsertManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
         await _manufacturerRepository.InsertAsync(manufacturer);
     }
 
@@ -323,6 +374,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateManufacturerAsync(Manufacturer manufacturer)
     {
+		_logger.LogDebug(">>> Entering UpdateManufacturerAsync(manufacturer={Manufacturer})", manufacturer);
         await _manufacturerRepository.UpdateAsync(manufacturer);
     }
 
@@ -333,6 +385,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductManufacturerAsync(ProductManufacturer productManufacturer)
     {
+		_logger.LogDebug(">>> Entering DeleteProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
         await _productManufacturerRepository.DeleteAsync(productManufacturer);
     }
 
@@ -343,6 +396,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductManufacturersAsync(IList<ProductManufacturer> productManufacturers)
     {
+		_logger.LogDebug(">>> Entering DeleteProductManufacturersAsync(productManufacturers={ProductManufacturers})", productManufacturers);
         await _productManufacturerRepository.DeleteAsync(productManufacturers);
     }
 
@@ -360,10 +414,12 @@ public partial class ManufacturerService : IManufacturerService
     public virtual async Task<IPagedList<ProductManufacturer>> GetProductManufacturersByManufacturerIdAsync(int manufacturerId,
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
     {
+		_logger.LogDebug(">>> Entering GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", manufacturerId, pageIndex, pageSize, showHidden);
         if (manufacturerId == 0)
             return new PagedList<ProductManufacturer>(new List<ProductManufacturer>(), pageIndex, pageSize);
 
         var query = from pm in _productManufacturerRepository.Table
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): query → {Query}", manufacturerId, pageIndex, pageSize, showHidden, query);
             join p in _productRepository.Table on pm.ProductId equals p.Id
             where pm.ManufacturerId == manufacturerId && !p.Deleted
             orderby pm.DisplayOrder, pm.Id
@@ -372,18 +428,22 @@ public partial class ManufacturerService : IManufacturerService
         if (!showHidden)
         {
             var manufacturersQuery = _manufacturerRepository.Table.Where(m => m.Published);
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): manufacturersQuery → {ManufacturersQuery}", manufacturerId, pageIndex, pageSize, showHidden, manufacturersQuery);
 
             //apply store mapping constraints
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): store → {Store}", manufacturerId, pageIndex, pageSize, showHidden, store);
             manufacturersQuery = await _storeMappingService.ApplyStoreMapping(manufacturersQuery, store.Id);
 
             //apply ACL constraints
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): customer → {Customer}", manufacturerId, pageIndex, pageSize, showHidden, customer);
             manufacturersQuery = await _aclService.ApplyAcl(manufacturersQuery, customer);
 
             query = query.Where(pm => manufacturersQuery.Any(m => m.Id == pm.ManufacturerId));
         }
 
+		_logger.LogDebug("<<< Exiting GetProductManufacturersByManufacturerIdAsync(manufacturerId={ManufacturerId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", manufacturerId, pageIndex, pageSize, showHidden);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -403,13 +463,17 @@ public partial class ManufacturerService : IManufacturerService
             return new List<ProductManufacturer>();
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): store → {Store}", productId, showHidden, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): customer → {Customer}", productId, showHidden, customer);
         var customerRoleIds = await _customerService.GetCustomerRoleIdsAsync(customer);
+		_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): customerRoleIds → {CustomerRoleIds}", productId, showHidden, customerRoleIds);
 
         var key = _staticCacheManager
             .PrepareKeyForDefaultCache(NopCatalogDefaults.ProductManufacturersByProductCacheKey, productId, showHidden, customerRoleIds, store);
 
         var query = from pm in _productManufacturerRepository.Table
+			_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): query → {Query}", productId, showHidden, query);
             join m in _manufacturerRepository.Table on pm.ManufacturerId equals m.Id
             where pm.ProductId == productId && !m.Deleted
             orderby pm.DisplayOrder, pm.Id
@@ -418,6 +482,7 @@ public partial class ManufacturerService : IManufacturerService
         if (!showHidden)
         {
             var manufacturersQuery = _manufacturerRepository.Table.Where(m => m.Published);
+			_logger.LogDebug("GetProductManufacturersByProductIdAsync(productId={ProductId},showHidden={ShowHidden}): manufacturersQuery → {ManufacturersQuery}", productId, showHidden, manufacturersQuery);
 
             //apply store mapping constraints
             manufacturersQuery = await _storeMappingService.ApplyStoreMapping(manufacturersQuery, store.Id);
@@ -428,6 +493,7 @@ public partial class ManufacturerService : IManufacturerService
             query = query.Where(pm => manufacturersQuery.Any(m => m.Id == pm.ManufacturerId));
         }
 
+		_logger.LogInformation("GetProductManufacturersByProductIdAsync(productId,showHidden)={ProductId},{ShowHidden}: find query executing", productId, showHidden);
         return await _staticCacheManager.GetAsync(key, async () => await query.ToListAsync());
     }
 
@@ -441,6 +507,8 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<ProductManufacturer> GetProductManufacturerByIdAsync(int productManufacturerId)
     {
+		_logger.LogDebug(">>> Entering GetProductManufacturerByIdAsync(productManufacturerId={ProductManufacturerId})", productManufacturerId);
+		_logger.LogInformation("GetProductManufacturerByIdAsync(productManufacturerId)={ProductManufacturerId}: find query executing", productManufacturerId);
         return await _productManufacturerRepository.GetByIdAsync(productManufacturerId, cache => default);
     }
 
@@ -451,6 +519,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductManufacturerAsync(ProductManufacturer productManufacturer)
     {
+		_logger.LogDebug(">>> Entering InsertProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
         await _productManufacturerRepository.InsertAsync(productManufacturer);
     }
 
@@ -461,6 +530,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductManufacturerAsync(ProductManufacturer productManufacturer)
     {
+		_logger.LogDebug(">>> Entering UpdateProductManufacturerAsync(productManufacturer={ProductManufacturer})", productManufacturer);
         await _productManufacturerRepository.UpdateAsync(productManufacturer);
     }
 
@@ -493,13 +563,19 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<string[]> GetNotExistingManufacturersAsync(string[] manufacturerIdsNames)
     {
+		_logger.LogDebug(">>> Entering GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames})", manufacturerIdsNames);
         ArgumentNullException.ThrowIfNull(manufacturerIdsNames);
 
         var query = _manufacturerRepository.Table;//.Where(m => !m.Deleted);
+		_logger.LogDebug("GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames}): query → {Query}", manufacturerIdsNames, query);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var queryFilter = manufacturerIdsNames.Distinct().ToArray();
+		_logger.LogDebug("GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames}): queryFilter → {QueryFilter}", manufacturerIdsNames, queryFilter);
         //filtering by name
         var filter = await query.Select(m => m.Name).Where(m => queryFilter.Contains(m)).ToListAsync();
         queryFilter = queryFilter.Except(filter).ToArray();
+		_logger.LogDebug("GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames}): filter → {Filter}", manufacturerIdsNames, filter);
+		_logger.LogInformation("GetNotExistingManufacturersAsync(manufacturerIdsNames)={ManufacturerIdsNames}: find query executed in {Arg1} ms", manufacturerIdsNames, __logStart.ElapsedMilliseconds);
 
         //if some names not found
         if (!queryFilter.Any())
@@ -510,6 +586,7 @@ public partial class ManufacturerService : IManufacturerService
             .Where(c => queryFilter.Contains(c))
             .ToListAsync();
 
+		_logger.LogDebug("<<< Exiting GetNotExistingManufacturersAsync(manufacturerIdsNames={ManufacturerIdsNames})", manufacturerIdsNames);
         return queryFilter.Except(filter).ToArray();
     }
 
@@ -522,6 +599,8 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A ProductManufacturer that has the specified values; otherwise null</returns>
     public virtual ProductManufacturer FindProductManufacturer(IList<ProductManufacturer> source, int productId, int manufacturerId)
     {
+		_logger.LogDebug(">>> Entering FindProductManufacturer(source={Source},productId={ProductId},manufacturerId={ManufacturerId})", source, productId, manufacturerId);
+		_logger.LogDebug("<<< Exiting FindProductManufacturer(source={Source},productId={ProductId},manufacturerId={ManufacturerId})", source, productId, manufacturerId);
         return source.FirstOrDefault(pm => pm.ProductId == productId && pm.ManufacturerId == manufacturerId);
     }
 
@@ -536,6 +615,7 @@ public partial class ManufacturerService : IManufacturerService
     /// </returns>
     public virtual async Task<DiscountManufacturerMapping> GetDiscountAppliedToManufacturerAsync(int manufacturerId, int discountId)
     {
+		_logger.LogDebug(">>> Entering GetDiscountAppliedToManufacturerAsync(manufacturerId={ManufacturerId},discountId={DiscountId})", manufacturerId, discountId);
         return await _discountManufacturerMappingRepository.Table
             .FirstOrDefaultAsync(dcm => dcm.EntityId == manufacturerId && dcm.DiscountId == discountId);
     }
@@ -547,6 +627,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertDiscountManufacturerMappingAsync(DiscountManufacturerMapping discountManufacturerMapping)
     {
+		_logger.LogDebug(">>> Entering InsertDiscountManufacturerMappingAsync(discountManufacturerMapping=<redacted>)");
         await _discountManufacturerMappingRepository.InsertAsync(discountManufacturerMapping);
     }
 
@@ -557,6 +638,7 @@ public partial class ManufacturerService : IManufacturerService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteDiscountManufacturerMappingAsync(DiscountManufacturerMapping discountManufacturerMapping)
     {
+		_logger.LogDebug(">>> Entering DeleteDiscountManufacturerMappingAsync(discountManufacturerMapping=<redacted>)");
         await _discountManufacturerMappingRepository.DeleteAsync(discountManufacturerMapping);
     }
 

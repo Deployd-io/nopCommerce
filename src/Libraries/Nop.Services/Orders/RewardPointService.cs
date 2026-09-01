@@ -4,6 +4,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Data;
 using Nop.Services.Helpers;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -12,6 +13,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class RewardPointService : IRewardPointService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDateTimeHelper _dateTimeHelper;
@@ -28,9 +30,13 @@ public partial class RewardPointService : IRewardPointService
         IRepository<RewardPointsHistory> rewardPointsHistoryRepository,
         RewardPointsSettings rewardPointsSettings)
     {
+		_logger.LogDebug(">>> Entering RewardPointService(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},rewardPointsHistoryRepository={RewardPointsHistoryRepository},rewardPointsSettings={RewardPointsSettings})", dateTimeHelper, localizationService, rewardPointsHistoryRepository, rewardPointsSettings);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("RewardPointService(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},rewardPointsHistoryRepository={RewardPointsHistoryRepository},rewardPointsSettings={RewardPointsSettings}): _dateTimeHelper → {_dateTimeHelper}", dateTimeHelper, localizationService, rewardPointsHistoryRepository, rewardPointsSettings, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("RewardPointService(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},rewardPointsHistoryRepository={RewardPointsHistoryRepository},rewardPointsSettings={RewardPointsSettings}): _localizationService → {_localizationService}", dateTimeHelper, localizationService, rewardPointsHistoryRepository, rewardPointsSettings, _localizationService);
         _rewardPointsHistoryRepository = rewardPointsHistoryRepository;
+		_logger.LogDebug("RewardPointService(dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},rewardPointsHistoryRepository={RewardPointsHistoryRepository},rewardPointsSettings={RewardPointsSettings}): _rewardPointsHistoryRepository → {_rewardPointsHistoryRepository}", dateTimeHelper, localizationService, rewardPointsHistoryRepository, rewardPointsSettings, _rewardPointsHistoryRepository);
         _rewardPointsSettings = rewardPointsSettings;
     }
 
@@ -50,8 +56,10 @@ public partial class RewardPointService : IRewardPointService
     /// </returns>
     protected virtual async Task<IQueryable<RewardPointsHistory>> GetRewardPointsQueryAsync(int customerId, int? storeId, bool showNotActivated = false)
     {
+		_logger.LogDebug(">>> Entering GetRewardPointsQueryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated})", customerId, storeId, showNotActivated);
         var query = _rewardPointsHistoryRepository.Table;
 
+		_logger.LogDebug("GetRewardPointsQueryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated}): query → {Query}", customerId, storeId, showNotActivated, query);
         //filter by customer
         if (customerId > 0)
             query = query.Where(historyEntry => historyEntry.CustomerId == customerId);
@@ -67,6 +75,7 @@ public partial class RewardPointService : IRewardPointService
         //update points balance
         await UpdateRewardPointsBalanceAsync(query);
 
+		_logger.LogDebug("<<< Exiting GetRewardPointsQueryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated})", customerId, storeId, showNotActivated);
         return query;
     }
 
@@ -77,11 +86,14 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task UpdateRewardPointsBalanceAsync(IQueryable<RewardPointsHistory> query)
     {
+		_logger.LogDebug(">>> Entering UpdateRewardPointsBalanceAsync(query={Query})", query);
         //get expired points
         var nowUtc = DateTime.UtcNow;
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var expiredPoints = await query
             .Where(historyEntry => historyEntry.EndDateUtc < nowUtc && historyEntry.ValidPoints > 0)
             .OrderBy(historyEntry => historyEntry.CreatedOnUtc).ThenBy(historyEntry => historyEntry.Id).ToListAsync();
+			_logger.LogInformation("UpdateRewardPointsBalanceAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         //reduce the balance for these points
         foreach (var historyEntry in expiredPoints)
@@ -97,6 +109,7 @@ public partial class RewardPointService : IRewardPointService
             });
 
             historyEntry.ValidPoints = 0;
+			_logger.LogDebug("UpdateRewardPointsBalanceAsync(query={Query}): historyEntry.ValidPoints → {Arg1}", query, historyEntry.ValidPoints);
             await UpdateRewardPointsHistoryEntryAsync(historyEntry);
         }
 
@@ -120,8 +133,10 @@ public partial class RewardPointService : IRewardPointService
         {
             currentPointsBalance += historyEntry.Points;
             historyEntry.PointsBalance = currentPointsBalance;
+			_logger.LogDebug("UpdateRewardPointsBalanceAsync(query={Query}): historyEntry.PointsBalance → {Arg1}", query, historyEntry.PointsBalance);
             await UpdateRewardPointsHistoryEntryAsync(historyEntry);
         }
+		_logger.LogDebug("<<< Exiting UpdateRewardPointsBalanceAsync(query={Query})", query);
     }
 
     /// <summary>
@@ -131,6 +146,7 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertRewardPointsHistoryEntryAsync(RewardPointsHistory rewardPointsHistory)
     {
+		_logger.LogDebug(">>> Entering InsertRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
         await _rewardPointsHistoryRepository.InsertAsync(rewardPointsHistory);
     }
 
@@ -154,8 +170,10 @@ public partial class RewardPointService : IRewardPointService
     public virtual async Task<IPagedList<RewardPointsHistory>> GetRewardPointsHistoryAsync(int customerId = 0, int? storeId = null,
         bool showNotActivated = false, Guid? orderGuid = null, int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogDebug(">>> Entering GetRewardPointsHistoryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated},orderGuid={OrderGuid},pageIndex={PageIndex},pageSize={PageSize})", customerId, storeId, showNotActivated, orderGuid, pageIndex, pageSize);
         var query = await GetRewardPointsQueryAsync(customerId, storeId, showNotActivated);
 
+		_logger.LogDebug("GetRewardPointsHistoryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated},orderGuid={OrderGuid},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", customerId, storeId, showNotActivated, orderGuid, pageIndex, pageSize, query);
         if (orderGuid.HasValue)
             query = query.Where(historyEntry => historyEntry.UsedWithOrder == orderGuid.Value);
 
@@ -163,6 +181,7 @@ public partial class RewardPointService : IRewardPointService
             .ThenByDescending(historyEntry => historyEntry.Id);
 
         //return paged reward points history
+		_logger.LogDebug("<<< Exiting GetRewardPointsHistoryAsync(customerId={CustomerId},storeId={StoreId},showNotActivated={ShowNotActivated},orderGuid={OrderGuid},pageIndex={PageIndex},pageSize={PageSize})", customerId, storeId, showNotActivated, orderGuid, pageIndex, pageSize);
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -177,10 +196,12 @@ public partial class RewardPointService : IRewardPointService
     /// </returns>
     public virtual async Task<int> GetRewardPointsBalanceAsync(int customerId, int storeId)
     {
+		_logger.LogDebug(">>> Entering GetRewardPointsBalanceAsync(customerId={CustomerId},storeId={StoreId})", customerId, storeId);
         var query = (await GetRewardPointsQueryAsync(customerId, storeId))
             .OrderByDescending(historyEntry => historyEntry.CreatedOnUtc).ThenByDescending(historyEntry => historyEntry.Id);
 
         //return point balance of the first actual history entry
+		_logger.LogDebug("<<< Exiting GetRewardPointsBalanceAsync(customerId={CustomerId},storeId={StoreId})", customerId, storeId);
         return (await query.FirstOrDefaultAsync())?.PointsBalance ?? 0;
     }
 
@@ -202,9 +223,11 @@ public partial class RewardPointService : IRewardPointService
     public virtual async Task<int> AddRewardPointsHistoryEntryAsync(Customer customer, int points, int storeId, string message = "",
         Order usedWithOrder = null, decimal usedAmount = 0M, DateTime? activatingDate = null, DateTime? endDate = null)
     {
+		_logger.LogDebug(">>> Entering AddRewardPointsHistoryEntryAsync(customer={Customer},points={Points},storeId={StoreId},message={Message},usedWithOrder={UsedWithOrder},usedAmount={UsedAmount},activatingDate={ActivatingDate},endDate={EndDate})", customer, points, storeId, message, usedWithOrder, usedAmount, activatingDate, endDate);
         ArgumentNullException.ThrowIfNull(customer);
 
         if (storeId == 0)
+			_logger.LogWarning("Throwing ArgumentException from AddRewardPointsHistoryEntryAsync(customer={Customer},points={Points},storeId={StoreId},message={Message},usedWithOrder={UsedWithOrder},usedAmount={UsedAmount},activatingDate={ActivatingDate},endDate={EndDate})", customer, points, storeId, message, usedWithOrder, usedAmount, activatingDate, endDate);
             throw new ArgumentException("Store ID should be valid");
 
         if (points < 0 && endDate.HasValue)
@@ -230,9 +253,11 @@ public partial class RewardPointService : IRewardPointService
         if (points >= 0)
             return newHistoryEntry.Id;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var withValidPoints = await (await GetRewardPointsQueryAsync(customer.Id, storeId))
             .Where(historyEntry => historyEntry.ValidPoints > 0)
             .OrderBy(historyEntry => historyEntry.CreatedOnUtc).ThenBy(historyEntry => historyEntry.Id).ToListAsync();
+			_logger.LogInformation("AddRewardPointsHistoryEntryAsync(customer,points,storeId,message,usedWithOrder,usedAmount,activatingDate,endDate)={Customer},{Points},{StoreId},{Message},{UsedWithOrder},{UsedAmount},{ActivatingDate},{EndDate}: database query executed in {Arg8} ms", customer, points, storeId, message, usedWithOrder, usedAmount, activatingDate, endDate, __logStart.ElapsedMilliseconds);
 
         foreach (var historyEntry in withValidPoints)
         {
@@ -244,6 +269,7 @@ public partial class RewardPointService : IRewardPointService
                 break;
         }
 
+		_logger.LogDebug("<<< Exiting AddRewardPointsHistoryEntryAsync(customer={Customer},points={Points},storeId={StoreId},message={Message},usedWithOrder={UsedWithOrder},usedAmount={UsedAmount},activatingDate={ActivatingDate},endDate={EndDate})", customer, points, storeId, message, usedWithOrder, usedAmount, activatingDate, endDate);
         return newHistoryEntry.Id;
     }
 
@@ -257,6 +283,8 @@ public partial class RewardPointService : IRewardPointService
     /// </returns>
     public virtual async Task<RewardPointsHistory> GetRewardPointsHistoryEntryByIdAsync(int rewardPointsHistoryId)
     {
+		_logger.LogDebug(">>> Entering GetRewardPointsHistoryEntryByIdAsync(rewardPointsHistoryId={RewardPointsHistoryId})", rewardPointsHistoryId);
+		_logger.LogDebug(">>> Entering UpdateRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
         return await _rewardPointsHistoryRepository.GetByIdAsync(rewardPointsHistoryId);
     }
 
@@ -277,6 +305,7 @@ public partial class RewardPointService : IRewardPointService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteRewardPointsHistoryEntryAsync(RewardPointsHistory rewardPointsHistory)
     {
+		_logger.LogDebug(">>> Entering DeleteRewardPointsHistoryEntryAsync(rewardPointsHistory={RewardPointsHistory})", rewardPointsHistory);
         await _rewardPointsHistoryRepository.DeleteAsync(rewardPointsHistory);
     }
 

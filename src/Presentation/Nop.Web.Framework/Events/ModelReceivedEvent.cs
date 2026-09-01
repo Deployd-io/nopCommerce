@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nop.Web.Framework.Events;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Framework.Events;
 /// <typeparam name="T">Type of the model</typeparam>
 public partial class ModelReceivedEvent<T>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -17,7 +19,9 @@ public partial class ModelReceivedEvent<T>
     /// <param name="modelState">Model state</param>
     public ModelReceivedEvent(T model, ModelStateDictionary modelState)
     {
+		_logger.LogDebug(">>> Entering ModelReceivedEvent(model={Model},modelState={ModelState})", model, modelState);
         Model = model;
+		_logger.LogDebug("ModelReceivedEvent(model={Model},modelState={ModelState}): Model → {Model1}", model, modelState, Model);
         ModelState = modelState;
     }
 

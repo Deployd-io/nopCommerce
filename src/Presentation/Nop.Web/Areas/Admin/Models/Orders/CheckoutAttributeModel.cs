@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -12,15 +13,22 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 public partial record CheckoutAttributeModel : BaseNopEntityModel,
     ILocalizedModel<CheckoutAttributeLocalizedModel>, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CheckoutAttributeModel()
     {
+		_logger.LogDebug(">>> Entering CheckoutAttributeModel()");
         Locales = new List<CheckoutAttributeLocalizedModel>();
+		_logger.LogDebug("CheckoutAttributeModel(): Locales → {Locales}", Locales);
         AvailableTaxCategories = new List<SelectListItem>();
+		_logger.LogDebug("CheckoutAttributeModel(): AvailableTaxCategories → {AvailableTaxCategories}", AvailableTaxCategories);
         ConditionModel = new ConditionModel();
+		_logger.LogDebug("CheckoutAttributeModel(): ConditionModel → {ConditionModel}", ConditionModel);
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("CheckoutAttributeModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogDebug("CheckoutAttributeModel(): AvailableStores → {AvailableStores}", AvailableStores);
         CheckoutAttributeValueSearchModel = new CheckoutAttributeValueSearchModel();
     }
 
@@ -91,9 +99,12 @@ public partial record CheckoutAttributeModel : BaseNopEntityModel,
 
 public partial record ConditionModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ConditionModel()
     {
+		_logger.LogDebug(">>> Entering ConditionModel()");
         ConditionAttributes = new List<AttributeConditionModel>();
+		_logger.LogDebug("ConditionModel(): ConditionAttributes → {ConditionAttributes}", ConditionAttributes);
     }
 
     [NopResourceDisplayName("Admin.Catalog.Attributes.CheckoutAttributes.Condition.EnableCondition")]

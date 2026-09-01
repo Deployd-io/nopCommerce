@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Tax;
 
@@ -7,11 +8,14 @@ namespace Nop.Web.Areas.Admin.Models.Tax;
 /// </summary>
 public partial record TaxCategorySearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public TaxCategorySearchModel()
     {
+		_logger.LogDebug(">>> Entering TaxCategorySearchModel()");
         AddTaxCategory = new TaxCategoryModel();
+		_logger.LogDebug("TaxCategorySearchModel(): AddTaxCategory → {AddTaxCategory}", AddTaxCategory);
     }
 
     #endregion

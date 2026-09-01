@@ -1,10 +1,12 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record ProductReviewOverviewModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public int ProductId { get; set; }
 
     public int RatingSum { get; set; }
@@ -19,11 +21,16 @@ public partial record ProductReviewOverviewModel : BaseNopModel
 
 public partial record ProductReviewsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductReviewsModel()
     {
+		_logger.LogDebug(">>> Entering ProductReviewsModel()");
         Items = new List<ProductReviewModel>();
+		_logger.LogDebug("ProductReviewsModel(): Items → {Items}", Items);
         AddProductReview = new AddProductReviewModel();
+		_logger.LogDebug("ProductReviewsModel(): AddProductReview → {AddProductReview}", AddProductReview);
         ReviewTypeList = new List<ReviewTypeModel>();
+		_logger.LogDebug("ProductReviewsModel(): ReviewTypeList → {ReviewTypeList}", ReviewTypeList);
         AddAdditionalProductReviewList = new List<AddProductReviewReviewTypeMappingModel>();
     }
 
@@ -55,9 +62,12 @@ public partial record ReviewTypeModel : BaseNopEntityModel
 
 public partial record ProductReviewModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductReviewModel()
     {
+		_logger.LogDebug(">>> Entering ProductReviewModel()");
         AdditionalProductReviewList = new List<ProductReviewReviewTypeMappingModel>();
+		_logger.LogDebug("ProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
     }
 
     public int CustomerId { get; set; }

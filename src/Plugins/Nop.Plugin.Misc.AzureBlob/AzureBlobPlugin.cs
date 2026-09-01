@@ -8,6 +8,7 @@ using Nop.Services.Common;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.AzureBlob;
 
@@ -16,6 +17,7 @@ namespace Nop.Plugin.Misc.AzureBlob;
 /// </summary>
 public class AzureBlobPlugin : BasePlugin, IMiscPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ILocalizationService _localizationService;
@@ -32,9 +34,13 @@ public class AzureBlobPlugin : BasePlugin, IMiscPlugin
         ISettingService settingService,
         IWebHelper webHelper)
     {
+		_logger.LogDebug(">>> Entering AzureBlobPlugin(localizationService={LocalizationService},fileProvider={FileProvider},settingService={SettingService},webHelper={WebHelper})", localizationService, fileProvider, settingService, webHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("AzureBlobPlugin(localizationService={LocalizationService},fileProvider={FileProvider},settingService={SettingService},webHelper={WebHelper}): _localizationService → {_localizationService}", localizationService, fileProvider, settingService, webHelper, _localizationService);
         _fileProvider = fileProvider;
+		_logger.LogDebug("AzureBlobPlugin(localizationService={LocalizationService},fileProvider={FileProvider},settingService={SettingService},webHelper={WebHelper}): _fileProvider → {_fileProvider}", localizationService, fileProvider, settingService, webHelper, _fileProvider);
         _settingService = settingService;
+		_logger.LogDebug("AzureBlobPlugin(localizationService={LocalizationService},fileProvider={FileProvider},settingService={SettingService},webHelper={WebHelper}): _settingService → {_settingService}", localizationService, fileProvider, settingService, webHelper, _settingService);
         _webHelper = webHelper;
     }
 
@@ -47,6 +53,7 @@ public class AzureBlobPlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogDebug(">>> Entering GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/AzureBlob/Configure";
     }
 
@@ -56,8 +63,10 @@ public class AzureBlobPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogDebug(">>> Entering InstallAsync()");
         //try to migrate settings from appsettings.json file
         var filePath = _fileProvider.MapPath(NopConfigurationDefaults.AppSettingsFilePath);
+		_logger.LogDebug("InstallAsync(): filePath → {FilePath}", filePath);
         var data = JsonConvert.DeserializeAnonymousType(await _fileProvider.ReadAllTextAsync(filePath, Encoding.UTF8),
             new { AzureBlobConfig = new AzureBlobSettings() });
 
@@ -95,6 +104,7 @@ public class AzureBlobPlugin : BasePlugin, IMiscPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogDebug("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -103,11 +113,13 @@ public class AzureBlobPlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogDebug(">>> Entering UninstallAsync()");
         //settings
         await _settingService.DeleteSettingAsync<AzureBlobSettings>();
 
         //locales
         await _localizationService.DeleteLocaleResourcesAsync("Nop.Plugin.Misc.AzureBlob");
+		_logger.LogDebug("<<< Exiting UninstallAsync()");
     }
 
     #endregion

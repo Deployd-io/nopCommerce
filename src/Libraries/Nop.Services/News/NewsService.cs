@@ -3,6 +3,7 @@ using Nop.Core.Caching;
 using Nop.Core.Domain.News;
 using Nop.Data;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.News;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.News;
 /// </summary>
 public partial class NewsService : INewsService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<NewsComment> _newsCommentRepository;
@@ -28,10 +30,16 @@ public partial class NewsService : INewsService
         IStaticCacheManager staticCacheManager,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogDebug(">>> Entering NewsService(newsCommentRepository={NewsCommentRepository},newsItemRepository={NewsItemRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>)", newsCommentRepository, newsItemRepository, staticCacheManager);
         _newsCommentRepository = newsCommentRepository;
+		_logger.LogDebug("NewsService(newsCommentRepository={NewsCommentRepository},newsItemRepository={NewsItemRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _newsCommentRepository → {_newsCommentRepository}", newsCommentRepository, newsItemRepository, staticCacheManager, _newsCommentRepository);
         _newsItemRepository = newsItemRepository;
+		_logger.LogDebug("NewsService(newsCommentRepository={NewsCommentRepository},newsItemRepository={NewsItemRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _newsItemRepository → {_newsItemRepository}", newsCommentRepository, newsItemRepository, staticCacheManager, _newsItemRepository);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("NewsService(newsCommentRepository={NewsCommentRepository},newsItemRepository={NewsItemRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _staticCacheManager → {_staticCacheManager}", newsCommentRepository, newsItemRepository, staticCacheManager, _staticCacheManager);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("<<< Exiting NewsService(newsCommentRepository={NewsCommentRepository},newsItemRepository={NewsItemRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>)", newsCommentRepository, newsItemRepository, staticCacheManager);
+		_logger.LogDebug("NewsService(newsCommentRepository={NewsCommentRepository},newsItemRepository={NewsItemRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _storeMappingService → {_storeMappingService}", newsCommentRepository, newsItemRepository, staticCacheManager, _storeMappingService);
 
     }
 
@@ -48,6 +56,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsAsync(NewsItem newsItem)
     {
+		_logger.LogDebug(">>> Entering DeleteNewsAsync(newsItem={NewsItem})", newsItem);
         await _newsItemRepository.DeleteAsync(newsItem);
     }
 
@@ -61,6 +70,8 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<NewsItem> GetNewsByIdAsync(int newsId)
     {
+		_logger.LogDebug(">>> Entering GetNewsByIdAsync(newsId={NewsId})", newsId);
+		_logger.LogInformation("GetNewsByIdAsync(newsId)={NewsId}: find query executing", newsId);
         return await _newsItemRepository.GetByIdAsync(newsId, cache => default);
     }
 
@@ -80,11 +91,15 @@ public partial class NewsService : INewsService
     public virtual async Task<IPagedList<NewsItem>> GetAllNewsAsync(int languageId = 0, int storeId = 0,
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false, string title = null)
     {
+		_logger.LogDebug(">>> Entering GetAllNewsAsync(languageId={LanguageId},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},title={Title})", languageId, storeId, pageIndex, pageSize, showHidden, title);
         var news = await _newsItemRepository.GetAllPagedAsync(async query =>
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogDebug("GetAllNewsAsync(languageId={LanguageId},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},title={Title}): query → {Query}", languageId, storeId, pageIndex, pageSize, showHidden, title, query);
             if (languageId > 0)
                 query = query.Where(n => languageId == n.LanguageId);
 
+			_logger.LogInformation("GetAllNewsAsync(languageId,storeId,pageIndex,pageSize,showHidden,title)={LanguageId},{StoreId},{PageIndex},{PageSize},{ShowHidden},{Title}: find query executed in {Arg6} ms", languageId, storeId, pageIndex, pageSize, showHidden, title, __logStart.ElapsedMilliseconds);
             if (!string.IsNullOrEmpty(title))
                 query = query.Where(n => n.Title.Contains(title));
 
@@ -102,6 +117,7 @@ public partial class NewsService : INewsService
                 query = query.Where(n => !n.EndDateUtc.HasValue || n.EndDateUtc >= utcNow);
             }
 
+		_logger.LogDebug("<<< Exiting GetAllNewsAsync(languageId={LanguageId},storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},title={Title})", languageId, storeId, pageIndex, pageSize, showHidden, title);
             return query.OrderByDescending(n => n.StartDateUtc ?? n.CreatedOnUtc);
         }, pageIndex, pageSize);
 
@@ -115,6 +131,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertNewsAsync(NewsItem news)
     {
+		_logger.LogDebug(">>> Entering InsertNewsAsync(news={News})", news);
         await _newsItemRepository.InsertAsync(news);
     }
 
@@ -125,6 +142,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateNewsAsync(NewsItem news)
     {
+		_logger.LogDebug(">>> Entering UpdateNewsAsync(news={News})", news);
         await _newsItemRepository.UpdateAsync(news);
     }
 
@@ -136,6 +154,7 @@ public partial class NewsService : INewsService
     /// <returns>Result</returns>
     public virtual bool IsNewsAvailable(NewsItem newsItem, DateTime? dateTime = null)
     {
+		_logger.LogDebug(">>> Entering IsNewsAvailable(newsItem={NewsItem},dateTime={DateTime})", newsItem, dateTime);
         ArgumentNullException.ThrowIfNull(newsItem);
 
         if (newsItem.StartDateUtc.HasValue && newsItem.StartDateUtc.Value >= dateTime)
@@ -167,8 +186,10 @@ public partial class NewsService : INewsService
     public virtual async Task<IList<NewsComment>> GetAllCommentsAsync(int customerId = 0, int storeId = 0, int? newsItemId = null,
         bool? approved = null, DateTime? fromUtc = null, DateTime? toUtc = null, string commentText = null)
     {
+		_logger.LogDebug(">>> Entering GetAllCommentsAsync(customerId={CustomerId},storeId={StoreId},newsItemId={NewsItemId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},commentText={CommentText})", customerId, storeId, newsItemId, approved, fromUtc, toUtc, commentText);
         return await _newsCommentRepository.GetAllAsync(query =>
         {
+			_logger.LogInformation("GetAllCommentsAsync(customerId,storeId,newsItemId,approved,fromUtc,toUtc,commentText)={CustomerId},{StoreId},{NewsItemId},{Approved},{FromUtc},{ToUtc},{CommentText}: find query executing", customerId, storeId, newsItemId, approved, fromUtc, toUtc, commentText);
             if (approved.HasValue)
                 query = query.Where(comment => comment.IsApproved == approved);
 
@@ -207,6 +228,8 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<NewsComment> GetNewsCommentByIdAsync(int newsCommentId)
     {
+		_logger.LogDebug(">>> Entering GetNewsCommentByIdAsync(newsCommentId={NewsCommentId})", newsCommentId);
+		_logger.LogInformation("GetNewsCommentByIdAsync(newsCommentId)={NewsCommentId}: find query executing", newsCommentId);
         return await _newsCommentRepository.GetByIdAsync(newsCommentId, cache => default, useShortTermCache: true);
     }
 
@@ -220,6 +243,7 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<IList<NewsComment>> GetNewsCommentsByIdsAsync(int[] commentIds)
     {
+		_logger.LogDebug(">>> Entering GetNewsCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
         return await _newsCommentRepository.GetByIdsAsync(commentIds);
     }
 
@@ -235,8 +259,11 @@ public partial class NewsService : INewsService
     /// </returns>
     public virtual async Task<int> GetNewsCommentsCountAsync(NewsItem newsItem, int storeId = 0, bool? isApproved = null)
     {
+		_logger.LogDebug(">>> Entering GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved})", newsItem, storeId, isApproved);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = _newsCommentRepository.Table.Where(comment => comment.NewsItemId == newsItem.Id);
 
+		_logger.LogDebug("GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved}): query → {Query}", newsItem, storeId, isApproved, query);
         if (storeId > 0)
             query = query.Where(comment => comment.StoreId == storeId);
 
@@ -244,7 +271,11 @@ public partial class NewsService : INewsService
             query = query.Where(comment => comment.IsApproved == isApproved.Value);
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopNewsDefaults.NewsCommentsNumberCacheKey, newsItem, storeId, isApproved);
+		_logger.LogDebug("GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved}): cacheKey → {CacheKey}", newsItem, storeId, isApproved, cacheKey);
+		_logger.LogInformation("GetNewsCommentsCountAsync(newsItem,storeId,isApproved)={NewsItem},{StoreId},{IsApproved}: find query executing", newsItem, storeId, isApproved);
+		_logger.LogInformation("GetNewsCommentsCountAsync(newsItem,storeId,isApproved)={NewsItem},{StoreId},{IsApproved}: external service call took {Arg3} ms", newsItem, storeId, isApproved, __logStart.ElapsedMilliseconds);
 
+		_logger.LogDebug("<<< Exiting GetNewsCommentsCountAsync(newsItem={NewsItem},storeId={StoreId},isApproved={IsApproved})", newsItem, storeId, isApproved);
         return await _staticCacheManager.GetAsync(cacheKey, async () => await query.CountAsync());
     }
 
@@ -255,6 +286,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsCommentAsync(NewsComment newsComment)
     {
+		_logger.LogDebug(">>> Entering DeleteNewsCommentAsync(newsComment={NewsComment})", newsComment);
         await _newsCommentRepository.DeleteAsync(newsComment);
     }
 
@@ -265,10 +297,12 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteNewsCommentsAsync(IList<NewsComment> newsComments)
     {
+		_logger.LogDebug(">>> Entering DeleteNewsCommentsAsync(newsComments={NewsComments})", newsComments);
         ArgumentNullException.ThrowIfNull(newsComments);
 
         foreach (var newsComment in newsComments)
             await DeleteNewsCommentAsync(newsComment);
+			_logger.LogDebug("<<< Exiting DeleteNewsCommentsAsync(newsComments={NewsComments})", newsComments);
     }
 
     /// <summary>
@@ -278,6 +312,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertNewsCommentAsync(NewsComment comment)
     {
+		_logger.LogDebug(">>> Entering InsertNewsCommentAsync(comment={Comment})", comment);
         await _newsCommentRepository.InsertAsync(comment);
     }
 
@@ -288,6 +323,7 @@ public partial class NewsService : INewsService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateNewsCommentAsync(NewsComment comment)
     {
+		_logger.LogDebug(">>> Entering UpdateNewsCommentAsync(comment={Comment})", comment);
         await _newsCommentRepository.UpdateAsync(comment);
     }
 

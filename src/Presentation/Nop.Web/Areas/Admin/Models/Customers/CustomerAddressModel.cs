@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -8,11 +9,14 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerAddressModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerAddressModel()
     {
+		_logger.LogDebug(">>> Entering CustomerAddressModel()");
         Address = new AddressModel();
+		_logger.LogDebug("CustomerAddressModel(): Address → {Address}", Address);
     }
 
     #endregion

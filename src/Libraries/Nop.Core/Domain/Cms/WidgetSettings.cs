@@ -1,4 +1,5 @@
-﻿using Nop.Core.Configuration;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Core.Configuration;
 
 namespace Nop.Core.Domain.Cms;
 
@@ -7,9 +8,12 @@ namespace Nop.Core.Domain.Cms;
 /// </summary>
 public partial class WidgetSettings : ISettings
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public WidgetSettings()
     {
+		_logger.LogDebug(">>> Entering WidgetSettings()");
         ActiveWidgetSystemNames = new List<string>();
+		_logger.LogDebug("WidgetSettings(): ActiveWidgetSystemNames → {ActiveWidgetSystemNames}", ActiveWidgetSystemNames);
     }
 
     /// <summary>

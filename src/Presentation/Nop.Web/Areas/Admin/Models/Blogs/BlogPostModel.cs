@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Blogs;
 
@@ -11,12 +12,16 @@ namespace Nop.Web.Areas.Admin.Models.Blogs;
 /// </summary>
 public partial record BlogPostModel : BaseNopEntityModel, IStoreMappingSupportedModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public BlogPostModel()
     {
+		_logger.LogDebug(">>> Entering BlogPostModel()");
         AvailableLanguages = new List<SelectListItem>();
+		_logger.LogDebug("BlogPostModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
         SelectedStoreIds = new List<int>();
+		_logger.LogDebug("BlogPostModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
     }
 

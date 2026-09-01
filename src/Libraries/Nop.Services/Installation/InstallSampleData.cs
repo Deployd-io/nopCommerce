@@ -21,6 +21,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Vendors;
 using Nop.Services.Installation.SampleData;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Installation;
 
@@ -44,13 +45,19 @@ public partial class InstallationService
     /// The task result contains the identifier of default language</returns>
     protected virtual async Task<int> GetDefaultLanguageIdAsync()
     {
+		_logger.LogDebug(">>> Entering GetDefaultLanguageIdAsync()");
         if (_defaultLanguageId.HasValue)
             return _defaultLanguageId.Value;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var lang = await Table<Language>().FirstOrDefaultAsync() ?? throw new Exception("Default language could not be loaded");
 
+		_logger.LogDebug("GetDefaultLanguageIdAsync(): lang → {Lang}", lang);
+		_logger.LogInformation("GetDefaultLanguageIdAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         _defaultLanguageId = lang.Id;
 
+		_logger.LogDebug("GetDefaultLanguageIdAsync(): _defaultLanguageId → {_defaultLanguageId}", _defaultLanguageId);
+		_logger.LogDebug("<<< Exiting GetDefaultLanguageIdAsync()");
         return lang.Id;
     }
 
@@ -61,13 +68,19 @@ public partial class InstallationService
     /// The task result contains the identifier of default store</returns>
     protected virtual async Task<int> GetDefaultStoreIdAsync()
     {
+		_logger.LogDebug(">>> Entering GetDefaultStoreIdAsync()");
         if (_defaultStoreId.HasValue)
             return _defaultStoreId.Value;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await Table<Store>().FirstOrDefaultAsync() ?? throw new Exception("No default store could be loaded");
 
+		_logger.LogDebug("GetDefaultStoreIdAsync(): store → {Store}", store);
+		_logger.LogInformation("GetDefaultStoreIdAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         _defaultStoreId = store.Id;
 
+		_logger.LogDebug("GetDefaultStoreIdAsync(): _defaultStoreId → {_defaultStoreId}", _defaultStoreId);
+		_logger.LogDebug("<<< Exiting GetDefaultStoreIdAsync()");
         return store.Id;
     }
 
@@ -80,6 +93,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertSearchEngineNamesAsync<TEntity>(IEnumerable<TEntity> entities, Func<TEntity, string> getName, int languageId = 0) where TEntity : BaseEntity
     {
+		_logger.LogDebug(">>> Entering InsertSearchEngineNamesAsync(entities={Entities},getName={GetName},languageId={LanguageId})", entities, getName, languageId);
         await _dataProvider.BulkInsertEntitiesAsync(await entities.SelectAwait(async entity => new UrlRecord
         {
             EntityId = entity.Id,
@@ -88,6 +102,7 @@ public partial class InstallationService
             IsActive = true,
             Slug = await ValidateSeNameAsync(entity, getName(entity))
         }).ToListAsync());
+			_logger.LogDebug("<<< Exiting InsertSearchEngineNamesAsync(entities={Entities},getName={GetName},languageId={LanguageId})", entities, getName, languageId);
     }
 
     /// <summary>
@@ -100,10 +115,12 @@ public partial class InstallationService
     /// </returns>
     protected virtual string GetSeName(string name)
     {
+		_logger.LogDebug(">>> Entering GetSeName(name={Name})", name);
         if (string.IsNullOrEmpty(name))
             return name;
 
         var okChars = new HashSet<char>("abcdefghijklmnopqrstuvwxyz1234567890 _-");
+		_logger.LogDebug("GetSeName(name={Name}): okChars → {OkChars}", name, okChars);
 
         // stores unicode characters and their "normalized"
         // values to a hash table. Character codes are referenced
@@ -1144,6 +1161,7 @@ public partial class InstallationService
         };
 
         var sb = new StringBuilder();
+		_logger.LogDebug("GetSeName(name={Name}): sb → {Sb}", name, sb);
         foreach (var c in name.Trim().ToLowerInvariant())
             if (seoCharacterTable.TryGetValue(c, out var transliteration))
                 sb.Append(transliteration.ToLowerInvariant());
@@ -1151,8 +1169,10 @@ public partial class InstallationService
                 sb.Append(c);
 
         var seName = new Regex(@"[\s-]+").Replace(sb.ToString(), "-");
+		_logger.LogDebug("GetSeName(name={Name}): seName → {SeName}", name, seName);
         seName = new Regex("_+").Replace(seName, "_");
 
+		_logger.LogDebug("<<< Exiting GetSeName(name={Name})", name);
         return seName;
     }
 
@@ -1167,15 +1187,20 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task<int> InsertPictureAsync(string fileName, string name)
     {
+		_logger.LogDebug(">>> Entering InsertPictureAsync(fileName={FileName},name={Name})", fileName, name);
         var sampleImagesPath = _fileProvider.GetAbsolutePath(NopInstallationDefaults.SampleImagesPath);
 
+		_logger.LogDebug("InsertPictureAsync(fileName={FileName},name={Name}): sampleImagesPath → {SampleImagesPath}", fileName, name, sampleImagesPath);
         var pictureBinary = await _fileProvider.ReadAllBytesAsync(_fileProvider.Combine(sampleImagesPath, fileName));
+		_logger.LogDebug("InsertPictureAsync(fileName={FileName},name={Name}): pictureBinary → {PictureBinary}", fileName, name, pictureBinary);
         var seName = CommonHelper.EnsureMaximumLength(GetSeName(name), 100);
+		_logger.LogDebug("InsertPictureAsync(fileName={FileName},name={Name}): seName → {SeName}", fileName, name, seName);
 
         _fileExtensionContentTypeProvider ??= new FileExtensionContentTypeProvider();
 
         if (!_fileExtensionContentTypeProvider.TryGetContentType(fileName, out var contentType))
             contentType = MimeTypes.ImageJpeg;
+			_logger.LogDebug("InsertPictureAsync(fileName={FileName},name={Name}): contentType → {ContentType}", fileName, name, contentType);
 
         var picture = new Picture
         {
@@ -1189,6 +1214,7 @@ public partial class InstallationService
         await _dataProvider.InsertEntityAsync(picture);
         await _dataProvider.InsertEntityAsync(new PictureBinary { PictureId = picture.Id, BinaryData = pictureBinary });
 
+		_logger.LogDebug("<<< Exiting InsertPictureAsync(fileName={FileName},name={Name})", fileName, name);
         return picture.Id;
     }
 
@@ -1201,11 +1227,16 @@ public partial class InstallationService
     /// </returns>
     protected virtual async Task InstallSampleCustomersAsync(List<SampleCustomer> sampleCustomers)
     {
+		_logger.LogDebug(">>> Entering InstallSampleCustomersAsync(sampleCustomers={SampleCustomers})", sampleCustomers);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customerRoles = await Table<CustomerRole>().ToDictionaryAsync(cr => cr.SystemName, cr => cr);
 
         //default store ID
+		_logger.LogDebug("InstallSampleCustomersAsync(sampleCustomers={SampleCustomers}): customerRoles → {CustomerRoles}", sampleCustomers, customerRoles);
+		_logger.LogInformation("InstallSampleCustomersAsync(sampleCustomers)={SampleCustomers}: database query executed in {Arg1} ms", sampleCustomers, __logStart.ElapsedMilliseconds);
         var storeId = await GetDefaultStoreIdAsync();
 
+		_logger.LogDebug("InstallSampleCustomersAsync(sampleCustomers={SampleCustomers}): storeId → {StoreId}", sampleCustomers, storeId);
         (Customer Customer, SampleCustomer jsonModel) createCustomer((Address address, SampleCustomer jsonModel) data)
         {
             var address = data.address;
@@ -1228,6 +1259,7 @@ public partial class InstallationService
 
         async Task<(Address Address, SampleCustomer jsonModel)> createAddress(SampleCustomer model)
         {
+			_logger.LogDebug("<<< Exiting InstallSampleCustomersAsync(sampleCustomers={SampleCustomers})", sampleCustomers);
             return (await CreateAddressAsync(model), model);
         }
 
@@ -1257,6 +1289,8 @@ public partial class InstallationService
             PasswordSalt = c.jsonModel.PasswordSalt,
             CreatedOnUtc = DateTime.UtcNow
         }));
+		_logger.LogDebug(">>> Entering CreateAddressAsync(sampleAddress={SampleAddress})", sampleAddress);
+		_logger.LogDebug("<<< Exiting CreateAddressAsync(sampleAddress={SampleAddress})", sampleAddress);
     }
 
     /// <summary>
@@ -1266,6 +1300,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallCheckoutAttributesAsync(List<SampleCheckoutAttribute> sampleCheckoutAttributes)
     {
+		_logger.LogDebug(">>> Entering InstallCheckoutAttributesAsync(sampleCheckoutAttributes={SampleCheckoutAttributes})", sampleCheckoutAttributes);
         foreach (var jsonModel in sampleCheckoutAttributes)
         {
             var checkoutAttribute = await _dataProvider.InsertEntityAsync(new CheckoutAttribute
@@ -1290,6 +1325,7 @@ public partial class InstallationService
                     AttributeId = checkoutAttribute.Id
                 }));
         }
+		_logger.LogDebug("<<< Exiting InstallCheckoutAttributesAsync(sampleCheckoutAttributes={SampleCheckoutAttributes})", sampleCheckoutAttributes);
     }
 
     /// <summary>
@@ -1299,6 +1335,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallSpecificationAttributesAsync(SampleSpecificationAttributes sampleSpecificationAttributes)
     {
+		_logger.LogDebug(">>> Entering InstallSpecificationAttributesAsync(sampleSpecificationAttributes={SampleSpecificationAttributes})", sampleSpecificationAttributes);
         var attributes = sampleSpecificationAttributes.Attributes.ToDictionary(data => data,
              data => new SpecificationAttribute { Name = data.Name, DisplayOrder = data.DisplayOrder });
 
@@ -1326,6 +1363,7 @@ public partial class InstallationService
                 ColorSquaresRgb = o.ColorSquaresRgb,
                 SpecificationAttributeId = data.Value.Id
             })));
+			_logger.LogDebug("<<< Exiting InstallSpecificationAttributesAsync(sampleSpecificationAttributes={SampleSpecificationAttributes})", sampleSpecificationAttributes);
     }
 
     /// <summary>
@@ -1335,10 +1373,12 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallProductAttributesAsync(IList<SampleProductAttribute> sampleProductAttributes)
     {
+		_logger.LogDebug(">>> Entering InstallProductAttributesAsync(sampleProductAttributes={SampleProductAttributes})", sampleProductAttributes);
         await _dataProvider.BulkInsertEntitiesAsync(sampleProductAttributes.Select(p => new ProductAttribute
         {
             Name = p.Name
         }));
+		_logger.LogDebug("<<< Exiting InstallProductAttributesAsync(sampleProductAttributes={SampleProductAttributes})", sampleProductAttributes);
     }
 
     /// <summary>
@@ -1348,10 +1388,12 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallCategoriesAsync(IList<SampleCategory> sampleCategories)
     {
+		_logger.LogDebug(">>> Entering InstallCategoriesAsync(sampleCategories={SampleCategories})", sampleCategories);
         var categoryTemplateInGridAndLines = await Table<CategoryTemplate>().FirstOrDefaultAsync(pt => pt.Name == "Products in Grid or Lines") ?? throw new Exception("Category template cannot be loaded");
 
         async Task<Category> createCategory(SampleCategory sample, int parentCategoryId = 0)
         {
+			_logger.LogDebug(">>> Entering createCategory(sample={Sample},parentCategoryId={ParentCategoryId})", sample, parentCategoryId);
             var category = new Category
             {
                 Name = sample.Name,
@@ -1372,10 +1414,15 @@ public partial class InstallationService
                 return category;
 
             category.PriceRangeFiltering = true;
+			_logger.LogDebug("createCategory(sample={Sample},parentCategoryId={ParentCategoryId}): category.PriceRangeFiltering → {Arg2}", sample, parentCategoryId, category.PriceRangeFiltering);
+			_logger.LogDebug("createCategory(sample={Sample},parentCategoryId={ParentCategoryId}): category.ManuallyPriceRange → {Arg2}", sample, parentCategoryId, category.ManuallyPriceRange);
+			_logger.LogDebug("createCategory(sample={Sample},parentCategoryId={ParentCategoryId}): category.PriceFrom → {Arg2}", sample, parentCategoryId, category.PriceFrom);
+			_logger.LogDebug("createCategory(sample={Sample},parentCategoryId={ParentCategoryId}): category.PriceTo → {Arg2}", sample, parentCategoryId, category.PriceTo);
             category.ManuallyPriceRange = sample.ManuallyPriceRange;
             category.PriceFrom = sample.PriceFrom;
             category.PriceTo = sample.PriceTo;
 
+			_logger.LogDebug("<<< Exiting createCategory(sample={Sample},parentCategoryId={ParentCategoryId})", sample, parentCategoryId);
             return category;
         }
 
@@ -1384,8 +1431,10 @@ public partial class InstallationService
 
         async Task saveCategory(SampleCategory sampleCategory, int parentCategoryId = 0)
         {
+			_logger.LogDebug(">>> Entering saveCategory(sampleCategory={SampleCategory},parentCategoryId={ParentCategoryId})", sampleCategory, parentCategoryId);
             var category = await createCategory(sampleCategory, parentCategoryId);
             allCategories.Add(category);
+			_logger.LogDebug("saveCategory(sampleCategory={SampleCategory},parentCategoryId={ParentCategoryId}): category → {Category}", sampleCategory, parentCategoryId, category);
 
             if (sampleCategory.SubCategories.Any())
             {
@@ -1396,6 +1445,7 @@ public partial class InstallationService
             }
             else
                 categoryToInsert.Add(category);
+				_logger.LogDebug("<<< Exiting saveCategory(sampleCategory={SampleCategory},parentCategoryId={ParentCategoryId})", sampleCategory, parentCategoryId);
         }
 
         foreach (var sampleCategory in sampleCategories)
@@ -1405,6 +1455,7 @@ public partial class InstallationService
 
         //search engine names
         await InsertSearchEngineNamesAsync(allCategories, category => category.Name);
+		_logger.LogDebug("<<< Exiting InstallCategoriesAsync(sampleCategories={SampleCategories})", sampleCategories);
     }
 
     /// <summary>
@@ -1414,11 +1465,13 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallManufacturersAsync(IList<SampleManufacturer> sampleManufacturers)
     {
+		_logger.LogDebug(">>> Entering InstallManufacturersAsync(sampleManufacturers={SampleManufacturers})", sampleManufacturers);
         var manufacturerTemplateInGridAndLines = await Table<ManufacturerTemplate>()
             .FirstOrDefaultAsync(pt => pt.Name == "Products in Grid or Lines") ?? throw new Exception("Manufacturer template cannot be loaded");
 
         async Task<Manufacturer> createManufacturer(SampleManufacturer sampleManufacturer)
         {
+			_logger.LogDebug(">>> Entering createManufacturer(sampleManufacturer={SampleManufacturer})", sampleManufacturer);
             var manufacturer = new Manufacturer
             {
                 Name = sampleManufacturer.Name,
@@ -1437,10 +1490,15 @@ public partial class InstallationService
                 return manufacturer;
 
             manufacturer.PriceRangeFiltering = true;
+			_logger.LogDebug("createManufacturer(sampleManufacturer={SampleManufacturer}): manufacturer.PriceRangeFiltering → {Arg1}", sampleManufacturer, manufacturer.PriceRangeFiltering);
+			_logger.LogDebug("createManufacturer(sampleManufacturer={SampleManufacturer}): manufacturer.ManuallyPriceRange → {Arg1}", sampleManufacturer, manufacturer.ManuallyPriceRange);
+			_logger.LogDebug("createManufacturer(sampleManufacturer={SampleManufacturer}): manufacturer.PriceFrom → {Arg1}", sampleManufacturer, manufacturer.PriceFrom);
+			_logger.LogDebug("createManufacturer(sampleManufacturer={SampleManufacturer}): manufacturer.PriceTo → {Arg1}", sampleManufacturer, manufacturer.PriceTo);
             manufacturer.ManuallyPriceRange = sampleManufacturer.ManuallyPriceRange;
             manufacturer.PriceFrom = sampleManufacturer.PriceFrom;
             manufacturer.PriceTo = sampleManufacturer.PriceTo;
 
+			_logger.LogDebug("<<< Exiting createManufacturer(sampleManufacturer={SampleManufacturer})", sampleManufacturer);
             return manufacturer;
         }
 
@@ -1459,6 +1517,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallForumsAsync(List<SampleForumGroup> sampleForumGroups)
     {
+		_logger.LogDebug(">>> Entering InstallForumsAsync(sampleForumGroups={SampleForumGroups})", sampleForumGroups);
         foreach (var sampleForumGroup in sampleForumGroups)
         {
             var forumGroup = await _dataProvider.InsertEntityAsync(new ForumGroup
@@ -1486,6 +1545,7 @@ public partial class InstallationService
                 UpdatedOnUtc = DateTime.UtcNow
             }));
         }
+		_logger.LogDebug("<<< Exiting InstallForumsAsync(sampleForumGroups={SampleForumGroups})", sampleForumGroups);
     }
 
     /// <summary>
@@ -1495,6 +1555,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallDiscountsAsync(IList<SampleDiscount> sampleDiscounts)
     {
+		_logger.LogDebug(">>> Entering InstallDiscountsAsync(sampleDiscounts={SampleDiscounts})", sampleDiscounts);
         await _dataProvider.BulkInsertEntitiesAsync(sampleDiscounts.Select(sd => new Discount
         {
             IsActive = sd.IsActive,
@@ -1509,6 +1570,7 @@ public partial class InstallationService
             RequiresCouponCode = sd.RequiresCouponCode,
             CouponCode = sd.CouponCode
         }));
+		_logger.LogDebug("<<< Exiting InstallDiscountsAsync(sampleDiscounts={SampleDiscounts})", sampleDiscounts);
     }
 
     /// <summary>
@@ -1518,9 +1580,13 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallBlogPostsAsync(IList<SampleBlogPost> sampleBlogPosts)
     {
+		_logger.LogDebug(">>> Entering InstallBlogPostsAsync(sampleBlogPosts={SampleBlogPosts})", sampleBlogPosts);
         var languageId = await GetDefaultLanguageIdAsync();
         var customerId = await GetDefaultCustomerIdAsync();
+		_logger.LogDebug("InstallBlogPostsAsync(sampleBlogPosts={SampleBlogPosts}): customerId → {CustomerId}", sampleBlogPosts, customerId);
         var storeId = await GetDefaultStoreIdAsync();
+		_logger.LogDebug("InstallBlogPostsAsync(sampleBlogPosts={SampleBlogPosts}): storeId → {StoreId}", sampleBlogPosts, storeId);
+		_logger.LogDebug("InstallBlogPostsAsync(sampleBlogPosts={SampleBlogPosts}): languageId → {LanguageId}", sampleBlogPosts, languageId);
 
         var blogPosts = sampleBlogPosts.ToDictionary(sbp => new BlogPost
         {
@@ -1545,6 +1611,7 @@ public partial class InstallationService
             StoreId = storeId,
             CreatedOnUtc = DateTime.UtcNow
         })));
+		_logger.LogDebug("<<< Exiting InstallBlogPostsAsync(sampleBlogPosts={SampleBlogPosts})", sampleBlogPosts);
     }
 
     /// <summary>
@@ -1554,9 +1621,13 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallNewsAsync(IList<SampleNewsItem> sampleNewsItems)
     {
+		_logger.LogDebug(">>> Entering InstallNewsAsync(sampleNewsItems={SampleNewsItems})", sampleNewsItems);
         var languageId = await GetDefaultLanguageIdAsync();
         var customerId = await GetDefaultCustomerIdAsync();
+		_logger.LogDebug("InstallNewsAsync(sampleNewsItems={SampleNewsItems}): customerId → {CustomerId}", sampleNewsItems, customerId);
         var storeId = await GetDefaultStoreIdAsync();
+		_logger.LogDebug("InstallNewsAsync(sampleNewsItems={SampleNewsItems}): storeId → {StoreId}", sampleNewsItems, storeId);
+		_logger.LogDebug("InstallNewsAsync(sampleNewsItems={SampleNewsItems}): languageId → {LanguageId}", sampleNewsItems, languageId);
 
         var news = sampleNewsItems.ToDictionary(sni => new NewsItem
         {
@@ -1582,6 +1653,7 @@ public partial class InstallationService
             StoreId = storeId,
             CreatedOnUtc = DateTime.UtcNow
         })));
+		_logger.LogDebug("<<< Exiting InstallNewsAsync(sampleNewsItems={SampleNewsItems})", sampleNewsItems);
     }
 
     /// <summary>
@@ -1591,8 +1663,10 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallPollsAsync(IList<SamplePoll> samplePolls)
     {
+		_logger.LogDebug(">>> Entering InstallPollsAsync(samplePolls={SamplePolls})", samplePolls);
         var languageId = await GetDefaultLanguageIdAsync();
 
+		_logger.LogDebug("InstallPollsAsync(samplePolls={SamplePolls}): languageId → {LanguageId}", samplePolls, languageId);
         var polls = samplePolls.ToDictionary(sp => new Poll
         {
             LanguageId = languageId,
@@ -1613,6 +1687,7 @@ public partial class InstallationService
                 PollId = sp.Key.Id
             }))
         );
+		_logger.LogDebug("<<< Exiting InstallPollsAsync(samplePolls={SamplePolls})", samplePolls);
     }
 
     /// <summary>
@@ -1650,6 +1725,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallWarehousesAsync(IList<SampleWarehouse> sampleWarehouses)
     {
+		_logger.LogDebug(">>> Entering InstallWarehousesAsync(sampleWarehouses={SampleWarehouses})", sampleWarehouses);
         var warehouses = await sampleWarehouses.ToDictionaryAwaitAsync(
             async sw => await CreateAddressAsync(sw), sw => new ValueTask<SampleWarehouse>(Task.FromResult(sw)));
 
@@ -1659,6 +1735,7 @@ public partial class InstallationService
             AddressId = w.Key.Id,
             Name = w.Value.Name
         }));
+		_logger.LogDebug("<<< Exiting InstallWarehousesAsync(sampleWarehouses={SampleWarehouses})", sampleWarehouses);
     }
 
     /// <summary>
@@ -1668,6 +1745,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallVendorsAsync(IList<SampleVendor> sampleVendors)
     {
+		_logger.LogDebug(">>> Entering InstallVendorsAsync(sampleVendors={SampleVendors})", sampleVendors);
         var vendors = sampleVendors.Select(sv => new Vendor
         {
             Name = sv.Name,
@@ -1687,6 +1765,7 @@ public partial class InstallationService
 
         await _dataProvider.BulkInsertEntitiesAsync(vendors);
         await InsertSearchEngineNamesAsync(vendors, vendor => vendor.Name);
+		_logger.LogDebug("<<< Exiting InstallVendorsAsync(sampleVendors={SampleVendors})", sampleVendors);
     }
 
     /// <summary>
@@ -1696,6 +1775,7 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallAffiliatesAsync(IList<SampleAffiliate> sampleAffiliates)
     {
+		_logger.LogDebug(">>> Entering InstallAffiliatesAsync(sampleAffiliates={SampleAffiliates})", sampleAffiliates);
         var affiliates = await sampleAffiliates.ToDictionaryAwaitAsync(
             async sa => await CreateAddressAsync(sa), sa => new ValueTask<SampleAffiliate>(Task.FromResult(sa)));
 
@@ -1706,6 +1786,7 @@ public partial class InstallationService
             Active = a.Value.Active,
             AddressId = a.Key.Id
         }));
+		_logger.LogDebug("<<< Exiting InstallAffiliatesAsync(sampleAffiliates={SampleAffiliates})", sampleAffiliates);
     }
 
     /// <summary>
@@ -1715,13 +1796,18 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallOrdersAsync(IList<SampleOrder> sampleOrders)
     {
+		_logger.LogDebug(">>> Entering InstallOrdersAsync(sampleOrders={SampleOrders})", sampleOrders);
         var languageId = await GetDefaultLanguageIdAsync();
         var defaultStoreId = await GetDefaultStoreIdAsync();
+		_logger.LogDebug("InstallOrdersAsync(sampleOrders={SampleOrders}): defaultStoreId → {DefaultStoreId}", sampleOrders, defaultStoreId);
+		_logger.LogDebug("InstallOrdersAsync(sampleOrders={SampleOrders}): languageId → {LanguageId}", sampleOrders, languageId);
 
         var customers = Table<Customer>().AsEnumerable().GroupBy(p => p.Email, p => p).ToDictionary(p => p.Key, p => p.First());
 
         static Address cloneAddress(Address address)
         {
+			_logger.LogDebug(">>> Entering cloneAddress(address={Address})", address);
+			_logger.LogDebug("<<< Exiting cloneAddress(address={Address})", address);
             return new Address
             {
                 FirstName = address.FirstName,
@@ -1873,6 +1959,7 @@ public partial class InstallationService
         await _dataProvider.BulkInsertEntitiesAsync(orders.SelectMany(o =>
             o.Value.OrderNotes.Select(note =>
                 new OrderNote { CreatedOnUtc = DateTime.UtcNow, Note = note, OrderId = o.Key.Id })));
+				_logger.LogDebug("<<< Exiting InstallOrdersAsync(sampleOrders={SampleOrders})", sampleOrders);
     }
 
     /// <summary>
@@ -1882,8 +1969,10 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallActivityLogsAsync(IList<SampleActivityLog> sampleActivityLogs)
     {
+		_logger.LogDebug(">>> Entering InstallActivityLogsAsync(sampleActivityLogs={SampleActivityLogs})", sampleActivityLogs);
         var customerId = await GetDefaultCustomerIdAsync();
 
+		_logger.LogDebug("InstallActivityLogsAsync(sampleActivityLogs={SampleActivityLogs}): customerId → {CustomerId}", sampleActivityLogs, customerId);
         await _dataProvider.BulkInsertEntitiesAsync(await sampleActivityLogs.SelectAwait(async sal => new ActivityLog
         {
             ActivityLogTypeId = await GetFirstEntityIdAsync<ActivityLogType>(alt => alt.SystemKeyword == sal.ActivityLogType) ?? throw new Exception($"Cannot load LogType: {sal.ActivityLogType}"),
@@ -1891,6 +1980,7 @@ public partial class InstallationService
             CreatedOnUtc = DateTime.UtcNow,
             CustomerId = customerId,
             IpAddress = sal.IpAddress
+			_logger.LogDebug("<<< Exiting InstallActivityLogsAsync(sampleActivityLogs={SampleActivityLogs})", sampleActivityLogs);
         }).ToListAsync());
     }
 
@@ -1901,14 +1991,17 @@ public partial class InstallationService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InstallSearchTermsAsync(IList<SampleSearchTerm> sampleSearchTerms)
     {
+		_logger.LogDebug(">>> Entering InstallSearchTermsAsync(sampleSearchTerms={SampleSearchTerms})", sampleSearchTerms);
         var storeId = await GetDefaultStoreIdAsync();
 
+		_logger.LogDebug("InstallSearchTermsAsync(sampleSearchTerms={SampleSearchTerms}): storeId → {StoreId}", sampleSearchTerms, storeId);
         await _dataProvider.BulkInsertEntitiesAsync(sampleSearchTerms.Select(sst => new SearchTerm
         {
             Count = sst.Count,
             Keyword = sst.Keyword,
             StoreId = storeId
         }));
+		_logger.LogDebug("<<< Exiting InstallSearchTermsAsync(sampleSearchTerms={SampleSearchTerms})", sampleSearchTerms);
     }
 
     #endregion

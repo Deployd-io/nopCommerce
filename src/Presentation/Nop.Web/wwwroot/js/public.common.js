@@ -1,37 +1,48 @@
-﻿/*
+﻿const logger = console;
+/*
 ** nopCommerce custom js functions
 */
 
 
 
 function OpenWindow(query, w, h, scroll) {
+	logger.debug(`>>> Entering OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll})`);
     var l = (screen.width - w) / 2;
     var t = (screen.height - h) / 2;
+	logger.debug(`OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll}): l → ${l}`);
+	logger.debug(`OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll}): t → ${t}`);
 
     winprops = 'resizable=0, height=' + h + ',width=' + w + ',top=' + t + ',left=' + l + 'w';
     if (scroll) winprops += ',scrollbars=1';
     var f = window.open(query, "_blank", winprops);
+	logger.debug(`<<< Exiting OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll})`);
 }
 
 function setLocation(url) {
+	logger.debug(`>>> Entering setLocation(url=${url})`);
     window.location.href = url;
+	logger.debug(`<<< Exiting setLocation(url=${url})`);
 }
 
 function displayAjaxLoading(display) {
+	logger.debug(`>>> Entering displayAjaxLoading(display=${display})`);
     if (display) {
         $('.ajax-loading-block-window').show();
     }
     else {
         $('.ajax-loading-block-window').hide('slow');
+		logger.debug(`<<< Exiting displayAjaxLoading(display=${display})`);
     }
 }
 
 function displayPopupNotification(message, messagetype, modal) {
+	logger.debug(`>>> Entering displayPopupNotification(message=${message},messagetype=${messagetype},modal=${modal})`);
     //types: success, error, warning
     var container;
     if (messagetype == 'success') {
         //success
         container = $('#dialog-notifications-success');
+		logger.debug(`<<< Exiting displayPopupNotification(message=${message},messagetype=${messagetype},modal=${modal})`);
     }
     else if (messagetype == 'error') {
         //error
@@ -65,10 +76,13 @@ function displayPopupNotification(message, messagetype, modal) {
     });
 }
 function displayJoinedPopupNotifications(notes) {
+	logger.debug(`>>> Entering displayJoinedPopupNotifications(notes=${notes})`);
     if (Object.keys(notes).length === 0) return;
 
     var container = $('#dialog-notifications-success');
+	logger.debug(`displayJoinedPopupNotifications(notes=${notes}): container → ${container}`);
     var htmlcode = document.createElement('div');
+	logger.debug(`displayJoinedPopupNotifications(notes=${notes}): htmlcode → ${htmlcode}`);
 
     for (var note in notes) {
         if (notes.hasOwnProperty(note)) {
@@ -76,8 +90,10 @@ function displayJoinedPopupNotifications(notes) {
 
             for (var i = 0; i < messages.length; ++i) {
                 var elem = document.createElement("div");
+				logger.debug(`displayJoinedPopupNotifications(notes=${notes}): elem → ${elem}`);
                 elem.innerHTML = messages[i];
                 elem.classList.add('popup-notification');
+				logger.debug(`displayJoinedPopupNotifications(notes=${notes}): elem.innerHTML → ${elem.innerHTML}`);
                 elem.classList.add(note);
 
                 htmlcode.append(elem);
@@ -85,6 +101,7 @@ function displayJoinedPopupNotifications(notes) {
         }
     }
 
+	logger.debug(`<<< Exiting displayJoinedPopupNotifications(notes=${notes})`);
     container.html(htmlcode);
     container.dialog({
         width: 350,
@@ -92,10 +109,14 @@ function displayJoinedPopupNotifications(notes) {
     });
 }
 function displayPopupContentFromUrl(url, title, modal, width) {
+	logger.debug(`>>> Entering displayPopupContentFromUrl(url=${url},title=${title},modal=${modal},width=${width})`);
     var isModal = (modal ? true : false);
     var targetWidth = (width ? width : 550);
+	logger.debug(`displayPopupContentFromUrl(url=${url},title=${title},modal=${modal},width=${width}): isModal → ${isModal}`);
+	logger.debug(`displayPopupContentFromUrl(url=${url},title=${title},modal=${modal},width=${width}): targetWidth → ${targetWidth}`);
     var maxHeight = $(window).height() - 20;
 
+	logger.debug(`displayPopupContentFromUrl(url=${url},title=${title},modal=${modal},width=${width}): maxHeight → ${maxHeight}`);
     $('<div></div>').load(url)
         .dialog({
             modal: isModal,
@@ -103,20 +124,25 @@ function displayPopupContentFromUrl(url, title, modal, width) {
             maxHeight: maxHeight,
             title: title,
             close: function(event, ui) {
+				logger.debug(`>>> Entering close(event=${event},ui=${ui})`);
                 $(this).dialog('destroy').remove();
+				logger.debug(`<<< Exiting close(event=${event},ui=${ui})`);
             }
         });
 }
 
 function displayBarNotification(message, messagetype, timeout) {
+	logger.debug(`>>> Entering displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout})`);
     var notificationTimeout;
 
     var messages = typeof message === 'string' ? [message] : message;
+	logger.debug(`displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout}): messages → ${messages}`);
     if (messages.length === 0)
         return;
 
     //types: success, error, warning
     var cssclass = ['success', 'error', 'warning'].indexOf(messagetype) !== -1 ? messagetype : 'success';
+	logger.debug(`displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout}): cssclass → ${cssclass}`);
 
     //remove previous CSS classes and notifications
     $('#bar-notification')
@@ -127,6 +153,7 @@ function displayBarNotification(message, messagetype, timeout) {
 
     //add new notifications
     var htmlcode = document.createElement('div');
+	logger.debug(`displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout}): htmlcode → ${htmlcode}`);
 
     //IE11 Does not support miltiple parameters for the add() & remove() methods
     htmlcode.classList.add('bar-notification', cssclass);
@@ -139,8 +166,10 @@ function displayBarNotification(message, messagetype, timeout) {
 
     for (var i = 0; i < messages.length; i++) {
         var content = document.createElement('p');
+		logger.debug(`displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout}): content → ${content}`);
         content.classList.add('content');
         content.innerHTML = messages[i];
+		logger.debug(`displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout}): content.innerHTML → ${content.innerHTML}`);
 
       htmlcode.appendChild(content);
     }
@@ -153,12 +182,15 @@ function displayBarNotification(message, messagetype, timeout) {
     $(htmlcode)
         .fadeIn('slow')
         .on('mouseenter', function() {
+			logger.debug('>>> Entering on()');
             clearTimeout(notificationTimeout);
         });
 
     //callback for notification removing
     var removeNoteItem = function () {
+		logger.debug('>>> Entering removeNoteItem()');
         $(htmlcode).remove();
+		logger.debug('<<< Exiting removeNoteItem()');
     };
 
     $(close).on('click', function () {
@@ -168,28 +200,37 @@ function displayBarNotification(message, messagetype, timeout) {
     //timeout (if set)
     if (timeout > 0) {
         notificationTimeout = setTimeout(function () {
+			logger.debug(`>>> Entering setTimeout(timeout=${timeout})`);
             $(htmlcode).fadeOut('slow', removeNoteItem);
+			logger.debug(`<<< Exiting setTimeout(timeout=${timeout})`);
         }, timeout);
     }
+	logger.debug(`<<< Exiting displayBarNotification(message=${message},messagetype=${messagetype},timeout=${timeout})`);
 }
 
 function htmlEncode(value) {
+	logger.debug(`>>> Entering htmlEncode(value=${value})`);
+	logger.debug(`<<< Exiting htmlEncode(value=${value})`);
     return $('<div/>').text(value).html();
 }
 
 function htmlDecode(value) {
+	logger.debug(`>>> Entering htmlDecode(value=${value})`);
+	logger.debug(`<<< Exiting htmlDecode(value=${value})`);
     return $('<div/>').html(value).text();
 }
 
 
 // CSRF (XSRF) security
 function addAntiForgeryToken(data) {
+	logger.debug(`>>> Entering addAntiForgeryToken(data=${data})`);
     //if the object is undefined, create a new one.
     if (!data) {
         data = {};
     }
     //add token
     var tokenInput = $('input[name=__RequestVerificationToken]');
+	logger.debug(`addAntiForgeryToken(data=${data}): data → ${data}`);
     if (tokenInput.length) {
         data.__RequestVerificationToken = tokenInput.val();
     }

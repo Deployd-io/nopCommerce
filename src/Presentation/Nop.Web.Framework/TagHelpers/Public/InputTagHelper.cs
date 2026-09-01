@@ -1,5 +1,6 @@
 ﻿﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
 
  namespace Nop.Web.Framework.TagHelpers.Public; 
 
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
  [HtmlTargetElement("input", Attributes = FOR_ATTRIBUTE_NAME)]
  public partial class InputTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.InputTagHelper
  {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
      #region Constants
 
      protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -20,6 +22,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 
      public InputTagHelper(IHtmlGenerator generator) : base(generator)
      {
+	_logger.LogDebug(">>> Entering InputTagHelper(generator={Generator})", generator);
      }
 
      #endregion
@@ -34,6 +37,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
      /// <returns>A task that represents the asynchronous operation</returns>
      public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
      {
+		_logger.LogDebug(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
          ArgumentNullException.ThrowIfNull(context);
 
          ArgumentNullException.ThrowIfNull(output);
@@ -48,6 +52,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
          }
          catch
          {
+			_logger.LogError("Exception in ProcessAsync(context={Context},output={Output}): {Arg2}", context, output, ex.Message);
              //If the passed values differ in data type according to the model, we should try to initialize the component with a default value. 
              //If this is not possible, then we suppress the generation of html for this imput.
              try
@@ -60,6 +65,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
                  output.SuppressOutput();
              }
          }
+		_logger.LogDebug("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
      }
 
      #endregion

@@ -28,9 +28,13 @@ public partial class DefaultLogger : ILogger
         IRepository<Log> logRepository,
         IWebHelper webHelper)
     {
+		DefaultLogger.LogDebug(">>> Entering DefaultLogger(commonSettings={CommonSettings},customerSettings={CustomerSettings},logRepository={LogRepository},webHelper={WebHelper})", commonSettings, customerSettings, logRepository, webHelper);
         _commonSettings = commonSettings;
+		DefaultLogger.LogDebug("DefaultLogger(commonSettings={CommonSettings},customerSettings={CustomerSettings},logRepository={LogRepository},webHelper={WebHelper}): _commonSettings → {_commonSettings}", commonSettings, customerSettings, logRepository, webHelper, _commonSettings);
         _customerSettings = customerSettings;
+		DefaultLogger.LogDebug("DefaultLogger(commonSettings={CommonSettings},customerSettings={CustomerSettings},logRepository={LogRepository},webHelper={WebHelper}): _customerSettings → {_customerSettings}", commonSettings, customerSettings, logRepository, webHelper, _customerSettings);
         _logRepository = logRepository;
+		DefaultLogger.LogDebug("DefaultLogger(commonSettings={CommonSettings},customerSettings={CustomerSettings},logRepository={LogRepository},webHelper={WebHelper}): _logRepository → {_logRepository}", commonSettings, customerSettings, logRepository, webHelper, _logRepository);
         _webHelper = webHelper;
     }
 
@@ -45,6 +49,7 @@ public partial class DefaultLogger : ILogger
     /// <returns>Result</returns>
     protected virtual bool IgnoreLog(string message)
     {
+		DefaultLogger.LogDebug(">>> Entering IgnoreLog(message={Message})", message);
         if (!_commonSettings.IgnoreLogWordlist.Any())
             return false;
 
@@ -66,6 +71,8 @@ public partial class DefaultLogger : ILogger
     /// <returns>Log item</returns>
     protected virtual Log PrepareLog(LogLevel logLevel, string shortMessage, string fullMessage = "", Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering PrepareLog(logLevel={LogLevel},shortMessage={ShortMessage},fullMessage={FullMessage},customer={Customer})", logLevel, shortMessage, fullMessage, customer);
+		DefaultLogger.LogDebug("<<< Exiting PrepareLog(logLevel={LogLevel},shortMessage={ShortMessage},fullMessage={FullMessage},customer={Customer})", logLevel, shortMessage, fullMessage, customer);
         return new Log
         {
             LogLevel = logLevel,
@@ -90,6 +97,9 @@ public partial class DefaultLogger : ILogger
     /// <returns>Result</returns>
     public virtual bool IsEnabled(LogLevel level)
     {
+		DefaultLogger.LogDebug(">>> Entering IsEnabled(level={Level})", level);
+		DefaultLogger.LogDebug("IsEnabled(level={Level}): LogLevel.Debug → {Arg1}", level, LogLevel.Debug);
+		DefaultLogger.LogDebug("<<< Exiting IsEnabled(level={Level})", level);
         return level switch
         {
             LogLevel.Debug => false,
@@ -104,8 +114,12 @@ public partial class DefaultLogger : ILogger
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLogAsync(Log log)
     {
+		DefaultLogger.LogDebug(">>> Entering DeleteLogAsync(log={Log})", log);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(log);
 
+		DefaultLogger.LogInformation("DeleteLogAsync(log)={Log}: external service call took {Arg1} ms", log, __logStart.ElapsedMilliseconds);
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
         await _logRepository.DeleteAsync(log, false);
     }
 
@@ -116,6 +130,7 @@ public partial class DefaultLogger : ILogger
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteLogsAsync(IList<Log> logs)
     {
+		DefaultLogger.LogDebug(">>> Entering DeleteLogsAsync(logs={Logs})", logs);
         await _logRepository.DeleteAsync(logs, false);
     }
 
@@ -126,6 +141,8 @@ public partial class DefaultLogger : ILogger
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ClearLogAsync(DateTime? olderThan = null)
     {
+		DefaultLogger.LogDebug(">>> Entering ClearLogAsync(olderThan={OlderThan})", olderThan);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (olderThan == null)
             await _logRepository.TruncateAsync();
         else
@@ -151,6 +168,7 @@ public partial class DefaultLogger : ILogger
     {
         var logs = await _logRepository.GetAllPagedAsync(query =>
         {
+			DefaultLogger.LogDebug(">>> Entering GetAllLogsAsync(fromUtc={FromUtc},toUtc={ToUtc},message={Message},logLevel={LogLevel},pageIndex={PageIndex},pageSize={PageSize})", fromUtc, toUtc, message, logLevel, pageIndex, pageSize);
             if (fromUtc.HasValue)
                 query = query.Where(l => fromUtc.Value <= l.CreatedOnUtc);
             if (toUtc.HasValue)
@@ -158,6 +176,7 @@ public partial class DefaultLogger : ILogger
             if (logLevel.HasValue)
             {
                 var logLevelId = (int)logLevel.Value;
+				DefaultLogger.LogDebug("GetAllLogsAsync(fromUtc={FromUtc},toUtc={ToUtc},message={Message},logLevel={LogLevel},pageIndex={PageIndex},pageSize={PageSize}): logLevelId → {LogLevelId}", fromUtc, toUtc, message, logLevel, pageIndex, pageSize, logLevelId);
                 query = query.Where(l => logLevelId == l.LogLevelId);
             }
 
@@ -181,6 +200,7 @@ public partial class DefaultLogger : ILogger
     /// </returns>
     public virtual async Task<Log> GetLogByIdAsync(int logId)
     {
+		DefaultLogger.LogDebug(">>> Entering GetLogByIdAsync(logId={LogId})", logId);
         return await _logRepository.GetByIdAsync(logId);
     }
 
@@ -194,6 +214,7 @@ public partial class DefaultLogger : ILogger
     /// </returns>
     public virtual async Task<IList<Log>> GetLogByIdsAsync(int[] logIds)
     {
+		DefaultLogger.LogDebug(">>> Entering GetLogByIdsAsync(logIds={LogIds})", logIds);
         return await _logRepository.GetByIdsAsync(logIds);
     }
 
@@ -209,11 +230,15 @@ public partial class DefaultLogger : ILogger
     /// </returns>
     public virtual async Task InsertLogAsync(LogLevel logLevel, string shortMessage, string fullMessage = "", Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering InsertLogAsync(logLevel={LogLevel},shortMessage={ShortMessage},fullMessage={FullMessage},customer={Customer})", logLevel, shortMessage, fullMessage, customer);
         //check ignore word/phrase list?
         if (IgnoreLog(shortMessage) || IgnoreLog(fullMessage))
             return;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         await _logRepository.InsertAsync(PrepareLog(logLevel, shortMessage, fullMessage, customer), false);
+		DefaultLogger.LogInformation("InsertLogAsync(logLevel,shortMessage,fullMessage,customer)={LogLevel},{ShortMessage},{FullMessage},{Customer}: save query executed in {Arg4} ms", logLevel, shortMessage, fullMessage, customer, __logStart.ElapsedMilliseconds);
+		DefaultLogger.LogDebug("<<< Exiting InsertLogAsync(logLevel={LogLevel},shortMessage={ShortMessage},fullMessage={FullMessage},customer={Customer})", logLevel, shortMessage, fullMessage, customer);
     }
 
     /// <summary>
@@ -225,11 +250,14 @@ public partial class DefaultLogger : ILogger
     /// <param name="customer">The customer to associate log record with</param>
     public virtual void InsertLog(LogLevel logLevel, string shortMessage, string fullMessage = "", Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering InsertLog(logLevel={LogLevel},shortMessage={ShortMessage},fullMessage={FullMessage},customer={Customer})", logLevel, shortMessage, fullMessage, customer);
         //check ignore word/phrase list?
         if (IgnoreLog(shortMessage) || IgnoreLog(fullMessage))
             return;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         
         _logRepository.Insert(PrepareLog(logLevel, shortMessage, fullMessage, customer), false);
+		DefaultLogger.LogInformation("InsertLog(logLevel,shortMessage,fullMessage,customer)={LogLevel},{ShortMessage},{FullMessage},{Customer}: save query executed in {Arg4} ms", logLevel, shortMessage, fullMessage, customer, __logStart.ElapsedMilliseconds);
     }
 
     /// <summary>
@@ -241,12 +269,14 @@ public partial class DefaultLogger : ILogger
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InformationAsync(string message, Exception exception = null, Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering InformationAsync(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
         //don't log thread abort exception
         if (exception is ThreadAbortException)
             return;
 
         if (IsEnabled(LogLevel.Information))
             await InsertLogAsync(LogLevel.Information, message, exception?.ToString() ?? string.Empty, customer);
+			DefaultLogger.LogDebug("<<< Exiting InformationAsync(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
     }
 
     /// <summary>
@@ -257,6 +287,7 @@ public partial class DefaultLogger : ILogger
     /// <param name="customer">Customer</param>
     public virtual void Information(string message, Exception exception = null, Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering Information(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
         //don't log thread abort exception
         if (exception is ThreadAbortException)
             return;
@@ -274,12 +305,14 @@ public partial class DefaultLogger : ILogger
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task WarningAsync(string message, Exception exception = null, Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering WarningAsync(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
         //don't log thread abort exception
         if (exception is ThreadAbortException)
             return;
 
         if (IsEnabled(LogLevel.Warning))
             await InsertLogAsync(LogLevel.Warning, message, exception?.ToString() ?? string.Empty, customer);
+			DefaultLogger.LogDebug("<<< Exiting WarningAsync(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
     }
 
     /// <summary>
@@ -290,6 +323,7 @@ public partial class DefaultLogger : ILogger
     /// <param name="customer">Customer</param>
     public virtual void Warning(string message, Exception exception = null, Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering Warning(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
         //don't log thread abort exception
         if (exception is ThreadAbortException)
             return;
@@ -307,12 +341,14 @@ public partial class DefaultLogger : ILogger
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ErrorAsync(string message, Exception exception = null, Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering ErrorAsync(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
         //don't log thread abort exception
         if (exception is ThreadAbortException)
             return;
 
         if (IsEnabled(LogLevel.Error))
             await InsertLogAsync(LogLevel.Error, message, exception?.ToString() ?? string.Empty, customer);
+			DefaultLogger.LogDebug("<<< Exiting ErrorAsync(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
     }
 
     /// <summary>
@@ -323,6 +359,7 @@ public partial class DefaultLogger : ILogger
     /// <param name="customer">Customer</param>
     public virtual void Error(string message, Exception exception = null, Customer customer = null)
     {
+		DefaultLogger.LogDebug(">>> Entering Error(message={Message},exception={Exception},customer={Customer})", message, exception, customer);
         //don't log thread abort exception
         if (exception is ThreadAbortException)
             return;

@@ -1,6 +1,7 @@
 ﻿using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -9,11 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record OrderSettingsModel : BaseNopModel, ISettingsModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OrderSettingsModel()
     {
+		_logger.LogDebug(">>> Entering OrderSettingsModel()");
         ReturnRequestReasonSearchModel = new ReturnRequestReasonSearchModel();
+		_logger.LogDebug("OrderSettingsModel(): ReturnRequestReasonSearchModel → {ReturnRequestReasonSearchModel}", ReturnRequestReasonSearchModel);
         ReturnRequestActionSearchModel = new ReturnRequestActionSearchModel();
     }
 

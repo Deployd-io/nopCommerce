@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Logging;
 
@@ -10,11 +11,14 @@ namespace Nop.Web.Areas.Admin.Models.Logging;
 /// </summary>
 public partial record ActivityLogSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ActivityLogSearchModel()
     {
+		_logger.LogDebug(">>> Entering ActivityLogSearchModel()");
         ActivityLogType = new List<SelectListItem>();
+		_logger.LogDebug("ActivityLogSearchModel(): ActivityLogType → {ActivityLogType}", ActivityLogType);
     }
 
     #endregion

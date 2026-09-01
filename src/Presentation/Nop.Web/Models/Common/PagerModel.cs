@@ -1,10 +1,12 @@
 ﻿using Nop.Services.Localization;
 using Nop.Web.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Common;
 
 public partial record PagerModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -27,7 +29,9 @@ public partial record PagerModel
 
     public PagerModel(ILocalizationService localizationService)
     {
+		_logger.LogDebug(">>> Entering PagerModel(localizationService={LocalizationService})", localizationService);
         _localizationService = localizationService;
+		_logger.LogDebug("PagerModel(localizationService={LocalizationService}): _localizationService → {_localizationService}", localizationService, _localizationService);
     }
 
     #endregion
@@ -40,6 +44,7 @@ public partial record PagerModel
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetFirstButtonTextAsync()
     {
+		_logger.LogDebug(">>> Entering GetFirstButtonTextAsync()");
         return await _localizationService.GetResourceAsync("Pager.First");
     }
 
@@ -49,6 +54,7 @@ public partial record PagerModel
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetLastButtonTextAsync()
     {
+		_logger.LogDebug(">>> Entering GetLastButtonTextAsync()");
         return await _localizationService.GetResourceAsync("Pager.Last");
     }
 
@@ -58,6 +64,7 @@ public partial record PagerModel
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetNextButtonTextAsync()
     {
+		_logger.LogDebug(">>> Entering GetNextButtonTextAsync()");
         return await _localizationService.GetResourceAsync("Pager.Next");
     }
 
@@ -67,6 +74,7 @@ public partial record PagerModel
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetPreviousButtonTextAsync()
     {
+		_logger.LogDebug(">>> Entering GetPreviousButtonTextAsync()");
         return await _localizationService.GetResourceAsync("Pager.Previous");
     }
 
@@ -76,6 +84,7 @@ public partial record PagerModel
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetCurrentPageTextAsync()
     {
+		_logger.LogDebug(">>> Entering GetCurrentPageTextAsync()");
         return await _localizationService.GetResourceAsync("Pager.CurrentPage");
     }
 
@@ -85,6 +94,7 @@ public partial record PagerModel
     /// <returns>Page index</returns>
     public int GetFirstIndividualPageIndex()
     {
+		_logger.LogDebug(">>> Entering GetFirstIndividualPageIndex()");
         if ((TotalPages < IndividualPagesDisplayedCount) ||
             ((PageIndex - (IndividualPagesDisplayedCount / 2)) < 0))
             return 0;
@@ -101,6 +111,7 @@ public partial record PagerModel
     /// <returns>Page index</returns>
     public virtual int GetLastIndividualPageIndex()
     {
+		_logger.LogDebug(">>> Entering GetLastIndividualPageIndex()");
         var num = IndividualPagesDisplayedCount / 2;
         if ((IndividualPagesDisplayedCount % 2) == 0) 
             num--;

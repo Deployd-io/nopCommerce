@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Core;
 using Nop.Data;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class ValidateVendorAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -19,7 +21,9 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public ValidateVendorAttribute(bool ignore = false) : base(typeof(ValidateVendorFilter))
     {
+		_logger.LogDebug(">>> Entering ValidateVendorAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
+		_logger.LogDebug("ValidateVendorAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
         Arguments = [ignore];
     }
 
@@ -41,6 +45,7 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
     /// </summary>
     private class ValidateVendorFilter : IAsyncAuthorizationFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly bool _ignoreFilter;
@@ -53,8 +58,11 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
 
         public ValidateVendorFilter(bool ignoreFilter, IWorkContext workContext, ICustomerService customerService)
         {
+			_logger.LogDebug(">>> Entering ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService})", ignoreFilter, workContext, customerService);
             _ignoreFilter = ignoreFilter;
+			_logger.LogDebug("ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService}): _ignoreFilter → {_ignoreFilter}", ignoreFilter, workContext, customerService, _ignoreFilter);
             _customerService = customerService;
+			_logger.LogDebug("ValidateVendorFilter(ignoreFilter={IgnoreFilter},workContext={WorkContext},customerService={CustomerService}): _customerService → {_customerService}", ignoreFilter, workContext, customerService, _customerService);
             _workContext = workContext;
         }
 
@@ -69,6 +77,7 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidateVendorAsync(AuthorizationFilterContext context)
         {
+			_logger.LogDebug(">>> Entering ValidateVendorAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -87,13 +96,16 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
 
             //whether current customer is vendor
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogDebug("ValidateVendorAsync(context={Context}): customer → {Customer}", context, customer);
             if (!await _customerService.IsVendorAsync(customer))
                 return;
 
             //ensure that this user has active vendor record associated
             var vendor = await _workContext.GetCurrentVendorAsync();
+			_logger.LogDebug("ValidateVendorAsync(context={Context}): vendor → {Vendor}", context, vendor);
             if (vendor == null)
                 context.Result = new ChallengeResult();
+				_logger.LogDebug("<<< Exiting ValidateVendorAsync(context={Context})", context);
         }
 
         #endregion
@@ -107,7 +119,9 @@ public sealed class ValidateVendorAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogDebug(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await ValidateVendorAsync(context);
+			_logger.LogDebug("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

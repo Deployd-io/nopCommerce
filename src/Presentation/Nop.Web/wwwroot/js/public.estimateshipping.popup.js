@@ -1,4 +1,6 @@
-﻿function createEstimateShippingPopUp(settings) {
+﻿const logger = console;
+function createEstimateShippingPopUp(settings) {
+logger.debug(`>>> Entering createEstimateShippingPopUp(settings=${settings})`);
   var defaultSettings = {
     opener: false,
     form: false,
@@ -25,14 +27,18 @@
     },
 
     init: function () {
+	logger.debug('>>> Entering init()');
       var self = this;
       var $content = $(this.settings.contentEl);
 
       $('.apply-shipping-button', $content).on('click', function () {
+		logger.debug('>>> Entering on()');
         var option = self.getActiveShippingOption();
         if (option && option.provider && option.price) {
+		logger.debug(`on(): option → ${option}`);
           self.selectShippingOption(option);
           self.closePopup();
+		logger.debug('<<< Exiting on()');
         }
       });
 
@@ -41,21 +47,27 @@
         removalDelay: 500,
         callbacks: {
           beforeOpen: function () {
+			logger.debug('>>> Entering beforeOpen()');
             this.st.mainClass = this.st.el.attr('data-effect');
+			logger.debug('<<< Exiting beforeOpen()');
           },
           open: function () {
+			logger.debug('>>> Entering open()');
             if (self.settings.handlers.openPopUp)
               self.settings.handlers.openPopUp();
 
             self.params.displayErrors = true;
+			logger.debug('<<< Exiting open()');
           }
         }
       });
 
       var addressChangedHandler = function () {
+		logger.debug('>>> Entering addressChangedHandler()');
         self.clearShippingOptions();
         var address = self.getShippingAddress();
         self.getShippingOptions(address);
+		logger.debug(`addressChangedHandler(): address → ${address}`);
       };
       $(this.settings.countryEl, $content).on('change', function () {
         $(self.settings.stateProvinceEl, $content).val(0);
@@ -67,18 +79,23 @@
         $(this.settings.cityEl, $content).on('input propertychange paste', addressChangedHandler);
       } else {
         $(this.settings.zipPostalCodeEl, $content).on('input propertychange paste', addressChangedHandler);
+		logger.debug('<<< Exiting init()');
       }
     },
 
     closePopup: function () {
+	logger.debug('>>> Entering closePopup()');
       $.magnificPopup.close();
+	logger.debug('<<< Exiting closePopup()');
     },
     
     getShippingOptions: function (address) {
+	logger.debug(`>>> Entering getShippingOptions(address=${address})`);
       if (!this.validateAddress(address))
         return;
 
       var self = this;
+	logger.debug(`getShippingOptions(address=${address}): self → ${self}`);
 
       self.setLoadWaiting();
 
@@ -86,26 +103,36 @@
         self.settings.handlers.load();
 
       clearTimeout(self.params.delayTimer);
+	logger.debug(`<<< Exiting getShippingOptions(address=${address})`);
       self.params.delayTimer = setTimeout(function () {
+		logger.debug('>>> Entering setTimeout()');
         if (self.params.jqXHR && self.params.jqXHR.readyState !== 4)
           self.params.jqXHR.abort();
 
         var url = self.settings.urlFactory(address);
+		logger.debug(`setTimeout(): url → ${url}`);
         if (url) {
+		logger.debug('<<< Exiting setTimeout()');
           self.params.jqXHR = $.ajax({
             cache: false,
             url: url,
             data: $(self.settings.form).serialize(),
             type: 'POST',
             success: function (response) {
+			logger.debug(`>>> Entering success(response=${response})`);
               self.successHandler(address, response);
+			logger.debug(`<<< Exiting success(response=${response})`);
             },
             error: function (jqXHR, textStatus, errorThrown) {
+			logger.debug(`>>> Entering error(jqXHR=${jqXHR},textStatus=${textStatus},errorThrown=${errorThrown})`);
               self.errorHandler(jqXHR, textStatus, errorThrown);
+			logger.debug(`<<< Exiting error(jqXHR=${jqXHR},textStatus=${textStatus},errorThrown=${errorThrown})`);
             },
             complete: function (jqXHR, textStatus) {
+			logger.debug(`>>> Entering complete(jqXHR=${jqXHR},textStatus=${textStatus})`);
               if (self.settings.handlers.complete)
                 self.settings.handlers.complete(jqXHR, textStatus);
+				logger.debug(`<<< Exiting complete(jqXHR=${jqXHR},textStatus=${textStatus})`);
             }
           });
         }
@@ -113,11 +140,14 @@
     },
 
     setLoadWaiting: function () {
+	logger.debug('>>> Entering setLoadWaiting()');
       this.clearErrorMessage();
       $('.shipping-options-body', $(this.settings.contentEl)).html($('<div/>').addClass('shipping-options-loading'));
+	logger.debug('<<< Exiting setLoadWaiting()');
     },
 
     successHandler: function (address, response) {
+	logger.debug(`>>> Entering successHandler(address=${address},response=${response})`);
       $('.shipping-options-body', $(this.settings.contentEl)).empty();
 
       if (response.Success) {
@@ -129,6 +159,7 @@
           var selectedShippingOption = this.params.selectedShippingOption;
 
           $.each(options, function (i, option) {
+			logger.debug(`>>> Entering each(options=${options})`);
             // try select the shipping option with the same provider and address
             if (option.Selected ||
               (selectedShippingOption &&
@@ -174,6 +205,7 @@
     },
 
     errorHandler: function (jqXHR, textStatus, errorThrown) {
+	logger.debug(`>>> Entering errorHandler(jqXHR=${jqXHR},textStatus=${textStatus},errorThrown=${errorThrown})`);
       if (textStatus === 'abort') return;
 
       this.clearShippingOptions();
@@ -183,12 +215,16 @@
     },
 
     clearErrorMessage: function () {
+	logger.debug('>>> Entering clearErrorMessage()');
       $('.' + this.settings.errorMessageBoxClass, $(this.settings.contentEl)).empty();
+	logger.debug('<<< Exiting clearErrorMessage()');
     },
 
     showErrorMessage: function (errors) {
+	logger.debug(`>>> Entering showErrorMessage(errors=${errors})`);
       if (this.params.displayErrors) {
         var errorMessagesContainer = $('.' + this.settings.errorMessageBoxClass, $(this.settings.contentEl));
+		logger.debug(`showErrorMessage(errors=${errors}): errorMessagesContainer → ${errorMessagesContainer}`);
         $.each(errors, function (i, error) {
           errorMessagesContainer.append($('<div/>').text(error));
         });
@@ -196,6 +232,7 @@
     },
 
     selectShippingOption: function (option) {
+	logger.debug(`>>> Entering selectShippingOption(option=${option})`);
       if (option && option.provider && option.price && this.validateAddress(option.address))
         this.params.selectedShippingOption = option;
 
@@ -225,11 +262,14 @@
       });
 
       $('.shipping-options-body', $(this.settings.contentEl)).append(shippingOption);
+	logger.debug(`<<< Exiting addShippingOption(name=${name},deliveryDate=${deliveryDate},price=${price})`);
     },
 
     clearShippingOptions: function () {
+	logger.debug('>>> Entering clearShippingOptions()');
       var noShippingOptionsMsg = this.settings.localizedData.noShippingOptionsMessage;
       $('.shipping-options-body', $(this.settings.contentEl)).html($('<div/>').addClass('no-shipping-options').text(noShippingOptionsMsg));
+	logger.debug('<<< Exiting clearShippingOptions()');
     },
 
     setActiveShippingOption: function (option) {
@@ -246,6 +286,7 @@
     },
 
     getActiveShippingOption: function () {
+	logger.debug('>>> Entering getActiveShippingOption()');
       var shippingItems = $('.shipping-item', $('.shipping-option.active', $(this.settings.contentEl)));
 
       return {
@@ -254,15 +295,21 @@
         price: shippingItems.eq(2).text().trim(),
         address: this.getShippingAddress()
       };
+	logger.debug('<<< Exiting getActiveShippingOption()');
     },
 
     getShippingAddress: function () {
+	logger.debug('>>> Entering getShippingAddress()');
       var address = {};
       var $content = $(this.settings.contentEl);
       var selectedCountryId = $(this.settings.countryEl, $content).find(':selected');
+	logger.debug(`getShippingAddress(): selectedCountryId → ${selectedCountryId}`);
       var selectedStateProvinceId = $(this.settings.stateProvinceEl, $content).find(':selected');
+	logger.debug(`getShippingAddress(): selectedStateProvinceId → ${selectedStateProvinceId}`);
       var selectedZipPostalCode = $(this.settings.zipPostalCodeEl, $content);
+	logger.debug(`getShippingAddress(): selectedZipPostalCode → ${selectedZipPostalCode}`);
       var selectedCity = $(this.settings.cityEl, $content);
+	logger.debug(`getShippingAddress(): selectedCity → ${selectedCity}`);
 
       if (selectedCountryId && selectedCountryId.val() > 0) {
         address.countryId = selectedCountryId.val();
@@ -282,17 +329,21 @@
         address.city = selectedCity.val();
       }
 
+	logger.debug('<<< Exiting getShippingAddress()');
       return address;
     },
 
     addressesAreEqual: function (address1, address2) {
+	logger.debug(`>>> Entering addressesAreEqual(address1=${address1},address2=${address2})`);
       return address1.countryId === address2.countryId &&
         address1.stateProvinceId === address2.stateProvinceId &&
           (this.settings.useCity || address1.zipPostalCode === address2.zipPostalCode) &&
             (!this.settings.useCity || address1.city === address2.city);
+			logger.debug(`<<< Exiting addressesAreEqual(address1=${address1},address2=${address2})`);
     },
 
     validateAddress: function (address) {
+	logger.debug(`>>> Entering validateAddress(address=${address})`);
       this.clearErrorMessage();
 
       var errors = [];
@@ -310,6 +361,8 @@
       if (errors.length > 0)
         this.showErrorMessage(errors);
 
+	logger.debug(`<<< Exiting validateAddress(address=${address})`);
+	logger.debug(`<<< Exiting createEstimateShippingPopUp(settings=${settings})`);
       return errors.length === 0;
     }
   }
