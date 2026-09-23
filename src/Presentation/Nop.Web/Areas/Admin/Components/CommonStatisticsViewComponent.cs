@@ -3,6 +3,7 @@ using Nop.Core;
 using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Components;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Areas.Admin.Components;
 /// </summary>
 public partial class CommonStatisticsViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICommonModelFactory _commonModelFactory;
@@ -25,8 +27,12 @@ public partial class CommonStatisticsViewComponent : NopViewComponent
         IPermissionService permissionService,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering CommonStatisticsViewComponent(commonModelFactory={CommonModelFactory},permissionService={PermissionService},workContext={WorkContext})", commonModelFactory, permissionService, workContext);
         _commonModelFactory = commonModelFactory;
         _permissionService = permissionService;
+		_logger.LogDebug("CommonStatisticsViewComponent(commonModelFactory={CommonModelFactory},permissionService={PermissionService},workContext={WorkContext}): _permissionService → {_permissionService}", commonModelFactory, permissionService, workContext, _permissionService);
+		_logger.LogDebug("CommonStatisticsViewComponent(commonModelFactory={CommonModelFactory},permissionService={PermissionService},workContext={WorkContext}): _commonModelFactory → {_commonModelFactory}", commonModelFactory, permissionService, workContext, _commonModelFactory);
+    _logger.LogWarning("<<< Exiting CommonStatisticsViewComponent(commonModelFactory={CommonModelFactory},permissionService={PermissionService},workContext={WorkContext})", commonModelFactory, permissionService, workContext);
         _workContext = workContext;
     }
 
@@ -43,6 +49,7 @@ public partial class CommonStatisticsViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		_logger.LogError(">>> Entering InvokeAsync()");
         if (!await _permissionService.AuthorizeAsync(StandardPermission.Customers.CUSTOMERS_VIEW) ||
             !await _permissionService.AuthorizeAsync(StandardPermission.Orders.ORDERS_VIEW) ||
             !await _permissionService.AuthorizeAsync(StandardPermission.Orders.RETURN_REQUESTS_VIEW) ||
@@ -57,7 +64,9 @@ public partial class CommonStatisticsViewComponent : NopViewComponent
 
         //prepare model
         var model = await _commonModelFactory.PrepareCommonStatisticsModelAsync();
+		_logger.LogError("InvokeAsync(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting InvokeAsync()");
         return View(model);
     }
 

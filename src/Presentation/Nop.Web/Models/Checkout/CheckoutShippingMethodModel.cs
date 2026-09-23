@@ -1,14 +1,18 @@
 ﻿using Nop.Core.Domain.Shipping;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Checkout;
 
 public partial record CheckoutShippingMethodModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CheckoutShippingMethodModel()
     {
+		_logger.LogError(">>> Entering CheckoutShippingMethodModel()");
         ShippingMethods = new List<ShippingMethodModel>();
         Warnings = new List<string>();
+		_logger.LogError("CheckoutShippingMethodModel(): Warnings → {Warnings}", Warnings);
     }
 
     public IList<ShippingMethodModel> ShippingMethods { get; set; }

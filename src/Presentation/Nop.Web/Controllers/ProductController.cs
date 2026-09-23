@@ -22,12 +22,14 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Models.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 [AutoValidateAntiforgeryToken]
 public partial class ProductController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -128,6 +130,7 @@ public partial class ProductController : BasePublicController
 
     public virtual async Task<IActionResult> ProductDetails(int productId, int updatecartitemid = 0, int? customwishlistid = null)
     {
+		_logger.LogError(">>> Entering ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid})", productId, updatecartitemid, customwishlistid);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null || product.Deleted)
             return InvokeHttp404();
@@ -144,6 +147,7 @@ public partial class ProductController : BasePublicController
         //Check whether the current user has a "Manage products" permission (usually a store owner)
         //We should allows him (her) to use "Preview" functionality
         var hasAdminAccess = await _permissionService.AuthorizeAsync(StandardPermission.Security.ACCESS_ADMIN_PANEL) && await _permissionService.AuthorizeAsync(StandardPermission.Catalog.PRODUCTS_VIEW);
+		_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): hasAdminAccess → {HasAdminAccess}", productId, updatecartitemid, customwishlistid, hasAdminAccess);
         if (notAvailable && !hasAdminAccess)
             return InvokeHttp404();
 
@@ -152,20 +156,25 @@ public partial class ProductController : BasePublicController
         {
             //is this one an associated products?
             var parentGroupedProduct = await _productService.GetProductByIdAsync(product.ParentGroupedProductId);
+			_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): parentGroupedProduct → {ParentGroupedProduct}", productId, updatecartitemid, customwishlistid, parentGroupedProduct);
             if (parentGroupedProduct == null)
                 return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
             var productUrl = await _nopUrlHelper.RouteGenericUrlAsync(parentGroupedProduct);
+			_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): productUrl → {ProductUrl}", productId, updatecartitemid, customwishlistid, productUrl);
             return LocalRedirectPermanent(productUrl);
         }
 
         //update existing shopping cart or wishlist  item?
         ShoppingCartItem updatecartitem = null;
+		_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): updatecartitem → {Updatecartitem}", productId, updatecartitemid, customwishlistid, updatecartitem);
         if (_shoppingCartSettings.AllowCartItemEditing && updatecartitemid > 0)
         {
             var productUrl = await _nopUrlHelper.RouteGenericUrlAsync(product);
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): store → {Store}", productId, updatecartitemid, customwishlistid, store);
             var cart = await _shoppingCartService.GetShoppingCartAsync(await _workContext.GetCurrentCustomerAsync(), storeId: store.Id, customWishlistId: customwishlistid);
+			_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): cart → {Cart}", productId, updatecartitemid, customwishlistid, cart);
             updatecartitem = cart.FirstOrDefault(x => x.Id == updatecartitemid);
 
             //not found?
@@ -186,6 +195,7 @@ public partial class ProductController : BasePublicController
         {
             //a vendor should have access only to his products
             var currentVendor = await _workContext.GetCurrentVendorAsync();
+			_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): currentVendor → {CurrentVendor}", productId, updatecartitemid, customwishlistid, currentVendor);
             if (currentVendor == null || currentVendor.Id == product.VendorId)
             {
                 DisplayEditLink(Url.Action("Edit", "Product", new { id = product.Id, area = AreaNames.ADMIN }));
@@ -198,19 +208,25 @@ public partial class ProductController : BasePublicController
 
         //model
         var model = await _productModelFactory.PrepareProductDetailsModelAsync(product, updatecartitem, false);
+		_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): model → {Model}", productId, updatecartitemid, customwishlistid, model);
         //template
         var productTemplateViewPath = await _productModelFactory.PrepareProductTemplateViewPathAsync(product);
+		_logger.LogError("ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid}): productTemplateViewPath → {ProductTemplateViewPath}", productId, updatecartitemid, customwishlistid, productTemplateViewPath);
 
+		_logger.LogWarning("<<< Exiting ProductDetails(productId={ProductId},updatecartitemid={Updatecartitemid},customwishlistid={Customwishlistid})", productId, updatecartitemid, customwishlistid);
         return View(productTemplateViewPath, model);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> EstimateShipping([FromQuery] ProductDetailsModel.ProductEstimateShippingModel model, IFormCollection form)
     {
+		_logger.LogError(">>> Entering EstimateShipping(model={Model},form={Form})", model, form);
         if (model == null)
             model = new ProductDetailsModel.ProductEstimateShippingModel();
+			_logger.LogError("EstimateShipping(model={Model},form={Form}): model → {Model1}", model, form, model);
 
         var errors = new List<string>();
+		_logger.LogError("EstimateShipping(model={Model},form={Form}): errors → {Errors}", model, form, errors);
 
         if (!_shippingSettings.EstimateShippingCityNameEnabled && string.IsNullOrEmpty(model.ZipPostalCode))
             errors.Add(await _localizationService.GetResourceAsync("Shipping.EstimateShipping.ZipPostalCode.Required"));
@@ -227,8 +243,10 @@ public partial class ProductController : BasePublicController
                 Success = false,
                 Errors = errors
             });
+			_logger.LogDebug("EstimateShipping(model={Model},form={Form}): Errors → {Errors}", model, form, Errors);
 
         var product = await _productService.GetProductByIdAsync(model.ProductId);
+		_logger.LogError("EstimateShipping(model={Model},form={Form}): product → {Product}", model, form, product);
         if (product == null || product.Deleted)
         {
             errors.Add(await _localizationService.GetResourceAsync("Shipping.EstimateShippingPopUp.Product.IsNotFound"));
@@ -240,7 +258,9 @@ public partial class ProductController : BasePublicController
         }
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("EstimateShipping(model={Model},form={Form}): store → {Store}", model, form, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("EstimateShipping(model={Model},form={Form}): customer → {Customer}", model, form, customer);
 
         var wrappedProduct = new ShoppingCartItem()
         {
@@ -252,6 +272,7 @@ public partial class ProductController : BasePublicController
         };
 
         var addToCartWarnings = new List<string>();
+		_logger.LogError("EstimateShipping(model={Model},form={Form}): addToCartWarnings → {AddToCartWarnings}", model, form, addToCartWarnings);
         //customer entered price
         wrappedProduct.CustomerEnteredPrice = await _productAttributeParser.ParseCustomerEnteredPriceAsync(product, form);
 
@@ -264,10 +285,14 @@ public partial class ProductController : BasePublicController
         //rental attributes
         _productAttributeParser.ParseRentalDates(product, form, out var rentalStartDate, out var rentalEndDate);
         wrappedProduct.RentalStartDateUtc = rentalStartDate;
+		_logger.LogDebug("EstimateShipping(model={Model},form={Form}): wrappedProduct.RentalStartDateUtc → {Arg2}", model, form, wrappedProduct.RentalStartDateUtc);
+		_logger.LogDebug("EstimateShipping(model={Model},form={Form}): wrappedProduct.RentalEndDateUtc → {Arg2}", model, form, wrappedProduct.RentalEndDateUtc);
         wrappedProduct.RentalEndDateUtc = rentalEndDate;
 
         var result = await _shoppingCartModelFactory.PrepareEstimateShippingResultModelAsync(new[] { wrappedProduct }, model, false);
+		_logger.LogError("EstimateShipping(model={Model},form={Form}): result → {Result}", model, form, result);
 
+		_logger.LogWarning("<<< Exiting EstimateShipping(model={Model},form={Form})", model, form);
         return Json(result);
     }
 
@@ -275,11 +300,14 @@ public partial class ProductController : BasePublicController
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> GetProductCombinations(int productId)
     {
+		_logger.LogError(">>> Entering GetProductCombinations(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null)
             return NotFound();
 
         var model = await _productModelFactory.PrepareProductCombinationModelsAsync(product);
+		_logger.LogError("GetProductCombinations(productId={ProductId}): model → {Model}", productId, model);
+		_logger.LogWarning("<<< Exiting GetProductCombinations(productId={ProductId})", productId);
         return Ok(model);
     }
 
@@ -289,14 +317,18 @@ public partial class ProductController : BasePublicController
 
     public virtual async Task<IActionResult> RecentlyViewedProducts()
     {
+		_logger.LogError(">>> Entering RecentlyViewedProducts()");
         if (!_catalogSettings.RecentlyViewedProductsEnabled)
             return Content("");
 
         var products = await _recentlyViewedProductsService.GetRecentlyViewedProductsAsync(_catalogSettings.RecentlyViewedProductsNumber);
+		_logger.LogError("RecentlyViewedProducts(): products → {Products}", products);
 
         var model = new List<ProductOverviewModel>();
+		_logger.LogError("RecentlyViewedProducts(): model → {Model}", model);
         model.AddRange(await _productModelFactory.PrepareProductOverviewModelsAsync(products));
 
+		_logger.LogWarning("<<< Exiting RecentlyViewedProducts()");
         return View(model);
     }
 
@@ -308,12 +340,15 @@ public partial class ProductController : BasePublicController
     [ValidateCaptcha]
     public virtual async Task<IActionResult> ProductReviewsAdd(int productId, ProductReviewsModel model, bool captchaValid)
     {
+		_logger.LogError(">>> Entering ProductReviewsAdd(productId={ProductId},model={Model},captchaValid={CaptchaValid})", productId, model, captchaValid);
         //validate CAPTCHA
         if (_captchaSettings.Enabled && _captchaSettings.ShowOnProductReviewPage && !captchaValid) 
             ModelState.AddModelError("", await _localizationService.GetResourceAsync("Common.WrongCaptchaMessage"));
 
         var product = await _productService.GetProductByIdAsync(productId);
+		_logger.LogError("ProductReviewsAdd(productId={ProductId},model={Model},captchaValid={CaptchaValid}): product → {Product}", productId, model, captchaValid, product);
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("ProductReviewsAdd(productId={ProductId},model={Model},captchaValid={CaptchaValid}): currentStore → {CurrentStore}", productId, model, captchaValid, currentStore);
 
         if (product == null || product.Deleted || !product.Published || !product.AllowCustomerReviews ||
             !await _productReviewService.CanAddReviewAsync(product.Id, _catalogSettings.ShowProductReviewsPerStore ? currentStore.Id : 0))
@@ -353,6 +388,7 @@ public partial class ProductController : BasePublicController
                     ReviewTypeId = additionalReview.ReviewTypeId,
                     Rating = additionalReview.Rating
                 }).ToList();
+				_logger.LogDebug("ProductReviewsAdd(productId={ProductId},model={Model},captchaValid={CaptchaValid}): Rating → {Rating}", productId, model, captchaValid, Rating);
 
             await _productReviewService.InsertProductReviewAsync(productReview, productReviewReviewTypeMappings);
 
@@ -378,15 +414,19 @@ public partial class ProductController : BasePublicController
         //template
         var productTemplateViewPath = await _productModelFactory.PrepareProductTemplateViewPathAsync(product);
 
+		_logger.LogWarning("<<< Exiting ProductReviewsAdd(productId={ProductId},model={Model},captchaValid={CaptchaValid})", productId, model, captchaValid);
         return View(productTemplateViewPath, productModel);
     }
 
     [HttpPost]
     public virtual async Task<IActionResult> SetProductReviewHelpfulness(int productReviewId, bool washelpful)
     {
+		_logger.LogError(">>> Entering SetProductReviewHelpfulness(productReviewId={ProductReviewId},washelpful={Washelpful})", productReviewId, washelpful);
         var productReview = await _productReviewService.GetProductReviewByIdAsync(productReviewId) ?? throw new ArgumentException("No product review found with the specified id");
 
+		_logger.LogError("SetProductReviewHelpfulness(productReviewId={ProductReviewId},washelpful={Washelpful}): productReview → {ProductReview}", productReviewId, washelpful, productReview);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("SetProductReviewHelpfulness(productReviewId={ProductReviewId},washelpful={Washelpful}): customer → {Customer}", productReviewId, washelpful, customer);
         if (await _customerService.IsGuestAsync(customer) && !_catalogSettings.AllowAnonymousUsersToReviewProduct)
         {
             return Json(new
@@ -395,6 +435,7 @@ public partial class ProductController : BasePublicController
                 TotalYes = productReview.HelpfulYesTotal,
                 TotalNo = productReview.HelpfulNoTotal
             });
+			_logger.LogDebug("SetProductReviewHelpfulness(productReviewId={ProductReviewId},washelpful={Washelpful}): TotalNo → {TotalNo}", productReviewId, washelpful, TotalNo);
         }
 
         //customers aren't allowed to vote for their own reviews
@@ -413,6 +454,7 @@ public partial class ProductController : BasePublicController
         //new totals
         await _productReviewService.UpdateProductReviewHelpfulnessTotalsAsync(productReview);
 
+		_logger.LogWarning("<<< Exiting SetProductReviewHelpfulness(productReviewId={ProductReviewId},washelpful={Washelpful})", productReviewId, washelpful);
         return Json(new
         {
             Result = await _localizationService.GetResourceAsync("Reviews.Helpfulness.SuccessfullyVoted"),
@@ -423,6 +465,7 @@ public partial class ProductController : BasePublicController
 
     public virtual async Task<IActionResult> CustomerProductReviews(int? pageNumber)
     {
+		_logger.LogError(">>> Entering CustomerProductReviews(pageNumber={PageNumber})", pageNumber);
         if (await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync()))
             return Challenge();
 
@@ -432,7 +475,9 @@ public partial class ProductController : BasePublicController
         }
 
         var model = await _productModelFactory.PrepareCustomerProductReviewsModelAsync(pageNumber);
+		_logger.LogError("CustomerProductReviews(pageNumber={PageNumber}): model → {Model}", pageNumber, model);
 
+		_logger.LogWarning("<<< Exiting CustomerProductReviews(pageNumber={PageNumber})", pageNumber);
         return View(model);
     }
 
@@ -442,12 +487,15 @@ public partial class ProductController : BasePublicController
 
     public virtual async Task<IActionResult> ProductEmailAFriend(int productId)
     {
+		_logger.LogError(">>> Entering ProductEmailAFriend(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null || product.Deleted || !product.Published || !_catalogSettings.EmailAFriendEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         var model = new ProductEmailAFriendModel();
+		_logger.LogError("ProductEmailAFriend(productId={ProductId}): model → {Model}", productId, model);
         model = await _productModelFactory.PrepareProductEmailAFriendModelAsync(model, product, false);
+		_logger.LogWarning("<<< Exiting ProductEmailAFriend(productId={ProductId})", productId);
         return View(model);
     }
 
@@ -456,6 +504,7 @@ public partial class ProductController : BasePublicController
     [ValidateCaptcha]
     public virtual async Task<IActionResult> ProductEmailAFriendSend(ProductEmailAFriendModel model, bool captchaValid)
     {
+		_logger.LogError(">>> Entering ProductEmailAFriendSend(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         var product = await _productService.GetProductByIdAsync(model.ProductId);
         if (product == null || product.Deleted || !product.Published || !_catalogSettings.EmailAFriendEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
@@ -468,6 +517,7 @@ public partial class ProductController : BasePublicController
 
         //check whether the current customer is guest and ia allowed to email a friend
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("ProductEmailAFriendSend(model={Model},captchaValid={CaptchaValid}): customer → {Customer}", model, captchaValid, customer);
         if (await _customerService.IsGuestAsync(customer) && !_catalogSettings.AllowAnonymousUsersToEmailAFriend)
         {
             ModelState.AddModelError("", await _localizationService.GetResourceAsync("Products.EmailAFriend.OnlyRegisteredUsers"));
@@ -482,6 +532,8 @@ public partial class ProductController : BasePublicController
                 _htmlFormatter.FormatText(model.PersonalMessage, false, true, false, false, false, false));
 
             model = await _productModelFactory.PrepareProductEmailAFriendModelAsync(model, product, true);
+			_logger.LogError("ProductEmailAFriendSend(model={Model},captchaValid={CaptchaValid}): model → {Model1}", model, captchaValid, model);
+			_logger.LogDebug("ProductEmailAFriendSend(model={Model},captchaValid={CaptchaValid}): model.SuccessfullySent → {Arg2}", model, captchaValid, model.SuccessfullySent);
             model.SuccessfullySent = true;
             model.Result = await _localizationService.GetResourceAsync("Products.EmailAFriend.SuccessfullySent");
 
@@ -490,6 +542,7 @@ public partial class ProductController : BasePublicController
 
         //If we got this far, something failed, redisplay form
         model = await _productModelFactory.PrepareProductEmailAFriendModelAsync(model, product, true);
+		_logger.LogWarning("<<< Exiting ProductEmailAFriendSend(model={Model},captchaValid={CaptchaValid})", model, captchaValid);
         return View(model);
     }
 
@@ -500,12 +553,14 @@ public partial class ProductController : BasePublicController
     [HttpPost]
     public virtual async Task<IActionResult> AddProductToCompareList(int productId)
     {
+		_logger.LogError(">>> Entering AddProductToCompareList(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null || product.Deleted || !product.Published)
             return Json(new
             {
                 success = false,
                 message = "No product found with the specified ID"
+				_logger.LogDebug("AddProductToCompareList(productId={ProductId}): message → {Message}", productId, message);
             });
 
         if (!_catalogSettings.CompareProductsEnabled)
@@ -521,6 +576,7 @@ public partial class ProductController : BasePublicController
         await _customerActivityService.InsertActivityAsync("PublicStore.AddToCompareList",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.PublicStore.AddToCompareList"), product.Name), product);
 
+		_logger.LogWarning("<<< Exiting AddProductToCompareList(productId={ProductId})", productId);
         return Json(new
         {
             success = true,
@@ -532,6 +588,7 @@ public partial class ProductController : BasePublicController
 
     public virtual async Task<IActionResult> RemoveProductFromCompareList(int productId)
     {
+		_logger.LogError(">>> Entering RemoveProductFromCompareList(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
         if (product == null)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
@@ -541,11 +598,13 @@ public partial class ProductController : BasePublicController
 
         await _compareProductsService.RemoveProductFromCompareListAsync(productId);
 
+		_logger.LogWarning("<<< Exiting RemoveProductFromCompareList(productId={ProductId})", productId);
         return RedirectToRoute(NopRouteNames.General.COMPARE_PRODUCTS);
     }
 
     public virtual async Task<IActionResult> CompareProducts()
     {
+		_logger.LogError(">>> Entering CompareProducts()");
         if (!_catalogSettings.CompareProductsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
@@ -559,7 +618,9 @@ public partial class ProductController : BasePublicController
             //ACL and store mapping
             .WhereAwait(async p => await _aclService.AuthorizeAsync(p) && await _storeMappingService.AuthorizeAsync(p))
             //availability dates
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             .Where(p => _productService.ProductIsAvailable(p)).ToListAsync();
+			_logger.LogError("CompareProducts(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
         //prepare model
         var poModels = (await _productModelFactory.PrepareProductOverviewModelsAsync(products, prepareSpecificationAttributes: true))
@@ -569,16 +630,19 @@ public partial class ProductController : BasePublicController
             model.Products.Add(poModel);
         }
 
+		_logger.LogWarning("<<< Exiting CompareProducts()");
         return View(model);
     }
 
     public virtual IActionResult ClearCompareList()
     {
+		_logger.LogError(">>> Entering ClearCompareList()");
         if (!_catalogSettings.CompareProductsEnabled)
             return RedirectToRoute(NopRouteNames.General.HOMEPAGE);
 
         _compareProductsService.ClearCompareProducts();
 
+		_logger.LogWarning("<<< Exiting ClearCompareList()");
         return RedirectToRoute(NopRouteNames.General.COMPARE_PRODUCTS);
     }
 

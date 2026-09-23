@@ -19,9 +19,13 @@ public partial class EventPublisher : IEventPublisher
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PublishAsync<TEvent>(TEvent @event)
     {
+		logger.LogError(">>> Entering PublishAsync()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get all event consumers
         var consumers = EngineContext.Current.ResolveAll<IConsumer<TEvent>>().ToList();
 
+		logger.LogError("PublishAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogError("PublishAsync(): consumers → {Consumers}", consumers);
         foreach (var consumer in consumers)
             try
             {
@@ -37,6 +41,7 @@ public partial class EventPublisher : IEventPublisher
                 try
                 {
                     var logger = EngineContext.Current.Resolve<ILogger>();
+					logger.LogError("PublishAsync(): logger → {Logger}", logger);
                     if (logger == null)
                         return;
 
@@ -44,9 +49,11 @@ public partial class EventPublisher : IEventPublisher
                 }
                 catch
                 {
+					logger.LogError("Exception in PublishAsync(): {Arg0}", exception.Message);
                     // ignored
                 }
             }
+			logger.LogWarning("<<< Exiting PublishAsync()");
     }
 
     /// <summary>
@@ -56,9 +63,13 @@ public partial class EventPublisher : IEventPublisher
     /// <param name="event">Event object</param>
     public virtual void Publish<TEvent>(TEvent @event)
     {
+		logger.LogError(">>> Entering Publish()");
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get all event consumers
         var consumers = EngineContext.Current.ResolveAll<IConsumer<TEvent>>().ToList();
 
+		logger.LogError("Publish(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+		logger.LogError("Publish(): consumers → {Consumers}", consumers);
         foreach (var consumer in consumers)
             try
             {
@@ -74,6 +85,7 @@ public partial class EventPublisher : IEventPublisher
                 try
                 {
                     var logger = EngineContext.Current.Resolve<ILogger>();
+					logger.LogError("Publish(): logger → {Logger}", logger);
                     if (logger == null)
                         return;
 
@@ -81,9 +93,11 @@ public partial class EventPublisher : IEventPublisher
                 }
                 catch
                 {
+					logger.LogError("Exception in Publish(): {Arg0}", exception.Message);
                     // ignored
                 }
             }
+			logger.LogWarning("<<< Exiting Publish()");
     }
 
     #endregion

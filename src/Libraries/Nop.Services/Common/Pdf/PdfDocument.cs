@@ -10,6 +10,7 @@ using PdfRpt.Core.Contracts;
 using PdfRpt.Core.Helper;
 using PdfRpt.FluentInterface;
 using Language = Nop.Core.Domain.Localization.Language;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -18,6 +19,7 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public abstract class PdfDocument<TItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     /// <summary>
@@ -28,11 +30,14 @@ public abstract class PdfDocument<TItem>
     /// <returns>A cell for PDF table</returns>
     protected virtual PdfPCell BuildHyperLinkCell<TLabel>(Expression<Func<TLabel, string>> labelSelector, string url)
     {
+		_logger.LogError(">>> Entering BuildHyperLinkCell(labelSelector={LabelSelector},url={Url})", labelSelector, url);
         ArgumentNullException.ThrowIfNull(labelSelector);
         ArgumentNullException.ThrowIfNullOrEmpty(url);
 
         var content = new Phrase();
+		_logger.LogError("BuildHyperLinkCell(labelSelector={LabelSelector},url={Url}): content → {Content}", labelSelector, url, content);
         var label = LabelField(labelSelector, Font, Language);
+		_logger.LogError("BuildHyperLinkCell(labelSelector={LabelSelector},url={Url}): label → {Label}", labelSelector, url, label);
 
         if (label.IsEmpty())
             label.Append(url);
@@ -49,6 +54,7 @@ public abstract class PdfDocument<TItem>
 
         cell.SetLeading(0f, PdfDocumentHelper.RELATIVE_LEADING);
 
+		_logger.LogWarning("<<< Exiting BuildHyperLinkCell(labelSelector={LabelSelector},url={Url})", labelSelector, url);
         return cell;
     }
 
@@ -61,8 +67,10 @@ public abstract class PdfDocument<TItem>
     /// <returns>A cell for PDF table</returns>
     protected virtual PdfPCell BuildPdfPCell<TLabel>(Expression<Func<TLabel, string>> labelSelector, string value, int horizontalAlign = Element.ALIGN_LEFT)
     {
+		_logger.LogError(">>> Entering BuildPdfPCell(labelSelector={LabelSelector},value={Value},horizontalAlign={HorizontalAlign})", labelSelector, value, horizontalAlign);
         var label = LabelField(labelSelector, Font, Language, value);
 
+		_logger.LogError("BuildPdfPCell(labelSelector={LabelSelector},value={Value},horizontalAlign={HorizontalAlign}): label → {Label}", labelSelector, value, horizontalAlign, label);
         var cell = new PdfPCell(new Phrase() { label })
         {
             RunDirection = DocumentRunDirection,
@@ -74,6 +82,7 @@ public abstract class PdfDocument<TItem>
 
         cell.SetLeading(0f, PdfDocumentHelper.RELATIVE_LEADING);
 
+		_logger.LogWarning("<<< Exiting BuildPdfPCell(labelSelector={LabelSelector},value={Value},horizontalAlign={HorizontalAlign})", labelSelector, value, horizontalAlign);
         return cell;
     }
 
@@ -137,12 +146,16 @@ public abstract class PdfDocument<TItem>
     /// <returns>PDF table</returns>
     protected virtual PdfGrid BuildAddressTable<TLabel>(Expression<Func<TLabel, AddressItem>> labelSelector, AddressItem address)
     {
+		_logger.LogError(">>> Entering BuildAddressTable(labelSelector={LabelSelector},address={Address})", labelSelector, address);
         ArgumentNullException.ThrowIfNull(address);
 
         var addressTable = PdfDocumentHelper.BuildPdfGrid(numColumns: 1, DocumentRunDirection);
+		_logger.LogError("BuildAddressTable(labelSelector={LabelSelector},address={Address}): addressTable → {AddressTable}", labelSelector, address, addressTable);
 
         var fontBold = PdfDocumentHelper.GetFont(Font, Font.Size, DocumentFontStyle.Bold);
+		_logger.LogError("BuildAddressTable(labelSelector={LabelSelector},address={Address}): fontBold → {FontBold}", labelSelector, address, fontBold);
         var label = LabelField(labelSelector, fontBold, Language);
+		_logger.LogError("BuildAddressTable(labelSelector={LabelSelector},address={Address}): label → {Label}", labelSelector, address, label);
 
         var captionCell = new PdfPCell()
         {
@@ -182,6 +195,7 @@ public abstract class PdfDocument<TItem>
             addressTable.AddCell(BuildPdfPCell($"{value.Name}: {value.Value}"));
         }
 
+		_logger.LogWarning("<<< Exiting BuildAddressTable(labelSelector={LabelSelector},address={Address})", labelSelector, address);
         return addressTable;
     }
 
@@ -194,6 +208,7 @@ public abstract class PdfDocument<TItem>
     /// <param name="printProductAttributes">Indicates that product attribute descriptions should be printed if they exist</param>
     protected virtual void ConfigureProductColumn(ColumnAttributesBuilder column, Expression<Func<TItem, object>> propertyExpression, int width = 1, bool printProductAttributes = false)
     {
+		_logger.LogError(">>> Entering ConfigureProductColumn(column={Column},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes})", column, propertyExpression, width, printProductAttributes);
         column.PropertyName(propertyExpression);
         column.CellsHorizontalAlignment(HorizontalAlignment.Left);
         column.IsVisible(true);
@@ -216,14 +231,18 @@ public abstract class PdfDocument<TItem>
                     };
 
                     var data = cellData.Attributes.RowData.TableRowData;
+					_logger.LogError("ConfigureProductColumn(column={Column},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes}): data → {Data}", column, propertyExpression, width, printProductAttributes, data);
                     var text = data.GetSafeStringValueOf(propertyExpression);
+					_logger.LogError("ConfigureProductColumn(column={Column},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes}): text → {Text}", column, propertyExpression, width, printProductAttributes, text);
 
                     table.AddCell(BuildPdfPCell(text, verticalAlignment: Element.ALIGN_TOP));
 
                     if (printProductAttributes)
                     {
                         var productAttributes = (List<string>)data.GetValueOf((ProductItem x) => x.ProductAttributes);
+						_logger.LogError("ConfigureProductColumn(column={Column},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes}): productAttributes → {ProductAttributes}", column, propertyExpression, width, printProductAttributes, productAttributes);
                         var font8Italic = PdfDocumentHelper.GetFont(Font, Font.Size * 0.8f, DocumentFontStyle.Italic);
+						_logger.LogError("ConfigureProductColumn(column={Column},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes}): font8Italic → {Font8Italic}", column, propertyExpression, width, printProductAttributes, font8Italic);
 
                         foreach (var pa in productAttributes)
                         {
@@ -247,6 +266,7 @@ public abstract class PdfDocument<TItem>
                 });
             });
         });
+		_logger.LogWarning("<<< Exiting ConfigureProductColumn(column={Column},propertyExpression={PropertyExpression},width={Width},printProductAttributes={PrintProductAttributes})", column, propertyExpression, width, printProductAttributes);
     }
 
     /// <summary>
@@ -255,13 +275,19 @@ public abstract class PdfDocument<TItem>
     /// <returns>PDF document builder</returns>
     protected virtual PdfReport DefaultDocument()
     {
+		_logger.LogError(">>> Entering DefaultDocument()");
         var pdfSettings = EngineContext.Current.Resolve<PdfSettings>();
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
+		_logger.LogError("DefaultDocument(): fileProvider → {FileProvider}", fileProvider);
         var fontSize = pdfSettings.BaseFontSize >= 0 ? (int)pdfSettings.BaseFontSize : 10;
+		_logger.LogError("DefaultDocument(): fontSize → {FontSize}", fontSize);
+		_logger.LogError("DefaultDocument(): pdfSettings → {PdfSettings}", pdfSettings);
         var fontFileName = Language.Rtl ? pdfSettings.RtlFontName : pdfSettings.LtrFontName;
 
         var mainFontPath = fileProvider.Combine(fileProvider.MapPath("~/App_Data/Pdf/"), $"{fontFileName}.ttf");
+		_logger.LogError("DefaultDocument(): mainFontPath → {MainFontPath}", mainFontPath);
 
+		_logger.LogWarning("<<< Exiting DefaultDocument()");
         return new PdfReport()
             .DocumentPreferences(doc =>
             {
@@ -298,8 +324,11 @@ public abstract class PdfDocument<TItem>
     /// <returns>A chunk with localized annotation if present, otherwise an empty chunk</returns>
     protected virtual Chunk LabelField<TLabel, TOut>(Expression<Func<TLabel, TOut>> propertyExpression, Font font, Language language, params string[] args)
     {
+		_logger.LogError(">>> Entering LabelField(propertyExpression={PropertyExpression},font={Font},language={Language},args={Args})", propertyExpression, font, language, args);
         var expression = (MemberExpression)propertyExpression.Body;
         var propertyInfo = (PropertyInfo)expression.Member;
+		_logger.LogError("LabelField(propertyExpression={PropertyExpression},font={Font},language={Language},args={Args}): propertyInfo → {PropertyInfo}", propertyExpression, font, language, args, propertyInfo);
+		_logger.LogError("LabelField(propertyExpression={PropertyExpression},font={Font},language={Language},args={Args}): expression → {Expression}", propertyExpression, font, language, args, expression);
 
         var label = propertyInfo.GetCustomAttributes<DisplayNameAttribute>(true).FirstOrDefault() is DisplayNameAttribute attr
             ? GetResourceAsync(attr.DisplayName, language?.Id ?? 0).Result
@@ -307,7 +336,9 @@ public abstract class PdfDocument<TItem>
 
         if (!string.IsNullOrEmpty(label) && args.Any())
             label = string.Format(label, args);
+			_logger.LogError("LabelField(propertyExpression={PropertyExpression},font={Font},language={Language},args={Args}): label → {Label}", propertyExpression, font, language, args, label);
 
+		_logger.LogWarning("<<< Exiting LabelField(propertyExpression={PropertyExpression},font={Font},language={Language},args={Args})", propertyExpression, font, language, args);
         return new Chunk(label, font);
     }
 

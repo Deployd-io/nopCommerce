@@ -2,17 +2,23 @@
 using LinqToDB;
 using Nop.Core.Domain.Logging;
 using Nop.Core.Domain.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo490;
 
 [NopUpdateMigration("2024-12-25 00:00:00", "4.90", UpdateMigrationType.Data)]
 public class DataMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private readonly INopDataProvider _dataProvider;
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		_logger.LogError(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+    _logger.LogError("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+    _logger.LogWarning("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
     }
 
     /// <summary>
@@ -20,21 +26,26 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         //#3425
         if (!_dataProvider.GetTable<MessageTemplate>().Any(st => string.Compare(st.Name, MessageTemplateSystemNames.ORDER_COMPLETED_STORE_OWNER_NOTIFICATION, StringComparison.InvariantCultureIgnoreCase) == 0))
         {
             var eaGeneral = _dataProvider.GetTable<EmailAccount>().FirstOrDefault() ?? throw new Exception("Default email account cannot be loaded");
+			_logger.LogError("Up(): eaGeneral → {EaGeneral}", eaGeneral);
             _dataProvider.InsertEntity(new MessageTemplate()
             {
                 Name = MessageTemplateSystemNames.ORDER_COMPLETED_STORE_OWNER_NOTIFICATION,
                 Subject = "%Store.Name%. Order #%Order.OrderNumber% completed",
                 Body = $"<p>{Environment.NewLine}<a href=\"%Store.URL%\">%Store.Name%</a>{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%Order.CustomerFullName% has just completed an order. Below is the summary of the order.{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Order Number: %Order.OrderNumber%{Environment.NewLine}<br />{Environment.NewLine}Date Ordered: %Order.CreatedOn%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Billing Address{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingFirstName% %Order.BillingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingCity% %Order.BillingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.BillingStateProvince% %Order.BillingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}%if (%Order.Shippable%) Shipping Address{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingFirstName% %Order.ShippingLastName%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress1%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingAddress2%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingCity% %Order.ShippingZipPostalCode%{Environment.NewLine}<br />{Environment.NewLine}%Order.ShippingStateProvince% %Order.ShippingCountry%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine}Shipping Method: %Order.ShippingMethod%{Environment.NewLine}<br />{Environment.NewLine}<br />{Environment.NewLine} endif% %Order.Product(s)%{Environment.NewLine}</p>{Environment.NewLine}",
                 IsActive = false, //this template is disabled by default
+				_logger.LogDebug("Up(): IsActive → {IsActive}", IsActive);
                 EmailAccountId = eaGeneral.Id
             });
+			_logger.LogDebug("Up(): EmailAccountId → {EmailAccountId}", EmailAccountId);
         }
 
         var activityLogTypeTable = _dataProvider.GetTable<ActivityLogType>();
+		_logger.LogError("Up(): activityLogTypeTable → {ActivityLogTypeTable}", activityLogTypeTable);
 
         //#6407
         if (!activityLogTypeTable.Any(alt => string.Compare(alt.SystemKeyword, "PublicStore.PasswordChanged", StringComparison.InvariantCultureIgnoreCase) == 0))
@@ -45,12 +56,14 @@ public class DataMigration : Migration
                     SystemKeyword = "PublicStore.PasswordChanged",
                     Enabled = true,
                     Name = "Public store. Change password"
+					_logger.LogDebug("Up(): Name → {Name}", Name);
                 }
             );
         }
 
         //#6874 Multiple newsletter lists
         var newsLetterSubscriptionTypeTable = _dataProvider.GetTable<NewsLetterSubscriptionType>();
+		_logger.LogError("Up(): newsLetterSubscriptionTypeTable → {NewsLetterSubscriptionTypeTable}", newsLetterSubscriptionTypeTable);
         if (!newsLetterSubscriptionTypeTable.Any(alt => string.Compare(alt.Name, "Newsletter", StringComparison.InvariantCultureIgnoreCase) == 0))
         {
             var subscriptionType = _dataProvider.InsertEntity(
@@ -61,6 +74,7 @@ public class DataMigration : Migration
                     DisplayOrder = 0
                 }
             );
+			_logger.LogDebug("Up(): DisplayOrder → {DisplayOrder}", DisplayOrder);
 
             _dataProvider.GetTable<NewsLetterSubscription>()
                 .Set(p => p.TypeId, subscriptionType.Id)
@@ -68,8 +82,11 @@ public class DataMigration : Migration
         }
 
         var newsLetterSubscriptionTableName = nameof(NewsLetterSubscription);
+		_logger.LogError("Up(): newsLetterSubscriptionTableName → {NewsLetterSubscriptionTableName}", newsLetterSubscriptionTableName);
         var typeIdIndexName = "IX_NewsLetterSubscription_TypeId";
+		_logger.LogError("Up(): typeIdIndexName → {TypeIdIndexName}", typeIdIndexName);
         var typeIdCollumnName = nameof(NewsLetterSubscription.TypeId);
+		_logger.LogError("Up(): typeIdCollumnName → {TypeIdCollumnName}", typeIdCollumnName);
 
         //delete the index if it already exists to prevent a problem
         //with altering NewsLetterSubscription table
@@ -131,6 +148,7 @@ public class DataMigration : Migration
             is ActivityLogType loginActivity)
         {
             loginActivity.SystemKeyword = "PublicStore.SuccessfulLogin";
+			_logger.LogDebug("Up(): loginActivity.SystemKeyword → {Arg0}", loginActivity.SystemKeyword);
             _dataProvider.UpdateEntity(loginActivity);
         }
         else
@@ -317,10 +335,13 @@ public class DataMigration : Migration
                 EmailAccountId = eaGeneral.Id
             });
         }
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogWarning("<<< Exiting Down()");
     }
 }

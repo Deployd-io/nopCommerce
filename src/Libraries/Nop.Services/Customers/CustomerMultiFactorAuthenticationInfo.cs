@@ -1,13 +1,19 @@
-﻿namespace Nop.Services.Customers;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Services.Customers;
 
 /// <summary>
 /// Customer multi-factor authentication info
 /// </summary>
 public partial class CustomerMultiFactorAuthenticationInfo
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerMultiFactorAuthenticationInfo()
     {
+		_logger.LogError(">>> Entering CustomerMultiFactorAuthenticationInfo()");
         CustomValues = new Dictionary<string, object>();
+		_logger.LogDebug("CustomerMultiFactorAuthenticationInfo(): CustomValues → {CustomValues}", CustomValues);
+    _logger.LogError("CustomerMultiFactorAuthenticationInfo(): CustomValues → {CustomValues}", CustomValues);
+    _logger.LogWarning("<<< Exiting CustomerMultiFactorAuthenticationInfo()");
     }
     public string UserName { get; set; }
 

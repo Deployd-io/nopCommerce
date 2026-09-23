@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Nop.Core.Configuration;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Caching;
 
@@ -11,6 +12,7 @@ namespace Nop.Core.Caching;
 /// </summary>
 public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     /// <summary>
@@ -35,9 +37,12 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
         IConcurrentCollection<object> concurrentCollection)
         : base(appSettings)
     {
+		_logger.LogError(">>> Entering DistributedCacheManager(appSettings={AppSettings},distributedCache={DistributedCache},cacheKeyManager={CacheKeyManager},concurrentCollection={ConcurrentCollection})", appSettings, distributedCache, cacheKeyManager, concurrentCollection);
         _distributedCache = distributedCache;
         _localKeyManager = cacheKeyManager;
+		_logger.LogDebug("DistributedCacheManager(appSettings={AppSettings},distributedCache={DistributedCache},cacheKeyManager={CacheKeyManager},concurrentCollection={ConcurrentCollection}): _localKeyManager → {_localKeyManager}", appSettings, distributedCache, cacheKeyManager, concurrentCollection, _localKeyManager);
         _concurrentCollection = concurrentCollection;
+		_logger.LogDebug("DistributedCacheManager(appSettings={AppSettings},distributedCache={DistributedCache},cacheKeyManager={CacheKeyManager},concurrentCollection={ConcurrentCollection}): _concurrentCollection → {_concurrentCollection}", appSettings, distributedCache, cacheKeyManager, concurrentCollection, _concurrentCollection);
     }
 
     #endregion
@@ -50,8 +55,10 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual void ClearInstanceData()
     {
+		_logger.LogError(">>> Entering ClearInstanceData()");
         _concurrentCollection.Clear();
         _localKeyManager.Clear();
+		_logger.LogWarning("<<< Exiting ClearInstanceData()");
     }
 
     /// <summary>
@@ -62,9 +69,12 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <returns>The removed keys</returns>
     protected virtual IEnumerable<string> RemoveByPrefixInstanceData(string prefix, params object[] prefixParameters)
     {
+		_logger.LogError(">>> Entering RemoveByPrefixInstanceData(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         var keyPrefix = PrepareKeyPrefix(prefix, prefixParameters);
         _concurrentCollection.Prune(keyPrefix, out _);
+		_logger.LogError("RemoveByPrefixInstanceData(prefix={Prefix},prefixParameters={PrefixParameters}): keyPrefix → {KeyPrefix}", prefix, prefixParameters, keyPrefix);
 
+		_logger.LogWarning("<<< Exiting RemoveByPrefixInstanceData(prefix={Prefix},prefixParameters={PrefixParameters})", prefix, prefixParameters);
         return _localKeyManager.RemoveByPrefix(keyPrefix);
     }
 
@@ -75,7 +85,9 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <returns>Cache entry options</returns>
     protected virtual DistributedCacheEntryOptions PrepareEntryOptions(CacheKey key)
     {
+		_logger.LogError(">>> Entering PrepareEntryOptions(key={Key})", key);
         //set expiration time for the passed cache key
+		_logger.LogWarning("<<< Exiting PrepareEntryOptions(key={Key})", key);
         return new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(key.CacheTime)
@@ -89,8 +101,10 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <param name="value">Value for caching</param>
     protected virtual void SetLocal(string key, object value)
     {
+		_logger.LogError(">>> Entering SetLocal(key={Key},value={Value})", key, value);
         _concurrentCollection.Add(key, value);
         _localKeyManager.AddKey(key);
+		_logger.LogWarning("<<< Exiting SetLocal(key={Key},value={Value})", key, value);
     }
 
     /// <summary>
@@ -99,8 +113,10 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <param name="key">Cache key</param>
     protected virtual void RemoveLocal(string key)
     {
+		_logger.LogError(">>> Entering RemoveLocal(key={Key})", key);
         _concurrentCollection.Remove(key);
         _localKeyManager.RemoveKey(key);
+		_logger.LogWarning("<<< Exiting RemoveLocal(key={Key})", key);
     }
 
     /// <summary>
@@ -124,6 +140,7 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <param name="removeFromInstance">Remove from instance</param>
     protected virtual async Task RemoveAsync(string key, bool removeFromInstance = true)
     {
+		_logger.LogError(">>> Entering RemoveAsync(key={Key},removeFromInstance={RemoveFromInstance})", key, removeFromInstance);
         _ongoing.TryRemove(key, out _);
         await _distributedCache.RemoveAsync(key);
 
@@ -131,6 +148,7 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
             return;
 
         RemoveLocal(key);
+		_logger.LogWarning("<<< Exiting RemoveAsync(key={Key},removeFromInstance={RemoveFromInstance})", key, removeFromInstance);
     }
 
     #endregion
@@ -145,6 +163,7 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task RemoveAsync(CacheKey cacheKey, params object[] cacheKeyParameters)
     {
+		_logger.LogError(">>> Entering RemoveAsync(cacheKey={CacheKey},cacheKeyParameters={CacheKeyParameters})", cacheKey, cacheKeyParameters);
         await RemoveAsync(PrepareKey(cacheKey, cacheKeyParameters).Key);
     }
 
@@ -160,10 +179,12 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// </returns>
     public virtual async Task<T> GetAsync<T>(CacheKey key, Func<Task<T>> acquire)
     {
+		_logger.LogError(">>> Entering GetAsync(key={Key},acquire={Acquire})", key, acquire);
         if (_concurrentCollection.TryGetValue(key.Key, out var data))
             return (T)data;
 
         var lazy = _ongoing.GetOrAdd(key.Key, _ => new(async () => await acquire(), true));
+		_logger.LogError("GetAsync(key={Key},acquire={Acquire}): lazy → {Lazy}", key, acquire, lazy);
         var setTask = Task.CompletedTask;
 
         try
@@ -175,6 +196,8 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
             if (!isSet)
             {
                 item = (T)await lazy.Value;
+				_logger.LogError("GetAsync(key={Key},acquire={Acquire}): item → {Item}", key, acquire, item);
+				_logger.LogDebug("GetAsync(key={Key},acquire={Acquire}): item → {Item}", key, acquire, item);
 
                 if (key.CacheTime == 0 || item == null)
                     return item;
@@ -212,11 +235,14 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
 
     public virtual async Task<T> GetAsync<T>(CacheKey key, T defaultValue = default)
     {
+		_logger.LogError(">>> Entering GetAsync(key={Key},defaultValue={DefaultValue})", key, defaultValue);
         var value = await _distributedCache.GetStringAsync(key.Key);
 
+		_logger.LogError("GetAsync(key={Key},defaultValue={DefaultValue}): value → {Value}", key, defaultValue, value);
         return value != null
             ? JsonConvert.DeserializeObject<T>(value)
             : defaultValue;
+			    _logger.LogWarning("<<< Exiting GetAsync(key={Key},defaultValue={DefaultValue})", key, defaultValue);
     }
 
     /// <summary>
@@ -240,10 +266,12 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetAsync<T>(CacheKey key, T data)
     {
+		_logger.LogError(">>> Entering SetAsync(key={Key},data={Data})", key, data);
         if (data == null || (key?.CacheTime ?? 0) <= 0)
             return;
 
         var lazy = new Lazy<Task<object>>(() => Task.FromResult(data as object), true);
+		_logger.LogError("SetAsync(key={Key},data={Data}): lazy → {Lazy}", key, data, lazy);
 
         try
         {
@@ -276,7 +304,9 @@ public abstract class DistributedCacheManager : CacheKeyService, IStaticCacheMan
     /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
     public virtual void Dispose()
     {
+		_logger.LogError(">>> Entering Dispose()");
         GC.SuppressFinalize(this);
+		_logger.LogWarning("<<< Exiting Dispose()");
     }
 
     #endregion

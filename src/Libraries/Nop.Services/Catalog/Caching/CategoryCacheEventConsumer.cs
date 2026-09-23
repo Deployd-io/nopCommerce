@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Services.Caching;
 using Nop.Services.Discounts;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog.Caching;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Catalog.Caching;
 /// </summary>
 public partial class CategoryCacheEventConsumer : CacheEventConsumer<Category>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache data
     /// </summary>
@@ -17,6 +19,7 @@ public partial class CategoryCacheEventConsumer : CacheEventConsumer<Category>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Category entity, EntityEventType entityEventType)
     {
+		_logger.LogError(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveByPrefixAsync(NopCatalogDefaults.CategoriesByParentCategoryPrefix, entity);
         await RemoveByPrefixAsync(NopCatalogDefaults.CategoriesByParentCategoryPrefix, entity.ParentCategoryId);
         await RemoveByPrefixAsync(NopCatalogDefaults.CategoriesChildIdsPrefix, entity);
@@ -38,5 +41,6 @@ public partial class CategoryCacheEventConsumer : CacheEventConsumer<Category>
         await RemoveAsync(NopDiscountDefaults.AppliedDiscountsCacheKey, nameof(Category), entity);
 
         await base.ClearCacheAsync(entity, entityEventType);
+		_logger.LogWarning("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

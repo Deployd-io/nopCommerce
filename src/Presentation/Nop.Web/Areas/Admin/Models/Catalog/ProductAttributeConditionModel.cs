@@ -1,14 +1,20 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
 public partial record ProductAttributeConditionModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductAttributeConditionModel()
     {
+		_logger.LogError(">>> Entering ProductAttributeConditionModel()");
         ProductAttributes = new List<ProductAttributeModel>();
+		_logger.LogDebug("ProductAttributeConditionModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
+    _logger.LogError("ProductAttributeConditionModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
+    _logger.LogWarning("<<< Exiting ProductAttributeConditionModel()");
     }
 
     [NopResourceDisplayName("Admin.Catalog.Products.ProductAttributes.Attributes.Condition.EnableCondition")]
@@ -26,7 +32,11 @@ public partial record ProductAttributeConditionModel : BaseNopModel
     {
         public ProductAttributeModel()
         {
+			_logger.LogError(">>> Entering ProductAttributeModel()");
             Values = new List<ProductAttributeValueModel>();
+			_logger.LogDebug("ProductAttributeModel(): Values → {Values}", Values);
+        _logger.LogError("ProductAttributeModel(): Values → {Values}", Values);
+        _logger.LogWarning("<<< Exiting ProductAttributeModel()");
         }
 
         public int ProductAttributeId { get; set; }

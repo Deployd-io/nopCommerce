@@ -4,12 +4,14 @@ using Nop.Data.Migrations;
 using Nop.Services.Configuration;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Data;
 
 [NopMigration("2021-09-06 00:00:00", "Tax.Avalara 2.50. Add certificates feature", MigrationProcessType.Update)]
 public class CertificatesMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxSettings _avalaraTaxSettings;
@@ -26,10 +28,14 @@ public class CertificatesMigration : MigrationBase
         ILocalizationService localizationService,
         ISettingService settingService)
     {
+		_logger.LogError(">>> Entering CertificatesMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService})", avalaraTaxSettings, languageService, localizationService, settingService);
         _avalaraTaxSettings = avalaraTaxSettings;
         _languageService = languageService;
+		_logger.LogDebug("CertificatesMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _languageService → {_languageService}", avalaraTaxSettings, languageService, localizationService, settingService, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("CertificatesMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _localizationService → {_localizationService}", avalaraTaxSettings, languageService, localizationService, settingService, _localizationService);
         _settingService = settingService;
+		_logger.LogDebug("CertificatesMigration(avalaraTaxSettings={AvalaraTaxSettings},languageService={LanguageService},localizationService={LocalizationService},settingService={SettingService}): _settingService → {_settingService}", avalaraTaxSettings, languageService, localizationService, settingService, _settingService);
     }
 
     #endregion
@@ -41,6 +47,7 @@ public class CertificatesMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -116,23 +123,33 @@ public class CertificatesMigration : MigrationBase
         //settings
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.CompanyId))
             _avalaraTaxSettings.CompanyId = null;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.CompanyId → {Arg0}", _avalaraTaxSettings.CompanyId);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.EnableCertificates))
             _avalaraTaxSettings.EnableCertificates = false;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.EnableCertificates → {Arg0}", _avalaraTaxSettings.EnableCertificates);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.AutoValidateCertificate))
             _avalaraTaxSettings.AutoValidateCertificate = true;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.AutoValidateCertificate → {Arg0}", _avalaraTaxSettings.AutoValidateCertificate);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.AllowEditCustomer))
             _avalaraTaxSettings.AllowEditCustomer = true;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.AllowEditCustomer → {Arg0}", _avalaraTaxSettings.AllowEditCustomer);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.DisplayNoValidCertificatesMessage))
             _avalaraTaxSettings.DisplayNoValidCertificatesMessage = true;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.DisplayNoValidCertificatesMessage → {Arg0}", _avalaraTaxSettings.DisplayNoValidCertificatesMessage);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.CustomerRoleIds))
             _avalaraTaxSettings.CustomerRoleIds = null;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.CustomerRoleIds → {Arg0}", _avalaraTaxSettings.CustomerRoleIds);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.PreviewCertificate))
             _avalaraTaxSettings.PreviewCertificate = false;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.PreviewCertificate → {Arg0}", _avalaraTaxSettings.PreviewCertificate);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.UploadOnly))
             _avalaraTaxSettings.UploadOnly = false;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.UploadOnly → {Arg0}", _avalaraTaxSettings.UploadOnly);
         if (!_settingService.SettingExists(_avalaraTaxSettings, settings => settings.FillOnly))
             _avalaraTaxSettings.FillOnly = false;
+			_logger.LogDebug("Up(): _avalaraTaxSettings.FillOnly → {Arg0}", _avalaraTaxSettings.FillOnly);
         _settingService.SaveSetting(_avalaraTaxSettings);
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -140,7 +157,9 @@ public class CertificatesMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //nothing
+		_logger.LogWarning("<<< Exiting Down()");
     }
 
     #endregion

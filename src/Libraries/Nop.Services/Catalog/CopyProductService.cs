@@ -6,6 +6,7 @@ using Nop.Services.Media;
 using Nop.Services.Security;
 using Nop.Services.Seo;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class CopyProductService : ICopyProductService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -54,22 +56,38 @@ public partial class CopyProductService : ICopyProductService
         IUrlRecordService urlRecordService,
         IVideoService videoService)
     {
+		_logger.LogError(">>> Entering CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService})", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService);
         _aclService = aclService;
         _categoryService = categoryService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _categoryService → {_categoryService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _categoryService);
         _downloadService = downloadService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _downloadService → {_downloadService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _downloadService);
         _languageService = languageService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _languageService → {_languageService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _localizationService → {_localizationService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _localizedEntityService → {_localizedEntityService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _localizedEntityService);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _manufacturerService → {_manufacturerService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _manufacturerService);
         _pictureService = pictureService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _pictureService → {_pictureService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _pictureService);
         _productAttributeParser = productAttributeParser;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _productAttributeParser → {_productAttributeParser}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _productAttributeParser);
         _productAttributeService = productAttributeService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _productAttributeService → {_productAttributeService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _productAttributeService);
         _productService = productService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _productService → {_productService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _productService);
         _productTagService = productTagService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _productTagService → {_productTagService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _productTagService);
         _specificationAttributeService = specificationAttributeService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _specificationAttributeService → {_specificationAttributeService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _specificationAttributeService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _storeMappingService → {_storeMappingService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _storeMappingService);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _urlRecordService → {_urlRecordService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _urlRecordService);
         _videoService = videoService;
+		_logger.LogDebug("CopyProductService(aclService={AclService},categoryService={CategoryService},downloadService={DownloadService},languageService={LanguageService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},manufacturerService={ManufacturerService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},productTagService={ProductTagService},specificationAttributeService={SpecificationAttributeService},storeMappingService=<redacted>,urlRecordService={UrlRecordService},videoService={VideoService}): _videoService → {_videoService}", aclService, categoryService, downloadService, languageService, localizationService, localizedEntityService, manufacturerService, pictureService, productAttributeParser, productAttributeService, productService, productTagService, specificationAttributeService, urlRecordService, videoService, _videoService);
     }
 
     #endregion
@@ -84,10 +102,12 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyDiscountsMappingAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyDiscountsMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var discountMapping in await _productService.GetAllDiscountsAppliedToProductAsync(product.Id))
         {
             await _productService.InsertDiscountProductMappingAsync(new DiscountProductMapping { EntityId = productCopy.Id, DiscountId = discountMapping.DiscountId });
         }
+		_logger.LogWarning("<<< Exiting CopyDiscountsMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
     }
 
     /// <summary>
@@ -101,18 +121,22 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyAssociatedProductsAsync(Product product, bool isPublished, bool copyMultimedia, bool copyAssociatedProducts, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyAssociatedProductsAsync(product={Product},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts},productCopy={ProductCopy})", product, isPublished, copyMultimedia, copyAssociatedProducts, productCopy);
         if (!copyAssociatedProducts)
             return;
 
         var associatedProducts = await _productService.GetAssociatedProductsAsync(product.Id, showHidden: true);
+		_logger.LogError("CopyAssociatedProductsAsync(product={Product},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts},productCopy={ProductCopy}): associatedProducts → {AssociatedProducts}", product, isPublished, copyMultimedia, copyAssociatedProducts, productCopy, associatedProducts);
         foreach (var associatedProduct in associatedProducts)
         {
             var associatedProductCopy = await CopyProductAsync(associatedProduct,
                 string.Format(NopCatalogDefaults.ProductCopyNameTemplate, associatedProduct.Name),
                 isPublished, copyMultimedia, false);
             associatedProductCopy.ParentGroupedProductId = productCopy.Id;
+			_logger.LogDebug("CopyAssociatedProductsAsync(product={Product},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts},productCopy={ProductCopy}): associatedProductCopy.ParentGroupedProductId → {Arg5}", product, isPublished, copyMultimedia, copyAssociatedProducts, productCopy, associatedProductCopy.ParentGroupedProductId);
             await _productService.UpdateProductAsync(associatedProductCopy);
         }
+		_logger.LogWarning("<<< Exiting CopyAssociatedProductsAsync(product={Product},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts},productCopy={ProductCopy})", product, isPublished, copyMultimedia, copyAssociatedProducts, productCopy);
     }
 
     /// <summary>
@@ -123,9 +147,11 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyTierPricesAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyTierPricesAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var tierPrice in await _productService.GetTierPricesByProductAsync(product.Id))
             await _productService.InsertTierPriceAsync(new TierPrice
             {
+				_logger.LogWarning("<<< Exiting CopyTierPricesAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
                 ProductId = productCopy.Id,
                 StoreId = tierPrice.StoreId,
                 CustomerRoleId = tierPrice.CustomerRoleId,
@@ -134,6 +160,10 @@ public partial class CopyProductService : ICopyProductService
                 StartDateTimeUtc = tierPrice.StartDateTimeUtc,
                 EndDateTimeUtc = tierPrice.EndDateTimeUtc
             });
+			_logger.LogDebug("CopyTierPricesAsync(product={Product},productCopy={ProductCopy}): EndDateTimeUtc → {EndDateTimeUtc}", product, productCopy, EndDateTimeUtc);
+			_logger.LogError(">>> Entering CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
+			_logger.LogError("Throwing ArgumentException from CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
+			_logger.LogWarning("<<< Exiting CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
     }
 
     /// <summary>
@@ -145,16 +175,22 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyAttributesMappingAsync(Product product, Product productCopy, Dictionary<int, int> originalNewPictureIdentifiers)
     {
+		_logger.LogError(">>> Entering CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers})", product, productCopy, originalNewPictureIdentifiers);
         var associatedAttributes = new Dictionary<int, int>();
         var associatedAttributeValues = new Dictionary<int, int>();
+		_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): associatedAttributeValues → {AssociatedAttributeValues}", product, productCopy, originalNewPictureIdentifiers, associatedAttributeValues);
+		_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): associatedAttributes → {AssociatedAttributes}", product, productCopy, originalNewPictureIdentifiers, associatedAttributes);
 
         //attribute mapping with condition attributes
         var oldCopyWithConditionAttributes = new List<ProductAttributeMapping>();
+		_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): oldCopyWithConditionAttributes → {OldCopyWithConditionAttributes}", product, productCopy, originalNewPictureIdentifiers, oldCopyWithConditionAttributes);
 
         //all product attribute mapping copies
         var productAttributeMappingCopies = new Dictionary<int, ProductAttributeMapping>();
+		_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): productAttributeMappingCopies → {ProductAttributeMappingCopies}", product, productCopy, originalNewPictureIdentifiers, productAttributeMappingCopies);
 
         var languages = await _languageService.GetAllLanguagesAsync(true);
+		_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): languages → {Languages}", product, productCopy, originalNewPictureIdentifiers, languages);
 
         foreach (var productAttributeMapping in await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id))
         {
@@ -177,6 +213,7 @@ public partial class CopyProductService : ICopyProductService
             foreach (var lang in languages)
             {
                 var textPrompt = await _localizationService.GetLocalizedAsync(productAttributeMapping, x => x.TextPrompt, lang.Id, false, false);
+				_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): textPrompt → {TextPrompt}", product, productCopy, originalNewPictureIdentifiers, textPrompt);
                 if (!string.IsNullOrEmpty(textPrompt))
                     await _localizedEntityService.SaveLocalizedValueAsync(productAttributeMappingCopy, x => x.TextPrompt, textPrompt,
                         lang.Id);
@@ -194,6 +231,7 @@ public partial class CopyProductService : ICopyProductService
 
             // product attribute values
             var productAttributeValues = await _productAttributeService.GetProductAttributeValuesAsync(productAttributeMapping.Id);
+			_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): productAttributeValues → {ProductAttributeValues}", product, productCopy, originalNewPictureIdentifiers, productAttributeValues);
             foreach (var productAttributeValue in productAttributeValues)
             {
                 var attributeValueCopy = new ProductAttributeValue
@@ -215,6 +253,7 @@ public partial class CopyProductService : ICopyProductService
 
                 //picture
                 var oldValuePictures = await _productAttributeService.GetProductAttributeValuePicturesAsync(productAttributeValue.Id);
+				_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): oldValuePictures → {OldValuePictures}", product, productCopy, originalNewPictureIdentifiers, oldValuePictures);
                 foreach (var oldValuePicture in oldValuePictures)
                 {
                     if (!originalNewPictureIdentifiers.TryGetValue(oldValuePicture.PictureId, out var valuePictureId))
@@ -225,6 +264,7 @@ public partial class CopyProductService : ICopyProductService
                         ProductAttributeValueId = attributeValueCopy.Id,
                         PictureId = valuePictureId
                     });
+					_logger.LogDebug("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): PictureId → {PictureId}", product, productCopy, originalNewPictureIdentifiers, PictureId);
                 }
 
                 //picture associated to "iamge square" attribute type (if exists)
@@ -242,6 +282,7 @@ public partial class CopyProductService : ICopyProductService
                             origImageSquaresPicture.AltAttribute,
                             origImageSquaresPicture.TitleAttribute);
                         attributeValueCopy.ImageSquaresPictureId = imageSquaresPictureCopy.Id;
+						_logger.LogDebug("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): attributeValueCopy.ImageSquaresPictureId → {Arg3}", product, productCopy, originalNewPictureIdentifiers, attributeValueCopy.ImageSquaresPictureId);
                     }
                 }
 
@@ -254,6 +295,7 @@ public partial class CopyProductService : ICopyProductService
                 foreach (var lang in languages)
                 {
                     var name = await _localizationService.GetLocalizedAsync(productAttributeValue, x => x.Name, lang.Id, false, false);
+					_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): name → {Name}", product, productCopy, originalNewPictureIdentifiers, name);
                     if (!string.IsNullOrEmpty(name))
                         await _localizedEntityService.SaveLocalizedValueAsync(attributeValueCopy, x => x.Name, name, lang.Id);
                 }
@@ -290,6 +332,7 @@ public partial class CopyProductService : ICopyProductService
             var attributeMappingId = associatedAttributes[productAttributeMapping.Id];
             var conditionAttribute = productAttributeMappingCopies[attributeMappingId];
             conditionAttribute.ConditionAttributeXml = newConditionAttributeXml;
+			_logger.LogDebug("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): conditionAttribute.ConditionAttributeXml → {Arg3}", product, productCopy, originalNewPictureIdentifiers, conditionAttribute.ConditionAttributeXml);
 
             await _productAttributeService.UpdateProductAttributeMappingAsync(conditionAttribute);
         }
@@ -300,17 +343,20 @@ public partial class CopyProductService : ICopyProductService
             //generate new AttributesXml according to new value IDs
             var newAttributesXml = string.Empty;
             var parsedProductAttributes = await _productAttributeParser.ParseProductAttributeMappingsAsync(combination.AttributesXml);
+			_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): parsedProductAttributes → {ParsedProductAttributes}", product, productCopy, originalNewPictureIdentifiers, parsedProductAttributes);
             foreach (var oldAttribute in parsedProductAttributes)
             {
                 if (!associatedAttributes.ContainsKey(oldAttribute.Id))
                     continue;
 
                 var newAttribute = await _productAttributeService.GetProductAttributeMappingByIdAsync(associatedAttributes[oldAttribute.Id]);
+				_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): newAttribute → {NewAttribute}", product, productCopy, originalNewPictureIdentifiers, newAttribute);
 
                 if (newAttribute == null)
                     continue;
 
                 var oldAttributeValuesStr = _productAttributeParser.ParseValues(combination.AttributesXml, oldAttribute.Id);
+				_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): oldAttributeValuesStr → {OldAttributeValuesStr}", product, productCopy, originalNewPictureIdentifiers, oldAttributeValuesStr);
 
                 foreach (var oldAttributeValueStr in oldAttributeValuesStr)
                 {
@@ -318,10 +364,12 @@ public partial class CopyProductService : ICopyProductService
                     {
                         //attribute values
                         var oldAttributeValue = int.Parse(oldAttributeValueStr);
+						_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): oldAttributeValue → {OldAttributeValue}", product, productCopy, originalNewPictureIdentifiers, oldAttributeValue);
                         if (!associatedAttributeValues.ContainsKey(oldAttributeValue))
                             continue;
 
                         var newAttributeValue = await _productAttributeService.GetProductAttributeValueByIdAsync(associatedAttributeValues[oldAttributeValue]);
+						_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): newAttributeValue → {NewAttributeValue}", product, productCopy, originalNewPictureIdentifiers, newAttributeValue);
 
                         if (newAttributeValue != null)
                         {
@@ -355,6 +403,7 @@ public partial class CopyProductService : ICopyProductService
 
             //picture
             var oldCombinationPictures = await _productAttributeService.GetProductAttributeCombinationPicturesAsync(combination.Id);
+			_logger.LogError("CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers}): oldCombinationPictures → {OldCombinationPictures}", product, productCopy, originalNewPictureIdentifiers, oldCombinationPictures);
             foreach (var oldCombinationPicture in oldCombinationPictures)
             {
                 if (!originalNewPictureIdentifiers.TryGetValue(oldCombinationPicture.PictureId, out var combinationPictureId))
@@ -372,6 +421,7 @@ public partial class CopyProductService : ICopyProductService
                 combinationCopy.StockQuantity,
                 message: string.Format(await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.CopyProduct"), product.Id), combinationId: combinationCopy.Id);
         }
+		_logger.LogWarning("<<< Exiting CopyAttributesMappingAsync(product={Product},productCopy={ProductCopy},originalNewPictureIdentifiers={OriginalNewPictureIdentifiers})", product, productCopy, originalNewPictureIdentifiers);
     }
 
     /// <summary>
@@ -382,8 +432,10 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyProductSpecificationsAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyProductSpecificationsAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         var allLanguages = await _languageService.GetAllLanguagesAsync();
 
+		_logger.LogError("CopyProductSpecificationsAsync(product={Product},productCopy={ProductCopy}): allLanguages → {AllLanguages}", product, productCopy, allLanguages);
         foreach (var productSpecificationAttribute in await _specificationAttributeService.GetProductSpecificationAttributesAsync(product.Id))
         {
             var psaCopy = new ProductSpecificationAttribute
@@ -402,10 +454,12 @@ public partial class CopyProductService : ICopyProductService
             foreach (var language in allLanguages)
             {
                 var customValue = await _localizationService.GetLocalizedAsync(productSpecificationAttribute, x => x.CustomValue, language.Id, false, false);
+				_logger.LogError("CopyProductSpecificationsAsync(product={Product},productCopy={ProductCopy}): customValue → {CustomValue}", product, productCopy, customValue);
                 if (!string.IsNullOrEmpty(customValue))
                     await _localizedEntityService.SaveLocalizedValueAsync(psaCopy, x => x.CustomValue, customValue, language.Id);
             }
         }
+		_logger.LogWarning("<<< Exiting CopyProductSpecificationsAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
     }
 
     /// <summary>
@@ -416,13 +470,16 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyCrossSellsMappingAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyCrossSellsMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var csProduct in await _productService.GetCrossSellProductsByProductId1Async(product.Id, true))
             await _productService.InsertCrossSellProductAsync(
                 new CrossSellProduct
                 {
+					_logger.LogWarning("<<< Exiting CopyCrossSellsMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
                     ProductId1 = productCopy.Id,
                     ProductId2 = csProduct.ProductId2
                 });
+				_logger.LogDebug("CopyCrossSellsMappingAsync(product={Product},productCopy={ProductCopy}): ProductId2 → {ProductId2}", product, productCopy, ProductId2);
     }
 
     /// <summary>
@@ -433,14 +490,17 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyRelatedProductsMappingAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyRelatedProductsMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var relatedProduct in await _productService.GetRelatedProductsByProductId1Async(product.Id, true))
             await _productService.InsertRelatedProductAsync(
                 new RelatedProduct
                 {
+					_logger.LogWarning("<<< Exiting CopyRelatedProductsMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
                     ProductId1 = productCopy.Id,
                     ProductId2 = relatedProduct.ProductId2,
                     DisplayOrder = relatedProduct.DisplayOrder
                 });
+				_logger.LogDebug("CopyRelatedProductsMappingAsync(product={Product},productCopy={ProductCopy}): DisplayOrder → {DisplayOrder}", product, productCopy, DisplayOrder);
     }
 
     /// <summary>
@@ -451,6 +511,7 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyManufacturersMappingAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyManufacturersMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var productManufacturers in await _manufacturerService.GetProductManufacturersByProductIdAsync(product.Id, true))
         {
             var productManufacturerCopy = new ProductManufacturer
@@ -463,6 +524,7 @@ public partial class CopyProductService : ICopyProductService
 
             await _manufacturerService.InsertProductManufacturerAsync(productManufacturerCopy);
         }
+		_logger.LogWarning("<<< Exiting CopyManufacturersMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
     }
 
     /// <summary>
@@ -473,6 +535,7 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyCategoriesMappingAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyCategoriesMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var productCategory in await _categoryService.GetProductCategoriesByProductIdAsync(product.Id, showHidden: true))
         {
             var productCategoryCopy = new ProductCategory
@@ -485,6 +548,7 @@ public partial class CopyProductService : ICopyProductService
 
             await _categoryService.InsertProductCategoryAsync(productCategoryCopy);
         }
+		_logger.LogWarning("<<< Exiting CopyCategoriesMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
     }
 
     /// <summary>
@@ -495,6 +559,7 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyWarehousesMappingAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyWarehousesMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         foreach (var pwi in await _productService.GetAllProductWarehouseInventoryRecordsAsync(product.Id))
         {
             await _productService.InsertProductWarehouseInventoryAsync(
@@ -505,11 +570,14 @@ public partial class CopyProductService : ICopyProductService
                     StockQuantity = pwi.StockQuantity,
                     ReservedQuantity = 0
                 });
+				_logger.LogDebug("CopyWarehousesMappingAsync(product={Product},productCopy={ProductCopy}): ReservedQuantity → {ReservedQuantity}", product, productCopy, ReservedQuantity);
 
             //quantity change history
             var message = $"{await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.MultipleWarehouses")} {string.Format(await _localizationService.GetResourceAsync("Admin.StockQuantityHistory.Messages.CopyProduct"), product.Id)}";
+			_logger.LogError("CopyWarehousesMappingAsync(product={Product},productCopy={ProductCopy}): message → {Message}", product, productCopy, message);
             await _productService.AddStockQuantityHistoryEntryAsync(productCopy, pwi.StockQuantity, pwi.StockQuantity, pwi.WarehouseId, message);
         }
+		_logger.LogWarning("<<< Exiting CopyWarehousesMappingAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
     }
 
     /// <summary>
@@ -560,20 +628,25 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyProductVideosAsync(Product product, bool copyVideos, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyProductVideosAsync(product={Product},copyVideos={CopyVideos},productCopy={ProductCopy})", product, copyVideos, productCopy);
         if (copyVideos)
         {
             foreach (var productVideo in await _productService.GetProductVideosByProductIdAsync(product.Id))
             {
                 var video = await _videoService.GetVideoByIdAsync(productVideo.VideoId);
+				_logger.LogError("CopyProductVideosAsync(product={Product},copyVideos={CopyVideos},productCopy={ProductCopy}): video → {Video}", product, copyVideos, productCopy, video);
                 var videoCopy = await _videoService.InsertVideoAsync(video);
+				_logger.LogError("CopyProductVideosAsync(product={Product},copyVideos={CopyVideos},productCopy={ProductCopy}): videoCopy → {VideoCopy}", product, copyVideos, productCopy, videoCopy);
                 await _productService.InsertProductVideoAsync(new ProductVideo
                 {
                     ProductId = productCopy.Id,
                     VideoId = videoCopy.Id,
                     DisplayOrder = productVideo.DisplayOrder
                 });
+				_logger.LogDebug("CopyProductVideosAsync(product={Product},copyVideos={CopyVideos},productCopy={ProductCopy}): DisplayOrder → {DisplayOrder}", product, copyVideos, productCopy, DisplayOrder);
             }
         }
+		_logger.LogWarning("<<< Exiting CopyProductVideosAsync(product={Product},copyVideos={CopyVideos},productCopy={ProductCopy})", product, copyVideos, productCopy);
     }
 
     /// <summary>
@@ -584,38 +657,47 @@ public partial class CopyProductService : ICopyProductService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task CopyLocalizationDataAsync(Product product, Product productCopy)
     {
+		_logger.LogError(">>> Entering CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
         var languages = await _languageService.GetAllLanguagesAsync(true);
 
+		_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): languages → {Languages}", product, productCopy, languages);
         //localization
         foreach (var lang in languages)
         {
             var name = await _localizationService.GetLocalizedAsync(product, x => x.Name, lang.Id, false, false);
+			_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): name → {Name}", product, productCopy, name);
             if (!string.IsNullOrEmpty(name))
                 await _localizedEntityService.SaveLocalizedValueAsync(productCopy, x => x.Name, name, lang.Id);
 
             var shortDescription = await _localizationService.GetLocalizedAsync(product, x => x.ShortDescription, lang.Id, false, false);
+			_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): shortDescription → {ShortDescription}", product, productCopy, shortDescription);
             if (!string.IsNullOrEmpty(shortDescription))
                 await _localizedEntityService.SaveLocalizedValueAsync(productCopy, x => x.ShortDescription, shortDescription, lang.Id);
 
             var fullDescription = await _localizationService.GetLocalizedAsync(product, x => x.FullDescription, lang.Id, false, false);
+			_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): fullDescription → {FullDescription}", product, productCopy, fullDescription);
             if (!string.IsNullOrEmpty(fullDescription))
                 await _localizedEntityService.SaveLocalizedValueAsync(productCopy, x => x.FullDescription, fullDescription, lang.Id);
 
             var metaKeywords = await _localizationService.GetLocalizedAsync(product, x => x.MetaKeywords, lang.Id, false, false);
+			_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): metaKeywords → {MetaKeywords}", product, productCopy, metaKeywords);
             if (!string.IsNullOrEmpty(metaKeywords))
                 await _localizedEntityService.SaveLocalizedValueAsync(productCopy, x => x.MetaKeywords, metaKeywords, lang.Id);
 
             var metaDescription = await _localizationService.GetLocalizedAsync(product, x => x.MetaDescription, lang.Id, false, false);
+			_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): metaDescription → {MetaDescription}", product, productCopy, metaDescription);
             if (!string.IsNullOrEmpty(metaDescription))
                 await _localizedEntityService.SaveLocalizedValueAsync(productCopy, x => x.MetaDescription, metaDescription, lang.Id);
 
             var metaTitle = await _localizationService.GetLocalizedAsync(product, x => x.MetaTitle, lang.Id, false, false);
+			_logger.LogError("CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy}): metaTitle → {MetaTitle}", product, productCopy, metaTitle);
             if (!string.IsNullOrEmpty(metaTitle))
                 await _localizedEntityService.SaveLocalizedValueAsync(productCopy, x => x.MetaTitle, metaTitle, lang.Id);
 
             //search engine name
             await _urlRecordService.SaveSlugAsync(productCopy, await _urlRecordService.ValidateSeNameAsync(productCopy, string.Empty, name, false), lang.Id);
         }
+		_logger.LogWarning("<<< Exiting CopyLocalizationDataAsync(product={Product},productCopy={ProductCopy})", product, productCopy);
     }
 
     /// <summary>
@@ -630,12 +712,16 @@ public partial class CopyProductService : ICopyProductService
     /// </returns>
     protected virtual async Task<Product> CopyBaseProductDataAsync(Product product, string newName, bool isPublished)
     {
+		_logger.LogError(">>> Entering CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished})", product, newName, isPublished);
         //product download & sample download
         var downloadId = product.DownloadId;
+		_logger.LogError("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): downloadId → {DownloadId}", product, newName, isPublished, downloadId);
         var sampleDownloadId = product.SampleDownloadId;
+		_logger.LogError("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): sampleDownloadId → {SampleDownloadId}", product, newName, isPublished, sampleDownloadId);
         if (product.IsDownload)
         {
             var download = await _downloadService.GetDownloadByIdAsync(product.DownloadId);
+			_logger.LogError("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): download → {Download}", product, newName, isPublished, download);
             if (download != null)
             {
                 var downloadCopy = new Download
@@ -656,6 +742,7 @@ public partial class CopyProductService : ICopyProductService
             if (product.HasSampleDownload)
             {
                 var sampleDownload = await _downloadService.GetDownloadByIdAsync(product.SampleDownloadId);
+				_logger.LogError("CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished}): sampleDownload → {SampleDownload}", product, newName, isPublished, sampleDownload);
                 if (sampleDownload != null)
                 {
                     var sampleDownloadCopy = new Download
@@ -786,6 +873,7 @@ public partial class CopyProductService : ICopyProductService
 
         //search engine name
         await _urlRecordService.SaveSlugAsync(productCopy, await _urlRecordService.ValidateSeNameAsync(productCopy, string.Empty, productCopy.Name, true), 0);
+		_logger.LogWarning("<<< Exiting CopyBaseProductDataAsync(product={Product},newName={NewName},isPublished={IsPublished})", product, newName, isPublished);
         return productCopy;
     }
 
@@ -808,12 +896,14 @@ public partial class CopyProductService : ICopyProductService
     public virtual async Task<Product> CopyProductAsync(Product product, string newName,
         bool isPublished = true, bool copyMultimedia = true, bool copyAssociatedProducts = true)
     {
+		_logger.LogError(">>> Entering CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts})", product, newName, isPublished, copyMultimedia, copyAssociatedProducts);
         ArgumentNullException.ThrowIfNull(product);
 
         if (string.IsNullOrEmpty(newName))
             throw new ArgumentException("Product name is required");
 
         var productCopy = await CopyBaseProductDataAsync(product, newName, isPublished);
+		_logger.LogError("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): productCopy → {ProductCopy}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, productCopy);
 
         //localization
         await CopyLocalizationDataAsync(product, productCopy);
@@ -824,6 +914,7 @@ public partial class CopyProductService : ICopyProductService
 
         //copy product pictures
         var originalNewPictureIdentifiers = await CopyProductPicturesAsync(product, newName, copyMultimedia, productCopy);
+		_logger.LogError("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): originalNewPictureIdentifiers → {OriginalNewPictureIdentifiers}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, originalNewPictureIdentifiers);
 
         //copy product videos
         await CopyProductVideosAsync(product, copyMultimedia, productCopy);
@@ -852,11 +943,13 @@ public partial class CopyProductService : ICopyProductService
 
         //store mapping
         var selectedStoreIds = await _storeMappingService.GetStoresIdsWithAccessAsync(product);
+		_logger.LogError("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): selectedStoreIds → {SelectedStoreIds}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, selectedStoreIds);
         foreach (var id in selectedStoreIds)
             await _storeMappingService.InsertStoreMappingAsync(productCopy, id);
 
         //customer role mapping
         var customerRoleIds = await _aclService.GetCustomerRoleIdsWithAccessAsync(product.Id, nameof(Product));
+		_logger.LogError("CopyProductAsync(product={Product},newName={NewName},isPublished={IsPublished},copyMultimedia={CopyMultimedia},copyAssociatedProducts={CopyAssociatedProducts}): customerRoleIds → {CustomerRoleIds}", product, newName, isPublished, copyMultimedia, copyAssociatedProducts, customerRoleIds);
 
         foreach (var id in customerRoleIds)
             await _aclService.InsertAclRecordAsync(productCopy, id);

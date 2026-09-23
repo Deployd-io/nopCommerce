@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Configuration;
 using Nop.Core.Events;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.Swiper.Infrastructure.Cache;
 
@@ -9,6 +10,7 @@ namespace Nop.Plugin.Widgets.Swiper.Infrastructure.Cache;
 /// Model cache event consumer (used for caching of presentation layer models)
 /// </summary>
 public class ModelCacheEventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<EntityInsertedEvent<Setting>>,
     IConsumer<EntityUpdatedEvent<Setting>>,
     IConsumer<EntityDeletedEvent<Setting>>
@@ -24,7 +26,10 @@ public class ModelCacheEventConsumer :
 
     public ModelCacheEventConsumer(IStaticCacheManager staticCacheManager)
     {
+		_logger.LogError(">>> Entering ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("ModelCacheEventConsumer(staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", staticCacheManager, _staticCacheManager);
+    _logger.LogWarning("<<< Exiting ModelCacheEventConsumer(staticCacheManager={StaticCacheManager})", staticCacheManager);
     }
 
     #endregion
@@ -38,7 +43,9 @@ public class ModelCacheEventConsumer :
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleEventAsync(EntityInsertedEvent<Setting> eventMessage)
     {
+		_logger.LogError(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
         await _staticCacheManager.RemoveByPrefixAsync(PictureUrlPrefix);
+		_logger.LogWarning("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

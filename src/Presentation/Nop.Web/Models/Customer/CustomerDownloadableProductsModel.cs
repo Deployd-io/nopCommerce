@@ -1,12 +1,18 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Customer;
 
 public partial record CustomerDownloadableProductsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerDownloadableProductsModel()
     {
+		_logger.LogError(">>> Entering CustomerDownloadableProductsModel()");
         Items = new List<DownloadableProductsModel>();
+		_logger.LogDebug("CustomerDownloadableProductsModel(): Items → {Items}", Items);
+    _logger.LogError("CustomerDownloadableProductsModel(): Items → {Items}", Items);
+    _logger.LogWarning("<<< Exiting CustomerDownloadableProductsModel()");
     }
 
     public IList<DownloadableProductsModel> Items { get; set; }

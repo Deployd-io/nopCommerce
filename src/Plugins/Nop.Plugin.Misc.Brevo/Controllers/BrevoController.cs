@@ -25,6 +25,7 @@ namespace Nop.Plugin.Misc.Brevo.Controllers;
 [AutoValidateAntiforgeryToken]
 public class BrevoController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly BrevoManager _brevoEmailManager;
@@ -66,20 +67,36 @@ public class BrevoController : BasePluginController
         MessageTemplatesSettings messageTemplatesSettings)
     {
         _brevoEmailManager = brevoEmailManager;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _brevoEmailManager → {_brevoEmailManager}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _brevoEmailManager);
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _emailAccountService → {_emailAccountService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _emailAccountService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _genericAttributeService → {_genericAttributeService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _localizationService → {_localizationService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _localizationService);
         _logger = logger;
+		_logger.LogError(">>> Entering BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings})", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings);
         _messageTemplateService = messageTemplateService;
         _messageTokenProvider = messageTokenProvider;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _messageTemplateService → {_messageTemplateService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _messageTemplateService);
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _messageTokenProvider → {_messageTokenProvider}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _messageTokenProvider);
         _newsLetterSubscriptionTypeService = newsLetterSubscriptionTypeService;
         _notificationService = notificationService;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _newsLetterSubscriptionTypeService → {_newsLetterSubscriptionTypeService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _newsLetterSubscriptionTypeService);
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _notificationService → {_notificationService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _notificationService);
         _settingService = settingService;
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _settingService → {_settingService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _settingService);
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _staticCacheManager → {_staticCacheManager}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _staticCacheManager);
         _storeContext = storeContext;
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _storeContext → {_storeContext}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _storeContext);
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _storeMappingService → {_storeMappingService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _storeMappingService);
         _storeService = storeService;
         _workContext = workContext;
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _storeService → {_storeService}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _storeService);
+		_logger.LogDebug("BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings}): _workContext → {_workContext}", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings, _workContext);
+		_logger.LogWarning("<<< Exiting BrevoController(brevoEmailManager={BrevoEmailManager},emailAccountService={EmailAccountService},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},logger={Logger},messageTemplateService={MessageTemplateService},messageTokenProvider=<redacted>,newsLetterSubscriptionTypeService={NewsLetterSubscriptionTypeService},notificationService={NotificationService},settingService={SettingService},staticCacheManager={StaticCacheManager},storeContext={StoreContext},storeMappingService=<redacted>,storeService={StoreService},workContext={WorkContext},messageTemplatesSettings={MessageTemplatesSettings})", brevoEmailManager, emailAccountService, genericAttributeService, localizationService, logger, messageTemplateService, newsLetterSubscriptionTypeService, notificationService, settingService, staticCacheManager, storeContext, storeService, workContext, messageTemplatesSettings);
         _messageTemplatesSettings = messageTemplatesSettings;
     }
 
@@ -94,9 +111,12 @@ public class BrevoController : BasePluginController
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task PrepareModelAsync(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering PrepareModelAsync(model={Model})", model);
         //load settings for active store scope
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogError("PrepareModelAsync(model={Model}): storeId → {StoreId}", model, storeId);
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
+		_logger.LogError("PrepareModelAsync(model={Model}): brevoSettings → {BrevoSettings}", model, brevoSettings);
 
         //whether plugin is configured
         if (string.IsNullOrEmpty(brevoSettings.ApiKey))
@@ -104,6 +124,15 @@ public class BrevoController : BasePluginController
 
         //prepare common properties
         model.ActiveStoreScopeConfiguration = storeId;
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.ActiveStoreScopeConfiguration → {Arg1}", model, model.ActiveStoreScopeConfiguration);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.ApiKey → {Arg1}", model, model.ApiKey);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.SmtpKey → {Arg1}", model, model.SmtpKey);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.SenderId → {Arg1}", model, model.SenderId);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.UseSmsNotifications → {Arg1}", model, model.UseSmsNotifications);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.SmsSenderName → {Arg1}", model, model.SmsSenderName);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.StoreOwnerPhoneNumber → {Arg1}", model, model.StoreOwnerPhoneNumber);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.UseMarketingAutomation → {Arg1}", model, model.UseMarketingAutomation);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.TrackingScript → {Arg1}", model, model.TrackingScript);
         model.ApiKey = brevoSettings.ApiKey;
         model.SmtpKey = brevoSettings.SmtpKey;
         model.SenderId = brevoSettings.SenderId;
@@ -114,6 +143,7 @@ public class BrevoController : BasePluginController
         model.TrackingScript = brevoSettings.TrackingScript;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareModelAsync(model={Model}): customer → {Customer}", model, customer);
         model.HideGeneralBlock = await _genericAttributeService.GetAttributeAsync<bool>(customer, BrevoDefaults.HideGeneralBlock);
         model.HideSynchronizationBlock = await _genericAttributeService.GetAttributeAsync<bool>(customer, BrevoDefaults.HideSynchronizationBlock);
         model.HideTransactionalBlock = await _genericAttributeService.GetAttributeAsync<bool>(customer, BrevoDefaults.HideTransactionalBlock);
@@ -131,29 +161,41 @@ public class BrevoController : BasePluginController
         model.AddSms.DefaultSelectedPhoneTypeId = model.AddSms.AvailablePhoneTypes.First().Value;
 
         var stores = await _storeService.GetAllStoresAsync();
+		_logger.LogError("PrepareModelAsync(model={Model}): stores → {Stores}", model, stores);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var messageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(storeId);
         model.AddSms.AvailableMessages = await messageTemplates.SelectAwait(async messageTemplate =>
         {
+			_logger.LogError("PrepareModelAsync(model={Model}): messageTemplates → {MessageTemplates}", model, messageTemplates);
             var name = messageTemplate.Name;
+			_logger.LogError("PrepareModelAsync(model={Model}): name → {Name}", model, name);
             if (storeId == 0 && messageTemplate.LimitedToStores)
             {
                 var storeIds = await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate);
+				_logger.LogError("PrepareModelAsync(model={Model}): storeIds → {StoreIds}", model, storeIds);
                 var storeNames = stores.Where(store => storeIds.Contains(store.Id)).Select(store => store.Name);
+				_logger.LogError("PrepareModelAsync(model={Model}): storeNames → {StoreNames}", model, storeNames);
                 name = $"{name} ({string.Join(',', storeNames)})";
             }
 
             return new SelectListItem(name, messageTemplate.Id.ToString());
         }).ToListAsync();
         var defaultSelectedMessage = model.AddSms.AvailableMessages.FirstOrDefault();
+		_logger.LogError("PrepareModelAsync(model)={Model}: database query executed in {Arg1} ms", model, __logStart.ElapsedMilliseconds);
+		_logger.LogError("PrepareModelAsync(model={Model}): defaultSelectedMessage → {DefaultSelectedMessage}", model, defaultSelectedMessage);
         model.AddSms.DefaultSelectedMessageId = defaultSelectedMessage?.Value ?? "0";
 
         //check whether email account exists
         if (brevoSettings.UseSmtp && await _emailAccountService.GetEmailAccountByIdAsync(brevoSettings.EmailAccountId) != null)
             model.UseSmtp = brevoSettings.UseSmtp;
+			_logger.LogDebug("PrepareModelAsync(model={Model}): model.UseSmtp → {Arg1}", model, model.UseSmtp);
 
         //get account info
         var (accountInfo, marketingAutomationEnabled, maKey, accountErrors) = await _brevoEmailManager.GetAccountInfoAsync();
         model.AccountInfo = accountInfo;
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.AccountInfo → {Arg1}", model, model.AccountInfo);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.MarketingAutomationKey → {Arg1}", model, model.MarketingAutomationKey);
+		_logger.LogDebug("PrepareModelAsync(model={Model}): model.MarketingAutomationDisabled → {Arg1}", model, model.MarketingAutomationDisabled);
         model.MarketingAutomationKey = maKey;
         model.MarketingAutomationDisabled = !marketingAutomationEnabled;
         if (!string.IsNullOrEmpty(accountErrors))
@@ -175,6 +217,7 @@ public class BrevoController : BasePluginController
             _notificationService.ErrorNotification($"{BrevoDefaults.NotificationMessage} {smtpErrors}");
 
         var newsLetterSubscriptionTypes = await _newsLetterSubscriptionTypeService.GetAllNewsLetterSubscriptionTypesAsync(storeId);
+		_logger.LogError("PrepareModelAsync(model={Model}): newsLetterSubscriptionTypes → {NewsLetterSubscriptionTypes}", model, newsLetterSubscriptionTypes);
         model.NewsLetterSubscriptionTypes = await newsLetterSubscriptionTypes.Select(subscriptionType => new NewsLetterSubscriptionMapModel
         {
             TypeId = subscriptionType.Id,
@@ -201,6 +244,7 @@ public class BrevoController : BasePluginController
 
         //create attributes in account
         var attributesErrors = await _brevoEmailManager.PrepareAttributesAsync();
+		_logger.LogError("PrepareModelAsync(model={Model}): attributesErrors → {AttributesErrors}", model, attributesErrors);
         if (!string.IsNullOrEmpty(attributesErrors))
             _notificationService.ErrorNotification($"{BrevoDefaults.NotificationMessage} {attributesErrors}");
 
@@ -208,13 +252,16 @@ public class BrevoController : BasePluginController
         if (!brevoSettings.PartnerValueSet)
         {
             var partnerSet = await _brevoEmailManager.SetPartnerAsync();
+			_logger.LogError("PrepareModelAsync(model={Model}): partnerSet → {PartnerSet}", model, partnerSet);
             if (partnerSet)
             {
                 brevoSettings.PartnerValueSet = true;
+				_logger.LogDebug("PrepareModelAsync(model={Model}): brevoSettings.PartnerValueSet → {Arg1}", model, brevoSettings.PartnerValueSet);
                 _settingService.SaveSetting(brevoSettings, settings => settings.PartnerValueSet, clearCache: false);
                 _settingService.ClearCache();
             }
         }
+		_logger.LogWarning("<<< Exiting PrepareModelAsync(model={Model})", model);
     }
 
     #endregion
@@ -225,9 +272,13 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         var model = new ConfigurationModel();
         await PrepareModelAsync(model);
+		_logger.LogError("Configure(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Configure()");
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Misc.Brevo/Views/Configure.cshtml", model);
     }
 
@@ -259,11 +310,14 @@ public class BrevoController : BasePluginController
     [FormValueRequired("saveSync")]
     public async Task<IActionResult> SaveSynchronization(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering SaveSynchronization(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogError("SaveSynchronization(model={Model}): storeId → {StoreId}", model, storeId);
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
+		_logger.LogError("SaveSynchronization(model={Model}): brevoSettings → {BrevoSettings}", model, brevoSettings);
 
         //create webhook for the unsubscribe event
         brevoSettings.UnsubscribeWebhookId = await _brevoEmailManager.GetUnsubscribeWebHookIdAsync();
@@ -272,6 +326,7 @@ public class BrevoController : BasePluginController
         //set list of contacts to synchronize
         brevoSettings.SubscriptionTypeMappings = model.NewsLetterSubscriptionTypes
             .ToDictionary(subscriptionType => subscriptionType.TypeId, subscriptionType => subscriptionType.ListId);
+			_logger.LogDebug("SaveSynchronization(model={Model}): brevoSettings.SubscriptionTypeMappings → {Arg1}", model, brevoSettings.SubscriptionTypeMappings);
         await _settingService.SaveSettingAsync(brevoSettings, settings => settings.SubscriptionTypeMappings, clearCache: false);
 
         //now clear settings cache
@@ -279,6 +334,9 @@ public class BrevoController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		_logger.LogError(">>> Entering Synchronization(model={Model})", model);
+		_logger.LogWarning("<<< Exiting Synchronization(model={Model})", model);
+		_logger.LogWarning("<<< Exiting SaveSynchronization(model={Model})", model);
         return await Configure();
     }
 
@@ -311,9 +369,15 @@ public class BrevoController : BasePluginController
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task<string> GetSynchronizationInfo()
     {
+		_logger.LogError(">>> Entering GetSynchronizationInfo()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var res = await _staticCacheManager.GetAsync(_staticCacheManager.PrepareKeyForDefaultCache(BrevoDefaults.SyncKeyCache), () => string.Empty);
         await _staticCacheManager.RemoveAsync(BrevoDefaults.SyncKeyCache);
+		_logger.LogError("GetSynchronizationInfo(): res → {Res}", res);
 
+		_logger.LogError("GetSynchronizationInfo(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetSynchronizationInfo()");
         return res;
     }
 
@@ -323,16 +387,20 @@ public class BrevoController : BasePluginController
     [FormValueRequired("saveSMTP")]
     public async Task<IActionResult> ConfigureSMTP(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering ConfigureSMTP(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogError("ConfigureSMTP(model={Model}): storeId → {StoreId}", model, storeId);
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
+		_logger.LogError("ConfigureSMTP(model={Model}): brevoSettings → {BrevoSettings}", model, brevoSettings);
 
         if (model.UseSmtp)
         {
             //set case invariant for true because tokens are used in uppercase format in Brevo's transactional emails
             _messageTemplatesSettings.CaseInvariantReplacement = true;
+			_logger.LogDebug("ConfigureSMTP(model={Model}): _messageTemplatesSettings.CaseInvariantReplacement → {Arg1}", model, _messageTemplatesSettings.CaseInvariantReplacement);
             await _settingService.SaveSettingAsync(_messageTemplatesSettings, settings => settings.CaseInvariantReplacement, clearCache: false);
 
             //check whether SMTP enabled on account
@@ -342,6 +410,7 @@ public class BrevoController : BasePluginController
                 //get email account or create new one
                 var (emailAccountId, emailAccountErrors) = await _brevoEmailManager.GetEmailAccountIdAsync(model.SenderId, model.SmtpKey);
                 brevoSettings.EmailAccountId = emailAccountId;
+				_logger.LogDebug("ConfigureSMTP(model={Model}): brevoSettings.EmailAccountId → {Arg1}", model, brevoSettings.EmailAccountId);
                 await _settingService.SaveSettingAsync(brevoSettings, settings => settings.EmailAccountId, storeId, false);
                 if (!string.IsNullOrEmpty(emailAccountErrors))
                     _notificationService.ErrorNotification($"{BrevoDefaults.NotificationMessage} {emailAccountErrors}");
@@ -351,6 +420,7 @@ public class BrevoController : BasePluginController
                 //need to activate SMTP account
                 _notificationService.WarningNotification(await _localizationService.GetResourceAsync("Plugins.Misc.Brevo.ActivateSMTP"));
                 model.UseSmtp = false;
+				_logger.LogDebug("ConfigureSMTP(model={Model}): model.UseSmtp → {Arg1}", model, model.UseSmtp);
             }
             if (!string.IsNullOrEmpty(smtpErrors))
                 _notificationService.ErrorNotification($"{BrevoDefaults.NotificationMessage} {smtpErrors}");
@@ -358,14 +428,17 @@ public class BrevoController : BasePluginController
 
         //set whether to use SMTP 
         brevoSettings.UseSmtp = model.UseSmtp;
+		_logger.LogDebug("ConfigureSMTP(model={Model}): brevoSettings.UseSmtp → {Arg1}", model, brevoSettings.UseSmtp);
         await _settingService.SaveSettingOverridablePerStoreAsync(brevoSettings, settings => settings.UseSmtp, model.UseSmtp_OverrideForStore, storeId, false);
 
         //set sender of transactional emails
         brevoSettings.SenderId = model.SenderId;
+		_logger.LogDebug("ConfigureSMTP(model={Model}): brevoSettings.SenderId → {Arg1}", model, brevoSettings.SenderId);
         await _settingService.SaveSettingOverridablePerStoreAsync(brevoSettings, settings => settings.SenderId, model.SenderId_OverrideForStore, storeId, false);
 
         //set SMTP key
         brevoSettings.SmtpKey = model.SmtpKey;
+		_logger.LogDebug("ConfigureSMTP(model={Model}): brevoSettings.SmtpKey → {Arg1}", model, brevoSettings.SmtpKey);
         await _settingService.SaveSettingAsync(brevoSettings, settings => settings.SmtpKey, clearCache: false);
 
         //now clear settings cache
@@ -373,6 +446,7 @@ public class BrevoController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		_logger.LogWarning("<<< Exiting ConfigureSMTP(model={Model})", model);
         return await Configure();
     }
 
@@ -381,8 +455,11 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> MessageList(BrevoMessageTemplateSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering MessageList(searchModel={SearchModel})", searchModel);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var messageTemplates = (await _messageTemplateService.GetAllMessageTemplatesAsync(storeId)).ToPagedList(searchModel);
+		_logger.LogError("MessageList(searchModel={SearchModel}): messageTemplates → {MessageTemplates}", searchModel, messageTemplates);
+		_logger.LogError("MessageList(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
 
         //prepare list model
         var model = await new BrevoMessageTemplateListModel().PrepareToGridAsync(searchModel, messageTemplates, () =>
@@ -391,6 +468,7 @@ public class BrevoController : BasePluginController
             {
                 //standard template of message is edited in the admin area, Brevo template is edited in the Brevo account
                 var templateId = await _genericAttributeService.GetAttributeAsync<int?>(messageTemplate, BrevoDefaults.TemplateIdAttribute);
+				_logger.LogError("MessageList(searchModel={SearchModel}): templateId → {TemplateId}", searchModel, templateId);
                 var stores = (await (await _storeService.GetAllStoresAsync())
                         .WhereAwait(async store => !messageTemplate.LimitedToStores
                                                    || (await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate)).Contains(store.Id))
@@ -411,6 +489,7 @@ public class BrevoController : BasePluginController
             });
         });
 
+		_logger.LogWarning("<<< Exiting MessageList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -419,19 +498,24 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> MessageUpdate(BrevoMessageTemplateModel model)
     {
+		_logger.LogError(">>> Entering MessageUpdate(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors().ToString());
 
         var message = await _messageTemplateService.GetMessageTemplateByIdAsync(model.Id);
+		_logger.LogError("MessageUpdate(model={Model}): message → {Message}", model, message);
 
         //Brevo message template
         if (model.UseBrevoTemplate)
         {
             var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+			_logger.LogError("MessageUpdate(model={Model}): storeId → {StoreId}", model, storeId);
             var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
+			_logger.LogError("MessageUpdate(model={Model}): brevoSettings → {BrevoSettings}", model, brevoSettings);
 
             //get template or create new one
             var currentTemplateId = await _genericAttributeService.GetAttributeAsync<int?>(message, BrevoDefaults.TemplateIdAttribute);
+			_logger.LogError("MessageUpdate(model={Model}): currentTemplateId → {CurrentTemplateId}", model, currentTemplateId);
             var templateId = await _brevoEmailManager.GetTemplateIdAsync(currentTemplateId, message,
                 await _emailAccountService.GetEmailAccountByIdAsync(brevoSettings.EmailAccountId));
             await _genericAttributeService.SaveAttributeAsync(message, BrevoDefaults.TemplateIdAttribute, templateId);
@@ -449,8 +533,10 @@ public class BrevoController : BasePluginController
             return new NullJsonResult();
 
         message.IsActive = model.IsActive;
+		_logger.LogDebug("MessageUpdate(model={Model}): message.IsActive → {Arg1}", model, message.IsActive);
         await _messageTemplateService.UpdateMessageTemplateAsync(message);
 
+		_logger.LogWarning("<<< Exiting MessageUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -460,17 +546,23 @@ public class BrevoController : BasePluginController
     [FormValueRequired("saveSMS")]
     public async Task<IActionResult> ConfigureSMS(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering ConfigureSMS(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogError("ConfigureSMS(model={Model}): storeId → {StoreId}", model, storeId);
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
+		_logger.LogError("ConfigureSMS(model={Model}): brevoSettings → {BrevoSettings}", model, brevoSettings);
 
         brevoSettings.UseSmsNotifications = model.UseSmsNotifications;
+		_logger.LogDebug("ConfigureSMS(model={Model}): brevoSettings.UseSmsNotifications → {Arg1}", model, brevoSettings.UseSmsNotifications);
         await _settingService.SaveSettingOverridablePerStoreAsync(brevoSettings, settings => settings.UseSmsNotifications, model.UseSmsNotifications_OverrideForStore, storeId, false);
         brevoSettings.SmsSenderName = model.SmsSenderName;
+		_logger.LogDebug("ConfigureSMS(model={Model}): brevoSettings.SmsSenderName → {Arg1}", model, brevoSettings.SmsSenderName);
         await _settingService.SaveSettingOverridablePerStoreAsync(brevoSettings, settings => settings.SmsSenderName, model.SmsSenderName_OverrideForStore, storeId, false);
         brevoSettings.StoreOwnerPhoneNumber = model.StoreOwnerPhoneNumber;
+		_logger.LogDebug("ConfigureSMS(model={Model}): brevoSettings.StoreOwnerPhoneNumber → {Arg1}", model, brevoSettings.StoreOwnerPhoneNumber);
         await _settingService.SaveSettingAsync(brevoSettings, settings => settings.StoreOwnerPhoneNumber, clearCache: false);
 
         //now clear settings cache
@@ -478,6 +570,7 @@ public class BrevoController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		_logger.LogWarning("<<< Exiting ConfigureSMS(model={Model})", model);
         return await Configure();
     }
 
@@ -486,10 +579,13 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> SMSList(SmsSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering SMSList(searchModel={SearchModel})", searchModel);
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
 
+		_logger.LogError("SMSList(searchModel={SearchModel}): storeId → {StoreId}", searchModel, storeId);
         //get message templates which are sending in SMS
         var allMessageTemplates = await _messageTemplateService.GetAllMessageTemplatesAsync(storeId);
+		_logger.LogError("SMSList(searchModel={SearchModel}): allMessageTemplates → {AllMessageTemplates}", searchModel, allMessageTemplates);
         var messageTemplates = await allMessageTemplates
 
             .WhereAwait(async messageTemplate => await _genericAttributeService.GetAttributeAsync<bool>(messageTemplate, BrevoDefaults.UseSmsAttribute))
@@ -501,6 +597,7 @@ public class BrevoController : BasePluginController
             return messageTemplates.SelectAwait(async messageTemplate =>
             {
                 var phoneTypeID = await _genericAttributeService.GetAttributeAsync<int>(messageTemplate, BrevoDefaults.PhoneTypeAttribute);
+				_logger.LogError("SMSList(searchModel={SearchModel}): phoneTypeID → {PhoneTypeID}", searchModel, phoneTypeID);
 
                 var smsModel = new SmsModel
                 {
@@ -517,7 +614,9 @@ public class BrevoController : BasePluginController
                     if (storeId == 0 && messageTemplate.LimitedToStores)
                     {
                         var storeIds = await _storeMappingService.GetStoresIdsWithAccessAsync(messageTemplate);
+						_logger.LogError("SMSList(searchModel={SearchModel}): storeIds → {StoreIds}", searchModel, storeIds);
                         var storeNames = (await _storeService.GetAllStoresAsync()).Where(store => storeIds.Contains(store.Id)).Select(store => store.Name);
+						_logger.LogError("SMSList(searchModel={SearchModel}): storeNames → {StoreNames}", searchModel, storeNames);
 
                         smsModel.Name = $"{smsModel.Name} ({string.Join(',', storeNames)})";
                     }
@@ -544,6 +643,7 @@ public class BrevoController : BasePluginController
             });
         });
 
+		_logger.LogWarning("<<< Exiting SMSList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -552,10 +652,12 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> SMSAdd(SmsModel model)
     {
+		_logger.LogError(">>> Entering SMSAdd(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         var message = await _messageTemplateService.GetMessageTemplateByIdAsync(model.MessageId);
+		_logger.LogError("SMSAdd(model={Model}): message → {Message}", model, message);
         if (message != null)
         {
             await _genericAttributeService.SaveAttributeAsync(message, BrevoDefaults.UseSmsAttribute, true);
@@ -563,6 +665,7 @@ public class BrevoController : BasePluginController
             await _genericAttributeService.SaveAttributeAsync(message, BrevoDefaults.PhoneTypeAttribute, model.PhoneTypeId);
         }
 
+		_logger.LogWarning("<<< Exiting SMSAdd(model={Model})", model);
         return Json(new { Result = true });
     }
 
@@ -571,11 +674,13 @@ public class BrevoController : BasePluginController
     [Area(AreaNames.ADMIN)]
     public async Task<IActionResult> SMSDelete(SmsModel model)
     {
+		_logger.LogError(">>> Entering SMSDelete(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         //delete generic attributes
         var message = await _messageTemplateService.GetMessageTemplateByIdAsync(model.Id);
+		_logger.LogError("SMSDelete(model={Model}): message → {Message}", model, message);
         if (message != null)
         {
             await _genericAttributeService.SaveAttributeAsync<bool?>(message, BrevoDefaults.UseSmsAttribute, null);
@@ -583,6 +688,7 @@ public class BrevoController : BasePluginController
             await _genericAttributeService.SaveAttributeAsync<int?>(message, BrevoDefaults.PhoneTypeAttribute, null);
         }
 
+		_logger.LogWarning("<<< Exiting SMSDelete(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -592,15 +698,18 @@ public class BrevoController : BasePluginController
     [FormValueRequired("submitCampaign")]
     public async Task<IActionResult> SubmitCampaign(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering SubmitCampaign(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         var campaignErrors = await _brevoEmailManager.SendSMSCampaignAsync(model.CampaignListId, model.CampaignSenderName, model.CampaignText);
+		_logger.LogError("SubmitCampaign(model={Model}): campaignErrors → {CampaignErrors}", model, campaignErrors);
         if (!string.IsNullOrEmpty(campaignErrors))
             _notificationService.ErrorNotification($"{BrevoDefaults.NotificationMessage} {campaignErrors}");
         else
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Misc.Brevo.SMS.Campaigns.Sent"));
 
+		_logger.LogWarning("<<< Exiting SubmitCampaign(model={Model})", model);
         return await Configure();
     }
 
@@ -610,22 +719,28 @@ public class BrevoController : BasePluginController
     [FormValueRequired("saveMA")]
     public async Task<IActionResult> ConfigureMA(ConfigurationModel model)
     {
+		_logger.LogError(">>> Entering ConfigureMA(model={Model})", model);
         if (!ModelState.IsValid)
             return await Configure();
 
         var storeId = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogError("ConfigureMA(model={Model}): storeId → {StoreId}", model, storeId);
         var brevoSettings = await _settingService.LoadSettingAsync<BrevoSettings>(storeId);
+		_logger.LogError("ConfigureMA(model={Model}): brevoSettings → {BrevoSettings}", model, brevoSettings);
 
         brevoSettings.UseMarketingAutomation = model.UseMarketingAutomation;
+		_logger.LogDebug("ConfigureMA(model={Model}): brevoSettings.UseMarketingAutomation → {Arg1}", model, brevoSettings.UseMarketingAutomation);
         await _settingService.SaveSettingOverridablePerStoreAsync(brevoSettings, settings => settings.UseMarketingAutomation, model.UseMarketingAutomation_OverrideForStore, storeId, false);
 
         var (accountInfo, marketingAutomationEnabled, maKey, accountErrors) = await _brevoEmailManager.GetAccountInfoAsync();
         brevoSettings.MarketingAutomationKey = maKey;
+		_logger.LogDebug("ConfigureMA(model={Model}): brevoSettings.MarketingAutomationKey → {Arg1}", model, brevoSettings.MarketingAutomationKey);
         if (!string.IsNullOrEmpty(accountErrors))
             _notificationService.ErrorNotification($"{BrevoDefaults.NotificationMessage} {accountErrors}");
 
         await _settingService.SaveSettingAsync(brevoSettings, settings => settings.MarketingAutomationKey, clearCache: false);
         brevoSettings.TrackingScript = model.TrackingScript;
+		_logger.LogDebug("ConfigureMA(model={Model}): brevoSettings.TrackingScript → {Arg1}", model, brevoSettings.TrackingScript);
         await _settingService.SaveSettingAsync(brevoSettings, settings => settings.TrackingScript, clearCache: false);
 
         //now clear settings cache
@@ -633,11 +748,13 @@ public class BrevoController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		_logger.LogWarning("<<< Exiting ConfigureMA(model={Model})", model);
         return await Configure();
     }
 
     public async Task<IActionResult> ImportContacts(BaseNopModel model, IFormCollection form)
     {
+		_logger.LogError(">>> Entering ImportContacts(model={Model},form={Form})", model, form);
         try
         {
             //logging info
@@ -654,6 +771,7 @@ public class BrevoController : BasePluginController
             await _staticCacheManager.SetAsync(_staticCacheManager.PrepareKeyForDefaultCache(BrevoDefaults.SyncKeyCache), ex.Message);
         }
 
+		_logger.LogWarning("<<< Exiting ImportContacts(model={Model},form={Form})", model, form);
         return Ok();
     }
 

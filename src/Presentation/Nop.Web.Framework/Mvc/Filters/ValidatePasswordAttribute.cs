@@ -5,6 +5,7 @@ using Nop.Core;
 using Nop.Core.Http;
 using Nop.Data;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class ValidatePasswordAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -20,6 +22,8 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
     /// </summary>
     public ValidatePasswordAttribute() : base(typeof(ValidatePasswordFilter))
     {
+	_logger.LogError(">>> Entering ValidatePasswordAttribute()");
+    _logger.LogWarning("<<< Exiting ValidatePasswordAttribute()");
     }
 
     #endregion
@@ -31,6 +35,7 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
     /// </summary>
     private class ValidatePasswordFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly ICustomerService _customerService;
@@ -45,9 +50,12 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
             IWebHelper webHelper,
             IWorkContext workContext)
         {
+			_logger.LogError(">>> Entering ValidatePasswordFilter(customerService={CustomerService},webHelper={WebHelper},workContext={WorkContext})", customerService, webHelper, workContext);
             _customerService = customerService;
             _webHelper = webHelper;
+			_logger.LogDebug("ValidatePasswordFilter(customerService={CustomerService},webHelper={WebHelper},workContext={WorkContext}): _webHelper → {_webHelper}", customerService, webHelper, workContext, _webHelper);
             _workContext = workContext;
+			_logger.LogDebug("ValidatePasswordFilter(customerService={CustomerService},webHelper={WebHelper},workContext={WorkContext}): _workContext → {_workContext}", customerService, webHelper, workContext, _workContext);
         }
 
         #endregion
@@ -61,6 +69,7 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidatePasswordAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering ValidatePasswordAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.HttpContext.Request == null)
@@ -106,6 +115,7 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
             var returnUrl = _webHelper.GetRawUrl(context.HttpContext.Request);
             //redirect to ChangePassword page if expires
             context.Result = new RedirectToRouteResult(NopRouteNames.Standard.CUSTOMER_CHANGE_PASSWORD, new { returnUrl = returnUrl });
+			_logger.LogWarning("<<< Exiting ValidatePasswordAsync(context={Context})", context);
         }
 
         #endregion
@@ -120,9 +130,11 @@ public sealed class ValidatePasswordAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await ValidatePasswordAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

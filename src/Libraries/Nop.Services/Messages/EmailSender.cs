@@ -4,6 +4,7 @@ using Nop.Core.Domain.Media;
 using Nop.Core.Domain.Messages;
 using Nop.Core.Infrastructure;
 using Nop.Services.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Messages;
 
@@ -12,6 +13,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class EmailSender : IEmailSender
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDownloadService _downloadService;
@@ -24,8 +26,12 @@ public partial class EmailSender : IEmailSender
 
     public EmailSender(IDownloadService downloadService, INopFileProvider fileProvider, ISmtpBuilder smtpBuilder)
     {
+		_logger.LogError(">>> Entering EmailSender(downloadService={DownloadService},fileProvider={FileProvider},smtpBuilder={SmtpBuilder})", downloadService, fileProvider, smtpBuilder);
         _downloadService = downloadService;
         _fileProvider = fileProvider;
+		_logger.LogDebug("EmailSender(downloadService={DownloadService},fileProvider={FileProvider},smtpBuilder={SmtpBuilder}): _fileProvider → {_fileProvider}", downloadService, fileProvider, smtpBuilder, _fileProvider);
+		_logger.LogDebug("EmailSender(downloadService={DownloadService},fileProvider={FileProvider},smtpBuilder={SmtpBuilder}): _downloadService → {_downloadService}", downloadService, fileProvider, smtpBuilder, _downloadService);
+    _logger.LogWarning("<<< Exiting EmailSender(downloadService={DownloadService},fileProvider={FileProvider},smtpBuilder={SmtpBuilder})", downloadService, fileProvider, smtpBuilder);
         _smtpBuilder = smtpBuilder;
     }
 
@@ -40,10 +46,14 @@ public partial class EmailSender : IEmailSender
     /// <returns>A leaf-node MIME part that contains an attachment.</returns>
     protected MimePart CreateMimeAttachment(Download download)
     {
+		_logger.LogError(">>> Entering CreateMimeAttachment(download={Download})", download);
         ArgumentNullException.ThrowIfNull(download);
 
         var fileName = !string.IsNullOrWhiteSpace(download.Filename) ? download.Filename : download.Id.ToString();
+		_logger.LogError("CreateMimeAttachment(download={Download}): fileName → {FileName}", download, fileName);
 
+		_logger.LogWarning("<<< Exiting CreateMimeAttachment(download={Download})", download);
+		_logger.LogWarning("<<< Exiting CreateMimeAttachment(attachmentFileName={AttachmentFileName},binaryContent={BinaryContent},cDate={CDate},mDate={MDate},rDate={RDate})", attachmentFileName, binaryContent, cDate, mDate, rDate);
         return CreateMimeAttachment($"{fileName}{download.Extension}", download.DownloadBinary, DateTime.UtcNow, DateTime.UtcNow, DateTime.UtcNow);
     }
 
@@ -58,16 +68,19 @@ public partial class EmailSender : IEmailSender
     /// </returns>
     protected virtual async Task<MimePart> CreateMimeAttachmentAsync(string filePath, string attachmentFileName = null)
     {
+		_logger.LogError(">>> Entering CreateMimeAttachmentAsync(filePath={FilePath},attachmentFileName={AttachmentFileName})", filePath, attachmentFileName);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         if (string.IsNullOrWhiteSpace(attachmentFileName))
             attachmentFileName = Path.GetFileName(filePath);
+			_logger.LogError("CreateMimeAttachmentAsync(filePath={FilePath},attachmentFileName={AttachmentFileName}): attachmentFileName → {AttachmentFileName1}", filePath, attachmentFileName, attachmentFileName);
 
         return CreateMimeAttachment(
             attachmentFileName,
             await _fileProvider.ReadAllBytesAsync(filePath),
             _fileProvider.GetCreationTime(filePath),
             _fileProvider.GetLastWriteTime(filePath),
+		_logger.LogWarning("<<< Exiting CreateMimeAttachmentAsync(filePath={FilePath},attachmentFileName={AttachmentFileName})", filePath, attachmentFileName);
             _fileProvider.GetLastAccessTime(filePath));
     }
 
@@ -129,8 +142,10 @@ public partial class EmailSender : IEmailSender
         string attachmentFilePath = null, string attachmentFileName = null,
         int attachedDownloadId = 0, IDictionary<string, string> headers = null)
     {
+		_logger.LogError(">>> Entering SendEmailAsync(emailAccount={EmailAccount},subject={Subject},body={Body},fromAddress={FromAddress},fromName={FromName},toAddress={ToAddress},toName={ToName},replyTo={ReplyTo},replyToName={ReplyToName},bcc={Bcc},cc={Cc},attachmentFilePath={AttachmentFilePath},attachmentFileName={AttachmentFileName},attachedDownloadId={AttachedDownloadId},headers={Headers})", emailAccount, subject, body, fromAddress, fromName, toAddress, toName, replyTo, replyToName, bcc, cc, attachmentFilePath, attachmentFileName, attachedDownloadId, headers);
         var message = new MimeMessage();
 
+		_logger.LogError("SendEmailAsync(emailAccount={EmailAccount},subject={Subject},body={Body},fromAddress={FromAddress},fromName={FromName},toAddress={ToAddress},toName={ToName},replyTo={ReplyTo},replyToName={ReplyToName},bcc={Bcc},cc={Cc},attachmentFilePath={AttachmentFilePath},attachmentFileName={AttachmentFileName},attachedDownloadId={AttachedDownloadId},headers={Headers}): message → {Message}", emailAccount, subject, body, fromAddress, fromName, toAddress, toName, replyTo, replyToName, bcc, cc, attachmentFilePath, attachmentFileName, attachedDownloadId, headers, message);
         message.From.Add(new MailboxAddress(fromName, fromAddress));
         message.To.Add(new MailboxAddress(toName, toAddress));
 
@@ -159,6 +174,7 @@ public partial class EmailSender : IEmailSender
 
         //content
         message.Subject = subject;
+		_logger.LogDebug("SendEmailAsync(emailAccount={EmailAccount},subject={Subject},body={Body},fromAddress={FromAddress},fromName={FromName},toAddress={ToAddress},toName={ToName},replyTo={ReplyTo},replyToName={ReplyToName},bcc={Bcc},cc={Cc},attachmentFilePath={AttachmentFilePath},attachmentFileName={AttachmentFileName},attachedDownloadId={AttachedDownloadId},headers={Headers}): message.Subject → {Arg15}", emailAccount, subject, body, fromAddress, fromName, toAddress, toName, replyTo, replyToName, bcc, cc, attachmentFilePath, attachmentFileName, attachedDownloadId, headers, message.Subject);
 
         //headers
         if (headers != null)
@@ -167,6 +183,7 @@ public partial class EmailSender : IEmailSender
                 message.Headers.Add(header.Key, header.Value);
             }
 
+		_logger.LogWarning("<<< Exiting SendEmailAsync(emailAccount={EmailAccount},subject={Subject},body={Body},fromAddress={FromAddress},fromName={FromName},toAddress={ToAddress},toName={ToName},replyTo={ReplyTo},replyToName={ReplyToName},bcc={Bcc},cc={Cc},attachmentFilePath={AttachmentFilePath},attachmentFileName={AttachmentFileName},attachedDownloadId={AttachedDownloadId},headers={Headers})", emailAccount, subject, body, fromAddress, fromName, toAddress, toName, replyTo, replyToName, bcc, cc, attachmentFilePath, attachmentFileName, attachedDownloadId, headers);
         var multipart = new Multipart("mixed")
         {
             new TextPart(TextFormat.Html) { Text = body }

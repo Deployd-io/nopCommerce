@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.ComponentModel;
 
@@ -10,6 +11,7 @@ namespace Nop.Core.ComponentModel;
 /// <typeparam name="V">Value type (simple)</typeparam>
 public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Type converter
     /// </summary>
@@ -22,10 +24,15 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
 
     public GenericDictionaryTypeConverter()
     {
+		_logger.LogError(">>> Entering GenericDictionaryTypeConverter()");
         _typeConverterKey = TypeDescriptor.GetConverter(typeof(K));
         if (_typeConverterKey == null)
+			_logger.LogError("Throwing InvalidOperationException from GenericDictionaryTypeConverter()");
+			_logger.LogDebug("GenericDictionaryTypeConverter(): _typeConverterKey → {_typeConverterKey}", _typeConverterKey);
             throw new InvalidOperationException("No type converter exists for type " + typeof(K).FullName);
         _typeConverterValue = TypeDescriptor.GetConverter(typeof(V));
+		_logger.LogError("GenericDictionaryTypeConverter(): _typeConverterValue → {_typeConverterValue}", _typeConverterValue);
+		_logger.LogDebug("GenericDictionaryTypeConverter(): _typeConverterValue → {_typeConverterValue}", _typeConverterValue);
         if (_typeConverterValue == null)
             throw new InvalidOperationException("No type converter exists for type " + typeof(V).FullName);
     }
@@ -40,9 +47,12 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
     /// <returns>Result</returns>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
+		_logger.LogError(">>> Entering CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         if (sourceType == typeof(string))
             return true;
 
+		_logger.LogError(">>> Entering ConvertFrom(context={Context},culture={Culture},value={Value})", context, culture, value);
+		_logger.LogWarning("<<< Exiting ConvertFrom(context={Context},culture={Culture},value={Value})", context, culture, value);
         return base.CanConvertFrom(context, sourceType);
     }
 
@@ -90,16 +100,19 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
     /// <returns>Result</returns>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
+		_logger.LogError(">>> Entering ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         if (destinationType != typeof(string))
             return base.ConvertTo(context, culture, value, destinationType);
 
         var result = string.Empty;
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): result → {Result}", context, culture, value, destinationType, result);
         if (value == null)
             return result;
 
         //we don't use string.Join() because it doesn't support invariant culture
         var counter = 0;
         var dictionary = (IDictionary<K, V>)value;
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): dictionary → {Dictionary}", context, culture, value, destinationType, dictionary);
         foreach (var keyValue in dictionary)
         {
             result += $"{Convert.ToString(keyValue.Key, CultureInfo.InvariantCulture)}, {Convert.ToString(keyValue.Value, CultureInfo.InvariantCulture)}";
@@ -109,6 +122,7 @@ public partial class GenericDictionaryTypeConverter<K, V> : TypeConverter
             counter++;
         }
 
+		_logger.LogWarning("<<< Exiting ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         return result;
     }
 }

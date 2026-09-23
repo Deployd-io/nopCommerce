@@ -2,13 +2,16 @@
 using Nop.Plugin.Payments.Manual.Models;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.Manual.Validators;
 
 public class PaymentInfoValidator : BaseNopValidator<PaymentInfoModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public PaymentInfoValidator(ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering PaymentInfoValidator(localizationService={LocalizationService})", localizationService);
         //useful links:
         //http://fluentvalidation.codeplex.com/wikipage?title=Custom&referringTitle=Documentation&ANCHOR#CustomValidator
         //http://benjii.me/2010/11/credit-card-validator-attribute-for-asp-net-mvc-3/
@@ -30,10 +33,12 @@ public class PaymentInfoValidator : BaseNopValidator<PaymentInfoModel>
             //the cards remain valid until the last calendar day of that month
             //If, for example, an expiration date reads 06/15, this means it can be used until midnight on June 30, 2015
             var enteredDate = new DateTime(int.Parse(x.ExpireYear), int.Parse(x.ExpireMonth), 1).AddMonths(1);
+			_logger.LogError("PaymentInfoValidator(localizationService={LocalizationService}): enteredDate → {EnteredDate}", localizationService, enteredDate);
 
             if (enteredDate < DateTime.Now)
                 return false;
 
+		_logger.LogWarning("<<< Exiting PaymentInfoValidator(localizationService={LocalizationService})", localizationService);
             return true;
         }).WithMessageAwait(localizationService.GetResourceAsync("Payment.ExpirationDate.Expired"));
     }

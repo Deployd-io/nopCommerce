@@ -7,6 +7,7 @@ using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel;
 
@@ -15,6 +16,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel;
 /// </summary>
 public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FacebookPixelService _facebookPixelService;
@@ -33,11 +35,16 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
         ISettingService settingService,
         WidgetSettings widgetSettings)
     {
+		_logger.LogError(">>> Entering FacebookPixelPlugin(facebookPixelService={FacebookPixelService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings})", facebookPixelService, localizationService, nopUrlHelper, settingService, widgetSettings);
         _facebookPixelService = facebookPixelService;
         _localizationService = localizationService;
+		_logger.LogDebug("FacebookPixelPlugin(facebookPixelService={FacebookPixelService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", facebookPixelService, localizationService, nopUrlHelper, settingService, widgetSettings, _localizationService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("FacebookPixelPlugin(facebookPixelService={FacebookPixelService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _nopUrlHelper → {_nopUrlHelper}", facebookPixelService, localizationService, nopUrlHelper, settingService, widgetSettings, _nopUrlHelper);
         _settingService = settingService;
+		_logger.LogDebug("FacebookPixelPlugin(facebookPixelService={FacebookPixelService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _settingService → {_settingService}", facebookPixelService, localizationService, nopUrlHelper, settingService, widgetSettings, _settingService);
         _widgetSettings = widgetSettings;
+		_logger.LogDebug("FacebookPixelPlugin(facebookPixelService={FacebookPixelService},localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _widgetSettings → {_widgetSettings}", facebookPixelService, localizationService, nopUrlHelper, settingService, widgetSettings, _widgetSettings);
     }
 
     #endregion
@@ -49,6 +56,8 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(FacebookPixelDefaults.ConfigurationRouteName);
     }
 
@@ -61,9 +70,11 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// </returns>
     public async Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogError(">>> Entering GetWidgetZonesAsync()");
         var widgetZones = new List<string> { PublicWidgetZones.HeadHtmlTag };
         widgetZones.AddRange(await _facebookPixelService.GetCustomEventsWidgetZonesAsync());
 
+		_logger.LogWarning("<<< Exiting GetWidgetZonesAsync()");
         return widgetZones;
     }
 
@@ -74,8 +85,10 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogError(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         ArgumentNullException.ThrowIfNull(widgetZone);
 
+		_logger.LogWarning("<<< Exiting GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         return typeof(FacebookPixelViewComponent);
     }
 
@@ -85,6 +98,7 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
         {
             ["Plugins.Widgets.FacebookPixel.Configuration"] = "Configuration",
@@ -140,6 +154,7 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
         });
 
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -148,12 +163,14 @@ public class FacebookPixelPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         _widgetSettings.ActiveWidgetSystemNames.Remove(FacebookPixelDefaults.SystemName);
         await _settingService.SaveSettingAsync(_widgetSettings);
 
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Widgets.FacebookPixel");
 
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

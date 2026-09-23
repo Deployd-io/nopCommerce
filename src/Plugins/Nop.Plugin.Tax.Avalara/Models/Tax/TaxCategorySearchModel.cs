@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Models.Tax;
 
@@ -8,12 +9,15 @@ namespace Nop.Plugin.Tax.Avalara.Models.Tax;
 /// </summary>
 public record TaxCategorySearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public TaxCategorySearchModel()
     {
+		_logger.LogError(">>> Entering TaxCategorySearchModel()");
         AddTaxCategory = new TaxCategoryModel();
         AvailableTypes = new List<SelectListItem>();
+		_logger.LogError("TaxCategorySearchModel(): AvailableTypes → {AvailableTypes}", AvailableTypes);
     }
 
     #endregion

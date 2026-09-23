@@ -16,6 +16,7 @@ using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Controllers;
 
@@ -24,6 +25,7 @@ namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Controllers;
 [AutoValidateAntiforgeryToken]
 public class FixedByWeightByTotalController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -58,19 +60,32 @@ public class FixedByWeightByTotalController : BasePluginController
         IWarehouseService warehouseService,
         MeasureSettings measureSettings)
     {
+		_logger.LogError(">>> Entering FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings})", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings);
         _currencySettings = currencySettings;
         _fixedByWeightByTotalSettings = fixedByWeightByTotalSettings;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _fixedByWeightByTotalSettings → {_fixedByWeightByTotalSettings}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _fixedByWeightByTotalSettings);
         _countryService = countryService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _countryService → {_countryService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _countryService);
         _currencyService = currencyService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _currencyService → {_currencyService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _currencyService);
         _localizationService = localizationService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _localizationService → {_localizationService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _localizationService);
         _measureService = measureService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _measureService → {_measureService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _measureService);
         _settingService = settingService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _settingService → {_settingService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _settingService);
         _shippingByWeightService = shippingByWeightService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _shippingByWeightService → {_shippingByWeightService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _shippingByWeightService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _stateProvinceService → {_stateProvinceService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _stateProvinceService);
         _shippingMethodsService = shippingMethodsService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _shippingMethodsService → {_shippingMethodsService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _shippingMethodsService);
         _storeService = storeService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _storeService → {_storeService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _storeService);
         _warehouseService = warehouseService;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _warehouseService → {_warehouseService}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _warehouseService);
         _measureSettings = measureSettings;
+		_logger.LogDebug("FixedByWeightByTotalController(currencySettings={CurrencySettings},fixedByWeightByTotalSettings={FixedByWeightByTotalSettings},countryService={CountryService},currencyService={CurrencyService},localizationService={LocalizationService},measureService={MeasureService},settingService={SettingService},shippingByWeightService=<redacted>,shippingMethodsService=<redacted>,stateProvinceService={StateProvinceService},storeService={StoreService},warehouseService={WarehouseService},measureSettings={MeasureSettings}): _measureSettings → {_measureSettings}", currencySettings, fixedByWeightByTotalSettings, countryService, currencyService, localizationService, measureService, settingService, stateProvinceService, storeService, warehouseService, measureSettings, _measureSettings);
     }
 
     #endregion
@@ -80,6 +95,7 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             LimitMethodsToCreated = _fixedByWeightByTotalSettings.LimitMethodsToCreated,
@@ -101,6 +117,7 @@ public class FixedByWeightByTotalController : BasePluginController
         //countries
         model.AvailableCountries.Add(new SelectListItem { Text = "*", Value = "0" });
         var countries = await _countryService.GetAllCountriesAsync();
+		_logger.LogError("Configure(): countries → {Countries}", countries);
         foreach (var c in countries)
             model.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
         //states
@@ -108,6 +125,8 @@ public class FixedByWeightByTotalController : BasePluginController
 
         model.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting Configure()");
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Shipping.FixedByWeightByTotal/Views/Configure.cshtml", model);
     }
 
@@ -126,10 +145,13 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> SaveMode(bool value)
     {
+		_logger.LogError(">>> Entering SaveMode(value={Value})", value);
         //save settings
         _fixedByWeightByTotalSettings.ShippingByWeightByTotalEnabled = value;
+		_logger.LogDebug("SaveMode(value={Value}): _fixedByWeightByTotalSettings.ShippingByWeightByTotalEnabled → {Arg1}", value, _fixedByWeightByTotalSettings.ShippingByWeightByTotalEnabled);
         await _settingService.SaveSettingAsync(_fixedByWeightByTotalSettings);
 
+		_logger.LogWarning("<<< Exiting SaveMode(value={Value})", value);
         return Json(new { Result = true });
     }
 
@@ -139,8 +161,10 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> FixedShippingRateList(ConfigurationModel searchModel)
     {
+		_logger.LogError(">>> Entering FixedShippingRateList(searchModel={SearchModel})", searchModel);
         var shippingMethods = (await _shippingMethodsService.GetAllShippingMethodsAsync()).ToPagedList(searchModel);
 
+		_logger.LogError("FixedShippingRateList(searchModel={SearchModel}): shippingMethods → {ShippingMethods}", searchModel, shippingMethods);
         var gridModel = await new FixedRateListModel().PrepareToGridAsync(searchModel, shippingMethods, () =>
         {
             return shippingMethods.SelectAwait(async shippingMethod => new FixedRateModel
@@ -155,6 +179,7 @@ public class FixedByWeightByTotalController : BasePluginController
             });
         });
 
+		_logger.LogWarning("<<< Exiting FixedShippingRateList(searchModel={SearchModel})", searchModel);
         return Json(gridModel);
     }
 
@@ -162,11 +187,13 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> UpdateFixedShippingRate(FixedRateModel model)
     {
+		_logger.LogError(">>> Entering UpdateFixedShippingRate(model={Model})", model);
         await _settingService.SetSettingAsync(string.Format(FixedByWeightByTotalDefaults.FIXED_RATE_SETTINGS_KEY, model.ShippingMethodId), model.Rate, 0, false);
         await _settingService.SetSettingAsync(string.Format(FixedByWeightByTotalDefaults.TRANSIT_DAYS_SETTINGS_KEY, model.ShippingMethodId), model.TransitDays, 0, false);
 
         await _settingService.ClearCacheAsync();
 
+		_logger.LogWarning("<<< Exiting UpdateFixedShippingRate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -178,6 +205,7 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> RateByWeightByTotalList(ConfigurationModel searchModel, ConfigurationModel filter)
     {
+		_logger.LogError(">>> Entering RateByWeightByTotalList(searchModel={SearchModel},filter={Filter})", searchModel, filter);
         //var records = _shippingByWeightService.GetAll(command.Page - 1, command.PageSize);
         var records = await _shippingByWeightService.FindRecordsAsync(
             pageIndex: searchModel.Page - 1,
@@ -221,6 +249,7 @@ public class FixedByWeightByTotalController : BasePluginController
                 };
 
                 var htmlSb = new StringBuilder("<div>");
+				_logger.LogError("RateByWeightByTotalList(searchModel={SearchModel},filter={Filter}): htmlSb → {HtmlSb}", searchModel, filter, htmlSb);
                 htmlSb.AppendFormat("{0}: {1}",
                     await _localizationService.GetResourceAsync("Plugins.Shipping.FixedByWeightByTotal.Fields.WeightFrom"),
                     model.WeightFrom);
@@ -260,12 +289,14 @@ public class FixedByWeightByTotalController : BasePluginController
             });
         });
 
+		_logger.LogWarning("<<< Exiting RateByWeightByTotalList(searchModel={SearchModel},filter={Filter})", searchModel, filter);
         return Json(gridModel);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> AddRateByWeightByTotalPopup()
     {
+		_logger.LogError(">>> Entering AddRateByWeightByTotalPopup()");
         var model = new ShippingByWeightByTotalModel
         {
             PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode,
@@ -275,6 +306,7 @@ public class FixedByWeightByTotalController : BasePluginController
         };
 
         var shippingMethods = await _shippingMethodsService.GetAllShippingMethodsAsync();
+		_logger.LogError("AddRateByWeightByTotalPopup(): shippingMethods → {ShippingMethods}", shippingMethods);
         if (!shippingMethods.Any())
             return Content("No shipping methods can be loaded");
 
@@ -292,11 +324,14 @@ public class FixedByWeightByTotalController : BasePluginController
         //countries
         model.AvailableCountries.Add(new SelectListItem { Text = "*", Value = "0" });
         var countries = await _countryService.GetAllCountriesAsync(showHidden: true);
+		_logger.LogError("AddRateByWeightByTotalPopup(): countries → {Countries}", countries);
         foreach (var c in countries)
             model.AvailableCountries.Add(new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
         //states
         model.AvailableStates.Add(new SelectListItem { Text = "*", Value = "0" });
 
+		_logger.LogWarning("<<< Exiting AddRateByWeightByTotalPopup()");
+		_logger.LogWarning("<<< Exiting AddRateByWeightByTotalPopup(model={Model})", model);
         return View("~/Plugins/Shipping.FixedByWeightByTotal/Views/AddRateByWeightByTotalPopup.cshtml", model);
     }
 
@@ -331,6 +366,7 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> EditRateByWeightByTotalPopup(int id)
     {
+		_logger.LogError(">>> Entering EditRateByWeightByTotalPopup(id={Id})", id);
         var sbw = await _shippingByWeightService.GetByIdAsync(id);
         if (sbw == null)
             //no record found with the specified id
@@ -389,6 +425,8 @@ public class FixedByWeightByTotalController : BasePluginController
         foreach (var s in states)
             model.AvailableStates.Add(new SelectListItem { Text = s.Name, Value = s.Id.ToString(), Selected = (selectedState != null && s.Id == selectedState.Id) });
 
+		_logger.LogWarning("<<< Exiting EditRateByWeightByTotalPopup(id={Id})", id);
+		_logger.LogWarning("<<< Exiting EditRateByWeightByTotalPopup(model={Model})", model);
         return View("~/Plugins/Shipping.FixedByWeightByTotal/Views/EditRateByWeightByTotalPopup.cshtml", model);
     }
 
@@ -428,10 +466,12 @@ public class FixedByWeightByTotalController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SHIPPING_SETTINGS)]
     public async Task<IActionResult> DeleteRateByWeightByTotal(int id)
     {
+		_logger.LogError(">>> Entering DeleteRateByWeightByTotal(id={Id})", id);
         var sbw = await _shippingByWeightService.GetByIdAsync(id);
         if (sbw != null)
             await _shippingByWeightService.DeleteShippingByWeightRecordAsync(sbw);
 
+		_logger.LogWarning("<<< Exiting DeleteRateByWeightByTotal(id={Id})", id);
         return new NullJsonResult();
     }
 

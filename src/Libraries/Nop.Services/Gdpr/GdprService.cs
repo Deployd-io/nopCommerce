@@ -12,6 +12,7 @@ using Nop.Services.Forums;
 using Nop.Services.Messages;
 using Nop.Services.News;
 using Nop.Services.Orders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Gdpr;
 
@@ -20,6 +21,7 @@ namespace Nop.Services.Gdpr;
 /// </summary>
 public partial class GdprService : IGdprService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -58,21 +60,36 @@ public partial class GdprService : IGdprService
         IRepository<GdprLog> gdprLogRepository,
         IShoppingCartService shoppingCartService)
     {
+		_logger.LogError(">>> Entering GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>)", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository);
         _addressService = addressService;
         _backInStockSubscriptionService = backInStockSubscriptionService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _backInStockSubscriptionService → {_backInStockSubscriptionService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _backInStockSubscriptionService);
         _blogService = blogService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _blogService → {_blogService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _blogService);
         _customerService = customerService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _customerService → {_customerService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _customerService);
         _externalAuthenticationService = externalAuthenticationService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _externalAuthenticationService → {_externalAuthenticationService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _externalAuthenticationService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _eventPublisher → {_eventPublisher}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _eventPublisher);
         _forumService = forumService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _forumService → {_forumService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _forumService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _genericAttributeService → {_genericAttributeService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _genericAttributeService);
         _newsService = newsService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _newsService → {_newsService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _newsService);
         _newsLetterSubscriptionService = newsLetterSubscriptionService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _newsLetterSubscriptionService → {_newsLetterSubscriptionService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _newsLetterSubscriptionService);
         _productReviewService = productReviewService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _productReviewService → {_productReviewService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _productReviewService);
         _productService = productService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _productService → {_productService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _productService);
         _gdprConsentRepository = gdprConsentRepository;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _gdprConsentRepository → {_gdprConsentRepository}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _gdprConsentRepository);
         _gdprLogRepository = gdprLogRepository;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _gdprLogRepository → {_gdprLogRepository}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _gdprLogRepository);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("GdprService(addressService={AddressService},backInStockSubscriptionService={BackInStockSubscriptionService},blogService={BlogService},customerService={CustomerService},externalAuthenticationService={ExternalAuthenticationService},eventPublisher={EventPublisher},forumService={ForumService},genericAttributeService={GenericAttributeService},newsService={NewsService},newsLetterSubscriptionService={NewsLetterSubscriptionService},productReviewService={ProductReviewService},productService={ProductService},gdprConsentRepository={GdprConsentRepository},gdprLogRepository={GdprLogRepository},shoppingCartService=<redacted>): _shoppingCartService → {_shoppingCartService}", addressService, backInStockSubscriptionService, blogService, customerService, externalAuthenticationService, eventPublisher, forumService, genericAttributeService, newsService, newsLetterSubscriptionService, productReviewService, productService, gdprConsentRepository, gdprLogRepository, _shoppingCartService);
     }
 
     #endregion
@@ -86,7 +103,9 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertLogAsync(GdprLog gdprLog)
     {
+		_logger.LogError(">>> Entering InsertLogAsync(gdprLog={GdprLog})", gdprLog);
         await _gdprLogRepository.InsertAsync(gdprLog);
+		_logger.LogWarning("<<< Exiting InsertLogAsync(gdprLog={GdprLog})", gdprLog);
     }
 
     #endregion
@@ -105,6 +124,9 @@ public partial class GdprService : IGdprService
     /// </returns>
     public virtual async Task<GdprConsent> GetConsentByIdAsync(int gdprConsentId)
     {
+		_logger.LogError(">>> Entering GetConsentByIdAsync(gdprConsentId={GdprConsentId})", gdprConsentId);
+		_logger.LogError("GetConsentByIdAsync(gdprConsentId)={GdprConsentId}: find query executing", gdprConsentId);
+    _logger.LogWarning("<<< Exiting GetConsentByIdAsync(gdprConsentId={GdprConsentId})", gdprConsentId);
         return await _gdprConsentRepository.GetByIdAsync(gdprConsentId, cache => default);
     }
 
@@ -117,13 +139,18 @@ public partial class GdprService : IGdprService
     /// </returns>
     public virtual async Task<IList<GdprConsent>> GetAllConsentsAsync()
     {
+		_logger.LogError(">>> Entering GetAllConsentsAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var gdprConsents = await _gdprConsentRepository.GetAllAsync(query =>
         {
             return from c in query
                 orderby c.DisplayOrder, c.Id
                 select c;
         }, cache => default);
+		_logger.LogError("GetAllConsentsAsync(): find query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetAllConsentsAsync()");
         return gdprConsents;
     }
 
@@ -134,7 +161,9 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertConsentAsync(GdprConsent gdprConsent)
     {
+		_logger.LogError(">>> Entering InsertConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
         await _gdprConsentRepository.InsertAsync(gdprConsent);
+		_logger.LogWarning("<<< Exiting InsertConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
     }
 
     /// <summary>
@@ -144,7 +173,9 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateConsentAsync(GdprConsent gdprConsent)
     {
+		_logger.LogError(">>> Entering UpdateConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
         await _gdprConsentRepository.UpdateAsync(gdprConsent);
+		_logger.LogWarning("<<< Exiting UpdateConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
     }
 
     /// <summary>
@@ -154,7 +185,12 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteConsentAsync(GdprConsent gdprConsent)
     {
+		_logger.LogError(">>> Entering DeleteConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _gdprConsentRepository.DeleteAsync(gdprConsent);
+		_logger.LogError("DeleteConsentAsync(gdprConsent)={GdprConsent}: external service call took {Arg1} ms", gdprConsent, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteConsentAsync(gdprConsent={GdprConsent})", gdprConsent);
     }
 
     /// <summary>
@@ -168,8 +204,10 @@ public partial class GdprService : IGdprService
     /// </returns>
     public virtual async Task<bool?> IsConsentAcceptedAsync(int consentId, int customerId)
     {
+		_logger.LogError(">>> Entering IsConsentAcceptedAsync(consentId={ConsentId},customerId={CustomerId})", consentId, customerId);
         //get latest record
         var log = (await GetAllLogAsync(customerId: customerId, consentId: consentId, pageIndex: 0, pageSize: 1)).FirstOrDefault();
+		_logger.LogError("IsConsentAcceptedAsync(consentId={ConsentId},customerId={CustomerId}): log → {Log}", consentId, customerId, log);
         if (log == null)
             return null;
 
@@ -202,8 +240,11 @@ public partial class GdprService : IGdprService
         string customerInfo = "", GdprRequestType? requestType = null,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllLogAsync(customerId={CustomerId},consentId={ConsentId},customerInfo={CustomerInfo},requestType={RequestType},pageIndex={PageIndex},pageSize={PageSize})", customerId, consentId, customerInfo, requestType, pageIndex, pageSize);
         return await _gdprLogRepository.GetAllPagedAsync(query =>
         {
+			_logger.LogWarning("<<< Exiting GetAllLogAsync(customerId={CustomerId},consentId={ConsentId},customerInfo={CustomerInfo},requestType={RequestType},pageIndex={PageIndex},pageSize={PageSize})", customerId, consentId, customerInfo, requestType, pageIndex, pageSize);
+			_logger.LogError("GetAllLogAsync(customerId,consentId,customerInfo,requestType,pageIndex,pageSize)={CustomerId},{ConsentId},{CustomerInfo},{RequestType},{PageIndex},{PageSize}: find query executing", customerId, consentId, customerInfo, requestType, pageIndex, pageSize);
             if (customerId > 0)
                 query = query.Where(log => log.CustomerId == customerId);
 
@@ -235,6 +276,7 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertLogAsync(Customer customer, int consentId, GdprRequestType requestType, string requestDetails)
     {
+		_logger.LogError(">>> Entering InsertLogAsync(customer={Customer},consentId={ConsentId},requestType={RequestType},requestDetails={RequestDetails})", customer, consentId, requestType, requestDetails);
         ArgumentNullException.ThrowIfNull(customer);
 
         var gdprLog = new GdprLog
@@ -248,6 +290,7 @@ public partial class GdprService : IGdprService
         };
 
         await InsertLogAsync(gdprLog);
+		_logger.LogWarning("<<< Exiting InsertLogAsync(customer={Customer},consentId={ConsentId},requestType={RequestType},requestDetails={RequestDetails})", customer, consentId, requestType, requestDetails);
     }
 
     #endregion
@@ -261,24 +304,30 @@ public partial class GdprService : IGdprService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PermanentDeleteCustomerAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering PermanentDeleteCustomerAsync(customer={Customer})", customer);
         ArgumentNullException.ThrowIfNull(customer);
 
         //blog comments
         var blogComments = await _blogService.GetAllCommentsAsync(customerId: customer.Id);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): blogComments → {BlogComments}", customer, blogComments);
         await _blogService.DeleteBlogCommentsAsync(blogComments);
 
         //news comments
         var newsComments = await _newsService.GetAllCommentsAsync(customerId: customer.Id);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): newsComments → {NewsComments}", customer, newsComments);
         await _newsService.DeleteNewsCommentsAsync(newsComments);
 
         //back in stock subscriptions
         var backInStockSubscriptions = await _backInStockSubscriptionService.GetAllSubscriptionsByCustomerIdAsync(customer.Id);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): backInStockSubscriptions → {BackInStockSubscriptions}", customer, backInStockSubscriptions);
         foreach (var backInStockSubscription in backInStockSubscriptions)
             await _backInStockSubscriptionService.DeleteSubscriptionAsync(backInStockSubscription);
 
         //product review
         var productReviews = await _productReviewService.GetAllProductReviewsAsync(customer.Id);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): productReviews → {ProductReviews}", customer, productReviews);
         var reviewedProducts = await _productService.GetProductsByIdsAsync(productReviews.Select(p => p.ProductId).Distinct().ToArray());
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): reviewedProducts → {ReviewedProducts}", customer, reviewedProducts);
         await _productReviewService.DeleteProductReviewsAsync(productReviews);
         //update product totals
         foreach (var product in reviewedProducts)
@@ -290,6 +339,7 @@ public partial class GdprService : IGdprService
 
         //forum subscriptions
         var forumSubscriptions = await _forumService.GetAllSubscriptionsAsync(customer.Id);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): forumSubscriptions → {ForumSubscriptions}", customer, forumSubscriptions);
         foreach (var forumSubscription in forumSubscriptions)
             await _forumService.DeleteSubscriptionAsync(forumSubscription);
 
@@ -307,6 +357,7 @@ public partial class GdprService : IGdprService
 
         //newsletter
         var newsletters = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(customer.Email);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): newsletters → {Newsletters}", customer, newsletters);
         foreach (var newsletter in newsletters)
             await _newsLetterSubscriptionService.DeleteNewsLetterSubscriptionAsync(newsletter);
 
@@ -321,7 +372,9 @@ public partial class GdprService : IGdprService
 
         //generic attributes
         var keyGroup = customer.GetType().Name;
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): keyGroup → {KeyGroup}", customer, keyGroup);
         var genericAttributes = await _genericAttributeService.GetAttributesForEntityAsync(customer.Id, keyGroup);
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): genericAttributes → {GenericAttributes}", customer, genericAttributes);
         await _genericAttributeService.DeleteAttributesAsync(genericAttributes);
 
         //ignore ActivityLog
@@ -338,19 +391,27 @@ public partial class GdprService : IGdprService
         if (await _customerService.IsRegisteredAsync(customer))
         {
             var registeredRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName);
+			_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): registeredRole → {RegisteredRole}", customer, registeredRole);
             await _customerService.RemoveCustomerRoleMappingAsync(customer, registeredRole);
         }
 
         if (!await _customerService.IsGuestAsync(customer))
         {
             var guestRole = await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.GuestsRoleName);
+			_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): guestRole → {GuestRole}", customer, guestRole);
             await _customerService.AddCustomerRoleMappingAsync(new CustomerCustomerRoleMapping { CustomerId = customer.Id, CustomerRoleId = guestRole.Id });
         }
 
         var email = customer.Email;
+		_logger.LogError("PermanentDeleteCustomerAsync(customer={Customer}): email → {Email}", customer, email);
 
         //clear other information
         customer.Email = string.Empty;
+		_logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Email → {Arg1}", customer, customer.Email);
+		_logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.EmailToRevalidate → {Arg1}", customer, customer.EmailToRevalidate);
+		_logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Username → {Arg1}", customer, customer.Username);
+		_logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Active → {Arg1}", customer, customer.Active);
+		_logger.LogDebug("PermanentDeleteCustomerAsync(customer={Customer}): customer.Deleted → {Arg1}", customer, customer.Deleted);
         customer.EmailToRevalidate = string.Empty;
         customer.Username = string.Empty;
         customer.Active = false;
@@ -360,6 +421,7 @@ public partial class GdprService : IGdprService
 
         //raise event
         await _eventPublisher.PublishAsync(new CustomerPermanentlyDeleted(customer.Id, email));
+		_logger.LogWarning("<<< Exiting PermanentDeleteCustomerAsync(customer={Customer})", customer);
     }
 
     #endregion

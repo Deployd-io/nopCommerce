@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Directory;
 
@@ -8,11 +9,16 @@ namespace Nop.Web.Areas.Admin.Models.Directory;
 /// </summary>
 public partial record StateProvinceModel : BaseNopEntityModel, ILocalizedModel<StateProvinceLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public StateProvinceModel()
     {
+		_logger.LogError(">>> Entering StateProvinceModel()");
         Locales = new List<StateProvinceLocalizedModel>();
+		_logger.LogDebug("StateProvinceModel(): Locales → {Locales}", Locales);
+    _logger.LogError("StateProvinceModel(): Locales → {Locales}", Locales);
+    _logger.LogWarning("<<< Exiting StateProvinceModel()");
     }
 
     #endregion

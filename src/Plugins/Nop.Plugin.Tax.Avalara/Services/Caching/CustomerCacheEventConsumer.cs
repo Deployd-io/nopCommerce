@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Customers;
 using Nop.Services.Caching;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Services.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Plugin.Tax.Avalara.Services.Caching;
 /// </summary>
 public class CustomerCacheEventConsumer : CacheEventConsumer<Customer>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -17,7 +19,9 @@ public class CustomerCacheEventConsumer : CacheEventConsumer<Customer>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Customer entity)
     {
+		_logger.LogError(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(AvalaraTaxDefaults.TaxRateCacheKeyByCustomerPrefix, entity);
+		_logger.LogWarning("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 
     #endregion

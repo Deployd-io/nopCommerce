@@ -1,16 +1,21 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record VendorModel : BaseNopEntityModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public VendorModel()
     {
+		_logger.LogError(">>> Entering VendorModel()");
         PictureModel = new PictureModel();
         CatalogProductsModel = new CatalogProductsModel();
+		_logger.LogError("VendorModel(): CatalogProductsModel → {CatalogProductsModel}", CatalogProductsModel);
         ProductReviews = new VendorProductReviewsListModel();
+		_logger.LogError("VendorModel(): ProductReviews → {ProductReviews}", ProductReviews);
     }
 
     public string Name { get; set; }

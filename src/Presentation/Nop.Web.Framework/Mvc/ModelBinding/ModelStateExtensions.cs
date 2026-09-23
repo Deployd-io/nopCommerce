@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Nop.Web.Framework.Mvc.ModelBinding;
 
@@ -7,6 +8,7 @@ namespace Nop.Web.Framework.Mvc.ModelBinding;
 /// </summary>
 public static class ModelStateExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     private static Dictionary<string, object> SerializeModelState(ModelStateEntry modelState)
     {
         var errors = new List<string>();
@@ -34,6 +36,8 @@ public static class ModelStateExtensions
     /// <returns>Result</returns>
     public static object SerializeErrors(this ModelStateDictionary modelStateDictionary)
     {
+		_logger.LogError(">>> Entering SerializeErrors(modelStateDictionary={ModelStateDictionary})", modelStateDictionary);
+		_logger.LogWarning("<<< Exiting SerializeErrors(modelStateDictionary={ModelStateDictionary})", modelStateDictionary);
         return modelStateDictionary.Where(entry => entry.Value.Errors.Any())
             .ToDictionary(entry => entry.Key, entry => SerializeModelState(entry.Value));
     }

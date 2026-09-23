@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.ExportImport.Help;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.ExportImport.Help;
 /// <typeparam name="T">Object type</typeparam>
 public partial class PropertyByName<T>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected object _propertyValue;
 
     /// <summary>
@@ -35,8 +37,14 @@ public partial class PropertyByName<T>
     /// <param name="ignore">Specifies whether the property should be exported</param>
     public PropertyByName(string propertyName, Func<T, Language, object> func = null, bool ignore = false)
     {
+		_logger.LogError(">>> Entering PropertyByName(propertyName={PropertyName},func={Func},ignore={Ignore})", propertyName, func, ignore);
         PropertyName = propertyName;
 
+		_logger.LogDebug("PropertyByName(propertyName={PropertyName},func={Func},ignore={Ignore}): PropertyName → {PropertyName1}", propertyName, func, ignore, PropertyName);
+		_logger.LogError("PropertyByName(propertyName={PropertyName},func={Func},ignore={Ignore}): GetProperty → {GetProperty}", propertyName, func, ignore, GetProperty);
+		_logger.LogDebug("PropertyByName(propertyName={PropertyName},func={Func},ignore={Ignore}): GetProperty → {GetProperty}", propertyName, func, ignore, GetProperty);
+		_logger.LogDebug("PropertyByName(propertyName={PropertyName},func={Func},ignore={Ignore}): PropertyOrderPosition → {PropertyOrderPosition}", propertyName, func, ignore, PropertyOrderPosition);
+		_logger.LogDebug("PropertyByName(propertyName={PropertyName},func={Func},ignore={Ignore}): Ignore → {Ignore1}", propertyName, func, ignore, Ignore);
         if (func != null)
             GetProperty = (obj, lang) => Task.FromResult(func(obj, lang));
 
@@ -80,6 +88,8 @@ public partial class PropertyByName<T>
                 return default;
             return rez;
         }
+		_logger.LogError(">>> Entering GetItemId(name={Name})", name);
+		_logger.LogWarning("<<< Exiting GetItemId(name={Name})", name);
     }
 
     /// <summary>
@@ -177,6 +187,8 @@ public partial class PropertyByName<T>
     /// <returns>String</returns>
     public override string ToString()
     {
+		_logger.LogError(">>> Entering ToString()");
+        _logger.LogWarning("<<< Exiting ToString()");
         return PropertyName;
     }
 
@@ -196,6 +208,8 @@ public partial class PropertyByName<T>
     /// <returns>Result</returns>
     public string[] GetDropDownElements()
     {
+		_logger.LogError(">>> Entering GetDropDownElements()");
+		_logger.LogWarning("<<< Exiting GetDropDownElements()");
         return IsDropDownCell ? DropDownElements.Select(ev => ev.Text).ToArray() : Array.Empty<string>();
     }
 
@@ -206,6 +220,8 @@ public partial class PropertyByName<T>
     /// <returns>Text</returns>
     public string GetItemText(object id)
     {
+		_logger.LogError(">>> Entering GetItemText(id={Id})", id);
+		_logger.LogWarning("<<< Exiting GetItemText(id={Id})", id);
         return DropDownElements.FirstOrDefault(ev => ev.Value == id.ToString())?.Text ?? string.Empty;
     }
 
@@ -221,6 +237,7 @@ public partial class PropertyByName<T>
 
         if (!int.TryParse(name.ToString(), out var id))
             id = 0;
+			_logger.LogError("GetItemId(name={Name}): id → {Id}", name, id);
 
         return Convert.ToInt32(DropDownElements.FirstOrDefault(ev => ev.Text.Trim() == name.ToString().Trim())?.Value ?? id.ToString());
     }

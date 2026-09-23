@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Public;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Framework.TagHelpers.Public;
 [HtmlTargetElement("textarea", Attributes = FOR_ATTRIBUTE_NAME)]
 public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.TextAreaTagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -20,6 +22,8 @@ public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.Tex
 
     public TextAreaTagHelper(IHtmlGenerator generator) : base(generator)
     {
+	_logger.LogError(">>> Entering TextAreaTagHelper(generator={Generator})", generator);
+    _logger.LogWarning("<<< Exiting TextAreaTagHelper(generator={Generator})", generator);
     }
 
     #endregion
@@ -34,6 +38,7 @@ public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.Tex
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -43,6 +48,7 @@ public partial class TextAreaTagHelper : Microsoft.AspNetCore.Mvc.TagHelpers.Tex
             output.Attributes.Add(new TagHelperAttribute("disabled", "disabled"));
 
         await base.ProcessAsync(context, output);
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

@@ -6,6 +6,7 @@ using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Models.Configuration;
 
@@ -14,19 +15,29 @@ namespace Nop.Plugin.Tax.Avalara.Models.Configuration;
 /// </summary>
 public record ConfigurationModel : BaseNopModel, IAclSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogError(">>> Entering ConfigurationModel()");
         TestAddress = new AddressModel();
         Companies = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): Companies → {Companies}", Companies);
         TaxOriginAddressTypes = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): TaxOriginAddressTypes → {TaxOriginAddressTypes}", TaxOriginAddressTypes);
         TaxTransactionLogSearchModel = new TaxTransactionLogSearchModel();
+		_logger.LogError("ConfigurationModel(): TaxTransactionLogSearchModel → {TaxTransactionLogSearchModel}", TaxTransactionLogSearchModel);
         ItemClassificationSearchModel = new ItemClassificationSearchModel();
+		_logger.LogError("ConfigurationModel(): ItemClassificationSearchModel → {ItemClassificationSearchModel}", ItemClassificationSearchModel);
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogError("ConfigurationModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
         SelectedCountryIds = new List<int>();
+		_logger.LogError("ConfigurationModel(): SelectedCountryIds → {SelectedCountryIds}", SelectedCountryIds);
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
     }
 
     #endregion

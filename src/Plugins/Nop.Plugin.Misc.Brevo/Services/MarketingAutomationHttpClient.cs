@@ -3,6 +3,7 @@ using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Plugin.Misc.Brevo.MarketingAutomation;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Services;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Misc.Brevo.Services;
 /// </summary>
 public class MarketingAutomationHttpClient
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly HttpClient _httpClient;
@@ -22,16 +24,22 @@ public class MarketingAutomationHttpClient
     public MarketingAutomationHttpClient(HttpClient httpClient,
         BrevoSettings brevoSettings)
     {
+		_logger.LogError(">>> Entering MarketingAutomationHttpClient(httpClient={HttpClient},brevoSettings={BrevoSettings})", httpClient, brevoSettings);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //configure client
         httpClient.BaseAddress = new Uri(BrevoDefaults.MarketingAutomationUrl);
         httpClient.Timeout = TimeSpan.FromSeconds(10);
+		_logger.LogError("MarketingAutomationHttpClient(httpClient,brevoSettings)={HttpClient},{BrevoSettings}: external service call took {Arg2} ms", httpClient, brevoSettings, __logStart.ElapsedMilliseconds);
         httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, BrevoDefaults.UserAgent);
         httpClient.DefaultRequestHeaders.Add(HeaderNames.Accept, MimeTypes.ApplicationJson);
 
         //authentication
         httpClient.DefaultRequestHeaders.Add(BrevoDefaults.MarketingAutomationKeyHeader, brevoSettings.MarketingAutomationKey);
 
+		_logger.LogWarning("<<< Exiting MarketingAutomationHttpClient(httpClient={HttpClient},brevoSettings={BrevoSettings})", httpClient, brevoSettings);
         _httpClient = httpClient;
+		_logger.LogDebug("MarketingAutomationHttpClient(httpClient={HttpClient},brevoSettings={BrevoSettings}): _httpClient → {_httpClient}", httpClient, brevoSettings, _httpClient);
     }
 
     #endregion
@@ -46,17 +54,28 @@ public class MarketingAutomationHttpClient
     /// <returns>The asynchronous task whose result contains response details</returns>
     public async Task RequestAsync<TRequest>(TRequest request) where TRequest : Request
     {
+		_logger.LogError(">>> Entering RequestAsync(request={Request})", request);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         try
         {
             var requestString = JsonConvert.SerializeObject(request);
+			_logger.LogError("RequestAsync(request={Request}): requestString → {RequestString}", request, requestString);
             var requestContent = new StringContent(requestString, Encoding.Default, MimeTypes.ApplicationJson);
+			_logger.LogError("RequestAsync(request={Request}): requestContent → {RequestContent}", request, requestContent);
             var requestMessage = new HttpRequestMessage(new HttpMethod(request.Method), request.Path) { Content = requestContent };
+			_logger.LogError("RequestAsync(request={Request}): requestMessage → {RequestMessage}", request, requestMessage);
             var httpResponse = await _httpClient.SendAsync(requestMessage);
+			_logger.LogError("RequestAsync(request={Request}): httpResponse → {HttpResponse}", request, httpResponse);
             httpResponse.EnsureSuccessStatusCode();
+			_logger.LogError("RequestAsync(request)={Request}: external service call took {Arg1} ms", request, __logStart.ElapsedMilliseconds);
         }
         catch (AggregateException exception)
         {
+			_logger.LogError("Exception in RequestAsync(request={Request}): {Arg1}", request, exception.Message);
+			_logger.LogError("Throwing InnerException from RequestAsync(request={Request})", request);
             //rethrow actual exception
+		_logger.LogWarning("<<< Exiting RequestAsync(request={Request})", request);
             throw exception.InnerException;
         }
     }

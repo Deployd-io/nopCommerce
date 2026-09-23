@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Nop.Core.Caching;
 
@@ -7,6 +8,7 @@ namespace Nop.Core.Caching;
 /// </summary>
 public partial class MemoryCacheLocker : ILocker
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IMemoryCache _memoryCache;
@@ -17,7 +19,10 @@ public partial class MemoryCacheLocker : ILocker
 
     public MemoryCacheLocker(IMemoryCache memoryCache)
     {
+		_logger.LogError(">>> Entering MemoryCacheLocker(memoryCache={MemoryCache})", memoryCache);
         _memoryCache = memoryCache;
+		_logger.LogDebug("MemoryCacheLocker(memoryCache={MemoryCache}): _memoryCache → {_memoryCache}", memoryCache, _memoryCache);
+    _logger.LogWarning("<<< Exiting MemoryCacheLocker(memoryCache={MemoryCache})", memoryCache);
     }
 
     #endregion
@@ -34,13 +39,16 @@ public partial class MemoryCacheLocker : ILocker
     /// <returns></returns>
     protected virtual async Task<bool> RunAsync(string key, TimeSpan? expirationTime, Func<CancellationToken, Task> action, CancellationTokenSource cancellationTokenSource = default)
     {
+		_logger.LogError(">>> Entering RunAsync(key={Key},expirationTime={ExpirationTime},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, action);
         var started = false;
 
+		_logger.LogError("RunAsync(key={Key},expirationTime={ExpirationTime},action={Action},cancellationTokenSource=<redacted>): started → {Started}", key, expirationTime, action, started);
         try
         {
             var tokenSource = _memoryCache.GetOrCreate(key, entry => new Lazy<CancellationTokenSource>(() =>
             {
                 entry.AbsoluteExpirationRelativeToNow = expirationTime;
+				_logger.LogDebug("RunAsync(key={Key},expirationTime={ExpirationTime},action={Action},cancellationTokenSource=<redacted>): entry.AbsoluteExpirationRelativeToNow → {Arg4}", key, expirationTime, action, entry.AbsoluteExpirationRelativeToNow);
                 entry.SetPriority(CacheItemPriority.NeverRemove);
                 started = true;
                 return cancellationTokenSource ?? new CancellationTokenSource();
@@ -52,10 +60,12 @@ public partial class MemoryCacheLocker : ILocker
         catch (OperationCanceledException) { }
         finally
         {
+			_logger.LogError("Exception in RunAsync(key={Key},expirationTime={ExpirationTime},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, action);
             if (started)
                 _memoryCache.Remove(key);
         }
 
+		_logger.LogWarning("<<< Exiting RunAsync(key={Key},expirationTime={ExpirationTime},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, action);
         return started;
     }
 
@@ -72,6 +82,8 @@ public partial class MemoryCacheLocker : ILocker
     /// <returns>A task that resolves true if lock was acquired and action was performed; otherwise false</returns>
     public virtual async Task<bool> PerformActionWithLockAsync(string resource, TimeSpan expirationTime, Func<Task> action)
     {
+		_logger.LogError(">>> Entering PerformActionWithLockAsync(resource={Resource},expirationTime={ExpirationTime},action={Action})", resource, expirationTime, action);
+		_logger.LogWarning("<<< Exiting PerformActionWithLockAsync(resource={Resource},expirationTime={ExpirationTime},action={Action})", resource, expirationTime, action);
         return await RunAsync(resource, expirationTime, _ => action());
     }
 
@@ -87,9 +99,11 @@ public partial class MemoryCacheLocker : ILocker
     /// <returns>A task that resolves true if lock was acquired and action was performed; otherwise false</returns>
     public virtual async Task RunWithHeartbeatAsync(string key, TimeSpan expirationTime, TimeSpan heartbeatInterval, Func<CancellationToken, Task> action, CancellationTokenSource cancellationTokenSource = default)
     {
+		_logger.LogError(">>> Entering RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, heartbeatInterval, action);
         // We ignore expirationTime and heartbeatInterval here, as the cache is not shared with other instances,
         // and will be cleared on system failure anyway. The task is guaranteed to still be running as long as it is in the cache.
         await RunAsync(key, null, action, cancellationTokenSource);
+		_logger.LogWarning("<<< Exiting RunWithHeartbeatAsync(key={Key},expirationTime={ExpirationTime},heartbeatInterval={HeartbeatInterval},action={Action},cancellationTokenSource=<redacted>)", key, expirationTime, heartbeatInterval, action);
     }
 
     /// <summary>
@@ -102,9 +116,11 @@ public partial class MemoryCacheLocker : ILocker
     /// necessarily imply that the task has been canceled, only that cancellation has been requested.</returns>
     public virtual Task CancelTaskAsync(string key, TimeSpan expirationTime)
     {
+		_logger.LogError(">>> Entering CancelTaskAsync(key={Key},expirationTime={ExpirationTime})", key, expirationTime);
         if (_memoryCache.TryGetValue(key, out Lazy<CancellationTokenSource> tokenSource))
             tokenSource.Value.Cancel();
 
+		_logger.LogWarning("<<< Exiting CancelTaskAsync(key={Key},expirationTime={ExpirationTime})", key, expirationTime);
         return Task.CompletedTask;
     }
 
@@ -115,6 +131,8 @@ public partial class MemoryCacheLocker : ILocker
     /// <returns>A task that resolves to true if the background task is running; otherwise false</returns>
     public virtual Task<bool> IsTaskRunningAsync(string key)
     {
+		_logger.LogError(">>> Entering IsTaskRunningAsync(key={Key})", key);
+        _logger.LogWarning("<<< Exiting IsTaskRunningAsync(key={Key})", key);
         return Task.FromResult(_memoryCache.TryGetValue(key, out _));
     }
 

@@ -5,12 +5,14 @@ using Nop.Data.Migrations;
 using Nop.Plugin.Widgets.FacebookPixel.Domain;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Data;
 
 [NopMigration("2022-03-18 12:00:00", "Widgets.FacebookPixel 2.00. Conversions API", MigrationProcessType.Update)]
 public class ConversionsApiMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILanguageService _languageService;
@@ -23,8 +25,11 @@ public class ConversionsApiMigration : MigrationBase
     public ConversionsApiMigration(ILanguageService languageService,
         ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering ConversionsApiMigration(languageService={LanguageService},localizationService={LocalizationService})", languageService, localizationService);
         _languageService = languageService;
         _localizationService = localizationService;
+		_logger.LogDebug("ConversionsApiMigration(languageService={LanguageService},localizationService={LocalizationService}): _languageService → {_languageService}", languageService, localizationService, _languageService);
+    _logger.LogWarning("<<< Exiting ConversionsApiMigration(languageService={LanguageService},localizationService={LocalizationService})", languageService, localizationService);
     }
 
     #endregion
@@ -36,10 +41,12 @@ public class ConversionsApiMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         var facebookPixelConfigurationTableName = NameCompatibilityManager.GetTableName(typeof(FacebookPixelConfiguration));
+		_logger.LogError("Up(): facebookPixelConfigurationTableName → {FacebookPixelConfigurationTableName}", facebookPixelConfigurationTableName);
 
         //add ConversionsApiEnabled column if not exists
         if (!Schema.Table(facebookPixelConfigurationTableName).Column(nameof(FacebookPixelConfiguration.ConversionsApiEnabled)).Exists())
@@ -83,6 +90,7 @@ public class ConversionsApiMigration : MigrationBase
             "Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled",
             "Plugins.Widgets.FacebookPixel.Configuration.Fields.Enabled.Hint"
         });
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -90,7 +98,9 @@ public class ConversionsApiMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //nothing
+		_logger.LogWarning("<<< Exiting Down()");
     }
 
     #endregion

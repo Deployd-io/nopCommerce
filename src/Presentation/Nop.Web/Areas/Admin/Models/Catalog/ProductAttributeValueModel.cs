@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,13 +10,17 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductAttributeValueModel : BaseNopEntityModel, ILocalizedModel<ProductAttributeValueLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductAttributeValueModel()
     {
+		_logger.LogError(">>> Entering ProductAttributeValueModel()");
         ProductPictureModels = new List<ProductPictureModel>();
         Locales = new List<ProductAttributeValueLocalizedModel>();
+		_logger.LogError("ProductAttributeValueModel(): Locales → {Locales}", Locales);
         PictureIds = new List<int>();
+		_logger.LogError("ProductAttributeValueModel(): PictureIds → {PictureIds}", PictureIds);
     }
 
     #endregion

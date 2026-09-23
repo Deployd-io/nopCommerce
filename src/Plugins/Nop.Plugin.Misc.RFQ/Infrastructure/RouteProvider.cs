@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Infrastructure;
 
@@ -11,16 +12,19 @@ namespace Nop.Plugin.Misc.RFQ.Infrastructure;
 /// </summary>
 public class RouteProvider : BaseRouteProvider, IRouteProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Register routes
     /// </summary>
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		_logger.LogError(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         endpointRouteBuilder.MapControllerRoute(name: RfqDefaults.ConfigurationRouteName,
             pattern: "Admin/RFQ/Configure",
             defaults: new { controller = "RfqAdmin", action = "Configure", area = AreaNames.ADMIN });
         var lang = GetLanguageRoutePattern();
+		_logger.LogError("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
 
         endpointRouteBuilder.MapControllerRoute(name: RfqDefaults.CreateCustomerRequestRouteName,
             pattern: $"{lang}/rfq/requestforquote/{{requestId?}}",
@@ -41,6 +45,7 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: RfqDefaults.CustomerQuoteRouteName,
             pattern: $"{lang}/rfq/quote/{{quoteId}}",
             defaults: new { controller = "RfqCustomer", action = "CustomerQuote" });
+			_logger.LogWarning("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

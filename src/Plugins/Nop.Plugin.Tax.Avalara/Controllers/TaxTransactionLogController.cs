@@ -10,11 +10,13 @@ using Nop.Services.Security;
 using Nop.Web.Areas.Admin.Controllers;
 using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
 public class TaxTransactionLogController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -37,13 +39,20 @@ public class TaxTransactionLogController : BaseAdminController
         IPermissionService permissionService,
         TaxTransactionLogService taxTransactionLogService)
     {
+		_logger.LogError(">>> Entering TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService})", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService);
         _customerService = customerService;
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService}): _dateTimeHelper → {_dateTimeHelper}", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService, _dateTimeHelper);
         _htmlFormatter = htmlFormatter;
+		_logger.LogDebug("TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService}): _htmlFormatter → {_htmlFormatter}", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService, _htmlFormatter);
         _localizationService = localizationService;
+		_logger.LogDebug("TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService}): _localizationService → {_localizationService}", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService}): _notificationService → {_notificationService}", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService}): _permissionService → {_permissionService}", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService, _permissionService);
         _taxTransactionLogService = taxTransactionLogService;
+		_logger.LogDebug("TaxTransactionLogController(customerService={CustomerService},dateTimeHelper={DateTimeHelper},htmlFormatter={HtmlFormatter},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},taxTransactionLogService={TaxTransactionLogService}): _taxTransactionLogService → {_taxTransactionLogService}", customerService, dateTimeHelper, htmlFormatter, localizationService, notificationService, permissionService, taxTransactionLogService, _taxTransactionLogService);
     }
 
     #endregion
@@ -54,6 +63,7 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> LogList(TaxTransactionLogSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering LogList(searchModel={SearchModel})", searchModel);
         //prepare filter parameters
         var createdFromValue = searchModel.CreatedFrom.HasValue
             ? (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.CreatedFrom.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync())
@@ -79,6 +89,7 @@ public class TaxTransactionLogController : BaseAdminController
             });
         });
 
+		_logger.LogWarning("<<< Exiting LogList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -86,19 +97,23 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteSelected(ICollection<int> selectedIds)
     {
+		_logger.LogError(">>> Entering DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         if (selectedIds == null || !selectedIds.Any())
             return NoContent();
 
         await _taxTransactionLogService.DeleteTaxTransactionLogAsync(selectedIds.ToArray());
 
+		_logger.LogWarning("<<< Exiting DeleteSelected(selectedIds={SelectedIds})", selectedIds);
         return Json(new { Result = true });
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> View(int id)
     {
+		_logger.LogError(">>> Entering View(id={Id})", id);
         //try to get log item with the passed identifier
         var logItem = await _taxTransactionLogService.GetTaxTransactionLogByIdAsync(id);
+		_logger.LogError("View(id={Id}): logItem → {LogItem}", id, logItem);
         if (logItem == null)
             return RedirectToAction("Configure", "Avalara");
 
@@ -114,6 +129,7 @@ public class TaxTransactionLogController : BaseAdminController
             CreatedDate = await _dateTimeHelper.ConvertToUserTimeAsync(logItem.CreatedDateUtc, DateTimeKind.Utc)
         };
 
+		_logger.LogWarning("<<< Exiting View(id={Id})", id);
         return View("~/Plugins/Tax.Avalara/Views/Log/View.cshtml", model);
     }
 
@@ -121,22 +137,27 @@ public class TaxTransactionLogController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get log item with the passed identifier
         var logItem = await _taxTransactionLogService.GetTaxTransactionLogByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): logItem → {LogItem}", id, logItem);
         if (logItem != null)
         {
             await _taxTransactionLogService.DeleteTaxTransactionLogAsync(logItem);
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.Log.Deleted"));
         }
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("Configure", "Avalara");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ClearAll()
     {
+		_logger.LogError(">>> Entering ClearAll()");
         await _taxTransactionLogService.ClearLogAsync();
 
+		_logger.LogWarning("<<< Exiting ClearAll()");
         return Json(new { Result = true });
     }
 

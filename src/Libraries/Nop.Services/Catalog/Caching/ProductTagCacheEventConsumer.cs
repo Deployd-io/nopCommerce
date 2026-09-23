@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Caching;
 using Nop.Core.Domain.Catalog;
 using Nop.Services.Caching;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog.Caching;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Catalog.Caching;
 /// </summary>
 public partial class ProductTagCacheEventConsumer : CacheEventConsumer<ProductTag>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache by entity event type
     /// </summary>
@@ -17,6 +19,8 @@ public partial class ProductTagCacheEventConsumer : CacheEventConsumer<ProductTa
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(ProductTag entity, EntityEventType entityEventType)
     {
+		_logger.LogError(">>> Entering ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
         await RemoveByPrefixAsync(NopEntityCacheDefaults<ProductTag>.Prefix);
+		_logger.LogWarning("<<< Exiting ClearCacheAsync(entity={Entity},entityEventType={EntityEventType})", entity, entityEventType);
     }
 }

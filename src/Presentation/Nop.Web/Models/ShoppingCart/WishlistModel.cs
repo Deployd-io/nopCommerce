@@ -1,16 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.ShoppingCart;
 
 public partial record WishlistModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public WishlistModel()
     {
+		_logger.LogError(">>> Entering WishlistModel()");
         Items = new List<ShoppingCartItemModel>();
         CustomWishlistItems = new List<CustomWishlistModel>();
+		_logger.LogError("WishlistModel(): CustomWishlistItems → {CustomWishlistItems}", CustomWishlistItems);
         Warnings = new List<string>();
+		_logger.LogError("WishlistModel(): Warnings → {Warnings}", Warnings);
     }
 
     public int? ListId { get; set; }
@@ -46,9 +51,12 @@ public partial record WishlistModel : BaseNopModel
     {
         public ShoppingCartItemModel()
         {
+			_logger.LogError(">>> Entering ShoppingCartItemModel()");
             Picture = new PictureModel();
             AllowedQuantities = new List<SelectListItem>();
+			_logger.LogError("ShoppingCartItemModel(): AllowedQuantities → {AllowedQuantities}", AllowedQuantities);
             Warnings = new List<string>();
+			_logger.LogError("ShoppingCartItemModel(): Warnings → {Warnings}", Warnings);
         }
 
         public string Sku { get; set; }

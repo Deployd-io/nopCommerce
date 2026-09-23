@@ -1,14 +1,20 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Infrastructure;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record CustomerProductReviewModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerProductReviewModel()
     {
+		_logger.LogError(">>> Entering CustomerProductReviewModel()");
         AdditionalProductReviewList = new List<ProductReviewReviewTypeMappingModel>();
+		_logger.LogDebug("CustomerProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
+    _logger.LogError("CustomerProductReviewModel(): AdditionalProductReviewList → {AdditionalProductReviewList}", AdditionalProductReviewList);
+    _logger.LogWarning("<<< Exiting CustomerProductReviewModel()");
     }
     public int ProductId { get; set; }
     public string ProductName { get; set; }
@@ -24,9 +30,14 @@ public partial record CustomerProductReviewModel : BaseNopModel
 
 public partial record CustomerProductReviewsModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerProductReviewsModel()
     {
+		_logger.LogError(">>> Entering CustomerProductReviewsModel()");
         ProductReviews = new List<CustomerProductReviewModel>();
+		_logger.LogDebug("CustomerProductReviewsModel(): ProductReviews → {ProductReviews}", ProductReviews);
+    _logger.LogError("CustomerProductReviewsModel(): ProductReviews → {ProductReviews}", ProductReviews);
+    _logger.LogWarning("<<< Exiting CustomerProductReviewsModel()");
     }
 
     public IList<CustomerProductReviewModel> ProductReviews { get; set; }
