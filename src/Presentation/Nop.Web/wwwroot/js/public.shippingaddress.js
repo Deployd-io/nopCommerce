@@ -1,14 +1,19 @@
-﻿var CheckoutShipping = {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+var CheckoutShipping = {
   form: false,
   selectedStateId: 0,
 
   init: function (form) {
+	logger.error(`>>> Entering init(form=${form})`);
     this.form = form;
+	logger.debug(`init(form=${form}): form → ${form}`);
   },
 
   editAddress: function(url, addressId, titleText) {
+	logger.error(`>>> Entering editAddress(url=${url},addressId=${addressId},titleText=${titleText})`);
     CheckoutShipping.resetShippingForm();
 
+	logger.warn(`<<< Exiting editAddress(url=${url},addressId=${addressId},titleText=${titleText})`);
     var prefix = 'ShippingNewAddress_';
     $.ajax({
       cache: false,
@@ -18,6 +23,7 @@
         "addressId": addressId
       },
       success: function(data, textStatus, jqXHR) {
+		logger.error(`>>> Entering success(data=${data},textStatus=${textStatus},jqXHR=${jqXHR})`);
         $.each(data,
           function(id, value) {
             if (id.indexOf("CustomAddressAttributes") >= 0 && Array.isArray(value)) {
@@ -48,24 +54,32 @@
               }
               if (id.indexOf('StateProvinceId') >= 0) {
                 CheckoutBilling.setSelectedStateId(value);
+				logger.warn(`<<< Exiting success(data=${data},textStatus=${textStatus},jqXHR=${jqXHR})`);
               }
             }
           });
+		logger.error(`>>> Entering success(response=${response})`);
+		logger.warn(`<<< Exiting success(response=${response})`);
       },
       complete: function(jqXHR, textStatus) {
+		logger.error(`>>> Entering complete(jqXHR=${jqXHR},textStatus=${textStatus})`);
         $('#shipping-addresses-form').hide();
         $('#shippingaddress-next-button').hide();
         $('#shippingaddress-save-button').show();
         $('#shippingaddress-cancel-button').show();
         $('#shippingaddress-new-form .title-text').html(titleText);
+		logger.warn(`<<< Exiting complete(jqXHR=${jqXHR},textStatus=${textStatus})`);
       },
       error: function(err) {
+		logger.error(`>>> Entering error(err=${err})`);
         alert(err);
+		logger.warn(`<<< Exiting error(err=${err})`);
       }
     });
   },
 
   saveEditAddress: function (url) {
+	logger.error(`>>> Entering saveEditAddress(url=${url})`);
     $.ajax({
       cache: false,
       url: url,
@@ -79,9 +93,11 @@
         alert(err);
       }
     });
+	logger.warn(`<<< Exiting saveEditAddress(url=${url})`);
   },
 
   deleteEditAddress: function(url, addressId) {
+	logger.error(`>>> Entering deleteEditAddress(url=${url},addressId=${addressId})`);
     $.ajax({
       cache: false,
       type: "GET",
@@ -97,13 +113,16 @@
         alert(err);
       }
     });
+	logger.warn(`<<< Exiting deleteEditAddress(url=${url},addressId=${addressId})`);
   },
 
   resetShippingForm: function() {
+	logger.error('>>> Entering resetShippingForm()');
     $(':input', '#shippingaddress-new-form')
       .not(':button, :submit, :reset, :hidden').removeAttr('checked').removeAttr('selected')
       .not(':checkbox, :radio, select').val('');
 
     $('select option[value="0"]').prop('selected', true);
+	logger.warn('<<< Exiting resetShippingForm()');
   },
 }

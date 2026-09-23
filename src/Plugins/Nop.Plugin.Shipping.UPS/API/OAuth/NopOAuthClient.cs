@@ -8,25 +8,35 @@ public partial class OAuthClient
 
     public OAuthClient(HttpClient httpClient, UPSSettings upsSettings) : this(httpClient)
     {
+		logger.LogError(">>> Entering OAuthClient(httpClient={HttpClient},upsSettings={UpsSettings})", httpClient, upsSettings);
         _upsSettings = upsSettings;
+		logger.LogWarning("<<< Exiting OAuthClient(httpClient={HttpClient},upsSettings={UpsSettings})", httpClient, upsSettings);
+		logger.LogDebug("OAuthClient(httpClient={HttpClient},upsSettings={UpsSettings}): _upsSettings → {_upsSettings}", httpClient, upsSettings, _upsSettings);
 
         if (!_upsSettings.UseSandbox)
             BaseUrl = UPSDefaults.ApiUrl.Replace("/api", "");
+			logger.LogError("OAuthClient(httpClient={HttpClient},upsSettings={UpsSettings}): BaseUrl → {BaseUrl}", httpClient, upsSettings, BaseUrl);
     }
 
     partial void PrepareRequest(HttpClient client, HttpRequestMessage request,
         string url)
     {
+		logger.LogError(">>> Entering PrepareRequest(client={Client},request={Request},url={Url})", client, request, url);
         client.PrepareRequest(request, _upsSettings);
+		logger.LogWarning("<<< Exiting PrepareRequest(client={Client},request={Request},url={Url})", client, request, url);
     }
 
     public virtual Task<GenerateTokenSuccessResponse> GenerateTokenAsync()
     {
+		logger.LogError(">>> Entering GenerateTokenAsync()");
+        logger.LogWarning("<<< Exiting GenerateTokenAsync()");
         return GenerateTokenAsync(null, new Body(), CancellationToken.None);
     }
 
     partial void ProcessResponse(HttpClient client, HttpResponseMessage response)
     {
+		logger.LogError(">>> Entering ProcessResponse(client={Client},response={Response})", client, response);
         client.ProcessResponse(response, _upsSettings);
+		logger.LogWarning("<<< Exiting ProcessResponse(client={Client},response={Response})", client, response);
     }
 }

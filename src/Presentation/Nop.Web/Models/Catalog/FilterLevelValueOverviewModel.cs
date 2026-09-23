@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -7,9 +8,14 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record FilterLevelValueOverviewModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public FilterLevelValueOverviewModel()
     {
+		_logger.LogError(">>> Entering FilterLevelValueOverviewModel()");
         FilterLevelValues = new List<FilterLevelValueInfoModel>();
+		_logger.LogDebug("FilterLevelValueOverviewModel(): FilterLevelValues → {FilterLevelValues}", FilterLevelValues);
+    _logger.LogError("FilterLevelValueOverviewModel(): FilterLevelValues → {FilterLevelValues}", FilterLevelValues);
+    _logger.LogWarning("<<< Exiting FilterLevelValueOverviewModel()");
     }
 
     public bool FilterLevel1ValueEnabled { get; set; }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Admin;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.TagHelpers.Admin;
 [HtmlTargetElement("nop-override-store-checkbox", Attributes = FOR_ATTRIBUTE_NAME, TagStructure = TagStructure.WithoutEndTag)]
 public partial class NopOverrideStoreCheckboxHelper : TagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string FOR_ATTRIBUTE_NAME = "asp-for";
@@ -31,7 +33,10 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
 
     public NopOverrideStoreCheckboxHelper(IHtmlHelper htmlHelper)
     {
+		_logger.LogError(">>> Entering NopOverrideStoreCheckboxHelper(htmlHelper={HtmlHelper})", htmlHelper);
         _htmlHelper = htmlHelper;
+		_logger.LogDebug("NopOverrideStoreCheckboxHelper(htmlHelper={HtmlHelper}): _htmlHelper → {_htmlHelper}", htmlHelper, _htmlHelper);
+    _logger.LogWarning("<<< Exiting NopOverrideStoreCheckboxHelper(htmlHelper={HtmlHelper})", htmlHelper);
     }
 
     #endregion
@@ -46,6 +51,7 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -61,6 +67,7 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
             viewContextAware?.Contextualize(ViewContext);
 
             var dataInputIds = new List<string>();
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): dataInputIds → {DataInputIds}", context, output, dataInputIds);
             if (Input != null)
                 dataInputIds.Add(_htmlHelper.Id(Input.Name));
             if (Input2 != null)
@@ -68,6 +75,7 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
 
             const string cssClass = "multi-store-override-option";
             var dataInputSelector = "";
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): dataInputSelector → {DataInputSelector}", context, output, dataInputSelector);
             if (!string.IsNullOrEmpty(ParentContainer))
                 dataInputSelector = "#" + ParentContainer + " input, #" + ParentContainer + " textarea, #" + ParentContainer + " select";
 
@@ -75,6 +83,7 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
                 dataInputSelector = "#" + string.Join(", #", dataInputIds);
 
             var onClick = $"checkOverriddenStoreValue(this, '{dataInputSelector}')";
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): onClick → {OnClick}", context, output, onClick);
 
             var htmlAttributes = new
             {
@@ -82,9 +91,12 @@ public partial class NopOverrideStoreCheckboxHelper : TagHelper
                 onclick = onClick,
                 data_for_input_selector = dataInputSelector
             };
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): data_for_input_selector → {Data_for_input_selector}", context, output, data_for_input_selector);
             var htmlOutput = await _htmlHelper.CheckBox(For.Name, null, htmlAttributes).RenderHtmlContentAsync();
+			_logger.LogError("ProcessAsync(context={Context},output={Output}): htmlOutput → {HtmlOutput}", context, output, htmlOutput);
             output.Content.SetHtmlContent(htmlOutput);
         }
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

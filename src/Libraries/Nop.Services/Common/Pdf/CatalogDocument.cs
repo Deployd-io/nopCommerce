@@ -2,6 +2,7 @@
 using iTextSharp.text.pdf;
 using PdfRpt.Core.Contracts;
 using PdfRpt.Core.Helper;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -10,15 +11,20 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public partial class CatalogDocument : PdfDocument<CatalogItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Utilities
 
     protected virtual PdfPCell BuildProductImages(IList<CellData> rowData)
     {
+		_logger.LogError(">>> Entering BuildProductImages(rowData={RowData})", rowData);
         var table = PdfDocumentHelper.BuildPdfGrid(2, DocumentRunDirection);
 
+		_logger.LogError("BuildProductImages(rowData={RowData}): table → {Table}", rowData, table);
+		_logger.LogDebug("BuildProductImages(rowData={RowData}): table.HorizontalAlignment → {Arg1}", rowData, table.HorizontalAlignment);
         table.HorizontalAlignment = Element.ALIGN_CENTER;
 
         var picPaths = (HashSet<string>)rowData.GetValueOf<CatalogItem>(x => x.PicturePaths) ?? new();
+		_logger.LogError("BuildProductImages(rowData={RowData}): picPaths → {PicPaths}", rowData, picPaths);
 
         if (!picPaths.Any())
             return PdfDocumentHelper.BuildPdfPCell(table, DocumentRunDirection, horizontalAlign: Element.ALIGN_CENTER);
@@ -26,6 +32,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
         foreach (var path in picPaths)
         {
             var image = PdfImageHelper.GetITextSharpImageFromByteArray(GetImageAsync(path).Result ?? Array.Empty<byte>());
+			_logger.LogError("BuildProductImages(rowData={RowData}): image → {Image}", rowData, image);
             image.ScaleToFit(ImageTargetSize, ImageTargetSize);
 
             var imageCell = new PdfPCell(image, fit: false)
@@ -38,40 +45,51 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
             if (picPaths.Count % 2 != 0 && picPaths.Last() == path)
                 imageCell.Colspan = 2;
+				_logger.LogDebug("BuildProductImages(rowData={RowData}): imageCell.Colspan → {Arg1}", rowData, imageCell.Colspan);
 
             table.AddCell(imageCell);
         }
 
+		_logger.LogWarning("<<< Exiting BuildProductImages(rowData={RowData})", rowData);
         return PdfDocumentHelper.BuildPdfPCell(table, DocumentRunDirection, horizontalAlign: Element.ALIGN_CENTER);
     }
 
     protected virtual PdfPCell BuildProductProperties(IList<CellData> rowData)
     {
+		_logger.LogError(">>> Entering BuildProductProperties(rowData={RowData})", rowData);
         var table = PdfDocumentHelper.BuildPdfGrid(1, DocumentRunDirection);
 
+		_logger.LogError("BuildProductProperties(rowData={RowData}): table → {Table}", rowData, table);
         var price = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Price);
+		_logger.LogError("BuildProductProperties(rowData={RowData}): price → {Price}", rowData, price);
         if (!string.IsNullOrEmpty(price))
             table.AddCell(BuildTextCell<CatalogItem>(p => p.Price, price));
 
         var sku = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Sku);
+		_logger.LogError("BuildProductProperties(rowData={RowData}): sku → {Sku}", rowData, sku);
         if (!string.IsNullOrEmpty(sku))
             table.AddCell(BuildTextCell<CatalogItem>(p => p.Sku, sku));
 
         var weight = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Weight);
+		_logger.LogError("BuildProductProperties(rowData={RowData}): weight → {Weight}", rowData, weight);
         if (!string.IsNullOrEmpty(weight))
             table.AddCell(BuildTextCell<CatalogItem>(p => p.Weight, weight));
 
         var stock = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Stock);
+		_logger.LogError("BuildProductProperties(rowData={RowData}): stock → {Stock}", rowData, stock);
         if (!string.IsNullOrEmpty(stock))
             table.AddCell(BuildTextCell<CatalogItem>(p => p.Stock, stock));
 
+		_logger.LogWarning("<<< Exiting BuildProductProperties(rowData={RowData})", rowData);
         return PdfDocumentHelper.BuildPdfPCell(table, DocumentRunDirection);
     }
 
     protected virtual PdfPCell ConfigureCatalogItemTemplate(InlineFieldData data)
     {
+		_logger.LogError(">>> Entering ConfigureCatalogItemTemplate(data={Data})", data);
         var font16Bold = PdfDocumentHelper.GetFont(Font, Font.Size * 1.6f, DocumentFontStyle.Bold);
 
+		_logger.LogError("ConfigureCatalogItemTemplate(data={Data}): font16Bold → {Font16Bold}", data, font16Bold);
         var table = new PdfGrid(numColumns: 1)
         {
             WidthPercentage = 100,
@@ -80,6 +98,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
         };
         var rowData = data.Attributes.RowData.TableRowData;
         var name = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Name);
+		_logger.LogError("ConfigureCatalogItemTemplate(data={Data}): name → {Name}", data, name);
         table.AddCell(new PdfPCell(new Phrase(name, font16Bold))
         {
             RunDirection = DocumentRunDirection,
@@ -88,8 +107,10 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
             PaddingBottom = 14,
             Border = 0
         });
+		_logger.LogDebug("ConfigureCatalogItemTemplate(data={Data}): Border → {Border}", data, Border);
 
         var description = rowData.GetSafeStringValueOf<CatalogItem>(p => p.Description);
+		_logger.LogError("ConfigureCatalogItemTemplate(data={Data}): description → {Description}", data, description);
 
         var cell = new PdfPCell(new Paragraph(description, Font))
         {
@@ -119,6 +140,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
             Border = 0,
         });
 
+		_logger.LogWarning("<<< Exiting ConfigureCatalogItemTemplate(data={Data})", data);
         return new PdfPCell(tableContainer)
         {
             RunDirection = DocumentRunDirection,
@@ -138,6 +160,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
     /// <param name="pdfStreamOutput">Stream for PDF output</param>
     public override void Generate(Stream pdfStreamOutput)
     {
+		_logger.LogError(">>> Entering Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
         Document
             .MainTablePreferences(table =>
             {
@@ -162,6 +185,7 @@ public partial class CatalogDocument : PdfDocument<CatalogItem>
 
             })
             .Generate(builder => builder.AsPdfStream(pdfStreamOutput, closeStream: false));
+			_logger.LogWarning("<<< Exiting Generate(pdfStreamOutput={PdfStreamOutput})", pdfStreamOutput);
     }
 
     #endregion

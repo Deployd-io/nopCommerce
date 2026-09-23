@@ -22,6 +22,7 @@ using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Controllers;
 
@@ -30,6 +31,7 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Controllers;
 [AutoValidateAntiforgeryToken]
 public class FacebookPixelController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly FacebookPixelService _facebookPixelService;
@@ -58,15 +60,26 @@ public class FacebookPixelController : BasePluginController
         IWorkContext workContext,
         StoreInformationSettings storeInformationSettings)
     {
+		_logger.LogError(">>> Entering FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings})", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings);
         _facebookPixelService = facebookPixelService;
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _baseAdminModelFactory → {_baseAdminModelFactory}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _baseAdminModelFactory);
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _facebookPixelService → {_facebookPixelService}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _facebookPixelService);
+    _logger.LogWarning("<<< Exiting FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings})", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _genericAttributeService → {_genericAttributeService}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _localizationService → {_localizationService}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _notificationService → {_notificationService}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _permissionService → {_permissionService}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _permissionService);
         _storeContext = storeContext;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _storeContext → {_storeContext}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _storeContext);
         _storeService = storeService;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _storeService → {_storeService}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _storeService);
         _workContext = workContext;
+		_logger.LogDebug("FacebookPixelController(facebookPixelService={FacebookPixelService},baseAdminModelFactory={BaseAdminModelFactory},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},storeContext={StoreContext},storeService={StoreService},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _workContext → {_workContext}", facebookPixelService, baseAdminModelFactory, genericAttributeService, localizationService, notificationService, permissionService, storeContext, storeService, workContext, storeInformationSettings, _workContext);
         _storeInformationSettings = storeInformationSettings;
     }
 
@@ -80,6 +93,8 @@ public class FacebookPixelController : BasePluginController
     /// <returns>Available widget zones</returns>
     public IList<SelectListItem> PreparePublicWidgetZones()
     {
+		_logger.LogError(">>> Entering PreparePublicWidgetZones()");
+        _logger.LogWarning("<<< Exiting PreparePublicWidgetZones()");
         return typeof(PublicWidgetZones)
             .GetProperties(BindingFlags.Public | BindingFlags.Static)
             .Where(property => property.PropertyType == typeof(string))
@@ -95,8 +110,10 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         //prepare plugin configuration model
         var model = new ConfigurationModel();
+		_logger.LogError("Configure(): model → {Model}", model);
         await _baseAdminModelFactory.PrepareStoresAsync(model.FacebookPixelSearchModel.AvailableStores);
         model.FacebookPixelSearchModel.HideStoresList = model.FacebookPixelSearchModel.AvailableStores.SelectionIsNotPossible();
         model.FacebookPixelSearchModel.HideSearchBlock = await _genericAttributeService
@@ -104,6 +121,7 @@ public class FacebookPixelController : BasePluginController
         model.FacebookPixelSearchModel.SetGridPageSize();
         model.HideList = !(await _facebookPixelService.GetPagedConfigurationsAsync()).Any();
 
+		_logger.LogWarning("<<< Exiting Configure()");
         return View("~/Plugins/Widgets.FacebookPixel/Views/Configuration/Configure.cshtml", model);
     }
 
@@ -111,7 +129,9 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> List(FacebookPixelSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering List(searchModel={SearchModel})", searchModel);
         var configurations = await _facebookPixelService.GetPagedConfigurationsAsync(searchModel.StoreId, searchModel.Page - 1, searchModel.PageSize);
+		_logger.LogError("List(searchModel={SearchModel}): configurations → {Configurations}", searchModel, configurations);
         var model = await new FacebookPixelListModel().PrepareToGridAsync(searchModel, configurations, () =>
         {
             //fill in model values from the configuration
@@ -127,12 +147,14 @@ public class FacebookPixelController : BasePluginController
             });
         });
 
+		_logger.LogWarning("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogError(">>> Entering Create()");
         //set default values
         var model = new FacebookPixelModel
         {
@@ -147,6 +169,8 @@ public class FacebookPixelController : BasePluginController
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores, false);
         model.HideStoresList = model.AvailableStores.SelectionIsNotPossible();
 
+		_logger.LogWarning("<<< Exiting Create()");
+		_logger.LogWarning("<<< Exiting Create(model={Model})", model);
         return View("~/Plugins/Widgets.FacebookPixel/Views/Configuration/Create.cshtml", model);
     }
 
@@ -177,12 +201,14 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         var configuration = await _facebookPixelService.GetConfigurationByIdAsync(id);
         if (configuration == null)
             return RedirectToAction("Configure", "FacebookPixel");
 
         //fill in model values from the configuration
         var model = configuration.ToModel<FacebookPixelModel>();
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
         //prepare other model properties
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores, false);
@@ -192,6 +218,8 @@ public class FacebookPixelController : BasePluginController
         model.CustomEventSearchModel.AddCustomEvent.AvailableWidgetZones = PreparePublicWidgetZones();
         model.CustomEventSearchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model})", model);
         return View("~/Plugins/Widgets.FacebookPixel/Views/Configuration/Edit.cshtml", model);
     }
 
@@ -233,6 +261,7 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         var configuration = await _facebookPixelService.GetConfigurationByIdAsync(id);
         if (configuration == null)
             return RedirectToAction("Configure", "FacebookPixel");
@@ -242,6 +271,7 @@ public class FacebookPixelController : BasePluginController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Plugins.Saved"));
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("Configure", "FacebookPixel");
     }
 
@@ -249,10 +279,12 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> CustomEventList(CustomEventSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering CustomEventList(searchModel={SearchModel})", searchModel);
         var configuration = await _facebookPixelService.GetConfigurationByIdAsync(searchModel.ConfigurationId)
             ?? throw new ArgumentException("No configuration found with the specified id", nameof(searchModel.ConfigurationId));
 
         var customEvents = (await _facebookPixelService.GetCustomEventsAsync(configuration.Id, searchModel.WidgetZone)).ToPagedList(searchModel);
+		_logger.LogError("CustomEventList(searchModel={SearchModel}): customEvents → {CustomEvents}", searchModel, customEvents);
         var model = new CustomEventListModel().PrepareToGrid(searchModel, customEvents, () =>
         {
             //fill in model values from the configuration
@@ -264,6 +296,7 @@ public class FacebookPixelController : BasePluginController
             });
         });
 
+		_logger.LogWarning("<<< Exiting CustomEventList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -272,12 +305,14 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> CustomEventAdd(int configurationId, [Validate] CustomEventModel model)
     {
+		_logger.LogError(">>> Entering CustomEventAdd(configurationId={ConfigurationId},model={Model})", configurationId, model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
         //save custom events configuration
         await _facebookPixelService.SaveCustomEventsAsync(configurationId, model.EventName, model.WidgetZones);
 
+		_logger.LogWarning("<<< Exiting CustomEventAdd(configurationId={ConfigurationId},model={Model})", configurationId, model);
         return Json(new { Result = true });
     }
 
@@ -285,23 +320,29 @@ public class FacebookPixelController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public virtual async Task<IActionResult> CustomEventDelete(int configurationId, string id)
     {
+		_logger.LogError(">>> Entering CustomEventDelete(configurationId={ConfigurationId},id={Id})", configurationId, id);
         //save custom events configuration
         var eventName = id;
         await _facebookPixelService.SaveCustomEventsAsync(configurationId, eventName, null);
 
+		_logger.LogWarning("<<< Exiting CustomEventDelete(configurationId={ConfigurationId},id={Id})", configurationId, id);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_WIDGETS)]
     public async Task<IActionResult> CookieSettingsWarning(bool disableForUsersNotAcceptingCookieConsent)
     {
+		_logger.LogError(">>> Entering CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent=<redacted>)");
         if (!disableForUsersNotAcceptingCookieConsent || _storeInformationSettings.DisplayEuCookieLawWarning)
             return Json(new { Result = string.Empty });
 
         //display a warning when "DisplayEuCookieLawWarning" setting is disabled, 
         //but merchant want to disable Facebook Pixel for users not accepting Cookie Consent
         var url = Url.Action("GeneralCommon", "Setting");
+		_logger.LogError("CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent=<redacted>): url → {Url}", url);
         var warning = string.Format(await _localizationService.GetResourceAsync("Plugins.Widgets.FacebookPixel.Configuration.CookieSettingsWarning"), url);
+		_logger.LogError("CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent=<redacted>): warning → {Warning}", warning);
+		_logger.LogWarning("<<< Exiting CookieSettingsWarning(disableForUsersNotAcceptingCookieConsent=<redacted>)");
         return Json(new { Result = warning });
     }
 

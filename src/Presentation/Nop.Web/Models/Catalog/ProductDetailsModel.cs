@@ -7,30 +7,49 @@ using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProductDetailsModel()
     {
+		_logger.LogError(">>> Entering ProductDetailsModel()");
         DefaultPictureModel = new PictureModel();
         PictureModels = new List<PictureModel>();
+		_logger.LogError("ProductDetailsModel(): PictureModels → {PictureModels}", PictureModels);
         VideoModels = new List<VideoModel>();
+		_logger.LogError("ProductDetailsModel(): VideoModels → {VideoModels}", VideoModels);
         GiftCard = new GiftCardModel();
+		_logger.LogError("ProductDetailsModel(): GiftCard → {GiftCard}", GiftCard);
         ProductPrice = new ProductPriceModel();
+		_logger.LogError("ProductDetailsModel(): ProductPrice → {ProductPrice}", ProductPrice);
         AddToCart = new AddToCartModel();
+		_logger.LogError("ProductDetailsModel(): AddToCart → {AddToCart}", AddToCart);
         ProductAttributes = new List<ProductAttributeModel>();
+		_logger.LogError("ProductDetailsModel(): ProductAttributes → {ProductAttributes}", ProductAttributes);
         AssociatedProducts = new List<ProductDetailsModel>();
+		_logger.LogError("ProductDetailsModel(): AssociatedProducts → {AssociatedProducts}", AssociatedProducts);
         VendorModel = new VendorBriefInfoModel();
+		_logger.LogError("ProductDetailsModel(): VendorModel → {VendorModel}", VendorModel);
         Breadcrumb = new ProductBreadcrumbModel();
+		_logger.LogError("ProductDetailsModel(): Breadcrumb → {Breadcrumb}", Breadcrumb);
         ProductTags = new List<ProductTagModel>();
+		_logger.LogError("ProductDetailsModel(): ProductTags → {ProductTags}", ProductTags);
         ProductSpecificationModel = new ProductSpecificationModel();
+		_logger.LogError("ProductDetailsModel(): ProductSpecificationModel → {ProductSpecificationModel}", ProductSpecificationModel);
         ProductManufacturers = new List<ManufacturerBriefInfoModel>();
+		_logger.LogError("ProductDetailsModel(): ProductManufacturers → {ProductManufacturers}", ProductManufacturers);
         ProductReviewOverview = new ProductReviewOverviewModel();
+		_logger.LogError("ProductDetailsModel(): ProductReviewOverview → {ProductReviewOverview}", ProductReviewOverview);
         ProductReviews = new ProductReviewsModel();
+		_logger.LogError("ProductDetailsModel(): ProductReviews → {ProductReviews}", ProductReviews);
         TierPrices = new List<TierPriceModel>();
+		_logger.LogError("ProductDetailsModel(): TierPrices → {TierPrices}", TierPrices);
         ProductEstimateShipping = new ProductEstimateShippingModel();
+		_logger.LogError("ProductDetailsModel(): ProductEstimateShipping → {ProductEstimateShipping}", ProductEstimateShipping);
     }
 
     //picture(s)
@@ -130,9 +149,14 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
 
     public partial record ProductBreadcrumbModel : BaseNopModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public ProductBreadcrumbModel()
         {
+			_logger.LogError(">>> Entering ProductBreadcrumbModel()");
             CategoryBreadcrumb = new List<CategorySimpleModel>();
+			_logger.LogDebug("ProductBreadcrumbModel(): CategoryBreadcrumb → {CategoryBreadcrumb}", CategoryBreadcrumb);
+        _logger.LogError("ProductBreadcrumbModel(): CategoryBreadcrumb → {CategoryBreadcrumb}", CategoryBreadcrumb);
+        _logger.LogWarning("<<< Exiting ProductBreadcrumbModel()");
         }
 
         public bool Enabled { get; set; }
@@ -145,10 +169,13 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
 
     public partial record AddToCartModel : BaseNopModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public AddToCartModel()
         {
+			_logger.LogError(">>> Entering AddToCartModel()");
             AllowedQuantities = new List<SelectListItem>();
             ProductToWishlist = new ProductToWishlistModel();
+			_logger.LogError("AddToCartModel(): ProductToWishlist → {ProductToWishlist}", ProductToWishlist);
         }
         public int ProductId { get; set; }
 
@@ -218,8 +245,10 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
     {
         public ProductAttributeModel()
         {
+			_logger.LogError(">>> Entering ProductAttributeModel()");
             AllowedFileExtensions = new List<string>();
             Values = new List<ProductAttributeValueModel>();
+			_logger.LogError("ProductAttributeModel(): Values → {Values}", Values);
         }
 
         public int ProductId { get; set; }
@@ -268,9 +297,14 @@ public partial record ProductDetailsModel : BaseNopEntityModel, IMetaTagsSupport
 
     public partial record ProductAttributeValueModel : BaseNopEntityModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public ProductAttributeValueModel()
         {
+			_logger.LogError(">>> Entering ProductAttributeValueModel()");
             ImageSquaresPictureModel = new PictureModel();
+			_logger.LogDebug("ProductAttributeValueModel(): ImageSquaresPictureModel → {ImageSquaresPictureModel}", ImageSquaresPictureModel);
+        _logger.LogError("ProductAttributeValueModel(): ImageSquaresPictureModel → {ImageSquaresPictureModel}", ImageSquaresPictureModel);
+        _logger.LogWarning("<<< Exiting ProductAttributeValueModel()");
         }
 
         public string Name { get; set; }

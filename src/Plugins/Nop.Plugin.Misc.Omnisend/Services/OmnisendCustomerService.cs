@@ -5,6 +5,7 @@ using Nop.Plugin.Misc.Omnisend.DTO;
 using Nop.Plugin.Misc.Omnisend.DTO.Events;
 using Nop.Services.Common;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Services;
 
@@ -13,6 +14,7 @@ namespace Nop.Plugin.Misc.Omnisend.Services;
 /// </summary>
 public class OmnisendCustomerService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IAddressService _addressService;
@@ -31,11 +33,16 @@ public class OmnisendCustomerService
         IWebHelper webHelper,
         OmnisendHttpClient httpClient)
     {
+		_logger.LogError(">>> Entering OmnisendCustomerService(addressService={AddressService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},httpClient={HttpClient})", addressService, genericAttributeService, nopUrlHelper, webHelper, httpClient);
         _addressService = addressService;
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("OmnisendCustomerService(addressService={AddressService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},httpClient={HttpClient}): _genericAttributeService → {_genericAttributeService}", addressService, genericAttributeService, nopUrlHelper, webHelper, httpClient, _genericAttributeService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("OmnisendCustomerService(addressService={AddressService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},httpClient={HttpClient}): _nopUrlHelper → {_nopUrlHelper}", addressService, genericAttributeService, nopUrlHelper, webHelper, httpClient, _nopUrlHelper);
         _webHelper = webHelper;
+		_logger.LogDebug("OmnisendCustomerService(addressService={AddressService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},httpClient={HttpClient}): _webHelper → {_webHelper}", addressService, genericAttributeService, nopUrlHelper, webHelper, httpClient, _webHelper);
         _httpClient = httpClient;
+		_logger.LogDebug("OmnisendCustomerService(addressService={AddressService},genericAttributeService={GenericAttributeService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper},httpClient={HttpClient}): _httpClient → {_httpClient}", addressService, genericAttributeService, nopUrlHelper, webHelper, httpClient, _httpClient);
     }
 
     #endregion
@@ -48,6 +55,7 @@ public class OmnisendCustomerService
     /// <param name="customer">Customer</param>
     public async Task<string> GetCartIdAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering GetCartIdAsync(customer={Customer})", customer);
         var cartId = await _genericAttributeService.GetAttributeAsync<string>(customer,
             OmnisendDefaults.StoredCustomerShoppingCartIdAttribute);
 
@@ -60,10 +68,12 @@ public class OmnisendCustomerService
             return cartId;
 
         cartId = Guid.NewGuid().ToString();
+		_logger.LogError("GetCartIdAsync(customer={Customer}): cartId → {CartId}", customer, cartId);
 
         await _genericAttributeService.SaveAttributeAsync(customer,
             OmnisendDefaults.CurrentCustomerShoppingCartIdAttribute, cartId);
 
+		_logger.LogWarning("<<< Exiting GetCartIdAsync(customer={Customer})", customer);
         return cartId;
     }
 
@@ -74,11 +84,13 @@ public class OmnisendCustomerService
     /// <param name="billingAddressId">billing address identifier</param>
     public async Task<string> GetEmailAsync(Customer customer, int? billingAddressId = null)
     {
+		_logger.LogError(">>> Entering GetEmailAsync(customer={Customer},billingAddressId={BillingAddressId})", customer, billingAddressId);
         var email = !string.IsNullOrEmpty(customer.Email)
             ? customer.Email
             : await _genericAttributeService.GetAttributeAsync<string>(customer,
                 OmnisendDefaults.CustomerEmailAttribute);
 
+		_logger.LogWarning("<<< Exiting GetEmailAsync(customer={Customer},billingAddressId={BillingAddressId})", customer, billingAddressId);
         return !string.IsNullOrEmpty(email)
             ? email
             : (await _addressService.GetAddressByIdAsync((billingAddressId ?? customer.BillingAddressId) ?? 0))
@@ -96,13 +108,16 @@ public class OmnisendCustomerService
     /// </returns>
     public async Task<CustomerEvents> CreateCustomerEventAsync(Customer customer, IEventProperty properties)
     {
+		_logger.LogError(">>> Entering CreateCustomerEventAsync(customer={Customer},properties={Properties})", customer, properties);
         var email = await GetEmailAsync(customer);
 
+		_logger.LogError("CreateCustomerEventAsync(customer={Customer},properties={Properties}): email → {Email}", customer, properties, email);
         if (string.IsNullOrEmpty(email))
             return null;
 
         var customerEvent = new CustomerEvents { Email = email, Properties = properties };
 
+		_logger.LogWarning("<<< Exiting CreateCustomerEventAsync(customer={Customer},properties={Properties})", customer, properties);
         return customerEvent;
     }
 
@@ -112,9 +127,15 @@ public class OmnisendCustomerService
     /// <param name="email">Email to determinate customer</param>
     public async Task<string> GetContactIdAsync(string email)
     {
+		_logger.LogError(">>> Entering GetContactIdAsync(email={Email})", email);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var url = $"{OmnisendDefaults.ContactsApiUrl}?email={email}&limit=1";
 
+		_logger.LogError("GetContactIdAsync(email={Email}): url → {Url}", email, url);
         var res = await _httpClient.PerformRequestAsync(url, httpMethod: HttpMethod.Get);
+		_logger.LogError("GetContactIdAsync(email={Email}): res → {Res}", email, res);
+		_logger.LogError("GetContactIdAsync(email)={Email}: external service call {Url} took {Arg2} ms", email, url, __logStart.ElapsedMilliseconds);
 
         if (string.IsNullOrEmpty(res))
             return null;
@@ -123,6 +144,7 @@ public class OmnisendCustomerService
             .DeserializeAnonymousType(res, new { contacts = new[] { new { contactID = string.Empty } } })?.contacts
             .FirstOrDefault();
 
+		_logger.LogWarning("<<< Exiting GetContactIdAsync(email={Email})", email);
         return contact?.contactID;
     }
 
@@ -132,12 +154,14 @@ public class OmnisendCustomerService
     /// <param name="customer">Customer</param>
     public async Task StoreCartIdAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering StoreCartIdAsync(customer={Customer})", customer);
         var cartId = await _genericAttributeService.GetAttributeAsync<string>(customer,
             OmnisendDefaults.StoredCustomerShoppingCartIdAttribute);
 
         if (string.IsNullOrEmpty(cartId))
             await _genericAttributeService.SaveAttributeAsync(customer,
                 OmnisendDefaults.StoredCustomerShoppingCartIdAttribute, await GetCartIdAsync(customer));
+				_logger.LogWarning("<<< Exiting StoreCartIdAsync(customer={Customer})", customer);
     }
 
     /// <summary>
@@ -146,8 +170,10 @@ public class OmnisendCustomerService
     /// <param name="customer">Customer</param>
     public async Task DeleteCurrentCustomerShoppingCartIdAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering DeleteCurrentCustomerShoppingCartIdAsync(customer={Customer})", customer);
         await _genericAttributeService.SaveAttributeAsync<string>(customer,
             OmnisendDefaults.CurrentCustomerShoppingCartIdAttribute, null);
+			_logger.LogWarning("<<< Exiting DeleteCurrentCustomerShoppingCartIdAsync(customer={Customer})", customer);
     }
 
     /// <summary>
@@ -159,6 +185,8 @@ public class OmnisendCustomerService
     /// The task result contains the True if we need to sand delete events</returns>
     public async Task<bool> IsNeedToSendDeleteShoppingCartEventAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering IsNeedToSendDeleteShoppingCartEventAsync(customer={Customer})", customer);
+        _logger.LogWarning("<<< Exiting IsNeedToSendDeleteShoppingCartEventAsync(customer={Customer})", customer);
         return string.IsNullOrEmpty(await _genericAttributeService.GetAttributeAsync<string>(customer,
             OmnisendDefaults.StoredCustomerShoppingCartIdAttribute));
     }
@@ -169,8 +197,10 @@ public class OmnisendCustomerService
     /// <param name="customer">Customer</param>
     public async Task DeleteStoredCustomerShoppingCartIdAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering DeleteStoredCustomerShoppingCartIdAsync(customer={Customer})", customer);
         await _genericAttributeService.SaveAttributeAsync<string>(customer,
             OmnisendDefaults.StoredCustomerShoppingCartIdAttribute, null);
+			_logger.LogWarning("<<< Exiting DeleteStoredCustomerShoppingCartIdAsync(customer={Customer})", customer);
     }
 
     /// <summary>
@@ -180,6 +210,8 @@ public class OmnisendCustomerService
     /// <returns>The abandoned checkout url</returns>
     public string GetAbandonedCheckoutUrl(string cartId)
     {
+		_logger.LogError(">>> Entering GetAbandonedCheckoutUrl(cartId={CartId})", cartId);
+        _logger.LogWarning("<<< Exiting GetAbandonedCheckoutUrl(cartId={CartId})", cartId);
         return _nopUrlHelper.RouteUrl(OmnisendDefaults.AbandonedCheckoutRouteName, new { cartId }, _webHelper.GetCurrentRequestProtocol());
     }
 

@@ -3,20 +3,29 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Customer;
 
 public partial record CustomerInfoModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CustomerInfoModel()
     {
+		_logger.LogError(">>> Entering CustomerInfoModel()");
         AvailableTimeZones = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("CustomerInfoModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("CustomerInfoModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AssociatedExternalAuthRecords = new List<AssociatedExternalAuthModel>();
+		_logger.LogError("CustomerInfoModel(): AssociatedExternalAuthRecords → {AssociatedExternalAuthRecords}", AssociatedExternalAuthRecords);
         CustomerAttributes = new List<CustomerAttributeModel>();
+		_logger.LogError("CustomerInfoModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
         GdprConsents = new List<GdprConsentModel>();
+		_logger.LogError("CustomerInfoModel(): GdprConsents → {GdprConsents}", GdprConsents);
         NewsLetterSubscriptions = new List<NewsLetterSubscriptionModel>();
+		_logger.LogError("CustomerInfoModel(): NewsLetterSubscriptions → {NewsLetterSubscriptions}", NewsLetterSubscriptions);
     }
 
     [DataType(DataType.EmailAddress)]
@@ -58,6 +67,8 @@ public partial record CustomerInfoModel : BaseNopModel
     public bool DateOfBirthRequired { get; set; }
     public DateTime? ParseDateOfBirth()
     {
+		_logger.LogError(">>> Entering ParseDateOfBirth()");
+        _logger.LogWarning("<<< Exiting ParseDateOfBirth()");
         return CommonHelper.ParseDate(DateOfBirthYear, DateOfBirthMonth, DateOfBirthDay);
     }
 

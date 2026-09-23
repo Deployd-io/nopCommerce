@@ -5,16 +5,19 @@ using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Validators;
 using Nop.Web.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Validators.Common;
 
 public partial class AddressValidator : BaseNopValidator<AddressModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AddressValidator(ILocalizationService localizationService,
         IStateProvinceService stateProvinceService,
         AddressSettings addressSettings,
         CustomerSettings customerSettings)
     {
+		_logger.LogError(">>> Entering AddressValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},addressSettings={AddressSettings},customerSettings={CustomerSettings})", localizationService, stateProvinceService, addressSettings, customerSettings);
         RuleFor(x => x.FirstName)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Address.Fields.FirstName.Required"));
@@ -43,6 +46,7 @@ public partial class AddressValidator : BaseNopValidator<AddressModel>
                 //does selected country has states?
                 var countryId = x.CountryId ?? 0;
                 var hasStates = (await stateProvinceService.GetStateProvincesByCountryIdAsync(countryId)).Any();
+				_logger.LogError("AddressValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},addressSettings={AddressSettings},customerSettings={CustomerSettings}): hasStates → {HasStates}", localizationService, stateProvinceService, addressSettings, customerSettings, hasStates);
 
                 if (hasStates)
                 {
@@ -90,5 +94,6 @@ public partial class AddressValidator : BaseNopValidator<AddressModel>
         {
             RuleFor(x => x.FaxNumber).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Account.Fields.Fax.Required"));
         }
+		_logger.LogWarning("<<< Exiting AddressValidator(localizationService={LocalizationService},stateProvinceService={StateProvinceService},addressSettings={AddressSettings},customerSettings={CustomerSettings})", localizationService, stateProvinceService, addressSettings, customerSettings);
     }
 }

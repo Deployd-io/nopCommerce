@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Menu;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Menu;
 
 namespace Nop.Web.Framework.Events;
 
@@ -7,6 +8,7 @@ namespace Nop.Web.Framework.Events;
 /// </summary>
 public partial class ThirdPartyPluginsMenuItemCreatedEvent : BaseMenuItemCreatedEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -16,7 +18,10 @@ public partial class ThirdPartyPluginsMenuItemCreatedEvent : BaseMenuItemCreated
     /// <param name="rootMenuItem">Third party plugins menu item</param>
     public ThirdPartyPluginsMenuItemCreatedEvent(IAdminMenu adminMenu, AdminMenuItem rootMenuItem) : base(adminMenu)
     {
+		_logger.LogError(">>> Entering ThirdPartyPluginsMenuItemCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem})", adminMenu, rootMenuItem);
         MenuItem = rootMenuItem;
+		_logger.LogDebug("ThirdPartyPluginsMenuItemCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem}): MenuItem → {MenuItem}", adminMenu, rootMenuItem, MenuItem);
+    _logger.LogWarning("<<< Exiting ThirdPartyPluginsMenuItemCreatedEvent(adminMenu={AdminMenu},rootMenuItem={RootMenuItem})", adminMenu, rootMenuItem);
     }
 
     #endregion

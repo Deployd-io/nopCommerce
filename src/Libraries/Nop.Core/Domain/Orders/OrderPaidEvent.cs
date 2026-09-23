@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 namespace Nop.Core.Domain.Orders;
 
 /// <summary>
@@ -5,13 +6,17 @@ namespace Nop.Core.Domain.Orders;
 /// </summary>
 public partial class OrderPaidEvent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
     /// <param name="order">Order</param>
     public OrderPaidEvent(Order order)
     {
+		_logger.LogError(">>> Entering OrderPaidEvent(order={Order})", order);
         Order = order;
+		_logger.LogDebug("OrderPaidEvent(order={Order}): Order → {Order1}", order, Order);
+    _logger.LogWarning("<<< Exiting OrderPaidEvent(order={Order})", order);
     }
 
     /// <summary>

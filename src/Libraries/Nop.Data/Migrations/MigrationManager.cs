@@ -3,6 +3,7 @@ using FluentMigrator;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -11,6 +12,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public partial class MigrationManager : IMigrationManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IFilteringMigrationSource _filteringMigrationSource;
@@ -28,11 +30,17 @@ public partial class MigrationManager : IMigrationManager
         IMigrationRunnerConventions migrationRunnerConventions,
         Lazy<IVersionLoader> versionLoader)
     {
+		_logger.LogError(">>> Entering MigrationManager(filteringMigrationSource={FilteringMigrationSource},migrationRunner={MigrationRunner},migrationRunnerConventions={MigrationRunnerConventions},versionLoader={VersionLoader})", filteringMigrationSource, migrationRunner, migrationRunnerConventions, versionLoader);
         _versionLoader = versionLoader;
+		_logger.LogWarning("<<< Exiting MigrationManager(filteringMigrationSource={FilteringMigrationSource},migrationRunner={MigrationRunner},migrationRunnerConventions={MigrationRunnerConventions},versionLoader={VersionLoader})", filteringMigrationSource, migrationRunner, migrationRunnerConventions, versionLoader);
+		_logger.LogDebug("MigrationManager(filteringMigrationSource={FilteringMigrationSource},migrationRunner={MigrationRunner},migrationRunnerConventions={MigrationRunnerConventions},versionLoader={VersionLoader}): _versionLoader → {_versionLoader}", filteringMigrationSource, migrationRunner, migrationRunnerConventions, versionLoader, _versionLoader);
 
         _filteringMigrationSource = filteringMigrationSource;
+		_logger.LogDebug("MigrationManager(filteringMigrationSource={FilteringMigrationSource},migrationRunner={MigrationRunner},migrationRunnerConventions={MigrationRunnerConventions},versionLoader={VersionLoader}): _filteringMigrationSource → {_filteringMigrationSource}", filteringMigrationSource, migrationRunner, migrationRunnerConventions, versionLoader, _filteringMigrationSource);
         _migrationRunner = migrationRunner;
+		_logger.LogDebug("MigrationManager(filteringMigrationSource={FilteringMigrationSource},migrationRunner={MigrationRunner},migrationRunnerConventions={MigrationRunnerConventions},versionLoader={VersionLoader}): _migrationRunner → {_migrationRunner}", filteringMigrationSource, migrationRunner, migrationRunnerConventions, versionLoader, _migrationRunner);
         _migrationRunnerConventions = migrationRunnerConventions;
+		_logger.LogDebug("MigrationManager(filteringMigrationSource={FilteringMigrationSource},migrationRunner={MigrationRunner},migrationRunnerConventions={MigrationRunnerConventions},versionLoader={VersionLoader}): _migrationRunnerConventions → {_migrationRunnerConventions}", filteringMigrationSource, migrationRunner, migrationRunnerConventions, versionLoader, _migrationRunnerConventions);
     }
 
     #endregion
@@ -51,7 +59,9 @@ public partial class MigrationManager : IMigrationManager
     protected virtual IEnumerable<IMigrationInfo> GetMigrations(Assembly assembly, bool exactlyProcessType,
         MigrationProcessType migrationProcessType = MigrationProcessType.NoMatter, bool isApplied = false, bool isSchemaMigration = false)
     {
+		_logger.LogError(">>> Entering GetMigrations(assembly={Assembly},exactlyProcessType={ExactlyProcessType},migrationProcessType={MigrationProcessType},isApplied={IsApplied},isSchemaMigration={IsSchemaMigration})", assembly, exactlyProcessType, migrationProcessType, isApplied, isSchemaMigration);
         if (exactlyProcessType && migrationProcessType == MigrationProcessType.NoMatter)
+			_logger.LogError("Throwing ArgumentException from GetMigrations(assembly={Assembly},exactlyProcessType={ExactlyProcessType},migrationProcessType={MigrationProcessType},isApplied={IsApplied},isSchemaMigration={IsSchemaMigration})", assembly, exactlyProcessType, migrationProcessType, isApplied, isSchemaMigration);
             throw new ArgumentException("Migration process type can't be NoMatter if exactlyProcessType set to true", nameof(migrationProcessType));
 
         //load all version data stored in the version table
@@ -62,6 +72,7 @@ public partial class MigrationManager : IMigrationManager
             .GetMigrations(t =>
             {
                 var migrationAttribute = t.GetCustomAttribute<NopMigrationAttribute>();
+				_logger.LogError("GetMigrations(assembly={Assembly},exactlyProcessType={ExactlyProcessType},migrationProcessType={MigrationProcessType},isApplied={IsApplied},isSchemaMigration={IsSchemaMigration}): migrationAttribute → {MigrationAttribute}", assembly, exactlyProcessType, migrationProcessType, isApplied, isSchemaMigration, migrationAttribute);
 
                 if (migrationAttribute is null)
                     return false;
@@ -80,6 +91,7 @@ public partial class MigrationManager : IMigrationManager
                     migrationProcessType != migrationAttribute.TargetMigrationProcess)
                     return false;
 
+		_logger.LogWarning("<<< Exiting GetMigrations(assembly={Assembly},exactlyProcessType={ExactlyProcessType},migrationProcessType={MigrationProcessType},isApplied={IsApplied},isSchemaMigration={IsSchemaMigration})", assembly, exactlyProcessType, migrationProcessType, isApplied, isSchemaMigration);
                 return assembly == null || t.Assembly == assembly;
             }) ?? Enumerable.Empty<IMigration>();
 
@@ -98,10 +110,12 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="commitVersionOnly">Commit only version information</param>
     public virtual void ApplyUpMigrations(Assembly assembly, MigrationProcessType migrationProcessType = MigrationProcessType.Installation, bool commitVersionOnly = false)
     {
+		_logger.LogError(">>> Entering ApplyUpMigrations(assembly={Assembly},migrationProcessType={MigrationProcessType},commitVersionOnly={CommitVersionOnly})", assembly, migrationProcessType, commitVersionOnly);
         ArgumentNullException.ThrowIfNull(assembly);
 
         foreach (var migrationInfo in GetMigrations(assembly, commitVersionOnly && migrationProcessType != MigrationProcessType.NoMatter, migrationProcessType).OrderBy(migration => migration.Version))
             ApplyUpMigration(migrationInfo, commitVersionOnly);
+			_logger.LogWarning("<<< Exiting ApplyUpMigrations(assembly={Assembly},migrationProcessType={MigrationProcessType},commitVersionOnly={CommitVersionOnly})", assembly, migrationProcessType, commitVersionOnly);
     }
 
     /// <summary>
@@ -110,10 +124,12 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="assembly">Assembly to find migrations</param>
     public virtual void ApplyUpSchemaMigrations(Assembly assembly)
     {
+		_logger.LogError(">>> Entering ApplyUpSchemaMigrations(assembly={Assembly})", assembly);
         ArgumentNullException.ThrowIfNull(assembly);
 
         foreach (var migrationInfo in GetMigrations(assembly, false, MigrationProcessType.NoMatter, isSchemaMigration: true).OrderBy(migration => migration.Version))
             ApplyUpMigration(migrationInfo);
+			_logger.LogWarning("<<< Exiting ApplyUpSchemaMigrations(assembly={Assembly})", assembly);
     }
 
     /// <summary>
@@ -122,10 +138,12 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="assembly">Assembly to find the migration</param>
     public virtual void ApplyDownMigrations(Assembly assembly)
     {
+		_logger.LogError(">>> Entering ApplyDownMigrations(assembly={Assembly})", assembly);
         ArgumentNullException.ThrowIfNull(assembly);
 
         foreach (var migrationInfo in GetMigrations(assembly, false, MigrationProcessType.NoMatter, true).OrderByDescending(migration => migration.Version))
             ApplyDownMigration(migrationInfo);
+			_logger.LogWarning("<<< Exiting ApplyDownMigrations(assembly={Assembly})", assembly);
     }
 
     /// <summary>
@@ -134,10 +152,12 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="migrationInfo">Migration to rollback</param>
     public virtual void ApplyDownMigration(IMigrationInfo migrationInfo)
     {
+		_logger.LogError(">>> Entering ApplyDownMigration(migrationInfo={MigrationInfo})", migrationInfo);
         ArgumentNullException.ThrowIfNull(migrationInfo);
 
         _migrationRunner.Down(migrationInfo.Migration);
         _versionLoader.Value.DeleteVersion(migrationInfo.Version);
+		_logger.LogWarning("<<< Exiting ApplyDownMigration(migrationInfo={MigrationInfo})", migrationInfo);
     }
 
     /// <summary>
@@ -147,6 +167,7 @@ public partial class MigrationManager : IMigrationManager
     /// <param name="commitVersionOnly">Commit only version information</param>
     public virtual void ApplyUpMigration(IMigrationInfo migrationInfo, bool commitVersionOnly = false)
     {
+		_logger.LogError(">>> Entering ApplyUpMigration(migrationInfo={MigrationInfo},commitVersionOnly={CommitVersionOnly})", migrationInfo, commitVersionOnly);
         ArgumentNullException.ThrowIfNull(migrationInfo);
 
         if (!commitVersionOnly)

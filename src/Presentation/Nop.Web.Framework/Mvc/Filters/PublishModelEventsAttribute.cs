@@ -4,6 +4,7 @@ using Nop.Core.Events;
 using Nop.Core.Http.Extensions;
 using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class PublishModelEventsAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -21,8 +23,11 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public PublishModelEventsAttribute(bool ignore = false) : base(typeof(PublishModelEventsFilter))
     {
+		_logger.LogError(">>> Entering PublishModelEventsAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		_logger.LogDebug("PublishModelEventsAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
+    _logger.LogWarning("<<< Exiting PublishModelEventsAttribute(ignore={Ignore})", ignore);
     }
 
     #endregion
@@ -44,6 +49,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
     /// </summary>
     private class PublishModelEventsFilter : IAsyncActionFilter, IAsyncResultFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly bool _ignoreFilter;
@@ -56,8 +62,10 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
         public PublishModelEventsFilter(bool ignoreFilter,
             IEventPublisher eventPublisher)
         {
+			_logger.LogError(">>> Entering PublishModelEventsFilter(ignoreFilter={IgnoreFilter},eventPublisher={EventPublisher})", ignoreFilter, eventPublisher);
             _ignoreFilter = ignoreFilter;
             _eventPublisher = eventPublisher;
+			_logger.LogDebug("PublishModelEventsFilter(ignoreFilter={IgnoreFilter},eventPublisher={EventPublisher}): _eventPublisher → {_eventPublisher}", ignoreFilter, eventPublisher, _eventPublisher);
         }
 
         #endregion
@@ -71,6 +79,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
         /// <returns>Result</returns>
         protected virtual bool IgnoreFilter(FilterContext context)
         {
+			_logger.LogError(">>> Entering IgnoreFilter(context={Context})", context);
             //check whether this filter has been overridden for the Action
             var actionFilter = context.ActionDescriptor.FilterDescriptors
                 .Where(filterDescriptor => filterDescriptor.Scope == FilterScope.Action)
@@ -78,6 +87,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
                 .OfType<PublishModelEventsAttribute>()
                 .FirstOrDefault();
 
+			_logger.LogWarning("<<< Exiting IgnoreFilter(context={Context})", context);
             return actionFilter?.IgnoreFilter ?? _ignoreFilter;
         }
 
@@ -88,6 +98,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task PublishModelReceivedEventAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering PublishModelReceivedEventAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in POST requests
@@ -104,6 +115,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
                 //so you need to implement IConsumer<ModelReceived<BaseNopModel>> interface to handle this event
                 await _eventPublisher.ModelReceivedAsync(model, context.ModelState);
             }
+			_logger.LogWarning("<<< Exiting PublishModelReceivedEventAsync(context={Context})", context);
         }
 
         /// <summary>
@@ -113,6 +125,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task PublishModelPreparedEventAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering PublishModelPreparedEventAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (IgnoreFilter(context))
@@ -121,6 +134,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
             //model prepared event
             if (context.Controller is Controller controller)
                 await _eventPublisher.ModelPreparedAsync(controller.ViewData.Model);
+				_logger.LogWarning("<<< Exiting PublishModelPreparedEventAsync(context={Context})", context);
         }
 
         #endregion
@@ -135,10 +149,12 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await PublishModelReceivedEventAsync(context);
             if (context.Result == null)
                 await next();
             await PublishModelPreparedEventAsync(context);
+			_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         /// <summary>Called asynchronously before the action result.</summary>
@@ -147,6 +163,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnResultExecutionAsync(context={Context},next={Next})", context, next);
             ArgumentNullException.ThrowIfNull(context);
 
             if (IgnoreFilter(context))
@@ -157,6 +174,7 @@ public sealed class PublishModelEventsAttribute : TypeFilterAttribute
                 await _eventPublisher.ModelPreparedAsync(result.Value);
 
             await next();
+			_logger.LogWarning("<<< Exiting OnResultExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

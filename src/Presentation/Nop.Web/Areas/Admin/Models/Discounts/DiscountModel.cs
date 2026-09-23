@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Discounts;
 
@@ -10,17 +11,25 @@ namespace Nop.Web.Areas.Admin.Models.Discounts;
 /// </summary>
 public partial record DiscountModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public DiscountModel()
     {
+		_logger.LogError(">>> Entering DiscountModel()");
         AvailableDiscountRequirementRules = new List<SelectListItem>();
         AvailableRequirementGroups = new List<SelectListItem>();
+		_logger.LogError("DiscountModel(): AvailableRequirementGroups → {AvailableRequirementGroups}", AvailableRequirementGroups);
         DiscountUsageHistorySearchModel = new DiscountUsageHistorySearchModel();
+		_logger.LogError("DiscountModel(): DiscountUsageHistorySearchModel → {DiscountUsageHistorySearchModel}", DiscountUsageHistorySearchModel);
         DiscountProductSearchModel = new DiscountProductSearchModel();
+		_logger.LogError("DiscountModel(): DiscountProductSearchModel → {DiscountProductSearchModel}", DiscountProductSearchModel);
         DiscountCategorySearchModel = new DiscountCategorySearchModel();
+		_logger.LogError("DiscountModel(): DiscountCategorySearchModel → {DiscountCategorySearchModel}", DiscountCategorySearchModel);
         DiscountManufacturerSearchModel = new DiscountManufacturerSearchModel();
+		_logger.LogError("DiscountModel(): DiscountManufacturerSearchModel → {DiscountManufacturerSearchModel}", DiscountManufacturerSearchModel);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("DiscountModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Domain.Catalog;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Customers;
 
@@ -11,29 +12,47 @@ namespace Nop.Web.Areas.Admin.Models.Customers;
 /// </summary>
 public partial record CustomerModel : BaseNopEntityModel, IAclSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomerModel()
     {
+		_logger.LogError(">>> Entering CustomerModel()");
         AvailableTimeZones = new List<SelectListItem>();
         SendEmail = new SendEmailModel() { SendImmediately = true };
+		_logger.LogDebug("CustomerModel(): AvailableTimeZones → {AvailableTimeZones}", AvailableTimeZones);
         SendPm = new SendPmModel();
+		_logger.LogError("CustomerModel(): SendPm → {SendPm}", SendPm);
 
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogError("CustomerModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogError("CustomerModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("CustomerModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("CustomerModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("CustomerModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         CustomerAttributes = new List<CustomerAttributeModel>();
+		_logger.LogError("CustomerModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
         AddRewardPoints = new AddRewardPointsToCustomerModel();
+		_logger.LogError("CustomerModel(): AddRewardPoints → {AddRewardPoints}", AddRewardPoints);
         CustomerRewardPointsSearchModel = new CustomerRewardPointsSearchModel();
+		_logger.LogError("CustomerModel(): CustomerRewardPointsSearchModel → {CustomerRewardPointsSearchModel}", CustomerRewardPointsSearchModel);
         CustomerAddressSearchModel = new CustomerAddressSearchModel();
+		_logger.LogError("CustomerModel(): CustomerAddressSearchModel → {CustomerAddressSearchModel}", CustomerAddressSearchModel);
         CustomerOrderSearchModel = new CustomerOrderSearchModel();
+		_logger.LogError("CustomerModel(): CustomerOrderSearchModel → {CustomerOrderSearchModel}", CustomerOrderSearchModel);
         CustomerShoppingCartSearchModel = new CustomerShoppingCartSearchModel();
+		_logger.LogError("CustomerModel(): CustomerShoppingCartSearchModel → {CustomerShoppingCartSearchModel}", CustomerShoppingCartSearchModel);
         CustomerActivityLogSearchModel = new CustomerActivityLogSearchModel();
+		_logger.LogError("CustomerModel(): CustomerActivityLogSearchModel → {CustomerActivityLogSearchModel}", CustomerActivityLogSearchModel);
         CustomerBackInStockSubscriptionSearchModel = new CustomerBackInStockSubscriptionSearchModel();
+		_logger.LogError("CustomerModel(): CustomerBackInStockSubscriptionSearchModel → {CustomerBackInStockSubscriptionSearchModel}", CustomerBackInStockSubscriptionSearchModel);
         CustomerAssociatedExternalAuthRecordsSearchModel = new CustomerAssociatedExternalAuthRecordsSearchModel();
+		_logger.LogError("CustomerModel(): CustomerAssociatedExternalAuthRecordsSearchModel → {CustomerAssociatedExternalAuthRecordsSearchModel}", CustomerAssociatedExternalAuthRecordsSearchModel);
     }
 
     #endregion
@@ -279,7 +298,11 @@ public partial record CustomerModel : BaseNopEntityModel, IAclSupportedModel
     {
         public CustomerAttributeModel()
         {
+			_logger.LogError(">>> Entering CustomerAttributeModel()");
             Values = new List<CustomerAttributeValueModel>();
+			_logger.LogDebug("CustomerAttributeModel(): Values → {Values}", Values);
+        _logger.LogError("CustomerAttributeModel(): Values → {Values}", Values);
+        _logger.LogWarning("<<< Exiting CustomerAttributeModel()");
         }
 
         public string Name { get; set; }

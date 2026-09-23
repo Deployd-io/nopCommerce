@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -9,9 +10,14 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ArtificialIntelligenceFullDescriptionModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ArtificialIntelligenceFullDescriptionModel()
     {
+		_logger.LogError(">>> Entering ArtificialIntelligenceFullDescriptionModel()");
         AvailableLanguages = new List<SelectListItem>();
+		_logger.LogDebug("ArtificialIntelligenceFullDescriptionModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+    _logger.LogError("ArtificialIntelligenceFullDescriptionModel(): AvailableLanguages → {AvailableLanguages}", AvailableLanguages);
+    _logger.LogWarning("<<< Exiting ArtificialIntelligenceFullDescriptionModel()");
     }
 
     [NopResourceDisplayName("Admin.Catalog.Products.AiFullDescription.ProductName")]

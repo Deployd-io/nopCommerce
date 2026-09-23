@@ -3,13 +3,16 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Core.Http.Extensions;
 using Nop.Plugin.Payments.Manual.Models;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.Manual.Components;
 
 public class PaymentManualViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		_logger.LogError(">>> Entering InvokeAsync()");
         var model = new PaymentInfoModel()
         {
             CreditCardTypes = new List<SelectListItem>
@@ -53,6 +56,7 @@ public class PaymentManualViewComponent : NopViewComponent
                 selectedYear.Selected = true;
         }
 
+		_logger.LogWarning("<<< Exiting InvokeAsync()");
         return View("~/Plugins/Payments.Manual/Views/PaymentInfo.cshtml", model);
     }
 }

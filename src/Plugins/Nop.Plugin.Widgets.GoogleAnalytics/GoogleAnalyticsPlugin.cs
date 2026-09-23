@@ -6,6 +6,7 @@ using Nop.Services.Localization;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Infrastructure;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.GoogleAnalytics;
 
@@ -14,6 +15,7 @@ namespace Nop.Plugin.Widgets.GoogleAnalytics;
 /// </summary>
 public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILocalizationService _localizationService;
@@ -30,9 +32,14 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
         ISettingService settingService,
         WidgetSettings widgetSettings)
     {
+		_logger.LogError(">>> Entering GoogleAnalyticsPlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings})", localizationService, nopUrlHelper, settingService, widgetSettings);
         _localizationService = localizationService;
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("GoogleAnalyticsPlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _nopUrlHelper → {_nopUrlHelper}", localizationService, nopUrlHelper, settingService, widgetSettings, _nopUrlHelper);
+		_logger.LogDebug("GoogleAnalyticsPlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _localizationService → {_localizationService}", localizationService, nopUrlHelper, settingService, widgetSettings, _localizationService);
+    _logger.LogWarning("<<< Exiting GoogleAnalyticsPlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings})", localizationService, nopUrlHelper, settingService, widgetSettings);
         _settingService = settingService;
+		_logger.LogDebug("GoogleAnalyticsPlugin(localizationService={LocalizationService},nopUrlHelper={NopUrlHelper},settingService={SettingService},widgetSettings={WidgetSettings}): _settingService → {_settingService}", localizationService, nopUrlHelper, settingService, widgetSettings, _settingService);
         _widgetSettings = widgetSettings;
     }
 
@@ -49,6 +56,8 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// </returns>
     public Task<IList<string>> GetWidgetZonesAsync()
     {
+		_logger.LogError(">>> Entering GetWidgetZonesAsync()");
+		_logger.LogWarning("<<< Exiting GetWidgetZonesAsync()");
         return Task.FromResult<IList<string>>(new List<string>
         {
             PublicWidgetZones.HeadHtmlTag
@@ -60,6 +69,8 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return _nopUrlHelper.RouteUrl(GoogleAnalyticsDefaults.ConfigurationRouteName);
     }
 
@@ -70,6 +81,7 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// <returns>View component type</returns>
     public Type GetWidgetViewComponent(string widgetZone)
     {
+		_logger.LogError(">>> Entering GetWidgetViewComponent(widgetZone={WidgetZone})", widgetZone);
         ArgumentNullException.ThrowIfNull(widgetZone);
 
         if (widgetZone.Equals(PublicWidgetZones.HeadHtmlTag))
@@ -84,12 +96,14 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         var settings = new GoogleAnalyticsSettings
         {
             GoogleId = "G-XXXXXXXXXX",
             TrackingScript = @"<!-- Global site tag (gtag.js) - Google Analytics -->
                 <script async src='https://www.googletagmanager.com/gtag/js?id={GOOGLEID}'></script>
                 <script>
+				_logger.LogWarning("<<< Exiting InstallAsync()");
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
@@ -134,6 +148,7 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         //settings
         if (_widgetSettings.ActiveWidgetSystemNames.Contains(GoogleAnalyticsDefaults.SystemName))
         {
@@ -146,6 +161,7 @@ public class GoogleAnalyticsPlugin : BasePlugin, IWidgetPlugin
         await _localizationService.DeleteLocaleResourcesAsync("Plugins.Widgets.GoogleAnalytics");
 
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

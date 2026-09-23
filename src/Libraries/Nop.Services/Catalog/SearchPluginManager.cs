@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
  namespace Nop.Services.Catalog; 
 
@@ -10,6 +11,7 @@ using Nop.Services.Plugins;
  /// </summary>
  public partial class SearchPluginManager : PluginManager<ISearchProvider>, ISearchPluginManager
  {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
      #region Fields
 
      protected readonly CatalogSettings _catalogSettings;
@@ -21,7 +23,10 @@ using Nop.Services.Plugins;
      public SearchPluginManager(CatalogSettings catalogSettings, ICustomerService customerService, IPluginService pluginService)
          : base(customerService, pluginService)
      {
+		_logger.LogError(">>> Entering SearchPluginManager(catalogSettings={CatalogSettings},customerService={CustomerService},pluginService={PluginService})", catalogSettings, customerService, pluginService);
          _catalogSettings = catalogSettings;
+		_logger.LogDebug("SearchPluginManager(catalogSettings={CatalogSettings},customerService={CustomerService},pluginService={PluginService}): _catalogSettings → {_catalogSettings}", catalogSettings, customerService, pluginService, _catalogSettings);
+     _logger.LogWarning("<<< Exiting SearchPluginManager(catalogSettings={CatalogSettings},customerService={CustomerService},pluginService={PluginService})", catalogSettings, customerService, pluginService);
      }
 
      #endregion
@@ -39,6 +44,7 @@ using Nop.Services.Plugins;
      /// </returns>
      public virtual async Task<ISearchProvider> LoadPrimaryPluginAsync(Customer customer = null, int storeId = 0)
      {
+		_logger.LogError(">>> Entering LoadPrimaryPluginAsync(customer={Customer},storeId={StoreId})", customer, storeId);
          if (string.IsNullOrEmpty(_catalogSettings.ActiveSearchProviderSystemName))
              return null;
 
@@ -52,6 +58,8 @@ using Nop.Services.Plugins;
      /// <returns>Result</returns>
      public virtual bool IsPluginActive(ISearchProvider searchProvider)
      {
+		_logger.LogError(">>> Entering IsPluginActive(searchProvider={SearchProvider})", searchProvider);
+         _logger.LogWarning("<<< Exiting IsPluginActive(searchProvider={SearchProvider})", searchProvider);
          return IsPluginActive(searchProvider, [_catalogSettings.ActiveSearchProviderSystemName]);
      }
 
@@ -67,7 +75,10 @@ using Nop.Services.Plugins;
      /// </returns>
      public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
      {
+		_logger.LogError(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
          var searchProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogError("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): searchProvider → {SearchProvider}", systemName, customer, storeId, searchProvider);
+		_logger.LogWarning("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
          return IsPluginActive(searchProvider);
      }
 

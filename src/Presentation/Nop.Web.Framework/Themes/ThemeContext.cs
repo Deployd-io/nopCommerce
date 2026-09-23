@@ -3,6 +3,7 @@ using Nop.Core.Domain;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Common;
 using Nop.Services.Themes;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Themes;
 
@@ -11,6 +12,7 @@ namespace Nop.Web.Framework.Themes;
 /// </summary>
 public partial class ThemeContext : IThemeContext
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IGenericAttributeService _genericAttributeService;
@@ -39,11 +41,16 @@ public partial class ThemeContext : IThemeContext
         IWorkContext workContext,
         StoreInformationSettings storeInformationSettings)
     {
+		_logger.LogError(">>> Entering ThemeContext(genericAttributeService={GenericAttributeService},storeContext={StoreContext},themeProvider={ThemeProvider},workContext={WorkContext},storeInformationSettings={StoreInformationSettings})", genericAttributeService, storeContext, themeProvider, workContext, storeInformationSettings);
         _genericAttributeService = genericAttributeService;
         _storeContext = storeContext;
+		_logger.LogDebug("ThemeContext(genericAttributeService={GenericAttributeService},storeContext={StoreContext},themeProvider={ThemeProvider},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _storeContext → {_storeContext}", genericAttributeService, storeContext, themeProvider, workContext, storeInformationSettings, _storeContext);
         _themeProvider = themeProvider;
+		_logger.LogDebug("ThemeContext(genericAttributeService={GenericAttributeService},storeContext={StoreContext},themeProvider={ThemeProvider},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _themeProvider → {_themeProvider}", genericAttributeService, storeContext, themeProvider, workContext, storeInformationSettings, _themeProvider);
         _workContext = workContext;
+		_logger.LogDebug("ThemeContext(genericAttributeService={GenericAttributeService},storeContext={StoreContext},themeProvider={ThemeProvider},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _workContext → {_workContext}", genericAttributeService, storeContext, themeProvider, workContext, storeInformationSettings, _workContext);
         _storeInformationSettings = storeInformationSettings;
+		_logger.LogDebug("ThemeContext(genericAttributeService={GenericAttributeService},storeContext={StoreContext},themeProvider={ThemeProvider},workContext={WorkContext},storeInformationSettings={StoreInformationSettings}): _storeInformationSettings → {_storeInformationSettings}", genericAttributeService, storeContext, themeProvider, workContext, storeInformationSettings, _storeInformationSettings);
     }
 
     #endregion
@@ -56,17 +63,21 @@ public partial class ThemeContext : IThemeContext
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task<string> GetWorkingThemeNameAsync()
     {
+		_logger.LogError(">>> Entering GetWorkingThemeNameAsync()");
         if (!string.IsNullOrEmpty(_cachedThemeName))
             return _cachedThemeName;
 
         var themeName = string.Empty;
+		_logger.LogError("GetWorkingThemeNameAsync(): themeName → {ThemeName}", themeName);
 
         //whether customers are allowed to select a theme
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("GetWorkingThemeNameAsync(): customer → {Customer}", customer);
         if (_storeInformationSettings.AllowCustomerToSelectTheme &&
             customer != null)
         {
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("GetWorkingThemeNameAsync(): store → {Store}", store);
             themeName = await _genericAttributeService.GetAttributeAsync<string>(customer,
                 NopCustomerDefaults.WorkingThemeNameAttribute, store.Id);
         }
@@ -85,7 +96,9 @@ public partial class ThemeContext : IThemeContext
 
         //cache theme system name
         _cachedThemeName = themeName;
+		_logger.LogDebug("GetWorkingThemeNameAsync(): _cachedThemeName → {_cachedThemeName}", _cachedThemeName);
 
+		_logger.LogWarning("<<< Exiting GetWorkingThemeNameAsync()");
         return themeName;
     }
 
@@ -95,8 +108,10 @@ public partial class ThemeContext : IThemeContext
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetWorkingThemeNameAsync(string workingThemeName)
     {
+		_logger.LogError(">>> Entering SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName})", workingThemeName);
         //whether customers are allowed to select a theme
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName}): customer → {Customer}", workingThemeName, customer);
         if (!_storeInformationSettings.AllowCustomerToSelectTheme ||
             customer == null)
             return;
@@ -109,6 +124,7 @@ public partial class ThemeContext : IThemeContext
 
         //clear cache
         _cachedThemeName = null;
+		_logger.LogDebug("SetWorkingThemeNameAsync(workingThemeName={WorkingThemeName}): _cachedThemeName → {_cachedThemeName}", workingThemeName, _cachedThemeName);
     }
 
     #endregion

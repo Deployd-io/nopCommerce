@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Payments.PayPalCommerce.Models.Admin;
 
@@ -11,11 +12,16 @@ namespace Nop.Plugin.Payments.PayPalCommerce.Models.Admin;
 /// </summary>
 public record ConfigurationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ConfigurationModel()
     {
+		_logger.LogError(">>> Entering ConfigurationModel()");
         PaymentTypes = new List<SelectListItem>();
+		_logger.LogDebug("ConfigurationModel(): PaymentTypes → {PaymentTypes}", PaymentTypes);
+    _logger.LogError("ConfigurationModel(): PaymentTypes → {PaymentTypes}", PaymentTypes);
+    _logger.LogWarning("<<< Exiting ConfigurationModel()");
     }
 
     #endregion

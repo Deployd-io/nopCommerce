@@ -5,6 +5,7 @@ using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -14,61 +15,113 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 public partial record ProductModel : BaseNopEntityModel,
     IAclSupportedModel, IDiscountSupportedModel, ITranslationSupportedModel, ILocalizedModel<ProductLocalizedModel>, IStoreMappingSupportedModel, IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductModel()
     {
+		_logger.LogError(">>> Entering ProductModel()");
         ProductPictureModels = new List<ProductPictureModel>();
         ProductVideoModels = new List<ProductVideoModel>();
+		_logger.LogError("ProductModel(): ProductVideoModels → {ProductVideoModels}", ProductVideoModels);
+		_logger.LogDebug("ProductModel(): ProductPictureModels → {ProductPictureModels}", ProductPictureModels);
+		_logger.LogDebug("ProductModel(): ProductVideoModels → {ProductVideoModels}", ProductVideoModels);
         Locales = new List<ProductLocalizedModel>();
+		_logger.LogError("ProductModel(): Locales → {Locales}", Locales);
         CopyProductModel = new CopyProductModel();
+		_logger.LogError("ProductModel(): CopyProductModel → {CopyProductModel}", CopyProductModel);
         AddPictureModel = new ProductPictureModel();
+		_logger.LogError("ProductModel(): AddPictureModel → {AddPictureModel}", AddPictureModel);
         AddVideoModel = new ProductVideoModel();
+		_logger.LogError("ProductModel(): AddVideoModel → {AddVideoModel}", AddVideoModel);
         ProductWarehouseInventoryModels = new List<ProductWarehouseInventoryModel>();
+		_logger.LogError("ProductModel(): ProductWarehouseInventoryModels → {ProductWarehouseInventoryModels}", ProductWarehouseInventoryModels);
         ProductEditorSettingsModel = new ProductEditorSettingsModel();
+		_logger.LogError("ProductModel(): ProductEditorSettingsModel → {ProductEditorSettingsModel}", ProductEditorSettingsModel);
         StockQuantityHistory = new StockQuantityHistoryModel();
+		_logger.LogError("ProductModel(): StockQuantityHistory → {StockQuantityHistory}", StockQuantityHistory);
 
         AvailableBasepriceUnits = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableBasepriceUnits → {AvailableBasepriceUnits}", AvailableBasepriceUnits);
         AvailableBasepriceBaseUnits = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableBasepriceBaseUnits → {AvailableBasepriceBaseUnits}", AvailableBasepriceBaseUnits);
         AvailableProductTemplates = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableProductTemplates → {AvailableProductTemplates}", AvailableProductTemplates);
         AvailableTaxCategories = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableTaxCategories → {AvailableTaxCategories}", AvailableTaxCategories);
         AvailableDeliveryDates = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableDeliveryDates → {AvailableDeliveryDates}", AvailableDeliveryDates);
         AvailableProductAvailabilityRanges = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableProductAvailabilityRanges → {AvailableProductAvailabilityRanges}", AvailableProductAvailabilityRanges);
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
         ProductsTypesSupportedByProductTemplates = new Dictionary<int, IList<SelectListItem>>();
+		_logger.LogError("ProductModel(): ProductsTypesSupportedByProductTemplates → {ProductsTypesSupportedByProductTemplates}", ProductsTypesSupportedByProductTemplates);
 
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
+		_logger.LogDebug("ProductModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("ProductModel(): CopyProductModel → {CopyProductModel}", CopyProductModel);
+		_logger.LogDebug("ProductModel(): AddPictureModel → {AddPictureModel}", AddPictureModel);
+		_logger.LogDebug("ProductModel(): AddVideoModel → {AddVideoModel}", AddVideoModel);
+		_logger.LogDebug("ProductModel(): ProductWarehouseInventoryModels → {ProductWarehouseInventoryModels}", ProductWarehouseInventoryModels);
+		_logger.LogDebug("ProductModel(): ProductEditorSettingsModel → {ProductEditorSettingsModel}", ProductEditorSettingsModel);
+		_logger.LogDebug("ProductModel(): StockQuantityHistory → {StockQuantityHistory}", StockQuantityHistory);
 
         SelectedStoreIds = new List<int>();
+		_logger.LogError("ProductModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         SelectedManufacturerIds = new List<int>();
+		_logger.LogError("ProductModel(): SelectedManufacturerIds → {SelectedManufacturerIds}", SelectedManufacturerIds);
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
 
         SelectedCategoryIds = new List<int>();
+		_logger.LogError("ProductModel(): SelectedCategoryIds → {SelectedCategoryIds}", SelectedCategoryIds);
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
 
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogError("ProductModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedDiscountIds = new List<int>();
+		_logger.LogError("ProductModel(): SelectedDiscountIds → {SelectedDiscountIds}", SelectedDiscountIds);
         AvailableDiscounts = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableDiscounts → {AvailableDiscounts}", AvailableDiscounts);
 
         AvailableProductTags = new List<SelectListItem>();
+		_logger.LogError("ProductModel(): AvailableProductTags → {AvailableProductTags}", AvailableProductTags);
         SelectedProductTags = new List<string>();
+		_logger.LogError("ProductModel(): SelectedProductTags → {SelectedProductTags}", SelectedProductTags);
 
         RelatedProductSearchModel = new RelatedProductSearchModel();
+		_logger.LogError("ProductModel(): RelatedProductSearchModel → {RelatedProductSearchModel}", RelatedProductSearchModel);
         CrossSellProductSearchModel = new CrossSellProductSearchModel();
+		_logger.LogError("ProductModel(): CrossSellProductSearchModel → {CrossSellProductSearchModel}", CrossSellProductSearchModel);
         FilterLevelValueSearchModel = new FilterLevelValueSearchModel();
+		_logger.LogError("ProductModel(): FilterLevelValueSearchModel → {FilterLevelValueSearchModel}", FilterLevelValueSearchModel);
         AssociatedProductSearchModel = new AssociatedProductSearchModel();
+		_logger.LogError("ProductModel(): AssociatedProductSearchModel → {AssociatedProductSearchModel}", AssociatedProductSearchModel);
         ProductPictureSearchModel = new ProductPictureSearchModel();
+		_logger.LogError("ProductModel(): ProductPictureSearchModel → {ProductPictureSearchModel}", ProductPictureSearchModel);
         ProductVideoSearchModel = new ProductVideoSearchModel();
+		_logger.LogError("ProductModel(): ProductVideoSearchModel → {ProductVideoSearchModel}", ProductVideoSearchModel);
         ProductSpecificationAttributeSearchModel = new ProductSpecificationAttributeSearchModel();
+		_logger.LogError("ProductModel(): ProductSpecificationAttributeSearchModel → {ProductSpecificationAttributeSearchModel}", ProductSpecificationAttributeSearchModel);
         ProductOrderSearchModel = new ProductOrderSearchModel();
+		_logger.LogError("ProductModel(): ProductOrderSearchModel → {ProductOrderSearchModel}", ProductOrderSearchModel);
         TierPriceSearchModel = new TierPriceSearchModel();
+		_logger.LogError("ProductModel(): TierPriceSearchModel → {TierPriceSearchModel}", TierPriceSearchModel);
         StockQuantityHistorySearchModel = new StockQuantityHistorySearchModel();
+		_logger.LogError("ProductModel(): StockQuantityHistorySearchModel → {StockQuantityHistorySearchModel}", StockQuantityHistorySearchModel);
         ProductAttributeMappingSearchModel = new ProductAttributeMappingSearchModel();
+		_logger.LogError("ProductModel(): ProductAttributeMappingSearchModel → {ProductAttributeMappingSearchModel}", ProductAttributeMappingSearchModel);
         ProductAttributeCombinationSearchModel = new ProductAttributeCombinationSearchModel();
+		_logger.LogError("ProductModel(): ProductAttributeCombinationSearchModel → {ProductAttributeCombinationSearchModel}", ProductAttributeCombinationSearchModel);
     }
 
     #endregion
