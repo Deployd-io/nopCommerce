@@ -2,6 +2,7 @@
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Nop.Core.Rss;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc;
 /// </summary>
 public partial class RssActionResult : ContentResult
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Ctor
     /// </summary>
@@ -17,14 +19,20 @@ public partial class RssActionResult : ContentResult
     /// <param name="feedPageUrl">Feed page url for atom self link</param>
     public RssActionResult(RssFeed feed, string feedPageUrl)
     {
+		_logger.LogError(">>> Entering RssActionResult(feed={Feed},feedPageUrl={FeedPageUrl})", feed, feedPageUrl);
         ContentType = "application/atom+xml";
         Feed = feed;
+		_logger.LogDebug("RssActionResult(feed={Feed},feedPageUrl={FeedPageUrl}): ContentType → {ContentType}", feed, feedPageUrl, ContentType);
+		_logger.LogDebug("RssActionResult(feed={Feed},feedPageUrl={FeedPageUrl}): Feed → {Feed1}", feed, feedPageUrl, Feed);
+		_logger.LogError("RssActionResult(feed={Feed},feedPageUrl={FeedPageUrl}): ContentType → {ContentType}", feed, feedPageUrl, ContentType);
 
         //add atom namespace
         XNamespace atom = "http://www.w3.org/2005/Atom";
+		_logger.LogError("RssActionResult(feed={Feed},feedPageUrl={FeedPageUrl}): atom → {Atom}", feed, feedPageUrl, atom);
         Feed.AttributeExtension = new KeyValuePair<XmlQualifiedName, string>(new XmlQualifiedName("atom", XNamespace.Xmlns.NamespaceName), atom.NamespaceName);
         //add atom:link with rel='self' 
         Feed.ElementExtensions.Add(new XElement(atom + "link", new XAttribute("href", new Uri(feedPageUrl)), new XAttribute("rel", "self"), new XAttribute("type", "application/rss+xml")));
+		_logger.LogWarning("<<< Exiting RssActionResult(feed={Feed},feedPageUrl={FeedPageUrl})", feed, feedPageUrl);
     }
 
     /// <summary>
@@ -39,7 +47,11 @@ public partial class RssActionResult : ContentResult
     /// <returns>A task that represents the asynchronous operation</returns>
     public override Task ExecuteResultAsync(ActionContext context)
     {
+		_logger.LogError(">>> Entering ExecuteResultAsync(context={Context})", context);
         Content = Feed.GetContent();
+		_logger.LogError("ExecuteResultAsync(context={Context}): Content → {Content}", context, Content);
+		_logger.LogDebug("ExecuteResultAsync(context={Context}): Content → {Content}", context, Content);
+    _logger.LogWarning("<<< Exiting ExecuteResultAsync(context={Context})", context);
         return base.ExecuteResultAsync(context);
     }
 
@@ -49,7 +61,11 @@ public partial class RssActionResult : ContentResult
     /// <param name="context">ActionContext</param>
     public override void ExecuteResult(ActionContext context)
     {
+		_logger.LogError(">>> Entering ExecuteResult(context={Context})", context);
         Content = Feed.GetContent();
+		_logger.LogWarning("<<< Exiting ExecuteResult(context={Context})", context);
+		_logger.LogDebug("ExecuteResult(context={Context}): Content → {Content}", context, Content);
+    _logger.LogError("ExecuteResult(context={Context}): Content → {Content}", context, Content);
         base.ExecuteResult(context);
     }
 }

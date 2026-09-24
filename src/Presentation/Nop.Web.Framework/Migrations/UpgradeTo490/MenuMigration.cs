@@ -15,12 +15,14 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Configuration;
 using M = Nop.Core.Domain.Menus;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo490;
 
 [NopMigration("2025-06-18 12:00:00", "Menus. Adding menus", MigrationProcessType.Update)]
 public class MenuMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IRepository<M.Menu> _menuRepository;
@@ -37,10 +39,14 @@ public class MenuMigration : Migration
         IRepository<Topic> topicRepository,
         ISettingService settingService)
     {
+		_logger.LogError(">>> Entering MenuMigration(menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},topicRepository={TopicRepository},settingService={SettingService})", menuRepository, menuItemRepository, topicRepository, settingService);
         _menuRepository = menuRepository;
         _menuItemRepository = menuItemRepository;
+		_logger.LogDebug("MenuMigration(menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},topicRepository={TopicRepository},settingService={SettingService}): _menuItemRepository → {_menuItemRepository}", menuRepository, menuItemRepository, topicRepository, settingService, _menuItemRepository);
         _topicRepository = topicRepository;
+		_logger.LogDebug("MenuMigration(menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},topicRepository={TopicRepository},settingService={SettingService}): _topicRepository → {_topicRepository}", menuRepository, menuItemRepository, topicRepository, settingService, _topicRepository);
         _settingService = settingService;
+		_logger.LogDebug("MenuMigration(menuRepository={MenuRepository},menuItemRepository={MenuItemRepository},topicRepository={TopicRepository},settingService={SettingService}): _settingService → {_settingService}", menuRepository, menuItemRepository, topicRepository, settingService, _settingService);
     }
 
     #endregion
@@ -49,7 +55,11 @@ public class MenuMigration : Migration
 
     private bool IsSettingEnabled(string key, out Setting setting)
     {
+		_logger.LogError(">>> Entering IsSettingEnabled(key={Key})", key);
         setting = _settingService.GetSetting(key);
+		_logger.LogError("IsSettingEnabled(key={Key}): setting → {Setting}", key, setting);
+		_logger.LogInformation("IsSettingEnabled(key={Key}): setting → {Setting}", key, setting);
+    _logger.LogWarning("<<< Exiting IsSettingEnabled(key={Key})", key);
         return setting is not null && CommonHelper.To<bool>(setting.Value);
     }
 
@@ -62,8 +72,10 @@ public class MenuMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!_menuRepository.Table.Any(m => m.MenuTypeId == (int)MenuType.Main))
         {
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             _menuRepository.Insert(new M.Menu
             {
                 Name = "Categories",
@@ -71,13 +83,16 @@ public class MenuMigration : Migration
                 DisplayAllCategories = true,
                 Published = true
             });
+			_logger.LogError("Up(): save query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
         }
 
         if (_menuRepository.Table.Any(m => m.MenuTypeId == (int)MenuType.Footer))
             return;
 
         var topics = _topicRepository.Table.ToList();
+		_logger.LogError("Up(): topics → {Topics}", topics);
         var catalogSettings = _settingService.LoadSetting<CatalogSettings>();
+		_logger.LogError("Up(): catalogSettings → {CatalogSettings}", catalogSettings);
 
         #region Information
 
@@ -142,6 +157,7 @@ public class MenuMigration : Migration
             Title = "Contact us",
             Published = IsSettingEnabled("displaydefaultfooteritemsettings.displaycontactusfooteritem", out var displaycontactusfooteritem)
         });
+			_logger.LogDebug("Up(): Published → {Published}", Published);
 
         if (displaycontactusfooteritem is not null)
             _settingService.DeleteSetting(displaycontactusfooteritem);
@@ -340,6 +356,7 @@ public class MenuMigration : Migration
             _settingService.DeleteSetting(displayapplyvendoraccountfooteritem);
 
         #endregion
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -347,7 +364,9 @@ public class MenuMigration : Migration
     /// </summary>
     public override void Down()
     {
+	_logger.LogError(">>> Entering Down()");
 
+	_logger.LogWarning("<<< Exiting Down()");
     }
 
     #endregion

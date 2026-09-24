@@ -15,6 +15,7 @@ using Nop.Web.Framework.Events;
 using Nop.Web.Framework.Menu;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Services;
 
@@ -28,6 +29,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
     IConsumer<EntityUpdatedEvent<ShoppingCartItem>>,
     IConsumer<ShoppingCartItemMovedToOrderItemEvent>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IHttpContextAccessor _httpContextAccessor;
@@ -56,16 +58,26 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
         RfqService rfqService,
         RfqSettings rfqSettings)
     {
+		_logger.LogError(">>> Entering EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings})", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings);
         _httpContextAccessor = httpContextAccessor;
         _localizationService = localizationService;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _localizationService → {_localizationService}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _localizationService);
         _pluginManager = pluginManager;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _pluginManager → {_pluginManager}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _pluginManager);
         _shoppingCartItemsRepository = shoppingCartItemsRepository;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _shoppingCartItemsRepository → {_shoppingCartItemsRepository}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _shoppingCartItemsRepository);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _shoppingCartService → {_shoppingCartService}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _shoppingCartService);
         _shortTermCacheManager = shortTermCacheManager;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _shortTermCacheManager → {_shortTermCacheManager}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _shortTermCacheManager);
         _storeContext = storeContext;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _storeContext → {_storeContext}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _storeContext);
         _workContext = workContext;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _workContext → {_workContext}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _workContext);
         _rfqService = rfqService;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _rfqService → {_rfqService}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _rfqService);
         _rfqSettings = rfqSettings;
+		_logger.LogDebug("EventConsumer(httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},shoppingCartItemsRepository=<redacted>,shoppingCartService=<redacted>,shortTermCacheManager={ShortTermCacheManager},storeContext={StoreContext},pluginManager={PluginManager},workContext={WorkContext},rfqService={RfqService},rfqSettings={RfqSettings}): _rfqSettings → {_rfqSettings}", httpContextAccessor, localizationService, shortTermCacheManager, storeContext, pluginManager, workContext, rfqService, rfqSettings, _rfqSettings);
     }
 
     #endregion
@@ -107,6 +119,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
             IconClass = "far fa-dot-circle",
             PermissionNames = new List<string> { RfqPermissionConfigManager.ADMIN_ACCESS_RFQ }
         });
+		_logger.LogWarning("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -232,6 +245,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
         }
 
         await _rfqService.UpdateQuoteItemsAsync(items);
+		_logger.LogError(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -245,6 +259,7 @@ public class EventConsumer : IConsumer<AdminMenuCreatedEvent>,
             return;
 
         var quoteItem = await _rfqService.GetQuoteItemByShoppingCartItemIdAsync(eventMessage.Entity.Id);
+		_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): quoteItem → {QuoteItem}", eventMessage, quoteItem);
         
         if (quoteItem == null || eventMessage.Entity.Quantity == quoteItem.OfferedQty)
             return;

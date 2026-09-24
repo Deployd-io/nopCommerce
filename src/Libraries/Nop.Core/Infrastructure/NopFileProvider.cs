@@ -3,6 +3,7 @@ using System.Security.AccessControl;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Infrastructure;
 
@@ -11,6 +12,7 @@ namespace Nop.Core.Infrastructure;
 /// </summary>
 public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -20,9 +22,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     public NopFileProvider(IWebHostEnvironment webHostEnvironment)
         : base(File.Exists(webHostEnvironment.ContentRootPath) ? Path.GetDirectoryName(webHostEnvironment.ContentRootPath)! : webHostEnvironment.ContentRootPath)
     {
+		_logger.LogError(">>> Entering NopFileProvider(webHostEnvironment={WebHostEnvironment})", webHostEnvironment);
         WebRootPath = File.Exists(webHostEnvironment.WebRootPath)
             ? Path.GetDirectoryName(webHostEnvironment.WebRootPath)
             : webHostEnvironment.WebRootPath;
+			_logger.LogDebug("NopFileProvider(webHostEnvironment={WebHostEnvironment}): WebRootPath → {WebRootPath}", webHostEnvironment, WebRootPath);
+    _logger.LogWarning("<<< Exiting NopFileProvider(webHostEnvironment={WebHostEnvironment})", webHostEnvironment);
     }
 
     #endregion
@@ -35,6 +40,7 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="path"></param>
     protected virtual void DeleteDirectoryRecursive(string path)
     {
+		_logger.LogError(">>> Entering DeleteDirectoryRecursive(path={Path})", path);
         Directory.Delete(path, true);
         const int maxIterationToWait = 10;
         var curIteration = 0;
@@ -52,6 +58,7 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
 
             Thread.Sleep(100);
         }
+		_logger.LogWarning("<<< Exiting DeleteDirectoryRecursive(path={Path})", path);
     }
 
     /// <summary>
@@ -63,6 +70,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// otherwise, <see langword="false"/>.</returns>
     protected static bool IsUncPath(string path)
     {
+		_logger.LogError(">>> Entering IsUncPath(path={Path})", path);
+        _logger.LogWarning("<<< Exiting IsUncPath(path={Path})", path);
         return Uri.TryCreate(path, UriKind.Absolute, out var uri) && uri.IsUnc;
     }
 
@@ -77,12 +86,15 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The combined paths</returns>
     public virtual string Combine(params string[] paths)
     {
+		_logger.LogError(">>> Entering Combine(paths={Paths})", paths);
         var path = Path.Combine(paths.SelectMany(p => IsUncPath(p) ? [p] : p.Split('\\', '/')).ToArray());
 
+		_logger.LogError("Combine(paths={Paths}): path → {Path}", paths, path);
         if (Environment.OSVersion.Platform == PlatformID.Unix && !IsUncPath(path))
             //add leading slash to correctly form path in the UNIX system
             path = "/" + path;
 
+		_logger.LogWarning("<<< Exiting Combine(paths={Paths})", paths);
         return path;
     }
 
@@ -92,8 +104,10 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="path">The directory to create</param>
     public virtual void CreateDirectory(string path)
     {
+		_logger.LogError(">>> Entering CreateDirectory(path={Path})", path);
         if (!DirectoryExists(path))
             Directory.CreateDirectory(path);
+			_logger.LogWarning("<<< Exiting CreateDirectory(path={Path})", path);
     }
 
     /// <summary>
@@ -102,16 +116,19 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="path">The path and name of the file to create</param>
     public virtual void CreateFile(string path)
     {
+		_logger.LogError(">>> Entering CreateFile(path={Path})", path);
         if (FileExists(path))
             return;
 
         var fileInfo = new FileInfo(path);
+		_logger.LogError("CreateFile(path={Path}): fileInfo → {FileInfo}", path, fileInfo);
         CreateDirectory(fileInfo.DirectoryName);
 
         //we use 'using' to close the file after it's created
         using (File.Create(path))
         {
         }
+		_logger.LogWarning("<<< Exiting CreateFile(path={Path})", path);
     }
 
     /// <summary>
@@ -120,6 +137,7 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="path">Directory path</param>
     public virtual void DeleteDirectory(string path)
     {
+		_logger.LogError(">>> Entering DeleteDirectory(path={Path})", path);
         ArgumentException.ThrowIfNullOrEmpty(path);
 
         //find more info about directory deletion
@@ -136,12 +154,15 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
         }
         catch (IOException)
         {
+			_logger.LogError("Exception in DeleteDirectory(path={Path}): {Arg1}", path, IOException.Message);
             DeleteDirectoryRecursive(path);
         }
         catch (UnauthorizedAccessException)
         {
+			_logger.LogError("Exception in DeleteDirectory(path={Path}): {Arg1}", path, UnauthorizedAccessException.Message);
             DeleteDirectoryRecursive(path);
         }
+		_logger.LogWarning("<<< Exiting DeleteDirectory(path={Path})", path);
     }
 
     /// <summary>
@@ -150,10 +171,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="filePath">The name of the file to be deleted. Wildcard characters are not supported</param>
     public virtual void DeleteFile(string filePath)
     {
+		_logger.LogError(">>> Entering DeleteFile(filePath={FilePath})", filePath);
         if (!FileExists(filePath))
             return;
 
         File.Delete(filePath);
+		_logger.LogWarning("<<< Exiting DeleteFile(filePath={FilePath})", filePath);
     }
 
     /// <summary>
@@ -166,6 +189,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual bool DirectoryExists(string path)
     {
+		_logger.LogError(">>> Entering DirectoryExists(path={Path})", path);
+        _logger.LogWarning("<<< Exiting DirectoryExists(path={Path})", path);
         return Directory.Exists(path);
     }
 
@@ -179,7 +204,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </param>
     public virtual void DirectoryMove(string sourceDirName, string destDirName)
     {
+		_logger.LogError(">>> Entering DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
         Directory.Move(sourceDirName, destDirName);
+		_logger.LogWarning("<<< Exiting DirectoryMove(sourceDirName={SourceDirName},destDirName={DestDirName})", sourceDirName, destDirName);
     }
 
     /// <summary>
@@ -203,6 +230,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     public virtual IEnumerable<string> EnumerateFiles(string directoryPath, string searchPattern,
         bool topDirectoryOnly = true)
     {
+		_logger.LogError(">>> Entering EnumerateFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
+        _logger.LogWarning("<<< Exiting EnumerateFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
         return Directory.EnumerateFiles(directoryPath, searchPattern,
             topDirectoryOnly ? SearchOption.TopDirectoryOnly : SearchOption.AllDirectories);
     }
@@ -215,7 +244,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="overwrite">true if the destination file can be overwritten; otherwise, false</param>
     public virtual void FileCopy(string sourceFileName, string destFileName, bool overwrite = false)
     {
+		_logger.LogError(">>> Entering FileCopy(sourceFileName={SourceFileName},destFileName={DestFileName},overwrite={Overwrite})", sourceFileName, destFileName, overwrite);
         File.Copy(sourceFileName, destFileName, overwrite);
+		_logger.LogWarning("<<< Exiting FileCopy(sourceFileName={SourceFileName},destFileName={DestFileName},overwrite={Overwrite})", sourceFileName, destFileName, overwrite);
     }
 
     /// <summary>
@@ -228,6 +259,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual bool FileExists(string filePath)
     {
+		_logger.LogError(">>> Entering FileExists(filePath={FilePath})", filePath);
+        _logger.LogWarning("<<< Exiting FileExists(filePath={FilePath})", filePath);
         return File.Exists(filePath);
     }
 
@@ -238,6 +271,7 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The length of the file</returns>
     public virtual long FileLength(string path)
     {
+		_logger.LogError(">>> Entering FileLength(path={Path})", path);
         if (!FileExists(path))
             return -1;
 
@@ -251,7 +285,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="destFileName">The new path and name for the file</param>
     public virtual void FileMove(string sourceFileName, string destFileName)
     {
+		_logger.LogError(">>> Entering FileMove(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
         File.Move(sourceFileName, destFileName);
+		_logger.LogWarning("<<< Exiting FileMove(sourceFileName={SourceFileName},destFileName={DestFileName})", sourceFileName, destFileName);
     }
 
     /// <summary>
@@ -261,13 +297,16 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The absolute path to the directory</returns>
     public virtual string GetAbsolutePath(params string[] paths)
     {
+		_logger.LogError(">>> Entering GetAbsolutePath(paths={Paths})", paths);
         var allPaths = new List<string>();
 
+		_logger.LogError("GetAbsolutePath(paths={Paths}): allPaths → {AllPaths}", paths, allPaths);
         if (paths.Any() && !paths[0].Contains(WebRootPath, StringComparison.InvariantCulture))
             allPaths.Add(WebRootPath);
 
         allPaths.AddRange(paths);
 
+		_logger.LogWarning("<<< Exiting GetAbsolutePath(paths={Paths})", paths);
         return Combine(allPaths.ToArray());
     }
 
@@ -279,6 +318,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     [SupportedOSPlatform("windows")]
     public virtual DirectorySecurity GetAccessControl(string path)
     {
+		_logger.LogError(">>> Entering GetAccessControl(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetAccessControl(path={Path})", path);
         return new DirectoryInfo(path).GetAccessControl();
     }
 
@@ -292,6 +333,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual DateTime GetCreationTime(string path)
     {
+		_logger.LogError(">>> Entering GetCreationTime(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetCreationTime(path={Path})", path);
         return File.GetCreationTime(path);
     }
 
@@ -315,9 +358,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual string[] GetDirectories(string path, string searchPattern = "", bool topDirectoryOnly = true)
     {
+		_logger.LogError(">>> Entering GetDirectories(path={Path},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", path, searchPattern, topDirectoryOnly);
         if (string.IsNullOrEmpty(searchPattern))
             searchPattern = "*";
+			_logger.LogError("GetDirectories(path={Path},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly}): searchPattern → {SearchPattern1}", path, searchPattern, topDirectoryOnly, searchPattern);
 
+			_logger.LogWarning("<<< Exiting GetDirectories(path={Path},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", path, searchPattern, topDirectoryOnly);
         return Directory.GetDirectories(path, searchPattern,
             topDirectoryOnly ? SearchOption.TopDirectoryOnly : SearchOption.AllDirectories);
     }
@@ -332,6 +378,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual string GetDirectoryName(string path)
     {
+		_logger.LogError(">>> Entering GetDirectoryName(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetDirectoryName(path={Path})", path);
         return Path.GetDirectoryName(path);
     }
 
@@ -342,6 +390,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The directory name</returns>
     public virtual string GetDirectoryNameOnly(string path)
     {
+		_logger.LogError(">>> Entering GetDirectoryNameOnly(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetDirectoryNameOnly(path={Path})", path);
         return new DirectoryInfo(path).Name;
     }
 
@@ -352,6 +402,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The extension of the specified path (including the period ".")</returns>
     public virtual string GetFileExtension(string filePath)
     {
+		_logger.LogError(">>> Entering GetFileExtension(filePath={FilePath})", filePath);
+        _logger.LogWarning("<<< Exiting GetFileExtension(filePath={FilePath})", filePath);
         return Path.GetExtension(filePath);
     }
 
@@ -362,6 +414,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The characters after the last directory character in path</returns>
     public virtual string GetFileName(string path)
     {
+		_logger.LogError(">>> Entering GetFileName(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetFileName(path={Path})", path);
         return Path.GetFileName(path);
     }
 
@@ -372,6 +426,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The file name, minus the last period (.) and all characters following it</returns>
     public virtual string GetFileNameWithoutExtension(string filePath)
     {
+		_logger.LogError(">>> Entering GetFileNameWithoutExtension(filePath={FilePath})", filePath);
+        _logger.LogWarning("<<< Exiting GetFileNameWithoutExtension(filePath={FilePath})", filePath);
         return Path.GetFileNameWithoutExtension(filePath);
     }
 
@@ -395,9 +451,12 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual string[] GetFiles(string directoryPath, string searchPattern = "", bool topDirectoryOnly = true)
     {
+		_logger.LogError(">>> Entering GetFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
         if (string.IsNullOrEmpty(searchPattern))
             searchPattern = "*.*";
+			_logger.LogError("GetFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly}): searchPattern → {SearchPattern1}", directoryPath, searchPattern, topDirectoryOnly, searchPattern);
 
+		_logger.LogWarning("<<< Exiting GetFiles(directoryPath={DirectoryPath},searchPattern={SearchPattern},topDirectoryOnly={TopDirectoryOnly})", directoryPath, searchPattern, topDirectoryOnly);
         return Directory.GetFileSystemEntries(directoryPath, searchPattern,
             new EnumerationOptions
             {
@@ -415,6 +474,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>A System.DateTime structure set to the date and time that the specified file</returns>
     public virtual DateTime GetLastAccessTime(string path)
     {
+		_logger.LogError(">>> Entering GetLastAccessTime(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetLastAccessTime(path={Path})", path);
         return File.GetLastAccessTime(path);
     }
 
@@ -428,6 +489,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual DateTime GetLastWriteTime(string path)
     {
+		_logger.LogError(">>> Entering GetLastWriteTime(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetLastWriteTime(path={Path})", path);
         return File.GetLastWriteTime(path);
     }
 
@@ -442,6 +505,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual DateTime GetLastWriteTimeUtc(string path)
     {
+		_logger.LogError(">>> Entering GetLastWriteTimeUtc(path={Path})", path);
+        _logger.LogWarning("<<< Exiting GetLastWriteTimeUtc(path={Path})", path);
         return File.GetLastWriteTimeUtc(path);
     }
 
@@ -452,12 +517,15 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>A <see cref="FileStream"/> that provides read/write access to the file specified in <paramref name="path"/></returns>
     public FileStream GetOrCreateFile(string path)
     {
+		_logger.LogError(">>> Entering GetOrCreateFile(path={Path})", path);
         if (FileExists(path))
             return File.Open(path, FileMode.Open, FileAccess.ReadWrite);
 
         var fileInfo = new FileInfo(path);
+		_logger.LogError("GetOrCreateFile(path={Path}): fileInfo → {FileInfo}", path, fileInfo);
         CreateDirectory(fileInfo.DirectoryName);
 
+		_logger.LogWarning("<<< Exiting GetOrCreateFile(path={Path})", path);
         return File.Create(path);
     }
 
@@ -468,6 +536,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The parent directory, or null if path is the root directory, including the root of a UNC server or share name</returns>
     public virtual string GetParentDirectory(string directoryPath)
     {
+		_logger.LogError(">>> Entering GetParentDirectory(directoryPath={DirectoryPath})", directoryPath);
+        _logger.LogWarning("<<< Exiting GetParentDirectory(directoryPath={DirectoryPath})", directoryPath);
         return Directory.GetParent(directoryPath).FullName;
     }
 
@@ -478,14 +548,17 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The virtual path. E.g. "~/bin"</returns>
     public virtual string GetVirtualPath(string path)
     {
+		_logger.LogError(">>> Entering GetVirtualPath(path={Path})", path);
         if (string.IsNullOrEmpty(path))
             return path;
 
         if (!IsDirectory(path) && FileExists(path))
             path = new FileInfo(path).DirectoryName;
+			_logger.LogError("GetVirtualPath(path={Path}): path → {Path1}", path, path);
 
         path = path?.Replace(WebRootPath, string.Empty).Replace('\\', '/').Trim('/').TrimStart('~', '/');
 
+		_logger.LogWarning("<<< Exiting GetVirtualPath(path={Path})", path);
         return $"~/{path ?? string.Empty}";
     }
 
@@ -496,6 +569,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>True, if the path is a directory, otherwise false</returns>
     public virtual bool IsDirectory(string path)
     {
+		_logger.LogError(">>> Entering IsDirectory(path={Path})", path);
+        _logger.LogWarning("<<< Exiting IsDirectory(path={Path})", path);
         return DirectoryExists(path);
     }
 
@@ -506,11 +581,15 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The physical path. E.g. "c:\inetpub\wwwroot\bin"</returns>
     public virtual string MapPath(string path)
     {
+		_logger.LogError(">>> Entering MapPath(path={Path})", path);
         path = path.Replace("~/", string.Empty).TrimStart('/');
 
+		_logger.LogError("MapPath(path={Path}): path → {Path1}", path, path);
         //if virtual path has slash on the end, it should be after transform the virtual path to physical path too
         var pathEnd = path.EndsWith('/') ? Path.DirectorySeparatorChar.ToString() : string.Empty;
+		_logger.LogError("MapPath(path={Path}): pathEnd → {PathEnd}", path, pathEnd);
 
+		_logger.LogWarning("<<< Exiting MapPath(path={Path})", path);
         return Combine(Root ?? string.Empty, path) + pathEnd;
     }
 
@@ -524,6 +603,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual async Task<byte[]> ReadAllBytesAsync(string filePath)
     {
+		_logger.LogError(">>> Entering ReadAllBytesAsync(filePath={FilePath})", filePath);
+        _logger.LogWarning("<<< Exiting ReadAllBytesAsync(filePath={FilePath})", filePath);
         return File.Exists(filePath) ? await File.ReadAllBytesAsync(filePath) : Array.Empty<byte>();
     }
 
@@ -538,9 +619,13 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// </returns>
     public virtual async Task<string> ReadAllTextAsync(string path, Encoding encoding)
     {
+		_logger.LogError(">>> Entering ReadAllTextAsync(path={Path},encoding={Encoding})", path, encoding);
         await using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var streamReader = new StreamReader(fileStream, encoding);
+		_logger.LogError("ReadAllTextAsync(path={Path},encoding={Encoding}): streamReader → {StreamReader}", path, encoding, streamReader);
+		_logger.LogError("ReadAllTextAsync(path={Path},encoding={Encoding}): fileStream → {FileStream}", path, encoding, fileStream);
 
+		_logger.LogWarning("<<< Exiting ReadAllTextAsync(path={Path},encoding={Encoding})", path, encoding);
         return await streamReader.ReadToEndAsync();
     }
 
@@ -552,9 +637,13 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>A string containing all lines of the file</returns>
     public virtual string ReadAllText(string path, Encoding encoding)
     {
+		_logger.LogError(">>> Entering ReadAllText(path={Path},encoding={Encoding})", path, encoding);
         using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         using var streamReader = new StreamReader(fileStream, encoding);
+		_logger.LogError("ReadAllText(path={Path},encoding={Encoding}): streamReader → {StreamReader}", path, encoding, streamReader);
+		_logger.LogError("ReadAllText(path={Path},encoding={Encoding}): fileStream → {FileStream}", path, encoding, fileStream);
 
+		_logger.LogWarning("<<< Exiting ReadAllText(path={Path},encoding={Encoding})", path, encoding);
         return streamReader.ReadToEnd();
     }
 
@@ -566,7 +655,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task WriteAllBytesAsync(string filePath, byte[] bytes)
     {
+		_logger.LogError(">>> Entering WriteAllBytesAsync(filePath={FilePath},bytes={Bytes})", filePath, bytes);
         await File.WriteAllBytesAsync(filePath, bytes);
+		_logger.LogWarning("<<< Exiting WriteAllBytesAsync(filePath={FilePath},bytes={Bytes})", filePath, bytes);
     }
 
     /// <summary>
@@ -579,7 +670,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task WriteAllTextAsync(string path, string contents, Encoding encoding)
     {
+		_logger.LogError(">>> Entering WriteAllTextAsync(path={Path},contents={Contents},encoding={Encoding})", path, contents, encoding);
         await File.WriteAllTextAsync(path, contents, encoding);
+		_logger.LogWarning("<<< Exiting WriteAllTextAsync(path={Path},contents={Contents},encoding={Encoding})", path, contents, encoding);
     }
 
     /// <summary>
@@ -591,7 +684,9 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <param name="encoding">The encoding to apply to the string</param>
     public virtual void WriteAllText(string path, string contents, Encoding encoding)
     {
+		_logger.LogError(">>> Entering WriteAllText(path={Path},contents={Contents},encoding={Encoding})", path, contents, encoding);
         File.WriteAllText(path, contents, encoding);
+		_logger.LogWarning("<<< Exiting WriteAllText(path={Path},contents={Contents},encoding={Encoding})", path, contents, encoding);
     }
 
     /// <summary>Locate a file at the given path.</summary>
@@ -599,8 +694,11 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>The file information. Caller must check Exists property.</returns>
     public new virtual IFileInfo GetFileInfo(string subpath)
     {
+		_logger.LogError(">>> Entering GetFileInfo(subpath={Subpath})", subpath);
         subpath = subpath.Replace(Root, string.Empty);
 
+		_logger.LogError("GetFileInfo(subpath={Subpath}): subpath → {Subpath1}", subpath, subpath);
+		_logger.LogWarning("<<< Exiting GetFileInfo(subpath={Subpath})", subpath);
         return base.GetFileInfo(subpath);
     }
 
@@ -612,6 +710,8 @@ public partial class NopFileProvider : PhysicalFileProvider, INopFileProvider
     /// <returns>true if path contains a root; otherwise, false</returns>
     public virtual bool IsPathRooted(string path)
     {
+		_logger.LogError(">>> Entering IsPathRooted(path={Path})", path);
+        _logger.LogWarning("<<< Exiting IsPathRooted(path={Path})", path);
         return !string.IsNullOrEmpty(path) && Path.IsPathRooted(path);
     }
 

@@ -10,11 +10,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class VendorAttributeController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAttributeService<VendorAttribute, VendorAttributeValue> _vendorAttributeService;
@@ -37,12 +39,20 @@ public partial class VendorAttributeController : BaseAdminController
         IPermissionService permissionService,
         IVendorAttributeModelFactory vendorAttributeModelFactory)
     {
+		_logger.LogError(">>> Entering VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory})", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory);
         _vendorAttributeService = vendorAttributeService;
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory}): _customerActivityService → {_customerActivityService}", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory, _customerActivityService);
+		_logger.LogDebug("VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory}): _vendorAttributeService → {_vendorAttributeService}", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory, _vendorAttributeService);
+    _logger.LogWarning("<<< Exiting VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory})", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory}): _localizationService → {_localizationService}", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory}): _localizedEntityService → {_localizedEntityService}", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory, _localizedEntityService);
         _notificationService = notificationService;
+		_logger.LogDebug("VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory}): _notificationService → {_notificationService}", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory, _notificationService);
         _permissionService = permissionService;
+		_logger.LogDebug("VendorAttributeController(vendorAttributeService={VendorAttributeService},customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},notificationService={NotificationService},permissionService={PermissionService},vendorAttributeModelFactory={VendorAttributeModelFactory}): _permissionService → {_permissionService}", vendorAttributeService, customerActivityService, localizationService, localizedEntityService, notificationService, permissionService, vendorAttributeModelFactory, _permissionService);
         _vendorAttributeModelFactory = vendorAttributeModelFactory;
     }
 
@@ -52,6 +62,7 @@ public partial class VendorAttributeController : BaseAdminController
 
     protected virtual async Task UpdateAttributeLocalesAsync(VendorAttribute vendorAttribute, VendorAttributeModel model)
     {
+		_logger.LogError(">>> Entering UpdateAttributeLocalesAsync(vendorAttribute={VendorAttribute},model={Model})", vendorAttribute, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(vendorAttribute,
@@ -59,10 +70,12 @@ public partial class VendorAttributeController : BaseAdminController
                 localized.Name,
                 localized.LanguageId);
         }
+		_logger.LogWarning("<<< Exiting UpdateAttributeLocalesAsync(vendorAttribute={VendorAttribute},model={Model})", vendorAttribute, model);
     }
 
     protected virtual async Task UpdateValueLocalesAsync(VendorAttributeValue vendorAttributeValue, VendorAttributeValueModel model)
     {
+		_logger.LogError(">>> Entering UpdateValueLocalesAsync(vendorAttributeValue={VendorAttributeValue},model={Model})", vendorAttributeValue, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(vendorAttributeValue,
@@ -70,6 +83,7 @@ public partial class VendorAttributeController : BaseAdminController
                 localized.Name,
                 localized.LanguageId);
         }
+		_logger.LogWarning("<<< Exiting UpdateValueLocalesAsync(vendorAttributeValue={VendorAttributeValue},model={Model})", vendorAttributeValue, model);
     }
 
     #endregion
@@ -78,13 +92,18 @@ public partial class VendorAttributeController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual IActionResult List()
     {
+		_logger.LogError(">>> Entering List()");
         //we just redirect a user to the vendor settings page
+		_logger.LogWarning("<<< Exiting List()");
+		_logger.LogWarning("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return RedirectToAction("Vendor", "Setting");
     }
 
@@ -101,9 +120,13 @@ public partial class VendorAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogError(">>> Entering Create()");
         //prepare model
         var model = await _vendorAttributeModelFactory.PrepareVendorAttributeModelAsync(new VendorAttributeModel(), null);
+		_logger.LogError("Create(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Create()");
+		_logger.LogWarning("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -141,14 +164,19 @@ public partial class VendorAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         //try to get a vendor attribute with the specified id
         var vendorAttribute = await _vendorAttributeService.GetAttributeByIdAsync(id);
+		_logger.LogError("Edit(id={Id}): vendorAttribute → {VendorAttribute}", id, vendorAttribute);
         if (vendorAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _vendorAttributeModelFactory.PrepareVendorAttributeModelAsync(null, vendorAttribute);
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -191,8 +219,10 @@ public partial class VendorAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get a vendor attribute with the specified id
         var vendorAttribute = await _vendorAttributeService.GetAttributeByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): vendorAttribute → {VendorAttribute}", id, vendorAttribute);
         if (vendorAttribute == null)
             return RedirectToAction("List");
 
@@ -204,6 +234,7 @@ public partial class VendorAttributeController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Vendors.VendorAttributes.Deleted"));
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -215,27 +246,35 @@ public partial class VendorAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueList(VendorAttributeValueSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering ValueList(searchModel={SearchModel})", searchModel);
         //try to get a vendor attribute with the specified id
         var vendorAttribute = await _vendorAttributeService.GetAttributeByIdAsync(searchModel.VendorAttributeId)
             ?? throw new ArgumentException("No vendor attribute found with the specified id");
 
         //prepare model
         var model = await _vendorAttributeModelFactory.PrepareVendorAttributeValueListModelAsync(searchModel, vendorAttribute);
+		_logger.LogError("ValueList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting ValueList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueCreatePopup(int vendorAttributeId)
     {
+		_logger.LogError(">>> Entering ValueCreatePopup(vendorAttributeId={VendorAttributeId})", vendorAttributeId);
         //try to get a vendor attribute with the specified id
         var vendorAttribute = await _vendorAttributeService.GetAttributeByIdAsync(vendorAttributeId);
+		_logger.LogError("ValueCreatePopup(vendorAttributeId={VendorAttributeId}): vendorAttribute → {VendorAttribute}", vendorAttributeId, vendorAttribute);
         if (vendorAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _vendorAttributeModelFactory.PrepareVendorAttributeValueModelAsync(new VendorAttributeValueModel(), vendorAttribute, null);
+		_logger.LogError("ValueCreatePopup(vendorAttributeId={VendorAttributeId}): model → {Model}", vendorAttributeId, model);
 
+		_logger.LogWarning("<<< Exiting ValueCreatePopup(vendorAttributeId={VendorAttributeId})", vendorAttributeId);
+		_logger.LogWarning("<<< Exiting ValueCreatePopup(model={Model})", model);
         return View(model);
     }
 
@@ -276,19 +315,25 @@ public partial class VendorAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueEditPopup(int id)
     {
+		_logger.LogError(">>> Entering ValueEditPopup(id={Id})", id);
         //try to get a vendor attribute value with the specified id
         var vendorAttributeValue = await _vendorAttributeService.GetAttributeValueByIdAsync(id);
+		_logger.LogError("ValueEditPopup(id={Id}): vendorAttributeValue → {VendorAttributeValue}", id, vendorAttributeValue);
         if (vendorAttributeValue == null)
             return RedirectToAction("List");
 
         //try to get a vendor attribute with the specified id
         var vendorAttribute = await _vendorAttributeService.GetAttributeByIdAsync(vendorAttributeValue.AttributeId);
+		_logger.LogError("ValueEditPopup(id={Id}): vendorAttribute → {VendorAttribute}", id, vendorAttribute);
         if (vendorAttribute == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _vendorAttributeModelFactory.PrepareVendorAttributeValueModelAsync(null, vendorAttribute, vendorAttributeValue);
+		_logger.LogError("ValueEditPopup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting ValueEditPopup(id={Id})", id);
+		_logger.LogWarning("<<< Exiting ValueEditPopup(model={Model})", model);
         return View(model);
     }
 
@@ -334,6 +379,7 @@ public partial class VendorAttributeController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ValueDelete(int id)
     {
+		_logger.LogError(">>> Entering ValueDelete(id={Id})", id);
         //try to get a vendor attribute value with the specified id
         var value = await _vendorAttributeService.GetAttributeValueByIdAsync(id)
             ?? throw new ArgumentException("No vendor attribute value found with the specified id", nameof(id));
@@ -344,6 +390,7 @@ public partial class VendorAttributeController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteVendorAttributeValue",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteVendorAttributeValue"), value.Id), value);
 
+		_logger.LogWarning("<<< Exiting ValueDelete(id={Id})", id);
         return new NullJsonResult();
     }
 

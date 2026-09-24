@@ -1,12 +1,18 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
 
 public partial record CategoryNavigationModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CategoryNavigationModel()
     {
+		_logger.LogError(">>> Entering CategoryNavigationModel()");
         Categories = new List<CategorySimpleModel>();
+		_logger.LogDebug("CategoryNavigationModel(): Categories → {Categories}", Categories);
+    _logger.LogError("CategoryNavigationModel(): Categories → {Categories}", Categories);
+    _logger.LogWarning("<<< Exiting CategoryNavigationModel()");
     }
 
     public int CurrentCategoryId { get; set; }

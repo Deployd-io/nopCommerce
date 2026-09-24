@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Reports;
 
@@ -10,14 +11,19 @@ namespace Nop.Web.Areas.Admin.Models.Reports;
 /// </summary>
 public partial record NeverSoldReportSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NeverSoldReportSearchModel()
     {
+		_logger.LogError(">>> Entering NeverSoldReportSearchModel()");
         AvailableCategories = new List<SelectListItem>();
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogError("NeverSoldReportSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("NeverSoldReportSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("NeverSoldReportSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

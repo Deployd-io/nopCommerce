@@ -2,6 +2,7 @@
 using Nop.Core.Infrastructure;
 using Nop.Data.Configuration;
 using Nop.Data.DataProviders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data;
 
@@ -10,6 +11,7 @@ namespace Nop.Data;
 /// </summary>
 public partial class DataProviderManager : IDataProviderManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -19,6 +21,8 @@ public partial class DataProviderManager : IDataProviderManager
     /// <returns></returns>
     public static INopDataProvider GetDataProvider(DataProviderType dataProviderType)
     {
+		_logger.LogError(">>> Entering GetDataProvider(dataProviderType={DataProviderType})", dataProviderType);
+		_logger.LogWarning("<<< Exiting GetDataProvider(dataProviderType={DataProviderType})", dataProviderType);
         return dataProviderType switch
         {
             DataProviderType.SqlServer => new MsSqlNopDataProvider(),

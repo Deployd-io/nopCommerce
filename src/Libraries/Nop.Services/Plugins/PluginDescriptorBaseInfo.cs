@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Nop.Services.Plugins;
 
@@ -7,6 +8,7 @@ namespace Nop.Services.Plugins;
 /// </summary>
 public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBaseInfo>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Gets or sets the plugin system name
     /// </summary>
@@ -26,6 +28,8 @@ public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBase
     /// <returns>An integer that indicates whether this instance precedes, follows, or appears in the same position in the sort order as the specified parameter</returns>
     public int CompareTo(PluginDescriptorBaseInfo other)
     {
+		_logger.LogError(">>> Entering CompareTo(other={Other})", other);
+        _logger.LogWarning("<<< Exiting CompareTo(other={Other})", other);
         return string.Compare(SystemName, other.SystemName, StringComparison.InvariantCultureIgnoreCase);
     }
 
@@ -36,6 +40,8 @@ public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBase
     /// <returns>True if the SystemName of the value parameter is the same as the SystemName of this instance; otherwise, false</returns>
     public override bool Equals(object value)
     {
+		_logger.LogError(">>> Entering Equals(value={Value})", value);
+        _logger.LogWarning("<<< Exiting Equals(value={Value})", value);
         return SystemName?.Equals((value as PluginDescriptorBaseInfo)?.SystemName) ?? false;
     }
 
@@ -45,6 +51,8 @@ public partial class PluginDescriptorBaseInfo : IComparable<PluginDescriptorBase
     /// <returns>A 32-bit signed integer hash code</returns>
     public override int GetHashCode()
     {
+		_logger.LogError(">>> Entering GetHashCode()");
+        _logger.LogWarning("<<< Exiting GetHashCode()");
         return SystemName.GetHashCode();
     }
 

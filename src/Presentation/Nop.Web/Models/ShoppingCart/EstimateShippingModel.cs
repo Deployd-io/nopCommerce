@@ -1,14 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.ShoppingCart;
 
 public partial record EstimateShippingModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public EstimateShippingModel()
     {
+		_logger.LogError(">>> Entering EstimateShippingModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("EstimateShippingModel(): AvailableStates → {AvailableStates}", AvailableStates);
     }
 
     public int RequestDelay { get; set; }
@@ -27,10 +31,13 @@ public partial record EstimateShippingModel : BaseNopModel
 
 public partial record EstimateShippingResultModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public EstimateShippingResultModel()
     {
+		_logger.LogError(">>> Entering EstimateShippingResultModel()");
         ShippingOptions = new List<ShippingOptionModel>();
         Errors = new List<string>();
+		_logger.LogError("EstimateShippingResultModel(): Errors → {Errors}", Errors);
     }
 
     public IList<ShippingOptionModel> ShippingOptions { get; set; }

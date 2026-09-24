@@ -4,26 +4,33 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Localization;
 using Nop.Web.Framework.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.GoogleAnalytics.Migrations.UpgradeTo470;
 
 [NopMigration("2023-03-01 17:00:00", "Widgets.GoogleAnalytics 2.00. Update localizations", MigrationProcessType.Update)]
 public class LocalizationMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogWarning("<<< Exiting Down()");
     }
 
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
         var localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+		_logger.LogError("Up(): localizationService → {LocalizationService}", localizationService);
 
         var (languageId, _) = this.GetLanguageData();
 
         //use localizationService to add, update and delete localization resources
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         localizationService.AddOrUpdateLocaleResource(new Dictionary<string, string>
         {
             ["Plugins.Widgets.GoogleAnalytics.UseSandbox"] = "UseSandbox",
@@ -33,5 +40,7 @@ public class LocalizationMigration : MigrationBase
             ["Plugins.Widgets.GoogleAnalytics.Instructions"] = "<p>Google Analytics is a free website stats tool from Google. It keeps track of statistics about the visitors and eCommerce conversion on your website.<br /><br />Follow the next steps to enable Google Analytics integration:<br /><ul><li><a href=\"http://www.google.com/analytics/\" target=\"_blank\">Create a Google Analytics account</a> and follow the wizard to add your website</li><li>Copy the <b>MEASUREMENT ID</b> into the <b>ID</b> box below</li><li>In Google Analytics click on the <b>Measurement Protocol API secrets</b> under <b>Events</b></li><li>Click on <b>Create</b> button and follow the instructions to create a new API secret</li><li>Copy the API secret into the <b>API Secret</b> box below</li><li>Click the 'Save' button below and Google Analytics will be integrated into your store</li></ul><br /></p>"
 
         }, languageId);
+		_logger.LogError("Up(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting Up()");
     }
 }

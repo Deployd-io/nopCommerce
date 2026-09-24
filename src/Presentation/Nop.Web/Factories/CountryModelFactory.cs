@@ -2,6 +2,7 @@
 using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Web.Models.Directory;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class CountryModelFactory : ICountryModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryService _countryService;
@@ -26,10 +28,14 @@ public partial class CountryModelFactory : ICountryModelFactory
         IStateProvinceService stateProvinceService,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext})", countryService, localizationService, stateProvinceService, workContext);
         _countryService = countryService;
         _localizationService = localizationService;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _localizationService → {_localizationService}", countryService, localizationService, stateProvinceService, workContext, _localizationService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _stateProvinceService → {_stateProvinceService}", countryService, localizationService, stateProvinceService, workContext, _stateProvinceService);
         _workContext = workContext;
+		_logger.LogDebug("CountryModelFactory(countryService={CountryService},localizationService={LocalizationService},stateProvinceService={StateProvinceService},workContext={WorkContext}): _workContext → {_workContext}", countryService, localizationService, stateProvinceService, workContext, _workContext);
     }
 
     #endregion
@@ -47,12 +53,17 @@ public partial class CountryModelFactory : ICountryModelFactory
     /// </returns>
     public virtual async Task<IList<StateProvinceModel>> GetStatesByCountryIdAsync(int countryId, bool addSelectStateItem)
     {
+		_logger.LogError(">>> Entering GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var country = await _countryService.GetCountryByIdAsync(countryId);
         var states =
             (await _stateProvinceService.GetStateProvincesByCountryIdAsync(country?.Id ?? 0,
                 (await _workContext.GetWorkingLanguageAsync()).Id)).ToList();
+				_logger.LogError("GetStatesByCountryIdAsync(countryId,addSelectStateItem)={CountryId},{AddSelectStateItem}: find query executed in {Arg2} ms", countryId, addSelectStateItem, __logStart.ElapsedMilliseconds);
+				_logger.LogError("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): country → {Country}", countryId, addSelectStateItem, country);
         
         var result = new List<StateProvinceModel>();
+		_logger.LogError("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): result → {Result}", countryId, addSelectStateItem, result);
         
         foreach (var state in states)
             result.Add(new StateProvinceModel
@@ -60,6 +71,7 @@ public partial class CountryModelFactory : ICountryModelFactory
                 id = state.Id,
                 name = await _localizationService.GetLocalizedAsync(state, x => x.Name)
             });
+				_logger.LogDebug("GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): name → {Name}", countryId, addSelectStateItem, name);
 
         if (country == null)
         {
@@ -99,6 +111,7 @@ public partial class CountryModelFactory : ICountryModelFactory
             }
         }
 
+		_logger.LogWarning("<<< Exiting GetStatesByCountryIdAsync(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         return result;
     }
 

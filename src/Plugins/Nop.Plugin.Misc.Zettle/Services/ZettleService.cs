@@ -27,6 +27,7 @@ namespace Nop.Plugin.Misc.Zettle.Services;
 /// </summary>
 public class ZettleService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -66,19 +67,33 @@ public class ZettleService
         ZettleSettings zettleSettings)
     {
         _currencySettings = currencySettings;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _currencySettings → {_currencySettings}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _currencySettings);
         _currencyService = currencyService;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _currencyService → {_currencyService}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _currencyService);
         _discountService = discountService;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _discountService → {_discountService}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _discountService);
         _logger = logger;
+		_logger.LogError(">>> Entering ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings})", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings);
         _pictureService = pictureService;
         _productAttributeParser = productAttributeParser;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _pictureService → {_pictureService}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _pictureService);
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _productAttributeParser → {_productAttributeParser}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _productAttributeParser);
         _productAttributeService = productAttributeService;
         _productService = productService;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _productAttributeService → {_productAttributeService}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _productAttributeService);
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _productService → {_productService}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _productService);
         _settingService = settingService;
         _workContext = workContext;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _settingService → {_settingService}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _settingService);
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _workContext → {_workContext}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _workContext);
         _mediaSettings = mediaSettings;
         _zettleHttpClient = zettleHttpClient;
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _mediaSettings → {_mediaSettings}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _mediaSettings);
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _zettleHttpClient → {_zettleHttpClient}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _zettleHttpClient);
         _zettleRecordService = zettleRecordService;
         _zettleSettings = zettleSettings;
+		_logger.LogWarning("<<< Exiting ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings})", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings);
+		_logger.LogDebug("ZettleService(currencySettings={CurrencySettings},currencyService={CurrencyService},discountService={DiscountService},logger={Logger},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},productService={ProductService},settingService={SettingService},workContext={WorkContext},mediaSettings={MediaSettings},zettleHttpClient={ZettleHttpClient},zettleRecordService={ZettleRecordService},zettleSettings={ZettleSettings}): _zettleSettings → {_zettleSettings}", currencySettings, currencyService, discountService, logger, pictureService, productAttributeParser, productAttributeService, productService, settingService, workContext, mediaSettings, zettleHttpClient, zettleRecordService, zettleSettings, _zettleSettings);
     }
 
     #endregion
@@ -127,6 +142,9 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task ImportDiscountsAsync(StringBuilder log)
     {
+		_logger.LogError(">>> Entering ImportDiscountsAsync(log={Log})", log);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //if enabled
         if (!_zettleSettings.DiscountSyncEnabled)
             return;
@@ -134,10 +152,13 @@ public class ZettleService
         log.AppendLine("Add discounts...");
 
         var storeCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogError("ImportDiscountsAsync(log={Log}): storeCurrency → {StoreCurrency}", log, storeCurrency);
 
         //add only assigned to order subtotal discounts
         var existingDiscounts = await _zettleHttpClient.RequestAsync<GetDiscountsRequest, DiscountList>(new());
+		_logger.LogError("ImportDiscountsAsync(log={Log}): existingDiscounts → {ExistingDiscounts}", log, existingDiscounts);
         var discounts = await _discountService.GetAllDiscountsAsync(DiscountType.AssignedToOrderSubTotal, showHidden: true);
+		_logger.LogError("ImportDiscountsAsync(log={Log}): discounts → {Discounts}", log, discounts);
         var discountsToAdd = discounts
             .Where(discount => !existingDiscounts.Any(existingDiscount => existingDiscount.ExternalReference == discount.Id.ToString()))
             .ToList();
@@ -153,6 +174,7 @@ public class ZettleService
             };
             if (!discount.UsePercentage)
             {
+				_logger.LogDebug("ImportDiscountsAsync(log={Log}): request.Amount → {Arg1}", log, request.Amount);
                 request.Amount = new Domain.Api.Product.Discount.DiscountAmount
                 {
                     CurrencyId = storeCurrency.CurrencyCode.ToUpper(),
@@ -165,11 +187,14 @@ public class ZettleService
             }
             else
                 request.Percentage = discount.DiscountPercentage;
+				_logger.LogDebug("ImportDiscountsAsync(log={Log}): request.Percentage → {Arg1}", log, request.Percentage);
 
             log.AppendLine($"\tAdd discount '{discount.Name}'");
 
             await _zettleHttpClient.RequestAsync<CreateDiscountRequest, ApiResponse>(request);
         }
+		_logger.LogError("ImportDiscountsAsync(log)={Log}: external service call took {Arg1} ms", log, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting ImportDiscountsAsync(log={Log})", log);
     }
 
     /// <summary>
@@ -179,6 +204,9 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task ImportDeletedAsync(StringBuilder log)
     {
+		_logger.LogError(">>> Entering ImportDeletedAsync(log={Log})", log);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         log.AppendLine("Delete products...");
 
         //get records to delete
@@ -204,7 +232,9 @@ public class ZettleService
                 .ToList();
 
             var products = await _zettleHttpClient.RequestAsync<GetProductsRequest, ProductList>(new());
+			_logger.LogError("ImportDeletedAsync(log={Log}): products → {Products}", log, products);
             var existingIds = products.Select(product => product.Uuid).ToList();
+			_logger.LogError("ImportDeletedAsync(log={Log}): existingIds → {ExistingIds}", log, existingIds);
 
             idsToDelete.AddRange(existingIds.Except(idsToKeep).ToList());
 
@@ -212,10 +242,13 @@ public class ZettleService
         }
 
         idsToDelete = idsToDelete.Distinct().ToList();
+		_logger.LogError("ImportDeletedAsync(log={Log}): idsToDelete → {IdsToDelete}", log, idsToDelete);
         if (idsToDelete.Any())
             await _zettleHttpClient.RequestAsync<DeleteProductsRequest, ApiResponse>(new DeleteProductsRequest { ProductUuids = idsToDelete });
 
         await _zettleRecordService.DeleteRecordsAsync(records.Select(record => record.Id).ToList());
+		_logger.LogError("ImportDeletedAsync(log)={Log}: external service call took {Arg1} ms", log, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting ImportDeletedAsync(log={Log})", log);
     }
 
     /// <summary>
@@ -225,6 +258,7 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task ImportImageChangedAsync(StringBuilder log)
     {
+		_logger.LogError(">>> Entering ImportImageChangedAsync(log={Log})", log);
         log.AppendLine("Change images...");
 
         //upload new images
@@ -256,6 +290,7 @@ public class ZettleService
             if (!product.CombinationRecords.Any())
             {
                 request.Presentation = new Product.ProductPresentation { ImageUrl = product.ProductRecord?.ImageUrl };
+				_logger.LogDebug("ImportImageChangedAsync(log={Log}): request.Presentation → {Arg1}", log, request.Presentation);
                 request.Variants =
                 [
                     new() { Uuid = product.ProductRecord.VariantUuid }
@@ -283,6 +318,9 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task ImportInventoryTrackingAsync(StringBuilder log)
     {
+		_logger.LogError(">>> Entering ImportInventoryTrackingAsync(log={Log})", log);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         log.AppendLine("Update inventory tracking...");
 
         var records = (await _zettleRecordService
@@ -293,6 +331,7 @@ public class ZettleService
             return;
 
         var storeBalance = await _zettleHttpClient.RequestAsync<GetLocationInventoryBalanceRequest, LocationInventoryBalance>(new());
+		_logger.LogError("ImportInventoryTrackingAsync(log={Log}): storeBalance → {StoreBalance}", log, storeBalance);
 
         var products = records
             .GroupBy(record => record.ProductId)
@@ -307,7 +346,9 @@ public class ZettleService
             return;
 
         var productChanges = new List<CreateTrackingRequest.ProductBalanceChange>();
+		_logger.LogError("ImportInventoryTrackingAsync(log={Log}): productChanges → {ProductChanges}", log, productChanges);
         var recordsToUpdate = new List<ZettleRecord>();
+		_logger.LogError("ImportInventoryTrackingAsync(log={Log}): recordsToUpdate → {RecordsToUpdate}", log, recordsToUpdate);
 
         foreach (var product in products)
         {
@@ -319,6 +360,7 @@ public class ZettleService
                 ?.Balance ?? 0;
             (ZettleRecord Record, int StockQuantity, int? QuantityAdjustment) productRecordToStart = (product.ProductRecord, productQuantity, null);
             var combinationRecordsToStart = new List<(ZettleRecord Record, int StockQuantity, int? QuantityAdjustment)>();
+			_logger.LogError("ImportInventoryTrackingAsync(log={Log}): combinationRecordsToStart → {CombinationRecordsToStart}", log, combinationRecordsToStart);
             foreach (var combinationRecord in product.CombinationRecords)
             {
                 //get current quantity if exists
@@ -337,6 +379,8 @@ public class ZettleService
         }
 
         await UpdateInventoryBalanceAsync(productChanges, recordsToUpdate);
+		_logger.LogError("ImportInventoryTrackingAsync(log)={Log}: external service call took {Arg1} ms", log, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting ImportInventoryTrackingAsync(log={Log})", log);
     }
 
     /// <summary>
@@ -349,12 +393,17 @@ public class ZettleService
     /// </returns>
     protected async Task<Import> ImportCreatedOrUpdatedAsync(StringBuilder log)
     {
+		_logger.LogError(">>> Entering ImportCreatedOrUpdatedAsync(log={Log})", log);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         log.AppendLine("Create and update products...");
 
         //check currency match
         var storeCurrency = await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId);
+		_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): storeCurrency → {StoreCurrency}", log, storeCurrency);
         var (accountInfo, _) = await GetAccountInfoAsync();
         var priceSyncAvailable = string.Equals(storeCurrency.CurrencyCode, accountInfo.Currency, StringComparison.InvariantCultureIgnoreCase);
+		_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): priceSyncAvailable → {PriceSyncAvailable}", log, priceSyncAvailable);
 
         //prepare price function
         int preparePrice(decimal price) => storeCurrency.CurrencyCode.ToUpper() switch
@@ -364,6 +413,7 @@ public class ZettleService
         };
 
         Import import = null;
+		_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): import → {Import}", log, import);
         var pageIndex = 0;
         while (true)
         {
@@ -410,6 +460,7 @@ public class ZettleService
                 //set image
                 if (product.ImageSyncEnabled && !string.IsNullOrEmpty(product.ImageUrl))
                     request.Presentation = new Product.ProductPresentation { ImageUrl = product.ImageUrl };
+					_logger.LogDebug("ImportCreatedOrUpdatedAsync(log={Log}): request.Presentation → {Arg1}", log, request.Presentation);
 
                 var combinationRecords = records
                     .Where(record => record.ProductId == product.Id && record.CombinationId != 0)
@@ -428,11 +479,13 @@ public class ZettleService
                     //set the price if available
                     if (product.PriceSyncEnabled && priceSyncAvailable)
                     {
+						_logger.LogDebug("ImportCreatedOrUpdatedAsync(log={Log}): variant.Price → {Arg1}", log, variant.Price);
                         variant.Price = new Product.ProductVariant.ProductPrice
                         {
                             Amount = preparePrice(product.Price),
                             CurrencyId = accountInfo.Currency
                         };
+						_logger.LogDebug("ImportCreatedOrUpdatedAsync(log={Log}): variant.CostPrice → {Arg1}", log, variant.CostPrice);
                         variant.CostPrice = new Product.ProductVariant.ProductPrice
                         {
                             Amount = preparePrice(product.ProductCost),
@@ -440,16 +493,24 @@ public class ZettleService
                         };
                     }
                     request.Variants = [variant];
+					_logger.LogDebug("ImportCreatedOrUpdatedAsync(log={Log}): request.Variants → {Arg1}", log, request.Variants);
                 }
                 else
                 {
                     //or multi variants
                     var productCombinations = await _productAttributeService.GetAllProductAttributeCombinationsAsync(product.Id);
+					_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): productCombinations → {ProductCombinations}", log, productCombinations);
                     var productAttributMappings = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+					_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): productAttributMappings → {ProductAttributMappings}", log, productAttributMappings);
                     var productAttributes = await productAttributMappings.SelectAwait(async mapping =>
                     {
                         var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(mapping.ProductAttributeId);
+						_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): productAttribute → {ProductAttribute}", log, productAttribute);
+						var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+						_logger.LogError("ImportCreatedOrUpdatedAsync(log)={Log}: database query executed in {Arg1} ms", log, __logStartDb.ElapsedMilliseconds);
+						_logger.LogDebug("ImportCreatedOrUpdatedAsync(log={Log}): request.VariantOptionDefinitions → {Arg1}", log, request.VariantOptionDefinitions);
                         var productAttributeValues = await _productAttributeService.GetProductAttributeValuesAsync(mapping.Id);
+						_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): productAttributeValues → {ProductAttributeValues}", log, productAttributeValues);
                         return new { Name = productAttribute.Name, Values = productAttributeValues.Select(value => value.Name).ToList() };
                     }).ToListAsync();
 
@@ -484,6 +545,7 @@ public class ZettleService
                         //set image
                         if (combination.Record.ImageSyncEnabled && !string.IsNullOrEmpty(combination.Record.ImageUrl))
                             variant.Presentation = new Product.ProductPresentation { ImageUrl = combination.Record.ImageUrl };
+							_logger.LogDebug("ImportCreatedOrUpdatedAsync(log={Log}): variant.Presentation → {Arg1}", log, variant.Presentation);
 
                         //set the price if available
                         if (combination.Record.PriceSyncEnabled && priceSyncAvailable)
@@ -495,6 +557,7 @@ public class ZettleService
                             };
 
                             var attributeValues = await _productAttributeParser.ParseProductAttributeValuesAsync(combination.Combination.AttributesXml);
+							_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): attributeValues → {AttributeValues}", log, attributeValues);
                             var attributesCost = attributeValues
                                 .Where(value => value.AttributeValueType == Core.Domain.Catalog.AttributeValueType.Simple)
                                 .Sum(value => value.Cost);
@@ -509,7 +572,9 @@ public class ZettleService
                             .SelectAwait(async mapping =>
                             {
                                 var attribute = await _productAttributeService.GetProductAttributeByIdAsync(mapping.ProductAttributeId);
+								_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): attribute → {Attribute}", log, attribute);
                                 var values = await _productAttributeParser.ParseProductAttributeValuesAsync(combination.Combination.AttributesXml, mapping.Id);
+								_logger.LogError("ImportCreatedOrUpdatedAsync(log={Log}): values → {Values}", log, values);
                                 return new Product.ProductVariant.ProductVariantOption { Name = attribute.Name, Value = values.FirstOrDefault()?.Name };
                             })
                             .ToListAsync();
@@ -525,7 +590,16 @@ public class ZettleService
             import = await _zettleHttpClient.RequestAsync<CreateImportRequest, Import>(new CreateImportRequest { Products = products });
 
             log.AppendLine($"\t\tImport ({import.Uuid}) created at {import.Created?.ToLongTimeString()}");
+			_logger.LogError("ImportCreatedOrUpdatedAsync(log)={Log}: external service call took {Arg1} ms", log, __logStart.ElapsedMilliseconds);
+			_logger.LogError(">>> Entering UploadImagesAsync(records={Records},update={Update},log={Log})", records, update, log);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogError("Throwing NopException from UploadImagesAsync(records={Records},update={Update},log={Log})", records, update, log);
+			_logger.LogError("UploadImagesAsync(records,update,log)={Records},{Update},{Log}: database query executed in {Arg3} ms", records, update, log, __logStartDb.ElapsedMilliseconds);
+			_logger.LogDebug("UploadImagesAsync(records={Records},update={Update},log={Log}): ImageUrl → {ImageUrl}", records, update, log, ImageUrl);
+			_logger.LogError("UploadImagesAsync(records,update,log)={Records},{Update},{Log}: external service call took {Arg3} ms", records, update, log, __logStart.ElapsedMilliseconds);
+			_logger.LogWarning("<<< Exiting UploadImagesAsync(records={Records},update={Update},log={Log})", records, update, log);
         }
+		_logger.LogWarning("<<< Exiting ImportCreatedOrUpdatedAsync(log={Log})", log);
     }
 
     /// <summary>
@@ -537,6 +611,9 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task UploadImagesAsync(IList<ZettleRecord> records, bool update, StringBuilder log)
     {
+		_logger.LogError(">>> Entering UploadImagesAsync(records={Records},update={Update},log={Log})", records, update, log);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //ensure MediaSettings.UseAbsoluteImagePath is enabled (used for images uploading)
         if (!_mediaSettings.UseAbsoluteImagePath)
             throw new NopException("For the correct image uploading need to use absolute pictures path (MediaSettings.UseAbsoluteImagePath setting)");
@@ -547,18 +624,24 @@ public class ZettleService
             .SelectAwait(async record =>
             {
                 var product = await _productService.GetProductByIdAsync(record.ProductId);
+				_logger.LogError("UploadImagesAsync(records={Records},update={Update},log={Log}): product → {Product}", records, update, log, product);
                 var combination = await _productAttributeService.GetProductAttributeCombinationByIdAsync(record.CombinationId);
+				_logger.LogError("UploadImagesAsync(records={Records},update={Update},log={Log}): combination → {Combination}", records, update, log, combination);
                 var picture = await _pictureService.GetProductPictureAsync(product, combination?.AttributesXml);
+				_logger.LogError("UploadImagesAsync(records={Records},update={Update},log={Log}): picture → {Picture}", records, update, log, picture);
                 var ext = await _pictureService.GetFileExtensionFromMimeTypeAsync(picture.MimeType);
+				_logger.LogError("UploadImagesAsync(records={Records},update={Update},log={Log}): ext → {Ext}", records, update, log, ext);
                 var (url, _) = await _pictureService.GetPictureUrlAsync(picture);
                 return new { Record = record, Url = url, Format = ext };
             })
             .ToListAsync();
+			var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
         var imagesToUpload = recordsWithImages.Select(record => new CreateImageRequest
         {
             ImageFormat = record.Format?.ToUpper().Replace("JPG", "JPEG"),
             ImageUrl = record.Url
         }).ToList();
+		_logger.LogError("UploadImagesAsync(records,update,log)={Records},{Update},{Log}: database query executed in {Arg3} ms", records, update, log, __logStartDb.ElapsedMilliseconds);
 
         if (!imagesToUpload.Any())
             return;
@@ -588,6 +671,7 @@ public class ZettleService
             .Distinct()
             .ToList();
         await _zettleRecordService.UpdateRecordsAsync(recordsToUpdate);
+		_logger.LogError("UploadImagesAsync(records,update,log)={Records},{Update},{Log}: external service call took {Arg3} ms", records, update, log, __logStart.ElapsedMilliseconds);
     }
 
     #region Inventory
@@ -651,6 +735,7 @@ public class ZettleService
                     }
                 ];
             }
+			_logger.LogWarning("<<< Exiting GetLocationAsync(type={Type})", type);
         }
         else
         {
@@ -689,6 +774,9 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected async Task UpdateInventoryBalanceAsync(List<CreateTrackingRequest.ProductBalanceChange> productChanges, List<ZettleRecord> records)
     {
+		_logger.LogError(">>> Entering UpdateInventoryBalanceAsync(productChanges={ProductChanges},records={Records})", productChanges, records);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!productChanges.Any())
             return;
 
@@ -703,11 +791,17 @@ public class ZettleService
         foreach (var record in records)
         {
             record.ExternalUuid = inventoryRequest.ExternalUuid;
+			_logger.LogDebug("UpdateInventoryBalanceAsync(productChanges={ProductChanges},records={Records}): record.ExternalUuid → {Arg2}", productChanges, records, record.ExternalUuid);
+			_logger.LogError(">>> Entering GetLocationAsync(type={Type})", type);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+			_logger.LogError("GetLocationAsync(type)={Type}: external service call took {Arg1} ms", type, __logStart.ElapsedMilliseconds);
         }
         await _zettleRecordService.UpdateRecordsAsync(records);
 
         //update balances
         await _zettleHttpClient.RequestAsync<CreateTrackingRequest, LocationInventoryBalance>(inventoryRequest);
+		_logger.LogError("UpdateInventoryBalanceAsync(productChanges,records)={ProductChanges},{Records}: external service call took {Arg2} ms", productChanges, records, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UpdateInventoryBalanceAsync(productChanges={ProductChanges},records={Records})", productChanges, records);
     }
 
     /// <summary>
@@ -720,12 +814,18 @@ public class ZettleService
     /// </returns>
     protected async Task<string> GetLocationAsync(string type)
     {
+		_logger.LogError(">>> Entering GetLocationAsync(type={Type})", type);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!_locations.TryGetValue(type, out var _))
         {
             var locationList = await _zettleHttpClient.RequestAsync<GetLocationsRequest, LocationList>(new());
+			_logger.LogError("GetLocationAsync(type={Type}): locationList → {LocationList}", type, locationList);
             _locations = locationList.ToDictionary(location => location.Type?.ToUpper(), location => location.Uuid);
         }
 
+		_logger.LogError("GetLocationAsync(type)={Type}: external service call took {Arg1} ms", type, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetLocationAsync(type={Type})", type);
         return _locations[type];
     }
 
@@ -744,7 +844,9 @@ public class ZettleService
     /// <returns>Result</returns>
     public static bool IsConfigured(ZettleSettings settings)
     {
+		_logger.LogError(">>> Entering IsConfigured(settings={Settings})", settings);
         //Client ID and API Key are required to request services
+		_logger.LogWarning("<<< Exiting IsConfigured(settings={Settings})", settings);
         return !string.IsNullOrEmpty(settings?.ClientId) && !string.IsNullOrEmpty(settings?.ApiKey);
     }
 
@@ -849,9 +951,13 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task DeleteWebhookAsync()
     {
+		_logger.LogError(">>> Entering DeleteWebhookAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await HandleFunctionAsync(async () =>
         {
             var webhooks = await _zettleHttpClient.RequestAsync<GetSubscriptionsRequest, SubscriptionList>(new());
+			_logger.LogError("DeleteWebhookAsync(): webhooks → {Webhooks}", webhooks);
             var existingWebhook = webhooks
                 ?.FirstOrDefault(webhook => webhook.Destination?.Equals(_zettleSettings.WebhookUrl, StringComparison.InvariantCultureIgnoreCase) ?? false);
             if (existingWebhook is null)
@@ -860,6 +966,8 @@ public class ZettleService
             var request = new DeleteSubscriptionsRequest { Uuid = existingWebhook.Uuid };
             await _zettleHttpClient.RequestAsync<DeleteSubscriptionsRequest, ApiResponse>(request);
 
+		_logger.LogError("DeleteWebhookAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteWebhookAsync()");
             return true;
         }, false);
     }
@@ -871,15 +979,22 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleWebhookAsync(Microsoft.AspNetCore.Http.HttpRequest request)
     {
+		_logger.LogError(">>> Entering HandleWebhookAsync(request={Request})", request);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await HandleFunctionAsync(async () =>
         {
             using var streamReader = new StreamReader(request.Body);
+			_logger.LogError("HandleWebhookAsync(request={Request}): streamReader → {StreamReader}", request, streamReader);
             var requestContent = await streamReader.ReadToEndAsync();
+			_logger.LogError("HandleWebhookAsync(request={Request}): requestContent → {RequestContent}", request, requestContent);
             if (string.IsNullOrEmpty(requestContent))
+				_logger.LogError("Throwing NopException from HandleWebhookAsync(request={Request})", request);
                 throw new NopException("Webhook request content is empty");
 
             //get webhook message
             var message = JsonConvert.DeserializeObject<Message>(requestContent);
+			_logger.LogError("HandleWebhookAsync(request={Request}): message → {Message}", request, message);
 
             //test message is sent during webhook initialization
             if (message.EventName == "TestMessage")
@@ -893,10 +1008,15 @@ public class ZettleService
                 throw new NopException("Webhook request not signed by a signature header");
 
             var messageBytes = Encoding.UTF8.GetBytes($"{message.Timestamp}.{message.Payload}");
+			_logger.LogError("HandleWebhookAsync(request={Request}): messageBytes → {MessageBytes}", request, messageBytes);
             var keyBytes = Encoding.UTF8.GetBytes(_zettleSettings.WebhookKey);
+			_logger.LogError("HandleWebhookAsync(request={Request}): keyBytes → {KeyBytes}", request, keyBytes);
             using var cryptographer = new HMACSHA256(keyBytes);
+			_logger.LogError("HandleWebhookAsync(request={Request}): cryptographer → {Cryptographer}", request, cryptographer);
             var hashBytes = cryptographer.ComputeHash(messageBytes);
+			_logger.LogError("HandleWebhookAsync(request={Request}): hashBytes → {HashBytes}", request, hashBytes);
             var encryptedString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+			_logger.LogError("HandleWebhookAsync(request={Request}): encryptedString → {EncryptedString}", request, encryptedString);
             if (!signatures.Any(signature => signature.Equals(encryptedString, StringComparison.InvariantCultureIgnoreCase)))
                 throw new NopException("Webhook request isn't valid");
 
@@ -905,11 +1025,14 @@ public class ZettleService
                 case "InventoryBalanceChanged":
                 {
                     var balanceInfo = JsonConvert.DeserializeObject<InventoryBalanceUpdate>(message.Payload);
+					_logger.LogError("HandleWebhookAsync(request={Request}): balanceInfo → {BalanceInfo}", request, balanceInfo);
 
                     for (var i = 0; i < (balanceInfo.BalanceBefore ?? new()).Count; i++)
                     {
                         var balanceBefore = balanceInfo.BalanceBefore?.ElementAtOrDefault(i);
+						_logger.LogError("HandleWebhookAsync(request={Request}): balanceBefore → {BalanceBefore}", request, balanceBefore);
                         var balanceAfter = balanceInfo.BalanceAfter?.ElementAtOrDefault(i);
+						_logger.LogError("HandleWebhookAsync(request={Request}): balanceAfter → {BalanceAfter}", request, balanceAfter);
 
                         if (string.IsNullOrEmpty(balanceBefore?.ProductUuid) || string.IsNullOrEmpty(balanceAfter?.ProductUuid))
                             continue;
@@ -921,7 +1044,9 @@ public class ZettleService
                             continue;
 
                         var records = await _zettleRecordService.GetAllRecordsAsync(productUuid: balanceAfter.ProductUuid);
+						_logger.LogError("HandleWebhookAsync(request={Request}): records → {Records}", request, records);
                         var productRecord = records.FirstOrDefault(record => string.Equals(record.VariantUuid, balanceAfter.VariantUuid, StringComparison.InvariantCultureIgnoreCase));
+						_logger.LogError("HandleWebhookAsync(request={Request}): productRecord → {ProductRecord}", request, productRecord);
                         if (productRecord is null || !productRecord.Active || !productRecord.InventoryTrackingEnabled)
                             continue;
 
@@ -933,6 +1058,7 @@ public class ZettleService
                             if (balanceChangeDate < DateTime.UtcNow.AddDays(-1))
                             {
                                 productRecord.ExternalUuid = null;
+								_logger.LogDebug("HandleWebhookAsync(request={Request}): productRecord.ExternalUuid → {Arg1}", request, productRecord.ExternalUuid);
                                 await _zettleRecordService.UpdateRecordAsync(productRecord);
                             }
                             continue;
@@ -940,9 +1066,12 @@ public class ZettleService
 
                         //adjust inventory
                         var product = await _productService.GetProductByIdAsync(productRecord.ProductId);
+						_logger.LogError("HandleWebhookAsync(request={Request}): product → {Product}", request, product);
                         var combination = await _productAttributeService.GetProductAttributeCombinationByIdAsync(productRecord.CombinationId);
+						_logger.LogError("HandleWebhookAsync(request={Request}): combination → {Combination}", request, combination);
                         var quantityToChange = balanceAfter.Balance.Value - balanceBefore.Balance.Value;
                         var logMessage = $"{ZettleDefaults.SystemName} update. Inventory balance changed at {balanceAfter.Created?.ToLongTimeString()}";
+						_logger.LogError("HandleWebhookAsync(request={Request}): logMessage → {LogMessage}", request, logMessage);
                         await _productService.AdjustInventoryAsync(product, quantityToChange, combination?.AttributesXml, logMessage);
                     }
 
@@ -951,6 +1080,7 @@ public class ZettleService
                 case "InventoryTrackingStopped":
                 {
                     var inventoryTrackingInfo = JsonConvert.DeserializeAnonymousType(message.Payload, new { ProductUuid = string.Empty });
+					_logger.LogError("HandleWebhookAsync(request={Request}): inventoryTrackingInfo → {InventoryTrackingInfo}", request, inventoryTrackingInfo);
                     if (string.IsNullOrEmpty(inventoryTrackingInfo.ProductUuid))
                         break;
 
@@ -959,6 +1089,8 @@ public class ZettleService
                     foreach (var record in records)
                     {
                         record.InventoryTrackingEnabled = false;
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): record.InventoryTrackingEnabled → {Arg1}", request, record.InventoryTrackingEnabled);
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): record.UpdatedOnUtc → {Arg1}", request, record.UpdatedOnUtc);
                         record.UpdatedOnUtc = DateTime.UtcNow;
                     }
                     await _zettleRecordService.UpdateRecordsAsync(records);
@@ -970,6 +1102,7 @@ public class ZettleService
                 {
                     //use this event only to start inventory tracking for product
                     var productInfo = JsonConvert.DeserializeObject<Product>(message.Payload);
+					_logger.LogError("HandleWebhookAsync(request={Request}): productInfo → {ProductInfo}", request, productInfo);
                     var records = await _zettleRecordService.GetAllRecordsAsync(productUuid: productInfo.Uuid);
                     var productRecord = records.FirstOrDefault(record => record.CombinationId == 0);
                     if (productRecord is null || !productRecord.Active || !productRecord.InventoryTrackingEnabled)
@@ -983,7 +1116,9 @@ public class ZettleService
                         break;
 
                     var combinationRecords = records.Where(record => record.CombinationId != 0).ToList();
+					_logger.LogError("HandleWebhookAsync(request={Request}): combinationRecords → {CombinationRecords}", request, combinationRecords);
                     var combinationRecordsToStart = new List<(ZettleRecord Record, int StockQuantity, int? QuantityAdjustment)>();
+					_logger.LogError("HandleWebhookAsync(request={Request}): combinationRecordsToStart → {CombinationRecordsToStart}", request, combinationRecordsToStart);
                     foreach (var combinationRecord in combinationRecords)
                     {
                         combinationRecordsToStart.Add((combinationRecord, 0, null));
@@ -1002,16 +1137,23 @@ public class ZettleService
                 case "ApplicationConnectionRemoved":
                 {
                     var applicationInfo = JsonConvert.DeserializeAnonymousType(message.Payload, new { Type = string.Empty });
+					_logger.LogError("HandleWebhookAsync(request={Request}): applicationInfo → {ApplicationInfo}", request, applicationInfo);
                     if (string.IsNullOrEmpty(applicationInfo.Type))
                         break;
 
                     var warning = applicationInfo.Type;
+					_logger.LogError("HandleWebhookAsync(request={Request}): warning → {Warning}", request, warning);
                     if (applicationInfo.Type.Equals("ApplicationConnectionRemoved", StringComparison.InvariantCultureIgnoreCase) ||
                         applicationInfo.Type.Equals("PersonalAssertionDeleted", StringComparison.InvariantCultureIgnoreCase))
                     {
                         warning = "The application was disconnected from PayPal Zettle organization. You need to reconfigure the plugin.";
 
                         _zettleSettings.ClientId = string.Empty;
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): _zettleSettings.ClientId → {Arg1}", request, _zettleSettings.ClientId);
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): _zettleSettings.ApiKey → {Arg1}", request, _zettleSettings.ApiKey);
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): _zettleSettings.WebhookUrl → {Arg1}", request, _zettleSettings.WebhookUrl);
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): _zettleSettings.WebhookKey → {Arg1}", request, _zettleSettings.WebhookKey);
+						_logger.LogDebug("HandleWebhookAsync(request={Request}): _zettleSettings.ImportId → {Arg1}", request, _zettleSettings.ImportId);
                         _zettleSettings.ApiKey = string.Empty;
                         _zettleSettings.WebhookUrl = string.Empty;
                         _zettleSettings.WebhookKey = string.Empty;
@@ -1027,6 +1169,8 @@ public class ZettleService
                     throw new NopException($"Unknown webhook resource type '{message.EventName}'");
             }
 
+		_logger.LogError("HandleWebhookAsync(request)={Request}: external service call took {Arg1} ms", request, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting HandleWebhookAsync(request={Request})", request);
             return true;
         });
     }
@@ -1112,6 +1256,7 @@ public class ZettleService
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task ChangeInventoryBalanceAsync(int productId, int combinationId, int quantityAdjustment)
     {
+		_logger.LogError(">>> Entering ChangeInventoryBalanceAsync(productId={ProductId},combinationId={CombinationId},quantityAdjustment={QuantityAdjustment})", productId, combinationId, quantityAdjustment);
         var records = (await _zettleRecordService.GetAllRecordsAsync(active: true))
             .Where(record => record.ProductId == productId && record.InventoryTrackingEnabled && !string.IsNullOrEmpty(record.Uuid))
             .ToList();
@@ -1119,6 +1264,7 @@ public class ZettleService
             return;
 
         var productRecord = records.FirstOrDefault(record => record.CombinationId == 0);
+		_logger.LogError("ChangeInventoryBalanceAsync(productId={ProductId},combinationId={CombinationId},quantityAdjustment={QuantityAdjustment}): productRecord → {ProductRecord}", productId, combinationId, quantityAdjustment, productRecord);
         var combinationRecords = combinationId > 0
             ? records.Where(record => record.CombinationId == combinationId && record.InventoryTrackingEnabled && !string.IsNullOrEmpty(record.VariantUuid)).ToList()
             : new List<ZettleRecord>();
@@ -1126,16 +1272,19 @@ public class ZettleService
         //we cannot know the exact reason of the change, so we will use Purchase for negative adjustments and Re-stock for positive ones
         var changeType = quantityAdjustment < 0 ? InventoryBalanceChangeType.Purchase : InventoryBalanceChangeType.Restock;
         var combinationRecordsToUpdate = new List<(ZettleRecord Record, int StockQuantity, int? QuantityAdjustment)>();
+		_logger.LogError("ChangeInventoryBalanceAsync(productId={ProductId},combinationId={CombinationId},quantityAdjustment={QuantityAdjustment}): combinationRecordsToUpdate → {CombinationRecordsToUpdate}", productId, combinationId, quantityAdjustment, combinationRecordsToUpdate);
         foreach (var combinationRecord in combinationRecords)
         {
             combinationRecordsToUpdate.Add((combinationRecord, 0, Math.Abs(quantityAdjustment)));
         }
         (ZettleRecord Record, int StockQuantity, int? QuantityAdjustment) productRecordToUpdate = (productRecord, 0, Math.Abs(quantityAdjustment));
         var productChange = await PrepareInventoryBalanceChangeAsync(changeType, productRecordToUpdate, combinationRecordsToUpdate);
+		_logger.LogError("ChangeInventoryBalanceAsync(productId={ProductId},combinationId={CombinationId},quantityAdjustment={QuantityAdjustment}): productChange → {ProductChange}", productId, combinationId, quantityAdjustment, productChange);
         if (productChange is null)
             return;
 
         await UpdateInventoryBalanceAsync([productChange], combinationRecords.Union([productRecord]).ToList());
+		_logger.LogWarning("<<< Exiting ChangeInventoryBalanceAsync(productId={ProductId},combinationId={CombinationId},quantityAdjustment={QuantityAdjustment})", productId, combinationId, quantityAdjustment);
     }
 
     #endregion

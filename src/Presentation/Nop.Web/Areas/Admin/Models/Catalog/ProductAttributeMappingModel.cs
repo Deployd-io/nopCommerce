@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -11,14 +12,19 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record ProductAttributeMappingModel : BaseNopEntityModel, ITranslationSupportedModel, ILocalizedModel<ProductAttributeMappingLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public ProductAttributeMappingModel()
     {
+		_logger.LogError(">>> Entering ProductAttributeMappingModel()");
         AvailableProductAttributes = new List<SelectListItem>();
         Locales = new List<ProductAttributeMappingLocalizedModel>();
+		_logger.LogError("ProductAttributeMappingModel(): Locales → {Locales}", Locales);
         ConditionModel = new ProductAttributeConditionModel();
+		_logger.LogError("ProductAttributeMappingModel(): ConditionModel → {ConditionModel}", ConditionModel);
         ProductAttributeValueSearchModel = new ProductAttributeValueSearchModel();
+		_logger.LogError("ProductAttributeMappingModel(): ProductAttributeValueSearchModel → {ProductAttributeValueSearchModel}", ProductAttributeValueSearchModel);
     }
 
     #endregion

@@ -3,21 +3,26 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Nop.Core.Infrastructure;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Globalization;
 
 public partial class NopAcceptLanguageHeaderRequestCultureProvider : RequestCultureProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
     {
+		_logger.LogError(">>> Entering DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
         ArgumentNullException.ThrowIfNull(httpContext);
 
         var acceptLanguageHeader = httpContext.Request.GetTypedHeaders().AcceptLanguage;
+		_logger.LogError("DetermineProviderCultureResult(httpContext={HttpContext}): acceptLanguageHeader → {AcceptLanguageHeader}", httpContext, acceptLanguageHeader);
 
         if (acceptLanguageHeader == null || acceptLanguageHeader.Count == 0)
             return NullProviderCultureResult;
 
         var languageHeader = acceptLanguageHeader.FirstOrDefault();
+		_logger.LogError("DetermineProviderCultureResult(httpContext={HttpContext}): languageHeader → {LanguageHeader}", httpContext, languageHeader);
 
         if (string.IsNullOrEmpty(languageHeader.Value.Value))
             return NullProviderCultureResult;
@@ -25,13 +30,16 @@ public partial class NopAcceptLanguageHeaderRequestCultureProvider : RequestCult
         try
         {
             var requestedCulture = new CultureInfo(languageHeader.Value.Value);
+			_logger.LogError("DetermineProviderCultureResult(httpContext={HttpContext}): requestedCulture → {RequestedCulture}", httpContext, requestedCulture);
 
             var languageService = EngineContext.Current.Resolve<ILanguageService>();
+			_logger.LogError("DetermineProviderCultureResult(httpContext={HttpContext}): languageService → {LanguageService}", httpContext, languageService);
             var language = languageService
                 .GetAllLanguages()
                 .FirstOrDefault(urlLanguage =>
                 {
                     var storeCulture = new CultureInfo(urlLanguage.LanguageCulture);
+					_logger.LogError("DetermineProviderCultureResult(httpContext={HttpContext}): storeCulture → {StoreCulture}", httpContext, storeCulture);
                     return storeCulture.Name == requestedCulture.Name || storeCulture.Parent?.Name == requestedCulture.Name;
                 });
 
@@ -42,6 +50,8 @@ public partial class NopAcceptLanguageHeaderRequestCultureProvider : RequestCult
         }
         catch (CultureNotFoundException)
         {
+			_logger.LogError("Exception in DetermineProviderCultureResult(httpContext={HttpContext}): {Arg1}", httpContext, CultureNotFoundException.Message);
+			_logger.LogWarning("<<< Exiting DetermineProviderCultureResult(httpContext={HttpContext})", httpContext);
             return NullProviderCultureResult;
         }
     }

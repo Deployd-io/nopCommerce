@@ -50,11 +50,13 @@ using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Security;
 using Nop.Web.Framework.WebOptimizer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class SettingController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AppSettings _appSettings;
@@ -108,28 +110,50 @@ public partial class SettingController : BaseAdminController
         IWorkContext workContext,
         IUploadService uploadService)
     {
+		_logger.LogError(">>> Entering SettingController()");
         _appSettings = appSettings;
         _addressService = addressService;
+		_logger.LogDebug("SettingController(): _addressService → {_addressService}", _addressService);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("SettingController(): _customerActivityService → {_customerActivityService}", _customerActivityService);
         _customerService = customerService;
+		_logger.LogDebug("SettingController(): _customerService → {_customerService}", _customerService);
         _dataProvider = dataProvider;
+		_logger.LogError("SettingController(): _dataProvider → {_dataProvider}", _dataProvider);
+		_logger.LogDebug("SettingController(): _dataProvider → {_dataProvider}", _dataProvider);
         _encryptionService = encryptionService;
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("SettingController(): _encryptionService → {_encryptionService}", _encryptionService);
+		_logger.LogDebug("SettingController(): _eventPublisher → {_eventPublisher}", _eventPublisher);
         _genericAttributeService = genericAttributeService;
         _gdprService = gdprService;
+		_logger.LogDebug("SettingController(): _genericAttributeService → {_genericAttributeService}", _genericAttributeService);
+		_logger.LogDebug("SettingController(): _gdprService → {_gdprService}", _gdprService);
         _localizedEntityService = localizedEntityService;
         _localizationService = localizationService;
+		_logger.LogDebug("SettingController(): _localizedEntityService → {_localizedEntityService}", _localizedEntityService);
+		_logger.LogDebug("SettingController(): _localizationService → {_localizationService}", _localizationService);
         _multiFactorAuthenticationPluginManager = multiFactorAuthenticationPluginManager;
         _fileProvider = fileProvider;
+		_logger.LogDebug("SettingController(): _multiFactorAuthenticationPluginManager → {_multiFactorAuthenticationPluginManager}", _multiFactorAuthenticationPluginManager);
+		_logger.LogDebug("SettingController(): _fileProvider → {_fileProvider}", _fileProvider);
         _notificationService = notificationService;
         _orderService = orderService;
+		_logger.LogDebug("SettingController(): _notificationService → {_notificationService}", _notificationService);
+		_logger.LogDebug("SettingController(): _orderService → {_orderService}", _orderService);
         _pictureService = pictureService;
         _settingModelFactory = settingModelFactory;
+		_logger.LogDebug("SettingController(): _pictureService → {_pictureService}", _pictureService);
+		_logger.LogDebug("SettingController(): _settingModelFactory → {_settingModelFactory}", _settingModelFactory);
         _settingService = settingService;
         _storeContext = storeContext;
+		_logger.LogDebug("SettingController(): _settingService → {_settingService}", _settingService);
+		_logger.LogDebug("SettingController(): _storeContext → {_storeContext}", _storeContext);
         _storeService = storeService;
         _workContext = workContext;
+		_logger.LogDebug("SettingController(): _storeService → {_storeService}", _storeService);
         _uploadService = uploadService;
+		_logger.LogDebug("SettingController(): _uploadService → {_uploadService}", _uploadService);
     }
 
     #endregion
@@ -138,6 +162,7 @@ public partial class SettingController : BaseAdminController
 
     protected virtual async Task UpdateFilterLevelLocalesAsync(FilterLevelEnum filterLevel, FilterLevelModel model)
     {
+		_logger.LogError(">>> Entering UpdateFilterLevelLocalesAsync(filterLevel={FilterLevel},model={Model})", filterLevel, model);
         foreach (var localized in model.Locales)
         {
             await _localizationService.AddOrUpdateLocaleResourceAsync(new Dictionary<string, string>
@@ -152,10 +177,12 @@ public partial class SettingController : BaseAdminController
                 [$"Enums.Nop.Core.Domain.FilterLevels.FilterLevelEnum.{filterLevel}"] = model.Name
             });
         }
+		_logger.LogWarning("<<< Exiting UpdateFilterLevelLocalesAsync(filterLevel={FilterLevel},model={Model})", filterLevel, model);
     }
 
     protected virtual async Task UpdateGdprConsentLocalesAsync(GdprConsent gdprConsent, GdprConsentModel model)
     {
+		_logger.LogError(">>> Entering UpdateGdprConsentLocalesAsync(gdprConsent={GdprConsent},model={Model})", gdprConsent, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(gdprConsent,
@@ -168,6 +195,7 @@ public partial class SettingController : BaseAdminController
                 localized.RequiredMessage,
                 localized.LanguageId);
         }
+		_logger.LogWarning("<<< Exiting UpdateGdprConsentLocalesAsync(gdprConsent={GdprConsent},model={Model})", gdprConsent, model);
     }
 
     #endregion
@@ -176,9 +204,11 @@ public partial class SettingController : BaseAdminController
 
     public virtual async Task<IActionResult> ChangeStoreScopeConfiguration(int storeid, string returnUrl = "")
     {
+		_logger.LogError(">>> Entering ChangeStoreScopeConfiguration(storeid={Storeid},returnUrl={ReturnUrl})", storeid, returnUrl);
         var store = await _storeService.GetStoreByIdAsync(storeid);
         if (store != null || storeid == 0)
         {
+			_logger.LogError("ChangeStoreScopeConfiguration(storeid={Storeid},returnUrl={ReturnUrl}): store → {Store}", storeid, returnUrl, store);
             await _genericAttributeService
                 .SaveAttributeAsync(await _workContext.GetCurrentCustomerAsync(), NopCustomerDefaults.AdminAreaStoreScopeConfigurationAttribute, storeid);
         }
@@ -186,6 +216,7 @@ public partial class SettingController : BaseAdminController
         //home page
         if (string.IsNullOrEmpty(returnUrl))
             returnUrl = Url.Action("Index", "Home", new { area = AreaNames.ADMIN });
+			_logger.LogError("ChangeStoreScopeConfiguration(storeid={Storeid},returnUrl={ReturnUrl}): returnUrl → {ReturnUrl1}", storeid, returnUrl, returnUrl);
 
         //prevent open redirection attack
         if (!Url.IsLocalUrl(returnUrl))
@@ -197,9 +228,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.System.MANAGE_APP_SETTINGS)]
     public virtual async Task<IActionResult> AppSettings()
     {
+		_logger.LogError(">>> Entering AppSettings()");
         //prepare model
         var model = await _settingModelFactory.PrepareAppSettingsModel();
+		_logger.LogError("AppSettings(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting AppSettings()");
+		_logger.LogWarning("<<< Exiting AppSettings(model={Model})", model);
         return View(model);
     }
 
@@ -245,9 +280,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Blog()
     {
+		_logger.LogError(">>> Entering Blog()");
         //prepare model
         var model = await _settingModelFactory.PrepareBlogSettingsModelAsync();
+		_logger.LogError("Blog(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Blog()");
+		_logger.LogWarning("<<< Exiting Blog(model={Model})", model);
         return View(model);
     }
 
@@ -295,9 +334,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Vendor()
     {
+		_logger.LogError(">>> Entering Vendor()");
         //prepare model
         var model = await _settingModelFactory.PrepareVendorSettingsModelAsync();
+		_logger.LogError("Vendor(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Vendor()");
+		_logger.LogWarning("<<< Exiting Vendor(model={Model})", model);
         return View(model);
     }
 
@@ -348,9 +391,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Forum()
     {
+		_logger.LogError(">>> Entering Forum()");
         //prepare model
         var model = await _settingModelFactory.PrepareForumSettingsModelAsync();
+		_logger.LogError("Forum(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Forum()");
+		_logger.LogWarning("<<< Exiting Forum(model={Model})", model);
         return View(model);
     }
 
@@ -413,9 +460,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> News()
     {
+		_logger.LogError(">>> Entering News()");
         //prepare model
         var model = await _settingModelFactory.PrepareNewsSettingsModelAsync();
+		_logger.LogError("News(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting News()");
+		_logger.LogWarning("<<< Exiting News(model={Model})", model);
         return View(model);
     }
 
@@ -464,9 +515,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Shipping()
     {
+		_logger.LogError(">>> Entering Shipping()");
         //prepare model
         var model = await _settingModelFactory.PrepareShippingSettingsModelAsync();
+		_logger.LogError("Shipping(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Shipping()");
+		_logger.LogWarning("<<< Exiting Shipping(model={Model})", model);
         return View(model);
     }
 
@@ -549,9 +604,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Tax()
     {
+		_logger.LogError(">>> Entering Tax()");
         //prepare model
         var model = await _settingModelFactory.PrepareTaxSettingsModelAsync();
+		_logger.LogError("Tax(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Tax()");
+		_logger.LogWarning("<<< Exiting Tax(model={Model})", model);
         return View(model);
     }
 
@@ -645,9 +704,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Catalog()
     {
+		_logger.LogError(">>> Entering Catalog()");
         //prepare model
         var model = await _settingModelFactory.PrepareCatalogSettingsModelAsync();
+		_logger.LogError("Catalog(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Catalog()");
+		_logger.LogWarning("<<< Exiting Catalog(model={Model})", model);
         return View(model);
     }
 
@@ -807,9 +870,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> FilterLevel()
     {
+		_logger.LogError(">>> Entering FilterLevel()");
         //prepare model
         var model = await _settingModelFactory.PrepareFilterLevelSettingsModelAsync();
+		_logger.LogError("FilterLevel(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting FilterLevel()");
+		_logger.LogWarning("<<< Exiting FilterLevel(model={Model})", model);
         return View(model);
     }
 
@@ -849,18 +916,25 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> FilterLevelList(FilterLevelSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering FilterLevelList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _settingModelFactory.PrepareFilterLevelListModelAsync(searchModel);
+		_logger.LogError("FilterLevelList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting FilterLevelList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> EditFilterLevel(int id)
     {
+		_logger.LogError(">>> Entering EditFilterLevel(id={Id})", id);
         //prepare model
         var model = await _settingModelFactory.PrepareFilterLevelModelAsync(null, (FilterLevelEnum)id);
+		_logger.LogError("EditFilterLevel(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting EditFilterLevel(id={Id})", id);
+		_logger.LogWarning("<<< Exiting EditFilterLevel(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -939,9 +1013,12 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> SortOptionsList(SortOptionSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering SortOptionsList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _settingModelFactory.PrepareSortOptionListModelAsync(searchModel);
+		_logger.LogError("SortOptionsList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting SortOptionsList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -949,8 +1026,11 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> SortOptionUpdate(SortOptionModel model)
     {
+		_logger.LogError(">>> Entering SortOptionUpdate(model={Model})", model);
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var catalogSettings = await _settingService.LoadSettingAsync<CatalogSettings>(storeScope);
+		_logger.LogError("SortOptionUpdate(model={Model}): catalogSettings → {CatalogSettings}", model, catalogSettings);
+		_logger.LogError("SortOptionUpdate(model={Model}): storeScope → {StoreScope}", model, storeScope);
 
         catalogSettings.ProductSortingEnumDisplayOrder[model.Id] = model.DisplayOrder;
         if (model.IsActive && catalogSettings.ProductSortingEnumDisabled.Contains(model.Id))
@@ -964,15 +1044,20 @@ public partial class SettingController : BaseAdminController
         //now clear settings cache
         await _settingService.ClearCacheAsync();
 
+		_logger.LogWarning("<<< Exiting SortOptionUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> RewardPoints()
     {
+		_logger.LogError(">>> Entering RewardPoints()");
         //prepare model
         var model = await _settingModelFactory.PrepareRewardPointsSettingsModelAsync();
+		_logger.LogError("RewardPoints(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting RewardPoints()");
+		_logger.LogWarning("<<< Exiting RewardPoints(model={Model})", model);
         return View(model);
     }
 
@@ -1031,9 +1116,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Order()
     {
+		_logger.LogError(">>> Entering Order()");
         //prepare model
         var model = await _settingModelFactory.PrepareOrderSettingsModelAsync();
+		_logger.LogError("Order(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Order()");
+		_logger.LogWarning("<<< Exiting Order(model={Model})", model);
         return View(model);
     }
 
@@ -1118,9 +1207,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ShoppingCart()
     {
+		_logger.LogError(">>> Entering ShoppingCart()");
         //prepare model
         var model = await _settingModelFactory.PrepareShoppingCartSettingsModelAsync();
+		_logger.LogError("ShoppingCart(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting ShoppingCart()");
+		_logger.LogWarning("<<< Exiting ShoppingCart(model={Model})", model);
         return View(model);
     }
 
@@ -1181,9 +1274,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Media()
     {
+		_logger.LogError(">>> Entering Media()");
         //prepare model
         var model = await _settingModelFactory.PrepareMediaSettingsModelAsync();
+		_logger.LogError("Media(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Media()");
+		_logger.LogWarning("<<< Exiting Media(model={Model})", model);
         return View(model);
     }
 
@@ -1244,6 +1341,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ChangePictureStorage()
     {
+		_logger.LogError(">>> Entering ChangePictureStorage()");
         await _pictureService.SetIsStoreInDbAsync(!await _pictureService.IsStoreInDbAsync());
 
         //activity log
@@ -1251,6 +1349,7 @@ public partial class SettingController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Updated"));
 
+		_logger.LogWarning("<<< Exiting ChangePictureStorage()");
         return RedirectToAction("Media");
     }
 
@@ -1259,6 +1358,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ChangeImagePath(MediaSettingsModel model)
     {
+		_logger.LogError(">>> Entering ChangeImagePath(model={Model})", model);
         try
         {
             if (!_fileProvider.CheckPermissions(model.PicturePath, true, true, true, true))
@@ -1276,33 +1376,42 @@ public partial class SettingController : BaseAdminController
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Updated"));
 
             var returnUrl = Url.Action("Media", "Setting", new { area = AreaNames.ADMIN });
+			_logger.LogError("ChangeImagePath(model={Model}): returnUrl → {ReturnUrl}", model, returnUrl);
             return View("RestartApplication", returnUrl);
         }
         catch (Exception ex)
         {
+			_logger.LogError("Exception in ChangeImagePath(model={Model}): {Arg1}", model, ex.Message);
             var exceptionMessage = ex.Message;
             var mediaSettings = await _settingService.LoadSettingAsync<MediaSettings>();
+			_logger.LogError("ChangeImagePath(model={Model}): mediaSettings → {MediaSettings}", model, mediaSettings);
 
             if (_fileProvider.EnumerateFiles(mediaSettings.PicturePath, "*.*", false).Any())
                 exceptionMessage += $" {await _localizationService.GetResourceAsync("Admin.Configuration.Settings.Media.ChangePicturePath.TryAgain")}";
             else
             {
                 mediaSettings.PicturePath = model.PicturePath;
+				_logger.LogDebug("ChangeImagePath(model={Model}): mediaSettings.PicturePath → {Arg1}", model, mediaSettings.PicturePath);
                 await _settingService.SaveSettingAsync(mediaSettings, settings => settings.PicturePath);
             }
 
             _notificationService.ErrorNotification(exceptionMessage);
         }
 
+		_logger.LogWarning("<<< Exiting ChangeImagePath(model={Model})", model);
         return RedirectToAction("Media");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> CustomerUser()
     {
+		_logger.LogError(">>> Entering CustomerUser()");
         //prepare model
         var model = await _settingModelFactory.PrepareCustomerUserSettingsModelAsync();
+		_logger.LogError("CustomerUser(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting CustomerUser()");
+		_logger.LogWarning("<<< Exiting CustomerUser(model={Model})", model);
         return View(model);
     }
 
@@ -1402,9 +1511,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> Gdpr()
     {
+		_logger.LogError(">>> Entering Gdpr()");
         //prepare model
         var model = await _settingModelFactory.PrepareGdprSettingsModelAsync();
+		_logger.LogError("Gdpr(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Gdpr()");
+		_logger.LogWarning("<<< Exiting Gdpr(model={Model})", model);
         return View(model);
     }
 
@@ -1450,18 +1563,25 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> GdprConsentList(GdprConsentSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering GdprConsentList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _settingModelFactory.PrepareGdprConsentListModelAsync(searchModel);
+		_logger.LogError("GdprConsentList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting GdprConsentList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> CreateGdprConsent()
     {
+		_logger.LogError(">>> Entering CreateGdprConsent()");
         //prepare model
         var model = await _settingModelFactory.PrepareGdprConsentModelAsync(new GdprConsentModel(), null);
+		_logger.LogError("CreateGdprConsent(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting CreateGdprConsent()");
+		_logger.LogWarning("<<< Exiting CreateGdprConsent(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -1492,14 +1612,19 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> EditGdprConsent(int id)
     {
+		_logger.LogError(">>> Entering EditGdprConsent(id={Id})", id);
         //try to get a consent with the specified id
         var gdprConsent = await _gdprService.GetConsentByIdAsync(id);
+		_logger.LogError("EditGdprConsent(id={Id}): gdprConsent → {GdprConsent}", id, gdprConsent);
         if (gdprConsent == null)
             return RedirectToAction("Gdpr");
 
         //prepare model
         var model = await _settingModelFactory.PrepareGdprConsentModelAsync(null, gdprConsent);
+		_logger.LogError("EditGdprConsent(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting EditGdprConsent(id={Id})", id);
+		_logger.LogWarning("<<< Exiting EditGdprConsent(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -1536,8 +1661,10 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> DeleteGdprConsent(int id)
     {
+		_logger.LogError(">>> Entering DeleteGdprConsent(id={Id})", id);
         //try to get a GDPR consent with the specified id
         var gdprConsent = await _gdprService.GetConsentByIdAsync(id);
+		_logger.LogError("DeleteGdprConsent(id={Id}): gdprConsent → {GdprConsent}", id, gdprConsent);
         if (gdprConsent == null)
             return RedirectToAction("Gdpr");
 
@@ -1545,6 +1672,7 @@ public partial class SettingController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.Gdpr.Consent.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteGdprConsent(id={Id})", id);
         return RedirectToAction("Gdpr");
     }
 
@@ -1553,9 +1681,13 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> GeneralCommon()
     {
+		_logger.LogError(">>> Entering GeneralCommon()");
         //prepare model
         var model = await _settingModelFactory.PrepareGeneralCommonSettingsModelAsync();
+		_logger.LogError("GeneralCommon(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting GeneralCommon()");
+		_logger.LogWarning("<<< Exiting GeneralCommon(model={Model})", model);
         return View(model);
     }
 
@@ -1837,8 +1969,11 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> ChangeEncryptionKey(GeneralCommonSettingsModel model)
     {
+		_logger.LogError(">>> Entering ChangeEncryptionKey(model={Model})", model);
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
         var securitySettings = await _settingService.LoadSettingAsync<SecuritySettings>(storeScope);
+		_logger.LogError("ChangeEncryptionKey(model={Model}): securitySettings → {SecuritySettings}", model, securitySettings);
+		_logger.LogError("ChangeEncryptionKey(model={Model}): storeScope → {StoreScope}", model, storeScope);
 
         try
         {
@@ -1847,6 +1982,7 @@ public partial class SettingController : BaseAdminController
 
             var newEncryptionPrivateKey = model.SecuritySettings.EncryptionKey;
             if (string.IsNullOrEmpty(newEncryptionPrivateKey) || newEncryptionPrivateKey.Length != 16)
+				_logger.LogError("Throwing NopException from ChangeEncryptionKey(model={Model})", model);
                 throw new NopException(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.GeneralCommon.EncryptionKey.TooShort"));
 
             var oldEncryptionPrivateKey = securitySettings.EncryptionKey;
@@ -1855,25 +1991,47 @@ public partial class SettingController : BaseAdminController
 
             //update encrypted order info
             var orders = await _orderService.SearchOrdersAsync();
+			_logger.LogError("ChangeEncryptionKey(model={Model}): orders → {Orders}", model, orders);
             foreach (var order in orders)
             {
                 var decryptedCardType = _encryptionService.DecryptText(order.CardType, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedCardType → {DecryptedCardType}", model, decryptedCardType);
                 var decryptedCardName = _encryptionService.DecryptText(order.CardName, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedCardName → {DecryptedCardName}", model, decryptedCardName);
                 var decryptedCardNumber = _encryptionService.DecryptText(order.CardNumber, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedCardNumber → {DecryptedCardNumber}", model, decryptedCardNumber);
                 var decryptedMaskedCreditCardNumber = _encryptionService.DecryptText(order.MaskedCreditCardNumber, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedMaskedCreditCardNumber → {DecryptedMaskedCreditCardNumber}", model, decryptedMaskedCreditCardNumber);
                 var decryptedCardCvv2 = _encryptionService.DecryptText(order.CardCvv2, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedCardCvv2 → {DecryptedCardCvv2}", model, decryptedCardCvv2);
                 var decryptedCardExpirationMonth = _encryptionService.DecryptText(order.CardExpirationMonth, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedCardExpirationMonth → {DecryptedCardExpirationMonth}", model, decryptedCardExpirationMonth);
                 var decryptedCardExpirationYear = _encryptionService.DecryptText(order.CardExpirationYear, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedCardExpirationYear → {DecryptedCardExpirationYear}", model, decryptedCardExpirationYear);
 
                 var encryptedCardType = _encryptionService.EncryptText(decryptedCardType, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedCardType → {EncryptedCardType}", model, encryptedCardType);
                 var encryptedCardName = _encryptionService.EncryptText(decryptedCardName, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedCardName → {EncryptedCardName}", model, encryptedCardName);
                 var encryptedCardNumber = _encryptionService.EncryptText(decryptedCardNumber, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedCardNumber → {EncryptedCardNumber}", model, encryptedCardNumber);
                 var encryptedMaskedCreditCardNumber = _encryptionService.EncryptText(decryptedMaskedCreditCardNumber, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedMaskedCreditCardNumber → {EncryptedMaskedCreditCardNumber}", model, encryptedMaskedCreditCardNumber);
                 var encryptedCardCvv2 = _encryptionService.EncryptText(decryptedCardCvv2, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedCardCvv2 → {EncryptedCardCvv2}", model, encryptedCardCvv2);
                 var encryptedCardExpirationMonth = _encryptionService.EncryptText(decryptedCardExpirationMonth, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedCardExpirationMonth → {EncryptedCardExpirationMonth}", model, encryptedCardExpirationMonth);
                 var encryptedCardExpirationYear = _encryptionService.EncryptText(decryptedCardExpirationYear, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedCardExpirationYear → {EncryptedCardExpirationYear}", model, encryptedCardExpirationYear);
 
                 order.CardType = encryptedCardType;
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.CardType → {Arg1}", model, order.CardType);
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.CardName → {Arg1}", model, order.CardName);
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.CardNumber → {Arg1}", model, order.CardNumber);
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.MaskedCreditCardNumber → {Arg1}", model, order.MaskedCreditCardNumber);
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.CardCvv2 → {Arg1}", model, order.CardCvv2);
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.CardExpirationMonth → {Arg1}", model, order.CardExpirationMonth);
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): order.CardExpirationYear → {Arg1}", model, order.CardExpirationYear);
                 order.CardName = encryptedCardName;
                 order.CardNumber = encryptedCardNumber;
                 order.MaskedCreditCardNumber = encryptedMaskedCreditCardNumber;
@@ -1886,16 +2044,21 @@ public partial class SettingController : BaseAdminController
             //update password information
             //optimization - load only passwords with PasswordFormat.Encrypted
             var customerPasswords = await _customerService.GetCustomerPasswordsAsync(passwordFormat: PasswordFormat.Encrypted);
+			_logger.LogError("ChangeEncryptionKey(model={Model}): customerPasswords → {CustomerPasswords}", model, customerPasswords);
             foreach (var customerPassword in customerPasswords)
             {
                 var decryptedPassword = _encryptionService.DecryptText(customerPassword.Password, oldEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): decryptedPassword → {DecryptedPassword}", model, decryptedPassword);
                 var encryptedPassword = _encryptionService.EncryptText(decryptedPassword, newEncryptionPrivateKey);
+				_logger.LogError("ChangeEncryptionKey(model={Model}): encryptedPassword → {EncryptedPassword}", model, encryptedPassword);
 
                 customerPassword.Password = encryptedPassword;
+				_logger.LogDebug("ChangeEncryptionKey(model={Model}): customerPassword.Password → {Arg1}", model, customerPassword.Password);
                 await _customerService.UpdateCustomerPasswordAsync(customerPassword);
             }
 
             securitySettings.EncryptionKey = newEncryptionPrivateKey;
+			_logger.LogDebug("ChangeEncryptionKey(model={Model}): securitySettings.EncryptionKey → {Arg1}", model, securitySettings.EncryptionKey);
             await _settingService.SaveSettingAsync(securitySettings);
             await _eventPublisher.PublishAsync(new SecuritySettingsChangedEvent(securitySettings, oldEncryptionPrivateKey));
 
@@ -1903,9 +2066,11 @@ public partial class SettingController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ChangeEncryptionKey(model={Model}): {Arg1}", model, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		_logger.LogWarning("<<< Exiting ChangeEncryptionKey(model={Model})", model);
         return RedirectToAction("GeneralCommon");
     }
 
@@ -1913,6 +2078,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> UploadLocalePattern()
     {
+		_logger.LogError(">>> Entering UploadLocalePattern()");
         try
         {
             await _uploadService.UploadLocalePatternAsync();
@@ -1920,9 +2086,11 @@ public partial class SettingController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in UploadLocalePattern(): {Arg0}", exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		_logger.LogWarning("<<< Exiting UploadLocalePattern()");
         return RedirectToAction("GeneralCommon");
     }
 
@@ -1930,6 +2098,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> UploadIcons(IFormFile iconsFile)
     {
+		_logger.LogError(">>> Entering UploadIcons(iconsFile={IconsFile})", iconsFile);
         try
         {
             if (iconsFile == null || iconsFile.Length == 0)
@@ -1940,7 +2109,9 @@ public partial class SettingController : BaseAdminController
 
             //load settings for a chosen store scope
             var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+			_logger.LogError("UploadIcons(iconsFile={IconsFile}): storeScope → {StoreScope}", iconsFile, storeScope);
             var commonSettings = await _settingService.LoadSettingAsync<CommonSettings>(storeScope);
+			_logger.LogError("UploadIcons(iconsFile={IconsFile}): commonSettings → {CommonSettings}", iconsFile, commonSettings);
 
             switch (_fileProvider.GetFileExtension(iconsFile.FileName))
             {
@@ -1954,7 +2125,9 @@ public partial class SettingController : BaseAdminController
                     await _uploadService.UploadIconsArchiveAsync(iconsFile);
 
                     var headCodePath = _fileProvider.GetAbsolutePath(string.Format(NopCommonDefaults.FaviconAndAppIconsPath, storeScope), NopCommonDefaults.HeadCodeFileName);
+					_logger.LogError("UploadIcons(iconsFile={IconsFile}): headCodePath → {HeadCodePath}", iconsFile, headCodePath);
                     if (!_fileProvider.FileExists(headCodePath))
+						_logger.LogError("Throwing Exception from UploadIcons(iconsFile={IconsFile})", iconsFile);
                         throw new Exception(string.Format(await _localizationService.GetResourceAsync("Admin.Configuration.Settings.GeneralCommon.FaviconAndAppIcons.MissingFile"), NopCommonDefaults.HeadCodeFileName));
 
                     using (var sr = new StreamReader(headCodePath))
@@ -1963,6 +2136,7 @@ public partial class SettingController : BaseAdminController
                     break;
 
                 default:
+					_logger.LogError("Throwing InvalidOperationException from UploadIcons(iconsFile={IconsFile})", iconsFile);
                     throw new InvalidOperationException("File is not supported.");
             }
 
@@ -1970,6 +2144,7 @@ public partial class SettingController : BaseAdminController
 
             //delete old favicon icon if exist
             var oldFaviconIconPath = _fileProvider.GetAbsolutePath(string.Format(NopCommonDefaults.OldFaviconIconName, storeScope));
+			_logger.LogError("UploadIcons(iconsFile={IconsFile}): oldFaviconIconPath → {OldFaviconIconPath}", iconsFile, oldFaviconIconPath);
             if (_fileProvider.FileExists(oldFaviconIconPath))
             {
                 _fileProvider.DeleteFile(oldFaviconIconPath);
@@ -1981,18 +2156,24 @@ public partial class SettingController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in UploadIcons(iconsFile={IconsFile}): {Arg1}", iconsFile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
         }
 
+		_logger.LogWarning("<<< Exiting UploadIcons(iconsFile={IconsFile})", iconsFile);
         return RedirectToAction("GeneralCommon");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> AllSettings(string settingName)
     {
+		_logger.LogError(">>> Entering AllSettings(settingName={SettingName})", settingName);
         //prepare model
         var model = await _settingModelFactory.PrepareSettingSearchModelAsync(new SettingSearchModel { SearchSettingName = WebUtility.HtmlEncode(settingName) });
+		_logger.LogError("AllSettings(settingName={SettingName}): model → {Model}", settingName, model);
 
+		_logger.LogWarning("<<< Exiting AllSettings(settingName={SettingName})", settingName);
+		_logger.LogWarning("<<< Exiting AllSettings(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -2010,6 +2191,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> SettingUpdate(SettingModel model)
     {
+		_logger.LogError(">>> Entering SettingUpdate(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
@@ -2028,6 +2210,7 @@ public partial class SettingController : BaseAdminController
         //activity log
         await _customerActivityService.InsertActivityAsync("EditSettings", await _localizationService.GetResourceAsync("ActivityLog.EditSettings"), setting);
 
+		_logger.LogWarning("<<< Exiting SettingUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -2035,6 +2218,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> SettingAdd(SettingModel model)
     {
+		_logger.LogError(">>> Entering SettingAdd(model={Model})", model);
         if (!ModelState.IsValid)
             return ErrorJson(ModelState.SerializeErrors());
 
@@ -2046,6 +2230,7 @@ public partial class SettingController : BaseAdminController
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.AddNewSetting"), model.Name),
             await _settingService.GetSettingAsync(model.Name, storeId));
 
+		_logger.LogWarning("<<< Exiting SettingAdd(model={Model})", model);
         return Json(new { Result = true });
     }
 
@@ -2053,6 +2238,7 @@ public partial class SettingController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_SETTINGS)]
     public virtual async Task<IActionResult> SettingDelete(int id)
     {
+		_logger.LogError(">>> Entering SettingDelete(id={Id})", id);
         //try to get a setting with the specified id
         var setting = await _settingService.GetSettingByIdAsync(id)
             ?? throw new ArgumentException("No setting found with the specified id", nameof(id));
@@ -2063,6 +2249,7 @@ public partial class SettingController : BaseAdminController
         await _customerActivityService.InsertActivityAsync("DeleteSetting",
             string.Format(await _localizationService.GetResourceAsync("ActivityLog.DeleteSetting"), setting.Name), setting);
 
+		_logger.LogWarning("<<< Exiting SettingDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -2070,6 +2257,7 @@ public partial class SettingController : BaseAdminController
     //between the distributed cache server and the application when LoadAllLocaleRecordsOnStartup setting is set
     public virtual async Task<IActionResult> DistributedCacheHighTrafficWarning(bool loadAllLocaleRecordsOnStartup)
     {
+		_logger.LogError(">>> Entering DistributedCacheHighTrafficWarning(loadAllLocaleRecordsOnStartup={LoadAllLocaleRecordsOnStartup})", loadAllLocaleRecordsOnStartup);
         //LoadAllLocaleRecordsOnStartup is set and distributed cache is used, so display warning
         if (_appSettings.Get<DistributedCacheConfig>().Enabled && _appSettings.Get<DistributedCacheConfig>().DistributedCacheType != DistributedCacheType.Memory && loadAllLocaleRecordsOnStartup)
         {
@@ -2080,12 +2268,14 @@ public partial class SettingController : BaseAdminController
             });
         }
 
+		_logger.LogWarning("<<< Exiting DistributedCacheHighTrafficWarning(loadAllLocaleRecordsOnStartup={LoadAllLocaleRecordsOnStartup})", loadAllLocaleRecordsOnStartup);
         return Json(new { Result = string.Empty });
     }
 
     //Action that displays a notification (warning) to the store owner about the absence of active authentication providers
     public virtual async Task<IActionResult> ForceMultifactorAuthenticationWarning(bool forceMultifactorAuthentication)
     {
+		_logger.LogError(">>> Entering ForceMultifactorAuthenticationWarning(forceMultifactorAuthentication={ForceMultifactorAuthentication})", forceMultifactorAuthentication);
         //ForceMultifactorAuthentication is set and the store haven't active Authentication provider , so display warning
         if (forceMultifactorAuthentication && !await _multiFactorAuthenticationPluginManager.HasActivePluginsAsync())
         {
@@ -2096,15 +2286,19 @@ public partial class SettingController : BaseAdminController
             });
         }
 
+		_logger.LogWarning("<<< Exiting ForceMultifactorAuthenticationWarning(forceMultifactorAuthentication={ForceMultifactorAuthentication})", forceMultifactorAuthentication);
         return Json(new { Result = string.Empty });
     }
 
     //Action that displays a notification (warning) to the store owner about the need to restart the application after changing the setting
     public virtual async Task<IActionResult> SeoFriendlyUrlsForLanguagesEnabledWarning(bool seoFriendlyUrlsForLanguagesEnabled)
     {
+		_logger.LogError(">>> Entering SeoFriendlyUrlsForLanguagesEnabledWarning(seoFriendlyUrlsForLanguagesEnabled={SeoFriendlyUrlsForLanguagesEnabled})", seoFriendlyUrlsForLanguagesEnabled);
         //load settings for a chosen store scope
         var storeScope = await _storeContext.GetActiveStoreScopeConfigurationAsync();
+		_logger.LogError("SeoFriendlyUrlsForLanguagesEnabledWarning(seoFriendlyUrlsForLanguagesEnabled={SeoFriendlyUrlsForLanguagesEnabled}): storeScope → {StoreScope}", seoFriendlyUrlsForLanguagesEnabled, storeScope);
         var localizationSettings = await _settingService.LoadSettingAsync<LocalizationSettings>(storeScope);
+		_logger.LogError("SeoFriendlyUrlsForLanguagesEnabledWarning(seoFriendlyUrlsForLanguagesEnabled={SeoFriendlyUrlsForLanguagesEnabled}): localizationSettings → {LocalizationSettings}", seoFriendlyUrlsForLanguagesEnabled, localizationSettings);
 
         if (seoFriendlyUrlsForLanguagesEnabled != localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
         {
@@ -2115,6 +2309,7 @@ public partial class SettingController : BaseAdminController
             });
         }
 
+		_logger.LogWarning("<<< Exiting SeoFriendlyUrlsForLanguagesEnabledWarning(seoFriendlyUrlsForLanguagesEnabled={SeoFriendlyUrlsForLanguagesEnabled})", seoFriendlyUrlsForLanguagesEnabled);
         return Json(new { Result = string.Empty });
     }
 

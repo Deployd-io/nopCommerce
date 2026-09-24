@@ -4,13 +4,16 @@ using Nop.Services.Localization;
 using Nop.Services.Seo;
 using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Validators.Catalog;
 
 public partial class CategoryValidator : BaseNopValidator<CategoryModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public CategoryValidator(ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering CategoryValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Name).NotEmpty().WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Categories.Fields.Name.Required"));
         RuleFor(x => x.PageSizeOptions).Must(ValidatorUtilities.PageSizeOptionsValidator).WithMessageAwait(localizationService.GetResourceAsync("Admin.Catalog.Categories.Fields.PageSizeOptions.ShouldHaveUniqueItems"));
         RuleFor(x => x.PageSize).Must((x, context) =>
@@ -34,5 +37,6 @@ public partial class CategoryValidator : BaseNopValidator<CategoryModel>
             .When(x => x.PriceRangeFiltering && x.ManuallyPriceRange);
 
         SetDatabaseValidationRules<Category>();
+		_logger.LogWarning("<<< Exiting CategoryValidator(localizationService={LocalizationService})", localizationService);
     }
 }

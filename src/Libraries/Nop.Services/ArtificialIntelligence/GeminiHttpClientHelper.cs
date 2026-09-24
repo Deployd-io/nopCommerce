@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Nop.Core;
 using Nop.Core.Domain.ArtificialIntelligence;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.ArtificialIntelligence;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.ArtificialIntelligence;
 /// </summary>
 public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -18,7 +20,12 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
     /// <param name="httpClient">HTTP client for configuration</param>
     public virtual void ConfigureClient(HttpClient httpClient)
     {
+		_logger.LogError(">>> Entering ConfigureClient(httpClient={HttpClient})", httpClient);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         httpClient.BaseAddress = new Uri(ArtificialIntelligenceDefaults.GeminiBaseApiUrl);
+		_logger.LogError("ConfigureClient(httpClient)={HttpClient}: external service call took {Arg1} ms", httpClient, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting ConfigureClient(httpClient={HttpClient})", httpClient);
     }
 
     /// <summary>
@@ -29,6 +36,7 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
     /// <returns>Created HttpRequestMessage</returns>
     public virtual HttpRequestMessage CreateRequest(ArtificialIntelligenceSettings settings, string query)
     {
+		_logger.LogError(">>> Entering CreateRequest(settings={Settings},query={Query})", settings);
         var request = new HttpRequestMessage { Method = HttpMethod.Post };
         request.Headers.TryAddWithoutValidation(ArtificialIntelligenceDefaults.GeminiApiKeyHeader, settings.GeminiApiKey);
 
@@ -39,6 +47,7 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
 
         request.Content = new StringContent(data, Encoding.UTF8, MimeTypes.ApplicationJson);
 
+		_logger.LogWarning("<<< Exiting CreateRequest(settings={Settings},query={Query})", settings);
         return request;
     }
 
@@ -49,6 +58,7 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
     /// <returns>Generated text from artificial intelligence host</returns>
     public virtual string ParseResponse(string responseText)
     {
+		_logger.LogError(">>> Entering ParseResponse(responseText={ResponseText})", responseText);
         var response = JsonConvert.DeserializeAnonymousType(responseText,
             new
             {
@@ -59,7 +69,9 @@ public partial class GeminiHttpClientHelper : IArtificialIntelligenceHttpClientH
             });
 
         var result = response.candidates.Select(c => c.content.parts).FirstOrDefault();
+		_logger.LogError("ParseResponse(responseText={ResponseText}): result → {Result}", responseText, result);
 
+		_logger.LogWarning("<<< Exiting ParseResponse(responseText={ResponseText})", responseText);
         return result?[0].text ?? string.Empty;
     }
 

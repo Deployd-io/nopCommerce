@@ -1,5 +1,6 @@
 ﻿using Nop.Core.Domain.Media;
 using Nop.Services.Caching;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.AzureBlob.Services.Caching;
 
@@ -8,6 +9,7 @@ namespace Nop.Plugin.Misc.AzureBlob.Services.Caching;
 /// </summary>
 public class PictureCacheEventConsumer : CacheEventConsumer<Picture>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Clear cache data
     /// </summary>
@@ -15,6 +17,8 @@ public class PictureCacheEventConsumer : CacheEventConsumer<Picture>
     /// <returns>A task that represents the asynchronous operation</returns>
     protected override async Task ClearCacheAsync(Picture entity)
     {
+		_logger.LogError(">>> Entering ClearCacheAsync(entity={Entity})", entity);
         await RemoveByPrefixAsync(AzureBlobDefaults.ThumbsExistsPrefix);
+		_logger.LogWarning("<<< Exiting ClearCacheAsync(entity={Entity})", entity);
     }
 }

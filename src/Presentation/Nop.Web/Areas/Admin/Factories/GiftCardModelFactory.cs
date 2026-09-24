@@ -9,6 +9,7 @@ using Nop.Services.Orders;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Orders;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class GiftCardModelFactory : IGiftCardModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CurrencySettings _currencySettings;
@@ -39,13 +41,20 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
         IOrderService orderService,
         IPriceFormatter priceFormatter)
     {
+		_logger.LogError(">>> Entering GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter})", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter);
         _currencySettings = currencySettings;
         _currencyService = currencyService;
+		_logger.LogDebug("GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter}): _currencyService → {_currencyService}", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter, _currencyService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter}): _dateTimeHelper → {_dateTimeHelper}", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter, _dateTimeHelper);
         _giftCardService = giftCardService;
+		_logger.LogDebug("GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter}): _giftCardService → {_giftCardService}", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter, _giftCardService);
         _localizationService = localizationService;
+		_logger.LogDebug("GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter}): _localizationService → {_localizationService}", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter, _localizationService);
         _orderService = orderService;
+		_logger.LogDebug("GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter}): _orderService → {_orderService}", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter, _orderService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("GiftCardModelFactory(currencySettings={CurrencySettings},currencyService={CurrencyService},dateTimeHelper={DateTimeHelper},giftCardService={GiftCardService},localizationService={LocalizationService},orderService={OrderService},priceFormatter={PriceFormatter}): _priceFormatter → {_priceFormatter}", currencySettings, currencyService, dateTimeHelper, giftCardService, localizationService, orderService, priceFormatter, _priceFormatter);
     }
 
     #endregion
@@ -61,15 +70,18 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     protected virtual GiftCardUsageHistorySearchModel PrepareGiftCardUsageHistorySearchModel(GiftCardUsageHistorySearchModel searchModel,
         GiftCard giftCard)
     {
+		_logger.LogError(">>> Entering PrepareGiftCardUsageHistorySearchModel(searchModel={SearchModel},giftCard={GiftCard})", searchModel, giftCard);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(giftCard);
 
         searchModel.GiftCardId = giftCard.Id;
+		_logger.LogDebug("PrepareGiftCardUsageHistorySearchModel(searchModel={SearchModel},giftCard={GiftCard}): searchModel.GiftCardId → {Arg2}", searchModel, giftCard, searchModel.GiftCardId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareGiftCardUsageHistorySearchModel(searchModel={SearchModel},giftCard={GiftCard})", searchModel, giftCard);
         return searchModel;
     }
 
@@ -87,6 +99,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     /// </returns>
     public virtual async Task<GiftCardSearchModel> PrepareGiftCardSearchModelAsync(GiftCardSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareGiftCardSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare "activated" filter (0 - all; 1 - activated only; 2 - deactivated only)
@@ -95,6 +108,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
             Value = "0",
             Text = await _localizationService.GetResourceAsync("Admin.GiftCards.List.Activated.All")
         });
+			_logger.LogDebug("PrepareGiftCardSearchModelAsync(searchModel={SearchModel}): Text → {Text}", searchModel, Text);
         searchModel.ActivatedList.Add(new SelectListItem
         {
             Value = "1",
@@ -109,6 +123,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareGiftCardSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -122,10 +137,12 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     /// </returns>
     public virtual async Task<GiftCardListModel> PrepareGiftCardListModelAsync(GiftCardSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareGiftCardListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter gift cards
         var isActivatedOnly = searchModel.ActivatedId == 0 ? null : searchModel.ActivatedId == 1 ? true : (bool?)false;
+		_logger.LogError("PrepareGiftCardListModelAsync(searchModel={SearchModel}): isActivatedOnly → {IsActivatedOnly}", searchModel, isActivatedOnly);
 
         //get gift cards
         var giftCards = await _giftCardService.GetAllGiftCardsAsync(isGiftCardActivated: isActivatedOnly,
@@ -140,12 +157,14 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
             {
                 //fill in model values from the entity
                 var giftCardModel = giftCard.ToModel<GiftCardModel>();
+				_logger.LogError("PrepareGiftCardListModelAsync(searchModel={SearchModel}): giftCardModel → {GiftCardModel}", searchModel, giftCardModel);
 
                 //convert dates to the user time
                 giftCardModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(giftCard.CreatedOnUtc, DateTimeKind.Utc);
 
                 //fill in additional values (not existing in the entity)
                 var giftAmount = await _giftCardService.GetGiftCardRemainingAmountAsync(giftCard);
+				_logger.LogError("PrepareGiftCardListModelAsync(searchModel={SearchModel}): giftAmount → {GiftAmount}", searchModel, giftAmount);
                 giftCardModel.RemainingAmountStr = await _priceFormatter.FormatPriceAsync(giftAmount, true, false);
                 giftCardModel.AmountStr = await _priceFormatter.FormatPriceAsync(giftCard.Amount, true, false);
 
@@ -153,6 +172,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareGiftCardListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -168,18 +188,22 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     /// </returns>
     public virtual async Task<GiftCardModel> PrepareGiftCardModelAsync(GiftCardModel model, GiftCard giftCard, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareGiftCardModelAsync(model={Model},giftCard={GiftCard},excludeProperties={ExcludeProperties})", model, giftCard, excludeProperties);
         if (giftCard != null)
         {
             //fill in model values from the entity
             model ??= giftCard.ToModel<GiftCardModel>();
 
             var order = await _orderService.GetOrderByOrderItemAsync(giftCard.PurchasedWithOrderItemId ?? 0);
+			_logger.LogError("PrepareGiftCardModelAsync(model={Model},giftCard={GiftCard},excludeProperties={ExcludeProperties}): order → {Order}", model, giftCard, excludeProperties, order);
 
             model.PurchasedWithOrderId = order?.Id;
+			_logger.LogDebug("PrepareGiftCardModelAsync(model={Model},giftCard={GiftCard},excludeProperties={ExcludeProperties}): model.PurchasedWithOrderId → {Arg3}", model, giftCard, excludeProperties, model.PurchasedWithOrderId);
             model.RemainingAmountStr = await _priceFormatter.FormatPriceAsync(await _giftCardService.GetGiftCardRemainingAmountAsync(giftCard), true, false);
             model.AmountStr = await _priceFormatter.FormatPriceAsync(giftCard.Amount, true, false);
             model.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(giftCard.CreatedOnUtc, DateTimeKind.Utc);
             model.PurchasedWithOrderNumber = order?.CustomOrderNumber;
+			_logger.LogDebug("PrepareGiftCardModelAsync(model={Model},giftCard={GiftCard},excludeProperties={ExcludeProperties}): model.PurchasedWithOrderNumber → {Arg3}", model, giftCard, excludeProperties, model.PurchasedWithOrderNumber);
 
             //prepare nested search model
             PrepareGiftCardUsageHistorySearchModel(model.GiftCardUsageHistorySearchModel, giftCard);
@@ -187,6 +211,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
 
         model.PrimaryStoreCurrencyCode = (await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId))?.CurrencyCode;
 
+		_logger.LogWarning("<<< Exiting PrepareGiftCardModelAsync(model={Model},giftCard={GiftCard},excludeProperties={ExcludeProperties})", model, giftCard, excludeProperties);
         return model;
     }
 
@@ -202,6 +227,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
     public virtual async Task<GiftCardUsageHistoryListModel> PrepareGiftCardUsageHistoryListModelAsync(GiftCardUsageHistorySearchModel searchModel,
         GiftCard giftCard)
     {
+		_logger.LogError(">>> Entering PrepareGiftCardUsageHistoryListModelAsync(searchModel={SearchModel},giftCard={GiftCard})", searchModel, giftCard);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(giftCard);
@@ -218,12 +244,14 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
             {
                 //fill in model values from the entity
                 var giftCardUsageHistoryModel = historyEntry.ToModel<GiftCardUsageHistoryModel>();
+				_logger.LogError("PrepareGiftCardUsageHistoryListModelAsync(searchModel={SearchModel},giftCard={GiftCard}): giftCardUsageHistoryModel → {GiftCardUsageHistoryModel}", searchModel, giftCard, giftCardUsageHistoryModel);
 
                 //convert dates to the user time
                 giftCardUsageHistoryModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(historyEntry.CreatedOnUtc, DateTimeKind.Utc);
 
                 //fill in additional values (not existing in the entity)
                 giftCardUsageHistoryModel.OrderId = historyEntry.UsedWithOrderId;
+				_logger.LogDebug("PrepareGiftCardUsageHistoryListModelAsync(searchModel={SearchModel},giftCard={GiftCard}): giftCardUsageHistoryModel.OrderId → {Arg2}", searchModel, giftCard, giftCardUsageHistoryModel.OrderId);
                 giftCardUsageHistoryModel.CustomOrderNumber = (await _orderService.GetOrderByIdAsync(historyEntry.UsedWithOrderId))?.CustomOrderNumber;
                 giftCardUsageHistoryModel.UsedValue = await _priceFormatter.FormatPriceAsync(historyEntry.UsedValue, true, false);
 
@@ -231,6 +259,7 @@ public partial class GiftCardModelFactory : IGiftCardModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareGiftCardUsageHistoryListModelAsync(searchModel={SearchModel},giftCard={GiftCard})", searchModel, giftCard);
         return model;
     }
 

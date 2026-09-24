@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Settings;
 
@@ -8,11 +9,16 @@ namespace Nop.Web.Areas.Admin.Models.Settings;
 /// </summary>
 public partial record GdprConsentModel : BaseNopEntityModel, ILocalizedModel<GdprConsentLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public GdprConsentModel()
     {
+		_logger.LogError(">>> Entering GdprConsentModel()");
         Locales = new List<GdprConsentLocalizedModel>();
+		_logger.LogDebug("GdprConsentModel(): Locales → {Locales}", Locales);
+    _logger.LogError("GdprConsentModel(): Locales → {Locales}", Locales);
+    _logger.LogWarning("<<< Exiting GdprConsentModel()");
     }
 
     #endregion

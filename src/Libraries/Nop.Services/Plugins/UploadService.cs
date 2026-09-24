@@ -8,6 +8,7 @@ using Nop.Core;
 using Nop.Core.Infrastructure;
 using Nop.Services.Common;
 using Nop.Services.Themes;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Plugins;
 
@@ -16,6 +17,7 @@ namespace Nop.Services.Plugins;
 /// </summary>
 public partial class UploadService : IUploadService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly INopFileProvider _fileProvider;
@@ -30,9 +32,12 @@ public partial class UploadService : IUploadService
         IStoreContext storeContext,
         IThemeProvider themeProvider)
     {
+		_logger.LogError(">>> Entering UploadService(fileProvider={FileProvider},storeContext={StoreContext},themeProvider={ThemeProvider})", fileProvider, storeContext, themeProvider);
         _fileProvider = fileProvider;
         _storeContext = storeContext;
+		_logger.LogDebug("UploadService(fileProvider={FileProvider},storeContext={StoreContext},themeProvider={ThemeProvider}): _storeContext → {_storeContext}", fileProvider, storeContext, themeProvider, _storeContext);
         _themeProvider = themeProvider;
+		_logger.LogDebug("UploadService(fileProvider={FileProvider},storeContext={StoreContext},themeProvider={ThemeProvider}): _themeProvider → {_themeProvider}", fileProvider, storeContext, themeProvider, _themeProvider);
     }
 
     #endregion
@@ -49,8 +54,12 @@ public partial class UploadService : IUploadService
     /// </returns>
     protected virtual async Task<IList<UploadedItem>> GetUploadedItemsAsync(string archivePath)
     {
+		_logger.LogError(">>> Entering GetUploadedItemsAsync(archivePath={ArchivePath})", archivePath);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         using var archive = ZipFile.OpenRead(archivePath);
         //try to get the entry containing information about the uploaded items 
+		_logger.LogError("GetUploadedItemsAsync(archivePath={ArchivePath}): archive → {Archive}", archivePath, archive);
         var uploadedItemsFileEntry = archive.Entries
             .FirstOrDefault(entry => entry.Name.Equals(NopPluginDefaults.UploadedItemsFileName, StringComparison.InvariantCultureIgnoreCase)
                                      && string.IsNullOrEmpty(_fileProvider.GetDirectoryName(entry.FullName)));
@@ -59,9 +68,14 @@ public partial class UploadService : IUploadService
 
         //read the content of this entry if exists
         await using var unzippedEntryStream = uploadedItemsFileEntry.Open();
+		_logger.LogError("GetUploadedItemsAsync(archivePath={ArchivePath}): unzippedEntryStream → {UnzippedEntryStream}", archivePath, unzippedEntryStream);
         using var reader = new StreamReader(unzippedEntryStream);
+		_logger.LogError("GetUploadedItemsAsync(archivePath={ArchivePath}): reader → {Reader}", archivePath, reader);
         var content = await reader.ReadToEndAsync();
+		_logger.LogError("GetUploadedItemsAsync(archivePath={ArchivePath}): content → {Content}", archivePath, content);
 
+		_logger.LogError("GetUploadedItemsAsync(archivePath)={ArchivePath}: external service call took {Arg1} ms", archivePath, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetUploadedItemsAsync(archivePath={ArchivePath})", archivePath);
         return JsonConvert.DeserializeObject<IList<UploadedItem>>(content);
     }
 
@@ -75,26 +89,34 @@ public partial class UploadService : IUploadService
     /// </returns>
     protected virtual async Task<IDescriptor> UploadSingleItemAsync(string archivePath)
     {
+		_logger.LogError(">>> Entering UploadSingleItemAsync(archivePath={ArchivePath})", archivePath);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get path to the plugins directory
         var pluginsDirectory = _fileProvider.MapPath(NopPluginDefaults.UploadedPath);
+		_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): pluginsDirectory → {PluginsDirectory}", archivePath, pluginsDirectory);
 
         //ensure plugins directory is created
         _fileProvider.CreateDirectory(pluginsDirectory);
 
         //get path to the themes directory
         var themesDirectory = string.Empty;
+		_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): themesDirectory → {ThemesDirectory}", archivePath, themesDirectory);
         if (!string.IsNullOrEmpty(NopPluginDefaults.ThemesPath))
             themesDirectory = _fileProvider.MapPath(NopPluginDefaults.ThemesPath);
 
         IDescriptor descriptor = null;
+		_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): descriptor → {Descriptor}", archivePath, descriptor);
         string uploadedItemDirectoryName;
         using (var archive = ZipFile.OpenRead(archivePath))
         {
             //the archive should contain only one root directory (the plugin one or the theme one)
             var rootDirectories = archive.Entries.Select(p => p.FullName.Split('/')[0]).Distinct().ToList();
+			_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): rootDirectories → {RootDirectories}", archivePath, rootDirectories);
 
             if (rootDirectories.Count != 1)
             {
+				_logger.LogError("Throwing Exception from UploadSingleItemAsync(archivePath={ArchivePath})", archivePath);
                 throw new Exception("The archive should contain only one root plugin or theme directory. " +
                                     "For example, Payments.PayPalDirect or DefaultClean. " +
                                     $"To upload multiple items, the archive should have the '{NopPluginDefaults.UploadedItemsFileName}' file in the root");
@@ -102,6 +124,8 @@ public partial class UploadService : IUploadService
 
             //get directory name (remove the ending /)
             uploadedItemDirectoryName = rootDirectories.First();
+			_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): uploadedItemDirectoryName → {UploadedItemDirectoryName}", archivePath, uploadedItemDirectoryName);
+			_logger.LogDebug("UploadSingleItemAsync(archivePath={ArchivePath}): uploadedItemDirectoryName → {UploadedItemDirectoryName}", archivePath, uploadedItemDirectoryName);
 
             //try to get descriptor of the uploaded item
             foreach (var entry in archive.Entries)
@@ -118,8 +142,11 @@ public partial class UploadService : IUploadService
                     continue;
 
                 await using var unzippedEntryStream = entry.Open();
+				_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): unzippedEntryStream → {UnzippedEntryStream}", archivePath, unzippedEntryStream);
                 using var reader = new StreamReader(unzippedEntryStream);
+				_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): reader → {Reader}", archivePath, reader);
                 var content = await reader.ReadToEndAsync();
+				_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): content → {Content}", archivePath, content);
 
                 //whether a plugin is upload 
                 if (isPluginDescriptor)
@@ -148,6 +175,7 @@ public partial class UploadService : IUploadService
         //get path to upload
         var directoryPath = descriptor is PluginDescriptor ? pluginsDirectory : themesDirectory;
         var pathToUpload = _fileProvider.Combine(directoryPath, uploadedItemDirectoryName);
+		_logger.LogError("UploadSingleItemAsync(archivePath={ArchivePath}): pathToUpload → {PathToUpload}", archivePath, pathToUpload);
 
         //ensure it's a new directory (e.g. some old files are not required when re-uploading a plugin)
         //furthermore, zip extract functionality cannot override existing files
@@ -158,6 +186,8 @@ public partial class UploadService : IUploadService
         //unzip archive
         ZipFile.ExtractToDirectory(archivePath, directoryPath);
 
+		_logger.LogError("UploadSingleItemAsync(archivePath)={ArchivePath}: external service call took {Arg1} ms", archivePath, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UploadSingleItemAsync(archivePath={ArchivePath})", archivePath);
         return descriptor;
     }
 
@@ -172,19 +202,25 @@ public partial class UploadService : IUploadService
     /// </returns>
     protected virtual async Task<IList<IDescriptor>> UploadMultipleItemsAsync(string archivePath, IList<UploadedItem> uploadedItems)
     {
+		_logger.LogError(">>> Entering UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems})", archivePath, uploadedItems);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get path to the plugins directory
         var pluginsDirectory = _fileProvider.MapPath(NopPluginDefaults.UploadedPath);
+		_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): pluginsDirectory → {PluginsDirectory}", archivePath, uploadedItems, pluginsDirectory);
 
         //ensure plugins directory is created
         _fileProvider.CreateDirectory(pluginsDirectory);
 
         //get path to the themes directory
         var themesDirectory = string.Empty;
+		_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): themesDirectory → {ThemesDirectory}", archivePath, uploadedItems, themesDirectory);
         if (!string.IsNullOrEmpty(NopPluginDefaults.ThemesPath))
             themesDirectory = _fileProvider.MapPath(NopPluginDefaults.ThemesPath);
 
         //get descriptors of items contained in the archive
         var descriptors = new List<IDescriptor>();
+		_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): descriptors → {Descriptors}", archivePath, uploadedItems, descriptors);
         using (var archive = ZipFile.OpenRead(archivePath))
         {
             foreach (var item in uploadedItems)
@@ -198,9 +234,11 @@ public partial class UploadService : IUploadService
 
                 //the item path should end with a slash
                 var itemPath = $"{item.DirectoryPath?.TrimEnd('/')}/";
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): itemPath → {ItemPath}", archivePath, uploadedItems, itemPath);
 
                 //get path to the descriptor entry in the archive
                 var descriptorPath = string.Empty;
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): descriptorPath → {DescriptorPath}", archivePath, uploadedItems, descriptorPath);
                 if (item.Type == UploadedItemType.Plugin)
                     descriptorPath = $"{itemPath}{NopPluginDefaults.DescriptionFileName}";
 
@@ -209,14 +247,19 @@ public partial class UploadService : IUploadService
 
                 //try to get the descriptor entry
                 var descriptorEntry = archive.Entries.FirstOrDefault(entry => entry.FullName.Equals(descriptorPath, StringComparison.InvariantCultureIgnoreCase));
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): descriptorEntry → {DescriptorEntry}", archivePath, uploadedItems, descriptorEntry);
                 if (descriptorEntry == null)
                     continue;
 
                 //try to get descriptor of the uploaded item
                 IDescriptor descriptor = null;
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): descriptor → {Descriptor}", archivePath, uploadedItems, descriptor);
                 await using var unzippedEntryStream = descriptorEntry.Open();
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): unzippedEntryStream → {UnzippedEntryStream}", archivePath, uploadedItems, unzippedEntryStream);
                 using var reader = new StreamReader(unzippedEntryStream);
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): reader → {Reader}", archivePath, uploadedItems, reader);
                 var content = await reader.ReadToEndAsync();
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): content → {Content}", archivePath, uploadedItems, content);
 
                 //whether a plugin is upload 
                 if (item.Type == UploadedItemType.Plugin)
@@ -235,7 +278,9 @@ public partial class UploadService : IUploadService
 
                 //get path to upload
                 var uploadedItemDirectoryName = _fileProvider.GetFileName(itemPath.TrimEnd('/'));
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): uploadedItemDirectoryName → {UploadedItemDirectoryName}", archivePath, uploadedItems, uploadedItemDirectoryName);
                 var pathToUpload = _fileProvider.Combine(item.Type == UploadedItemType.Plugin ? pluginsDirectory : themesDirectory, uploadedItemDirectoryName);
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): pathToUpload → {PathToUpload}", archivePath, uploadedItems, pathToUpload);
 
                 //ensure it's a new directory (e.g. some old files are not required when re-uploading a plugin or a theme)
                 //furthermore, zip extract functionality cannot override existing files
@@ -245,6 +290,7 @@ public partial class UploadService : IUploadService
 
                 //unzip entries into files
                 var entries = archive.Entries.Where(entry => entry.FullName.StartsWith(itemPath, StringComparison.InvariantCultureIgnoreCase));
+				_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): entries → {Entries}", archivePath, uploadedItems, entries);
                 foreach (var entry in entries)
                 {
                     //get name of the file
@@ -253,6 +299,7 @@ public partial class UploadService : IUploadService
                         continue;
 
                     var filePath = _fileProvider.Combine(pathToUpload, fileName);
+					_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): filePath → {FilePath}", archivePath, uploadedItems, filePath);
 
                     //if it's a folder, we need to create it
                     if (string.IsNullOrEmpty(entry.Name) && !_fileProvider.DirectoryExists(filePath))
@@ -262,6 +309,7 @@ public partial class UploadService : IUploadService
                     }
 
                     var directoryPath = _fileProvider.GetDirectoryName(filePath);
+					_logger.LogError("UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems}): directoryPath → {DirectoryPath}", archivePath, uploadedItems, directoryPath);
 
                     //whether the file directory is already exists, otherwise create the new one
                     if (!_fileProvider.DirectoryExists(directoryPath))
@@ -277,6 +325,8 @@ public partial class UploadService : IUploadService
             }
         }
 
+		_logger.LogError("UploadMultipleItemsAsync(archivePath,uploadedItems)={ArchivePath},{UploadedItems}: external service call took {Arg2} ms", archivePath, uploadedItems, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UploadMultipleItemsAsync(archivePath={ArchivePath},uploadedItems={UploadedItems})", archivePath, uploadedItems);
         return descriptors;
     }
 
@@ -286,6 +336,7 @@ public partial class UploadService : IUploadService
     /// <param name="path"></param>
     protected virtual void CreateDirectory(string path)
     {
+		_logger.LogError(">>> Entering CreateDirectory(path={Path})", path);
         //if the folder does not exist, create it
         //if the folder is already there - we delete it (since the pictures in the folder are in the unpacked version, there will be many files and it is easier for us to delete the folder than to delete all the files one by one) and create a new
         if (!_fileProvider.DirectoryExists(path))
@@ -297,6 +348,7 @@ public partial class UploadService : IUploadService
             _fileProvider.DeleteDirectory(path);
             _fileProvider.CreateDirectory(path);
         }
+		_logger.LogWarning("<<< Exiting CreateDirectory(path={Path})", path);
     }
 
     #endregion
@@ -313,18 +365,23 @@ public partial class UploadService : IUploadService
     /// </returns>
     public virtual async Task<IList<IDescriptor>> UploadPluginsAndThemesAsync(IFormFile archivefile)
     {
+		_logger.LogError(">>> Entering UploadPluginsAndThemesAsync(archivefile={Archivefile})", archivefile);
         ArgumentNullException.ThrowIfNull(archivefile);
 
         var zipFilePath = string.Empty;
+		_logger.LogError("UploadPluginsAndThemesAsync(archivefile={Archivefile}): zipFilePath → {ZipFilePath}", archivefile, zipFilePath);
         var descriptors = new List<IDescriptor>();
+		_logger.LogError("UploadPluginsAndThemesAsync(archivefile={Archivefile}): descriptors → {Descriptors}", archivefile, descriptors);
         try
         {
             //only zip archives are supported
             if (!_fileProvider.GetFileExtension(archivefile.FileName)?.Equals(".zip", StringComparison.InvariantCultureIgnoreCase) ?? true)
+				_logger.LogError("Throwing Exception from UploadPluginsAndThemesAsync(archivefile={Archivefile})", archivefile);
                 throw new Exception("Only zip archives are supported");
 
             //ensure that temp directory is created
             var tempDirectory = _fileProvider.MapPath(NopPluginDefaults.UploadsTempPath);
+			_logger.LogError("UploadPluginsAndThemesAsync(archivefile={Archivefile}): tempDirectory → {TempDirectory}", archivefile, tempDirectory);
             _fileProvider.CreateDirectory(tempDirectory);
 
             //copy original archive to the temp directory
@@ -335,6 +392,7 @@ public partial class UploadService : IUploadService
             //try to get information about the uploaded items from the JSON file in the root of the archive
             //you can find a sample of such descriptive file in Libraries\Nop.Core\Plugins\Samples\
             var uploadedItems = await GetUploadedItemsAsync(zipFilePath);
+			_logger.LogError("UploadPluginsAndThemesAsync(archivefile={Archivefile}): uploadedItems → {UploadedItems}", archivefile, uploadedItems);
             if (!uploadedItems?.Any() ?? true)
             {
                 //JSON file doesn't exist, so there is a single plugin or theme in the archive, just unzip it
@@ -350,6 +408,7 @@ public partial class UploadService : IUploadService
                 _fileProvider.DeleteFile(zipFilePath);
         }
 
+		_logger.LogWarning("<<< Exiting UploadPluginsAndThemesAsync(archivefile={Archivefile})", archivefile);
         return descriptors;
     }
 
@@ -360,17 +419,21 @@ public partial class UploadService : IUploadService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UploadIconsArchiveAsync(IFormFile archivefile)
     {
+		_logger.LogError(">>> Entering UploadIconsArchiveAsync(archivefile={Archivefile})", archivefile);
         ArgumentNullException.ThrowIfNull(archivefile);
 
         var zipFilePath = string.Empty;
+		_logger.LogError("UploadIconsArchiveAsync(archivefile={Archivefile}): zipFilePath → {ZipFilePath}", archivefile, zipFilePath);
         try
         {
             //only zip archives are supported
             if (!_fileProvider.GetFileExtension(archivefile.FileName)?.Equals(".zip", StringComparison.InvariantCultureIgnoreCase) ?? true)
+				_logger.LogError("Throwing Exception from UploadIconsArchiveAsync(archivefile={Archivefile})", archivefile);
                 throw new Exception("Only zip archives are supported (*.zip)");
 
             //check if there is a folder for favicon and app icons for the current store (all store icons folders are in wwwroot/icons and are called icons_{storeId})
             var storeIconsPath = _fileProvider.GetAbsolutePath(string.Format(NopCommonDefaults.FaviconAndAppIconsPath, await _storeContext.GetActiveStoreScopeConfigurationAsync()));
+			_logger.LogError("UploadIconsArchiveAsync(archivefile={Archivefile}): storeIconsPath → {StoreIconsPath}", archivefile, storeIconsPath);
 
             CreateDirectory(storeIconsPath);
 
@@ -386,6 +449,7 @@ public partial class UploadService : IUploadService
             if (!string.IsNullOrEmpty(zipFilePath))
                 _fileProvider.DeleteFile(zipFilePath);
         }
+		_logger.LogWarning("<<< Exiting UploadIconsArchiveAsync(archivefile={Archivefile})", archivefile);
     }
 
     /// <summary>
@@ -395,19 +459,24 @@ public partial class UploadService : IUploadService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UploadFaviconAsync(IFormFile favicon)
     {
+		_logger.LogError(">>> Entering UploadFaviconAsync(favicon={Favicon})", favicon);
         ArgumentNullException.ThrowIfNull(favicon);
 
         //only icons are supported
         if (!_fileProvider.GetFileExtension(favicon.FileName)?.Equals(".ico", StringComparison.InvariantCultureIgnoreCase) ?? true)
+			_logger.LogError("Throwing Exception from UploadFaviconAsync(favicon={Favicon})", favicon);
             throw new Exception("Only icons are supported (*.ico)");
 
         //check if there is a folder for favicon (favicon folder is in wwwroot/icons and is called icons_{storeId})
         var storeFaviconPath = _fileProvider.GetAbsolutePath(string.Format(NopCommonDefaults.FaviconAndAppIconsPath, await _storeContext.GetActiveStoreScopeConfigurationAsync()));
+		_logger.LogError("UploadFaviconAsync(favicon={Favicon}): storeFaviconPath → {StoreFaviconPath}", favicon, storeFaviconPath);
 
         CreateDirectory(storeFaviconPath);
 
         var faviconPath = _fileProvider.Combine(storeFaviconPath, favicon.FileName);
+		_logger.LogError("UploadFaviconAsync(favicon={Favicon}): faviconPath → {FaviconPath}", favicon, faviconPath);
         await using var fileStream = new FileStream(faviconPath, FileMode.Create);
+		_logger.LogError("UploadFaviconAsync(favicon={Favicon}): fileStream → {FileStream}", favicon, fileStream);
         await favicon.CopyToAsync(fileStream);
     }
 
@@ -418,6 +487,7 @@ public partial class UploadService : IUploadService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task UploadLocalePatternAsync(CultureInfo cultureInfo = null)
     {
+		_logger.LogError(">>> Entering UploadLocalePatternAsync(cultureInfo={CultureInfo})", cultureInfo);
         string getPath(string dirPath, string dirName)
         {
             return _fileProvider.GetAbsolutePath(string.Format(dirPath, dirName));
@@ -429,32 +499,39 @@ public partial class UploadService : IUploadService
         }
 
         var tempFolder = "temp";
+		_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): tempFolder → {TempFolder}", cultureInfo, tempFolder);
         try
         {
             //1. check if the archive with localization of templates is in its place
             var ziplocalePatternPath = getPath(NopCommonDefaults.LocalePatternPath, NopCommonDefaults.LocalePatternArchiveName);
+			_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): ziplocalePatternPath → {ZiplocalePatternPath}", cultureInfo, ziplocalePatternPath);
             if (!_fileProvider.GetFileExtension(ziplocalePatternPath)?.Equals(".zip", StringComparison.InvariantCultureIgnoreCase) ?? true)
+				_logger.LogError("Throwing Exception from UploadLocalePatternAsync(cultureInfo={CultureInfo})", cultureInfo);
                 throw new Exception($"Archive '{NopCommonDefaults.LocalePatternArchiveName}' to retrieve localization patterns not found.");
 
             var currentCulture = (cultureInfo is not null) ? cultureInfo : CultureInfo.CurrentCulture;
+			_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): currentCulture → {CurrentCulture}", cultureInfo, currentCulture);
 
             //2. Check if there is already an unpacked folder with locales for the current culture in the lib directory, if not then
             if (!(checkDirectoryExists(NopCommonDefaults.LocalePatternPath, currentCulture.Name) ||
                   checkDirectoryExists(NopCommonDefaults.LocalePatternPath, currentCulture.TwoLetterISOLanguageName)))
             {
                 var cultureToUse = string.Empty;
+				_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): cultureToUse → {CultureToUse}", cultureInfo, cultureToUse);
 
                 //3. Unpack the archive into a temporary folder
                 ZipFile.ExtractToDirectory(ziplocalePatternPath, getPath(NopCommonDefaults.LocalePatternPath, tempFolder));
 
                 //4. Search in the temp unpacked archive a folder with locales by culture
                 var sourcelocalePath = _fileProvider.Combine(getPath(NopCommonDefaults.LocalePatternPath, tempFolder), currentCulture.Name);
+				_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): sourcelocalePath → {SourcelocalePath}", cultureInfo, sourcelocalePath);
                 if (_fileProvider.DirectoryExists(sourcelocalePath))
                 {
                     cultureToUse = currentCulture.Name;
                 }
 
                 var sourcelocaleISOPath = _fileProvider.Combine(getPath(NopCommonDefaults.LocalePatternPath, tempFolder), currentCulture.TwoLetterISOLanguageName);
+				_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): sourcelocaleISOPath → {SourcelocaleISOPath}", cultureInfo, sourcelocaleISOPath);
                 if (_fileProvider.DirectoryExists(sourcelocaleISOPath))
                 {
                     cultureToUse = currentCulture.TwoLetterISOLanguageName;
@@ -465,6 +542,7 @@ public partial class UploadService : IUploadService
                 if (!string.IsNullOrEmpty(cultureToUse))
                 {
                     var destlocalePath = getPath(NopCommonDefaults.LocalePatternPath, cultureToUse);
+					_logger.LogError("UploadLocalePatternAsync(cultureInfo={CultureInfo}): destlocalePath → {DestlocalePath}", cultureInfo, destlocalePath);
                     if (_fileProvider.DirectoryExists(destlocalePath))
                     {
                         _fileProvider.DeleteDirectory(destlocalePath);
@@ -481,6 +559,7 @@ public partial class UploadService : IUploadService
                 _fileProvider.DeleteDirectory(getPath(NopCommonDefaults.LocalePatternPath, tempFolder));
         }
 
+		_logger.LogWarning("<<< Exiting UploadLocalePatternAsync(cultureInfo={CultureInfo})", cultureInfo);
         return Task.CompletedTask;
     }
 

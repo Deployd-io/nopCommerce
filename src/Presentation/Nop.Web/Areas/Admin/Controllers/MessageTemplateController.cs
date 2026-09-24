@@ -10,11 +10,13 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class MessageTemplateController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerActivityService _customerActivityService;
@@ -39,14 +41,22 @@ public partial class MessageTemplateController : BaseAdminController
         IStoreMappingService storeMappingService,
         IWorkflowMessageService workflowMessageService)
     {
+		_logger.LogError(">>> Entering MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService})", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService);
         _customerActivityService = customerActivityService;
         _localizationService = localizationService;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _localizationService → {_localizationService}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _localizationService);
         _localizedEntityService = localizedEntityService;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _localizedEntityService → {_localizedEntityService}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _localizedEntityService);
         _messageTemplateModelFactory = messageTemplateModelFactory;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _messageTemplateModelFactory → {_messageTemplateModelFactory}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _messageTemplateModelFactory);
         _messageTemplateService = messageTemplateService;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _messageTemplateService → {_messageTemplateService}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _messageTemplateService);
         _notificationService = notificationService;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _notificationService → {_notificationService}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _notificationService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _storeMappingService → {_storeMappingService}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _storeMappingService);
         _workflowMessageService = workflowMessageService;
+		_logger.LogDebug("MessageTemplateController(customerActivityService={CustomerActivityService},localizationService={LocalizationService},localizedEntityService={LocalizedEntityService},messageTemplateModelFactory={MessageTemplateModelFactory},messageTemplateService={MessageTemplateService},notificationService={NotificationService},storeMappingService=<redacted>,workflowMessageService={WorkflowMessageService}): _workflowMessageService → {_workflowMessageService}", customerActivityService, localizationService, localizedEntityService, messageTemplateModelFactory, messageTemplateService, notificationService, workflowMessageService, _workflowMessageService);
     }
 
     #endregion
@@ -55,6 +65,7 @@ public partial class MessageTemplateController : BaseAdminController
 
     protected virtual async Task UpdateLocalesAsync(MessageTemplate mt, MessageTemplateModel model)
     {
+		_logger.LogError(">>> Entering UpdateLocalesAsync(mt={Mt},model={Model})", mt, model);
         foreach (var localized in model.Locales)
         {
             await _localizedEntityService.SaveLocalizedValueAsync(mt,
@@ -77,6 +88,7 @@ public partial class MessageTemplateController : BaseAdminController
                 localized.EmailAccountId,
                 localized.LanguageId);
         }
+		_logger.LogWarning("<<< Exiting UpdateLocalesAsync(mt={Mt},model={Model})", mt, model);
     }
 
     #endregion
@@ -85,15 +97,21 @@ public partial class MessageTemplateController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _messageTemplateModelFactory.PrepareMessageTemplateSearchModelAsync(new MessageTemplateSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
+		_logger.LogWarning("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -110,14 +128,19 @@ public partial class MessageTemplateController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(id);
+		_logger.LogError("Edit(id={Id}): messageTemplate → {MessageTemplate}", id, messageTemplate);
         if (messageTemplate == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _messageTemplateModelFactory.PrepareMessageTemplateModelAsync(null, messageTemplate);
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -171,8 +194,10 @@ public partial class MessageTemplateController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): messageTemplate → {MessageTemplate}", id, messageTemplate);
         if (messageTemplate == null)
             return RedirectToAction("List");
 
@@ -184,6 +209,7 @@ public partial class MessageTemplateController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.MessageTemplates.Deleted"));
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -192,14 +218,17 @@ public partial class MessageTemplateController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CopyTemplate(MessageTemplateModel model)
     {
+		_logger.LogError(">>> Entering CopyTemplate(model={Model})", model);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(model.Id);
+		_logger.LogError("CopyTemplate(model={Model}): messageTemplate → {MessageTemplate}", model, messageTemplate);
         if (messageTemplate == null)
             return RedirectToAction("List");
 
         try
         {
             var newMessageTemplate = await _messageTemplateService.CopyMessageTemplateAsync(messageTemplate);
+			_logger.LogError("CopyTemplate(model={Model}): newMessageTemplate → {NewMessageTemplate}", model, newMessageTemplate);
 
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.MessageTemplates.Copied"));
 
@@ -207,7 +236,9 @@ public partial class MessageTemplateController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in CopyTemplate(model={Model}): {Arg1}", model, exc.Message);
             _notificationService.ErrorNotification(exc.Message);
+			_logger.LogWarning("<<< Exiting CopyTemplate(model={Model})", model);
             return RedirectToAction("Edit", new { id = model.Id });
         }
     }
@@ -215,8 +246,10 @@ public partial class MessageTemplateController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.MESSAGE_TEMPLATES_VIEW)]
     public virtual async Task<IActionResult> TestTemplate(int id, int languageId = 0)
     {
+		_logger.LogError(">>> Entering TestTemplate(id={Id},languageId={LanguageId})", id, languageId);
         //try to get a message template with the specified id
         var messageTemplate = await _messageTemplateService.GetMessageTemplateByIdAsync(id);
+		_logger.LogError("TestTemplate(id={Id},languageId={LanguageId}): messageTemplate → {MessageTemplate}", id, languageId, messageTemplate);
         if (messageTemplate == null)
             return RedirectToAction("List");
 
@@ -224,6 +257,7 @@ public partial class MessageTemplateController : BaseAdminController
         var model = await _messageTemplateModelFactory
             .PrepareTestMessageTemplateModelAsync(new TestMessageTemplateModel(), messageTemplate, languageId);
 
+		_logger.LogWarning("<<< Exiting TestTemplate(model={Model},form={Form})", model, form);
         return View(model);
     }
 

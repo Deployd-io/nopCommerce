@@ -17,11 +17,13 @@ using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class LanguageController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Const
 
     protected const string FLAGS_PATH = "flags";
@@ -52,14 +54,22 @@ public partial class LanguageController : BaseAdminController
         IStoreMappingService storeMappingService,
         MediaSettings mediaSettings)
     {
+		_logger.LogError(">>> Entering LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings})", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings);
         _customerActivityService = customerActivityService;
         _languageModelFactory = languageModelFactory;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _languageModelFactory → {_languageModelFactory}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _languageModelFactory);
         _languageService = languageService;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _languageService → {_languageService}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _localizationService → {_localizationService}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _localizationService);
         _fileProvider = fileProvider;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _fileProvider → {_fileProvider}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _fileProvider);
         _notificationService = notificationService;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _notificationService → {_notificationService}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _notificationService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _storeMappingService → {_storeMappingService}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _storeMappingService);
         _mediaSettings = mediaSettings;
+		_logger.LogDebug("LanguageController(customerActivityService={CustomerActivityService},languageModelFactory={LanguageModelFactory},languageService={LanguageService},localizationService={LocalizationService},fileProvider={FileProvider},notificationService={NotificationService},storeMappingService=<redacted>,mediaSettings={MediaSettings}): _mediaSettings → {_mediaSettings}", customerActivityService, languageModelFactory, languageService, localizationService, fileProvider, notificationService, mediaSettings, _mediaSettings);
     }
 
     #endregion
@@ -68,15 +78,21 @@ public partial class LanguageController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _languageModelFactory.PrepareLanguageSearchModelAsync(new LanguageSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
+		_logger.LogWarning("<<< Exiting List(searchModel={SearchModel})", searchModel);
         return View(model);
     }
 
@@ -93,9 +109,13 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogError(">>> Entering Create()");
         //prepare model
         var model = await _languageModelFactory.PrepareLanguageModelAsync(new LanguageModel(), null);
+		_logger.LogError("Create(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Create()");
+		_logger.LogWarning("<<< Exiting Create(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -134,14 +154,19 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         //try to get a language with the specified id
         var language = await _languageService.GetLanguageByIdAsync(id);
+		_logger.LogError("Edit(id={Id}): language → {Language}", id, language);
         if (language == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _languageModelFactory.PrepareLanguageModelAsync(null, language);
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -196,13 +221,16 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get a language with the specified id
         var language = await _languageService.GetLanguageByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): language → {Language}", id, language);
         if (language == null)
             return RedirectToAction("List");
 
         //ensure we have at least one published language
         var allLanguages = await _languageService.GetAllLanguagesAsync();
+		_logger.LogError("Delete(id={Id}): allLanguages → {AllLanguages}", id, allLanguages);
         if (allLanguages.Count == 1 && allLanguages[0].Id == language.Id)
         {
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Languages.PublishedLanguageRequired"));
@@ -220,6 +248,7 @@ public partial class LanguageController : BaseAdminController
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Languages.Deleted"));
         _notificationService.WarningNotification(await _localizationService.GetResourceAsync("Admin.Configuration.Languages.NeedRestart"));
 
+		_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -227,6 +256,7 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual JsonResult GetAvailableFlagFileNames()
     {
+		_logger.LogError(">>> Entering GetAvailableFlagFileNames()");
         var flagNames = _fileProvider
             .EnumerateFiles(_fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), FLAGS_PATH), "*.png")
             .Select(_fileProvider.GetFileName)
@@ -237,13 +267,16 @@ public partial class LanguageController : BaseAdminController
             Text = flagName,
             Value = flagName
         }).ToList();
+		_logger.LogDebug("GetAvailableFlagFileNames(): Value → {Value}", Value);
 
+		_logger.LogWarning("<<< Exiting GetAvailableFlagFileNames()");
         return Json(availableFlagFileNames);
     }
 
     //action displaying notification (warning) to a store owner that changed culture
     public virtual async Task<IActionResult> LanguageCultureWarning(string currentCulture, string changedCulture)
     {
+		_logger.LogError(">>> Entering LanguageCultureWarning(currentCulture={CurrentCulture},changedCulture={ChangedCulture})", currentCulture, changedCulture);
         if (currentCulture != changedCulture)
         {
             return Json(new
@@ -253,6 +286,7 @@ public partial class LanguageController : BaseAdminController
             });
         }
 
+		_logger.LogWarning("<<< Exiting LanguageCultureWarning(currentCulture={CurrentCulture},changedCulture={ChangedCulture})", currentCulture, changedCulture);
         return Json(new { Result = string.Empty });
     }
 
@@ -264,14 +298,18 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> Resources(LocaleResourceSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering Resources(searchModel={SearchModel})", searchModel);
         //try to get a language with the specified id
         var language = await _languageService.GetLanguageByIdAsync(searchModel.LanguageId);
+		_logger.LogError("Resources(searchModel={SearchModel}): language → {Language}", searchModel, language);
         if (language == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _languageModelFactory.PrepareLocaleResourceListModelAsync(searchModel, language);
+		_logger.LogError("Resources(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting Resources(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -280,16 +318,19 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> ResourceUpdate([Validate] LocaleResourceModel model)
     {
+		_logger.LogError(">>> Entering ResourceUpdate(model={Model})", model);
         if (!ModelState.IsValid)
         {
             return ErrorJson(ModelState.SerializeErrors());
         }
 
         var resource = await _localizationService.GetLocaleStringResourceByIdAsync(model.Id);
+		_logger.LogError("ResourceUpdate(model={Model}): resource → {Resource}", model, resource);
         // if the resourceName changed, ensure it isn't being used by another resource
         if (!resource.ResourceName.Equals(model.ResourceName, StringComparison.InvariantCultureIgnoreCase))
         {
             var res = await _localizationService.GetLocaleStringResourceByNameAsync(model.ResourceName, model.LanguageId, false);
+			_logger.LogError("ResourceUpdate(model={Model}): res → {Res}", model, res);
             if (res != null && res.Id != resource.Id)
             {
                 return ErrorJson(string.Format(await _localizationService.GetResourceAsync("Admin.Configuration.Languages.Resources.NameAlreadyExists"), res.ResourceName));
@@ -301,6 +342,7 @@ public partial class LanguageController : BaseAdminController
 
         await _localizationService.UpdateLocaleStringResourceAsync(resource);
 
+		_logger.LogWarning("<<< Exiting ResourceUpdate(model={Model})", model);
         return new NullJsonResult();
     }
 
@@ -309,23 +351,28 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> ResourceAdd(int languageId, [Validate] LocaleResourceModel model)
     {
+		_logger.LogError(">>> Entering ResourceAdd(languageId={LanguageId},model={Model})", languageId, model);
         if (!ModelState.IsValid)
         {
             return ErrorJson(ModelState.SerializeErrors());
         }
 
         var res = await _localizationService.GetLocaleStringResourceByNameAsync(model.ResourceName, model.LanguageId, false);
+		_logger.LogError("ResourceAdd(languageId={LanguageId},model={Model}): res → {Res}", languageId, model, res);
         if (res == null)
         {
             //fill entity from model
             var resource = model.ToEntity<LocaleStringResource>();
+			_logger.LogError("ResourceAdd(languageId={LanguageId},model={Model}): resource → {Resource}", languageId, model, resource);
 
             resource.LanguageId = languageId;
+			_logger.LogDebug("ResourceAdd(languageId={LanguageId},model={Model}): resource.LanguageId → {Arg2}", languageId, model, resource.LanguageId);
 
             await _localizationService.InsertLocaleStringResourceAsync(resource);
         }
         else
         {
+		_logger.LogWarning("<<< Exiting ResourceAdd(languageId={LanguageId},model={Model})", languageId, model);
             return ErrorJson(string.Format(await _localizationService.GetResourceAsync("Admin.Configuration.Languages.Resources.NameAlreadyExists"), model.ResourceName));
         }
 
@@ -336,12 +383,14 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> ResourceDelete(int id)
     {
+		_logger.LogError(">>> Entering ResourceDelete(id={Id})", id);
         //try to get a locale resource with the specified id
         var resource = await _localizationService.GetLocaleStringResourceByIdAsync(id)
             ?? throw new ArgumentException("No resource found with the specified id", nameof(id));
 
         await _localizationService.DeleteLocaleStringResourceAsync(resource);
 
+		_logger.LogWarning("<<< Exiting ResourceDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -352,19 +401,24 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> ExportXml(int id)
     {
+		_logger.LogError(">>> Entering ExportXml(id={Id})", id);
         //try to get a language with the specified id
         var language = await _languageService.GetLanguageByIdAsync(id);
+		_logger.LogError("ExportXml(id={Id}): language → {Language}", id, language);
         if (language == null)
             return RedirectToAction("List");
 
         try
         {
             var xml = await _localizationService.ExportResourcesToXmlAsync(language);
+			_logger.LogError("ExportXml(id={Id}): xml → {Xml}", id, xml);
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", "language_pack.xml");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXml(id={Id}): {Arg1}", id, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting ExportXml(id={Id})", id);
             return RedirectToAction("List");
         }
     }
@@ -373,8 +427,10 @@ public partial class LanguageController : BaseAdminController
     [CheckPermission(StandardPermission.Configuration.MANAGE_LANGUAGES)]
     public virtual async Task<IActionResult> ImportXml(int id, IFormFile importxmlfile)
     {
+		_logger.LogError(">>> Entering ImportXml(id={Id},importxmlfile={Importxmlfile})", id, importxmlfile);
         //try to get a language with the specified id
         var language = await _languageService.GetLanguageByIdAsync(id);
+		_logger.LogError("ImportXml(id={Id},importxmlfile={Importxmlfile}): language → {Language}", id, importxmlfile, language);
         if (language == null)
             return RedirectToAction("List");
 
@@ -383,6 +439,7 @@ public partial class LanguageController : BaseAdminController
             if (importxmlfile != null && importxmlfile.Length > 0)
             {
                 using var sr = new StreamReader(importxmlfile.OpenReadStream(), Encoding.UTF8);
+				_logger.LogError("ImportXml(id={Id},importxmlfile={Importxmlfile}): sr → {Sr}", id, importxmlfile, sr);
                 await _localizationService.ImportResourcesFromXmlAsync(language, sr);
             }
             else
@@ -396,7 +453,9 @@ public partial class LanguageController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ImportXml(id={Id},importxmlfile={Importxmlfile}): {Arg2}", id, importxmlfile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting ImportXml(id={Id},importxmlfile={Importxmlfile})", id, importxmlfile);
             return RedirectToAction("Edit", new { id = language.Id });
         }
     }

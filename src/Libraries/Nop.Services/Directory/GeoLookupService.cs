@@ -16,6 +16,7 @@ namespace Nop.Services.Directory;
 /// </summary>
 public partial class GeoLookupService : IGeoLookupService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ILogger _logger;
@@ -29,6 +30,9 @@ public partial class GeoLookupService : IGeoLookupService
         INopFileProvider fileProvider)
     {
         _logger = logger;
+		_logger.LogError(">>> Entering GeoLookupService(logger={Logger},fileProvider={FileProvider})", logger, fileProvider);
+		_logger.LogDebug("GeoLookupService(logger={Logger},fileProvider={FileProvider}): _logger → {_logger}", logger, fileProvider, _logger);
+    _logger.LogWarning("<<< Exiting GeoLookupService(logger={Logger},fileProvider={FileProvider})", logger, fileProvider);
         _fileProvider = fileProvider;
     }
 
@@ -43,6 +47,7 @@ public partial class GeoLookupService : IGeoLookupService
     /// <returns>Information</returns>
     protected virtual CountryResponse GetInformation(string ipAddress)
     {
+		_logger.LogError(">>> Entering GetInformation(ipAddress={IpAddress})", ipAddress);
         if (string.IsNullOrEmpty(ipAddress))
             return null;
 
@@ -50,8 +55,11 @@ public partial class GeoLookupService : IGeoLookupService
         {
             //This product includes GeoLite2 data created by MaxMind, available from http://www.maxmind.com
             var databasePath = _fileProvider.MapPath("~/App_Data/GeoLite2-Country.mmdb");
+			_logger.LogError("GetInformation(ipAddress={IpAddress}): databasePath → {DatabasePath}", ipAddress, databasePath);
             var reader = new DatabaseReader(databasePath);
+			_logger.LogError("GetInformation(ipAddress={IpAddress}): reader → {Reader}", ipAddress, reader);
             var omni = reader.Country(ipAddress);
+			_logger.LogError("GetInformation(ipAddress={IpAddress}): omni → {Omni}", ipAddress, omni);
 
             return omni;
                 
@@ -59,6 +67,7 @@ public partial class GeoLookupService : IGeoLookupService
         //catch (AddressNotFoundException exc)
         catch (GeoIP2Exception)
         {
+			_logger.LogError("Exception in GetInformation(ipAddress={IpAddress}): {Arg1}", ipAddress, exc.Message);
             //address is not found
             //do not throw exceptions
             return null;
@@ -67,6 +76,7 @@ public partial class GeoLookupService : IGeoLookupService
         {
             //do not throw exceptions
             _logger.Warning("Cannot load MaxMind record", exc);
+			_logger.LogWarning("<<< Exiting GetInformation(ipAddress={IpAddress})", ipAddress);
             return null;
         }
     }
@@ -82,6 +92,7 @@ public partial class GeoLookupService : IGeoLookupService
     /// <returns>Country name</returns>
     public virtual string LookupCountryIsoCode(string ipAddress)
     {
+		_logger.LogError(">>> Entering LookupCountryIsoCode(ipAddress={IpAddress})", ipAddress);
         var response = GetInformation(ipAddress);
         if (response?.Country != null)
             return response.Country.IsoCode;
@@ -96,6 +107,7 @@ public partial class GeoLookupService : IGeoLookupService
     /// <returns>Country name</returns>
     public virtual string LookupCountryName(string ipAddress)
     {
+		_logger.LogError(">>> Entering LookupCountryName(ipAddress={IpAddress})", ipAddress);
         var response = GetInformation(ipAddress);
         if (response?.Country != null)
             return response.Country.Name;

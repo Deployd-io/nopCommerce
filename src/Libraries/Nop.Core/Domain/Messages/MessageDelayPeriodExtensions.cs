@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Domain.Messages;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Domain.Messages;
 
 /// <summary>
 /// MessageDelayPeriod Extensions
 /// </summary>
 public static class MessageDelayPeriodExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Returns message delay in hours
     /// </summary>
@@ -13,6 +15,8 @@ public static class MessageDelayPeriodExtensions
     /// <returns>Value of message delay in hours</returns>
     public static int ToHours(this MessageDelayPeriod period, int value)
     {
+		_logger.LogError(">>> Entering ToHours(period={Period},value={Value})", period, value);
+		_logger.LogWarning("<<< Exiting ToHours(period={Period},value={Value})", period, value);
         return period switch
         {
             MessageDelayPeriod.Hours => value,

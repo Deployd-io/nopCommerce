@@ -7,6 +7,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.CloudflareImages.Controllers;
 
@@ -15,6 +16,7 @@ namespace Nop.Plugin.Misc.CloudflareImages.Controllers;
 [AutoValidateAntiforgeryToken]
 public class CloudflareImagesController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly CloudflareImagesSettings _cloudflareImagesSettings;
@@ -31,10 +33,14 @@ public class CloudflareImagesController : BasePluginController
         INotificationService notificationService,
         ISettingService settingService)
     {
+		_logger.LogError(">>> Entering CloudflareImagesController(cloudflareImagesSettings={CloudflareImagesSettings},localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService})", cloudflareImagesSettings, localizationService, notificationService, settingService);
         _cloudflareImagesSettings = cloudflareImagesSettings;
         _localizationService = localizationService;
+		_logger.LogDebug("CloudflareImagesController(cloudflareImagesSettings={CloudflareImagesSettings},localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService}): _localizationService → {_localizationService}", cloudflareImagesSettings, localizationService, notificationService, settingService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("CloudflareImagesController(cloudflareImagesSettings={CloudflareImagesSettings},localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService}): _notificationService → {_notificationService}", cloudflareImagesSettings, localizationService, notificationService, settingService, _notificationService);
         _settingService = settingService;
+		_logger.LogDebug("CloudflareImagesController(cloudflareImagesSettings={CloudflareImagesSettings},localizationService={LocalizationService},notificationService={NotificationService},settingService={SettingService}): _settingService → {_settingService}", cloudflareImagesSettings, localizationService, notificationService, settingService, _settingService);
     }
 
     #endregion
@@ -44,6 +50,7 @@ public class CloudflareImagesController : BasePluginController
     [CheckPermission(StandardPermission.Configuration.MANAGE_PLUGINS)]
     public IActionResult Configure()
     {
+		_logger.LogError(">>> Entering Configure()");
         var model = new ConfigurationModel
         {
             Enabled = _cloudflareImagesSettings.Enabled,
@@ -53,6 +60,8 @@ public class CloudflareImagesController : BasePluginController
             RequestTimeout = _cloudflareImagesSettings.RequestTimeout
         };
 
+		_logger.LogWarning("<<< Exiting Configure()");
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/Misc.CloudflareImages/Views/Configure.cshtml", model);
     }
 

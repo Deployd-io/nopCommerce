@@ -2,6 +2,7 @@
 using Nop.Services.Customers;
 using Nop.Services.Security;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class AclSupportedModelFactory : IAclSupportedModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAclService _aclService;
@@ -22,8 +24,10 @@ public partial class AclSupportedModelFactory : IAclSupportedModelFactory
     public AclSupportedModelFactory(IAclService aclService,
         ICustomerService customerService)
     {
+		_logger.LogError(">>> Entering AclSupportedModelFactory(aclService={AclService},customerService={CustomerService})", aclService, customerService);
         _aclService = aclService;
         _customerService = customerService;
+		_logger.LogDebug("AclSupportedModelFactory(aclService={AclService},customerService={CustomerService}): _customerService → {_customerService}", aclService, customerService, _customerService);
     }
 
     #endregion
@@ -38,16 +42,20 @@ public partial class AclSupportedModelFactory : IAclSupportedModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareModelCustomerRolesAsync<TModel>(TModel model) where TModel : IAclSupportedModel
     {
+		_logger.LogError(">>> Entering PrepareModelCustomerRolesAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available customer roles
         var availableRoles = await _customerService.GetAllCustomerRolesAsync(showHidden: true);
+		_logger.LogError("PrepareModelCustomerRolesAsync(model={Model}): availableRoles → {AvailableRoles}", model, availableRoles);
         model.AvailableCustomerRoles = availableRoles.Select(role => new SelectListItem
         {
             Text = role.Name,
             Value = role.Id.ToString(),
             Selected = model.SelectedCustomerRoleIds.Contains(role.Id)
         }).ToList();
+		_logger.LogWarning("<<< Exiting PrepareModelCustomerRolesAsync(model={Model},entityName={EntityName})", model, entityName);
+			_logger.LogDebug("PrepareModelCustomerRolesAsync(model={Model}): Selected → {Selected}", model, Selected);
     }
 
     /// <summary>

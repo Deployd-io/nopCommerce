@@ -8,6 +8,7 @@ using Nop.Data;
 using Nop.Services.Authentication.MultiFactor;
 using Nop.Services.Common;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -16,6 +17,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribute
 {
+private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
 
     #region Ctor
 
@@ -24,6 +26,8 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
     /// </summary>
     public ForceMultiFactorAuthenticationAttribute() : base(typeof(ForceMultiFactorAuthenticationFilter))
     {
+	_logger.LogError(">>> Entering ForceMultiFactorAuthenticationAttribute()");
+    _logger.LogWarning("<<< Exiting ForceMultiFactorAuthenticationAttribute()");
     }
 
     #endregion
@@ -32,6 +36,7 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
 
     private class ForceMultiFactorAuthenticationFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly IGenericAttributeService _genericAttributeService;
@@ -50,10 +55,16 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
             IWorkContext workContext,
             MultiFactorAuthenticationSettings multiFactorAuthenticationSettings)
         {
+			_logger.LogError(">>> Entering ForceMultiFactorAuthenticationFilter(genericAttributeService={GenericAttributeService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},workContext={WorkContext},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings})", genericAttributeService, multiFactorAuthenticationPluginManager, permissionService, workContext, multiFactorAuthenticationSettings);
             _genericAttributeService = genericAttributeService;
             _multiFactorAuthenticationPluginManager = multiFactorAuthenticationPluginManager;
+			_logger.LogDebug("ForceMultiFactorAuthenticationFilter(genericAttributeService={GenericAttributeService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},workContext={WorkContext},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _multiFactorAuthenticationPluginManager → {_multiFactorAuthenticationPluginManager}", genericAttributeService, multiFactorAuthenticationPluginManager, permissionService, workContext, multiFactorAuthenticationSettings, _multiFactorAuthenticationPluginManager);
+			_logger.LogDebug("ForceMultiFactorAuthenticationFilter(genericAttributeService={GenericAttributeService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},workContext={WorkContext},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _genericAttributeService → {_genericAttributeService}", genericAttributeService, multiFactorAuthenticationPluginManager, permissionService, workContext, multiFactorAuthenticationSettings, _genericAttributeService);
+        _logger.LogWarning("<<< Exiting ForceMultiFactorAuthenticationFilter(genericAttributeService={GenericAttributeService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},workContext={WorkContext},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings})", genericAttributeService, multiFactorAuthenticationPluginManager, permissionService, workContext, multiFactorAuthenticationSettings);
             _permissionService = permissionService;
+			_logger.LogDebug("ForceMultiFactorAuthenticationFilter(genericAttributeService={GenericAttributeService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},workContext={WorkContext},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _permissionService → {_permissionService}", genericAttributeService, multiFactorAuthenticationPluginManager, permissionService, workContext, multiFactorAuthenticationSettings, _permissionService);
             _workContext = workContext;
+			_logger.LogDebug("ForceMultiFactorAuthenticationFilter(genericAttributeService={GenericAttributeService},multiFactorAuthenticationPluginManager={MultiFactorAuthenticationPluginManager},permissionService={PermissionService},workContext={WorkContext},multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings}): _workContext → {_workContext}", genericAttributeService, multiFactorAuthenticationPluginManager, permissionService, workContext, multiFactorAuthenticationSettings, _workContext);
             _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
         }
 
@@ -68,6 +79,7 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidateAuthenticationForceAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering ValidateAuthenticationForceAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (context.HttpContext.Request == null)
@@ -102,6 +114,7 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
 
             //check selected provider of MFA
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("ValidateAuthenticationForceAsync(context={Context}): customer → {Customer}", context, customer);
             var selectedProvider = await _genericAttributeService
                 .GetAttributeAsync<string>(customer, NopCustomerDefaults.SelectedMultiFactorAuthenticationProviderAttribute);
             if (!string.IsNullOrEmpty(selectedProvider))
@@ -109,6 +122,7 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
 
             //redirect to MultiFactorAuthenticationSettings page if force is enabled
             context.Result = new RedirectToRouteResult(NopRouteNames.Standard.MULTI_FACTOR_AUTHENTICATION_SETTINGS, null);
+			_logger.LogWarning("<<< Exiting ValidateAuthenticationForceAsync(context={Context})", context);
         }
 
         #endregion
@@ -123,9 +137,11 @@ public sealed class ForceMultiFactorAuthenticationAttribute : TypeFilterAttribut
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await ValidateAuthenticationForceAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

@@ -70,6 +70,7 @@ using Nop.Web.Areas.Admin.Models.Vendors;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.WebOptimizer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Infrastructure.Mapper;
 
@@ -78,10 +79,12 @@ namespace Nop.Web.Areas.Admin.Infrastructure.Mapper;
 /// </summary>
 public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AdminMapperConfiguration()
     {
+		_logger.LogError(">>> Entering AdminMapperConfiguration()");
         //create specific maps
         CreateConfigMaps();
         CreateAffiliatesMaps();
@@ -184,6 +187,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
                 }
             }
         });
+		_logger.LogWarning("<<< Exiting AdminMapperConfiguration()");
     }
 
     #endregion
@@ -195,6 +199,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateConfigMaps()
     {
+		_logger.LogError(">>> Entering CreateConfigMaps()");
         CreateMap<CacheConfig, CacheConfigModel>();
         CreateMap<CacheConfigModel, CacheConfig>();
 
@@ -229,6 +234,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(entity => entity.EnableCaching, options => options.Ignore())
             .ForMember(entity => entity.EnableMemoryCache, options => options.Ignore())
             .ForMember(entity => entity.MemoryCacheTimeToLive, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateConfigMaps()");
     }
 
     /// <summary>
@@ -236,6 +242,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateAffiliatesMaps()
     {
+		_logger.LogError(">>> Entering CreateAffiliatesMaps()");
         CreateMap<Affiliate, AffiliateModel>()
             .ForMember(model => model.Address, options => options.Ignore())
             .ForMember(model => model.AffiliatedCustomerSearchModel, options => options.Ignore())
@@ -252,6 +259,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.CreatedOn, options => options.Ignore());
 
         CreateMap<Customer, AffiliatedCustomerModel>()
+		_logger.LogWarning("<<< Exiting CreateAffiliatesMaps()");
             .ForMember(model => model.Name, options => options.Ignore());
 
     }
@@ -261,7 +269,9 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateAuthenticationMaps()
     {
+		_logger.LogError(">>> Entering CreateAuthenticationMaps()");
         CreateMap<IExternalAuthenticationMethod, ExternalAuthenticationMethodModel>();
+		_logger.LogWarning("<<< Exiting CreateAuthenticationMaps()");
     }
 
     /// <summary>
@@ -269,7 +279,9 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateMultiFactorAuthenticationMaps()
     {
+		_logger.LogError(">>> Entering CreateMultiFactorAuthenticationMaps()");
         CreateMap<IMultiFactorAuthenticationMethod, MultiFactorAuthenticationMethodModel>();
+		_logger.LogWarning("<<< Exiting CreateMultiFactorAuthenticationMaps()");
     }
 
     /// <summary>
@@ -277,6 +289,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>new
     protected virtual void CreateBlogsMaps()
     {
+		_logger.LogError(">>> Entering CreateBlogsMaps()");
         CreateMap<BlogComment, BlogCommentModel>()
             .ForMember(model => model.BlogPostTitle, options => options.Ignore())
             .ForMember(model => model.Comment, options => options.Ignore())
@@ -311,6 +324,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.PostsPageSize_OverrideForStore, options => options.Ignore())
             .ForMember(model => model.ShowHeaderRssUrl_OverrideForStore, options => options.Ignore());
         CreateMap<BlogSettingsModel, BlogSettings>();
+		_logger.LogWarning("<<< Exiting CreateBlogsMaps()");
     }
 
     /// <summary>
@@ -318,6 +332,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateCatalogMaps()
     {
+		_logger.LogError(">>> Entering CreateCatalogMaps()");
         CreateMap<CatalogSettings, CatalogSettingsModel>()
             .ForMember(model => model.AllowAnonymousUsersToEmailAFriend_OverrideForStore, options => options.Ignore())
             .ForMember(model => model.AllowAnonymousUsersToReviewProduct_OverrideForStore, options => options.Ignore())
@@ -588,6 +603,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.Warnings, options => options.Ignore())
             .ForMember(model => model.PictureIds, options => options.Ignore());
         CreateMap<ProductAttributeCombinationModel, ProductAttributeCombination>()
+		_logger.LogWarning("<<< Exiting CreateCatalogMaps()");
             .ForMember(entity => entity.AttributesXml, options => options.Ignore())
 #pragma warning disable CS0618
             .ForMember(entity => entity.PictureId, options => options.Ignore());
@@ -720,9 +736,11 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateCmsMaps()
     {
+		_logger.LogError(">>> Entering CreateCmsMaps()");
         CreateMap<IWidgetPlugin, WidgetModel>()
             .ForMember(model => model.WidgetViewComponentArguments, options => options.Ignore())
             .ForMember(model => model.WidgetViewComponentName, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateCmsMaps()");
     }
 
     /// <summary>
@@ -730,6 +748,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateCommonMaps()
     {
+		_logger.LogError(">>> Entering CreateCommonMaps()");
         CreateMap<Address, AddressModel>()
             .ForMember(model => model.AddressHtml, options => options.Ignore())
             .ForMember(model => model.AvailableCountries, options => options.Ignore())
@@ -773,6 +792,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<Setting, SettingModel>()
             .ForMember(setting => setting.AvailableStores, options => options.Ignore())
             .ForMember(setting => setting.Store, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateCommonMaps()");
     }
 
     /// <summary>
@@ -780,6 +800,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateCustomersMaps()
     {
+		_logger.LogError(">>> Entering CreateCustomersMaps()");
         CreateMap<CustomerAttribute, CustomerAttributeModel>()
             .ForMember(model => model.AttributeControlTypeName, options => options.Ignore())
             .ForMember(model => model.CustomerAttributeValueSearchModel, options => options.Ignore());
@@ -942,6 +963,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.CreatedOn, options => options.Ignore())
             .ForMember(model => model.StoreName, options => options.Ignore())
             .ForMember(model => model.ProductName, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateCustomersMaps()");
     }
 
     /// <summary>
@@ -949,6 +971,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateDirectoryMaps()
     {
+		_logger.LogError(">>> Entering CreateDirectoryMaps()");
         CreateMap<Country, CountryModel>()
             .ForMember(model => model.NumberOfStates, options => options.Ignore())
             .ForMember(model => model.StateProvinceSearchModel, options => options.Ignore());
@@ -973,6 +996,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
 
         CreateMap<StateProvince, StateProvinceModel>();
         CreateMap<StateProvinceModel, StateProvince>();
+		_logger.LogWarning("<<< Exiting CreateDirectoryMaps()");
     }
 
     /// <summary>
@@ -980,6 +1004,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateDiscountsMaps()
     {
+		_logger.LogError(">>> Entering CreateDiscountsMaps()");
         CreateMap<Discount, DiscountModel>()
             .ForMember(model => model.AddDiscountRequirement, options => options.Ignore())
             .ForMember(model => model.AvailableDiscountRequirementRules, options => options.Ignore())
@@ -1012,6 +1037,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<Manufacturer, DiscountManufacturerModel>()
             .ForMember(entity => entity.ManufacturerId, options => options.Ignore())
             .ForMember(entity => entity.ManufacturerName, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateDiscountsMaps()");
     }
 
     /// <summary>
@@ -1019,6 +1045,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateForumsMaps()
     {
+		_logger.LogError(">>> Entering CreateForumsMaps()");
         CreateMap<Forum, ForumModel>()
             .ForMember(model => model.CreatedOn, options => options.Ignore())
             .ForMember(model => model.ForumGroups, options => options.Ignore());
@@ -1075,6 +1102,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(settings => settings.StrippedTopicMaxLength, options => options.Ignore())
             .ForMember(settings => settings.TopicSubjectMaxLength, options => options.Ignore())
             .ForMember(settings => settings.TopicMetaDescriptionLength, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateForumsMaps()");
     }
 
     /// <summary>
@@ -1082,6 +1110,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateFilterLevelMaps()
     {
+		_logger.LogError(">>> Entering CreateFilterLevelMaps()");
         CreateMap<FilterLevelSettingsModel, FilterLevelSettings>()
             .ForMember(settings => settings.FilterLevelEnumDisabled, options => options.Ignore());
 
@@ -1100,6 +1129,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<FilterLevelValueProductModel, FilterLevelValueProductMapping>();
         CreateMap<FilterLevelValueProductMapping, FilterLevelValueProductModel>()
             .ForMember(model => model.ProductName, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateFilterLevelMaps()");
     }
 
 
@@ -1108,6 +1138,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateGdprMaps()
     {
+		_logger.LogError(">>> Entering CreateGdprMaps()");
         CreateMap<GdprSettings, GdprSettingsModel>()
             .ForMember(model => model.GdprConsentSearchModel, options => options.Ignore())
             .ForMember(model => model.GdprEnabled_OverrideForStore, options => options.Ignore())
@@ -1124,6 +1155,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.CustomerInfo, options => options.Ignore())
             .ForMember(model => model.RequestType, options => options.Ignore())
             .ForMember(model => model.CreatedOn, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateGdprMaps()");
     }
 
     /// <summary>
@@ -1131,6 +1163,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateLocalizationMaps()
     {
+		_logger.LogError(">>> Entering CreateLocalizationMaps()");
         CreateMap<Language, LanguageModel>()
             .ForMember(model => model.AvailableCurrencies, options => options.Ignore())
             .ForMember(model => model.LocaleResourceSearchModel, options => options.Ignore())
@@ -1139,6 +1172,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
 
         CreateMap<LocaleResourceModel, LocaleStringResource>()
             .ForMember(entity => entity.LanguageId, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateLocalizationMaps()");
     }
 
     /// <summary>
@@ -1146,6 +1180,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateLoggingMaps()
     {
+		_logger.LogError(">>> Entering CreateLoggingMaps()");
         CreateMap<ActivityLog, ActivityLogModel>()
             .ForMember(model => model.ActivityLogTypeName, options => options.Ignore())
             .ForMember(model => model.CreatedOn, options => options.Ignore())
@@ -1167,6 +1202,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<LogModel, Log>()
             .ForMember(entity => entity.CreatedOnUtc, options => options.Ignore())
             .ForMember(entity => entity.LogLevelId, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateLoggingMaps()");
     }
 
     /// <summary>
@@ -1174,6 +1210,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateMediaMaps()
     {
+		_logger.LogError(">>> Entering CreateMediaMaps()");
         CreateMap<MediaSettings, MediaSettingsModel>()
             .ForMember(model => model.AssociatedProductPictureSize_OverrideForStore, options => options.Ignore())
             .ForMember(model => model.AvatarPictureSize_OverrideForStore, options => options.Ignore())
@@ -1203,6 +1240,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(settings => settings.VideoIframeHeight, options => options.Ignore())
             .ForMember(settings => settings.VideoIframeWidth, options => options.Ignore())
             .ForMember(settings => settings.PicturePath, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateMediaMaps()");
     }
 
     /// <summary>
@@ -1210,6 +1248,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateMessagesMaps()
     {
+		_logger.LogError(">>> Entering CreateMessagesMaps()");
         CreateMap<Campaign, CampaignModel>()
             .ForMember(model => model.AllowedTokens, options => options.Ignore())
             .ForMember(model => model.AvailableCustomerRoles, options => options.Ignore())
@@ -1282,6 +1321,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(entity => entity.Priority, options => options.Ignore())
             .ForMember(entity => entity.PriorityId, options => options.Ignore())
             .ForMember(entity => entity.SentOnUtc, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateMessagesMaps()");
     }
 
     /// <summary>
@@ -1289,6 +1329,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateNewsMaps()
     {
+		_logger.LogError(">>> Entering CreateNewsMaps()");
         CreateMap<NewsComment, NewsCommentModel>()
             .ForMember(model => model.CustomerInfo, options => options.Ignore())
             .ForMember(model => model.CreatedOn, options => options.Ignore())
@@ -1323,6 +1364,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.ShowHeaderRssUrl_OverrideForStore, options => options.Ignore())
             .ForMember(model => model.ShowNewsOnMainPage_OverrideForStore, options => options.Ignore());
         CreateMap<NewsSettingsModel, NewsSettings>();
+		_logger.LogWarning("<<< Exiting CreateNewsMaps()");
     }
 
     /// <summary>
@@ -1330,6 +1372,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateOrdersMaps()
     {
+		_logger.LogError(">>> Entering CreateOrdersMaps()");
         CreateMap<Order, CustomerOrderModel>()
             .ForMember(model => model.CreatedOn, options => options.Ignore())
             .ForMember(model => model.OrderStatus, options => options.Ignore())
@@ -1484,6 +1527,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.ProductName, options => options.Ignore())
             .ForMember(model => model.Total, options => options.Ignore())
             .ForMember(model => model.TotalValue, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateOrdersMaps()");
     }
 
     /// <summary>
@@ -1491,6 +1535,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreatePaymentsMaps()
     {
+		_logger.LogError(">>> Entering CreatePaymentsMaps()");
         CreateMap<IPaymentMethod, PaymentMethodModel>()
             .ForMember(model => model.RecurringPaymentType, options => options.Ignore());
 
@@ -1519,6 +1564,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.PaymentStatus, options => options.Ignore())
             .ForMember(model => model.ShippingStatus, options => options.Ignore())
             .ForMember(model => model.CustomOrderNumber, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreatePaymentsMaps()");
     }
 
     /// <summary>
@@ -1526,9 +1572,11 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreatePluginsMaps()
     {
+		_logger.LogError(">>> Entering CreatePluginsMaps()");
         CreateMap<PluginDescriptor, PluginModel>()
             .ForMember(model => model.CanChangeEnabled, options => options.Ignore())
             .ForMember(model => model.IsEnabled, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreatePluginsMaps()");
     }
 
     /// <summary>
@@ -1536,6 +1584,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreatePollsMaps()
     {
+		_logger.LogError(">>> Entering CreatePollsMaps()");
         CreateMap<PollAnswer, PollAnswerModel>();
         CreateMap<PollAnswerModel, PollAnswer>();
 
@@ -1544,6 +1593,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.PollAnswerSearchModel, options => options.Ignore())
             .ForMember(model => model.LanguageName, options => options.Ignore());
         CreateMap<PollModel, Poll>();
+		_logger.LogWarning("<<< Exiting CreatePollsMaps()");
     }
 
     /// <summary>
@@ -1551,6 +1601,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateSecurityMaps()
     {
+		_logger.LogError(">>> Entering CreateSecurityMaps()");
         CreateMap<CaptchaSettings, CaptchaSettingsModel>()
             .ForMember(model => model.Enabled_OverrideForStore, options => options.Ignore())
             .ForMember(model => model.ReCaptchaPrivateKey_OverrideForStore, options => options.Ignore())
@@ -1578,6 +1629,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(settings => settings.ReCaptchaRequestTimeout, options => options.Ignore())
             .ForMember(settings => settings.ReCaptchaTheme, options => options.Ignore())
             .ForMember(settings => settings.ReCaptchaApiUrl, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateSecurityMaps()");
     }
 
     /// <summary>
@@ -1585,6 +1637,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateSeoMaps()
     {
+		_logger.LogError(">>> Entering CreateSeoMaps()");
         CreateMap<UrlRecord, UrlRecordModel>()
             .ForMember(model => model.DetailsUrl, options => options.Ignore())
             .ForMember(model => model.Language, options => options.Ignore())
@@ -1592,6 +1645,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<UrlRecordModel, UrlRecord>()
             .ForMember(entity => entity.LanguageId, options => options.Ignore())
             .ForMember(entity => entity.Slug, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateSeoMaps()");
     }
 
     /// <summary>
@@ -1599,6 +1653,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateShippingMaps()
     {
+		_logger.LogError(">>> Entering CreateShippingMaps()");
         CreateMap<DeliveryDate, DeliveryDateModel>();
         CreateMap<DeliveryDateModel, DeliveryDate>();
 
@@ -1657,6 +1712,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(settings => settings.ShipSeparatelyOneItemEach, options => options.Ignore())
             .ForMember(settings => settings.UseCubeRootMethod, options => options.Ignore())
             .ForMember(settings => settings.RequestDelay, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateShippingMaps()");
     }
 
     /// <summary>
@@ -1664,11 +1720,13 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateStoresMaps()
     {
+		_logger.LogError(">>> Entering CreateStoresMaps()");
         CreateMap<Store, StoreModel>()
             .ForMember(model => model.AvailableLanguages, options => options.Ignore());
         CreateMap<StoreModel, Store>()
             .ForMember(entity => entity.SslEnabled, options => options.Ignore())
             .ForMember(entity => entity.Deleted, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateStoresMaps()");
     }
 
     /// <summary>
@@ -1676,6 +1734,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateTasksMaps()
     {
+		_logger.LogError(">>> Entering CreateTasksMaps()");
         CreateMap<ScheduleTask, ScheduleTaskModel>();
         CreateMap<ScheduleTaskModel, ScheduleTask>()
             .ForMember(entity => entity.Type, options => options.Ignore())
@@ -1683,6 +1742,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(entity => entity.LastEndUtc, options => options.Ignore())
             .ForMember(entity => entity.LastSuccessUtc, options => options.Ignore())
             .ForMember(entity => entity.LastEnabledUtc, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateTasksMaps()");
     }
 
     /// <summary>
@@ -1690,6 +1750,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateTaxMaps()
     {
+		_logger.LogError(">>> Entering CreateTaxMaps()");
         CreateMap<TaxCategory, TaxCategoryModel>();
         CreateMap<TaxCategoryModel, TaxCategory>();
 
@@ -1735,6 +1796,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<TaxSettingsModel, TaxSettings>()
             .ForMember(settings => settings.ActiveTaxProviderSystemName, options => options.Ignore())
             .ForMember(settings => settings.LogErrors, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateTaxMaps()");
     }
 
     /// <summary>
@@ -1742,6 +1804,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateTopicsMaps()
     {
+		_logger.LogError(">>> Entering CreateTopicsMaps()");
         CreateMap<Topic, TopicModel>()
             .ForMember(model => model.AvailableTopicTemplates, options => options.Ignore())
             .ForMember(model => model.SeName, options => options.Ignore())
@@ -1751,6 +1814,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
 
         CreateMap<TopicTemplate, TopicTemplateModel>();
         CreateMap<TopicTemplateModel, TopicTemplate>();
+		_logger.LogWarning("<<< Exiting CreateTopicsMaps()");
     }
 
     /// <summary>
@@ -1758,6 +1822,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateVendorsMaps()
     {
+		_logger.LogError(">>> Entering CreateVendorsMaps()");
         CreateMap<Vendor, VendorModel>()
             .ForMember(model => model.Address, options => options.Ignore())
             .ForMember(model => model.AddVendorNoteMessage, options => options.Ignore())
@@ -1799,6 +1864,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
         CreateMap<VendorSettingsModel, VendorSettings>()
             .ForMember(settings => settings.DefaultVendorPageSizeOptions, options => options.Ignore())
             .ForMember(settings => settings.MaximumProductPicturesNumber, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateVendorsMaps()");
     }
 
     /// <summary>
@@ -1806,10 +1872,12 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateWarehouseMaps()
     {
+		_logger.LogError(">>> Entering CreateWarehouseMaps()");
         CreateMap<Warehouse, WarehouseModel>()
             .ForMember(entity => entity.Address, options => options.Ignore());
         CreateMap<WarehouseModel, Warehouse>()
             .ForMember(entity => entity.AddressId, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateWarehouseMaps()");
     }
 
     /// <summary>
@@ -1817,6 +1885,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
     /// </summary>
     protected virtual void CreateMenuMaps()
     {
+		_logger.LogError(">>> Entering CreateMenuMaps()");
         CreateMap<Menu, MenuModel>()
             .ForMember(model => model.AvailableMenuTypes, options => options.Ignore())
             .ForMember(model => model.MenuTypeName, options => options.Ignore())
@@ -1851,6 +1920,7 @@ public partial class AdminMapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(entity => entity.MenuItemType, options => options.Ignore())
             .ForMember(entity => entity.Template, options => options.Ignore())
             .ForMember(entity => entity.EntityId, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting CreateMenuMaps()");
     }
 
     #endregion

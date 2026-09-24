@@ -4,12 +4,14 @@ using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Media;
 using Nop.Services.Media.RoxyFileman;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Migrations.UpgradeTo460;
 
 [NopMigration("2022-10-18 00:00:00", "Move uploaded images to disk", MigrationProcessType.Update)]
 public class UploadedImagesMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPictureService _pictureService;
@@ -20,19 +22,27 @@ public class UploadedImagesMigration : Migration
 
     public UploadedImagesMigration(IPictureService pictureService, IRepository<Picture> pictureRepository, IRoxyFilemanFileProvider roxyFilemanFileProvider)
     {
+		_logger.LogError(">>> Entering UploadedImagesMigration(pictureService={PictureService},pictureRepository={PictureRepository},roxyFilemanFileProvider={RoxyFilemanFileProvider})", pictureService, pictureRepository, roxyFilemanFileProvider);
         _pictureService = pictureService;
         _pictureRepository = pictureRepository;
+		_logger.LogDebug("UploadedImagesMigration(pictureService={PictureService},pictureRepository={PictureRepository},roxyFilemanFileProvider={RoxyFilemanFileProvider}): _pictureRepository → {_pictureRepository}", pictureService, pictureRepository, roxyFilemanFileProvider, _pictureRepository);
+		_logger.LogDebug("UploadedImagesMigration(pictureService={PictureService},pictureRepository={PictureRepository},roxyFilemanFileProvider={RoxyFilemanFileProvider}): _pictureService → {_pictureService}", pictureService, pictureRepository, roxyFilemanFileProvider, _pictureService);
+    _logger.LogWarning("<<< Exiting UploadedImagesMigration(pictureService={PictureService},pictureRepository={PictureRepository},roxyFilemanFileProvider={RoxyFilemanFileProvider})", pictureService, pictureRepository, roxyFilemanFileProvider);
         _roxyFilemanFileProvider = roxyFilemanFileProvider;
     }
 
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!_pictureService.IsStoreInDbAsync().Result)
             return;
 
         const int pageSize = 400;
         var pageIndex = 0;
         var uploadRoot = $"~{NopRoxyFilemanDefaults.DefaultRootDirectory}/";
+		_logger.LogError("Up(): uploadRoot → {UploadRoot}", uploadRoot);
 
         try
         {
@@ -54,10 +64,13 @@ public class UploadedImagesMigration : Migration
                     var seoFileName = picture.SeoFilename;
 
                     var lastPart = _pictureService.GetFileExtensionFromMimeTypeAsync(picture.MimeType).Result;
+					_logger.LogError("Up(): lastPart → {LastPart}", lastPart);
 
                     var thumbFileName = $"{seoFileName}.{lastPart}";
+					_logger.LogError("Up(): thumbFileName → {ThumbFileName}", thumbFileName);
                     var thumbDirectoryName = picture.VirtualPath[uploadRoot.Length..];
                     var thumbFilePath = Path.Combine(thumbDirectoryName, thumbFileName);
+					_logger.LogError("Up(): thumbFilePath → {ThumbFilePath}", thumbFilePath);
 
                     _roxyFilemanFileProvider.CreateDirectory("/", thumbDirectoryName);
 
@@ -69,6 +82,8 @@ public class UploadedImagesMigration : Migration
 
                     if (_roxyFilemanFileProvider.GetFileInfo(thumbFilePath).Exists)
                     {
+						var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+						_logger.LogError("Up(): delete query executed in {Arg0} ms", __logStartDb.ElapsedMilliseconds);
                         _pictureRepository.DeleteAsync(picture, false).Wait();
                         continue;
                     }
@@ -77,6 +92,7 @@ public class UploadedImagesMigration : Migration
                     //you should be very careful, mutexes cannot be used in with the await operation
                     //we can't use semaphore here, because it produces PlatformNotSupportedException exception on UNIX based systems
                     using var mutex = new Mutex(false, thumbFileName);
+					_logger.LogError("Up(): mutex → {Mutex}", mutex);
 
                     mutex.WaitOne();
 
@@ -86,11 +102,13 @@ public class UploadedImagesMigration : Migration
                         if (!_roxyFilemanFileProvider.GetFileInfo(thumbFilePath).Exists)
                         {
                             var pictureBinary = _pictureService.LoadPictureBinaryAsync(picture).Result;
+							_logger.LogError("Up(): pictureBinary → {PictureBinary}", pictureBinary);
 
                             if (pictureBinary == null || pictureBinary.Length == 0)
                                 continue;
 
                             using var stream = new MemoryStream(pictureBinary);
+							_logger.LogError("Up(): stream → {Stream}", stream);
                             _roxyFilemanFileProvider.SaveFileAsync(thumbDirectoryName, thumbFileName, picture.MimeType, stream).Wait();
                         }
                     }
@@ -105,12 +123,16 @@ public class UploadedImagesMigration : Migration
         }
         catch
         {
+			_logger.LogError("Exception in Up(): {Arg0}", ex.Message);
             // ignored
         }
+		_logger.LogError("Up(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
     }
 
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogWarning("<<< Exiting Down()");
     }
 }

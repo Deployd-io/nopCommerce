@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Orders;
 
@@ -11,22 +12,35 @@ namespace Nop.Web.Areas.Admin.Models.Orders;
 /// </summary>
 public partial record OrderSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public OrderSearchModel()
     {
+		_logger.LogError(">>> Entering OrderSearchModel()");
         AvailableOrderStatuses = new List<SelectListItem>();
         AvailablePaymentStatuses = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableShippingStatuses = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailableShippingStatuses → {AvailableShippingStatuses}", AvailableShippingStatuses);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
         AvailablePaymentMethods = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailablePaymentMethods → {AvailablePaymentMethods}", AvailablePaymentMethods);
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("OrderSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         OrderStatusIds = new List<int>();
+		_logger.LogError("OrderSearchModel(): OrderStatusIds → {OrderStatusIds}", OrderStatusIds);
         PaymentStatusIds = new List<int>();
+		_logger.LogError("OrderSearchModel(): PaymentStatusIds → {PaymentStatusIds}", PaymentStatusIds);
         ShippingStatusIds = new List<int>();
+		_logger.LogError("OrderSearchModel(): ShippingStatusIds → {ShippingStatusIds}", ShippingStatusIds);
         LicenseCheckModel = new();
+		_logger.LogError("OrderSearchModel(): LicenseCheckModel → {LicenseCheckModel}", LicenseCheckModel);
     }
 
     #endregion

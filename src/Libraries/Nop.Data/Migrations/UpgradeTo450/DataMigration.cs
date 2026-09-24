@@ -6,17 +6,23 @@ using Nop.Core.Domain.ScheduleTasks;
 using Nop.Core.Domain.Security;
 using Nop.Core.Domain.Shipping;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo450;
 
 [NopUpdateMigration("2021-04-23 00:00:00", "4.50", UpdateMigrationType.Data)]
 public class DataMigration : Migration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly INopDataProvider _dataProvider;
 
     public DataMigration(INopDataProvider dataProvider)
     {
+		_logger.LogError(">>> Entering DataMigration(dataProvider={DataProvider})", dataProvider);
         _dataProvider = dataProvider;
+		_logger.LogDebug("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+    _logger.LogError("DataMigration(dataProvider={DataProvider}): _dataProvider → {_dataProvider}", dataProvider, _dataProvider);
+    _logger.LogWarning("<<< Exiting DataMigration(dataProvider={DataProvider})", dataProvider);
     }
 
     /// <summary>
@@ -24,9 +30,12 @@ public class DataMigration : Migration
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         // add column
         var shipmentTableName = nameof(Shipment);
+		_logger.LogError("Up(): shipmentTableName → {ShipmentTableName}", shipmentTableName);
         var collectedDateUtcColumnName = "ReadyForPickupDateUtc";
+		_logger.LogError("Up(): collectedDateUtcColumnName → {CollectedDateUtcColumnName}", collectedDateUtcColumnName);
 
         if (!Schema.Table(shipmentTableName).Column(collectedDateUtcColumnName).Exists())
         {
@@ -47,9 +56,11 @@ public class DataMigration : Migration
                     EmailAccountId = _dataProvider.GetTable<EmailAccount>().FirstOrDefault()?.Id ?? 0
                 }
             );
+			_logger.LogDebug("Up(): EmailAccountId → {EmailAccountId}", EmailAccountId);
         }
         //#5547
         var scheduleTaskTableName = NameCompatibilityManager.GetTableName(typeof(ScheduleTask));
+		_logger.LogError("Up(): scheduleTaskTableName → {ScheduleTaskTableName}", scheduleTaskTableName);
 
         //add column
         if (!Schema.Table(scheduleTaskTableName).Column(nameof(ScheduleTask.LastEnabledUtc)).Exists())
@@ -71,6 +82,7 @@ public class DataMigration : Migration
                     Name = "Admin area. Access sales summary report",
                     SystemName = "SalesSummaryReport",
                     Category = "Orders"
+					_logger.LogDebug("Up(): Category → {Category}", Category);
                 }
             );
 
@@ -86,11 +98,14 @@ public class DataMigration : Migration
                     PermissionRecordId = salesSummaryReportPermission.Id
                 }
             );
+			_logger.LogDebug("Up(): PermissionRecordId → {PermissionRecordId}", PermissionRecordId);
         }
 
         //add column
         var returnRequestTableName = NameCompatibilityManager.GetTableName(typeof(ReturnRequest));
+		_logger.LogError("Up(): returnRequestTableName → {ReturnRequestTableName}", returnRequestTableName);
         var returnedQuantityColumnName = "ReturnedQuantity";
+		_logger.LogError("Up(): returnedQuantityColumnName → {ReturnedQuantityColumnName}", returnedQuantityColumnName);
 
         if (!Schema.Table(returnRequestTableName).Column(returnedQuantityColumnName).Exists())
         {
@@ -123,10 +138,13 @@ public class DataMigration : Migration
                 }
             );
         }
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //add the downgrade logic if necessary 
+		_logger.LogWarning("<<< Exiting Down()");
     }
 }

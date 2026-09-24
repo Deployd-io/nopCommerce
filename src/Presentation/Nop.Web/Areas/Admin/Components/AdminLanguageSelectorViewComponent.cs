@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Components;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Areas.Admin.Components;
 /// </summary>
 public partial class AdminLanguageSelectorViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICommonModelFactory _commonModelFactory;
@@ -19,7 +21,10 @@ public partial class AdminLanguageSelectorViewComponent : NopViewComponent
 
     public AdminLanguageSelectorViewComponent(ICommonModelFactory commonModelFactory)
     {
+		_logger.LogError(">>> Entering AdminLanguageSelectorViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
         _commonModelFactory = commonModelFactory;
+		_logger.LogDebug("AdminLanguageSelectorViewComponent(commonModelFactory={CommonModelFactory}): _commonModelFactory → {_commonModelFactory}", commonModelFactory, _commonModelFactory);
+    _logger.LogWarning("<<< Exiting AdminLanguageSelectorViewComponent(commonModelFactory={CommonModelFactory})", commonModelFactory);
     }
 
     #endregion
@@ -35,9 +40,12 @@ public partial class AdminLanguageSelectorViewComponent : NopViewComponent
     /// </returns>
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		_logger.LogError(">>> Entering InvokeAsync()");
         //prepare model
         var model = await _commonModelFactory.PrepareLanguageSelectorModelAsync();
+		_logger.LogError("InvokeAsync(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting InvokeAsync()");
         return View(model);
     }
 

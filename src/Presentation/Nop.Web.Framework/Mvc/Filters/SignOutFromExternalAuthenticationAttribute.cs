@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Nop.Services.Authentication;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -17,6 +19,8 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
     /// </summary>
     public SignOutFromExternalAuthenticationAttribute() : base(typeof(SignOutFromExternalAuthenticationFilter))
     {
+	_logger.LogError(">>> Entering SignOutFromExternalAuthenticationAttribute()");
+    _logger.LogWarning("<<< Exiting SignOutFromExternalAuthenticationAttribute()");
     }
 
     #endregion
@@ -28,6 +32,7 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
     /// </summary>
     private class SignOutFromExternalAuthenticationFilter : IAsyncAuthorizationFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Utilities
 
         /// <summary>
@@ -37,12 +42,15 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SignOutFromExternalAuthenticationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering SignOutFromExternalAuthenticationAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //sign out from the external authentication scheme
             var authenticateResult = await context.HttpContext.AuthenticateAsync(NopAuthenticationDefaults.ExternalAuthenticationScheme);
+			_logger.LogError("SignOutFromExternalAuthenticationAsync(context={Context}): authenticateResult → {AuthenticateResult}", context, authenticateResult);
             if (authenticateResult.Succeeded)
                 await context.HttpContext.SignOutAsync(NopAuthenticationDefaults.ExternalAuthenticationScheme);
+				_logger.LogWarning("<<< Exiting SignOutFromExternalAuthenticationAsync(context={Context})", context);
         }
 
         #endregion
@@ -56,7 +64,9 @@ public sealed class SignOutFromExternalAuthenticationAttribute : TypeFilterAttri
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await SignOutFromExternalAuthenticationAsync(context);
+			_logger.LogWarning("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

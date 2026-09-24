@@ -60,6 +60,7 @@ using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Framework.Themes;
 using Nop.Web.Framework.UI;
 using TaskScheduler = Nop.Services.ScheduleTasks.TaskScheduler;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Infrastructure;
 
@@ -68,6 +69,7 @@ namespace Nop.Web.Framework.Infrastructure;
 /// </summary>
 public partial class NopStartup : INopStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Add and configure any of the middleware
     /// </summary>
@@ -75,6 +77,7 @@ public partial class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		_logger.LogError(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //file provider
         services.AddScoped<INopFileProvider, NopFileProvider>();
 
@@ -91,6 +94,7 @@ public partial class NopStartup : INopStartup
         //static cache manager
         var appSettings = Singleton<AppSettings>.Instance;
         var distributedCacheConfig = appSettings.Get<DistributedCacheConfig>();
+		_logger.LogError("ConfigureServices(services={Services},configuration={Configuration}): distributedCacheConfig → {DistributedCacheConfig}", services, configuration, distributedCacheConfig);
 
         services.AddTransient(typeof(IConcurrentCollection<>), typeof(ConcurrentTrie<>));
 
@@ -274,6 +278,7 @@ public partial class NopStartup : INopStartup
         var typeFinder = Singleton<ITypeFinder>.Instance;
 
         var settings = typeFinder.FindClassesOfType(typeof(ISettings), false).ToList();
+		_logger.LogError("ConfigureServices(services={Services},configuration={Configuration}): settings → {Settings}", services, configuration, settings);
         foreach (var setting in settings)
         {
             services.AddScoped(setting, serviceProvider =>
@@ -309,10 +314,12 @@ public partial class NopStartup : INopStartup
 
         //event consumers
         var consumers = typeFinder.FindClassesOfType(typeof(IConsumer<>)).ToList();
+		_logger.LogError("ConfigureServices(services={Services},configuration={Configuration}): consumers → {Consumers}", services, configuration, consumers);
         foreach (var consumer in consumers)
         foreach (var findInterface in consumer.FindInterfaces((type, criteria) =>
                  {
                      var isMatch = type.IsGenericType && ((Type)criteria).IsAssignableFrom(type.GetGenericTypeDefinition());
+					_logger.LogError("ConfigureServices(services={Services},configuration={Configuration}): isMatch → {IsMatch}", services, configuration, isMatch);
                      return isMatch;
                  }, typeof(IConsumer<>)))
             services.AddScoped(findInterface, consumer);
@@ -322,8 +329,10 @@ public partial class NopStartup : INopStartup
 
         //register the Lazy resolver for .Net IoC
         var useAutofac = appSettings.Get<CommonConfig>().UseAutofac;
+		_logger.LogError("ConfigureServices(services={Services},configuration={Configuration}): useAutofac → {UseAutofac}", services, configuration, useAutofac);
         if (!useAutofac)
             services.AddScoped(typeof(Lazy<>), typeof(LazyInstance<>));
+			_logger.LogWarning("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -332,6 +341,8 @@ public partial class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+	_logger.LogError(">>> Entering Configure(application={Application})", application);
+    _logger.LogWarning("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

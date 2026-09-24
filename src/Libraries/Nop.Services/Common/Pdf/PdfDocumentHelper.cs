@@ -1,6 +1,7 @@
 ﻿using iTextSharp.text;
 using iTextSharp.text.pdf;
 using PdfRpt.Core.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common.Pdf;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Common.Pdf;
 /// </summary>
 public static partial class PdfDocumentHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     public const float RELATIVE_LEADING = 1.3f;
@@ -27,6 +29,7 @@ public static partial class PdfDocumentHelper
     /// <returns>A cell for PDF table</returns>
     public static PdfPCell BuildPdfPCell(PdfGrid table, int runDirection, int collSpan = 1, int horizontalAlign = Element.ALIGN_CENTER)
     {
+		_logger.LogError(">>> Entering BuildPdfPCell(table={Table},runDirection={RunDirection},collSpan={CollSpan},horizontalAlign={HorizontalAlign})", table, runDirection, collSpan, horizontalAlign);
         var cell = new PdfPCell(table)
         {
             RunDirection = runDirection,
@@ -37,6 +40,7 @@ public static partial class PdfDocumentHelper
 
         cell.SetLeading(0f, RELATIVE_LEADING);
 
+		_logger.LogWarning("<<< Exiting BuildPdfPCell(table={Table},runDirection={RunDirection},collSpan={CollSpan},horizontalAlign={HorizontalAlign})", table, runDirection, collSpan, horizontalAlign);
         return cell;
     }
 
@@ -48,6 +52,8 @@ public static partial class PdfDocumentHelper
     /// <returns>A PDF table</returns>
     public static PdfGrid BuildPdfGrid(int numColumns, int runDirection)
     {
+		_logger.LogError(">>> Entering BuildPdfGrid(numColumns={NumColumns},runDirection={RunDirection})", numColumns, runDirection);
+		_logger.LogWarning("<<< Exiting BuildPdfGrid(numColumns={NumColumns},runDirection={RunDirection})", numColumns, runDirection);
         return new PdfGrid(numColumns: numColumns)
         {
             WidthPercentage = 100,
@@ -66,6 +72,8 @@ public static partial class PdfDocumentHelper
     /// <returns>A font object</returns>
     public static Font GetFont(string fontName, float size, DocumentFontStyle style = DocumentFontStyle.Normal)
     {
+		_logger.LogError(">>> Entering GetFont(fontName={FontName},size={Size},style={Style})", fontName, size, style);
+        _logger.LogWarning("<<< Exiting GetFont(fontName={FontName},size={Size},style={Style})", fontName, size, style);
         return FontFactory.GetFont(fontName, BaseFont.IDENTITY_H, true, size, (int)style, BaseColor.Black);
     }
 

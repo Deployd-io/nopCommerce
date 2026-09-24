@@ -8,6 +8,7 @@ namespace Nop.Services.Messages;
 /// </summary>
 public partial class QueuedMessagesSendTask : IScheduleTask
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IEmailAccountService _emailAccountService;
@@ -26,9 +27,13 @@ public partial class QueuedMessagesSendTask : IScheduleTask
         IQueuedEmailService queuedEmailService)
     {
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("QueuedMessagesSendTask(emailAccountService={EmailAccountService},emailSender={EmailSender},logger={Logger},queuedEmailService={QueuedEmailService}): _emailAccountService → {_emailAccountService}", emailAccountService, emailSender, logger, queuedEmailService, _emailAccountService);
         _emailSender = emailSender;
+		_logger.LogDebug("QueuedMessagesSendTask(emailAccountService={EmailAccountService},emailSender={EmailSender},logger={Logger},queuedEmailService={QueuedEmailService}): _emailSender → {_emailSender}", emailAccountService, emailSender, logger, queuedEmailService, _emailSender);
         _logger = logger;
+		_logger.LogError(">>> Entering QueuedMessagesSendTask(emailAccountService={EmailAccountService},emailSender={EmailSender},logger={Logger},queuedEmailService={QueuedEmailService})", emailAccountService, emailSender, logger, queuedEmailService);
         _queuedEmailService = queuedEmailService;
+		_logger.LogDebug("QueuedMessagesSendTask(emailAccountService={EmailAccountService},emailSender={EmailSender},logger={Logger},queuedEmailService={QueuedEmailService}): _queuedEmailService → {_queuedEmailService}", emailAccountService, emailSender, logger, queuedEmailService, _queuedEmailService);
     }
 
     #endregion
@@ -40,6 +45,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
     /// </summary>
     public virtual async Task ExecuteAsync()
     {
+		_logger.LogError(">>> Entering ExecuteAsync()");
         var maxTries = 3;
         var queuedEmails = (await _queuedEmailService.SearchEmailsAsync(null, null, null, null,
             true, true, maxTries, false, 0, int.MaxValue)).GroupBy(qe => qe.EmailAccountId);
@@ -47,6 +53,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
         foreach (var item in queuedEmails)
         {
             var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(item.Key);
+			_logger.LogError("ExecuteAsync(): emailAccount → {EmailAccount}", emailAccount);
 
             foreach (var queuedEmail in item.Take(emailAccount.MaxNumberOfEmails))
             {
@@ -75,6 +82,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
                         queuedEmail.AttachedDownloadId);
 
                     queuedEmail.SentOnUtc = DateTime.UtcNow;
+					_logger.LogDebug("ExecuteAsync(): queuedEmail.SentOnUtc → {Arg0}", queuedEmail.SentOnUtc);
                 }
                 catch (Exception exc)
                 {
@@ -87,6 +95,7 @@ public partial class QueuedMessagesSendTask : IScheduleTask
                 }
             }
         }
+		_logger.LogWarning("<<< Exiting ExecuteAsync()");
     }
 
     #endregion

@@ -2,25 +2,37 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Reports;
 
 public partial record SalesSummarySearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public SalesSummarySearchModel()
     {
+		_logger.LogError(">>> Entering SalesSummarySearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableOrderStatuses = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailablePaymentStatuses = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         OrderStatusIds = new List<int>();
+		_logger.LogError("SalesSummarySearchModel(): OrderStatusIds → {OrderStatusIds}", OrderStatusIds);
         PaymentStatusIds = new List<int>();
+		_logger.LogError("SalesSummarySearchModel(): PaymentStatusIds → {PaymentStatusIds}", PaymentStatusIds);
         GroupByOptions = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): GroupByOptions → {GroupByOptions}", GroupByOptions);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("SalesSummarySearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

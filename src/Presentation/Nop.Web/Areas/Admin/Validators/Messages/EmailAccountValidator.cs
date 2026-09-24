@@ -3,13 +3,16 @@ using Nop.Core.Domain.Messages;
 using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Validators.Messages;
 
 public partial class EmailAccountValidator : BaseNopValidator<EmailAccountModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public EmailAccountValidator(ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering EmailAccountValidator(localizationService={LocalizationService})", localizationService);
         RuleFor(x => x.Email).NotEmpty();
         RuleFor(x => x.Email)
             .IsEmailAddress()
@@ -30,5 +33,6 @@ public partial class EmailAccountValidator : BaseNopValidator<EmailAccountModel>
             .When(x => x.EmailAuthenticationMethod == EmailAuthenticationMethod.MicrosoftOAuth2);
 
         SetDatabaseValidationRules<EmailAccount>();
+		_logger.LogWarning("<<< Exiting EmailAccountValidator(localizationService={LocalizationService})", localizationService);
     }
 }

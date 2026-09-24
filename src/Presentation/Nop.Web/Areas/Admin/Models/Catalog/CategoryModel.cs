@@ -4,6 +4,7 @@ using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.ArtificialIntelligence;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -14,28 +15,45 @@ public partial record CategoryModel : BaseNopEntityModel, IAclSupportedModel, ID
     ITranslationSupportedModel, ILocalizedModel<CategoryLocalizedModel>, IStoreMappingSupportedModel,
     IMetaTagsSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CategoryModel()
     {
+		_logger.LogError(">>> Entering CategoryModel()");
         if (PageSize < 1)
         {
             PageSize = 5;
+			_logger.LogDebug("CategoryModel(): PageSize → {PageSize}", PageSize);
         }
+		_logger.LogWarning("<<< Exiting CategoryModel()");
 
         Locales = new List<CategoryLocalizedModel>();
+		_logger.LogError("CategoryModel(): Locales → {Locales}", Locales);
+		_logger.LogDebug("CategoryModel(): Locales → {Locales}", Locales);
         AvailableCategoryTemplates = new List<SelectListItem>();
+		_logger.LogError("CategoryModel(): AvailableCategoryTemplates → {AvailableCategoryTemplates}", AvailableCategoryTemplates);
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogError("CategoryModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableDiscounts = new List<SelectListItem>();
+		_logger.LogError("CategoryModel(): AvailableDiscounts → {AvailableDiscounts}", AvailableDiscounts);
         SelectedDiscountIds = new List<int>();
+		_logger.LogError("CategoryModel(): SelectedDiscountIds → {SelectedDiscountIds}", SelectedDiscountIds);
 
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogError("CategoryModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
+		_logger.LogDebug("CategoryModel(): AvailableCategoryTemplates → {AvailableCategoryTemplates}", AvailableCategoryTemplates);
+		_logger.LogDebug("CategoryModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogError("CategoryModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
 
         SelectedStoreIds = new List<int>();
+		_logger.LogError("CategoryModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("CategoryModel(): AvailableStores → {AvailableStores}", AvailableStores);
 
         CategoryProductSearchModel = new CategoryProductSearchModel();
+		_logger.LogError("CategoryModel(): CategoryProductSearchModel → {CategoryProductSearchModel}", CategoryProductSearchModel);
     }
 
     #endregion
