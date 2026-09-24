@@ -2,15 +2,19 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Models;
 
 public record StorePickupPointModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public StorePickupPointModel()
     {
+		_logger.LogError(">>> Entering StorePickupPointModel()");
         Address = new AddressModel();
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("StorePickupPointModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     public AddressModel Address { get; set; }
@@ -50,10 +54,13 @@ public record StorePickupPointModel : BaseNopEntityModel
 
 public class AddressModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AddressModel()
     {
+		_logger.LogError(">>> Entering AddressModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("AddressModel(): AvailableStates → {AvailableStates}", AvailableStates);
     }
 
     [NopResourceDisplayName("Admin.Address.Fields.Country")]

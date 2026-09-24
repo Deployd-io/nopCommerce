@@ -14,16 +14,19 @@ using Nop.Core.Domain.Seo;
 using Nop.Core.Domain.Stores;
 using Nop.Core.Domain.Topics;
 using Nop.Data.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.Installation;
 
 [NopSchemaMigration("2020/03/13 09:36:08:9037677", "Nop.Data base indexes", MigrationProcessType.Installation)]
 public class Indexes : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         Create.Index("IX_UrlRecord_Slug")
             .OnTable(nameof(UrlRecord))
             .OnColumn(nameof(UrlRecord.Slug))
@@ -361,6 +364,7 @@ public class Indexes : ForwardOnlyMigration
             .OnColumn(nameof(ProductManufacturer.ManufacturerId)).Ascending()
             .WithOptions().NonClustered()
             .Include(nameof(ProductManufacturer.ProductId));
+			_logger.LogWarning("<<< Exiting Up()");
     }
 
     #endregion

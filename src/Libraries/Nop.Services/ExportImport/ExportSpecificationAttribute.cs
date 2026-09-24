@@ -1,10 +1,12 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Services.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.ExportImport;
 
 public partial class ExportSpecificationAttribute : ProductSpecificationAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected ExportSpecificationAttribute() { }
 
     /// <summary>
@@ -20,8 +22,10 @@ public partial class ExportSpecificationAttribute : ProductSpecificationAttribut
     /// <returns></returns>
     public static async Task<ExportSpecificationAttribute> CreateAsync(ProductSpecificationAttribute specificationAttribute, ISpecificationAttributeService specificationAttributeService)
     {
+		_logger.LogError(">>> Entering CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService})", specificationAttribute, specificationAttributeService);
         var specificationAttributeOption = await specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(specificationAttribute.SpecificationAttributeOptionId);
 
+		_logger.LogError("CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService}): specificationAttributeOption → {SpecificationAttributeOption}", specificationAttribute, specificationAttributeService, specificationAttributeOption);
         var attribute = new ExportSpecificationAttribute
         {
             Id = specificationAttribute.Id,
@@ -37,6 +41,7 @@ public partial class ExportSpecificationAttribute : ProductSpecificationAttribut
         {
             case SpecificationAttributeType.Option:
                 attribute.CustomValue = specificationAttributeOption.Name;
+				_logger.LogDebug("CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService}): attribute.CustomValue → {Arg2}", specificationAttribute, specificationAttributeService, attribute.CustomValue);
                 break;
             case SpecificationAttributeType.CustomText:
             case SpecificationAttributeType.CustomHtmlText:
@@ -45,6 +50,7 @@ public partial class ExportSpecificationAttribute : ProductSpecificationAttribut
                 break;
         }
 
+		_logger.LogWarning("<<< Exiting CreateAsync(specificationAttribute={SpecificationAttribute},specificationAttributeService={SpecificationAttributeService})", specificationAttribute, specificationAttributeService);
         return attribute;
     }
 }

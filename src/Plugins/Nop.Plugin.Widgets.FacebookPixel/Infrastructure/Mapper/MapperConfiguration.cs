@@ -2,6 +2,7 @@
 using Nop.Core.Infrastructure.Mapper;
 using Nop.Plugin.Widgets.FacebookPixel.Domain;
 using Nop.Plugin.Widgets.FacebookPixel.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Infrastructure.Mapper;
 
@@ -10,10 +11,12 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Infrastructure.Mapper;
 /// </summary>
 public class MapperConfiguration : Profile, IOrderedMapperProfile
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MapperConfiguration()
     {
+		_logger.LogError(">>> Entering MapperConfiguration()");
         CreateMap<FacebookPixelConfiguration, FacebookPixelModel>()
             .ForMember(model => model.AvailableStores, options => options.Ignore())
             .ForMember(model => model.CustomEventSearchModel, options => options.Ignore())
@@ -23,6 +26,7 @@ public class MapperConfiguration : Profile, IOrderedMapperProfile
             .ForMember(model => model.StoreName, options => options.Ignore());
         CreateMap<FacebookPixelModel, FacebookPixelConfiguration>()
             .ForMember(entity => entity.CustomEvents, options => options.Ignore());
+			_logger.LogWarning("<<< Exiting MapperConfiguration()");
     }
 
     #endregion

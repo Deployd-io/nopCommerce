@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Razor.TagHelpers;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Nop.Web.Framework.UI;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Shared;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Framework.TagHelpers.Shared;
 [HtmlTargetElement(LINK_TAG_NAME, Attributes = "[rel=stylesheet]")]
 public partial class NopLinkTagHelper : UrlResolutionTagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string LINK_TAG_NAME = "link";
@@ -31,7 +33,10 @@ public partial class NopLinkTagHelper : UrlResolutionTagHelper
         INopHtmlHelper nopHtmlHelper,
         IUrlHelperFactory urlHelperFactory) : base(urlHelperFactory, htmlEncoder)
     {
+		_logger.LogError(">>> Entering NopLinkTagHelper(htmlEncoder={HtmlEncoder},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory})", htmlEncoder, nopHtmlHelper, urlHelperFactory);
         _nopHtmlHelper = nopHtmlHelper;
+		_logger.LogDebug("NopLinkTagHelper(htmlEncoder={HtmlEncoder},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory}): _nopHtmlHelper → {_nopHtmlHelper}", htmlEncoder, nopHtmlHelper, urlHelperFactory, _nopHtmlHelper);
+    _logger.LogWarning("<<< Exiting NopLinkTagHelper(htmlEncoder={HtmlEncoder},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory})", htmlEncoder, nopHtmlHelper, urlHelperFactory);
     }
 
     #endregion
@@ -40,6 +45,7 @@ public partial class NopLinkTagHelper : UrlResolutionTagHelper
 
     public override Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -48,6 +54,7 @@ public partial class NopLinkTagHelper : UrlResolutionTagHelper
 
         output.SuppressOutput();
 
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
         return Task.CompletedTask;
     }
 

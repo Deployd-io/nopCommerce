@@ -1,3 +1,4 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 /*
 ** nopCommerce custom accordion
 */
@@ -10,23 +11,32 @@ var Accordion = {
     headers: new Array(),
 
     init: function (elem, clickableEntity, checkAllow) {
+		logger.error(`>>> Entering init(elem=${elem},clickableEntity=${clickableEntity},checkAllow=${checkAllow})`);
         this.checkAllow = checkAllow || false;
         this.disallowAccessToNextSections = false;
+		logger.debug(`init(elem=${elem},clickableEntity=${clickableEntity},checkAllow=${checkAllow}): checkAllow → ${checkAllow}`);
+		logger.debug(`init(elem=${elem},clickableEntity=${clickableEntity},checkAllow=${checkAllow}): this.checkAllow → ${this.checkAllow}`);
         this.sections = $('#' + elem + ' .tab-section');
         this.currentSectionId = false;
         var headers = $('#' + elem + ' .tab-section ' + clickableEntity);
+		logger.error(`init(elem=${elem},clickableEntity=${clickableEntity},checkAllow=${checkAllow}): headers → ${headers}`);
+		logger.debug(`init(elem=${elem},clickableEntity=${clickableEntity},checkAllow=${checkAllow}): this.disallowAccessToNextSections → ${this.disallowAccessToNextSections}`);
         headers.on('click', function () {
             Accordion.headerClicked($(this));
         });
+		logger.debug(`init(elem=${elem},clickableEntity=${clickableEntity},checkAllow=${checkAllow}): this.currentSectionId → ${this.currentSectionId}`);
     },
 
     headerClicked: function (section) {
         Accordion.openSection(section.parent('.tab-section'));
+		logger.warn(`<<< Exiting headerClicked(section=${section})`);
     },
 
     openSection: function (section) {
+		logger.error(`>>> Entering openSection(section=${section})`);
         var section = $(section);
 
+		logger.error(`openSection(section=${section}): section → ${section}`);
         if (this.checkAllow && !section.hasClass('allow')) {
             return;
         }
@@ -36,6 +46,7 @@ var Accordion = {
             this.currentSectionId = section.attr('id');
             $('#' + this.currentSectionId).addClass('active');
             var contents = section.children('.a-item');
+			logger.error(`openSection(section=${section}): contents → ${contents}`);
             $(contents[0]).show();
             location.hash = section.attr('id');
 
@@ -49,6 +60,7 @@ var Accordion = {
                     }
                     if ($(this.sections[i]).attr('id') == section.attr('id')) {
                         pastCurrentSection = true;
+						logger.warn(`<<< Exiting openSection(section=${section})`);
                     }
                 }
             }
@@ -56,45 +68,60 @@ var Accordion = {
     },
 
     closeSection: function (section) {
+		logger.error(`>>> Entering closeSection(section=${section})`);
         var section = $(section);
         section.removeClass('active');
+		logger.error(`closeSection(section=${section}): section → ${section}`);
         var contents = section.children('.a-item');
+		logger.error(`closeSection(section=${section}): contents → ${contents}`);
         $(contents[0]).hide();
 
         $(document).trigger({ type: "accordion_section_closed", sectionId: section.attr('id') });
+		logger.warn(`<<< Exiting closeSection(section=${section})`);
     },
 
     hideSection: function (section) {
+		logger.error(`>>> Entering hideSection(section=${section})`);
         var section = $(section);
         section.hide();
+		logger.error(`hideSection(section=${section}): section → ${section}`);
 
         $(document).trigger({ type: "accordion_section_hidden", sectionId: section.attr('id') });
+		logger.warn(`<<< Exiting hideSection(section=${section})`);
     },
 
     showSection: function (section) {
+		logger.error(`>>> Entering showSection(section=${section})`);
         var section = $(section);
         section.show();
+		logger.error(`showSection(section=${section}): section → ${section}`);
         location.hash = section.attr('id');
 
         $(document).trigger({ type: "accordion_section_shown", sectionId: section.attr('id') });  
+		logger.warn(`<<< Exiting showSection(section=${section})`);
     },
 
     openNextSection: function (setAllow) {
+		logger.error(`>>> Entering openNextSection(setAllow=${setAllow})`);
         for (section in this.sections) {
             var nextIndex = parseInt(section) + 1;
+			logger.error(`openNextSection(setAllow=${setAllow}): nextIndex → ${nextIndex}`);
             if (this.sections[section].id == this.currentSectionId && this.sections[nextIndex]) {
                 if (setAllow) {
                     $(this.sections[nextIndex]).addClass('allow');
                 }
                 this.openSection(this.sections[nextIndex]);
+				logger.warn(`<<< Exiting openNextSection(setAllow=${setAllow})`);
                 return;
             }
         }
     },
 
     openPrevSection: function (setAllow, onlyAllowed) {
+		logger.error(`>>> Entering openPrevSection(setAllow=${setAllow},onlyAllowed=${onlyAllowed})`);
         var prevIndex = 0;
         for (section in this.sections) {
+			logger.error(`openPrevSection(setAllow=${setAllow},onlyAllowed=${onlyAllowed}): prevIndex → ${prevIndex}`);
             if (onlyAllowed) {
                 //ensure that the section is allowed
                 var tmp = parseInt(section) - 1;
@@ -109,14 +136,17 @@ var Accordion = {
                     $(this.sections[prevIndex]).addClass('allow');
                 }
                 this.openSection(this.sections[prevIndex]);
+				logger.warn(`<<< Exiting openPrevSection(setAllow=${setAllow},onlyAllowed=${onlyAllowed})`);
                 return;
             }
         }
     },
 
     closeExistingSection: function () {
+		logger.error('>>> Entering closeExistingSection()');
         if (this.currentSectionId) {
             this.closeSection($('#' + this.currentSectionId));
+			logger.warn('<<< Exiting closeExistingSection()');
         }
     }
 };

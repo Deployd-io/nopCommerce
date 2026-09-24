@@ -20,6 +20,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class HomeModelFactory : IHomeModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AdminAreaSettings _adminAreaSettings;
@@ -47,14 +48,23 @@ public partial class HomeModelFactory : IHomeModelFactory
         NopHttpClient nopHttpClient)
     {
         _adminAreaSettings = adminAreaSettings;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _adminAreaSettings → {_adminAreaSettings}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _adminAreaSettings);
         _commonModelFactory = commonModelFactory;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _commonModelFactory → {_commonModelFactory}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _commonModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _localizationService → {_localizationService}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _localizationService);
         _logger = logger;
+		_logger.LogError(">>> Entering HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient})", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient);
         _orderModelFactory = orderModelFactory;
         _settingService = settingService;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _orderModelFactory → {_orderModelFactory}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _orderModelFactory);
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _settingService → {_settingService}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _settingService);
         _staticCacheManager = staticCacheManager;
         _workContext = workContext;
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _staticCacheManager → {_staticCacheManager}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _staticCacheManager);
         _nopHttpClient = nopHttpClient;
+		_logger.LogWarning("<<< Exiting HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient})", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient);
+		_logger.LogDebug("HomeModelFactory(adminAreaSettings={AdminAreaSettings},commonModelFactory={CommonModelFactory},localizationService={LocalizationService},logger={Logger},orderModelFactory={OrderModelFactory},settingService={SettingService},staticCacheManager={StaticCacheManager},workContext={WorkContext},nopHttpClient={NopHttpClient}): _nopHttpClient → {_nopHttpClient}", adminAreaSettings, commonModelFactory, localizationService, logger, orderModelFactory, settingService, staticCacheManager, workContext, nopHttpClient, _nopHttpClient);
     }
 
     #endregion
@@ -71,10 +81,12 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DashboardModel> PrepareDashboardModelAsync(DashboardModel model)
     {
+		_logger.LogError(">>> Entering PrepareDashboardModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         model.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
 
+		_logger.LogWarning("<<< Exiting PrepareDashboardModelAsync(model={Model})", model);
         return model;
     }
 
@@ -88,18 +100,25 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DataTablesModel> PreparePopularSearchTermReportModelAsync(DataTablesModel model)
     {
+		_logger.LogError(">>> Entering PreparePopularSearchTermReportModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var searchModel = new PopularSearchTermSearchModel();
+		_logger.LogError("PreparePopularSearchTermReportModelAsync(model={Model}): searchModel → {SearchModel}", model, searchModel);
         searchModel = await _commonModelFactory.PreparePopularSearchTermSearchModelAsync(searchModel);
 
         model.Name = "search-term-report-grid";
+		_logger.LogDebug("PreparePopularSearchTermReportModelAsync(model={Model}): model.Name → {Arg1}", model, model.Name);
         model.UrlRead = new DataUrl("PopularSearchTermsReport", "Common", null);
         model.Length = searchModel.Length;
+		_logger.LogDebug("PreparePopularSearchTermReportModelAsync(model={Model}): model.Length → {Arg1}", model, model.Length);
+		_logger.LogDebug("PreparePopularSearchTermReportModelAsync(model={Model}): model.LengthMenu → {Arg1}", model, model.LengthMenu);
+		_logger.LogDebug("PreparePopularSearchTermReportModelAsync(model={Model}): model.RefreshButton → {Arg1}", model, model.RefreshButton);
         model.LengthMenu = searchModel.AvailablePageSizes;
         model.RefreshButton = false;
         model.ColumnCollection = new List<ColumnProperty>
         {
+			_logger.LogDebug("PreparePopularSearchTermReportModelAsync(model={Model}): model.ColumnCollection → {Arg1}", model, model.ColumnCollection);
             new(nameof(PopularSearchTermModel.Keyword))
             {
                 Title = await _localizationService.GetResourceAsync("Admin.SearchTermReport.Keyword")
@@ -110,6 +129,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             }
         };
 
+		_logger.LogWarning("<<< Exiting PreparePopularSearchTermReportModelAsync(model={Model})", model);
         return model;
     }
 
@@ -123,17 +143,23 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DataTablesModel> PrepareBestsellersBriefReportByAmountModelAsync(DataTablesModel model)
     {
+		_logger.LogError(">>> Entering PrepareBestsellersBriefReportByAmountModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var searchModel = new BestsellerBriefSearchModel();
+		_logger.LogError("PrepareBestsellersBriefReportByAmountModelAsync(model={Model}): searchModel → {SearchModel}", model, searchModel);
         searchModel = await _orderModelFactory.PrepareBestsellerBriefSearchModelAsync(searchModel);
 
         model.Name = "bestsellers-byamount-grid";
+		_logger.LogDebug("PrepareBestsellersBriefReportByAmountModelAsync(model={Model}): model.Name → {Arg1}", model, model.Name);
         model.UrlRead = new DataUrl("BestsellersBriefReportByAmountList", "Order", new RouteValueDictionary { [nameof(searchModel.OrderBy)] = OrderByEnum.OrderByTotalAmount });
         model.Length = searchModel.PageSize;
+		_logger.LogDebug("PrepareBestsellersBriefReportByAmountModelAsync(model={Model}): model.Length → {Arg1}", model, model.Length);
+		_logger.LogDebug("PrepareBestsellersBriefReportByAmountModelAsync(model={Model}): model.RefreshButton → {Arg1}", model, model.RefreshButton);
         model.RefreshButton = false;
         model.ColumnCollection = new List<ColumnProperty>
         {
+			_logger.LogDebug("PrepareBestsellersBriefReportByAmountModelAsync(model={Model}): model.ColumnCollection → {Arg1}", model, model.ColumnCollection);
             new(nameof(BestsellerModel.ProductName))
             {
                 Title = await _localizationService.GetResourceAsync("Admin.Reports.Sales.Bestsellers.Fields.Name")
@@ -155,6 +181,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             }
         };
 
+		_logger.LogWarning("<<< Exiting PrepareBestsellersBriefReportByAmountModelAsync(model={Model})", model);
         return model;
     }
 
@@ -168,17 +195,23 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DataTablesModel> PrepareBestsellersBriefReportByQuantityModelAsync(DataTablesModel model)
     {
+		_logger.LogError(">>> Entering PrepareBestsellersBriefReportByQuantityModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         var searchModel = new BestsellerBriefSearchModel();
+		_logger.LogError("PrepareBestsellersBriefReportByQuantityModelAsync(model={Model}): searchModel → {SearchModel}", model, searchModel);
         searchModel = await _orderModelFactory.PrepareBestsellerBriefSearchModelAsync(searchModel);
 
         model.Name = "bestsellers-byquantity-grid";
+		_logger.LogDebug("PrepareBestsellersBriefReportByQuantityModelAsync(model={Model}): model.Name → {Arg1}", model, model.Name);
         model.UrlRead = new DataUrl("BestsellersBriefReportByQuantityList", "Order", new RouteValueDictionary { [nameof(searchModel.OrderBy)] = OrderByEnum.OrderByQuantity });
         model.Length = searchModel.PageSize;
+		_logger.LogDebug("PrepareBestsellersBriefReportByQuantityModelAsync(model={Model}): model.Length → {Arg1}", model, model.Length);
+		_logger.LogDebug("PrepareBestsellersBriefReportByQuantityModelAsync(model={Model}): model.RefreshButton → {Arg1}", model, model.RefreshButton);
         model.RefreshButton = false;        
         model.ColumnCollection = new List<ColumnProperty>
         {
+			_logger.LogDebug("PrepareBestsellersBriefReportByQuantityModelAsync(model={Model}): model.ColumnCollection → {Arg1}", model, model.ColumnCollection);
             new(nameof(BestsellerModel.ProductName))
             {
                 Title = await _localizationService.GetResourceAsync("Admin.Reports.Sales.Bestsellers.Fields.Name")
@@ -200,6 +233,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             }
         };
 
+		_logger.LogWarning("<<< Exiting PrepareBestsellersBriefReportByQuantityModelAsync(model={Model})", model);
         return model;
     }
 
@@ -214,14 +248,19 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DataTablesModel> PrepareLatestOrdersModelAsync(DataTablesModel model)
     {
+		_logger.LogError(">>> Entering PrepareLatestOrdersModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         model.Name = "orders-grid";
+		_logger.LogDebug("PrepareLatestOrdersModelAsync(model={Model}): model.Name → {Arg1}", model, model.Name);
         model.UrlRead = new DataUrl("OrderList", "Order", null);
         model.Length = 5;
+		_logger.LogDebug("PrepareLatestOrdersModelAsync(model={Model}): model.Length → {Arg1}", model, model.Length);
+		_logger.LogDebug("PrepareLatestOrdersModelAsync(model={Model}): model.RefreshButton → {Arg1}", model, model.RefreshButton);
         model.RefreshButton = false;        
         model.ColumnCollection = new List<ColumnProperty>
         {
+			_logger.LogDebug("PrepareLatestOrdersModelAsync(model={Model}): model.ColumnCollection → {Arg1}", model, model.ColumnCollection);
             new(nameof(OrderModel.CustomOrderNumber))
             {
                 Title = await _localizationService.GetResourceAsync("Admin.Orders.Fields.CustomOrderNumber"),
@@ -254,6 +293,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             }
         };
 
+		_logger.LogWarning("<<< Exiting PrepareLatestOrdersModelAsync(model={Model})", model);
         return model;
     }
 
@@ -267,15 +307,21 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DataTablesModel> PrepareOrderIncompleteModelAsync(DataTablesModel model)
     {
+		_logger.LogError(">>> Entering PrepareOrderIncompleteModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         model.Name = "incomplete-order-report-grid";
+		_logger.LogDebug("PrepareOrderIncompleteModelAsync(model={Model}): model.Name → {Arg1}", model, model.Name);
         model.UrlRead = new DataUrl("OrderIncompleteReportList", "Order", null);
         model.Length = int.MaxValue;
+		_logger.LogDebug("PrepareOrderIncompleteModelAsync(model={Model}): model.Length → {Arg1}", model, model.Length);
+		_logger.LogDebug("PrepareOrderIncompleteModelAsync(model={Model}): model.Paging → {Arg1}", model, model.Paging);
+		_logger.LogDebug("PrepareOrderIncompleteModelAsync(model={Model}): model.Info → {Arg1}", model, model.Info);
         model.Paging = false;
         model.Info = false;
         model.ColumnCollection = new List<ColumnProperty>
         {
+			_logger.LogDebug("PrepareOrderIncompleteModelAsync(model={Model}): model.ColumnCollection → {Arg1}", model, model.ColumnCollection);
             new(nameof(OrderIncompleteReportModel.Item))
             {
                 Title = await _localizationService.GetResourceAsync("Admin.SalesReport.Incomplete.Item")
@@ -294,6 +340,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             }
         };
 
+		_logger.LogWarning("<<< Exiting PrepareOrderIncompleteModelAsync(model={Model})", model);
         return model;
     }
 
@@ -307,15 +354,21 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<DataTablesModel> PrepareOrderAverageModelAsync(DataTablesModel model)
     {
+		_logger.LogError(">>> Entering PrepareOrderAverageModelAsync(model={Model})", model);
         ArgumentNullException.ThrowIfNull(model);
 
         model.Name = "average-order-report-grid";
+		_logger.LogDebug("PrepareOrderAverageModelAsync(model={Model}): model.Name → {Arg1}", model, model.Name);
         model.UrlRead = new DataUrl("OrderAverageReportList", "Order", null);
         model.Length = int.MaxValue;
+		_logger.LogDebug("PrepareOrderAverageModelAsync(model={Model}): model.Length → {Arg1}", model, model.Length);
+		_logger.LogDebug("PrepareOrderAverageModelAsync(model={Model}): model.Paging → {Arg1}", model, model.Paging);
+		_logger.LogDebug("PrepareOrderAverageModelAsync(model={Model}): model.Info → {Arg1}", model, model.Info);
         model.Paging = false;
         model.Info = false;
         model.ColumnCollection = new List<ColumnProperty>
         {
+			_logger.LogDebug("PrepareOrderAverageModelAsync(model={Model}): model.ColumnCollection → {Arg1}", model, model.ColumnCollection);
             new(nameof(OrderAverageReportModel.OrderStatus))
             {
                 Title = await _localizationService.GetResourceAsync("Admin.SalesReport.Average.OrderStatus")
@@ -342,6 +395,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             }
         };
 
+		_logger.LogWarning("<<< Exiting PrepareOrderAverageModelAsync(model={Model})", model);
         return model;
     }
 
@@ -354,6 +408,9 @@ public partial class HomeModelFactory : IHomeModelFactory
     /// </returns>
     public virtual async Task<NopCommerceNewsModel> PrepareNopCommerceNewsModelAsync()
     {
+		_logger.LogError(">>> Entering PrepareNopCommerceNewsModelAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = new NopCommerceNewsModel
         {
             HideAdvertisements = _adminAreaSettings.HideAdvertisementsOnAdminArea
@@ -370,6 +427,8 @@ public partial class HomeModelFactory : IHomeModelFactory
                 }
                 catch (AggregateException exception)
                 {
+					_logger.LogError("Exception in PrepareNopCommerceNewsModelAsync(): {Arg0}", exception.Message);
+					_logger.LogError("Throwing InnerException from PrepareNopCommerceNewsModelAsync()");
                     //rethrow actual excepion
                     throw exception.InnerException;
                 }
@@ -378,6 +437,7 @@ public partial class HomeModelFactory : IHomeModelFactory
             for (var i = 0; i < rssData.Items.Count; i++)
             {
                 var item = rssData.Items.ElementAt(i);
+				_logger.LogError("PrepareNopCommerceNewsModelAsync(): item → {Item}", item);
                 var newsItem = new NopCommerceNewsDetailsModel
                 {
                     Title = item.TitleText,
@@ -392,15 +452,18 @@ public partial class HomeModelFactory : IHomeModelFactory
                     continue;
 
                 var firstRequest = string.IsNullOrEmpty(_adminAreaSettings.LastNewsTitleAdminArea);
+				_logger.LogError("PrepareNopCommerceNewsModelAsync(): firstRequest → {FirstRequest}", firstRequest);
                 if (_adminAreaSettings.LastNewsTitleAdminArea == newsItem.Title)
                     continue;
 
                 _adminAreaSettings.LastNewsTitleAdminArea = newsItem.Title;
+				_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): _adminAreaSettings.LastNewsTitleAdminArea → {Arg0}", _adminAreaSettings.LastNewsTitleAdminArea);
                 await _settingService.SaveSettingAsync(_adminAreaSettings);
 
                 //new item
                 if (!firstRequest)
                     model.HasNewItems = true;
+					_logger.LogDebug("PrepareNopCommerceNewsModelAsync(): model.HasNewItems → {Arg0}", model.HasNewItems);
             }
         }
         catch (Exception ex)
@@ -408,6 +471,8 @@ public partial class HomeModelFactory : IHomeModelFactory
             await _logger.ErrorAsync("No access to the news. Website www.nopcommerce.com is not available.", ex);
         }
 
+		_logger.LogError("PrepareNopCommerceNewsModelAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting PrepareNopCommerceNewsModelAsync()");
         return model;
     }
 

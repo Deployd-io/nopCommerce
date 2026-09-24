@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Nop.Web.Controllers;
 
@@ -6,9 +7,13 @@ namespace Nop.Web.Controllers;
 //they can create guest account(s), etc
 public partial class ErrorController : Controller
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public virtual IActionResult Error()
     {
+		_logger.LogError(">>> Entering Error()");
         Response.StatusCode = StatusCodes.Status500InternalServerError;
+		_logger.LogDebug("Error(): Response.StatusCode → {Arg0}", Response.StatusCode);
+        _logger.LogWarning("<<< Exiting Error()");
         return File("ErrorPage.htm", "text/html");
     }
 }

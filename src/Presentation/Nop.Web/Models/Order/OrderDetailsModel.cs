@@ -4,24 +4,37 @@ using Nop.Services.Orders;
 using Nop.Web.Framework.Models;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Order;
 
 public partial record OrderDetailsModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public OrderDetailsModel()
     {
+		_logger.LogError(">>> Entering OrderDetailsModel()");
         TaxRates = new List<TaxRate>();
         GiftCards = new List<GiftCard>();
+		_logger.LogError("OrderDetailsModel(): GiftCards → {GiftCards}", GiftCards);
+		_logger.LogDebug("OrderDetailsModel(): TaxRates → {TaxRates}", TaxRates);
+		_logger.LogDebug("OrderDetailsModel(): GiftCards → {GiftCards}", GiftCards);
         Items = new List<OrderItemModel>();
+		_logger.LogError("OrderDetailsModel(): Items → {Items}", Items);
         OrderNotes = new List<OrderNote>();
+		_logger.LogError("OrderDetailsModel(): OrderNotes → {OrderNotes}", OrderNotes);
         Shipments = new List<ShipmentBriefModel>();
+		_logger.LogError("OrderDetailsModel(): Shipments → {Shipments}", Shipments);
 
         BillingAddress = new AddressModel();
+		_logger.LogError("OrderDetailsModel(): BillingAddress → {BillingAddress}", BillingAddress);
         ShippingAddress = new AddressModel();
+		_logger.LogError("OrderDetailsModel(): ShippingAddress → {ShippingAddress}", ShippingAddress);
         PickupAddress = new AddressModel();
+		_logger.LogError("OrderDetailsModel(): PickupAddress → {PickupAddress}", PickupAddress);
 
         CustomValues = new CustomValues();
+		_logger.LogError("OrderDetailsModel(): CustomValues → {CustomValues}", CustomValues);
     }
 
     public bool PrintMode { get; set; }
@@ -95,9 +108,14 @@ public partial record OrderDetailsModel : BaseNopEntityModel
 
     public partial record OrderItemModel : BaseNopEntityModel
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         public OrderItemModel()
         {
+			_logger.LogError(">>> Entering OrderItemModel()");
             Picture = new PictureModel();
+			_logger.LogDebug("OrderItemModel(): Picture → {Picture}", Picture);
+        _logger.LogError("OrderItemModel(): Picture → {Picture}", Picture);
+        _logger.LogWarning("<<< Exiting OrderItemModel()");
         }
 
         public Guid OrderItemGuid { get; set; }

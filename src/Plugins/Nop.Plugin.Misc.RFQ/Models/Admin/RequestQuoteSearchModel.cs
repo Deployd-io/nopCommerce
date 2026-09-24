@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Models.Admin;
 
@@ -10,11 +11,16 @@ namespace Nop.Plugin.Misc.RFQ.Models.Admin;
 /// </summary>
 public record RequestQuoteSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public RequestQuoteSearchModel()
     {
+		_logger.LogError(">>> Entering RequestQuoteSearchModel()");
         AvailableRequestQuoteStatuses = new List<SelectListItem>();
+		_logger.LogDebug("RequestQuoteSearchModel(): AvailableRequestQuoteStatuses → {AvailableRequestQuoteStatuses}", AvailableRequestQuoteStatuses);
+    _logger.LogError("RequestQuoteSearchModel(): AvailableRequestQuoteStatuses → {AvailableRequestQuoteStatuses}", AvailableRequestQuoteStatuses);
+    _logger.LogWarning("<<< Exiting RequestQuoteSearchModel()");
     }
 
     #endregion

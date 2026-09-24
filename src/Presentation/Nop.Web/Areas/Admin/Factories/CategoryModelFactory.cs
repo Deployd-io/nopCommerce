@@ -12,6 +12,7 @@ using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CategoryModelFactory : ICategoryModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -52,18 +54,30 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
         IUrlRecordService urlRecordService)
     {
+		_logger.LogError(">>> Entering CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService})", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService);
         _catalogSettings = catalogSettings;
         _currencySettings = currencySettings;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _currencySettings → {_currencySettings}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _currencySettings);
         _currencyService = currencyService;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _currencyService → {_currencyService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _currencyService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _baseAdminModelFactory);
         _categoryService = categoryService;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _categoryService → {_categoryService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _categoryService);
         _discountService = discountService;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _discountService → {_discountService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _discountService);
         _discountSupportedModelFactory = discountSupportedModelFactory;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _discountSupportedModelFactory → {_discountSupportedModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _discountSupportedModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _localizationService → {_localizationService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _localizedModelFactory → {_localizedModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _localizedModelFactory);
         _productService = productService;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _productService → {_productService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _productService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _storeMappingSupportedModelFactory);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("CategoryModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},categoryService={CategoryService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _urlRecordService → {_urlRecordService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, categoryService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _urlRecordService);
     }
 
     #endregion
@@ -78,15 +92,18 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// <returns>Category product search model</returns>
     protected virtual CategoryProductSearchModel PrepareCategoryProductSearchModel(CategoryProductSearchModel searchModel, Category category)
     {
+		_logger.LogError(">>> Entering PrepareCategoryProductSearchModel(searchModel={SearchModel},category={Category})", searchModel, category);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(category);
 
         searchModel.CategoryId = category.Id;
+		_logger.LogDebug("PrepareCategoryProductSearchModel(searchModel={SearchModel},category={Category}): searchModel.CategoryId → {Arg2}", searchModel, category, searchModel.CategoryId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareCategoryProductSearchModel(searchModel={SearchModel},category={Category})", searchModel, category);
         return searchModel;
     }
 
@@ -104,6 +121,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategorySearchModel> PrepareCategorySearchModelAsync(CategorySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -117,6 +135,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             Value = "0",
             Text = await _localizationService.GetResourceAsync("Admin.Catalog.Categories.List.SearchPublished.All")
         });
+			_logger.LogDebug("PrepareCategorySearchModelAsync(searchModel={SearchModel}): Text → {Text}", searchModel, Text);
         searchModel.AvailablePublishedOptions.Add(new SelectListItem
         {
             Value = "1",
@@ -131,6 +150,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -144,6 +164,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategoryListModel> PrepareCategoryListModelAsync(CategorySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
         //get categories
         var categories = await _categoryService.GetAllCategoriesAsync(categoryName: searchModel.SearchCategoryName,
@@ -159,6 +180,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             {
                 //fill in model values from the entity
                 var categoryModel = category.ToModel<CategoryModel>();
+				_logger.LogError("PrepareCategoryListModelAsync(searchModel={SearchModel}): categoryModel → {CategoryModel}", searchModel, categoryModel);
 
                 //fill in additional values (not existing in the entity)
                 categoryModel.Breadcrumb = await _categoryService.GetFormattedBreadCrumbAsync(category);
@@ -168,6 +190,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -183,6 +206,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategoryModel> PrepareCategoryModelAsync(CategoryModel model, Category category, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties})", model, category, excludeProperties);
         Func<CategoryLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (category != null)
@@ -191,6 +215,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             if (model == null)
             {
                 model = category.ToModel<CategoryModel>();
+				_logger.LogError("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model → {Model1}", model, category, excludeProperties, model);
                 model.SeName = await _urlRecordService.GetSeNameAsync(category, 0, true, false);
             }
 
@@ -213,6 +238,14 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         if (category == null)
         {
             model.PageSize = _catalogSettings.DefaultCategoryPageSize;
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PageSize → {Arg3}", model, category, excludeProperties, model.PageSize);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PageSizeOptions → {Arg3}", model, category, excludeProperties, model.PageSizeOptions);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, category, excludeProperties, model.Published);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.AllowCustomersToSelectPageSize → {Arg3}", model, category, excludeProperties, model.AllowCustomersToSelectPageSize);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PriceRangeFiltering → {Arg3}", model, category, excludeProperties, model.PriceRangeFiltering);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.ManuallyPriceRange → {Arg3}", model, category, excludeProperties, model.ManuallyPriceRange);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PriceFrom → {Arg3}", model, category, excludeProperties, model.PriceFrom);
+			_logger.LogDebug("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): model.PriceTo → {Arg3}", model, category, excludeProperties, model.PriceTo);
             model.PageSizeOptions = _catalogSettings.DefaultCategoryPageSizeOptions;
             model.Published = true;
             model.AllowCustomersToSelectPageSize = true;
@@ -237,6 +270,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
 
         //prepare model discounts
         var availableDiscounts = await _discountService.GetAllDiscountsAsync(DiscountType.AssignedToCategories, showHidden: true, isActive: null);
+		_logger.LogError("PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties}): availableDiscounts → {AvailableDiscounts}", model, category, excludeProperties, availableDiscounts);
         await _discountSupportedModelFactory.PrepareModelDiscountsAsync(model, category, availableDiscounts, excludeProperties);
 
         //prepare model stores
@@ -244,6 +278,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
 
         await _baseAdminModelFactory.PreparePreTranslationSupportModelAsync(model);
 
+		_logger.LogWarning("<<< Exiting PrepareCategoryModelAsync(model={Model},category={Category},excludeProperties={ExcludeProperties})", model, category, excludeProperties);
         return model;
     }
 
@@ -258,6 +293,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<CategoryProductListModel> PrepareCategoryProductListModelAsync(CategoryProductSearchModel searchModel, Category category)
     {
+		_logger.LogError(">>> Entering PrepareCategoryProductListModelAsync(searchModel={SearchModel},category={Category})", searchModel, category);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(category);
@@ -274,6 +310,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             {
                 //fill in model values from the entity
                 var categoryProductModel = productCategory.ToModel<CategoryProductModel>();
+				_logger.LogError("PrepareCategoryProductListModelAsync(searchModel={SearchModel},category={Category}): categoryProductModel → {CategoryProductModel}", searchModel, category, categoryProductModel);
 
                 //fill in additional values (not existing in the entity)
                 categoryProductModel.ProductName = (await _productService.GetProductByIdAsync(productCategory.ProductId))?.Name;
@@ -282,6 +319,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareCategoryProductListModelAsync(searchModel={SearchModel},category={Category})", searchModel, category);
         return model;
     }
 
@@ -295,6 +333,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<AddProductToCategorySearchModel> PrepareAddProductToCategorySearchModelAsync(AddProductToCategorySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareAddProductToCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available categories
@@ -315,6 +354,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareAddProductToCategorySearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -328,6 +368,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
     /// </returns>
     public virtual async Task<AddProductToCategoryListModel> PrepareAddProductToCategoryListModelAsync(AddProductToCategorySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareAddProductToCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get products
@@ -346,6 +387,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             return products.SelectAwait(async product =>
             {
                 var productModel = product.ToModel<ProductModel>();
+				_logger.LogError("PrepareAddProductToCategoryListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
 
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
@@ -353,6 +395,7 @@ public partial class CategoryModelFactory : ICategoryModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareAddProductToCategoryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

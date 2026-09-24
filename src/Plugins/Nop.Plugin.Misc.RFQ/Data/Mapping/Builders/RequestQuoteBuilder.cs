@@ -3,11 +3,13 @@ using Nop.Core.Domain.Customers;
 using Nop.Data.Extensions;
 using Nop.Data.Mapping.Builders;
 using Nop.Plugin.Misc.RFQ.Domains;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.RFQ.Data.Mapping.Builders;
 
 public class RequestQuoteBuilder : NopEntityBuilder<RequestQuote>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -16,7 +18,9 @@ public class RequestQuoteBuilder : NopEntityBuilder<RequestQuote>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogError(">>> Entering MapEntity(table={Table})", table);
         table.WithColumn(nameof(RequestQuote.CustomerId)).AsInt32().ForeignKey<Customer>();
+		_logger.LogWarning("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

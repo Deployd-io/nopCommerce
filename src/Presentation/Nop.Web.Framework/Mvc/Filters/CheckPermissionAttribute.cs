@@ -6,6 +6,7 @@ using Nop.Core;
 using Nop.Data;
 using Nop.Services.Localization;
 using Nop.Services.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class CheckPermissionAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -24,9 +26,18 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
     /// <param name="resultType">The result type for not confirmed access situation</param>
     public CheckPermissionAttribute(string permissionSystemName, CheckPermissionResultType resultType = CheckPermissionResultType.Default) : base(typeof(CheckPermissionFilter))
     {
+		_logger.LogError(">>> Entering CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType})", permissionSystemName, resultType);
         Arguments = new object[] { resultType, new List<string> { permissionSystemName } };
+		_logger.LogError("CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType}): Arguments → {Arguments}", permissionSystemNames, resultType, Arguments);
+		_logger.LogDebug("CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType}): Arguments → {Arguments}", permissionSystemName, resultType, Arguments);
         PermissionSystemName.Add(permissionSystemName);
         ResultType = resultType;
+		_logger.LogDebug("CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType}): ResultType → {ResultType1}", permissionSystemName, resultType, ResultType);
+    _logger.LogWarning("<<< Exiting CheckPermissionAttribute(permissionSystemName={PermissionSystemName},resultType={ResultType})", permissionSystemName, resultType);
+		_logger.LogError(">>> Entering CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType})", permissionSystemNames, resultType);
+		_logger.LogWarning("<<< Exiting CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType})", permissionSystemNames, resultType);
+		_logger.LogDebug("CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType}): Arguments → {Arguments}", permissionSystemNames, resultType, Arguments);
+		_logger.LogDebug("CheckPermissionAttribute(permissionSystemNames={PermissionSystemNames},resultType={ResultType}): ResultType → {ResultType1}", permissionSystemNames, resultType, ResultType);
     }
 
     /// <summary>
@@ -64,6 +75,7 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
     /// </summary>
     private class CheckPermissionFilter : IAsyncAuthorizationFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly IHttpContextAccessor _httpContextAccessor;
@@ -85,13 +97,22 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
             IPermissionService permissionService,
             IWebHelper webHelper)
         {
+			_logger.LogError(">>> Entering CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper})", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper);
             _resultType = resultType;
+			_logger.LogError("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _resultType → {_resultType}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _resultType);
+			_logger.LogDebug("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _resultType → {_resultType}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _resultType);
             _permissionSystemNames = permissionSystemNames;
 
+			_logger.LogDebug("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _permissionSystemNames → {_permissionSystemNames}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _permissionSystemNames);
             _httpContextAccessor = httpContextAccessor;
+			_logger.LogDebug("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _httpContextAccessor → {_httpContextAccessor}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _httpContextAccessor);
             _localizationService = localizationService;
+			_logger.LogDebug("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _localizationService → {_localizationService}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _localizationService);
             _permissionService = permissionService;
+			_logger.LogDebug("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _permissionService → {_permissionService}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _permissionService);
             _webHelper = webHelper;
+			_logger.LogDebug("CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper}): _webHelper → {_webHelper}", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper, _webHelper);
+        _logger.LogWarning("<<< Exiting CheckPermissionFilter(resultType={ResultType},permissionSystemNames={PermissionSystemNames},httpContextAccessor={HttpContextAccessor},localizationService={LocalizationService},permissionService={PermissionService},webHelper={WebHelper})", resultType, permissionSystemNames, httpContextAccessor, localizationService, permissionService, webHelper);
         }
 
         #endregion
@@ -105,13 +126,16 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task AuthorizeAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering AuthorizeAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
                 return;
 
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (!context.Filters.Any(filter => filter is CheckPermissionFilter))
                 return;
+				_logger.LogError("AuthorizeAsync(context)={Context}: database query executed in {Arg1} ms", context, __logStart.ElapsedMilliseconds);
 
             //authorize permission
             foreach (var permissionSystemName in _permissionSystemNames)
@@ -119,6 +143,7 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
                     return;
 
             var resultType = _resultType;
+			_logger.LogError("AuthorizeAsync(context={Context}): resultType → {ResultType}", context, resultType);
 
             var request = _httpContextAccessor.HttpContext?.Request;
 
@@ -144,7 +169,9 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
                     : string.Empty;
 
                 var pageSystemNameKey = $"{controller}.{action}";
+				_logger.LogError("AuthorizeAsync(context={Context}): pageSystemNameKey → {PageSystemNameKey}", context, pageSystemNameKey);
 
+			_logger.LogDebug("AuthorizeAsync(context={Context}): context.Result → {Arg1}", context, context.Result);
                 return new RedirectToActionResult("AccessDenied", "Security",
                     new { pageUrl = _webHelper.GetRawUrl(request), pageSystemNameKey });
             }
@@ -157,12 +184,15 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
                 }),
                 CheckPermissionResultType.Html => html(),
                 CheckPermissionResultType.Text => new ContentResult
+					_logger.LogDebug("AuthorizeAsync(context={Context}): error → {Error}", context, error);
                 {
+					_logger.LogDebug("AuthorizeAsync(context={Context}): CheckPermissionResultType.Text → {Arg1}", context, CheckPermissionResultType.Text);
                     Content = await _localizationService.GetResourceAsync("Admin.AccessDenied.Description"),
                     ContentType = "text/plain",
                 },
                 _ => context.Result
             };
+			_logger.LogWarning("<<< Exiting AuthorizeAsync(context={Context})", context);
         }
 
         #endregion
@@ -176,7 +206,9 @@ public sealed class CheckPermissionAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering OnAuthorizationAsync(context={Context})", context);
             await AuthorizeAsync(context);
+			_logger.LogWarning("<<< Exiting OnAuthorizationAsync(context={Context})", context);
         }
 
         #endregion

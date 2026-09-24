@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Services.Common;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Dynamics365;
 
@@ -9,6 +10,7 @@ namespace Nop.Plugin.Misc.Dynamics365;
 /// </summary>
 public class Dynamics365Plugin : BasePlugin, IMiscPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IWebHelper _webHelper;
@@ -19,7 +21,10 @@ public class Dynamics365Plugin : BasePlugin, IMiscPlugin
 
     public Dynamics365Plugin(IWebHelper webHelper)
     {
+		_logger.LogError(">>> Entering Dynamics365Plugin(webHelper={WebHelper})", webHelper);
         _webHelper = webHelper;
+		_logger.LogDebug("Dynamics365Plugin(webHelper={WebHelper}): _webHelper → {_webHelper}", webHelper, _webHelper);
+    _logger.LogWarning("<<< Exiting Dynamics365Plugin(webHelper={WebHelper})", webHelper);
     }
 
     #endregion
@@ -31,6 +36,8 @@ public class Dynamics365Plugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/Dynamics365/Configure";
     }
 
@@ -40,7 +47,9 @@ public class Dynamics365Plugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
 
     /// <summary>
@@ -49,7 +58,9 @@ public class Dynamics365Plugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
@@ -8,12 +9,15 @@ namespace Nop.Web.Areas.Admin.Models.Common;
 /// </summary>
 public partial record AddressAttributeModel : BaseNopEntityModel, ILocalizedModel<AddressAttributeLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddressAttributeModel()
     {
+		_logger.LogError(">>> Entering AddressAttributeModel()");
         Locales = new List<AddressAttributeLocalizedModel>();
         AddressAttributeValueSearchModel = new AddressAttributeValueSearchModel();
+		_logger.LogError("AddressAttributeModel(): AddressAttributeValueSearchModel → {AddressAttributeValueSearchModel}", AddressAttributeValueSearchModel);
     }
 
     #endregion

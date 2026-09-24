@@ -12,6 +12,7 @@ using Nop.Web.Areas.Admin.Models.Catalog;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ManufacturerModelFactory : IManufacturerModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -52,18 +54,30 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
         IUrlRecordService urlRecordService)
     {
+		_logger.LogError(">>> Entering ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService})", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService);
         _catalogSettings = catalogSettings;
         _currencySettings = currencySettings;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _currencySettings → {_currencySettings}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _currencySettings);
         _currencyService = currencyService;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _currencyService → {_currencyService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _currencyService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _baseAdminModelFactory);
         _manufacturerService = manufacturerService;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _manufacturerService → {_manufacturerService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _manufacturerService);
         _discountService = discountService;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _discountService → {_discountService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _discountService);
         _discountSupportedModelFactory = discountSupportedModelFactory;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _discountSupportedModelFactory → {_discountSupportedModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _discountSupportedModelFactory);
         _localizationService = localizationService;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _localizationService → {_localizationService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _localizationService);
         _localizedModelFactory = localizedModelFactory;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _localizedModelFactory → {_localizedModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _localizedModelFactory);
         _productService = productService;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _productService → {_productService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _productService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _storeMappingSupportedModelFactory);
         _urlRecordService = urlRecordService;
+		_logger.LogDebug("ManufacturerModelFactory(catalogSettings={CatalogSettings},currencySettings={CurrencySettings},currencyService={CurrencyService},baseAdminModelFactory={BaseAdminModelFactory},manufacturerService={ManufacturerService},discountService={DiscountService},discountSupportedModelFactory={DiscountSupportedModelFactory},localizationService={LocalizationService},localizedModelFactory={LocalizedModelFactory},productService={ProductService},storeMappingSupportedModelFactory=<redacted>,urlRecordService={UrlRecordService}): _urlRecordService → {_urlRecordService}", catalogSettings, currencySettings, currencyService, baseAdminModelFactory, manufacturerService, discountService, discountSupportedModelFactory, localizationService, localizedModelFactory, productService, urlRecordService, _urlRecordService);
     }
 
     #endregion
@@ -79,15 +93,18 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     protected virtual ManufacturerProductSearchModel PrepareManufacturerProductSearchModel(ManufacturerProductSearchModel searchModel,
         Manufacturer manufacturer)
     {
+		_logger.LogError(">>> Entering PrepareManufacturerProductSearchModel(searchModel={SearchModel},manufacturer={Manufacturer})", searchModel, manufacturer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(manufacturer);
 
         searchModel.ManufacturerId = manufacturer.Id;
+		_logger.LogDebug("PrepareManufacturerProductSearchModel(searchModel={SearchModel},manufacturer={Manufacturer}): searchModel.ManufacturerId → {Arg2}", searchModel, manufacturer, searchModel.ManufacturerId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareManufacturerProductSearchModel(searchModel={SearchModel},manufacturer={Manufacturer})", searchModel, manufacturer);
         return searchModel;
     }
 
@@ -105,6 +122,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<ManufacturerSearchModel> PrepareManufacturerSearchModelAsync(ManufacturerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -118,6 +136,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             Value = "0",
             Text = await _localizationService.GetResourceAsync("Admin.Catalog.Manufacturers.List.SearchPublished.All")
         });
+			_logger.LogDebug("PrepareManufacturerSearchModelAsync(searchModel={SearchModel}): Text → {Text}", searchModel, Text);
         searchModel.AvailablePublishedOptions.Add(new SelectListItem
         {
             Value = "1",
@@ -132,6 +151,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -145,6 +165,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<ManufacturerListModel> PrepareManufacturerListModelAsync(ManufacturerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get manufacturers
@@ -161,6 +182,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             return manufacturers.SelectAwait(async manufacturer =>
             {
                 var manufacturerModel = manufacturer.ToModel<ManufacturerModel>();
+				_logger.LogError("PrepareManufacturerListModelAsync(searchModel={SearchModel}): manufacturerModel → {ManufacturerModel}", searchModel, manufacturerModel);
 
                 manufacturerModel.SeName = await _urlRecordService.GetSeNameAsync(manufacturer, 0, true, false);
 
@@ -168,6 +190,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -184,6 +207,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     public virtual async Task<ManufacturerModel> PrepareManufacturerModelAsync(ManufacturerModel model,
         Manufacturer manufacturer, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties})", model, manufacturer, excludeProperties);
         Func<ManufacturerLocalizedModel, int, Task> localizedModelConfiguration = null;
 
         if (manufacturer != null)
@@ -192,6 +216,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             if (model == null)
             {
                 model = manufacturer.ToModel<ManufacturerModel>();
+				_logger.LogError("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model → {Model1}", model, manufacturer, excludeProperties, model);
                 model.SeName = await _urlRecordService.GetSeNameAsync(manufacturer, 0, true, false);
             }
 
@@ -214,6 +239,14 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
         if (manufacturer == null)
         {
             model.PageSize = _catalogSettings.DefaultManufacturerPageSize;
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.PageSize → {Arg3}", model, manufacturer, excludeProperties, model.PageSize);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.PageSizeOptions → {Arg3}", model, manufacturer, excludeProperties, model.PageSizeOptions);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, manufacturer, excludeProperties, model.Published);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.AllowCustomersToSelectPageSize → {Arg3}", model, manufacturer, excludeProperties, model.AllowCustomersToSelectPageSize);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.PriceRangeFiltering → {Arg3}", model, manufacturer, excludeProperties, model.PriceRangeFiltering);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.ManuallyPriceRange → {Arg3}", model, manufacturer, excludeProperties, model.ManuallyPriceRange);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.PriceFrom → {Arg3}", model, manufacturer, excludeProperties, model.PriceFrom);
+			_logger.LogDebug("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): model.PriceTo → {Arg3}", model, manufacturer, excludeProperties, model.PriceTo);
             model.PageSizeOptions = _catalogSettings.DefaultManufacturerPageSizeOptions;
             model.Published = true;
             model.AllowCustomersToSelectPageSize = true;
@@ -234,6 +267,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
 
         //prepare model discounts
         var availableDiscounts = await _discountService.GetAllDiscountsAsync(DiscountType.AssignedToManufacturers, showHidden: true, isActive: null);
+		_logger.LogError("PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties}): availableDiscounts → {AvailableDiscounts}", model, manufacturer, excludeProperties, availableDiscounts);
         await _discountSupportedModelFactory.PrepareModelDiscountsAsync(model, manufacturer, availableDiscounts, excludeProperties);
         
         //prepare model stores
@@ -241,6 +275,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
 
         await _baseAdminModelFactory.PreparePreTranslationSupportModelAsync(model);
 
+		_logger.LogWarning("<<< Exiting PrepareManufacturerModelAsync(model={Model},manufacturer={Manufacturer},excludeProperties={ExcludeProperties})", model, manufacturer, excludeProperties);
         return model;
     }
 
@@ -256,6 +291,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     public virtual async Task<ManufacturerProductListModel> PrepareManufacturerProductListModelAsync(ManufacturerProductSearchModel searchModel,
         Manufacturer manufacturer)
     {
+		_logger.LogError(">>> Entering PrepareManufacturerProductListModelAsync(searchModel={SearchModel},manufacturer={Manufacturer})", searchModel, manufacturer);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(manufacturer);
@@ -272,6 +308,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             {
                 //fill in model values from the entity
                 var manufacturerProductModel = productManufacturer.ToModel<ManufacturerProductModel>();
+				_logger.LogError("PrepareManufacturerProductListModelAsync(searchModel={SearchModel},manufacturer={Manufacturer}): manufacturerProductModel → {ManufacturerProductModel}", searchModel, manufacturer, manufacturerProductModel);
 
                 //fill in additional values (not existing in the entity)
                 manufacturerProductModel.ProductName = (await _productService.GetProductByIdAsync(productManufacturer.ProductId))?.Name;
@@ -280,6 +317,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareManufacturerProductListModelAsync(searchModel={SearchModel},manufacturer={Manufacturer})", searchModel, manufacturer);
         return model;
     }
 
@@ -293,6 +331,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<AddProductToManufacturerSearchModel> PrepareAddProductToManufacturerSearchModelAsync(AddProductToManufacturerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareAddProductToManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available categories
@@ -313,6 +352,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
         //prepare page parameters
         searchModel.SetPopupGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareAddProductToManufacturerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -326,6 +366,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
     /// </returns>
     public virtual async Task<AddProductToManufacturerListModel> PrepareAddProductToManufacturerListModelAsync(AddProductToManufacturerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareAddProductToManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get products
@@ -344,6 +385,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             return products.SelectAwait(async product =>
             {
                 var productModel = product.ToModel<ProductModel>();
+				_logger.LogError("PrepareAddProductToManufacturerListModelAsync(searchModel={SearchModel}): productModel → {ProductModel}", searchModel, productModel);
 
                 productModel.SeName = await _urlRecordService.GetSeNameAsync(product, 0, true, false);
 
@@ -351,6 +393,7 @@ public partial class ManufacturerModelFactory : IManufacturerModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareAddProductToManufacturerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

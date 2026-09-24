@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Discounts;
 
@@ -7,11 +8,16 @@ namespace Nop.Web.Areas.Admin.Models.Discounts;
 /// </summary>
 public partial record AddCategoryToDiscountModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public AddCategoryToDiscountModel()
     {
+		_logger.LogError(">>> Entering AddCategoryToDiscountModel()");
         SelectedCategoryIds = new List<int>();
+		_logger.LogDebug("AddCategoryToDiscountModel(): SelectedCategoryIds → {SelectedCategoryIds}", SelectedCategoryIds);
+    _logger.LogError("AddCategoryToDiscountModel(): SelectedCategoryIds → {SelectedCategoryIds}", SelectedCategoryIds);
+    _logger.LogWarning("<<< Exiting AddCategoryToDiscountModel()");
     }
     #endregion
 

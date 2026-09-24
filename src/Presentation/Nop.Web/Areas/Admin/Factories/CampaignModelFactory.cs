@@ -7,6 +7,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class CampaignModelFactory : ICampaignModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -37,12 +39,20 @@ public partial class CampaignModelFactory : ICampaignModelFactory
         ILocalizationService localizationService,
         IMessageTokenProvider messageTokenProvider)
     {
+		_logger.LogError(">>> Entering CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>)", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService);
         _catalogSettings = catalogSettings;
         _emailAccountSettings = emailAccountSettings;
+		_logger.LogDebug("CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>): _emailAccountSettings → {_emailAccountSettings}", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService, _emailAccountSettings);
+		_logger.LogDebug("CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>): _catalogSettings → {_catalogSettings}", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService, _catalogSettings);
+    _logger.LogWarning("<<< Exiting CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>)", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService);
         _baseAdminModelFactory = baseAdminModelFactory;
+		_logger.LogDebug("CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>): _baseAdminModelFactory → {_baseAdminModelFactory}", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService, _baseAdminModelFactory);
         _campaignService = campaignService;
+		_logger.LogDebug("CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>): _campaignService → {_campaignService}", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService, _campaignService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>): _dateTimeHelper → {_dateTimeHelper}", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("CampaignModelFactory(catalogSettings={CatalogSettings},emailAccountSettings={EmailAccountSettings},baseAdminModelFactory={BaseAdminModelFactory},campaignService={CampaignService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},messageTokenProvider=<redacted>): _localizationService → {_localizationService}", catalogSettings, emailAccountSettings, baseAdminModelFactory, campaignService, dateTimeHelper, localizationService, _localizationService);
         _messageTokenProvider = messageTokenProvider;
     }
 
@@ -60,6 +70,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignSearchModel> PrepareCampaignSearchModelAsync(CampaignSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCampaignSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available stores
@@ -70,6 +81,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareCampaignSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -83,10 +95,12 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignListModel> PrepareCampaignListModelAsync(CampaignSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCampaignListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get campaigns
         var campaigns = (await _campaignService.GetAllCampaignsAsync(searchModel.StoreId)).ToPagedList(searchModel);
+		_logger.LogError("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaigns → {Campaigns}", searchModel, campaigns);
 
         //prepare grid model
         var model = await new CampaignListModel().PrepareToGridAsync(searchModel, campaigns, () =>
@@ -95,6 +109,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
             {
                 //fill in model values from the entity
                 var campaignModel = campaign.ToModel<CampaignModel>();
+				_logger.LogError("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaignModel → {CampaignModel}", searchModel, campaignModel);
 
                 //convert dates to the user time
                 campaignModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(campaign.CreatedOnUtc, DateTimeKind.Utc);
@@ -102,12 +117,14 @@ public partial class CampaignModelFactory : ICampaignModelFactory
                 {
                     campaignModel.DontSendBeforeDate = await _dateTimeHelper
                         .ConvertToUserTimeAsync(campaign.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
+						_logger.LogDebug("PrepareCampaignListModelAsync(searchModel={SearchModel}): campaignModel.DontSendBeforeDate → {Arg1}", searchModel, campaignModel.DontSendBeforeDate);
                 }
 
                 return campaignModel;
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareCampaignListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -123,6 +140,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
     /// </returns>
     public virtual async Task<CampaignModel> PrepareCampaignModelAsync(CampaignModel model, Campaign campaign, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareCampaignModelAsync(model={Model},campaign={Campaign},excludeProperties={ExcludeProperties})", model, campaign, excludeProperties);
         //fill in model values from the entity
         if (campaign != null)
         {
@@ -131,6 +149,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
                 model.DontSendBeforeDate = await _dateTimeHelper.ConvertToUserTimeAsync(campaign.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
 
             //prepare copy campaign model
+			_logger.LogDebug("PrepareCampaignModelAsync(model={Model},campaign={Campaign},excludeProperties={ExcludeProperties}): model.CopyCampaignModel → {Arg3}", model, campaign, excludeProperties, model.CopyCampaignModel);
             model.CopyCampaignModel = new CopyCampaignModel
             {
                 OriginalCampaignId = campaign.Id,
@@ -143,6 +162,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
         //whether to fill in some of properties
         if (!excludeProperties)
             model.EmailAccountId = _emailAccountSettings.DefaultEmailAccountId;
+			_logger.LogDebug("PrepareCampaignModelAsync(model={Model},campaign={Campaign},excludeProperties={ExcludeProperties}): model.EmailAccountId → {Arg3}", model, campaign, excludeProperties, model.EmailAccountId);
 
         //prepare available stores
         await _baseAdminModelFactory.PrepareStoresAsync(model.AvailableStores);
@@ -156,6 +176,7 @@ public partial class CampaignModelFactory : ICampaignModelFactory
         //prepare available email accounts
         await _baseAdminModelFactory.PrepareEmailAccountsAsync(model.AvailableEmailAccounts, false);
 
+		_logger.LogWarning("<<< Exiting PrepareCampaignModelAsync(model={Model},campaign={Campaign},excludeProperties={ExcludeProperties})", model, campaign, excludeProperties);
         return model;
     }
 

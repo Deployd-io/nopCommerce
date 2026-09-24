@@ -11,6 +11,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.DiscountRules.CustomerRoles.Controllers;
 
@@ -19,6 +20,7 @@ namespace Nop.Plugin.DiscountRules.CustomerRoles.Controllers;
 [AutoValidateAntiforgeryToken]
 public class DiscountRulesCustomerRolesController : BasePluginController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -37,10 +39,16 @@ public class DiscountRulesCustomerRolesController : BasePluginController
         IPermissionService permissionService,
         ISettingService settingService)
     {
+		_logger.LogError(">>> Entering DiscountRulesCustomerRolesController(customerService={CustomerService},discountService={DiscountService},localizationService={LocalizationService},permissionService={PermissionService},settingService={SettingService})", customerService, discountService, localizationService, permissionService, settingService);
         _customerService = customerService;
         _discountService = discountService;
+		_logger.LogDebug("DiscountRulesCustomerRolesController(customerService={CustomerService},discountService={DiscountService},localizationService={LocalizationService},permissionService={PermissionService},settingService={SettingService}): _discountService → {_discountService}", customerService, discountService, localizationService, permissionService, settingService, _discountService);
+		_logger.LogDebug("DiscountRulesCustomerRolesController(customerService={CustomerService},discountService={DiscountService},localizationService={LocalizationService},permissionService={PermissionService},settingService={SettingService}): _customerService → {_customerService}", customerService, discountService, localizationService, permissionService, settingService, _customerService);
+    _logger.LogWarning("<<< Exiting DiscountRulesCustomerRolesController(customerService={CustomerService},discountService={DiscountService},localizationService={LocalizationService},permissionService={PermissionService},settingService={SettingService})", customerService, discountService, localizationService, permissionService, settingService);
         _localizationService = localizationService;
+		_logger.LogDebug("DiscountRulesCustomerRolesController(customerService={CustomerService},discountService={DiscountService},localizationService={LocalizationService},permissionService={PermissionService},settingService={SettingService}): _localizationService → {_localizationService}", customerService, discountService, localizationService, permissionService, settingService, _localizationService);
         _permissionService = permissionService;
+		_logger.LogDebug("DiscountRulesCustomerRolesController(customerService={CustomerService},discountService={DiscountService},localizationService={LocalizationService},permissionService={PermissionService},settingService={SettingService}): _permissionService → {_permissionService}", customerService, discountService, localizationService, permissionService, settingService, _permissionService);
         _settingService = settingService;
     }
 
@@ -55,6 +63,8 @@ public class DiscountRulesCustomerRolesController : BasePluginController
     /// <returns>Errors message</returns>
     protected IEnumerable<string> GetErrorsFromModelState(ModelStateDictionary modelState)
     {
+		_logger.LogError(">>> Entering GetErrorsFromModelState(modelState={ModelState})", modelState);
+		_logger.LogWarning("<<< Exiting GetErrorsFromModelState(modelState={ModelState})", modelState);
         return ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage));
     }
 
@@ -65,6 +75,7 @@ public class DiscountRulesCustomerRolesController : BasePluginController
     [CheckPermission(StandardPermission.Promotions.DISCOUNTS_VIEW)]
     public async Task<IActionResult> Configure(int discountId, int? discountRequirementId)
     {
+		_logger.LogError(">>> Entering Configure(discountId={DiscountId},discountRequirementId={DiscountRequirementId})", discountId, discountRequirementId);
         //load the discount
         var discount = await _discountService.GetDiscountByIdAsync(discountId)
                        ?? throw new ArgumentException("Discount could not be loaded");
@@ -75,6 +86,7 @@ public class DiscountRulesCustomerRolesController : BasePluginController
 
         //try to get previously saved restricted customer role identifier
         var restrictedRoleId = await _settingService.GetSettingByKeyAsync<int>(string.Format(DiscountRequirementDefaults.SettingsKey, discountRequirementId ?? 0));
+		_logger.LogError("Configure(discountId={DiscountId},discountRequirementId={DiscountRequirementId}): restrictedRoleId → {RestrictedRoleId}", discountId, discountRequirementId, restrictedRoleId);
 
         var model = new RequirementModel
         {
@@ -93,11 +105,14 @@ public class DiscountRulesCustomerRolesController : BasePluginController
         {
             Text = await _localizationService.GetResourceAsync("Plugins.DiscountRules.CustomerRoles.Fields.CustomerRole.Select"),
             Value = "0"
+			_logger.LogDebug("Configure(discountId={DiscountId},discountRequirementId={DiscountRequirementId}): Value → {Value}", discountId, discountRequirementId, Value);
         });
 
         //set the HTML field prefix
         ViewData.TemplateInfo.HtmlFieldPrefix = string.Format(DiscountRequirementDefaults.HtmlFieldPrefix, discountRequirementId ?? 0);
 
+		_logger.LogWarning("<<< Exiting Configure(discountId={DiscountId},discountRequirementId={DiscountRequirementId})", discountId, discountRequirementId);
+		_logger.LogWarning("<<< Exiting Configure(model={Model})", model);
         return View("~/Plugins/DiscountRules.CustomerRoles/Views/Configure.cshtml", model);
     }
 

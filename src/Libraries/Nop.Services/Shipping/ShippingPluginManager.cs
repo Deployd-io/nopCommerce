@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Shipping;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping;
 
@@ -10,6 +11,7 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class ShippingPluginManager : PluginManager<IShippingRateComputationMethod>, IShippingPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ShippingSettings _shippingSettings;
@@ -22,7 +24,10 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
         IPluginService pluginService,
         ShippingSettings shippingSettings) : base(customerService, pluginService)
     {
+		_logger.LogError(">>> Entering ShippingPluginManager(customerService={CustomerService},pluginService={PluginService},shippingSettings=<redacted>)", customerService, pluginService);
         _shippingSettings = shippingSettings;
+		_logger.LogDebug("ShippingPluginManager(customerService={CustomerService},pluginService={PluginService},shippingSettings=<redacted>): _shippingSettings → {_shippingSettings}", customerService, pluginService, _shippingSettings);
+    _logger.LogWarning("<<< Exiting ShippingPluginManager(customerService={CustomerService},pluginService={PluginService},shippingSettings=<redacted>)", customerService, pluginService);
     }
 
     #endregion
@@ -42,8 +47,10 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
     public virtual async Task<IList<IShippingRateComputationMethod>> LoadActivePluginsAsync(Customer customer = null,
         int storeId = 0, string systemName = null)
     {
+		_logger.LogError(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         var shippingProviders = await LoadActivePluginsAsync(_shippingSettings.ActiveShippingRateComputationMethodSystemNames, customer, storeId);
 
+		_logger.LogError("LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName}): shippingProviders → {ShippingProviders}", customer, storeId, systemName, shippingProviders);
         //filter by passed system name
         if (!string.IsNullOrEmpty(systemName))
         {
@@ -52,6 +59,7 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
                 .ToList();
         }
 
+		_logger.LogWarning("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId},systemName={SystemName})", customer, storeId, systemName);
         return shippingProviders;
     }
 
@@ -62,6 +70,8 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IShippingRateComputationMethod shippingProvider)
     {
+		_logger.LogError(">>> Entering IsPluginActive(shippingProvider=<redacted>)");
+        _logger.LogWarning("<<< Exiting IsPluginActive(shippingProvider=<redacted>)");
         return IsPluginActive(shippingProvider, _shippingSettings.ActiveShippingRateComputationMethodSystemNames);
     }
 
@@ -77,7 +87,10 @@ public partial class ShippingPluginManager : PluginManager<IShippingRateComputat
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogError(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var shippingProvider = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogError("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): shippingProvider → {ShippingProvider}", systemName, customer, storeId, shippingProvider);
+		_logger.LogWarning("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(shippingProvider);
     }
 

@@ -1,5 +1,6 @@
 ﻿using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -8,13 +9,16 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public class NopConventionSet : IConventionSet
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public NopConventionSet(INopDataProvider dataProvider)
     {
+		_logger.LogError(">>> Entering NopConventionSet(dataProvider={DataProvider})", dataProvider);
         ArgumentNullException.ThrowIfNull(dataProvider);
 
         var defaultConventionSet = new DefaultConventionSet();
+		_logger.LogError("NopConventionSet(dataProvider={DataProvider}): defaultConventionSet → {DefaultConventionSet}", dataProvider, defaultConventionSet);
 
         ForeignKeyConventions = new List<IForeignKeyConvention>()
         {
@@ -35,11 +39,17 @@ public class NopConventionSet : IConventionSet
         };
 
         ConstraintConventions = defaultConventionSet.ConstraintConventions;
+		_logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): ConstraintConventions → {ConstraintConventions}", dataProvider, ConstraintConventions);
 
+		_logger.LogWarning("<<< Exiting NopConventionSet(dataProvider={DataProvider})", dataProvider);
         SequenceConventions = defaultConventionSet.SequenceConventions;
+		_logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): SequenceConventions → {SequenceConventions}", dataProvider, SequenceConventions);
         AutoNameConventions = defaultConventionSet.AutoNameConventions;
+		_logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): AutoNameConventions → {AutoNameConventions}", dataProvider, AutoNameConventions);
         SchemaConvention = defaultConventionSet.SchemaConvention;
+		_logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): SchemaConvention → {SchemaConvention}", dataProvider, SchemaConvention);
         RootPathConvention = defaultConventionSet.RootPathConvention;
+		_logger.LogDebug("NopConventionSet(dataProvider={DataProvider}): RootPathConvention → {RootPathConvention}", dataProvider, RootPathConvention);
     }
 
     #endregion

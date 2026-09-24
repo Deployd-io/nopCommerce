@@ -2,18 +2,25 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Models;
 
 public record ShippingByWeightByTotalModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ShippingByWeightByTotalModel()
     {
+		_logger.LogError(">>> Entering ShippingByWeightByTotalModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("ShippingByWeightByTotalModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableShippingMethods = new List<SelectListItem>();
+		_logger.LogError("ShippingByWeightByTotalModel(): AvailableShippingMethods → {AvailableShippingMethods}", AvailableShippingMethods);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("ShippingByWeightByTotalModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogError("ShippingByWeightByTotalModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     [NopResourceDisplayName("Plugins.Shipping.FixedByWeightByTotal.Fields.Store")]

@@ -6,6 +6,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Data;
 using Nop.Services.Shipping.Pickup;
 using Nop.Services.Shipping.Tracking;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping;
 
@@ -14,6 +15,7 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class ShipmentService : IShipmentService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IPickupPluginManager _pickupPluginManager;
@@ -38,14 +40,22 @@ public partial class ShipmentService : IShipmentService
         IRepository<ShipmentItem> siRepository,
         IShippingPluginManager shippingPluginManager)
     {
+		_logger.LogError(">>> Entering ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>)", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository);
         _pickupPluginManager = pickupPluginManager;
         _addressRepository = addressRepository;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _addressRepository → {_addressRepository}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _addressRepository);
         _orderRepository = orderRepository;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _orderRepository → {_orderRepository}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _orderRepository);
         _orderItemRepository = orderItemRepository;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _orderItemRepository → {_orderItemRepository}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _orderItemRepository);
         _productRepository = productRepository;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _productRepository → {_productRepository}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _productRepository);
         _shipmentRepository = shipmentRepository;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _shipmentRepository → {_shipmentRepository}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _shipmentRepository);
         _siRepository = siRepository;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _siRepository → {_siRepository}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _siRepository);
         _shippingPluginManager = shippingPluginManager;
+		_logger.LogDebug("ShipmentService(pickupPluginManager={PickupPluginManager},addressRepository={AddressRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},productRepository={ProductRepository},shipmentRepository={ShipmentRepository},siRepository={SiRepository},shippingPluginManager=<redacted>): _shippingPluginManager → {_shippingPluginManager}", pickupPluginManager, addressRepository, orderRepository, orderItemRepository, productRepository, shipmentRepository, siRepository, _shippingPluginManager);
     }
 
     #endregion
@@ -59,7 +69,12 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShipmentAsync(Shipment shipment)
     {
+		_logger.LogError(">>> Entering DeleteShipmentAsync(shipment={Shipment})", shipment);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _shipmentRepository.DeleteAsync(shipment);
+		_logger.LogError("DeleteShipmentAsync(shipment)={Shipment}: external service call took {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteShipmentAsync(shipment={Shipment})", shipment);
     }
 
     /// <summary>
@@ -97,11 +112,15 @@ public partial class ShipmentService : IShipmentService
         DateTime? createdFromUtc = null, DateTime? createdToUtc = null,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllShipmentsAsync(vendorId={VendorId},warehouseId={WarehouseId},shippingCountryId=<redacted>,shippingStateId=<redacted>,shippingCounty=<redacted>,shippingCity=<redacted>,trackingNumber={TrackingNumber},loadNotShipped={LoadNotShipped},loadNotReadyForPickup={LoadNotReadyForPickup},loadNotDelivered={LoadNotDelivered},orderId={OrderId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize})", vendorId, warehouseId, trackingNumber, loadNotShipped, loadNotReadyForPickup, loadNotDelivered, orderId, createdFromUtc, createdToUtc, pageIndex, pageSize);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var shipments = await _shipmentRepository.GetAllPagedAsync(query =>
         {
             if (orderId > 0)
                 query = query.Where(o => o.OrderId == orderId);
 
+			_logger.LogError("GetAllShipmentsAsync(vendorId={VendorId},warehouseId={WarehouseId},shippingCountryId=<redacted>,shippingStateId=<redacted>,shippingCounty=<redacted>,shippingCity=<redacted>,trackingNumber={TrackingNumber},loadNotShipped={LoadNotShipped},loadNotReadyForPickup={LoadNotReadyForPickup},loadNotDelivered={LoadNotDelivered},orderId={OrderId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", vendorId, warehouseId, trackingNumber, loadNotShipped, loadNotReadyForPickup, loadNotDelivered, orderId, createdFromUtc, createdToUtc, pageIndex, pageSize, query);
             if (!string.IsNullOrEmpty(trackingNumber))
                 query = query.Where(s => s.TrackingNumber.Contains(trackingNumber));
 
@@ -194,7 +213,9 @@ public partial class ShipmentService : IShipmentService
 
             return query;
         }, pageIndex, pageSize);
+		_logger.LogError("GetAllShipmentsAsync(vendorId,warehouseId,shippingCountryId,shippingStateId,shippingCounty,shippingCity,trackingNumber,loadNotShipped,loadNotReadyForPickup,loadNotDelivered,orderId,createdFromUtc,createdToUtc,pageIndex,pageSize)={VendorId},{WarehouseId},<redacted>,<redacted>,<redacted>,<redacted>,{TrackingNumber},{LoadNotShipped},{LoadNotReadyForPickup},{LoadNotDelivered},{OrderId},{CreatedFromUtc},{CreatedToUtc},{PageIndex},{PageSize}: find query executed in {Arg15} ms", vendorId, warehouseId, trackingNumber, loadNotShipped, loadNotReadyForPickup, loadNotDelivered, orderId, createdFromUtc, createdToUtc, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetAllShipmentsAsync(vendorId={VendorId},warehouseId={WarehouseId},shippingCountryId=<redacted>,shippingStateId=<redacted>,shippingCounty=<redacted>,shippingCity=<redacted>,trackingNumber={TrackingNumber},loadNotShipped={LoadNotShipped},loadNotReadyForPickup={LoadNotReadyForPickup},loadNotDelivered={LoadNotDelivered},orderId={OrderId},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},pageIndex={PageIndex},pageSize={PageSize})", vendorId, warehouseId, trackingNumber, loadNotShipped, loadNotReadyForPickup, loadNotDelivered, orderId, createdFromUtc, createdToUtc, pageIndex, pageSize);
         return shipments;
     }
 
@@ -208,6 +229,8 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IList<Shipment>> GetShipmentsByIdsAsync(int[] shipmentIds)
     {
+		_logger.LogError(">>> Entering GetShipmentsByIdsAsync(shipmentIds={ShipmentIds})", shipmentIds);
+        _logger.LogWarning("<<< Exiting GetShipmentsByIdsAsync(shipmentIds={ShipmentIds})", shipmentIds);
         return await _shipmentRepository.GetByIdsAsync(shipmentIds);
     }
 
@@ -221,6 +244,9 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<Shipment> GetShipmentByIdAsync(int shipmentId)
     {
+		_logger.LogError(">>> Entering GetShipmentByIdAsync(shipmentId={ShipmentId})", shipmentId);
+		_logger.LogError("GetShipmentByIdAsync(shipmentId)={ShipmentId}: find query executing", shipmentId);
+    _logger.LogWarning("<<< Exiting GetShipmentByIdAsync(shipmentId={ShipmentId})", shipmentId);
         return await _shipmentRepository.GetByIdAsync(shipmentId, cache => default, useShortTermCache: true);
     }
 
@@ -237,10 +263,12 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IList<Shipment>> GetShipmentsByOrderIdAsync(int orderId, bool? shipped = null, bool? readyForPickup = null, int vendorId = 0)
     {
+		_logger.LogError(">>> Entering GetShipmentsByOrderIdAsync(orderId={OrderId},shipped={Shipped},readyForPickup={ReadyForPickup},vendorId={VendorId})", orderId, shipped, readyForPickup, vendorId);
         if (orderId == 0)
             return new List<Shipment>();
 
         var shipments = _shipmentRepository.Table;
+		_logger.LogError("GetShipmentsByOrderIdAsync(orderId={OrderId},shipped={Shipped},readyForPickup={ReadyForPickup},vendorId={VendorId}): shipments → {Shipments}", orderId, shipped, readyForPickup, vendorId, shipments);
 
         if (shipped.HasValue)
             shipments = shipments.Where(s => s.ShippedDateUtc.HasValue == shipped);
@@ -248,6 +276,7 @@ public partial class ShipmentService : IShipmentService
         if (readyForPickup.HasValue)
             shipments = shipments.Where(s => s.ReadyForPickupDateUtc.HasValue == readyForPickup);
 
+		_logger.LogWarning("<<< Exiting GetShipmentsByOrderIdAsync(orderId={OrderId},shipped={Shipped},readyForPickup={ReadyForPickup},vendorId={VendorId})", orderId, shipped, readyForPickup, vendorId);
         return await shipments.Where(shipment => shipment.OrderId == orderId).ToListAsync();
     }
 
@@ -258,7 +287,9 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShipmentAsync(Shipment shipment)
     {
+		_logger.LogError(">>> Entering InsertShipmentAsync(shipment={Shipment})", shipment);
         await _shipmentRepository.InsertAsync(shipment);
+		_logger.LogWarning("<<< Exiting InsertShipmentAsync(shipment={Shipment})", shipment);
     }
 
     /// <summary>
@@ -268,7 +299,9 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateShipmentAsync(Shipment shipment)
     {
+		_logger.LogError(">>> Entering UpdateShipmentAsync(shipment={Shipment})", shipment);
         await _shipmentRepository.UpdateAsync(shipment);
+		_logger.LogWarning("<<< Exiting UpdateShipmentAsync(shipment={Shipment})", shipment);
     }
 
     /// <summary>
@@ -281,6 +314,7 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IList<ShipmentItem>> GetShipmentItemsByShipmentIdAsync(int shipmentId)
     {
+		_logger.LogError(">>> Entering GetShipmentItemsByShipmentIdAsync(shipmentId={ShipmentId})", shipmentId);
         if (shipmentId == 0)
             return null;
 
@@ -294,7 +328,9 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertShipmentItemAsync(ShipmentItem shipmentItem)
     {
+		_logger.LogError(">>> Entering InsertShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
         await _siRepository.InsertAsync(shipmentItem);
+		_logger.LogWarning("<<< Exiting InsertShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
     }
 
     /// <summary>
@@ -304,7 +340,12 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteShipmentItemAsync(ShipmentItem shipmentItem)
     {
+		_logger.LogError(">>> Entering DeleteShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _siRepository.DeleteAsync(shipmentItem);
+		_logger.LogError("DeleteShipmentItemAsync(shipmentItem)={ShipmentItem}: external service call took {Arg1} ms", shipmentItem, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
     }
 
     /// <summary>
@@ -314,7 +355,9 @@ public partial class ShipmentService : IShipmentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateShipmentItemAsync(ShipmentItem shipmentItem)
     {
+		_logger.LogError(">>> Entering UpdateShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
         await _siRepository.UpdateAsync(shipmentItem);
+		_logger.LogWarning("<<< Exiting UpdateShipmentItemAsync(shipmentItem={ShipmentItem})", shipmentItem);
     }
 
     /// <summary>
@@ -327,6 +370,9 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<ShipmentItem> GetShipmentItemByIdAsync(int shipmentItemId)
     {
+		_logger.LogError(">>> Entering GetShipmentItemByIdAsync(shipmentItemId={ShipmentItemId})", shipmentItemId);
+		_logger.LogError("GetShipmentItemByIdAsync(shipmentItemId)={ShipmentItemId}: find query executing", shipmentItemId);
+    _logger.LogWarning("<<< Exiting GetShipmentItemByIdAsync(shipmentItemId={ShipmentItemId})", shipmentItemId);
         return await _siRepository.GetByIdAsync(shipmentItemId, cache => default, useShortTermCache: true);
     }
 
@@ -344,6 +390,7 @@ public partial class ShipmentService : IShipmentService
     public virtual async Task<int> GetQuantityInShipmentsAsync(Product product, int warehouseId,
         bool ignoreShipped, bool ignoreDelivered)
     {
+		_logger.LogError(">>> Entering GetQuantityInShipmentsAsync(product={Product},warehouseId={WarehouseId},ignoreShipped={IgnoreShipped},ignoreDelivered={IgnoreDelivered})", product, warehouseId, ignoreShipped, ignoreDelivered);
         ArgumentNullException.ThrowIfNull(product);
 
         //only products with "use multiple warehouses" are handled this way
@@ -353,8 +400,10 @@ public partial class ShipmentService : IShipmentService
             return 0;
 
         const int cancelledOrderStatusId = (int)OrderStatus.Cancelled;
+		_logger.LogError("GetQuantityInShipmentsAsync(product={Product},warehouseId={WarehouseId},ignoreShipped={IgnoreShipped},ignoreDelivered={IgnoreDelivered}): cancelledOrderStatusId → {CancelledOrderStatusId}", product, warehouseId, ignoreShipped, ignoreDelivered, cancelledOrderStatusId);
 
         var query = _siRepository.Table;
+		_logger.LogError("GetQuantityInShipmentsAsync(product={Product},warehouseId={WarehouseId},ignoreShipped={IgnoreShipped},ignoreDelivered={IgnoreDelivered}): query → {Query}", product, warehouseId, ignoreShipped, ignoreDelivered, query);
 
         query = from si in query
             join s in _shipmentRepository.Table on si.ShipmentId equals s.Id
@@ -390,7 +439,11 @@ public partial class ShipmentService : IShipmentService
             select si;
 
         //some null validation
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("GetQuantityInShipmentsAsync(product,warehouseId,ignoreShipped,ignoreDelivered)={Product},{WarehouseId},{IgnoreShipped},{IgnoreDelivered}: database query executed in {Arg4} ms", product, warehouseId, ignoreShipped, ignoreDelivered, __logStart.ElapsedMilliseconds);
         var result = Convert.ToInt32(await query.SumAsync(si => (int?)si.Quantity));
+		_logger.LogError("GetQuantityInShipmentsAsync(product={Product},warehouseId={WarehouseId},ignoreShipped={IgnoreShipped},ignoreDelivered={IgnoreDelivered}): result → {Result}", product, warehouseId, ignoreShipped, ignoreDelivered, result);
+		_logger.LogWarning("<<< Exiting GetQuantityInShipmentsAsync(product={Product},warehouseId={WarehouseId},ignoreShipped={IgnoreShipped},ignoreDelivered={IgnoreDelivered})", product, warehouseId, ignoreShipped, ignoreDelivered);
         return result;
     }
 
@@ -404,13 +457,19 @@ public partial class ShipmentService : IShipmentService
     /// </returns>
     public virtual async Task<IShipmentTracker> GetShipmentTrackerAsync(Shipment shipment)
     {
+		_logger.LogError(">>> Entering GetShipmentTrackerAsync(shipment={Shipment})", shipment);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var order = await _orderRepository.GetByIdAsync(shipment.OrderId, cache => default, useShortTermCache: true);
         IShipmentTracker shipmentTracker = null;
 
+		_logger.LogError("GetShipmentTrackerAsync(shipment)={Shipment}: find query executed in {Arg1} ms", shipment, __logStart.ElapsedMilliseconds);
         if (order.PickupInStore)
         {
+			_logger.LogError("GetShipmentTrackerAsync(shipment={Shipment}): order → {Order}", shipment, order);
             var pickupPointProvider = await _pickupPluginManager
                 .LoadPluginBySystemNameAsync(order.ShippingRateComputationMethodSystemName);
+				_logger.LogError("GetShipmentTrackerAsync(shipment={Shipment}): shipmentTracker → {ShipmentTracker}", shipment, shipmentTracker);
 
             if (pickupPointProvider != null)
                 shipmentTracker = await pickupPointProvider.GetShipmentTrackerAsync();
@@ -424,6 +483,7 @@ public partial class ShipmentService : IShipmentService
                 shipmentTracker = await shippingRateComputationMethod.GetShipmentTrackerAsync();
         }
 
+		_logger.LogWarning("<<< Exiting GetShipmentTrackerAsync(shipment={Shipment})", shipment);
         return shipmentTracker;
     }
 

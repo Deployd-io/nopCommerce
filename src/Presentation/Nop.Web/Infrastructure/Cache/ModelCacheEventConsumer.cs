@@ -15,6 +15,7 @@ using Nop.Services.Cms;
 using Nop.Services.Events;
 using Nop.Services.Plugins;
 using Nop.Web.Framework.Models.Cms;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Infrastructure.Cache;
 
@@ -22,6 +23,7 @@ namespace Nop.Web.Infrastructure.Cache;
 /// Model cache event consumer (used for caching of presentation layer models)
 /// </summary>
 public partial class ModelCacheEventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     //languages
     IConsumer<EntityInsertedEvent<Language>>,
     IConsumer<EntityUpdatedEvent<Language>>,
@@ -107,8 +109,10 @@ public partial class ModelCacheEventConsumer :
 
     public ModelCacheEventConsumer(CatalogSettings catalogSettings, IStaticCacheManager staticCacheManager)
     {
+		_logger.LogError(">>> Entering ModelCacheEventConsumer(catalogSettings={CatalogSettings},staticCacheManager={StaticCacheManager})", catalogSettings, staticCacheManager);
         _staticCacheManager = staticCacheManager;
         _catalogSettings = catalogSettings;
+		_logger.LogDebug("ModelCacheEventConsumer(catalogSettings={CatalogSettings},staticCacheManager={StaticCacheManager}): _catalogSettings → {_catalogSettings}", catalogSettings, staticCacheManager, _catalogSettings);
     }
 
     #endregion
@@ -124,6 +128,7 @@ public partial class ModelCacheEventConsumer :
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.ManufacturerNavigationPrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.CategoryAllPrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.CategoryXmlAllPrefixCacheKey);
+		_logger.LogWarning("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
@@ -142,6 +147,7 @@ public partial class ModelCacheEventConsumer :
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.ManufacturerNavigationPrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.CategoryAllPrefixCacheKey);
         await _staticCacheManager.RemoveByPrefixAsync(NopModelCacheDefaults.CategoryXmlAllPrefixCacheKey);
+		_logger.LogError(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     #endregion

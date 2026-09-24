@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Catalog;
 using Nop.Core.Domain.Orders;
 using Nop.Services.Orders;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Payments;
 
@@ -9,10 +10,14 @@ namespace Nop.Services.Payments;
 /// </summary>
 public partial class ProcessPaymentRequest
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ProcessPaymentRequest()
     {
+		_logger.LogError(">>> Entering ProcessPaymentRequest()");
         CustomValues = new CustomValues();
         OrderGuid = Guid.NewGuid();
+		_logger.LogError("ProcessPaymentRequest(): OrderGuid → {OrderGuid}", OrderGuid);
+		_logger.LogDebug("ProcessPaymentRequest(): OrderGuid → {OrderGuid}", OrderGuid);
         OrderGuidGeneratedOnUtc = DateTime.UtcNow;
     }
 

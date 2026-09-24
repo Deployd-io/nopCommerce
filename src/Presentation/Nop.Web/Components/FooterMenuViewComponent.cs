@@ -2,11 +2,13 @@
 using Nop.Core.Domain.Menus;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Components;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Components;
 
 public partial class FooterMenuViewComponent : NopViewComponent
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IMenuModelFactory _menuModelFactory;
@@ -17,7 +19,10 @@ public partial class FooterMenuViewComponent : NopViewComponent
 
     public FooterMenuViewComponent(IMenuModelFactory menuModelFactory)
     {
+		_logger.LogError(">>> Entering FooterMenuViewComponent(menuModelFactory={MenuModelFactory})", menuModelFactory);
         _menuModelFactory = menuModelFactory;
+		_logger.LogDebug("FooterMenuViewComponent(menuModelFactory={MenuModelFactory}): _menuModelFactory → {_menuModelFactory}", menuModelFactory, _menuModelFactory);
+    _logger.LogWarning("<<< Exiting FooterMenuViewComponent(menuModelFactory={MenuModelFactory})", menuModelFactory);
     }
 
     #endregion
@@ -26,6 +31,8 @@ public partial class FooterMenuViewComponent : NopViewComponent
 
     public async Task<IViewComponentResult> InvokeAsync()
     {
+		_logger.LogError(">>> Entering InvokeAsync()");
+        _logger.LogWarning("<<< Exiting InvokeAsync()");
         return View(await _menuModelFactory.PrepareMenuModelsAsync(MenuType.Footer));
     }
 

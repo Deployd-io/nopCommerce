@@ -5,6 +5,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Core.Domain.Directory;
 using Nop.Core.Domain.Localization;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Customers;
 
@@ -13,6 +14,7 @@ namespace Nop.Data.Mapping.Builders.Customers;
 /// </summary>
 public partial class CustomerBuilder : NopEntityBuilder<Customer>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -21,6 +23,7 @@ public partial class CustomerBuilder : NopEntityBuilder<Customer>
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogError(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(Customer.Username)).AsString(1000).Nullable()
             .WithColumn(nameof(Customer.Email)).AsString(1000).Nullable()
@@ -46,6 +49,7 @@ public partial class CustomerBuilder : NopEntityBuilder<Customer>
             .WithColumn(nameof(Customer.LanguageId)).AsInt32().ForeignKey<Language>(onDelete: Rule.SetNull).Nullable()
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(Customer), nameof(Customer.BillingAddressId))).AsInt32().ForeignKey<Address>(onDelete: Rule.None).Nullable()
             .WithColumn(NameCompatibilityManager.GetColumnName(typeof(Customer), nameof(Customer.ShippingAddressId))).AsInt32().ForeignKey<Address>(onDelete: Rule.None).Nullable();
+			_logger.LogWarning("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

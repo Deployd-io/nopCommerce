@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Widgets.FacebookPixel.Models;
 
@@ -11,12 +12,15 @@ namespace Nop.Plugin.Widgets.FacebookPixel.Models;
 /// </summary>
 public record FacebookPixelModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public FacebookPixelModel()
     {
+		_logger.LogError(">>> Entering FacebookPixelModel()");
         AvailableStores = new List<SelectListItem>();
         CustomEventSearchModel = new CustomEventSearchModel();
+		_logger.LogError("FacebookPixelModel(): CustomEventSearchModel → {CustomEventSearchModel}", CustomEventSearchModel);
     }
 
     #endregion

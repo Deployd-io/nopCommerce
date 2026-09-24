@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Discounts;
 using Nop.Services.Discounts;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Factories;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Factories;
 /// </summary>
 public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDiscountService _discountService;
@@ -20,7 +22,10 @@ public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFact
 
     public DiscountSupportedModelFactory(IDiscountService discountService)
     {
+		_logger.LogError(">>> Entering DiscountSupportedModelFactory(discountService={DiscountService})", discountService);
         _discountService = discountService;
+		_logger.LogDebug("DiscountSupportedModelFactory(discountService={DiscountService}): _discountService → {_discountService}", discountService, _discountService);
+    _logger.LogWarning("<<< Exiting DiscountSupportedModelFactory(discountService={DiscountService})", discountService);
     }
 
     #endregion
@@ -36,6 +41,7 @@ public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFact
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task<TModel> PrepareModelDiscountsAsync<TModel>(TModel model, IList<Discount> availableDiscounts) where TModel : IDiscountSupportedModel
     {
+		_logger.LogError(">>> Entering PrepareModelDiscountsAsync(model={Model},availableDiscounts={AvailableDiscounts})", model, availableDiscounts);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available discounts
@@ -45,7 +51,9 @@ public partial class DiscountSupportedModelFactory : IDiscountSupportedModelFact
             Value = discount.Id.ToString(),
             Selected = model.SelectedDiscountIds.Contains(discount.Id)
         }).ToList();
+			_logger.LogDebug("PrepareModelDiscountsAsync(model={Model},availableDiscounts={AvailableDiscounts}): Selected → {Selected}", model, availableDiscounts, Selected);
 
+		_logger.LogWarning("<<< Exiting PrepareModelDiscountsAsync(model={Model},availableDiscounts={AvailableDiscounts})", model, availableDiscounts);
         return Task.FromResult(model);
     }
 

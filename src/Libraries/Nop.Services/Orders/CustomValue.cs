@@ -1,19 +1,26 @@
-﻿namespace Nop.Services.Orders;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Services.Orders;
 
 /// <summary>
 /// Represents the custom value
 /// </summary>
 public partial class CustomValue
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CustomValue(string name, string value, CustomValueDisplayLocation displayLocation = CustomValueDisplayLocation.Payment, bool displayToCustomer = true, DateTime? createdOnUtc = null)
     {
+		_logger.LogError(">>> Entering CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc})", name, value, displayLocation, displayToCustomer, createdOnUtc);
         Name = name;
         Value = value;
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): Name → {Name1}", name, value, displayLocation, displayToCustomer, createdOnUtc, Name);
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): Value → {Value1}", name, value, displayLocation, displayToCustomer, createdOnUtc, Value);
         DisplayLocation = displayLocation;
         DisplayToCustomer = displayToCustomer;
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): DisplayLocation → {DisplayLocation1}", name, value, displayLocation, displayToCustomer, createdOnUtc, DisplayLocation);
         CreatedOnUtc = createdOnUtc;
+		_logger.LogDebug("CustomValue(name={Name},value={Value},displayLocation={DisplayLocation},displayToCustomer={DisplayToCustomer},createdOnUtc={CreatedOnUtc}): CreatedOnUtc → {CreatedOnUtc1}", name, value, displayLocation, displayToCustomer, createdOnUtc, CreatedOnUtc);
     }
 
     #endregion
@@ -55,6 +62,8 @@ public partial class CustomValue
     /// <returns>A string that represents the current object</returns>
     public override string ToString()
     {
+		_logger.LogError(">>> Entering ToString()");
+        _logger.LogWarning("<<< Exiting ToString()");
         return Value;
     }
 

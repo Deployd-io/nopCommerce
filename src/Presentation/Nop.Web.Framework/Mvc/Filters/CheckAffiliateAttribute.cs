@@ -6,6 +6,7 @@ using Nop.Core.Domain.Customers;
 using Nop.Data;
 using Nop.Services.Affiliates;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -14,6 +15,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class CheckAffiliateAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -21,6 +23,8 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
     /// </summary>
     public CheckAffiliateAttribute() : base(typeof(CheckAffiliateFilter))
     {
+	_logger.LogError(">>> Entering CheckAffiliateAttribute()");
+    _logger.LogWarning("<<< Exiting CheckAffiliateAttribute()");
     }
 
     #endregion
@@ -32,6 +36,7 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
     /// </summary>
     private class CheckAffiliateFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Constants
 
         private const string AFFILIATE_ID_QUERY_PARAMETER_NAME = "affiliateid";
@@ -53,8 +58,12 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
             ICustomerService customerService,
             IWorkContext workContext)
         {
+			_logger.LogError(">>> Entering CheckAffiliateFilter(affiliateService={AffiliateService},customerService={CustomerService},workContext={WorkContext})", affiliateService, customerService, workContext);
             _affiliateService = affiliateService;
             _customerService = customerService;
+			_logger.LogDebug("CheckAffiliateFilter(affiliateService={AffiliateService},customerService={CustomerService},workContext={WorkContext}): _customerService → {_customerService}", affiliateService, customerService, workContext, _customerService);
+			_logger.LogDebug("CheckAffiliateFilter(affiliateService={AffiliateService},customerService={CustomerService},workContext={WorkContext}): _affiliateService → {_affiliateService}", affiliateService, customerService, workContext, _affiliateService);
+        _logger.LogWarning("<<< Exiting CheckAffiliateFilter(affiliateService={AffiliateService},customerService={CustomerService},workContext={WorkContext})", affiliateService, customerService, workContext);
             _workContext = workContext;
         }
 
@@ -70,6 +79,7 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task SetCustomerAffiliateIdAsync(Affiliate affiliate, Customer customer)
         {
+			_logger.LogError(">>> Entering SetCustomerAffiliateIdAsync(affiliate={Affiliate},customer={Customer})", affiliate, customer);
             if (affiliate == null || affiliate.Deleted || !affiliate.Active)
                 return;
 
@@ -82,7 +92,9 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
 
             //update affiliate identifier
             customer.AffiliateId = affiliate.Id;
+			_logger.LogDebug("SetCustomerAffiliateIdAsync(affiliate={Affiliate},customer={Customer}): customer.AffiliateId → {Arg2}", affiliate, customer, customer.AffiliateId);
             await _customerService.UpdateCustomerAsync(customer);
+			_logger.LogWarning("<<< Exiting SetCustomerAffiliateIdAsync(affiliate={Affiliate},customer={Customer})", affiliate, customer);
         }
 
         /// <summary>
@@ -92,6 +104,7 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckAffiliateAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering CheckAffiliateAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //check request query parameters
@@ -104,11 +117,13 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
 
             //try to find by ID
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("CheckAffiliateAsync(context={Context}): customer → {Customer}", context, customer);
             var affiliateIds = request.Query[AFFILIATE_ID_QUERY_PARAMETER_NAME];
 
             if (int.TryParse(affiliateIds.FirstOrDefault(), out var affiliateId) && affiliateId > 0 && affiliateId != customer.AffiliateId)
             {
                 var affiliate = await _affiliateService.GetAffiliateByIdAsync(affiliateId);
+				_logger.LogError("CheckAffiliateAsync(context={Context}): affiliate → {Affiliate}", context, affiliate);
                 await SetCustomerAffiliateIdAsync(affiliate, customer);
                 return;
             }
@@ -116,11 +131,13 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
             //try to find by friendly name
             var affiliateNames = request.Query[AFFILIATE_FRIENDLYURLNAME_QUERY_PARAMETER_NAME];
             var affiliateName = affiliateNames.FirstOrDefault();
+			_logger.LogError("CheckAffiliateAsync(context={Context}): affiliateName → {AffiliateName}", context, affiliateName);
             if (!string.IsNullOrEmpty(affiliateName))
             {
                 var affiliate = await _affiliateService.GetAffiliateByFriendlyUrlNameAsync(affiliateName);
                 await SetCustomerAffiliateIdAsync(affiliate, customer);
             }
+			_logger.LogWarning("<<< Exiting CheckAffiliateAsync(context={Context})", context);
         }
 
         #endregion
@@ -135,9 +152,11 @@ public sealed class CheckAffiliateAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckAffiliateAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

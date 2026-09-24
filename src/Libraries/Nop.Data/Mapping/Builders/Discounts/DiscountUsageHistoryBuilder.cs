@@ -2,6 +2,7 @@
 using Nop.Core.Domain.Discounts;
 using Nop.Core.Domain.Orders;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Discounts;
 
@@ -10,6 +11,7 @@ namespace Nop.Data.Mapping.Builders.Discounts;
 /// </summary>
 public partial class DiscountUsageHistoryBuilder : NopEntityBuilder<DiscountUsageHistory>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -18,9 +20,11 @@ public partial class DiscountUsageHistoryBuilder : NopEntityBuilder<DiscountUsag
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogError(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(DiscountUsageHistory.DiscountId)).AsInt32().ForeignKey<Discount>()
             .WithColumn(nameof(DiscountUsageHistory.OrderId)).AsInt32().ForeignKey<Order>();
+			_logger.LogWarning("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

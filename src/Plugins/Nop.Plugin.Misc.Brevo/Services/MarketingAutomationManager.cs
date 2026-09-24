@@ -21,6 +21,7 @@ namespace Nop.Plugin.Misc.Brevo.Services;
 /// </summary>
 public class MarketingAutomationManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly BrevoSettings _brevoSettings;
@@ -72,26 +73,47 @@ public class MarketingAutomationManager
         MarketingAutomationHttpClient marketingAutomationHttpClient)
     {
         _brevoSettings = brevoSettings;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _brevoSettings → {_brevoSettings}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _brevoSettings);
         _currencySettings = currencySettings;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _currencySettings → {_currencySettings}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _currencySettings);
         _addressService = addressService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _addressService → {_addressService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _addressService);
         _categoryService = categoryService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _categoryService → {_categoryService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _categoryService);
         _countryService = countryService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _countryService → {_countryService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _countryService);
         _currencyService = currencyService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _currencyService → {_currencyService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _currencyService);
         _customerService = customerService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _customerService → {_customerService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _customerService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _genericAttributeService → {_genericAttributeService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _genericAttributeService);
         _logger = logger;
+		_logger.LogError(">>> Entering MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient})", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient);
         _nopUrlHelper = nopUrlHelper;
         _orderService = orderService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _nopUrlHelper → {_nopUrlHelper}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _nopUrlHelper);
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _orderService → {_orderService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _orderService);
         _orderTotalCalculationService = orderTotalCalculationService;
         _pictureService = pictureService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _orderTotalCalculationService → {_orderTotalCalculationService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _orderTotalCalculationService);
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _pictureService → {_pictureService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _pictureService);
         _productAttributeParser = productAttributeParser;
         _productService = productService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _productAttributeParser → {_productAttributeParser}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _productAttributeParser);
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _productService → {_productService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _productService);
         _shoppingCartService = shoppingCartService;
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _shoppingCartService → {_shoppingCartService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _shoppingCartService);
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _stateProvinceService → {_stateProvinceService}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _stateProvinceService);
         _storeContext = storeContext;
         _webHelper = webHelper;
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _storeContext → {_storeContext}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _storeContext);
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _webHelper → {_webHelper}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _webHelper);
         _workContext = workContext;
         _marketingAutomationHttpClient = marketingAutomationHttpClient;
+		_logger.LogWarning("<<< Exiting MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient})", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient);
+		_logger.LogDebug("MarketingAutomationManager(brevoSettings={BrevoSettings},currencySettings={CurrencySettings},addressService={AddressService},categoryService={CategoryService},countryService={CountryService},currencyService={CurrencyService},customerService={CustomerService},genericAttributeService={GenericAttributeService},logger={Logger},nopUrlHelper={NopUrlHelper},orderService={OrderService},orderTotalCalculationService={OrderTotalCalculationService},pictureService={PictureService},productAttributeParser={ProductAttributeParser},productService={ProductService},shoppingCartService=<redacted>,stateProvinceService={StateProvinceService},storeContext={StoreContext},webHelper={WebHelper},workContext={WorkContext},marketingAutomationHttpClient={MarketingAutomationHttpClient}): _workContext → {_workContext}", brevoSettings, currencySettings, addressService, categoryService, countryService, currencyService, customerService, genericAttributeService, logger, nopUrlHelper, orderService, orderTotalCalculationService, pictureService, productAttributeParser, productService, stateProvinceService, storeContext, webHelper, workContext, marketingAutomationHttpClient, _workContext);
     }
 
     #endregion
@@ -105,12 +127,17 @@ public class MarketingAutomationManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleShoppingCartChangedEventAsync(ShoppingCartItem cartItem)
     {
+		_logger.LogError(">>> Entering HandleShoppingCartChangedEventAsync(cartItem={CartItem})", cartItem);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //whether marketing automation is enabled
         if (!_brevoSettings.UseMarketingAutomation)
             return;
 
         var customer = await _customerService.GetCustomerByIdAsync(cartItem.CustomerId);
+		_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): customer → {Customer}", cartItem, customer);
         var email = customer.Email;
+		_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): email → {Email}", cartItem, email);
 
         if (string.IsNullOrEmpty(email))
             return;
@@ -129,6 +156,7 @@ public class MarketingAutomationManager
 
             //get current customer's shopping cart
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): store → {Store}", cartItem, store);
             var cart = await _shoppingCartService
                 .GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
 
@@ -138,19 +166,24 @@ public class MarketingAutomationManager
                 var (cartDiscount, _, cartSubtotal, _, _) = await _orderTotalCalculationService.GetShoppingCartSubTotalAsync(cart,
                     await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax);
                 var cartTax = await _orderTotalCalculationService.GetTaxTotalAsync(cart, false);
+				_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): cartTax → {CartTax}", cartItem, cartTax);
                 var cartShipping = await _orderTotalCalculationService.GetShoppingCartShippingTotalAsync(cart);
+				_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): cartShipping → {CartShipping}", cartItem, cartShipping);
                 var (cartTotal, _, _, _, _, _) = await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart, false, false);
 
                 //get products data by shopping cart items
                 var itemsData = await cart.Where(item => item.ProductId != 0).SelectAwait(async item =>
                 {
                     var product = await _productService.GetProductByIdAsync(item.ProductId);
+					_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): product → {Product}", cartItem, product);
 
                     //try to get product attribute combination
                     var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, item.AttributesXml);
+					_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): combination → {Combination}", cartItem, combination);
 
                     //get default product picture
                     var picture = await _pictureService.GetProductPictureAsync(product, item.AttributesXml);
+					_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): picture → {Picture}", cartItem, picture);
 
                     //create product data
                     return new
@@ -163,6 +196,7 @@ public class MarketingAutomationManager
                         category = await (await _categoryService.GetProductCategoriesByProductIdAsync(item.ProductId)).AggregateAwaitAsync(",", async (all, pc) =>
                         {
                             var res = (await _categoryService.GetCategoryByIdAsync(pc.CategoryId)).Name;
+							_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): res → {Res}", cartItem, res);
                             res = all == "," ? res : all + ", " + res;
                             return res;
                         }),
@@ -171,6 +205,9 @@ public class MarketingAutomationManager
                         quantity = item.Quantity,
                         price = (await _shoppingCartService.GetSubTotalAsync(item, true)).subTotal
                     };
+					var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+					_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem)={CartItem}: database query executed in {Arg1} ms", cartItem, __logStartDb.ElapsedMilliseconds);
+					_logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): price → {Price}", cartItem, price);
                 }).ToArrayAsync();
 
                 //prepare cart data
@@ -188,11 +225,13 @@ public class MarketingAutomationManager
                     //gift_wrapping = string.Empty, //currently we can't get this value
                     items = itemsData
                 };
+				_logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): items → {Items}", cartItem, items);
 
                 //if there is a single item in the cart, so the cart is just created
                 if (cart.Count == 1)
                 {
                     shoppingCartGuid = Guid.NewGuid();
+					_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): shoppingCartGuid → {ShoppingCartGuid}", cartItem, shoppingCartGuid);
                 }
                 else
                 {
@@ -200,6 +239,8 @@ public class MarketingAutomationManager
                     shoppingCartGuid ??= Guid.NewGuid();
                 }
                 trackEvent.EventName = BrevoDefaults.CartUpdatedEventName;
+				_logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): trackEvent.EventName → {Arg1}", cartItem, trackEvent.EventName);
+				_logger.LogDebug("HandleShoppingCartChangedEventAsync(cartItem={CartItem}): trackEvent.EventData → {Arg1}", cartItem, trackEvent.EventData);
                 trackEvent.EventData = new { id = $"cart:{shoppingCartGuid}", data = cartData };
             }
             else
@@ -221,6 +262,8 @@ public class MarketingAutomationManager
             //log full error
             await _logger.ErrorAsync($"Brevo Marketing Automation error: {exception.Message}.", exception, customer);
         }
+		_logger.LogError("HandleShoppingCartChangedEventAsync(cartItem)={CartItem}: external service call took {Arg1} ms", cartItem, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting HandleShoppingCartChangedEventAsync(cartItem={CartItem})", cartItem);
     }
 
     /// <summary>
@@ -230,6 +273,9 @@ public class MarketingAutomationManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleOrderCompletedEventAsync(Order order)
     {
+		_logger.LogError(">>> Entering HandleOrderCompletedEventAsync(order={Order})", order);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //whether marketing automation is enabled
         if (!_brevoSettings.UseMarketingAutomation)
             return;
@@ -237,9 +283,13 @@ public class MarketingAutomationManager
         ArgumentNullException.ThrowIfNull(order);
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): customer → {Customer}", order, customer);
         var shippingAddress = await _addressService.GetAddressByIdAsync(order.ShippingAddressId ?? 0);
+		_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): shippingAddress → {ShippingAddress}", order, shippingAddress);
         var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+		_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): billingAddress → {BillingAddress}", order, billingAddress);
         var email = customer.Email ?? billingAddress?.Email;
+		_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): email → {Email}", order, email);
 
         if (string.IsNullOrEmpty(email))
             return;
@@ -253,12 +303,15 @@ public class MarketingAutomationManager
             var itemsData = await (await _orderService.GetOrderItemsAsync(order.Id)).SelectAwait(async item =>
             {
                 var product = await _productService.GetProductByIdAsync(item.ProductId);
+				_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): product → {Product}", order, product);
 
                 //try to get product attribute combination
                 var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, item.AttributesXml);
+				_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): combination → {Combination}", order, combination);
 
                 //get default product picture
                 var picture = await _pictureService.GetProductPictureAsync(product, item.AttributesXml);
+				_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): picture → {Picture}", order, picture);
 
                 //create product data
                 return new
@@ -271,6 +324,7 @@ public class MarketingAutomationManager
                     category = await (await _categoryService.GetProductCategoriesByProductIdAsync(item.ProductId)).AggregateAwaitAsync(",", async (all, pc) =>
                     {
                         var res = (await _categoryService.GetCategoryByIdAsync(pc.CategoryId)).Name;
+						_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): res → {Res}", order, res);
                         res = all == "," ? res : all + ", " + res;
                         return res;
                     }),
@@ -279,6 +333,8 @@ public class MarketingAutomationManager
                     quantity = item.Quantity,
                     price = item.PriceInclTax,
                 };
+				var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogError("HandleOrderCompletedEventAsync(order)={Order}: database query executed in {Arg1} ms", order, __logStartDb.ElapsedMilliseconds);
             }).ToArrayAsync();
 
             var shippingAddressData = new
@@ -294,6 +350,7 @@ public class MarketingAutomationManager
                 state = (await _stateProvinceService.GetStateProvinceByAddressAsync(shippingAddress))?.Name,
                 zipcode = shippingAddress?.ZipPostalCode
             };
+			_logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): zipcode → {Zipcode}", order, zipcode);
 
             var billingAddressData = new
             {
@@ -310,6 +367,7 @@ public class MarketingAutomationManager
             };
 
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("HandleOrderCompletedEventAsync(order={Order}): store → {Store}", order, store);
 
             //prepare cart data
             var cartData = new
@@ -330,6 +388,7 @@ public class MarketingAutomationManager
                 shipping_address = shippingAddressData,
                 billing_address = billingAddressData
             };
+			_logger.LogDebug("HandleOrderCompletedEventAsync(order={Order}): billing_address → {Billing_address}", order, billing_address);
 
             //get shopping cart GUID
             var shoppingCartGuid = await _genericAttributeService.GetAttributeAsync<Guid?>(order,
@@ -354,6 +413,8 @@ public class MarketingAutomationManager
             //log full error
             await _logger.ErrorAsync($"Brevo Marketing Automation error: {exception.Message}.", exception, customer);
         }
+		_logger.LogError("HandleOrderCompletedEventAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting HandleOrderCompletedEventAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -363,13 +424,16 @@ public class MarketingAutomationManager
     /// <returns>A task that represents the asynchronous operation</returns>
     public async Task HandleOrderPlacedEventAsync(Order order)
     {
+		_logger.LogError(">>> Entering HandleOrderPlacedEventAsync(order={Order})", order);
         //whether marketing automation is enabled
         if (!_brevoSettings.UseMarketingAutomation)
             return;
 
         //copy shopping cart GUID to order
         var shoppingCartGuid = await _genericAttributeService.GetAttributeAsync<Customer, Guid?>(order.CustomerId, BrevoDefaults.ShoppingCartGuidAttribute);
+		_logger.LogError("HandleOrderPlacedEventAsync(order={Order}): shoppingCartGuid → {ShoppingCartGuid}", order, shoppingCartGuid);
         await _genericAttributeService.SaveAttributeAsync(order, BrevoDefaults.ShoppingCartGuidAttribute, shoppingCartGuid);
+		_logger.LogWarning("<<< Exiting HandleOrderPlacedEventAsync(order={Order})", order);
     }
 
     #endregion

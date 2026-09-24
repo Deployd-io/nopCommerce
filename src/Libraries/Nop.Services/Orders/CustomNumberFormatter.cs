@@ -1,4 +1,5 @@
-﻿using Nop.Core.Domain.Orders;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Core.Domain.Orders;
 
 namespace Nop.Services.Orders;
 
@@ -7,6 +8,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class CustomNumberFormatter : ICustomNumberFormatter
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly OrderSettings _orderSettings;
@@ -17,7 +19,10 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
 
     public CustomNumberFormatter(OrderSettings orderSettings)
     {
+		_logger.LogError(">>> Entering CustomNumberFormatter(orderSettings={OrderSettings})", orderSettings);
         _orderSettings = orderSettings;
+		_logger.LogDebug("CustomNumberFormatter(orderSettings={OrderSettings}): _orderSettings → {_orderSettings}", orderSettings, _orderSettings);
+    _logger.LogWarning("<<< Exiting CustomNumberFormatter(orderSettings={OrderSettings})", orderSettings);
     }
 
     #endregion
@@ -31,11 +36,13 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
     /// <returns>Custom number</returns>
     public virtual string GenerateReturnRequestCustomNumber(ReturnRequest returnRequest)
     {
+		_logger.LogError(">>> Entering GenerateReturnRequestCustomNumber(returnRequest={ReturnRequest})", returnRequest);
         string customNumber;
 
         if (string.IsNullOrEmpty(_orderSettings.ReturnRequestNumberMask))
         {
             customNumber = returnRequest.Id.ToString();
+			_logger.LogError("GenerateReturnRequestCustomNumber(returnRequest={ReturnRequest}): customNumber → {CustomNumber}", returnRequest, customNumber);
         }
         else
         {
@@ -62,6 +69,7 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
             //    customNumber = customNumber.Insert(0, $"{returnRequest.Id}-");
         }
 
+		_logger.LogWarning("<<< Exiting GenerateReturnRequestCustomNumber(returnRequest={ReturnRequest})", returnRequest);
         return customNumber;
     }
 
@@ -72,6 +80,7 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
     /// <returns>Custom number</returns>
     public virtual string GenerateOrderCustomNumber(Order order)
     {
+		_logger.LogError(">>> Entering GenerateOrderCustomNumber(order={Order})", order);
         if (string.IsNullOrEmpty(_orderSettings.CustomOrderNumberMask))
             return order.Id.ToString();
 
@@ -97,6 +106,7 @@ public partial class CustomNumberFormatter : ICustomNumberFormatter
         //else
         //    customNumber = customNumber.Insert(0, $"{order.Id}-");
 
+		_logger.LogWarning("<<< Exiting GenerateOrderCustomNumber(order={Order})", order);
         return customNumber;
     }
 

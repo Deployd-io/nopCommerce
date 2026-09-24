@@ -1,5 +1,6 @@
 ﻿using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -8,11 +9,16 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record FilterLevelValueModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public FilterLevelValueModel()
     {
+		_logger.LogError(">>> Entering FilterLevelValueModel()");
         FilterLevelValueProductSearchModel = new FilterLevelValueProductSearchModel();
+		_logger.LogDebug("FilterLevelValueModel(): FilterLevelValueProductSearchModel → {FilterLevelValueProductSearchModel}", FilterLevelValueProductSearchModel);
+    _logger.LogError("FilterLevelValueModel(): FilterLevelValueProductSearchModel → {FilterLevelValueProductSearchModel}", FilterLevelValueProductSearchModel);
+    _logger.LogWarning("<<< Exiting FilterLevelValueModel()");
     }
 
     #endregion

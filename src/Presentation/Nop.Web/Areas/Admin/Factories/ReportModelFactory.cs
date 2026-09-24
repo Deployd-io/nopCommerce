@@ -12,6 +12,7 @@ using Nop.Services.Localization;
 using Nop.Services.Orders;
 using Nop.Web.Areas.Admin.Models.Reports;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class ReportModelFactory : IReportModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -52,17 +54,30 @@ public partial class ReportModelFactory : IReportModelFactory
         IStoreContext storeContext,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext})", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext);
         _baseAdminModelFactory = baseAdminModelFactory;
         _countryService = countryService;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _countryService → {_countryService}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _countryService);
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _baseAdminModelFactory);
+    _logger.LogWarning("<<< Exiting ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext})", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext);
         _customerReportService = customerReportService;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _customerReportService → {_customerReportService}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _customerReportService);
         _customerService = customerService;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _customerService → {_customerService}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _dateTimeHelper → {_dateTimeHelper}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _dateTimeHelper);
         _localizationService = localizationService;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _localizationService → {_localizationService}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _localizationService);
         _orderReportService = orderReportService;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _orderReportService → {_orderReportService}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _orderReportService);
         _priceFormatter = priceFormatter;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _priceFormatter → {_priceFormatter}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _priceFormatter);
         _productAttributeFormatter = productAttributeFormatter;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _productAttributeFormatter → {_productAttributeFormatter}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _productAttributeFormatter);
         _productService = productService;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _productService → {_productService}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _productService);
         _storeContext = storeContext;
+		_logger.LogDebug("ReportModelFactory(baseAdminModelFactory={BaseAdminModelFactory},countryService={CountryService},customerReportService={CustomerReportService},customerService={CustomerService},dateTimeHelper={DateTimeHelper},localizationService={LocalizationService},orderReportService={OrderReportService},priceFormatter={PriceFormatter},productAttributeFormatter={ProductAttributeFormatter},productService={ProductService},storeContext={StoreContext},workContext={WorkContext}): _storeContext → {_storeContext}", baseAdminModelFactory, countryService, customerReportService, customerService, dateTimeHelper, localizationService, orderReportService, priceFormatter, productAttributeFormatter, productService, storeContext, workContext, _storeContext);
         _workContext = workContext;
     }
 
@@ -73,11 +88,15 @@ public partial class ReportModelFactory : IReportModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<IPagedList<SalesSummaryReportLine>> GetSalesSummaryReportAsync(SalesSummarySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering GetSalesSummaryReportAsync(searchModel={SearchModel})", searchModel);
         //get parameters to filter orders
         var orderStatusIds = (searchModel.OrderStatusIds?.Contains(0) ?? true) ? null : searchModel.OrderStatusIds.ToList();
+		_logger.LogError("GetSalesSummaryReportAsync(searchModel={SearchModel}): orderStatusIds → {OrderStatusIds}", searchModel, orderStatusIds);
         var paymentStatusIds = (searchModel.PaymentStatusIds?.Contains(0) ?? true) ? null : searchModel.PaymentStatusIds.ToList();
+		_logger.LogError("GetSalesSummaryReportAsync(searchModel={SearchModel}): paymentStatusIds → {PaymentStatusIds}", searchModel, paymentStatusIds);
 
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogError("GetSalesSummaryReportAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
 
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
@@ -99,18 +118,24 @@ public partial class ReportModelFactory : IReportModelFactory
             storeId: searchModel.StoreId,
             pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
+		_logger.LogWarning("<<< Exiting GetSalesSummaryReportAsync(searchModel={SearchModel})", searchModel);
         return salesSummary;
     }
 
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task<IPagedList<BestsellersReportLine>> GetBestsellersReportAsync(BestsellerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering GetBestsellersReportAsync(searchModel={SearchModel})", searchModel);
         //get parameters to filter bestsellers
         var orderStatus = searchModel.OrderStatusId > 0 ? (OrderStatus?)searchModel.OrderStatusId : null;
+		_logger.LogError("GetBestsellersReportAsync(searchModel={SearchModel}): orderStatus → {OrderStatus}", searchModel, orderStatus);
         var paymentStatus = searchModel.PaymentStatusId > 0 ? (PaymentStatus?)searchModel.PaymentStatusId : null;
+		_logger.LogError("GetBestsellersReportAsync(searchModel={SearchModel}): paymentStatus → {PaymentStatus}", searchModel, paymentStatus);
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogError("GetBestsellersReportAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null)
             searchModel.VendorId = currentVendor.Id;
+			_logger.LogDebug("GetBestsellersReportAsync(searchModel={SearchModel}): searchModel.VendorId → {Arg1}", searchModel, searchModel.VendorId);
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -130,6 +155,7 @@ public partial class ReportModelFactory : IReportModelFactory
             storeId: searchModel.StoreId,
             pageIndex: searchModel.Page - 1, pageSize: searchModel.PageSize);
 
+		_logger.LogWarning("<<< Exiting GetBestsellersReportAsync(searchModel={SearchModel})", searchModel);
         return bestsellers;
     }
 
@@ -149,6 +175,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<SalesSummarySearchModel> PrepareSalesSummarySearchModelAsync(SalesSummarySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareSalesSummarySearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -163,10 +190,13 @@ public partial class ReportModelFactory : IReportModelFactory
             if (searchModel.OrderStatusIds?.Any() ?? false)
             {
                 var ids = searchModel.OrderStatusIds.Select(id => id.ToString());
+				_logger.LogError("PrepareSalesSummarySearchModelAsync(searchModel={SearchModel}): ids → {Ids}", searchModel, ids);
                 var statusItems = searchModel.AvailableOrderStatuses.Where(statusItem => ids.Contains(statusItem.Value)).ToList();
+				_logger.LogError("PrepareSalesSummarySearchModelAsync(searchModel={SearchModel}): statusItems → {StatusItems}", searchModel, statusItems);
                 foreach (var statusItem in statusItems)
                 {
                     statusItem.Selected = true;
+					_logger.LogDebug("PrepareSalesSummarySearchModelAsync(searchModel={SearchModel}): statusItem.Selected → {Arg1}", searchModel, statusItem.Selected);
                 }
             }
             else
@@ -210,6 +240,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareSalesSummarySearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -223,9 +254,11 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<SalesSummaryListModel> PrepareSalesSummaryListModelAsync(SalesSummarySearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareSalesSummaryListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var salesSummary = await GetSalesSummaryReportAsync(searchModel);
+		_logger.LogError("PrepareSalesSummaryListModelAsync(searchModel={SearchModel}): salesSummary → {SalesSummary}", searchModel, salesSummary);
 
         //prepare list model
         var model = new SalesSummaryListModel().PrepareToGrid(searchModel, salesSummary, () =>
@@ -247,6 +280,7 @@ public partial class ReportModelFactory : IReportModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareSalesSummaryListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -264,6 +298,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<LowStockProductSearchModel> PrepareLowStockProductSearchModelAsync(LowStockProductSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareLowStockProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare "published" filter (0 - all; 1 - published only; 2 - unpublished only)
@@ -272,6 +307,7 @@ public partial class ReportModelFactory : IReportModelFactory
             Value = "0",
             Text = await _localizationService.GetResourceAsync("Admin.Reports.LowStock.SearchPublished.All")
         });
+			_logger.LogDebug("PrepareLowStockProductSearchModelAsync(searchModel={SearchModel}): Text → {Text}", searchModel, Text);
         searchModel.AvailablePublishedOptions.Add(new SelectListItem
         {
             Value = "1",
@@ -286,6 +322,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareLowStockProductSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -299,21 +336,28 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<LowStockProductListModel> PrepareLowStockProductListModelAsync(LowStockProductSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareLowStockProductListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter comments
         var publishedOnly = searchModel.SearchPublishedId == 0 ? null : searchModel.SearchPublishedId == 1 ? true : (bool?)false;
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): publishedOnly → {PublishedOnly}", searchModel, publishedOnly);
         var vendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): vendor → {Vendor}", searchModel, vendor);
         var vendorId = vendor?.Id ?? 0;
 
         //get low stock product and product combinations
         var products = await _productService.GetLowStockProductsAsync(vendorId: vendorId, loadPublishedOnly: publishedOnly);
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): products → {Products}", searchModel, products);
         var combinations = await _productService.GetLowStockProductCombinationsAsync(vendorId: vendorId, loadPublishedOnly: publishedOnly);
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): combinations → {Combinations}", searchModel, combinations);
 
         //prepare low stock product models
         var lowStockProductModels = new List<LowStockProductModel>();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         lowStockProductModels.AddRange(await products.SelectAwait(async product => new LowStockProductModel
         {
+			_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): lowStockProductModels → {LowStockProductModels}", searchModel, lowStockProductModels);
             Id = product.Id,
             Name = product.Name,
 
@@ -322,12 +366,17 @@ public partial class ReportModelFactory : IReportModelFactory
             Published = product.Published
         }).ToListAsync());
 
+		_logger.LogDebug("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): Published → {Published}", searchModel, Published);
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel)={SearchModel}: database query executed in {Arg1} ms", searchModel, __logStart.ElapsedMilliseconds);
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): currentCustomer → {CurrentCustomer}", searchModel, currentCustomer);
         var currentStore = await _storeContext.GetCurrentStoreAsync();
 
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): currentStore → {CurrentStore}", searchModel, currentStore);
         lowStockProductModels.AddRange(await combinations.SelectAwait(async combination =>
         {
             var product = await _productService.GetProductByIdAsync(combination.ProductId);
+			_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): product → {Product}", searchModel, product);
 
             return new LowStockProductModel
             {
@@ -344,10 +393,13 @@ public partial class ReportModelFactory : IReportModelFactory
         }).ToListAsync());
 
         var pagesList = lowStockProductModels.ToPagedList(searchModel);
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): pagesList → {PagesList}", searchModel, pagesList);
 
         //prepare list model
         var model = new LowStockProductListModel().PrepareToGrid(searchModel, pagesList, () => pagesList);
+		_logger.LogError("PrepareLowStockProductListModelAsync(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting PrepareLowStockProductListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -365,6 +417,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<BestsellerSearchModel> PrepareBestsellerSearchModelAsync(BestsellerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareBestsellerSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -395,6 +448,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareBestsellerSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -408,9 +462,11 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<BestsellerListModel> PrepareBestsellerListModelAsync(BestsellerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareBestsellerListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         var bestsellers = await GetBestsellersReportAsync(searchModel);
+		_logger.LogError("PrepareBestsellerListModelAsync(searchModel={SearchModel}): bestsellers → {Bestsellers}", searchModel, bestsellers);
 
         //prepare list model
         var model = await new BestsellerListModel().PrepareToGridAsync(searchModel, bestsellers, () =>
@@ -432,6 +488,7 @@ public partial class ReportModelFactory : IReportModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareBestsellerListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -445,14 +502,19 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<string> GetBestsellerTotalAmountAsync(BestsellerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering GetBestsellerTotalAmountAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter bestsellers
         var orderStatus = searchModel.OrderStatusId > 0 ? (OrderStatus?)searchModel.OrderStatusId : null;
+		_logger.LogError("GetBestsellerTotalAmountAsync(searchModel={SearchModel}): orderStatus → {OrderStatus}", searchModel, orderStatus);
         var paymentStatus = searchModel.PaymentStatusId > 0 ? (PaymentStatus?)searchModel.PaymentStatusId : null;
+		_logger.LogError("GetBestsellerTotalAmountAsync(searchModel={SearchModel}): paymentStatus → {PaymentStatus}", searchModel, paymentStatus);
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogError("GetBestsellerTotalAmountAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null)
             searchModel.VendorId = currentVendor.Id;
+			_logger.LogDebug("GetBestsellerTotalAmountAsync(searchModel={SearchModel}): searchModel.VendorId → {Arg1}", searchModel, searchModel.VendorId);
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -471,6 +533,7 @@ public partial class ReportModelFactory : IReportModelFactory
             manufacturerId: searchModel.ManufacturerId,
             storeId: searchModel.StoreId);
 
+		_logger.LogWarning("<<< Exiting GetBestsellerTotalAmountAsync(searchModel={SearchModel})", searchModel);
         return await _priceFormatter.FormatPriceAsync(totalAmount, true, false);
     }
 
@@ -488,6 +551,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<NeverSoldReportSearchModel> PrepareNeverSoldSearchModelAsync(NeverSoldReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNeverSoldSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         searchModel.IsLoggedInAsVendor = await _workContext.GetCurrentVendorAsync() != null;
@@ -507,6 +571,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareNeverSoldSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -520,12 +585,15 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<NeverSoldReportListModel> PrepareNeverSoldListModelAsync(NeverSoldReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareNeverSoldListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter neverSoldReports
         var currentVendor = await _workContext.GetCurrentVendorAsync();
+		_logger.LogError("PrepareNeverSoldListModelAsync(searchModel={SearchModel}): currentVendor → {CurrentVendor}", searchModel, currentVendor);
         if (currentVendor != null)
             searchModel.SearchVendorId = currentVendor.Id;
+			_logger.LogDebug("PrepareNeverSoldListModelAsync(searchModel={SearchModel}): searchModel.SearchVendorId → {Arg1}", searchModel, searchModel.SearchVendorId);
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -552,6 +620,7 @@ public partial class ReportModelFactory : IReportModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareNeverSoldListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -569,6 +638,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<CountryReportSearchModel> PrepareCountrySalesSearchModelAsync(CountryReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCountrySalesSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available order statuses
@@ -583,6 +653,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareCountrySalesSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -596,11 +667,14 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<CountryReportListModel> PrepareCountrySalesListModelAsync(CountryReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCountrySalesListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter countryReports
         var orderStatus = searchModel.OrderStatusId > 0 ? (OrderStatus?)searchModel.OrderStatusId : null;
+		_logger.LogError("PrepareCountrySalesListModelAsync(searchModel={SearchModel}): orderStatus → {OrderStatus}", searchModel, orderStatus);
         var paymentStatus = searchModel.PaymentStatusId > 0 ? (PaymentStatus?)searchModel.PaymentStatusId : null;
+		_logger.LogError("PrepareCountrySalesListModelAsync(searchModel={SearchModel}): paymentStatus → {PaymentStatus}", searchModel, paymentStatus);
         var startDateValue = !searchModel.StartDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.StartDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync());
         var endDateValue = !searchModel.EndDate.HasValue ? null
@@ -632,6 +706,7 @@ public partial class ReportModelFactory : IReportModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareCountrySalesListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -649,6 +724,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<CustomerReportsSearchModel> PrepareCustomerReportsSearchModelAsync(CustomerReportsSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareCustomerReportsSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare nested search models
@@ -656,6 +732,7 @@ public partial class ReportModelFactory : IReportModelFactory
         await PrepareBestCustomersReportSearchModelAsync(searchModel.BestCustomersByNumberOfOrders);
         await PrepareRegisteredCustomersReportSearchModelAsync(searchModel.RegisteredCustomers);
 
+		_logger.LogWarning("<<< Exiting PrepareCustomerReportsSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -669,6 +746,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     protected virtual async Task<BestCustomersReportSearchModel> PrepareBestCustomersReportSearchModelAsync(BestCustomersReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareBestCustomersReportSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available order, payment and shipping statuses
@@ -679,6 +757,9 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareBestCustomersReportSearchModelAsync(searchModel={SearchModel})", searchModel);
+		_logger.LogError(">>> Entering PrepareRegisteredCustomersReportSearchModelAsync(searchModel={SearchModel})", searchModel);
+		_logger.LogWarning("<<< Exiting PrepareRegisteredCustomersReportSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -692,6 +773,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     protected virtual async Task<BestCustomersReportSearchModel> PrepareBestCustomersReportByOrderTotalSearchModelAsync(BestCustomersReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareBestCustomersReportByOrderTotalSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare available order, payment and shipping statuses
@@ -702,6 +784,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareBestCustomersReportByOrderTotalSearchModelAsync(searchModel={SearchModel})", searchModel);
         return searchModel;
     }
 
@@ -734,6 +817,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<BestCustomersReportListModel> PrepareBestCustomersReportListModelAsync(BestCustomersReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareBestCustomersReportListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter
@@ -742,8 +826,11 @@ public partial class ReportModelFactory : IReportModelFactory
         var endDateValue = !searchModel.EndDate.HasValue ? null
             : (DateTime?)_dateTimeHelper.ConvertToUtcTime(searchModel.EndDate.Value, await _dateTimeHelper.GetCurrentTimeZoneAsync()).AddDays(1);
         var orderStatus = searchModel.OrderStatusId > 0 ? (OrderStatus?)searchModel.OrderStatusId : null;
+		_logger.LogError("PrepareBestCustomersReportListModelAsync(searchModel={SearchModel}): orderStatus → {OrderStatus}", searchModel, orderStatus);
         var paymentStatus = searchModel.PaymentStatusId > 0 ? (PaymentStatus?)searchModel.PaymentStatusId : null;
+		_logger.LogError("PrepareBestCustomersReportListModelAsync(searchModel={SearchModel}): paymentStatus → {PaymentStatus}", searchModel, paymentStatus);
         var shippingStatus = searchModel.ShippingStatusId > 0 ? (ShippingStatus?)searchModel.ShippingStatusId : null;
+		_logger.LogError("PrepareBestCustomersReportListModelAsync(searchModel={SearchModel}): shippingStatus → {ShippingStatus}", searchModel, shippingStatus);
 
         //get report items
         var reportItems = await _customerReportService.GetBestCustomersReportAsync(createdFromUtc: startDateValue,
@@ -770,6 +857,7 @@ public partial class ReportModelFactory : IReportModelFactory
 
                 //fill in additional values (not existing in the entity)
                 var customer = await _customerService.GetCustomerByIdAsync(item.CustomerId);
+				_logger.LogError("PrepareBestCustomersReportListModelAsync(searchModel={SearchModel}): customer → {Customer}", searchModel, customer);
                 if (customer != null)
                 {
                     bestCustomersReportModel.CustomerName = (await _customerService.IsRegisteredAsync(customer))
@@ -781,6 +869,7 @@ public partial class ReportModelFactory : IReportModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareBestCustomersReportListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -794,6 +883,7 @@ public partial class ReportModelFactory : IReportModelFactory
     /// </returns>
     public virtual async Task<RegisteredCustomersReportListModel> PrepareRegisteredCustomersReportListModelAsync(RegisteredCustomersReportSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareRegisteredCustomersReportListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get report items
@@ -822,6 +912,7 @@ public partial class ReportModelFactory : IReportModelFactory
         //prepare list model
         var model = new RegisteredCustomersReportListModel().PrepareToGrid(searchModel, pagedList, () => pagedList);
 
+		_logger.LogWarning("<<< Exiting PrepareRegisteredCustomersReportListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 

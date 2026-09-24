@@ -3,13 +3,16 @@ using Nop.Core.Domain.Common;
 using Nop.Services.Localization;
 using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Validators;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Validators.Common;
 
 public partial class AddressValidator : BaseNopValidator<AddressModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public AddressValidator(AddressSettings addressSettings, ILocalizationService localizationService)
     {
+		_logger.LogError(">>> Entering AddressValidator(addressSettings={AddressSettings},localizationService={LocalizationService})", addressSettings, localizationService);
         RuleFor(x => x.FirstName)
             .NotEmpty()
             .WithMessageAwait(localizationService.GetResourceAsync("Admin.Address.Fields.FirstName.Required"))
@@ -67,5 +70,6 @@ public partial class AddressValidator : BaseNopValidator<AddressModel>
             .When(x => addressSettings.FaxEnabled && x.FaxRequired);
 
         SetDatabaseValidationRules<Address>();
+		_logger.LogWarning("<<< Exiting AddressValidator(addressSettings={AddressSettings},localizationService={LocalizationService})", addressSettings, localizationService);
     }
 }

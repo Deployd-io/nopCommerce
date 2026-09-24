@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Shipping;
 
@@ -7,12 +8,15 @@ namespace Nop.Web.Areas.Admin.Models.Shipping;
 /// </summary>
 public partial record DatesRangesSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public DatesRangesSearchModel()
     {
+		_logger.LogError(">>> Entering DatesRangesSearchModel()");
         DeliveryDateSearchModel = new DeliveryDateSearchModel();
         ProductAvailabilityRangeSearchModel = new ProductAvailabilityRangeSearchModel();
+		_logger.LogError("DatesRangesSearchModel(): ProductAvailabilityRangeSearchModel → {ProductAvailabilityRangeSearchModel}", ProductAvailabilityRangeSearchModel);
     }
 
     #endregion

@@ -20,6 +20,7 @@ namespace Nop.Services.ArtificialIntelligence;
 /// </summary>
 public partial class ArtificialIntelligenceService : IArtificialIntelligenceService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ArtificialIntelligenceHttpClient _httpClient;
@@ -43,12 +44,19 @@ public partial class ArtificialIntelligenceService : IArtificialIntelligenceServ
         LocalizationSettings localizationSettings)
     {
         _httpClient = httpClient;
+		_logger.LogDebug("ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings}): _httpClient → {_httpClient}", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings, _httpClient);
         _artificialIntelligenceSettings = artificialIntelligenceSettings;
+		_logger.LogDebug("ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings}): _artificialIntelligenceSettings → {_artificialIntelligenceSettings}", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings, _artificialIntelligenceSettings);
         _languageService = languageService;
+		_logger.LogDebug("ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings}): _languageService → {_languageService}", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings}): _localizationService → {_localizationService}", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings, _localizationService);
         _logger = logger;
+		_logger.LogError(">>> Entering ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings})", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings);
         _workContext = workContext;
         _localizationSettings = localizationSettings;
+		_logger.LogWarning("<<< Exiting ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings})", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings);
+		_logger.LogDebug("ArtificialIntelligenceService(httpClient={HttpClient},artificialIntelligenceSettings={ArtificialIntelligenceSettings},languageService={LanguageService},localizationService={LocalizationService},logger={Logger},workContext={WorkContext},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", httpClient, artificialIntelligenceSettings, languageService, localizationService, logger, workContext, localizationSettings, _localizationSettings);
     }
 
     #endregion
@@ -66,9 +74,11 @@ public partial class ArtificialIntelligenceService : IArtificialIntelligenceServ
     /// </returns>
     protected virtual async Task<string> GetTonOfVoiceInstructionAsync(ToneOfVoiceType toneOfVoice, string customToneOfVoice)
     {
+		_logger.LogError(">>> Entering GetTonOfVoiceInstructionAsync(toneOfVoice={ToneOfVoice},customToneOfVoice={CustomToneOfVoice})", toneOfVoice, customToneOfVoice);
         if (toneOfVoice == ToneOfVoiceType.Custom && string.IsNullOrEmpty(customToneOfVoice))
             toneOfVoice = ToneOfVoiceType.Expert;
 
+		_logger.LogWarning("<<< Exiting GetTonOfVoiceInstructionAsync(toneOfVoice={ToneOfVoice},customToneOfVoice={CustomToneOfVoice})", toneOfVoice, customToneOfVoice);
         return toneOfVoice switch
         {
             ToneOfVoiceType.Expert or ToneOfVoiceType.Supportive => await _localizationService.GetResourceAsync(
@@ -279,18 +289,27 @@ public partial class ArtificialIntelligenceService : IArtificialIntelligenceServ
     /// </returns>
     public virtual async Task<string> CreateProductDescriptionAsync(string productName, string keywords, ToneOfVoiceType toneOfVoice, string instruction, string customToneOfVoice = null, int languageId = 0)
     {
+		_logger.LogError(">>> Entering CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId})", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var toneOfVoiceInstruction = await GetTonOfVoiceInstructionAsync(toneOfVoice, customToneOfVoice);
 
+		_logger.LogError("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): toneOfVoiceInstruction → {ToneOfVoiceInstruction}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, toneOfVoiceInstruction);
         if (languageId == 0)
             languageId = _localizationSettings.DefaultAdminLanguageId;
 
         var lang = await _languageService.GetLanguageByIdAsync(languageId);
+		_logger.LogError("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): lang → {Lang}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, lang);
 
         var query = string.Format(string.IsNullOrEmpty(_artificialIntelligenceSettings.ProductDescriptionQuery) ? ArtificialIntelligenceDefaults.ProductDescriptionQuery : _artificialIntelligenceSettings.ProductDescriptionQuery, productName, keywords, toneOfVoiceInstruction, instruction, lang.Name);
+		_logger.LogError("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): query → {Query}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, query);
 
         try
         {
             var result = await _httpClient.SendQueryAsync(query);
+			_logger.LogError("CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId}): result → {Result}", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, result);
+			_logger.LogError("CreateProductDescriptionAsync(productName,keywords,toneOfVoice,instruction,customToneOfVoice,languageId)={ProductName},{Keywords},{ToneOfVoice},{Instruction},{CustomToneOfVoice},{LanguageId}: external service call took {Arg6} ms", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId, __logStart.ElapsedMilliseconds);
+			_logger.LogWarning("<<< Exiting CreateProductDescriptionAsync(productName={ProductName},keywords={Keywords},toneOfVoice={ToneOfVoice},instruction={Instruction},customToneOfVoice={CustomToneOfVoice},languageId={LanguageId})", productName, keywords, toneOfVoice, instruction, customToneOfVoice, languageId);
             return Markdown.ToHtml(result);
         }
         catch (Exception e)
