@@ -28,6 +28,7 @@ using Nop.Services.Shipping;
 using Nop.Services.Stores;
 using Nop.Services.Vendors;
 using PdfRpt.Core.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common;
 
@@ -36,6 +37,7 @@ namespace Nop.Services.Common;
 /// </summary>
 public partial class PdfService : IPdfService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -155,37 +157,50 @@ public partial class PdfService : IPdfService
     /// <returns>A task that contains address item</returns>
     protected virtual async Task<AddressItem> GetBillingAddressAsync(Vendor vendor, Language lang, Order order)
     {
+		_logger.LogError(">>> Entering GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order})", vendor, lang, order);
         var addressResult = new AddressItem();
 
+		_logger.LogError("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult → {AddressResult}", vendor, lang, order, addressResult);
         var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+		_logger.LogError("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): billingAddress → {BillingAddress}", vendor, lang, order, billingAddress);
 
         if (_addressSettings.CompanyEnabled && !string.IsNullOrEmpty(billingAddress.Company))
             addressResult.Company = billingAddress.Company;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.Company → {Arg3}", vendor, lang, order, addressResult.Company);
 
         addressResult.Name = $"{billingAddress.FirstName} {billingAddress.LastName}";
+		_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.Name → {Arg3}", vendor, lang, order, addressResult.Name);
 
         if (_addressSettings.PhoneEnabled)
             addressResult.Phone = billingAddress.PhoneNumber;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.Phone → {Arg3}", vendor, lang, order, addressResult.Phone);
 
         if (_addressSettings.FaxEnabled && !string.IsNullOrEmpty(billingAddress.FaxNumber))
             addressResult.Fax = billingAddress.FaxNumber;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.Fax → {Arg3}", vendor, lang, order, addressResult.Fax);
 
         if (_addressSettings.StreetAddressEnabled)
             addressResult.Address = billingAddress.Address1;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.Address → {Arg3}", vendor, lang, order, addressResult.Address);
 
         if (_addressSettings.StreetAddress2Enabled && !string.IsNullOrEmpty(billingAddress.Address2))
             addressResult.Address2 = billingAddress.Address2;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.Address2 → {Arg3}", vendor, lang, order, addressResult.Address2);
 
         if (_addressSettings.CityEnabled && !string.IsNullOrEmpty(billingAddress.City))
             addressResult.City = billingAddress.City;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.City → {Arg3}", vendor, lang, order, addressResult.City);
 
         if (_addressSettings.CountyEnabled && !string.IsNullOrEmpty(billingAddress.County))
             addressResult.County = billingAddress.County;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.County → {Arg3}", vendor, lang, order, addressResult.County);
 
         if (_addressSettings.ZipPostalCodeEnabled && !string.IsNullOrEmpty(billingAddress.ZipPostalCode))
             addressResult.ZipPostalCode = billingAddress.ZipPostalCode;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.ZipPostalCode → {Arg3}", vendor, lang, order, addressResult.ZipPostalCode);
 
         var stateProvince = await _stateProvinceService.GetStateProvinceByAddressAsync(billingAddress);
+		_logger.LogError("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): stateProvince → {StateProvince}", vendor, lang, order, stateProvince);
         addressResult.StateProvinceName = stateProvince != null ? await _localizationService.GetLocalizedAsync(stateProvince, x => x.Name, lang.Id) : string.Empty;
 
         if (_addressSettings.CountryEnabled && await _countryService.GetCountryByAddressAsync(billingAddress) is Country country)
@@ -193,10 +208,12 @@ public partial class PdfService : IPdfService
 
         var (addressLine, _) = await _addressService.FormatAddressAsync(billingAddress, lang.Id);
         addressResult.AddressLine = addressLine;
+		_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.AddressLine → {Arg3}", vendor, lang, order, addressResult.AddressLine);
 
         //VAT number
         if (!string.IsNullOrEmpty(order.VatNumber))
             addressResult.VATNumber = order.VatNumber;
+			_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.VATNumber → {Arg3}", vendor, lang, order, addressResult.VATNumber);
 
         //custom attributes
         var customBillingAddressAttributes = await _addressAttributeFormatter
@@ -205,11 +222,13 @@ public partial class PdfService : IPdfService
         if (!string.IsNullOrEmpty(customBillingAddressAttributes))
         {
             var text = _htmlFormatter.ConvertHtmlToPlainText(customBillingAddressAttributes, true, true);
+			_logger.LogError("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): text → {Text}", vendor, lang, order, text);
             addressResult.AddressAttributes = text.Split('\n').ToList();
         }
 
         //billing address custom values
         var customValues = new CustomValues();
+		_logger.LogError("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): customValues → {CustomValues}", vendor, lang, order, customValues);
         customValues.FillByXml(order.CustomValuesXml, true);
         addressResult.CustomValues.AddRange(customValues.Where(value => value.DisplayLocation == CustomValueDisplayLocation.BillingAddress));
 
@@ -218,18 +237,21 @@ public partial class PdfService : IPdfService
         {
             //payment method
             var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(order.PaymentMethodSystemName);
+			_logger.LogError("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): paymentMethod → {PaymentMethod}", vendor, lang, order, paymentMethod);
             var paymentMethodStr = paymentMethod != null
                 ? await _localizationService.GetLocalizedFriendlyNameAsync(paymentMethod, lang.Id)
                 : order.PaymentMethodSystemName;
             if (!string.IsNullOrEmpty(paymentMethodStr))
             {
                 addressResult.PaymentMethod = paymentMethodStr;
+				_logger.LogDebug("GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order}): addressResult.PaymentMethod → {Arg3}", vendor, lang, order, addressResult.PaymentMethod);
             }
 
             //payment custom values
             addressResult.CustomValues.AddRange(customValues.Where(value => value.DisplayLocation == CustomValueDisplayLocation.Payment));
         }
 
+		_logger.LogWarning("<<< Exiting GetBillingAddressAsync(vendor={Vendor},lang={Lang},order={Order})", vendor, lang, order);
         return addressResult;
     }
 
@@ -241,42 +263,56 @@ public partial class PdfService : IPdfService
     /// <returns>A task that contains address item</returns>
     protected virtual async Task<AddressItem> GetShippingAddressAsync(Language lang, Order order)
     {
+		_logger.LogError(">>> Entering GetShippingAddressAsync(lang={Lang},order={Order})", lang, order);
         var addressResult = new AddressItem();
 
+		_logger.LogError("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult → {AddressResult}", lang, order, addressResult);
         if (order.ShippingStatus != ShippingStatus.ShippingNotRequired)
         {
             if (!order.PickupInStore)
             {
                 if (order.ShippingAddressId == null || await _addressService.GetAddressByIdAsync(order.ShippingAddressId.Value) is not Address shippingAddress)
+					_logger.LogError("Throwing NopException from GetShippingAddressAsync(lang={Lang},order={Order})", lang, order);
+				_logger.LogError("GetShippingAddressAsync(lang={Lang},order={Order}): ID → {ID}", lang, order, ID);
                     throw new NopException($"Shipping is required, but address is not available. Order ID = {order.Id}");
 
                 if (!string.IsNullOrEmpty(shippingAddress.Company))
                     addressResult.Company = shippingAddress.Company;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.Company → {Arg2}", lang, order, addressResult.Company);
 
                 addressResult.Name = $"{shippingAddress.FirstName} {shippingAddress.LastName}";
+				_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.Name → {Arg2}", lang, order, addressResult.Name);
 
                 if (_addressSettings.PhoneEnabled)
                     addressResult.Phone = shippingAddress.PhoneNumber;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.Phone → {Arg2}", lang, order, addressResult.Phone);
 
                 if (_addressSettings.FaxEnabled && !string.IsNullOrEmpty(shippingAddress.FaxNumber))
                     addressResult.Fax = shippingAddress.FaxNumber;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.Fax → {Arg2}", lang, order, addressResult.Fax);
 
                 if (_addressSettings.StreetAddressEnabled)
                     addressResult.Address = shippingAddress.Address1;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.Address → {Arg2}", lang, order, addressResult.Address);
 
                 if (_addressSettings.StreetAddress2Enabled && !string.IsNullOrEmpty(shippingAddress.Address2))
                     addressResult.Address2 = shippingAddress.Address2;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.Address2 → {Arg2}", lang, order, addressResult.Address2);
 
                 if (_addressSettings.CityEnabled && !string.IsNullOrEmpty(shippingAddress.City))
                     addressResult.City = shippingAddress.City;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.City → {Arg2}", lang, order, addressResult.City);
 
                 if (_addressSettings.CountyEnabled && !string.IsNullOrEmpty(shippingAddress.County))
                     addressResult.County = shippingAddress.County;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.County → {Arg2}", lang, order, addressResult.County);
 
                 if (_addressSettings.ZipPostalCodeEnabled && !string.IsNullOrEmpty(shippingAddress.ZipPostalCode))
                     addressResult.ZipPostalCode = shippingAddress.ZipPostalCode;
+					_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.ZipPostalCode → {Arg2}", lang, order, addressResult.ZipPostalCode);
 
                 var stateProvince = await _stateProvinceService.GetStateProvinceByAddressAsync(shippingAddress);
+				_logger.LogError("GetShippingAddressAsync(lang={Lang},order={Order}): stateProvince → {StateProvince}", lang, order, stateProvince);
                 addressResult.StateProvinceName = stateProvince != null ? await _localizationService.GetLocalizedAsync(stateProvince, x => x.Name, lang.Id) : string.Empty;
 
                 if (_addressSettings.CountryEnabled && await _countryService.GetCountryByAddressAsync(shippingAddress) is Country country)
@@ -286,6 +322,7 @@ public partial class PdfService : IPdfService
 
                 var (addressLine, _) = await _addressService.FormatAddressAsync(shippingAddress, lang.Id);
                 addressResult.AddressLine = addressLine;
+				_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.AddressLine → {Arg2}", lang, order, addressResult.AddressLine);
 
                 //custom attributes
                 var customShippingAddressAttributes = await _addressAttributeFormatter
@@ -293,6 +330,7 @@ public partial class PdfService : IPdfService
                 if (!string.IsNullOrEmpty(customShippingAddressAttributes))
                 {
                     var text = _htmlFormatter.ConvertHtmlToPlainText(customShippingAddressAttributes, true, true);
+					_logger.LogError("GetShippingAddressAsync(lang={Lang},order={Order}): text → {Text}", lang, order, text);
                     addressResult.AddressAttributes = text.Split('\n').ToList();
                 }
             }
@@ -325,15 +363,18 @@ public partial class PdfService : IPdfService
 
             //shipping address custom values
             var customValues = new CustomValues();
+			_logger.LogError("GetShippingAddressAsync(lang={Lang},order={Order}): customValues → {CustomValues}", lang, order, customValues);
             customValues.FillByXml(order.CustomValuesXml, true);
             addressResult.CustomValues.AddRange(customValues.Where(value => value.DisplayLocation == CustomValueDisplayLocation.ShippingAddress));
 
             addressResult.ShippingMethod = order.ShippingMethod;
+			_logger.LogDebug("GetShippingAddressAsync(lang={Lang},order={Order}): addressResult.ShippingMethod → {Arg2}", lang, order, addressResult.ShippingMethod);
 
             //shipping custom values
             addressResult.CustomValues.AddRange(customValues.Where(value => value.DisplayLocation == CustomValueDisplayLocation.Shipping));
         }
 
+		_logger.LogWarning("<<< Exiting GetShippingAddressAsync(lang={Lang},order={Order})", lang, order);
         return addressResult;
     }
 
@@ -382,14 +423,19 @@ public partial class PdfService : IPdfService
     /// <returns>A task that contains collection of product entries</returns>
     protected virtual async Task<List<ProductItem>> GetOrderProductItemsAsync(Order order, IList<OrderItem> orderItems, Language language, IList<ShipmentItem> shipmentItems = null)
     {
+		_logger.LogError(">>> Entering GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems})", order, orderItems, language, shipmentItems);
         var vendors = _vendorSettings.ShowVendorOnOrderDetailsPage ? await _vendorService.GetVendorsByProductIdsAsync(orderItems.Select(item => item.ProductId).ToArray()) : new List<Vendor>();
 
+		_logger.LogError("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): vendors → {Vendors}", order, orderItems, language, shipmentItems, vendors);
         var result = new List<ProductItem>();
+		_logger.LogError("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): result → {Result}", order, orderItems, language, shipmentItems, result);
 
         foreach (var oi in orderItems)
         {
             var productItem = new ProductItem();
+			_logger.LogError("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): productItem → {ProductItem}", order, orderItems, language, shipmentItems, productItem);
             var product = await _productService.GetProductByIdAsync(oi.ProductId);
+			_logger.LogError("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): product → {Product}", order, orderItems, language, shipmentItems, product);
 
             //product name
             productItem.Name = await _localizationService.GetLocalizedAsync(product, x => x.Name, language.Id);
@@ -398,6 +444,7 @@ public partial class PdfService : IPdfService
             if (!string.IsNullOrEmpty(oi.AttributeDescription))
             {
                 var attributes = _htmlFormatter.ConvertHtmlToPlainText(oi.AttributeDescription, true, true);
+				_logger.LogError("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): attributes → {Attributes}", order, orderItems, language, shipmentItems, attributes);
                 productItem.ProductAttributes = attributes.Split('\n').ToList();
             }
 
@@ -429,10 +476,12 @@ public partial class PdfService : IPdfService
             }
 
             productItem.Price = unitPrice;
+			_logger.LogDebug("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): productItem.Price → {Arg4}", order, orderItems, language, shipmentItems, productItem.Price);
 
             //qty
             productItem.Quantity = shipmentItems is null ?
                 oi.Quantity.ToString() :
+				_logger.LogDebug("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): productItem.Quantity → {Arg4}", order, orderItems, language, shipmentItems, productItem.Quantity);
                 shipmentItems.FirstOrDefault(x => x.OrderItemId == oi.Id).Quantity.ToString();
 
             //total
@@ -455,10 +504,12 @@ public partial class PdfService : IPdfService
             }
 
             productItem.Total = subTotal;
+			_logger.LogDebug("GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems}): productItem.Total → {Arg4}", order, orderItems, language, shipmentItems, productItem.Total);
 
             result.Add(productItem);
         }
 
+		_logger.LogWarning("<<< Exiting GetOrderProductItemsAsync(order={Order},orderItems={OrderItems},language={Language},shipmentItems={ShipmentItems})", order, orderItems, language, shipmentItems);
         return result;
     }
 
@@ -470,8 +521,10 @@ public partial class PdfService : IPdfService
     /// <returns>A task that contains invoice totals</returns>
     protected virtual async Task<InvoiceTotals> GetTotalsAsync(Language lang, Order order)
     {
+		_logger.LogError(">>> Entering GetTotalsAsync(lang={Lang},order={Order})", lang, order);
         var result = new InvoiceTotals();
         var languageId = lang.Id;
+		_logger.LogError("GetTotalsAsync(lang={Lang},order={Order}): result → {Result}", lang, order, result);
 
         //order subtotal
         if (order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax &&
@@ -560,14 +613,18 @@ public partial class PdfService : IPdfService
         //tax
         var taxStr = string.Empty;
         var taxRates = new SortedDictionary<decimal, decimal>();
+		_logger.LogError("GetTotalsAsync(lang={Lang},order={Order}): taxRates → {TaxRates}", lang, order, taxRates);
         bool displayTax;
         var displayTaxRates = true;
+		_logger.LogError("GetTotalsAsync(lang={Lang},order={Order}): displayTaxRates → {DisplayTaxRates}", lang, order, displayTaxRates);
         if (_taxSettings.HideTaxInOrderSummary && order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax)
         {
             displayTax = false;
+			_logger.LogError("GetTotalsAsync(lang={Lang},order={Order}): displayTax → {DisplayTax}", lang, order, displayTax);
         }
         else
         {
+			_logger.LogDebug("GetTotalsAsync(lang={Lang},order={Order}): displayTax → {DisplayTax}", lang, order, displayTax);
             if (order.OrderTax == 0 && _taxSettings.HideZeroTax)
             {
                 displayTax = false;
@@ -581,6 +638,7 @@ public partial class PdfService : IPdfService
                 displayTax = !displayTaxRates;
 
                 var orderTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTax, order.CurrencyRate);
+				_logger.LogError("GetTotalsAsync(lang={Lang},order={Order}): orderTaxInCustomerCurrency → {OrderTaxInCustomerCurrency}", lang, order, orderTaxInCustomerCurrency);
                 taxStr = await _priceFormatter.FormatPriceAsync(orderTaxInCustomerCurrency, true, order.CustomerCurrencyCode,
                     false, languageId);
             }
@@ -589,6 +647,7 @@ public partial class PdfService : IPdfService
         if (displayTax)
         {
             result.Tax = taxStr;
+			_logger.LogDebug("GetTotalsAsync(lang={Lang},order={Order}): result.Tax → {Arg2}", lang, order, result.Tax);
         }
 
         if (displayTaxRates)
@@ -636,12 +695,15 @@ public partial class PdfService : IPdfService
                 true, order.CustomerCurrencyCode, false, languageId);
 
             result.RewardPoints = $"{rpTitle} {rpAmount}";
+			_logger.LogDebug("GetTotalsAsync(lang={Lang},order={Order}): result.RewardPoints → {Arg2}", lang, order, result.RewardPoints);
         }
 
         //order total
         var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+		_logger.LogError("GetTotalsAsync(lang={Lang},order={Order}): orderTotalInCustomerCurrency → {OrderTotalInCustomerCurrency}", lang, order, orderTotalInCustomerCurrency);
         result.OrderTotal = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
 
+		_logger.LogWarning("<<< Exiting GetTotalsAsync(lang={Lang},order={Order})", lang, order);
         return result;
     }
 
@@ -653,6 +715,7 @@ public partial class PdfService : IPdfService
     /// <returns>A font object</returns>
     protected virtual Font ResolvePdfFont(Language language, PdfSettings settings)
     {
+		_logger.LogError(">>> Entering ResolvePdfFont(language={Language},settings={Settings})", language, settings);
         ArgumentNullException.ThrowIfNull(settings);
 
         var fontName = language?.Rtl == true
@@ -661,6 +724,7 @@ public partial class PdfService : IPdfService
 
         var fontSize = settings.BaseFontSize >= 0 ? settings.BaseFontSize : 10;
 
+		_logger.LogWarning("<<< Exiting ResolvePdfFont(language={Language},settings={Settings})", language, settings);
         return PdfDocumentHelper.GetFont(fontName, fontSize);
     }
 
@@ -681,6 +745,7 @@ public partial class PdfService : IPdfService
     /// </returns>
     public virtual async Task PrintOrderToPdfAsync(Stream stream, Order order, Language language = null, Store store = null, Vendor vendor = null)
     {
+		_logger.LogError(">>> Entering PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor})", stream, order, language, store, vendor);
         ArgumentNullException.ThrowIfNull(order);
 
         //store info
@@ -691,6 +756,7 @@ public partial class PdfService : IPdfService
 
         //language info
         language ??= await _languageService.GetLanguageByIdAsync(order.CustomerLanguageId);
+		_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): language → {Language1}", stream, order, language, store, vendor, language);
 
         if (language?.Published != true)
             language = await _workContext.GetWorkingLanguageAsync();
@@ -699,24 +765,31 @@ public partial class PdfService : IPdfService
         //and we need PdfSettings for the store which was used to place an order
         //so let's load it based on a store of the current order
         var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(orderStore.Id);
+		_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): pdfSettingsByStore → {PdfSettingsByStore}", stream, order, language, store, vendor, pdfSettingsByStore);
 
         byte[] logo = null;
         var logoPicture = await _pictureService.GetPictureByIdAsync(pdfSettingsByStore.LogoPictureId);
+		_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): logoPicture → {LogoPicture}", stream, order, language, store, vendor, logoPicture);
         if (logoPicture != null)
         {
             logo = await _pictureService.LoadPictureBinaryAsync(logoPicture);
+			_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): logo → {Logo}", stream, order, language, store, vendor, logo);
+			_logger.LogDebug("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): logo → {Logo}", stream, order, language, store, vendor, logo);
 
             if (logoPicture.MimeType == MimeTypes.ImageSvg)
             {
                 await using var logoStream = new MemoryStream(logo);
+				_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): logoStream → {LogoStream}", stream, order, language, store, vendor, logoStream);
                 logo = await _pictureService.ConvertSvgToPngAsync(logoStream);
             }
         }
 
         var date = await _dateTimeHelper.ConvertToUserTimeAsync(order.CreatedOnUtc, DateTimeKind.Utc);
+		_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): date → {Date}", stream, order, language, store, vendor, date);
 
         //a vendor should have access only to products
         var orderItems = await _orderService.GetOrderItemsAsync(order.Id, vendorId: vendor?.Id ?? 0);
+		_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): orderItems → {OrderItems}", stream, order, language, store, vendor, orderItems);
 
         var column1Lines = string.IsNullOrEmpty(pdfSettingsByStore.InvoiceFooterTextColumn1) ?
             new List<string>()
@@ -754,10 +827,13 @@ public partial class PdfService : IPdfService
         };
 
         await using var pdfStream = new MemoryStream();
+		_logger.LogError("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): pdfStream → {PdfStream}", stream, order, language, store, vendor, pdfStream);
         document.Generate(pdfStream);
 
         pdfStream.Position = 0;
+		_logger.LogDebug("PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor}): pdfStream.Position → {Arg5}", stream, order, language, store, vendor, pdfStream.Position);
         await pdfStream.CopyToAsync(stream);
+		_logger.LogWarning("<<< Exiting PrintOrderToPdfAsync(stream={Stream},order={Order},language={Language},store={Store},vendor={Vendor})", stream, order, language, store, vendor);
     }
 
     /// <summary>
@@ -770,24 +846,32 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintOrdersToPdfAsync(Stream stream, IList<Order> orders, Language language = null, Vendor vendor = null)
     {
+		_logger.LogError(">>> Entering PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor})", stream, orders, language, vendor);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(orders);
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): currentStore → {CurrentStore}", stream, orders, language, vendor, currentStore);
 
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
+		_logger.LogError("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): archive → {Archive}", stream, orders, language, vendor, archive);
 
         foreach (var order in orders)
         {
             var entryName = string.Format(await _localizationService.GetResourceAsync("Pdf.Order"), order.CustomOrderNumber);
+			_logger.LogError("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): entryName → {EntryName}", stream, orders, language, vendor, entryName);
 
             await using var fileStreamInZip = archive.CreateEntry($"{entryName}.pdf").Open();
+			_logger.LogError("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): fileStreamInZip → {FileStreamInZip}", stream, orders, language, vendor, fileStreamInZip);
             await using var pdfStream = new MemoryStream();
+			_logger.LogError("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): pdfStream → {PdfStream}", stream, orders, language, vendor, pdfStream);
             await PrintOrderToPdfAsync(pdfStream, order, language, currentStore, vendor);
             pdfStream.Position = 0;
+			_logger.LogDebug("PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor}): pdfStream.Position → {Arg4}", stream, orders, language, vendor, pdfStream.Position);
             await pdfStream.CopyToAsync(fileStreamInZip);
         }
+		_logger.LogWarning("<<< Exiting PrintOrdersToPdfAsync(stream={Stream},orders={Orders},language={Language},vendor={Vendor})", stream, orders, language, vendor);
     }
 
     /// <summary>
@@ -799,23 +883,30 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintPackagingSlipsToPdfAsync(Stream stream, IList<Shipment> shipments, Language language = null)
     {
+		_logger.LogError(">>> Entering PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language})", stream, shipments, language);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(shipments);
 
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, true);
+		_logger.LogError("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): archive → {Archive}", stream, shipments, language, archive);
 
         foreach (var shipment in shipments)
         {
             var entryName = string.Format(await _localizationService.GetResourceAsync("Pdf.Shipment"), shipment.Id);
+			_logger.LogError("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): entryName → {EntryName}", stream, shipments, language, entryName);
 
             await using var fileStreamInZip = archive.CreateEntry($"{entryName}.pdf").Open();
+			_logger.LogError("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): fileStreamInZip → {FileStreamInZip}", stream, shipments, language, fileStreamInZip);
             await using var pdfStream = new MemoryStream();
+			_logger.LogError("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): pdfStream → {PdfStream}", stream, shipments, language, pdfStream);
             await PrintPackagingSlipToPdfAsync(pdfStream, shipment, language);
 
             pdfStream.Position = 0;
+			_logger.LogDebug("PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language}): pdfStream.Position → {Arg3}", stream, shipments, language, pdfStream.Position);
             await pdfStream.CopyToAsync(fileStreamInZip);
         }
+		_logger.LogWarning("<<< Exiting PrintPackagingSlipsToPdfAsync(stream={Stream},shipments={Shipments},language={Language})", stream, shipments, language);
     }
 
     /// <summary>
@@ -827,34 +918,42 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintPackagingSlipToPdfAsync(Stream stream, Shipment shipment, Language language = null)
     {
+		_logger.LogError(">>> Entering PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language})", stream, shipment, language);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId);
+		_logger.LogError("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): order → {Order}", stream, shipment, language, order);
 
         var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(order.StoreId);
+		_logger.LogError("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): pdfSettingsByStore → {PdfSettingsByStore}", stream, shipment, language, pdfSettingsByStore);
 
         //language info
         language ??= await _languageService.GetLanguageByIdAsync(order.CustomerLanguageId);
+		_logger.LogError("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): language → {Language1}", stream, shipment, language, language);
 
         if (language?.Published != true)
             language = await _workContext.GetWorkingLanguageAsync();
 
         var shipmentItems = await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id);
+		_logger.LogError("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): shipmentItems → {ShipmentItems}", stream, shipment, language, shipmentItems);
 
         if (shipmentItems?.Any() != true)
             return;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var orderItems = await shipmentItems
             .SelectAwait(async si => await _orderService.GetOrderItemByIdAsync(si.OrderItemId))
             .Where(pi => pi != null)
             .ToListAsync();
+			_logger.LogError("PrintPackagingSlipToPdfAsync(stream,shipment,language)={Stream},{Shipment},{Language}: database query executed in {Arg3} ms", stream, shipment, language, __logStart.ElapsedMilliseconds);
 
         if (orderItems?.Any() != true)
             return;
 
         await using var pdfStream = new MemoryStream();
+		_logger.LogError("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): pdfStream → {PdfStream}", stream, shipment, language, pdfStream);
         var document = new ShipmentDocument
         {
             PageSize = pdfSettingsByStore.LetterPageSizeEnabled ? PdfPageSize.Letter : PdfPageSize.A4,
@@ -871,7 +970,9 @@ public partial class PdfService : IPdfService
         document.Generate(pdfStream);
 
         pdfStream.Position = 0;
+		_logger.LogDebug("PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language}): pdfStream.Position → {Arg3}", stream, shipment, language, pdfStream.Position);
         await pdfStream.CopyToAsync(stream);
+		_logger.LogWarning("<<< Exiting PrintPackagingSlipToPdfAsync(stream={Stream},shipment={Shipment},language={Language})", stream, shipment, language);
     }
 
     /// <summary>
@@ -882,26 +983,35 @@ public partial class PdfService : IPdfService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrintProductsToPdfAsync(Stream stream, IList<Product> products)
     {
+		_logger.LogError(">>> Entering PrintProductsToPdfAsync(stream={Stream},products={Products})", stream, products);
         ArgumentNullException.ThrowIfNull(stream);
 
         ArgumentNullException.ThrowIfNull(products);
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): currentStore → {CurrentStore}", stream, products, currentStore);
         var pdfSettingsByStore = await _settingService.LoadSettingAsync<PdfSettings>(currentStore.Id);
+		_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): pdfSettingsByStore → {PdfSettingsByStore}", stream, products, pdfSettingsByStore);
         var lang = await _workContext.GetWorkingLanguageAsync();
+		_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): lang → {Lang}", stream, products, lang);
 
         var productItems = new List<CatalogItem>();
+		_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): productItems → {ProductItems}", stream, products, productItems);
 
         foreach (var product in products)
         {
             var priceStr = $"{product.Price:0.00} {(await _currencyService.GetCurrencyByIdAsync(_currencySettings.PrimaryStoreCurrencyId)).CurrencyCode}";
+			_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): priceStr → {PriceStr}", stream, products, priceStr);
             if (product.IsRental)
                 priceStr = await _priceFormatter.FormatRentalProductPeriodAsync(product, priceStr);
 
             var rawDescription = await _localizationService.GetLocalizedAsync(product, x => x.FullDescription, lang.Id);
+			_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): rawDescription → {RawDescription}", stream, products, rawDescription);
 
             var productNumber = products.IndexOf(product) + 1;
+			_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): productNumber → {ProductNumber}", stream, products, productNumber);
             var productName = await _localizationService.GetLocalizedAsync(product, x => x.Name, lang.Id);
+			_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): productName → {ProductName}", stream, products, productName);
 
             var item = new CatalogItem()
             {
@@ -918,6 +1028,7 @@ public partial class PdfService : IPdfService
             };
 
             var pictures = await _pictureService.GetPicturesByProductIdAsync(product.Id);
+			_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): pictures → {Pictures}", stream, products, pictures);
 
             //WebP images are not supported
             pictures = pictures.Where(picture => picture.MimeType != MimeTypes.ImageWebp).ToList();
@@ -925,17 +1036,20 @@ public partial class PdfService : IPdfService
             if (pictures.Any())
             {
                 var picturePaths = new HashSet<string>();
+				_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): picturePaths → {PicturePaths}", stream, products, picturePaths);
 
                 foreach (var pic in pictures)
                 {
                     var (pictureUrl, _) = await _pictureService.GetPictureUrlAsync(pic, pdfSettingsByStore.ImageTargetSize, false);
                     var picPath = await _thumbService.GetThumbLocalPathAsync(pictureUrl);
+					_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): picPath → {PicPath}", stream, products, picPath);
 
                     if (!string.IsNullOrEmpty(picPath))
                         picturePaths.Add(picPath);
                 }
 
                 item.PicturePaths = picturePaths;
+				_logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): item.PicturePaths → {Arg2}", stream, products, item.PicturePaths);
             }
 
             productItems.Add(item);
@@ -966,10 +1080,13 @@ public partial class PdfService : IPdfService
 
 
         await using var pdfStream = new MemoryStream();
+		_logger.LogError("PrintProductsToPdfAsync(stream={Stream},products={Products}): pdfStream → {PdfStream}", stream, products, pdfStream);
         catalogDocument.Generate(pdfStream);
 
         pdfStream.Position = 0;
+		_logger.LogDebug("PrintProductsToPdfAsync(stream={Stream},products={Products}): pdfStream.Position → {Arg2}", stream, products, pdfStream.Position);
         await pdfStream.CopyToAsync(stream);
+		_logger.LogWarning("<<< Exiting PrintProductsToPdfAsync(stream={Stream},products={Products})", stream, products);
     }
 
     /// <summary>
@@ -984,9 +1101,13 @@ public partial class PdfService : IPdfService
     /// </returns>
     public virtual async Task<string> SaveOrderPdfToDiskAsync(Order order, Language language = null, Vendor vendor = null)
     {
+		_logger.LogError(">>> Entering SaveOrderPdfToDiskAsync(order={Order},language={Language},vendor={Vendor})", order, language, vendor);
         var fileName = $"order_{order.OrderGuid}_{CommonHelper.GenerateRandomDigitCode(4)}.pdf";
         var filePath = _fileProvider.Combine(_fileProvider.MapPath("~/wwwroot/files/exportimport"), fileName);
+		_logger.LogError("SaveOrderPdfToDiskAsync(order={Order},language={Language},vendor={Vendor}): filePath → {FilePath}", order, language, vendor, filePath);
         await using var fileStream = new FileStream(filePath, FileMode.Create);
+		_logger.LogError("SaveOrderPdfToDiskAsync(order={Order},language={Language},vendor={Vendor}): fileStream → {FileStream}", order, language, vendor, fileStream);
+		_logger.LogError("SaveOrderPdfToDiskAsync(order={Order},language={Language},vendor={Vendor}): fileName → {FileName}", order, language, vendor, fileName);
 
         await PrintOrderToPdfAsync(fileStream, order, language, store: null, vendor: vendor);
 

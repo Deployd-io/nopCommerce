@@ -5,6 +5,7 @@ using Nop.Core.Domain.Directory;
 using Nop.Data;
 using Nop.Services.Localization;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Directory;
 
@@ -13,6 +14,7 @@ namespace Nop.Services.Directory;
 /// </summary>
 public partial class CountryService : ICountryService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IStaticCacheManager _staticCacheManager;
@@ -32,10 +34,16 @@ public partial class CountryService : ICountryService
         IStoreContext storeContext,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogError(">>> Entering CountryService(staticCacheManager={StaticCacheManager},localizationService={LocalizationService},countryRepository={CountryRepository},storeContext={StoreContext},storeMappingService=<redacted>)", staticCacheManager, localizationService, countryRepository, storeContext);
         _staticCacheManager = staticCacheManager;
         _localizationService = localizationService;
+		_logger.LogDebug("CountryService(staticCacheManager={StaticCacheManager},localizationService={LocalizationService},countryRepository={CountryRepository},storeContext={StoreContext},storeMappingService=<redacted>): _localizationService → {_localizationService}", staticCacheManager, localizationService, countryRepository, storeContext, _localizationService);
+		_logger.LogDebug("CountryService(staticCacheManager={StaticCacheManager},localizationService={LocalizationService},countryRepository={CountryRepository},storeContext={StoreContext},storeMappingService=<redacted>): _staticCacheManager → {_staticCacheManager}", staticCacheManager, localizationService, countryRepository, storeContext, _staticCacheManager);
+    _logger.LogWarning("<<< Exiting CountryService(staticCacheManager={StaticCacheManager},localizationService={LocalizationService},countryRepository={CountryRepository},storeContext={StoreContext},storeMappingService=<redacted>)", staticCacheManager, localizationService, countryRepository, storeContext);
         _countryRepository = countryRepository;
+		_logger.LogDebug("CountryService(staticCacheManager={StaticCacheManager},localizationService={LocalizationService},countryRepository={CountryRepository},storeContext={StoreContext},storeMappingService=<redacted>): _countryRepository → {_countryRepository}", staticCacheManager, localizationService, countryRepository, storeContext, _countryRepository);
         _storeContext = storeContext;
+		_logger.LogDebug("CountryService(staticCacheManager={StaticCacheManager},localizationService={LocalizationService},countryRepository={CountryRepository},storeContext={StoreContext},storeMappingService=<redacted>): _storeContext → {_storeContext}", staticCacheManager, localizationService, countryRepository, storeContext, _storeContext);
         _storeMappingService = storeMappingService;
     }
 
@@ -50,7 +58,11 @@ public partial class CountryService : ICountryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteCountryAsync(Country country)
     {
+		_logger.LogError(">>> Entering DeleteCountryAsync(country={Country})", country);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _countryRepository.DeleteAsync(country);
+		_logger.LogError("DeleteCountryAsync(country)={Country}: external service call took {Arg1} ms", country, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteCountryAsync(country={Country})", country);
     }
 
     /// <summary>
@@ -64,12 +76,16 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<IList<Country>> GetAllCountriesAsync(int languageId = 0, bool showHidden = false)
     {
+		_logger.LogError(">>> Entering GetAllCountriesAsync(languageId={LanguageId},showHidden={ShowHidden})", languageId, showHidden);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopDirectoryDefaults.CountriesAllCacheKey, languageId,
             showHidden, store);
+			_logger.LogError("GetAllCountriesAsync(languageId={LanguageId},showHidden={ShowHidden}): store → {Store}", languageId, showHidden, store);
 
         return await _staticCacheManager.GetAsync(key, async () =>
         {
+			var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
             var countries = await _countryRepository.GetAllAsync(async query =>
             {
                 if (!showHidden)
@@ -82,6 +98,7 @@ public partial class CountryService : ICountryService
 
                 return query.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name);
             });
+			_logger.LogError("GetAllCountriesAsync(languageId,showHidden)={LanguageId},{ShowHidden}: find query executed in {Arg2} ms", languageId, showHidden, __logStartDb.ElapsedMilliseconds);
 
             if (languageId > 0)
             {
@@ -91,10 +108,13 @@ public partial class CountryService : ICountryService
                     .OrderBy(c => c.DisplayOrder)
                     .ThenByAwait(async c => await _localizationService.GetLocalizedAsync(c, x => x.Name, languageId))
                     .ToListAsync();
+					_logger.LogError("GetAllCountriesAsync(languageId,showHidden)={LanguageId},{ShowHidden}: database query executed in {Arg2} ms", languageId, showHidden, __logStartDb.ElapsedMilliseconds);
             }
 
             return countries;
         });
+		_logger.LogError("GetAllCountriesAsync(languageId,showHidden)={LanguageId},{ShowHidden}: external service call took {Arg2} ms", languageId, showHidden, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetAllCountriesAsync(languageId={LanguageId},showHidden={ShowHidden})", languageId, showHidden);
     }
 
     /// <summary>
@@ -108,6 +128,8 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<IList<Country>> GetAllCountriesForBillingAsync(int languageId = 0, bool showHidden = false)
     {
+		_logger.LogError(">>> Entering GetAllCountriesForBillingAsync(languageId={LanguageId},showHidden={ShowHidden})", languageId, showHidden);
+		_logger.LogWarning("<<< Exiting GetAllCountriesForBillingAsync(languageId={LanguageId},showHidden={ShowHidden})", languageId, showHidden);
         return (await GetAllCountriesAsync(languageId, showHidden)).Where(c => c.AllowsBilling).ToList();
     }
 
@@ -122,6 +144,8 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<IList<Country>> GetAllCountriesForShippingAsync(int languageId = 0, bool showHidden = false)
     {
+		_logger.LogError(">>> Entering GetAllCountriesForShippingAsync(languageId={LanguageId},showHidden={ShowHidden})", languageId, showHidden);
+		_logger.LogWarning("<<< Exiting GetAllCountriesForShippingAsync(languageId={LanguageId},showHidden={ShowHidden})", languageId, showHidden);
         return (await GetAllCountriesAsync(languageId, showHidden)).Where(c => c.AllowsShipping).ToList();
     }
 
@@ -135,6 +159,8 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<Country> GetCountryByAddressAsync(Address address)
     {
+		_logger.LogError(">>> Entering GetCountryByAddressAsync(address={Address})", address);
+        _logger.LogWarning("<<< Exiting GetCountryByAddressAsync(address={Address})", address);
         return await GetCountryByIdAsync(address?.CountryId ?? 0);
     }
 
@@ -148,6 +174,9 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<Country> GetCountryByIdAsync(int countryId)
     {
+		_logger.LogError(">>> Entering GetCountryByIdAsync(countryId={CountryId})", countryId);
+		_logger.LogError("GetCountryByIdAsync(countryId)={CountryId}: find query executing", countryId);
+    _logger.LogWarning("<<< Exiting GetCountryByIdAsync(countryId={CountryId})", countryId);
         return await _countryRepository.GetByIdAsync(countryId, cache => default);
     }
 
@@ -161,6 +190,8 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<IList<Country>> GetCountriesByIdsAsync(int[] countryIds)
     {
+		_logger.LogError(">>> Entering GetCountriesByIdsAsync(countryIds={CountryIds})", countryIds);
+        _logger.LogWarning("<<< Exiting GetCountriesByIdsAsync(countryIds={CountryIds})", countryIds);
         return await _countryRepository.GetByIdsAsync(countryIds);
     }
 
@@ -174,15 +205,21 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<Country> GetCountryByTwoLetterIsoCodeAsync(string twoLetterIsoCode)
     {
+		_logger.LogError(">>> Entering GetCountryByTwoLetterIsoCodeAsync(twoLetterIsoCode={TwoLetterIsoCode})", twoLetterIsoCode);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(twoLetterIsoCode))
             return null;
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopDirectoryDefaults.CountriesByTwoLetterCodeCacheKey, twoLetterIsoCode);
+		_logger.LogError("GetCountryByTwoLetterIsoCodeAsync(twoLetterIsoCode={TwoLetterIsoCode}): key → {Key}", twoLetterIsoCode, key);
 
         var query = from c in _countryRepository.Table
             where c.TwoLetterIsoCode == twoLetterIsoCode
             select c;
 
+		_logger.LogError("GetCountryByTwoLetterIsoCodeAsync(twoLetterIsoCode)={TwoLetterIsoCode}: find query executing", twoLetterIsoCode);
+		_logger.LogError("GetCountryByTwoLetterIsoCodeAsync(twoLetterIsoCode)={TwoLetterIsoCode}: external service call took {Arg1} ms", twoLetterIsoCode, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetCountryByTwoLetterIsoCodeAsync(twoLetterIsoCode={TwoLetterIsoCode})", twoLetterIsoCode);
         return await _staticCacheManager.GetAsync(key, async () => await query.FirstOrDefaultAsync());
     }
 
@@ -196,15 +233,21 @@ public partial class CountryService : ICountryService
     /// </returns>
     public virtual async Task<Country> GetCountryByThreeLetterIsoCodeAsync(string threeLetterIsoCode)
     {
+		_logger.LogError(">>> Entering GetCountryByThreeLetterIsoCodeAsync(threeLetterIsoCode={ThreeLetterIsoCode})", threeLetterIsoCode);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (string.IsNullOrEmpty(threeLetterIsoCode))
             return null;
 
         var key = _staticCacheManager.PrepareKeyForDefaultCache(NopDirectoryDefaults.CountriesByThreeLetterCodeCacheKey, threeLetterIsoCode);
+		_logger.LogError("GetCountryByThreeLetterIsoCodeAsync(threeLetterIsoCode={ThreeLetterIsoCode}): key → {Key}", threeLetterIsoCode, key);
 
         var query = from c in _countryRepository.Table
             where c.ThreeLetterIsoCode == threeLetterIsoCode
             select c;
 
+		_logger.LogError("GetCountryByThreeLetterIsoCodeAsync(threeLetterIsoCode)={ThreeLetterIsoCode}: find query executing", threeLetterIsoCode);
+		_logger.LogError("GetCountryByThreeLetterIsoCodeAsync(threeLetterIsoCode)={ThreeLetterIsoCode}: external service call took {Arg1} ms", threeLetterIsoCode, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetCountryByThreeLetterIsoCodeAsync(threeLetterIsoCode={ThreeLetterIsoCode})", threeLetterIsoCode);
         return await _staticCacheManager.GetAsync(key, async () => await query.FirstOrDefaultAsync());
     }
 
@@ -215,7 +258,9 @@ public partial class CountryService : ICountryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertCountryAsync(Country country)
     {
+		_logger.LogError(">>> Entering InsertCountryAsync(country={Country})", country);
         await _countryRepository.InsertAsync(country);
+		_logger.LogWarning("<<< Exiting InsertCountryAsync(country={Country})", country);
     }
 
     /// <summary>
@@ -225,7 +270,9 @@ public partial class CountryService : ICountryService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateCountryAsync(Country country)
     {
+		_logger.LogError(">>> Entering UpdateCountryAsync(country={Country})", country);
         await _countryRepository.UpdateAsync(country);
+		_logger.LogWarning("<<< Exiting UpdateCountryAsync(country={Country})", country);
     }
 
     #endregion

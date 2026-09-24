@@ -1,12 +1,18 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Polls;
 
 public partial record PollModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public PollModel()
     {
+		_logger.LogError(">>> Entering PollModel()");
         Answers = new List<PollAnswerModel>();
+		_logger.LogDebug("PollModel(): Answers → {Answers}", Answers);
+    _logger.LogError("PollModel(): Answers → {Answers}", Answers);
+    _logger.LogWarning("<<< Exiting PollModel()");
     }
 
     public string Name { get; set; }

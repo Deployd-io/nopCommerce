@@ -2,6 +2,7 @@
 using FluentValidation;
 using FluentValidation.Validators;
 using Nop.Core.Domain.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Validators;
 /// </summary>
 public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValidator<T, TProperty>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected readonly CustomerSettings _customerSettings;
 
     public override string Name => "PhoneNumberPropertyValidator";
@@ -19,7 +21,10 @@ public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValida
     /// </summary>
     public PhoneNumberPropertyValidator(CustomerSettings customerSettings)
     {
+		_logger.LogError(">>> Entering PhoneNumberPropertyValidator(customerSettings={CustomerSettings})", customerSettings);
         _customerSettings = customerSettings;
+		_logger.LogDebug("PhoneNumberPropertyValidator(customerSettings={CustomerSettings}): _customerSettings → {_customerSettings}", customerSettings, _customerSettings);
+    _logger.LogWarning("<<< Exiting PhoneNumberPropertyValidator(customerSettings={CustomerSettings})", customerSettings);
     }
 
     /// <summary>
@@ -29,6 +34,9 @@ public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValida
     /// <returns>Result</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		_logger.LogError(">>> Entering IsValid(context={Context},value={Value})", context, value);
+		_logger.LogWarning("<<< Exiting IsValid(context={Context},value={Value})", context, value);
+		_logger.LogWarning("<<< Exiting IsValid(phoneNumber={PhoneNumber},customerSettings={CustomerSettings})", phoneNumber, customerSettings);
         return IsValid(value as string, _customerSettings);
     }
 
@@ -53,5 +61,10 @@ public partial class PhoneNumberPropertyValidator<T, TProperty> : PropertyValida
             : phoneNumber.All(l => customerSettings.PhoneNumberValidationRule.Contains(l));
     }
 
-    protected override string GetDefaultMessageTemplate(string errorCode) => "Phone number is not valid";
+    protected override string GetDefaultMessageTemplate(string errorCode)
+    {
+        _logger.LogError(">>> Entering GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+        _logger.LogWarning("<<< Exiting GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+        return "Phone number is not valid";
+    }
 }

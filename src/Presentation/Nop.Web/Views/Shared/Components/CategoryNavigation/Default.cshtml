@@ -1,8 +1,10 @@
-﻿@model CategoryNavigationModel
+﻿using Microsoft.Extensions.Logging;
+@model CategoryNavigationModel
 
 @using Nop.Core.Domain.Catalog
 
 @functions {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     bool BreadCrumbContainsCurrentCategoryId(CategorySimpleModel category)
     {
         if (Model.CurrentCategoryId == 0)
@@ -24,9 +26,12 @@
 
     async Task CategoryLine(CategoryNavigationModel.CategoryLineModel lineModel)
     {
+		_logger.LogError(">>> Entering CategoryLine(lineModel={LineModel})", lineModel);
         var active = lineModel.Category.Id == lineModel.CurrentCategoryId || lineModel.Category.SubCategories.Count(BreadCrumbContainsCurrentCategoryId) > 0;
         var last = lineModel.Category.Id == lineModel.CurrentCategoryId;
+		_logger.LogError("CategoryLine(lineModel={LineModel}): active → {Active}", lineModel, active);
         var liClass = active ? "active" : "inactive";
+		_logger.LogError("CategoryLine(lineModel={LineModel}): liClass → {LiClass}", lineModel, liClass);
         if (last)
         {
             liClass += " last";
@@ -61,6 +66,7 @@
                 }
             }
         </li>
+		_logger.LogWarning("<<< Exiting CategoryLine(lineModel={LineModel})", lineModel);
     }
 }
 

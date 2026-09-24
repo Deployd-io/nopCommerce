@@ -15,6 +15,7 @@ using Nop.Services.Discounts;
 using Nop.Services.Payments;
 using Nop.Services.Shipping;
 using Nop.Services.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -23,6 +24,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class OrderTotalCalculationService : IOrderTotalCalculationService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -75,27 +77,50 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
         ShoppingCartSettings shoppingCartSettings,
         TaxSettings taxSettings)
     {
+		_logger.LogError(">>> Entering OrderTotalCalculationService()");
         _catalogSettings = catalogSettings;
         _addressService = addressService;
+		_logger.LogDebug("OrderTotalCalculationService(): _addressService → {_addressService}", _addressService);
+		_logger.LogDebug("OrderTotalCalculationService(): _catalogSettings → {_catalogSettings}", _catalogSettings);
+    _logger.LogWarning("<<< Exiting OrderTotalCalculationService()");
         _checkoutAttributeParser = checkoutAttributeParser;
+		_logger.LogDebug("OrderTotalCalculationService(): _checkoutAttributeParser → {_checkoutAttributeParser}", _checkoutAttributeParser);
         _customerService = customerService;
+		_logger.LogDebug("OrderTotalCalculationService(): _customerService → {_customerService}", _customerService);
         _discountService = discountService;
+		_logger.LogDebug("OrderTotalCalculationService(): _discountService → {_discountService}", _discountService);
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("OrderTotalCalculationService(): _genericAttributeService → {_genericAttributeService}", _genericAttributeService);
         _giftCardService = giftCardService;
+		_logger.LogDebug("OrderTotalCalculationService(): _giftCardService → {_giftCardService}", _giftCardService);
         _orderService = orderService;
+		_logger.LogDebug("OrderTotalCalculationService(): _orderService → {_orderService}", _orderService);
         _paymentService = paymentService;
+		_logger.LogDebug("OrderTotalCalculationService(): _paymentService → {_paymentService}", _paymentService);
         _priceCalculationService = priceCalculationService;
+		_logger.LogDebug("OrderTotalCalculationService(): _priceCalculationService → {_priceCalculationService}", _priceCalculationService);
         _productService = productService;
+		_logger.LogDebug("OrderTotalCalculationService(): _productService → {_productService}", _productService);
         _rewardPointService = rewardPointService;
+		_logger.LogDebug("OrderTotalCalculationService(): _rewardPointService → {_rewardPointService}", _rewardPointService);
         _shippingPluginManager = shippingPluginManager;
+		_logger.LogDebug("OrderTotalCalculationService(): _shippingPluginManager → {_shippingPluginManager}", _shippingPluginManager);
         _shippingService = shippingService;
+		_logger.LogDebug("OrderTotalCalculationService(): _shippingService → {_shippingService}", _shippingService);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("OrderTotalCalculationService(): _shoppingCartService → {_shoppingCartService}", _shoppingCartService);
         _storeContext = storeContext;
+		_logger.LogDebug("OrderTotalCalculationService(): _storeContext → {_storeContext}", _storeContext);
         _taxService = taxService;
+		_logger.LogDebug("OrderTotalCalculationService(): _taxService → {_taxService}", _taxService);
         _workContext = workContext;
+		_logger.LogDebug("OrderTotalCalculationService(): _workContext → {_workContext}", _workContext);
         _rewardPointsSettings = rewardPointsSettings;
+		_logger.LogDebug("OrderTotalCalculationService(): _rewardPointsSettings → {_rewardPointsSettings}", _rewardPointsSettings);
         _shippingSettings = shippingSettings;
+		_logger.LogDebug("OrderTotalCalculationService(): _shippingSettings → {_shippingSettings}", _shippingSettings);
         _shoppingCartSettings = shoppingCartSettings;
+		_logger.LogDebug("OrderTotalCalculationService(): _shoppingCartSettings → {_shoppingCartSettings}", _shoppingCartSettings);
         _taxSettings = taxSettings;
     }
 
@@ -234,15 +259,19 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     protected virtual async Task UpdateTotalAsync(UpdateOrderParameters updateOrderParameters, decimal subTotalExclTax,
         decimal discountAmountExclTax, decimal shippingTotalExclTax, decimal taxTotal)
     {
+		_logger.LogError(">>> Entering UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal})", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal);
         var updatedOrder = updateOrderParameters.UpdatedOrder;
         var customer = await _customerService.GetCustomerByIdAsync(updatedOrder.CustomerId);
+		_logger.LogError("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): customer → {Customer}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, customer);
 
         var total = subTotalExclTax - discountAmountExclTax + shippingTotalExclTax + updatedOrder.PaymentMethodAdditionalFeeExclTax + taxTotal;
+		_logger.LogError("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): total → {Total}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, total);
 
         //get discounts for the order total
         var (discountAmountTotal, orderAppliedDiscounts) = await GetOrderTotalDiscountAsync(customer, total);
         if (total < discountAmountTotal)
             discountAmountTotal = total;
+			_logger.LogDebug("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): discountAmountTotal → {DiscountAmountTotal}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, discountAmountTotal);
         total -= discountAmountTotal;
 
         //applied giftcards
@@ -259,10 +288,13 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
 
         //reward points
         var rewardPointsOfOrder = await _rewardPointService.GetRewardPointsHistoryEntryByIdAsync(updatedOrder.RedeemedRewardPointsEntryId ?? 0);
+		_logger.LogError("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): rewardPointsOfOrder → {RewardPointsOfOrder}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, rewardPointsOfOrder);
         if (rewardPointsOfOrder != null)
         {
             var rewardPoints = -rewardPointsOfOrder.Points;
+			_logger.LogError("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): rewardPoints → {RewardPoints}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, rewardPoints);
             var rewardPointsAmount = await ConvertRewardPointsToAmountAsync(rewardPoints);
+			_logger.LogError("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): rewardPointsAmount → {RewardPointsAmount}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, rewardPointsAmount);
             if (total < rewardPointsAmount)
             {
                 rewardPoints = ConvertAmountToRewardPoints(total);
@@ -279,6 +311,8 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
             if (rewardPointsAmount != rewardPointsOfOrder.UsedAmount)
             {
                 rewardPointsOfOrder.UsedAmount = rewardPointsAmount;
+				_logger.LogDebug("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): rewardPointsOfOrder.UsedAmount → {Arg5}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, rewardPointsOfOrder.UsedAmount);
+				_logger.LogDebug("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): rewardPointsOfOrder.Points → {Arg5}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, rewardPointsOfOrder.Points);
                 rewardPointsOfOrder.Points = -rewardPoints;
                 await _rewardPointService.UpdateRewardPointsHistoryEntryAsync(rewardPointsOfOrder);
             }
@@ -291,11 +325,14 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
             total = await _priceCalculationService.RoundPriceAsync(total);
 
         updatedOrder.OrderDiscount = discountAmountTotal;
+		_logger.LogDebug("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): updatedOrder.OrderDiscount → {Arg5}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, updatedOrder.OrderDiscount);
+		_logger.LogDebug("UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal}): updatedOrder.OrderTotal → {Arg5}", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal, updatedOrder.OrderTotal);
         updatedOrder.OrderTotal = total;
 
         foreach (var discount in orderAppliedDiscounts)
             if (!_discountService.ContainsDiscount(updateOrderParameters.AppliedDiscounts, discount))
                 updateOrderParameters.AppliedDiscounts.Add(discount);
+				_logger.LogWarning("<<< Exiting UpdateTotalAsync(updateOrderParameters={UpdateOrderParameters},subTotalExclTax={SubTotalExclTax},discountAmountExclTax={DiscountAmountExclTax},shippingTotalExclTax=<redacted>,taxTotal={TaxTotal})", updateOrderParameters, subTotalExclTax, discountAmountExclTax, taxTotal);
     }
 
     /// <summary>
@@ -729,11 +766,13 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     protected virtual async Task<decimal> AppliedGiftCardsAsync(IList<ShoppingCartItem> cart, List<AppliedGiftCard> appliedGiftCards,
         Customer customer, decimal resultTemp)
     {
+		_logger.LogError(">>> Entering AppliedGiftCardsAsync(cart={Cart},appliedGiftCards={AppliedGiftCards},customer={Customer},resultTemp={ResultTemp})", cart, appliedGiftCards, customer, resultTemp);
         if (await _shoppingCartService.ShoppingCartIsRecurringAsync(cart))
             return resultTemp;
 
         //we don't apply gift cards for recurring products
         var giftCards = await _giftCardService.GetActiveGiftCardsAppliedByCustomerAsync(customer);
+		_logger.LogError("AppliedGiftCardsAsync(cart={Cart},appliedGiftCards={AppliedGiftCards},customer={Customer},resultTemp={ResultTemp}): giftCards → {GiftCards}", cart, appliedGiftCards, customer, resultTemp, giftCards);
         if (giftCards == null)
             return resultTemp;
 
@@ -743,6 +782,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
                 continue;
 
             var remainingAmount = await _giftCardService.GetGiftCardRemainingAmountAsync(gc);
+			_logger.LogError("AppliedGiftCardsAsync(cart={Cart},appliedGiftCards={AppliedGiftCards},customer={Customer},resultTemp={ResultTemp}): remainingAmount → {RemainingAmount}", cart, appliedGiftCards, customer, resultTemp, remainingAmount);
             var amountCanBeUsed = resultTemp > remainingAmount ? remainingAmount : resultTemp;
 
             //reduce subtotal
@@ -756,6 +796,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
             appliedGiftCards.Add(appliedGiftCard);
         }
 
+		_logger.LogWarning("<<< Exiting AppliedGiftCardsAsync(cart={Cart},appliedGiftCards={AppliedGiftCards},customer={Customer},resultTemp={ResultTemp})", cart, appliedGiftCards, customer, resultTemp);
         return resultTemp;
     }
 
@@ -769,6 +810,8 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     protected virtual async Task<decimal> GetShoppingCartAdditionalShippingChargeAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogError(">>> Entering GetShoppingCartAdditionalShippingChargeAsync(cart={Cart})", cart);
+		_logger.LogWarning("<<< Exiting GetShoppingCartAdditionalShippingChargeAsync(cart={Cart})", cart);
         return await cart.SumAwaitAsync(async shoppingCartItem => await _shippingService.GetAdditionalShippingChargeAsync(shoppingCartItem));
     }
 
@@ -779,12 +822,14 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// <returns>Converted value</returns>
     protected virtual int ConvertAmountToRewardPoints(decimal amount)
     {
+		_logger.LogError(">>> Entering ConvertAmountToRewardPoints(amount={Amount})", amount);
         var result = 0;
         if (amount <= 0)
             return 0;
 
         if (_rewardPointsSettings.ExchangeRate > 0)
             result = (int)Math.Ceiling(amount / _rewardPointsSettings.ExchangeRate);
+		_logger.LogWarning("<<< Exiting ConvertAmountToRewardPoints(amount={Amount})", amount);
         return result;
     }
 
@@ -973,6 +1018,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderTotalsAsync(UpdateOrderParameters updateOrderParameters, IList<ShoppingCartItem> restoredCart)
     {
+		_logger.LogError(">>> Entering UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters},restoredCart={RestoredCart})", updateOrderParameters, restoredCart);
         //sub total
         var (subTotalExclTax, subTotalInclTax, subTotalTaxRates, discountAmountExclTax) = await UpdateSubTotalAsync(updateOrderParameters, restoredCart);
 
@@ -981,9 +1027,11 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
 
         //tax rates
         var taxTotal = await UpdateTaxRatesAsync(subTotalTaxRates, shippingTotalInclTax, shippingTotalExclTax, shippingTaxRate, updateOrderParameters.UpdatedOrder);
+		_logger.LogError("UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters},restoredCart={RestoredCart}): taxTotal → {TaxTotal}", updateOrderParameters, restoredCart, taxTotal);
 
         //total
         await UpdateTotalAsync(updateOrderParameters, subTotalExclTax, discountAmountExclTax, shippingTotalExclTax, taxTotal);
+		_logger.LogWarning("<<< Exiting UpdateOrderTotalsAsync(updateOrderParameters={UpdateOrderParameters},restoredCart={RestoredCart})", updateOrderParameters, restoredCart);
     }
 
     /// <summary>
@@ -997,8 +1045,10 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<bool> IsFreeShippingAsync(IList<ShoppingCartItem> cart, decimal? subTotal = null)
     {
+		_logger.LogError(">>> Entering IsFreeShippingAsync(cart={Cart},subTotal={SubTotal})", cart, subTotal);
         //check whether customer is in a customer role with free shipping applied
         var customer = await _customerService.GetCustomerByIdAsync(cart.FirstOrDefault()?.CustomerId ?? 0);
+		_logger.LogError("IsFreeShippingAsync(cart={Cart},subTotal={SubTotal}): customer → {Customer}", cart, subTotal, customer);
 
         if (customer != null && (await _customerService.GetCustomerRolesAsync(customer)).Any(role => role.FreeShipping))
             return true;
@@ -1076,7 +1126,10 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<decimal?> GetShoppingCartShippingTotalAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogError(">>> Entering GetShoppingCartShippingTotalAsync(cart={Cart})", cart);
         var includingTax = await _workContext.GetTaxDisplayTypeAsync() == TaxDisplayType.IncludingTax;
+		_logger.LogError("GetShoppingCartShippingTotalAsync(cart={Cart}): includingTax → {IncludingTax}", cart, includingTax);
+		_logger.LogWarning("<<< Exiting GetShoppingCartShippingTotalAsync(cart={Cart})", cart);
         return (await GetShoppingCartShippingTotalAsync(cart, includingTax)).shippingTotal;
     }
 
@@ -1415,12 +1468,16 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<decimal> CalculatePaymentAdditionalFeeAsync(IList<ShoppingCartItem> cart, decimal fee, bool usePercentage)
     {
+		_logger.LogError(">>> Entering CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage})", cart, fee, usePercentage);
         if (!usePercentage || fee <= 0)
             return fee;
 
         var orderTotalWithoutPaymentFee = (await GetShoppingCartTotalAsync(cart, usePaymentMethodAdditionalFee: false)).shoppingCartTotal ?? 0;
+		_logger.LogError("CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage}): orderTotalWithoutPaymentFee → {OrderTotalWithoutPaymentFee}", cart, fee, usePercentage, orderTotalWithoutPaymentFee);
         var result = (decimal)((float)orderTotalWithoutPaymentFee * (float)fee / 100f);
+		_logger.LogError("CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage}): result → {Result}", cart, fee, usePercentage, result);
 
+		_logger.LogWarning("<<< Exiting CalculatePaymentAdditionalFeeAsync(cart={Cart},fee={Fee},usePercentage={UsePercentage})", cart, fee, usePercentage);
         return result;
     }
 
@@ -1434,12 +1491,15 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<decimal> ConvertRewardPointsToAmountAsync(int rewardPoints)
     {
+		_logger.LogError(">>> Entering ConvertRewardPointsToAmountAsync(rewardPoints={RewardPoints})", rewardPoints);
         if (rewardPoints <= 0)
             return decimal.Zero;
 
         var result = rewardPoints * _rewardPointsSettings.ExchangeRate;
+		_logger.LogError("ConvertRewardPointsToAmountAsync(rewardPoints={RewardPoints}): result → {Result}", rewardPoints, result);
         if (_shoppingCartSettings.RoundPricesDuringCalculation)
             result = await _priceCalculationService.RoundPriceAsync(result);
+		_logger.LogWarning("<<< Exiting ConvertRewardPointsToAmountAsync(rewardPoints={RewardPoints})", rewardPoints);
         return result;
     }
 
@@ -1450,6 +1510,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// <returns>true - reward points could use; false - cannot be used.</returns>
     public virtual bool CheckMinimumRewardPointsToUseRequirement(int rewardPoints)
     {
+		_logger.LogError(">>> Entering CheckMinimumRewardPointsToUseRequirement(rewardPoints={RewardPoints})", rewardPoints);
         if (_rewardPointsSettings.MinimumRewardPointsToUse <= 0)
             return true;
 
@@ -1464,6 +1525,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// <returns>Applicable order total</returns>
     public virtual decimal CalculateApplicableOrderTotalForRewardPoints(decimal orderShippingInclTax, decimal orderTotal)
     {
+		_logger.LogError(">>> Entering CalculateApplicableOrderTotalForRewardPoints(orderShippingInclTax=<redacted>,orderTotal={OrderTotal})", orderTotal);
         //do you give reward points for order total? or do you exclude shipping?
         //since shipping costs vary some of store owners don't give reward points based on shipping total
         //you can put your custom logic here
@@ -1487,6 +1549,7 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
     /// </returns>
     public virtual async Task<int> CalculateRewardPointsAsync(Customer customer, decimal amount)
     {
+		_logger.LogError(">>> Entering CalculateRewardPointsAsync(customer={Customer},amount={Amount})", customer, amount);
         if (!_rewardPointsSettings.Enabled)
             return 0;
 
@@ -1498,6 +1561,8 @@ public partial class OrderTotalCalculationService : IOrderTotalCalculationServic
             return 0;
 
         var points = (int)Math.Truncate(amount / _rewardPointsSettings.PointsForPurchases_Amount) * _rewardPointsSettings.PointsForPurchases_Points;
+		_logger.LogError("CalculateRewardPointsAsync(customer={Customer},amount={Amount}): points → {Points}", customer, amount, points);
+		_logger.LogWarning("<<< Exiting CalculateRewardPointsAsync(customer={Customer},amount={Amount})", customer, amount);
         return points;
     }
 

@@ -1,6 +1,7 @@
 ﻿using Nop.Core;
 using Nop.Services.Common;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.NopMobileApp;
 
@@ -9,6 +10,7 @@ namespace Nop.Plugin.Misc.NopMobileApp;
 /// </summary>
 public class NopMobilePlugin : BasePlugin, IMiscPlugin
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IWebHelper _webHelper;
@@ -19,7 +21,10 @@ public class NopMobilePlugin : BasePlugin, IMiscPlugin
 
     public NopMobilePlugin(IWebHelper webHelper)
     {
+		_logger.LogError(">>> Entering NopMobilePlugin(webHelper={WebHelper})", webHelper);
         _webHelper = webHelper;
+		_logger.LogDebug("NopMobilePlugin(webHelper={WebHelper}): _webHelper → {_webHelper}", webHelper, _webHelper);
+    _logger.LogWarning("<<< Exiting NopMobilePlugin(webHelper={WebHelper})", webHelper);
     }
 
     #endregion
@@ -31,6 +36,8 @@ public class NopMobilePlugin : BasePlugin, IMiscPlugin
     /// </summary>
     public override string GetConfigurationPageUrl()
     {
+		_logger.LogError(">>> Entering GetConfigurationPageUrl()");
+        _logger.LogWarning("<<< Exiting GetConfigurationPageUrl()");
         return $"{_webHelper.GetStoreLocation()}Admin/NopMobileApp/Configure";
     }
 
@@ -40,7 +47,9 @@ public class NopMobilePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task InstallAsync()
     {
+		_logger.LogError(">>> Entering InstallAsync()");
         await base.InstallAsync();
+		_logger.LogWarning("<<< Exiting InstallAsync()");
     }
     
     /// <summary>
@@ -49,7 +58,9 @@ public class NopMobilePlugin : BasePlugin, IMiscPlugin
     /// <returns>A task that represents the asynchronous operation</returns>
     public override async Task UninstallAsync()
     {
+		_logger.LogError(">>> Entering UninstallAsync()");
         await base.UninstallAsync();
+		_logger.LogWarning("<<< Exiting UninstallAsync()");
     }
 
     #endregion

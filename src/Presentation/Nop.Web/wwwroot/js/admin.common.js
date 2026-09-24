@@ -1,33 +1,46 @@
+var logger = (typeof logger !== 'undefined' && logger) || console;
 //this method is used to show an element by removing the appropriate hiding class
 //we don't use the jquery show/hide methods since they don't work with "display: flex" properly
 $.fn.showElement = function () {
+logger.error('>>> Entering showElement()');
   this.removeClass('d-none');
+logger.warn('<<< Exiting showElement()');
 }
 
 //this method is used to hide an element by adding the appropriate hiding class
 //we don't use the jquery show/hide methods since they don't work with "display: flex" properly
 $.fn.hideElement = function () {
+logger.error('>>> Entering hideElement()');
   this.addClass('d-none');
+logger.warn('<<< Exiting hideElement()');
 }
 
 function setLocation(url) {
+	logger.error(`>>> Entering setLocation(url=${url})`);
     window.location.href = url;
+	logger.warn(`<<< Exiting setLocation(url=${url})`);
 }
 
 function OpenWindow(query, w, h, scroll) {
+	logger.error(`>>> Entering OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll})`);
     var l = (screen.width - w) / 2;
     var t = (screen.height - h) / 2;
+	logger.error(`OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll}): l → ${l}`);
+	logger.error(`OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll}): t → ${t}`);
 
     winprops = 'resizable=1, height=' + h + ',width=' + w + ',top=' + t + ',left=' + l + 'w';
     if (scroll) winprops += ',scrollbars=1';
     var f = window.open(query, "_blank", winprops);
+	logger.warn(`<<< Exiting OpenWindow(query=${query},w=${w},h=${h},scroll=${scroll})`);
 }
 
 function showThrobber(message) {
+	logger.error(`>>> Entering showThrobber(message=${message})`);
     $('.throbber-header').html(message);
     window.setTimeout(function () {
         $(".throbber").show();
     }, 1000);
+	logger.warn(`<<< Exiting showThrobber(message=${message})`);
 }
 
 $(function() {
@@ -52,18 +65,23 @@ $(function() {
 });
 
 function checkAllOverriddenStoreValue(item) {
+	logger.error(`>>> Entering checkAllOverriddenStoreValue(item=${item})`);
     $('.multi-store-override-option').each(function (k, v) {
         $(v).attr('checked', item.checked);
         checkOverriddenStoreValue(v, $(v).attr('data-for-input-selector'));
     });
+	logger.warn(`<<< Exiting checkAllOverriddenStoreValue(item=${item})`);
 }
 
 function checkOverriddenStoreValue(obj, selector) {
+	logger.error(`>>> Entering checkOverriddenStoreValue(obj=${obj},selector=${selector})`);
     var elementsArray = selector.split(",");
 
+	logger.error(`checkOverriddenStoreValue(obj=${obj},selector=${selector}): elementsArray → ${elementsArray}`);
     // first toggle appropriate hidden inputs for checkboxes
     if ($(selector).is(':checkbox')) {
         var name = $(selector).attr('name');
+		logger.error(`checkOverriddenStoreValue(obj=${obj},selector=${selector}): name → ${name}`);
         $('input:hidden[name="' + name + '"]').attr('disabled', !$(obj).is(':checked'));
     }
 
@@ -72,17 +90,21 @@ function checkOverriddenStoreValue(obj, selector) {
     }
     else {
         $(selector).removeAttr('disabled');
+		logger.warn(`<<< Exiting checkOverriddenStoreValue(obj=${obj},selector=${selector})`);
     }
 }
 
 function bindBootstrapTabSelectEvent(tabsId, inputId) {
+	logger.error(`>>> Entering bindBootstrapTabSelectEvent(tabsId=${tabsId},inputId=${inputId})`);
     $('#' + tabsId + ' > div ul li a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
         var tabName = $(e.target).attr("data-tab-name");
         $("#" + inputId).val(tabName);
     });
+	logger.warn(`<<< Exiting bindBootstrapTabSelectEvent(tabsId=${tabsId},inputId=${inputId})`);
 }
 
 function display_nop_error(e) {
+logger.error(`>>> Entering display_nop_error(e=${e})`);
   if (e.error) {
     if ((typeof e.error) == 'string') {
       //single error
@@ -91,6 +113,7 @@ function display_nop_error(e) {
     } else {
       //array of errors
       var message = "The following errors have occurred:";
+	logger.error(`display_nop_error(e=${e}): message → ${message}`);
       //create a message containing all errors.
       $.each(e.error, function (key, value) {
         if (value.errors) {
@@ -104,17 +127,20 @@ function display_nop_error(e) {
     //ignore empty error
   } else if (e.errorThrown) {
     alert('Error happened');
+	logger.warn(`<<< Exiting display_nop_error(e=${e})`);
   }
 }
 
 // CSRF (XSRF) security
 function addAntiForgeryToken(data) {
+	logger.error(`>>> Entering addAntiForgeryToken(data=${data})`);
     //if the object is undefined, create a new one.
     if (!data) {
         data = {};
     }
     //add token
     var tokenInput = $('input[name=__RequestVerificationToken]');
+	logger.error(`addAntiForgeryToken(data=${data}): data → ${data}`);
     if (tokenInput.length) {
         data.__RequestVerificationToken = tokenInput.val();
     }
@@ -122,6 +148,7 @@ function addAntiForgeryToken(data) {
 };
 
 function saveUserPreferences(url, name, value) {
+	logger.error(`>>> Entering saveUserPreferences(url=${url},name=${name},value=${value})`);
     var postData = {
         name: name,
         value: value
@@ -134,24 +161,33 @@ function saveUserPreferences(url, name, value) {
         data: postData,
         dataType: "json",
         error: function (jqXHR, textStatus, errorThrown) {
+		logger.error(`>>> Entering error(jqXHR=${jqXHR},textStatus=${textStatus},errorThrown=${errorThrown})`);
           alert('Failed to save preferences.');
+		logger.warn(`<<< Exiting error(jqXHR=${jqXHR},textStatus=${textStatus},errorThrown=${errorThrown})`);
         },
         complete: function (jqXHR, textStatus) {
+		logger.error(`>>> Entering complete(jqXHR=${jqXHR},textStatus=${textStatus})`);
           $("#ajaxBusy span").removeClass("no-ajax-loader");
+		logger.warn(`<<< Exiting complete(jqXHR=${jqXHR},textStatus=${textStatus})`);
+	logger.warn(`<<< Exiting saveUserPreferences(url=${url},name=${name},value=${value})`);
         }        
   });
 
 };
 
 function warningValidation(validationUrl, warningElementName, passedParameters) {
+	logger.error(`>>> Entering warningValidation(validationUrl=${validationUrl},warningElementName=${warningElementName},passedParameters=${passedParameters})`);
     addAntiForgeryToken(passedParameters);
     var element = $('[data-valmsg-for="' + warningElementName + '"]');
+	logger.error(`warningValidation(validationUrl=${validationUrl},warningElementName=${warningElementName},passedParameters=${passedParameters}): element → ${element}`);
 
     var messageElement = element.siblings('.field-validation-custom');
+	logger.error(`warningValidation(validationUrl=${validationUrl},warningElementName=${warningElementName},passedParameters=${passedParameters}): messageElement → ${messageElement}`);
     if (messageElement.length == 0) {
         messageElement = $(document.createElement("span"));
         messageElement.addClass('field-validation-custom');
         element.after(messageElement);
+		logger.warn(`<<< Exiting warningValidation(validationUrl=${validationUrl},warningElementName=${warningElementName},passedParameters=${passedParameters})`);
     }
 
     $.ajax({
@@ -161,12 +197,14 @@ function warningValidation(validationUrl, warningElementName, passedParameters) 
         dataType: "json",
         data: passedParameters,
         success: function (data, textStatus, jqXHR) {
+			logger.error(`>>> Entering success(data=${data},textStatus=${textStatus},jqXHR=${jqXHR})`);
             if (data.Result) {
                 messageElement.addClass("warning");
                 messageElement.html(data.Result);
             } else {
                 messageElement.removeClass("warning");
                 messageElement.html('');
+				logger.warn(`<<< Exiting success(data=${data},textStatus=${textStatus},jqXHR=${jqXHR})`);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -177,20 +215,26 @@ function warningValidation(validationUrl, warningElementName, passedParameters) 
 };
 
 function toggleNestedSetting(parentSettingName, parentFormGroupId) {
+	logger.error(`>>> Entering toggleNestedSetting(parentSettingName=${parentSettingName},parentFormGroupId=${parentFormGroupId})`);
     if ($('input[name="' + parentSettingName + '"]').is(':checked')) {
         $('#' + parentFormGroupId).addClass('opened');
     } else {
         $('#' + parentFormGroupId).removeClass('opened');
+		logger.warn(`<<< Exiting toggleNestedSetting(parentSettingName=${parentSettingName},parentFormGroupId=${parentFormGroupId})`);
     }
 }
 
 function parentSettingClick(e) {
+	logger.error(`>>> Entering parentSettingClick(e=${e})`);
     toggleNestedSetting(e.data.parentSettingName, e.data.parentFormGroupId);
+	logger.warn(`<<< Exiting parentSettingClick(e=${e})`);
 }
 
 function initNestedSetting(parentSettingName, parentSettingId, nestedSettingId) {
+	logger.error(`>>> Entering initNestedSetting(parentSettingName=${parentSettingName},parentSettingId=${parentSettingId},nestedSettingId=${nestedSettingId})`);
     var parentFormGroup = $('input[name="' + parentSettingName +'"]').closest('.form-group');
     var parentFormGroupId = $(parentFormGroup).attr('id');
+	logger.error(`initNestedSetting(parentSettingName=${parentSettingName},parentSettingId=${parentSettingId},nestedSettingId=${nestedSettingId}): parentFormGroup → ${parentFormGroup}`);
     if (!parentFormGroupId) {
         parentFormGroupId = parentSettingId;
     }
@@ -203,11 +247,13 @@ function initNestedSetting(parentSettingName, parentSettingId, nestedSettingId) 
     $('input[name="' + parentSettingName + '"]').click(
         { parentSettingName: parentSettingName, parentFormGroupId: parentFormGroupId }, parentSettingClick);
     toggleNestedSetting(parentSettingName, parentFormGroupId);
+	logger.warn(`<<< Exiting initNestedSetting(parentSettingName=${parentSettingName},parentSettingId=${parentSettingId},nestedSettingId=${nestedSettingId})`);
 }
 
 //scroll to top
 (function ($) {
     $.fn.backTop = function () {
+		logger.error('>>> Entering backTop()');
         var backBtn = this;
 
         var position = 1000;
@@ -226,6 +272,7 @@ function initNestedSetting(parentSettingName, parentSettingId, nestedSettingId) 
         backBtn.click(function () {
             $("html, body").animate({ scrollTop: 0 }, 900);
         });
+		logger.warn('<<< Exiting backTop()');
     }
 }(jQuery));
 
@@ -258,13 +305,17 @@ $(function() {
 });
 
 function CardToggle() {
+logger.error('>>> Entering CardToggle()');
   var card = $(this).parent(".card.card-secondary");
   card.CardWidget('toggle'); 
+logger.error(`CardToggle(): card → ${card}`);
 }
 
 function WrapAndSaveBlockData(card, collapsed) {
+logger.error(`>>> Entering WrapAndSaveBlockData(card=${card},collapsed=${collapsed})`);
   var hideAttribute = card.attr("data-hideAttribute");
   saveUserPreferences(rootAppPath + 'admin/preferences/savepreference', hideAttribute, collapsed);
+logger.error(`WrapAndSaveBlockData(card=${card},collapsed=${collapsed}): hideAttribute → ${hideAttribute}`);
 }
 
 //collapse search block
@@ -273,8 +324,10 @@ $(function() {
 });
 
 function ToggleSearchBlockAndSavePreferences() {
+	logger.error('>>> Entering ToggleSearchBlockAndSavePreferences()');
     $(this).parents(".card-search").find(".search-body").slideToggle();
     var icon = $(this).find(".icon-collapse i");
+	logger.error(`ToggleSearchBlockAndSavePreferences(): icon → ${icon}`);
     if ($(this).hasClass("opened")) {
       icon.removeClass("fa-angle-up");
       icon.addClass("fa-angle-down");
@@ -286,17 +339,22 @@ function ToggleSearchBlockAndSavePreferences() {
     }
 
     $(this).toggleClass("opened");
+	logger.warn('<<< Exiting ToggleSearchBlockAndSavePreferences()');
 }
 
 function ensureDataTablesRendered() {
+logger.error('>>> Entering ensureDataTablesRendered()');
   $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+logger.warn('<<< Exiting ensureDataTablesRendered()');
 }
 
 function reloadAllDataTables(itemCount) {
+logger.error(`>>> Entering reloadAllDataTables(itemCount=${itemCount})`);
   //depending on the number of elements, the time for animation of opening the menu should increase
   var timePause = 300;
   if (itemCount) {
     timePause = itemCount * 100;
+	logger.warn(`<<< Exiting reloadAllDataTables(itemCount=${itemCount})`);
   }
   $('table[class^="table"]').each(function () {
     setTimeout(function () {
@@ -311,8 +369,10 @@ function reloadAllDataTables(itemCount) {
  */
 function showAlert(alertId, text)
 {
+	logger.error(`>>> Entering showAlert(alertId=${alertId},text=${text})`);
     $('#' + alertId + '-info').text(text);
     $('#' + alertId).trigger("click");
+	logger.warn(`<<< Exiting showAlert(alertId=${alertId},text=${text})`);
 }
 
 //scrolling and hidden DataTables issue workaround
@@ -352,6 +412,7 @@ $(function() {
  * @param {string} childCheckbox Child checkbox selector
  */
 function prepareTableCheckboxes(masterCheckbox, childCheckbox) {
+logger.error(`>>> Entering prepareTableCheckboxes(masterCheckbox=${masterCheckbox},childCheckbox=${childCheckbox})`);
   //Handling the event of clicking on the master checkbox
   $(masterCheckbox).click(function () {
     $(childCheckbox).prop('checked', $(this).prop('checked'));
@@ -364,18 +425,24 @@ function prepareTableCheckboxes(masterCheckbox, childCheckbox) {
 
   //Determining the state of the master checkbox by the state of its children
   $(masterCheckbox).prop('checked', $(childCheckbox).length == $(childCheckbox + ':checked').length && $(childCheckbox).length > 0);
+logger.warn(`<<< Exiting prepareTableCheckboxes(masterCheckbox=${masterCheckbox},childCheckbox=${childCheckbox})`);
 }
 
 function displayBarNotification(message, notifyTypeId, timeout) {
+logger.error(`>>> Entering displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout})`);
 
   var cssStyles = ["alert-success", "alert-danger", "alert-warning"]
+logger.error(`displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout}): cssStyles → ${cssStyles}`);
 
   cssStyle = notifyTypeId >= 0 && notifyTypeId <= 2 ? cssStyles[notifyTypeId] : cssStyles[0];
 
   var htmlcode = document.createElement('div');
+logger.error(`displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout}): htmlcode → ${htmlcode}`);
   htmlcode.classList.add('alert', cssStyle, 'alert-dismissable');
 
   var button = document.createElement('button');
+logger.error(`displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout}): button → ${button}`);
+logger.debug(`displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout}): button.innerHTML → ${button.innerHTML}`);
   button.classList.add('close');
   button.setAttribute('data-dismiss', 'alert');
   button.setAttribute('aria-hidden', 'true');
@@ -383,14 +450,18 @@ function displayBarNotification(message, notifyTypeId, timeout) {
   htmlcode.appendChild(button);
 
   var html = document.createElement('span');
+logger.error(`displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout}): html → ${html}`);
   html.innerHTML = message;
+logger.debug(`displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout}): html.innerHTML → ${html.innerHTML}`);
   htmlcode.appendChild(html);
 
   $('#admin-notifications').append(htmlcode);
 
   //callback for notification removing
   var removeNoteItem = function () {
+	logger.error('>>> Entering removeNoteItem()');
     $(htmlcode).remove();
+	logger.warn('<<< Exiting removeNoteItem()');
   };
 
   //timeout (if set)
@@ -404,5 +475,6 @@ function displayBarNotification(message, notifyTypeId, timeout) {
       .on('mouseenter', function () {
         clearTimeout(notificationTimeout);
       });
+	logger.warn(`<<< Exiting displayBarNotification(message=${message},notifyTypeId=${notifyTypeId},timeout=${timeout})`);
   }
 }

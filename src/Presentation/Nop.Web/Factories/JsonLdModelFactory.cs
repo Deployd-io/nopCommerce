@@ -12,6 +12,7 @@ using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Models.Boards;
 using Nop.Web.Models.Catalog;
 using Nop.Web.Models.JsonLD;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -20,6 +21,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class JsonLdModelFactory : IJsonLdModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ForumSettings _forumSettings;
@@ -42,12 +44,20 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
         INopUrlHelper nopUrlHelper,
         IWebHelper webHelper)
     {
+		_logger.LogError(">>> Entering JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper})", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper);
         _forumSettings = forumSettings;
         _customerService = customerService;
+		_logger.LogDebug("JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper}): _customerService → {_customerService}", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper, _customerService);
+		_logger.LogDebug("JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper}): _forumSettings → {_forumSettings}", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper, _forumSettings);
+    _logger.LogWarning("<<< Exiting JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper})", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper}): _dateTimeHelper → {_dateTimeHelper}", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper, _dateTimeHelper);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper}): _eventPublisher → {_eventPublisher}", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper, _eventPublisher);
         _forumService = forumService;
+		_logger.LogDebug("JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper}): _forumService → {_forumService}", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper, _forumService);
         _nopUrlHelper = nopUrlHelper;
+		_logger.LogDebug("JsonLdModelFactory(forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},eventPublisher={EventPublisher},forumService={ForumService},nopUrlHelper={NopUrlHelper},webHelper={WebHelper}): _nopUrlHelper → {_nopUrlHelper}", forumSettings, customerService, dateTimeHelper, eventPublisher, forumService, nopUrlHelper, webHelper, _nopUrlHelper);
         _webHelper = webHelper;
     }
 
@@ -62,6 +72,8 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// <returns>Datetime string in the ISO 8601 format</returns>
     protected virtual string ConvertDateTimeToIso8601String(DateTime? dateTime)
     {
+		_logger.LogError(">>> Entering ConvertDateTimeToIso8601String(dateTime={DateTime})", dateTime);
+        _logger.LogWarning("<<< Exiting ConvertDateTimeToIso8601String(dateTime={DateTime})", dateTime);
         return dateTime == null ? null : new DateTimeOffset(dateTime.Value).ToString("O", CultureInfo.InvariantCulture);
     }
 
@@ -74,8 +86,10 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     protected virtual async Task<JsonLdBreadcrumbListModel> PrepareJsonLdBreadcrumbListAsync(IList<CategorySimpleModel> categoryModels)
     {
+		_logger.LogError(">>> Entering PrepareJsonLdBreadcrumbListAsync(categoryModels={CategoryModels})", categoryModels);
         var breadcrumbList = new JsonLdBreadcrumbListModel();
         var position = 1;
+		_logger.LogError("PrepareJsonLdBreadcrumbListAsync(categoryModels={CategoryModels}): breadcrumbList → {BreadcrumbList}", categoryModels, breadcrumbList);
 
         foreach (var cat in categoryModels)
         {
@@ -92,6 +106,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
             position++;
         }
 
+		_logger.LogWarning("<<< Exiting PrepareJsonLdBreadcrumbListAsync(categoryModels={CategoryModels})", categoryModels);
         return breadcrumbList;
     }
 
@@ -108,10 +123,13 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     public virtual async Task<JsonLdBreadcrumbListModel> PrepareJsonLdCategoryBreadcrumbAsync(IList<CategorySimpleModel> categoryModels)
     {
+		_logger.LogError(">>> Entering PrepareJsonLdCategoryBreadcrumbAsync(categoryModels={CategoryModels})", categoryModels);
         var breadcrumbList = await PrepareJsonLdBreadcrumbListAsync(categoryModels);
 
+		_logger.LogError("PrepareJsonLdCategoryBreadcrumbAsync(categoryModels={CategoryModels}): breadcrumbList → {BreadcrumbList}", categoryModels, breadcrumbList);
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdBreadcrumbListModel>(breadcrumbList));
 
+		_logger.LogWarning("<<< Exiting PrepareJsonLdCategoryBreadcrumbAsync(categoryModels={CategoryModels})", categoryModels);
         return breadcrumbList;
     }
 
@@ -124,10 +142,13 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     public virtual async Task<JsonLdBreadcrumbListModel> PrepareJsonLdProductBreadcrumbAsync(ProductDetailsModel.ProductBreadcrumbModel breadcrumbModel)
     {
+		_logger.LogError(">>> Entering PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel})", breadcrumbModel);
         var breadcrumbList = await PrepareJsonLdBreadcrumbListAsync(breadcrumbModel.CategoryBreadcrumb);
 
+		_logger.LogError("PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel}): breadcrumbList → {BreadcrumbList}", breadcrumbModel, breadcrumbList);
         breadcrumbList.ItemListElement.Add(new JsonLdBreadcrumbListItemModel
         {
+			_logger.LogDebug("PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel}): Item → {Item}", breadcrumbModel, Item);
             Position = breadcrumbList.ItemListElement.Count + 1,
             Item = new JsonLdBreadcrumbItemModel
             {
@@ -138,6 +159,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
 
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdBreadcrumbListModel>(breadcrumbList));
 
+		_logger.LogWarning("<<< Exiting PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel={BreadcrumbModel})", breadcrumbModel);
         return breadcrumbList;
     }
 
@@ -151,6 +173,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
     /// </returns>
     public virtual async Task<JsonLdProductModel> PrepareJsonLdProductAsync(ProductDetailsModel model, string productUrl = null)
     {
+		_logger.LogError(">>> Entering PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl})", model, productUrl);
         productUrl ??= await _nopUrlHelper.RouteGenericUrlAsync<Product>(new { SeName = model.SeName }, _webHelper.GetCurrentRequestProtocol());
 
         var productPrice = model.AssociatedProducts.Any()
@@ -181,6 +204,8 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
             var ratingPercent = model.ProductReviewOverview.RatingSum * 100 / model.ProductReviewOverview.TotalReviews / 5;
 
             var ratingValue = ratingPercent / (decimal)20;
+			_logger.LogError("PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl}): ratingValue → {RatingValue}", model, productUrl, ratingValue);
+			_logger.LogDebug("PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl}): product.AggregateRating → {Arg2}", model, productUrl, product.AggregateRating);
 
             product.AggregateRating = new JsonLdAggregateRatingModel
             {
@@ -199,6 +224,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
                 Author = new JsonLdPersonModel { Name = JavaScriptEncoder.Default.Encode(review.CustomerName) },
                 DatePublished = ConvertDateTimeToIso8601String(review.WrittenOn)
             }).ToList();
+				_logger.LogDebug("PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl}): DatePublished → {DatePublished}", model, productUrl, DatePublished);
         }
 
         foreach (var associatedProduct in model.AssociatedProducts)
@@ -209,6 +235,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
 
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdProductModel>(product));
 
+		_logger.LogWarning("<<< Exiting PrepareJsonLdProductAsync(model={Model},productUrl={ProductUrl})", model, productUrl);
         return product;
     }
 
@@ -226,9 +253,13 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
         ForumPost firstPost,
         ForumTopicPageModel model)
     {
+		_logger.LogError(">>> Entering PrepareJsonLdForumTopicAsync(forumTopic={ForumTopic},firstPost={FirstPost},model={Model})", forumTopic, firstPost, model);
         var forumTopicCustomer = await _customerService.GetCustomerByIdAsync(forumTopic.CustomerId);
         var customerName = await _customerService.FormatUsernameAsync(forumTopicCustomer);
+		_logger.LogError("PrepareJsonLdForumTopicAsync(forumTopic={ForumTopic},firstPost={FirstPost},model={Model}): customerName → {CustomerName}", forumTopic, firstPost, model, customerName);
         var createdOn = await _dateTimeHelper.ConvertToUserTimeAsync(forumTopic.CreatedOnUtc, DateTimeKind.Utc);
+		_logger.LogError("PrepareJsonLdForumTopicAsync(forumTopic={ForumTopic},firstPost={FirstPost},model={Model}): createdOn → {CreatedOn}", forumTopic, firstPost, model, createdOn);
+		_logger.LogError("PrepareJsonLdForumTopicAsync(forumTopic={ForumTopic},firstPost={FirstPost},model={Model}): forumTopicCustomer → {ForumTopicCustomer}", forumTopic, firstPost, model, forumTopicCustomer);
 
         var forumTopicModel = new JsonLdForumTopicModel
         {
@@ -273,6 +304,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
                     };
                 }
 
+				_logger.LogDebug("PrepareJsonLdForumTopicAsync(forumTopic={ForumTopic},firstPost={FirstPost},model={Model}): InteractionStatistic → {InteractionStatistic}", forumTopic, firstPost, model, InteractionStatistic);
                 return commentModel;
             }).ToList(),
             InteractionStatistic = new List<JsonLdInteractionStatisticModel>
@@ -290,6 +322,7 @@ public partial class JsonLdModelFactory : IJsonLdModelFactory
 
         await _eventPublisher.PublishAsync(new JsonLdCreatedEvent<JsonLdForumTopicModel>(forumTopicModel));
 
+		_logger.LogWarning("<<< Exiting PrepareJsonLdForumTopicAsync(forumTopic={ForumTopic},firstPost={FirstPost},model={Model})", forumTopic, firstPost, model);
         return forumTopicModel;
     }
 

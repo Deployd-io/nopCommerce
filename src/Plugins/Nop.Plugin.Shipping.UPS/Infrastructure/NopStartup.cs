@@ -18,8 +18,10 @@ public class NopStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		logger.LogError(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //register UPSService
         services.AddScoped<UPSService>();
+		logger.LogWarning("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -28,6 +30,8 @@ public class NopStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public void Configure(IApplicationBuilder application)
     {
+	logger.LogError(">>> Entering Configure(application={Application})", application);
+    logger.LogWarning("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

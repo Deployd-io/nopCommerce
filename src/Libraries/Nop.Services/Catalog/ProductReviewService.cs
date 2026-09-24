@@ -11,6 +11,7 @@ using Nop.Services.Messages;
 using Nop.Services.Orders;
 using Nop.Services.Security;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Catalog;
 
@@ -19,6 +20,7 @@ namespace Nop.Services.Catalog;
 /// </summary>
 public partial class ProductReviewService : IProductReviewService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CatalogSettings _catalogSettings;
@@ -59,21 +61,38 @@ public partial class ProductReviewService : IProductReviewService
         IWorkflowMessageService workflowMessageService,
         LocalizationSettings localizationSettings)
     {
+		_logger.LogError(">>> Entering ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings})", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings);
         _catalogSettings = catalogSettings;
         _aclService = aclService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _aclService → {_aclService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _aclService);
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _catalogSettings → {_catalogSettings}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _catalogSettings);
+    _logger.LogWarning("<<< Exiting ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings})", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings);
         _customerActivityService = customerActivityService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _customerActivityService → {_customerActivityService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _customerActivityService);
         _customerService = customerService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _customerService → {_customerService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _customerService);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _eventPublisher → {_eventPublisher}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _eventPublisher);
         _localizationService = localizationService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _localizationService → {_localizationService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _localizationService);
         _orderService = orderService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _orderService → {_orderService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _orderService);
         _productService = productService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _productService → {_productService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _productService);
         _productRepository = productRepository;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _productRepository → {_productRepository}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _productRepository);
         _productReviewRepository = productReviewRepository;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _productReviewRepository → {_productReviewRepository}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _productReviewRepository);
         _productReviewHelpfulnessRepository = productReviewHelpfulnessRepository;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _productReviewHelpfulnessRepository → {_productReviewHelpfulnessRepository}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _productReviewHelpfulnessRepository);
         _reviewTypeService = reviewTypeService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _reviewTypeService → {_reviewTypeService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _reviewTypeService);
         _storeMappingService = storeMappingService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _storeMappingService → {_storeMappingService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _storeMappingService);
         _workContext = workContext;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _workContext → {_workContext}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _workContext);
         _workflowMessageService = workflowMessageService;
+		_logger.LogDebug("ProductReviewService(catalogSettings={CatalogSettings},aclService={AclService},customerActivityService={CustomerActivityService},customerService={CustomerService},eventPublisher={EventPublisher},localizationService={LocalizationService},orderService={OrderService},productService={ProductService},productRepository={ProductRepository},productReviewRepository={ProductReviewRepository},productReviewHelpfulnessRepository={ProductReviewHelpfulnessRepository},reviewTypeService={ReviewTypeService},storeMappingService=<redacted>,workContext={WorkContext},workflowMessageService={WorkflowMessageService},localizationSettings={LocalizationSettings}): _workflowMessageService → {_workflowMessageService}", catalogSettings, aclService, customerActivityService, customerService, eventPublisher, localizationService, orderService, productService, productRepository, productReviewRepository, productReviewHelpfulnessRepository, reviewTypeService, workContext, workflowMessageService, localizationSettings, _workflowMessageService);
         _localizationSettings = localizationSettings;
     }
 
@@ -91,7 +110,10 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     protected virtual async ValueTask<bool> HasCompletedOrdersAsync(Product product)
     {
+		_logger.LogError(">>> Entering HasCompletedOrdersAsync(product={Product})", product);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("HasCompletedOrdersAsync(product={Product}): customer → {Customer}", product, customer);
+		_logger.LogWarning("<<< Exiting HasCompletedOrdersAsync(product={Product})", product);
         return (await _orderService.SearchOrdersAsync(customerId: customer.Id,
             productId: product.Id,
             osIds: [(int)OrderStatus.Complete],
@@ -124,7 +146,9 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task InsertProductReviewHelpfulnessAsync(ProductReviewHelpfulness productReviewHelpfulness)
     {
+		_logger.LogError(">>> Entering InsertProductReviewHelpfulnessAsync(productReviewHelpfulness={ProductReviewHelpfulness})", productReviewHelpfulness);
         await _productReviewHelpfulnessRepository.InsertAsync(productReviewHelpfulness);
+		_logger.LogWarning("<<< Exiting InsertProductReviewHelpfulnessAsync(productReviewHelpfulness={ProductReviewHelpfulness})", productReviewHelpfulness);
     }
 
     #endregion
@@ -138,6 +162,7 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductReviewTotalsAsync(Product product)
     {
+		_logger.LogError(">>> Entering UpdateProductReviewTotalsAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var approvedRatingSum = 0;
@@ -161,10 +186,15 @@ public partial class ProductReviewService : IProductReviewService
             }
 
         product.ApprovedRatingSum = approvedRatingSum;
+		_logger.LogDebug("UpdateProductReviewTotalsAsync(product={Product}): product.ApprovedRatingSum → {Arg1}", product, product.ApprovedRatingSum);
+		_logger.LogDebug("UpdateProductReviewTotalsAsync(product={Product}): product.NotApprovedRatingSum → {Arg1}", product, product.NotApprovedRatingSum);
+		_logger.LogDebug("UpdateProductReviewTotalsAsync(product={Product}): product.ApprovedTotalReviews → {Arg1}", product, product.ApprovedTotalReviews);
+		_logger.LogDebug("UpdateProductReviewTotalsAsync(product={Product}): product.NotApprovedTotalReviews → {Arg1}", product, product.NotApprovedTotalReviews);
         product.NotApprovedRatingSum = notApprovedRatingSum;
         product.ApprovedTotalReviews = approvedTotalReviews;
         product.NotApprovedTotalReviews = notApprovedTotalReviews;
         await _productService.UpdateProductAsync(product);
+		_logger.LogWarning("<<< Exiting UpdateProductReviewTotalsAsync(product={Product})", product);
     }
 
     /// <summary>
@@ -177,10 +207,13 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<IList<string>> ValidateProductReviewAvailabilityAsync(Product product)
     {
+		_logger.LogError(">>> Entering ValidateProductReviewAvailabilityAsync(product={Product})", product);
         var error = new List<string>();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("ValidateProductReviewAvailabilityAsync(product={Product}): customer → {Customer}", product, customer);
         if (await _customerService.IsGuestAsync(customer) && !_catalogSettings.AllowAnonymousUsersToReviewProduct)
             error.Add(await _localizationService.GetResourceAsync("Reviews.OnlyRegisteredUsersCanWriteReviews"));
+			_logger.LogError("ValidateProductReviewAvailabilityAsync(product={Product}): error → {Error}", product, error);
 
         if (!_catalogSettings.ProductReviewPossibleOnlyAfterPurchasing)
             return error;
@@ -192,6 +225,7 @@ public partial class ProductReviewService : IProductReviewService
         if (!hasCompletedOrders)
             error.Add(await _localizationService.GetResourceAsync("Reviews.ProductReviewPossibleOnlyAfterPurchasing"));
 
+		_logger.LogWarning("<<< Exiting ValidateProductReviewAvailabilityAsync(product={Product})", product);
         return error;
     }
 
@@ -218,20 +252,25 @@ public partial class ProductReviewService : IProductReviewService
         string message = null, int storeId = 0, int productId = 0, int vendorId = 0, bool showHidden = false,
         int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productReviews = await _productReviewRepository.GetAllPagedAsync(async query =>
         {
             if (!showHidden)
             {
                 var productsQuery = _productRepository.Table.Where(p => p.Published);
 
+				_logger.LogError("GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): productsQuery → {ProductsQuery}", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, productsQuery);
                 //apply store mapping constraints
                 productsQuery = await _storeMappingService.ApplyStoreMapping(productsQuery, storeId);
 
                 //apply ACL constraints
                 var customer = await _workContext.GetCurrentCustomerAsync();
+				_logger.LogError("GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): customer → {Customer}", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, customer);
                 productsQuery = await _aclService.ApplyAcl(productsQuery, customer);
 
                 query = query.Where(review => productsQuery.Any(product => product.Id == review.ProductId));
+				_logger.LogError("GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, query);
             }
 
             if (approved.HasValue)
@@ -263,7 +302,9 @@ public partial class ProductReviewService : IProductReviewService
 
             return query;
         }, pageIndex, pageSize);
+		_logger.LogError("GetAllProductReviewsAsync(customerId,approved,fromUtc,toUtc,message,storeId,productId,vendorId,showHidden,pageIndex,pageSize)={CustomerId},{Approved},{FromUtc},{ToUtc},{Message},{StoreId},{ProductId},{VendorId},{ShowHidden},{PageIndex},{PageSize}: find query executed in {Arg11} ms", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetAllProductReviewsAsync(customerId={CustomerId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},message={Message},storeId={StoreId},productId={ProductId},vendorId={VendorId},showHidden={ShowHidden},pageIndex={PageIndex},pageSize={PageSize})", customerId, approved, fromUtc, toUtc, message, storeId, productId, vendorId, showHidden, pageIndex, pageSize);
         return productReviews;
     }
 
@@ -277,6 +318,9 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<ProductReview> GetProductReviewByIdAsync(int productReviewId)
     {
+		_logger.LogError(">>> Entering GetProductReviewByIdAsync(productReviewId={ProductReviewId})", productReviewId);
+		_logger.LogError("GetProductReviewByIdAsync(productReviewId)={ProductReviewId}: find query executing", productReviewId);
+    _logger.LogWarning("<<< Exiting GetProductReviewByIdAsync(productReviewId={ProductReviewId})", productReviewId);
         return await _productReviewRepository.GetByIdAsync(productReviewId, _ => default);
     }
 
@@ -290,6 +334,8 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<IList<ProductReview>> GetProductReviewsByIdsAsync(int[] productReviewIds)
     {
+		_logger.LogError(">>> Entering GetProductReviewsByIdsAsync(productReviewIds={ProductReviewIds})", productReviewIds);
+        _logger.LogWarning("<<< Exiting GetProductReviewsByIdsAsync(productReviewIds={ProductReviewIds})", productReviewIds);
         return await _productReviewRepository.GetByIdsAsync(productReviewIds);
     }
 
@@ -301,20 +347,25 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertProductReviewAsync(ProductReview productReview, IList<ProductReviewReviewTypeMapping> productReviewReviewTypeMappings = null)
     {
+		_logger.LogError(">>> Entering InsertProductReviewAsync(productReview={ProductReview},productReviewReviewTypeMappings=<redacted>)", productReview);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewRepository.InsertAsync(productReview);
 
+		_logger.LogError("InsertProductReviewAsync(productReview,productReviewReviewTypeMappings)={ProductReview},<redacted>: save query executed in {Arg2} ms", productReview, __logStart.ElapsedMilliseconds);
         //add product review and review type mapping
         if (productReviewReviewTypeMappings != null && productReviewReviewTypeMappings.Any())
         {
             foreach (var additionalProductReview in productReviewReviewTypeMappings)
             {
                 additionalProductReview.ProductReviewId = productReview.Id;
+				_logger.LogDebug("InsertProductReviewAsync(productReview={ProductReview},productReviewReviewTypeMappings=<redacted>): additionalProductReview.ProductReviewId → {Arg2}", productReview, additionalProductReview.ProductReviewId);
                 await _reviewTypeService.InsertProductReviewReviewTypeMappingsAsync(additionalProductReview);
             }
         }
 
         //update product totals
         var product = await _productService.GetProductByIdAsync(productReview.ProductId);
+		_logger.LogError("InsertProductReviewAsync(productReview={ProductReview},productReviewReviewTypeMappings=<redacted>): product → {Product}", productReview, product);
         await UpdateProductReviewTotalsAsync(product);
 
         //notify store owner
@@ -328,6 +379,7 @@ public partial class ProductReviewService : IProductReviewService
         //raise event
         if (productReview.IsApproved)
             await _eventPublisher.PublishAsync(new ProductReviewApprovedEvent(productReview));
+			_logger.LogWarning("<<< Exiting InsertProductReviewAsync(productReview={ProductReview},productReviewReviewTypeMappings=<redacted>)", productReview);
     }
 
     /// <summary>
@@ -337,7 +389,11 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductReviewAsync(ProductReview productReview)
     {
+		_logger.LogError(">>> Entering DeleteProductReviewAsync(productReview={ProductReview})", productReview);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewRepository.DeleteAsync(productReview);
+		_logger.LogError("DeleteProductReviewAsync(productReview)={ProductReview}: external service call took {Arg1} ms", productReview, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteProductReviewAsync(productReview={ProductReview})", productReview);
     }
 
     /// <summary>
@@ -347,7 +403,11 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteProductReviewsAsync(IList<ProductReview> productReviews)
     {
+		_logger.LogError(">>> Entering DeleteProductReviewsAsync(productReviews={ProductReviews})", productReviews);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _productReviewRepository.DeleteAsync(productReviews);
+		_logger.LogError("DeleteProductReviewsAsync(productReviews)={ProductReviews}: external service call took {Arg1} ms", productReviews, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteProductReviewsAsync(productReviews={ProductReviews})", productReviews);
     }
 
     /// <summary>
@@ -358,11 +418,15 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetProductReviewHelpfulnessAsync(ProductReview productReview, bool helpfulness)
     {
+		_logger.LogError(">>> Entering SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness})", productReview, helpfulness);
         ArgumentNullException.ThrowIfNull(productReview);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var prh = await _productReviewHelpfulnessRepository.Table
             .SingleOrDefaultAsync(h => h.ProductReviewId == productReview.Id && h.CustomerId == customer.Id);
+			_logger.LogError("SetProductReviewHelpfulnessAsync(productReview,helpfulness)={ProductReview},{Helpfulness}: database query executed in {Arg2} ms", productReview, helpfulness, __logStart.ElapsedMilliseconds);
+			_logger.LogError("SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness}): customer → {Customer}", productReview, helpfulness, customer);
 
         if (prh is null)
         {
@@ -380,8 +444,11 @@ public partial class ProductReviewService : IProductReviewService
         {
             //existing one
             prh.WasHelpful = helpfulness;
+			_logger.LogDebug("SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness}): prh.WasHelpful → {Arg2}", productReview, helpfulness, prh.WasHelpful);
 
             await _productReviewHelpfulnessRepository.UpdateAsync(prh);
+			_logger.LogWarning("<<< Exiting SetProductReviewHelpfulnessAsync(productReview={ProductReview},helpfulness={Helpfulness})", productReview, helpfulness);
+			_logger.LogError("SetProductReviewHelpfulnessAsync(productReview,helpfulness)={ProductReview},{Helpfulness}: update query executed in {Arg2} ms", productReview, helpfulness, __logStart.ElapsedMilliseconds);
         }
     }
 
@@ -392,7 +459,9 @@ public partial class ProductReviewService : IProductReviewService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateProductReviewAsync(ProductReview productReview)
     {
+		_logger.LogError(">>> Entering UpdateProductReviewAsync(productReview={ProductReview})", productReview);
         await _productReviewRepository.UpdateAsync(productReview);
+		_logger.LogWarning("<<< Exiting UpdateProductReviewAsync(productReview={ProductReview})", productReview);
     }
 
     /// <summary>
@@ -405,10 +474,14 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task UpdateProductReviewHelpfulnessTotalsAsync(ProductReview productReview)
     {
+		_logger.LogError(">>> Entering UpdateProductReviewHelpfulnessTotalsAsync(productReview={ProductReview})", productReview);
         ArgumentNullException.ThrowIfNull(productReview);
 
         (productReview.HelpfulYesTotal, productReview.HelpfulNoTotal) = await GetHelpfulnessCountsAsync(productReview);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("UpdateProductReviewHelpfulnessTotalsAsync(productReview)={ProductReview}: update query executed in {Arg1} ms", productReview, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting UpdateProductReviewHelpfulnessTotalsAsync(productReview={ProductReview})", productReview);
         await _productReviewRepository.UpdateAsync(productReview);
     }
 
@@ -423,8 +496,10 @@ public partial class ProductReviewService : IProductReviewService
     /// </returns>
     public virtual async Task<bool> CanAddReviewAsync(int productId, int storeId = 0)
     {
+		_logger.LogError(">>> Entering CanAddReviewAsync(productId={ProductId},storeId={StoreId})", productId, storeId);
         var customer = await _workContext.GetCurrentCustomerAsync();
 
+		_logger.LogError("CanAddReviewAsync(productId={ProductId},storeId={StoreId}): customer → {Customer}", productId, storeId, customer);
         if (_catalogSettings.OneReviewPerProductFromCustomer)
             return (await GetAllProductReviewsAsync(customerId: customer.Id, productId: productId, storeId: storeId)).TotalCount == 0;
 

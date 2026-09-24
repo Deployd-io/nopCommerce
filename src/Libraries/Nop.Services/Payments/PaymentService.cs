@@ -3,6 +3,7 @@ using Nop.Core.Domain.Orders;
 using Nop.Core.Domain.Payments;
 using Nop.Services.Catalog;
 using Nop.Services.Customers;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Payments;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Payments;
 /// </summary>
 public partial class PaymentService : IPaymentService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICustomerService _customerService;
@@ -29,11 +31,16 @@ public partial class PaymentService : IPaymentService
         PaymentSettings paymentSettings,
         ShoppingCartSettings shoppingCartSettings)
     {
+		_logger.LogError(">>> Entering PaymentService(customerService={CustomerService},paymentPluginManager={PaymentPluginManager},priceCalculationService={PriceCalculationService},paymentSettings={PaymentSettings},shoppingCartSettings=<redacted>)", customerService, paymentPluginManager, priceCalculationService, paymentSettings);
         _customerService = customerService;
         _paymentPluginManager = paymentPluginManager;
+		_logger.LogDebug("PaymentService(customerService={CustomerService},paymentPluginManager={PaymentPluginManager},priceCalculationService={PriceCalculationService},paymentSettings={PaymentSettings},shoppingCartSettings=<redacted>): _paymentPluginManager → {_paymentPluginManager}", customerService, paymentPluginManager, priceCalculationService, paymentSettings, _paymentPluginManager);
         _priceCalculationService = priceCalculationService;
+		_logger.LogDebug("PaymentService(customerService={CustomerService},paymentPluginManager={PaymentPluginManager},priceCalculationService={PriceCalculationService},paymentSettings={PaymentSettings},shoppingCartSettings=<redacted>): _priceCalculationService → {_priceCalculationService}", customerService, paymentPluginManager, priceCalculationService, paymentSettings, _priceCalculationService);
         _paymentSettings = paymentSettings;
+		_logger.LogDebug("PaymentService(customerService={CustomerService},paymentPluginManager={PaymentPluginManager},priceCalculationService={PriceCalculationService},paymentSettings={PaymentSettings},shoppingCartSettings=<redacted>): _paymentSettings → {_paymentSettings}", customerService, paymentPluginManager, priceCalculationService, paymentSettings, _paymentSettings);
         _shoppingCartSettings = shoppingCartSettings;
+		_logger.LogDebug("PaymentService(customerService={CustomerService},paymentPluginManager={PaymentPluginManager},priceCalculationService={PriceCalculationService},paymentSettings={PaymentSettings},shoppingCartSettings=<redacted>): _shoppingCartSettings → {_shoppingCartSettings}", customerService, paymentPluginManager, priceCalculationService, paymentSettings, _shoppingCartSettings);
     }
 
     #endregion
@@ -50,6 +57,7 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<ProcessPaymentResult> ProcessPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogError(">>> Entering ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         if (processPaymentRequest.OrderTotal == decimal.Zero)
         {
             var result = new ProcessPaymentResult
@@ -67,6 +75,7 @@ public partial class PaymentService : IPaymentService
         }
 
         var customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
+		_logger.LogError("ProcessPaymentAsync(processPaymentRequest={ProcessPaymentRequest}): customer → {Customer}", processPaymentRequest, customer);
         var paymentMethod = await _paymentPluginManager
                                 .LoadPluginBySystemNameAsync(processPaymentRequest.PaymentMethodSystemName, customer, processPaymentRequest.StoreId)
                             ?? throw new NopException("Payment method couldn't be loaded");
@@ -81,16 +90,19 @@ public partial class PaymentService : IPaymentService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PostProcessPaymentAsync(PostProcessPaymentRequest postProcessPaymentRequest)
     {
+		_logger.LogError(">>> Entering PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
         //already paid or order.OrderTotal == decimal.Zero
         if (postProcessPaymentRequest.Order.PaymentStatus == PaymentStatus.Paid)
             return;
 
         var customer = await _customerService.GetCustomerByIdAsync(postProcessPaymentRequest.Order.CustomerId);
+		_logger.LogError("PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest}): customer → {Customer}", postProcessPaymentRequest, customer);
         var paymentMethod = await _paymentPluginManager
                                 .LoadPluginBySystemNameAsync(postProcessPaymentRequest.Order.PaymentMethodSystemName, customer, postProcessPaymentRequest.Order.StoreId)
                             ?? throw new NopException("Payment method couldn't be loaded");
 
         await paymentMethod.PostProcessPaymentAsync(postProcessPaymentRequest);
+		_logger.LogWarning("<<< Exiting PostProcessPaymentAsync(postProcessPaymentRequest={PostProcessPaymentRequest})", postProcessPaymentRequest);
     }
 
     /// <summary>
@@ -103,13 +115,16 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<bool> CanRePostProcessPaymentAsync(Order order)
     {
+		_logger.LogError(">>> Entering CanRePostProcessPaymentAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!_paymentSettings.AllowRePostingPayments)
             return false;
 
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogError("CanRePostProcessPaymentAsync(order={Order}): customer → {Customer}", order, customer);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(order.PaymentMethodSystemName, customer, order.StoreId);
+		_logger.LogError("CanRePostProcessPaymentAsync(order={Order}): paymentMethod → {PaymentMethod}", order, paymentMethod);
         if (paymentMethod == null)
             return false; //Payment method couldn't be loaded (for example, was uninstalled)
 
@@ -139,15 +154,19 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart, string paymentMethodSystemName)
     {
+		_logger.LogError(">>> Entering GetAdditionalHandlingFeeAsync(cart={Cart},paymentMethodSystemName={PaymentMethodSystemName})", cart, paymentMethodSystemName);
         if (string.IsNullOrEmpty(paymentMethodSystemName))
             return decimal.Zero;
 
         var customer = await _customerService.GetCustomerByIdAsync(cart.FirstOrDefault()?.CustomerId ?? 0);
+		_logger.LogError("GetAdditionalHandlingFeeAsync(cart={Cart},paymentMethodSystemName={PaymentMethodSystemName}): customer → {Customer}", cart, paymentMethodSystemName, customer);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(paymentMethodSystemName, customer, cart.FirstOrDefault()?.StoreId ?? 0);
+		_logger.LogError("GetAdditionalHandlingFeeAsync(cart={Cart},paymentMethodSystemName={PaymentMethodSystemName}): paymentMethod → {PaymentMethod}", cart, paymentMethodSystemName, paymentMethod);
         if (paymentMethod == null)
             return decimal.Zero;
 
         var result = await paymentMethod.GetAdditionalHandlingFeeAsync(cart);
+		_logger.LogError("GetAdditionalHandlingFeeAsync(cart={Cart},paymentMethodSystemName={PaymentMethodSystemName}): result → {Result}", cart, paymentMethodSystemName, result);
         if (result < decimal.Zero)
             result = decimal.Zero;
 
@@ -156,6 +175,7 @@ public partial class PaymentService : IPaymentService
 
         result = await _priceCalculationService.RoundPriceAsync(result);
 
+		_logger.LogWarning("<<< Exiting GetAdditionalHandlingFeeAsync(cart={Cart},paymentMethodSystemName={PaymentMethodSystemName})", cart, paymentMethodSystemName);
         return result;
     }
 
@@ -169,9 +189,11 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<bool> SupportCaptureAsync(string paymentMethodSystemName)
     {
+		_logger.LogError(">>> Entering SupportCaptureAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(paymentMethodSystemName);
         if (paymentMethod == null)
             return false;
+		_logger.LogWarning("<<< Exiting SupportCaptureAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         return paymentMethod.SupportCapture;
     }
 
@@ -201,9 +223,11 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<bool> SupportPartiallyRefundAsync(string paymentMethodSystemName)
     {
+		_logger.LogError(">>> Entering SupportPartiallyRefundAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(paymentMethodSystemName);
         if (paymentMethod == null)
             return false;
+		_logger.LogWarning("<<< Exiting SupportPartiallyRefundAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         return paymentMethod.SupportPartiallyRefund;
     }
 
@@ -217,6 +241,7 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<bool> SupportRefundAsync(string paymentMethodSystemName)
     {
+		_logger.LogError(">>> Entering SupportRefundAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(paymentMethodSystemName);
         if (paymentMethod == null)
             return false;
@@ -249,9 +274,11 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<bool> SupportVoidAsync(string paymentMethodSystemName)
     {
+		_logger.LogError(">>> Entering SupportVoidAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(paymentMethodSystemName);
         if (paymentMethod == null)
             return false;
+		_logger.LogWarning("<<< Exiting SupportVoidAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         return paymentMethod.SupportVoid;
     }
 
@@ -281,6 +308,7 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<RecurringPaymentType> GetRecurringPaymentTypeAsync(string paymentMethodSystemName)
     {
+		_logger.LogError(">>> Entering GetRecurringPaymentTypeAsync(paymentMethodSystemName={PaymentMethodSystemName})", paymentMethodSystemName);
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(paymentMethodSystemName);
         if (paymentMethod == null)
             return RecurringPaymentType.NotSupported;
@@ -298,6 +326,7 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<ProcessPaymentResult> ProcessRecurringPaymentAsync(ProcessPaymentRequest processPaymentRequest)
     {
+		_logger.LogError(">>> Entering ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         if (processPaymentRequest.OrderTotal == decimal.Zero)
         {
             var result = new ProcessPaymentResult
@@ -308,10 +337,12 @@ public partial class PaymentService : IPaymentService
         }
 
         var customer = await _customerService.GetCustomerByIdAsync(processPaymentRequest.CustomerId);
+		_logger.LogError("ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest}): customer → {Customer}", processPaymentRequest, customer);
         var paymentMethod = await _paymentPluginManager
                                 .LoadPluginBySystemNameAsync(processPaymentRequest.PaymentMethodSystemName, customer, processPaymentRequest.StoreId)
                             ?? throw new NopException("Payment method couldn't be loaded");
 
+		_logger.LogWarning("<<< Exiting ProcessRecurringPaymentAsync(processPaymentRequest={ProcessPaymentRequest})", processPaymentRequest);
         return await paymentMethod.ProcessRecurringPaymentAsync(processPaymentRequest);
     }
 
@@ -325,12 +356,14 @@ public partial class PaymentService : IPaymentService
     /// </returns>
     public virtual async Task<CancelRecurringPaymentResult> CancelRecurringPaymentAsync(CancelRecurringPaymentRequest cancelPaymentRequest)
     {
+		_logger.LogError(">>> Entering CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         if (cancelPaymentRequest.Order.OrderTotal == decimal.Zero)
             return new CancelRecurringPaymentResult();
 
         var paymentMethod = await _paymentPluginManager.LoadPluginBySystemNameAsync(cancelPaymentRequest.Order.PaymentMethodSystemName)
                             ?? throw new NopException("Payment method couldn't be loaded");
 
+		_logger.LogWarning("<<< Exiting CancelRecurringPaymentAsync(cancelPaymentRequest={CancelPaymentRequest})", cancelPaymentRequest);
         return await paymentMethod.CancelRecurringPaymentAsync(cancelPaymentRequest);
     }
 
@@ -341,6 +374,7 @@ public partial class PaymentService : IPaymentService
     /// <returns>Masked credit card number</returns>
     public virtual string GetMaskedCreditCardNumber(string creditCardNumber)
     {
+		_logger.LogError(">>> Entering GetMaskedCreditCardNumber(creditCardNumber=<redacted>)");
         if (string.IsNullOrEmpty(creditCardNumber))
             return string.Empty;
 
@@ -348,12 +382,14 @@ public partial class PaymentService : IPaymentService
             return creditCardNumber;
 
         var last4 = creditCardNumber[(creditCardNumber.Length - 4)..creditCardNumber.Length];
+		_logger.LogError("GetMaskedCreditCardNumber(creditCardNumber=<redacted>): last4 → {Last4}", last4);
         var maskedChars = string.Empty;
         for (var i = 0; i < creditCardNumber.Length - 4; i++)
         {
             maskedChars += "*";
         }
 
+		_logger.LogWarning("<<< Exiting GetMaskedCreditCardNumber(creditCardNumber=<redacted>)");
         return maskedChars + last4;
     }
 

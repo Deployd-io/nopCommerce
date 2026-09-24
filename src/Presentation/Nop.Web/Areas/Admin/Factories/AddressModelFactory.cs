@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Common;
 using Nop.Services.Attributes;
 using Nop.Web.Areas.Admin.Models.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -9,6 +10,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class AddressModelFactory : IAddressModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressAttributeModelFactory _addressAttributeModelFactory;
@@ -23,8 +25,12 @@ public partial class AddressModelFactory : IAddressModelFactory
         IAttributeFormatter<AddressAttribute, AddressAttributeValue> addressAttributeFormatter,
         IBaseAdminModelFactory baseAdminModelFactory)
     {
+		_logger.LogError(">>> Entering AddressModelFactory(addressAttributeModelFactory={AddressAttributeModelFactory},addressAttributeFormatter={AddressAttributeFormatter},baseAdminModelFactory={BaseAdminModelFactory})", addressAttributeModelFactory, addressAttributeFormatter, baseAdminModelFactory);
         _addressAttributeModelFactory = addressAttributeModelFactory;
         _addressAttributeFormatter = addressAttributeFormatter;
+		_logger.LogDebug("AddressModelFactory(addressAttributeModelFactory={AddressAttributeModelFactory},addressAttributeFormatter={AddressAttributeFormatter},baseAdminModelFactory={BaseAdminModelFactory}): _addressAttributeFormatter → {_addressAttributeFormatter}", addressAttributeModelFactory, addressAttributeFormatter, baseAdminModelFactory, _addressAttributeFormatter);
+		_logger.LogDebug("AddressModelFactory(addressAttributeModelFactory={AddressAttributeModelFactory},addressAttributeFormatter={AddressAttributeFormatter},baseAdminModelFactory={BaseAdminModelFactory}): _addressAttributeModelFactory → {_addressAttributeModelFactory}", addressAttributeModelFactory, addressAttributeFormatter, baseAdminModelFactory, _addressAttributeModelFactory);
+    _logger.LogWarning("<<< Exiting AddressModelFactory(addressAttributeModelFactory={AddressAttributeModelFactory},addressAttributeFormatter={AddressAttributeFormatter},baseAdminModelFactory={BaseAdminModelFactory})", addressAttributeModelFactory, addressAttributeFormatter, baseAdminModelFactory);
         _baseAdminModelFactory = baseAdminModelFactory;
     }
 
@@ -40,6 +46,7 @@ public partial class AddressModelFactory : IAddressModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task PrepareAddressModelAsync(AddressModel model, Address address = null)
     {
+		_logger.LogError(">>> Entering PrepareAddressModelAsync(model={Model},address={Address})", model, address);
         ArgumentNullException.ThrowIfNull(model);
 
         //prepare available countries
@@ -55,6 +62,7 @@ public partial class AddressModelFactory : IAddressModelFactory
             return;
 
         model.FormattedCustomAddressAttributes = await _addressAttributeFormatter.FormatAttributesAsync(address.CustomAttributes);
+		_logger.LogWarning("<<< Exiting PrepareAddressModelAsync(model={Model},address={Address})", model, address);
     }
 
     #endregion

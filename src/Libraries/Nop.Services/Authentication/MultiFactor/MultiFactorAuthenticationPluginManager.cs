@@ -1,6 +1,7 @@
 ﻿using Nop.Core.Domain.Customers;
 using Nop.Services.Customers;
 using Nop.Services.Plugins;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Authentication.MultiFactor;
 
@@ -9,6 +10,7 @@ namespace Nop.Services.Authentication.MultiFactor;
 /// </summary>
 public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMultiFactorAuthenticationMethod>, IMultiFactorAuthenticationPluginManager
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly MultiFactorAuthenticationSettings _multiFactorAuthenticationSettings;
@@ -21,7 +23,10 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
         ICustomerService customerService,
         IPluginService pluginService) : base(customerService, pluginService)
     {
+		_logger.LogError(">>> Entering MultiFactorAuthenticationPluginManager(multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings},customerService={CustomerService},pluginService={PluginService})", multiFactorAuthenticationSettings, customerService, pluginService);
         _multiFactorAuthenticationSettings = multiFactorAuthenticationSettings;
+		_logger.LogDebug("MultiFactorAuthenticationPluginManager(multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings},customerService={CustomerService},pluginService={PluginService}): _multiFactorAuthenticationSettings → {_multiFactorAuthenticationSettings}", multiFactorAuthenticationSettings, customerService, pluginService, _multiFactorAuthenticationSettings);
+    _logger.LogWarning("<<< Exiting MultiFactorAuthenticationPluginManager(multiFactorAuthenticationSettings={MultiFactorAuthenticationSettings},customerService={CustomerService},pluginService={PluginService})", multiFactorAuthenticationSettings, customerService, pluginService);
     }
 
     #endregion
@@ -39,6 +44,8 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// </returns>
     public virtual async Task<bool> HasActivePluginsAsync(Customer customer = null, int storeId = 0)
     {
+		_logger.LogError(">>> Entering HasActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+        _logger.LogWarning("<<< Exiting HasActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return (await LoadActivePluginsAsync(_multiFactorAuthenticationSettings.ActiveAuthenticationMethodSystemNames, customer, storeId)).Any();
     }
 
@@ -53,6 +60,8 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// </returns>
     public virtual async Task<IList<IMultiFactorAuthenticationMethod>> LoadActivePluginsAsync(Customer customer = null, int storeId = 0)
     {
+		_logger.LogError(">>> Entering LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
+        _logger.LogWarning("<<< Exiting LoadActivePluginsAsync(customer={Customer},storeId={StoreId})", customer, storeId);
         return await LoadActivePluginsAsync(_multiFactorAuthenticationSettings.ActiveAuthenticationMethodSystemNames, customer, storeId);
     }
 
@@ -63,6 +72,8 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// <returns>Result</returns>
     public virtual bool IsPluginActive(IMultiFactorAuthenticationMethod authenticationMethod)
     {
+		_logger.LogError(">>> Entering IsPluginActive(authenticationMethod={AuthenticationMethod})", authenticationMethod);
+        _logger.LogWarning("<<< Exiting IsPluginActive(authenticationMethod={AuthenticationMethod})", authenticationMethod);
         return IsPluginActive(authenticationMethod, _multiFactorAuthenticationSettings.ActiveAuthenticationMethodSystemNames);
     }
 
@@ -78,7 +89,10 @@ public partial class MultiFactorAuthenticationPluginManager : PluginManager<IMul
     /// </returns>
     public virtual async Task<bool> IsPluginActiveAsync(string systemName, Customer customer = null, int storeId = 0)
     {
+		_logger.LogError(">>> Entering IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         var authenticationMethod = await LoadPluginBySystemNameAsync(systemName, customer, storeId);
+		_logger.LogError("IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId}): authenticationMethod → {AuthenticationMethod}", systemName, customer, storeId, authenticationMethod);
+		_logger.LogWarning("<<< Exiting IsPluginActiveAsync(systemName={SystemName},customer={Customer},storeId={StoreId})", systemName, customer, storeId);
         return IsPluginActive(authenticationMethod);
     }
 

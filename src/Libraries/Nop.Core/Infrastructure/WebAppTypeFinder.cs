@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.Infrastructure;
 
@@ -11,6 +12,7 @@ namespace Nop.Core.Infrastructure;
 /// </summary>
 public partial class WebAppTypeFinder : ITypeFinder
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     /// <summary>Gets the pattern for DLLs that we know don't need to be investigated.</summary>
@@ -34,6 +36,8 @@ public partial class WebAppTypeFinder : ITypeFinder
     public WebAppTypeFinder()
     {
         _fileProvider = CommonHelper.DefaultFileProvider;
+		_logger.LogError(">>> Entering WebAppTypeFinder()");
+		_logger.LogWarning("<<< Exiting WebAppTypeFinder()");
     }
 
     static WebAppTypeFinder()
@@ -47,6 +51,7 @@ public partial class WebAppTypeFinder : ITypeFinder
 
     private static void OnAssemblyLoad(object sender, AssemblyLoadEventArgs args)
     {
+		_logger.LogError(">>> Entering OnAssemblyLoad(sender={Sender},args={Args})", sender, args);
         var assembly = args.LoadedAssembly;
 
         if (assembly.FullName == null)
@@ -59,6 +64,7 @@ public partial class WebAppTypeFinder : ITypeFinder
             return;
 
         _assemblies.TryAdd(assembly.FullName, assembly);
+		_logger.LogWarning("<<< Exiting OnAssemblyLoad(sender={Sender},args={Args})", sender, args);
     }
 
     /// <summary>
@@ -72,6 +78,8 @@ public partial class WebAppTypeFinder : ITypeFinder
     /// </returns>
     protected static bool Matches(string assemblyFullName)
     {
+		_logger.LogError(">>> Entering Matches(assemblyFullName={AssemblyFullName})", assemblyFullName);
+        _logger.LogWarning("<<< Exiting Matches(assemblyFullName={AssemblyFullName})", assemblyFullName);
         return !Regex.IsMatch(assemblyFullName, ASSEMBLY_SKIP_LOADING_PATTERN, RegexOptions.IgnoreCase | RegexOptions.Compiled);
     }
 
@@ -83,15 +91,19 @@ public partial class WebAppTypeFinder : ITypeFinder
     /// <returns></returns>
     protected virtual bool DoesTypeImplementOpenGeneric(Type type, Type openGeneric)
     {
+		_logger.LogError(">>> Entering DoesTypeImplementOpenGeneric(type={Type},openGeneric={OpenGeneric})", type, openGeneric);
         try
         {
             var genericTypeDefinition = openGeneric.GetGenericTypeDefinition();
+			_logger.LogError("DoesTypeImplementOpenGeneric(type={Type},openGeneric={OpenGeneric}): genericTypeDefinition → {GenericTypeDefinition}", type, openGeneric, genericTypeDefinition);
             return type.FindInterfaces((_, _) => true, null)
                 .Where(implementedInterface => implementedInterface.IsGenericType).Any(implementedInterface =>
                     genericTypeDefinition.IsAssignableFrom(implementedInterface.GetGenericTypeDefinition()));
         }
         catch
         {
+			_logger.LogError("Exception in DoesTypeImplementOpenGeneric(type={Type},openGeneric={OpenGeneric}): {Arg2}", type, openGeneric, ex.Message);
+			_logger.LogWarning("<<< Exiting DoesTypeImplementOpenGeneric(type={Type},openGeneric={OpenGeneric})", type, openGeneric);
             return false;
         }
     }
@@ -105,8 +117,10 @@ public partial class WebAppTypeFinder : ITypeFinder
     /// <returns>Result</returns>
     protected virtual IEnumerable<Type> FindClassesOfType(Type assignTypeFrom, IEnumerable<Assembly> assemblies, bool onlyConcreteClasses = true)
     {
+		_logger.LogError(">>> Entering FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses})", assignTypeFrom, assemblies, onlyConcreteClasses);
         var result = new List<Type>();
 
+		_logger.LogError("FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses}): result → {Result}", assignTypeFrom, assemblies, onlyConcreteClasses, result);
         try
         {
             foreach (var a in assemblies)
@@ -115,9 +129,12 @@ public partial class WebAppTypeFinder : ITypeFinder
                 try
                 {
                     types = a.GetTypes();
+					_logger.LogError("FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses}): types → {Types}", assignTypeFrom, assemblies, onlyConcreteClasses, types);
                 }
                 catch
                 {
+					_logger.LogError("Exception in FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses}): {Arg3}", assignTypeFrom, assemblies, onlyConcreteClasses, ex.Message);
+					_logger.LogDebug("FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses}): types → {Types}", assignTypeFrom, assemblies, onlyConcreteClasses, types);
                     //ignore
                 }
 
@@ -151,8 +168,10 @@ public partial class WebAppTypeFinder : ITypeFinder
                     .Aggregate(msg, (current, e) => $"{current}{e.Message + Environment.NewLine}");
 
             var fail = new Exception(msg, ex);
+			_logger.LogError("FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses}): fail → {Fail}", assignTypeFrom, assemblies, onlyConcreteClasses, fail);
             Debug.WriteLine(fail.Message, fail);
 
+		_logger.LogWarning("<<< Exiting FindClassesOfType(assignTypeFrom={AssignTypeFrom},assemblies={Assemblies},onlyConcreteClasses={OnlyConcreteClasses})", assignTypeFrom, assemblies, onlyConcreteClasses);
             throw fail;
         }
 
@@ -161,6 +180,7 @@ public partial class WebAppTypeFinder : ITypeFinder
 
     protected virtual void InitData()
     {
+		_logger.LogError(">>> Entering InitData()");
         //data already loaded
         if (_loaded)
             return;
@@ -191,6 +211,7 @@ public partial class WebAppTypeFinder : ITypeFinder
                 try
                 {
                     var an = AssemblyName.GetAssemblyName(dllPath);
+					_logger.LogError("InitData(): an → {An}", an);
 
                     if (_assemblies.ContainsKey(an.FullName))
                         continue;
@@ -203,6 +224,7 @@ public partial class WebAppTypeFinder : ITypeFinder
                     try
                     {
                         assembly = AppDomain.CurrentDomain.Load(an);
+						_logger.LogError("InitData(): assembly → {Assembly}", assembly);
                     }
                     catch
                     {
@@ -218,7 +240,9 @@ public partial class WebAppTypeFinder : ITypeFinder
             }
 
             _loaded = true;
+			_logger.LogDebug("InitData(): _loaded → {_loaded}", _loaded);
         }
+		_logger.LogWarning("<<< Exiting InitData()");
     }
 
     #endregion
@@ -231,9 +255,11 @@ public partial class WebAppTypeFinder : ITypeFinder
     /// <returns>A list of assemblies</returns>
     public virtual IList<Assembly> GetAssemblies()
     {
+		_logger.LogError(">>> Entering GetAssemblies()");
         if (!_loaded)
             InitData();
 
+		_logger.LogWarning("<<< Exiting GetAssemblies()");
         return _assemblies.Values.ToList();
     }
 
@@ -266,6 +292,7 @@ public partial class WebAppTypeFinder : ITypeFinder
     /// <returns>A list of assemblies</returns>
     public virtual Assembly GetAssemblyByName(string assemblyFullName)
     {
+		_logger.LogError(">>> Entering GetAssemblyByName(assemblyFullName={AssemblyFullName})", assemblyFullName);
         if (!_loaded)
             InitData();
 
@@ -275,8 +302,11 @@ public partial class WebAppTypeFinder : ITypeFinder
             return assembly;
 
         var assemblyName = new AssemblyName(assemblyFullName);
+		_logger.LogError("GetAssemblyByName(assemblyFullName={AssemblyFullName}): assemblyName → {AssemblyName}", assemblyFullName, assemblyName);
         var key = _assemblies.Keys.FirstOrDefault(k => k.StartsWith(assemblyName.Name ?? assemblyFullName.Split(' ')[0], StringComparison.InvariantCultureIgnoreCase));
+		_logger.LogError("GetAssemblyByName(assemblyFullName={AssemblyFullName}): key → {Key}", assemblyFullName, key);
 
+		_logger.LogWarning("<<< Exiting GetAssemblyByName(assemblyFullName={AssemblyFullName})", assemblyFullName);
         return string.IsNullOrEmpty(key) ? null : _assemblies[key];
     }
 

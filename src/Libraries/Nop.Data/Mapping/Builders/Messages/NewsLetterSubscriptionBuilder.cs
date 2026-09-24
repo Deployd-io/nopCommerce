@@ -2,6 +2,7 @@
 using FluentMigrator.Builders.Create.Table;
 using Nop.Core.Domain.Messages;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Messages;
 
@@ -10,6 +11,7 @@ namespace Nop.Data.Mapping.Builders.Messages;
 /// </summary>
 public partial class NewsLetterSubscriptionBuilder : NopEntityBuilder<NewsLetterSubscription>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -18,9 +20,11 @@ public partial class NewsLetterSubscriptionBuilder : NopEntityBuilder<NewsLetter
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogError(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(NewsLetterSubscription.TypeId)).AsInt32().ForeignKey<NewsLetterSubscriptionType>(onDelete: Rule.Cascade).NotNullable()
             .WithColumn(nameof(NewsLetterSubscription.Email)).AsString(255).NotNullable();
+			_logger.LogWarning("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

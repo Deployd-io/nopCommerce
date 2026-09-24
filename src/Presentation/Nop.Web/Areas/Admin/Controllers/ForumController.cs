@@ -8,11 +8,13 @@ using Nop.Web.Areas.Admin.Factories;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Forums;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class ForumController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IForumModelFactory _forumModelFactory;
@@ -31,10 +33,16 @@ public partial class ForumController : BaseAdminController
         INotificationService notificationService,
         IPermissionService permissionService)
     {
+		_logger.LogError(">>> Entering ForumController(forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService})", forumModelFactory, forumService, localizationService, notificationService, permissionService);
         _forumModelFactory = forumModelFactory;
         _forumService = forumService;
+		_logger.LogDebug("ForumController(forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService}): _forumService → {_forumService}", forumModelFactory, forumService, localizationService, notificationService, permissionService, _forumService);
+		_logger.LogDebug("ForumController(forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService}): _forumModelFactory → {_forumModelFactory}", forumModelFactory, forumService, localizationService, notificationService, permissionService, _forumModelFactory);
+    _logger.LogWarning("<<< Exiting ForumController(forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService})", forumModelFactory, forumService, localizationService, notificationService, permissionService);
         _localizationService = localizationService;
+		_logger.LogDebug("ForumController(forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService}): _localizationService → {_localizationService}", forumModelFactory, forumService, localizationService, notificationService, permissionService, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("ForumController(forumModelFactory={ForumModelFactory},forumService={ForumService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService}): _notificationService → {_notificationService}", forumModelFactory, forumService, localizationService, notificationService, permissionService, _notificationService);
         _permissionService = permissionService;
     }
 
@@ -46,15 +54,20 @@ public partial class ForumController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupSearchModelAsync(new ForumGroupSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
         return View(model);
     }
 
@@ -62,9 +75,12 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> ForumGroupList(ForumGroupSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering ForumGroupList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupListModelAsync(searchModel);
+		_logger.LogError("ForumGroupList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting ForumGroupList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -72,13 +88,16 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> ForumList(ForumSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering ForumList(searchModel={SearchModel})", searchModel);
         //try to get a forum group with the specified id
         var forumGroup = await _forumService.GetForumGroupByIdAsync(searchModel.ForumGroupId)
                          ?? throw new ArgumentException("No forum group found with the specified id");
 
         //prepare model
         var model = await _forumModelFactory.PrepareForumListModelAsync(searchModel, forumGroup);
+		_logger.LogError("ForumList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting ForumList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -89,9 +108,13 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CreateForumGroup()
     {
+		_logger.LogError(">>> Entering CreateForumGroup()");
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupModelAsync(new ForumGroupModel(), null);
+		_logger.LogError("CreateForumGroup(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting CreateForumGroup()");
+		_logger.LogWarning("<<< Exiting CreateForumGroup(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -121,9 +144,13 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> CreateForum()
     {
+		_logger.LogError(">>> Entering CreateForum()");
         //prepare model
         var model = await _forumModelFactory.PrepareForumModelAsync(new ForumModel(), null);
+		_logger.LogError("CreateForum(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting CreateForum()");
+		_logger.LogWarning("<<< Exiting CreateForum(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -157,14 +184,19 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> EditForumGroup(int id)
     {
+		_logger.LogError(">>> Entering EditForumGroup(id={Id})", id);
         //try to get a forum group with the specified id
         var forumGroup = await _forumService.GetForumGroupByIdAsync(id);
+		_logger.LogError("EditForumGroup(id={Id}): forumGroup → {ForumGroup}", id, forumGroup);
         if (forumGroup == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _forumModelFactory.PrepareForumGroupModelAsync(null, forumGroup);
+		_logger.LogError("EditForumGroup(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting EditForumGroup(id={Id})", id);
+		_logger.LogWarning("<<< Exiting EditForumGroup(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -198,14 +230,19 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_VIEW)]
     public virtual async Task<IActionResult> EditForum(int id)
     {
+		_logger.LogError(">>> Entering EditForum(id={Id})", id);
         //try to get a forum with the specified id
         var forum = await _forumService.GetForumByIdAsync(id);
+		_logger.LogError("EditForum(id={Id}): forum → {Forum}", id, forum);
         if (forum == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _forumModelFactory.PrepareForumModelAsync(null, forum);
+		_logger.LogError("EditForum(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting EditForum(id={Id})", id);
+		_logger.LogWarning("<<< Exiting EditForum(model={Model},continueEditing={ContinueEditing})", model, continueEditing);
         return View(model);
     }
 
@@ -244,8 +281,10 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteForumGroup(int id)
     {
+		_logger.LogError(">>> Entering DeleteForumGroup(id={Id})", id);
         //try to get a forum group with the specified id
         var forumGroup = await _forumService.GetForumGroupByIdAsync(id);
+		_logger.LogError("DeleteForumGroup(id={Id}): forumGroup → {ForumGroup}", id, forumGroup);
         if (forumGroup == null)
             return RedirectToAction("List");
 
@@ -253,6 +292,7 @@ public partial class ForumController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Forums.ForumGroup.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteForumGroup(id={Id})", id);
         return RedirectToAction("List");
     }
 
@@ -260,8 +300,10 @@ public partial class ForumController : BaseAdminController
     [CheckPermission(StandardPermission.ContentManagement.FORUMS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> DeleteForum(int id)
     {
+		_logger.LogError(">>> Entering DeleteForum(id={Id})", id);
         //try to get a forum with the specified id
         var forum = await _forumService.GetForumByIdAsync(id);
+		_logger.LogError("DeleteForum(id={Id}): forum → {Forum}", id, forum);
         if (forum == null)
             return RedirectToAction("List");
 
@@ -269,6 +311,7 @@ public partial class ForumController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.ContentManagement.Forums.Forum.Deleted"));
 
+		_logger.LogWarning("<<< Exiting DeleteForum(id={Id})", id);
         return RedirectToAction("List");
     }
 

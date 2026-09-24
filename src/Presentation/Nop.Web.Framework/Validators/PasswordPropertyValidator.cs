@@ -4,11 +4,13 @@ using FluentValidation;
 using FluentValidation.Validators;
 using Nop.Core.Domain.Customers;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Validators;
 
 public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator<T, TProperty>, IRegularExpressionValidator
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -20,8 +22,11 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
 
     public PasswordPropertyValidator(ILocalizationService localizationService, CustomerSettings customerSettings)
     {
+		_logger.LogError(">>> Entering PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
         _localizationService = localizationService;
         _customerSettings = customerSettings;
+		_logger.LogDebug("PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings}): _localizationService → {_localizationService}", localizationService, customerSettings, _localizationService);
+    _logger.LogWarning("<<< Exiting PasswordPropertyValidator(localizationService={LocalizationService},customerSettings={CustomerSettings})", localizationService, customerSettings);
     }
 
     #endregion
@@ -30,6 +35,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
 
     private async Task<string> GetValidationMessageAsync()
     {
+		_logger.LogError(">>> Entering GetValidationMessageAsync()");
         var regExpError = new StringBuilder()
             .AppendJoin(' ',
                 await _localizationService.GetResourceAsync("Validation.Password.Rule"),
@@ -47,6 +53,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
         if (_customerSettings.PasswordRequireNonAlphanumeric)
             regExpError.AppendFormat(", {0}", await _localizationService.GetResourceAsync("Validation.Password.RequireNonAlphanumeric"));
 
+		_logger.LogWarning("<<< Exiting GetValidationMessageAsync()");
         return regExpError.ToString();
     }
 
@@ -60,6 +67,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
     /// <returns>True if valid, otherwise false</returns>
     public override bool IsValid(ValidationContext<T> context, TProperty value)
     {
+		_logger.LogError(">>> Entering IsValid(context={Context},value={Value})", context, value);
         var password = value as string;
 
         if (string.IsNullOrEmpty(password))
@@ -74,6 +82,7 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
             return false;
         }
 
+		_logger.LogWarning("<<< Exiting IsValid(context={Context},value={Value})", context, value);
         return true;
     }
 
@@ -83,6 +92,8 @@ public partial class PasswordPropertyValidator<T, TProperty> : PropertyValidator
     /// <param name="errorCode">The currently configured error code for the validator</param>
     protected override string GetDefaultMessageTemplate(string errorCode)
     {
+		_logger.LogError(">>> Entering GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
+        _logger.LogWarning("<<< Exiting GetDefaultMessageTemplate(errorCode={ErrorCode})", errorCode);
         return GetValidationMessageAsync().Result;
     }
 

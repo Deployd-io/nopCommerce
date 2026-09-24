@@ -51,7 +51,9 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void ConfigureRequestPipeline(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering ConfigureRequestPipeline(application={Application})", application);
         EngineContext.Current.ConfigureRequestPipeline(application);
+		logger.LogWarning("<<< Exiting ConfigureRequestPipeline(application={Application})", application);
     }
 
     /// <summary>
@@ -61,9 +63,12 @@ public static class ApplicationBuilderExtensions
     /// <returns>A task that represents the asynchronous operation</returns>
     public static async Task PublishAppStartedEventAsync(this IApplicationBuilder _)
     {
+		logger.LogError(">>> Entering PublishAppStartedEventAsync(_={_})", _);
         //publish AppStartedEvent
         var eventPublisher = EngineContext.Current.Resolve<IEventPublisher>();
+		logger.LogError("PublishAppStartedEventAsync(_={_}): eventPublisher → {EventPublisher}", _, eventPublisher);
         await eventPublisher.PublishAsync(new AppStartedEvent());
+		logger.LogWarning("<<< Exiting PublishAppStartedEventAsync(_={_})", _);
     }
 
     /// <summary>
@@ -72,11 +77,15 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopExceptionHandler(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopExceptionHandler(application={Application})", application);
         var appSettings = EngineContext.Current.Resolve<AppSettings>();
         var webHostEnvironment = EngineContext.Current.Resolve<IWebHostEnvironment>();
+		logger.LogError("UseNopExceptionHandler(application={Application}): webHostEnvironment → {WebHostEnvironment}", application, webHostEnvironment);
+		logger.LogError("UseNopExceptionHandler(application={Application}): appSettings → {AppSettings}", application, appSettings);
         var useDetailedExceptionPage = appSettings.Get<CommonConfig>().DisplayFullErrorStack || webHostEnvironment.IsDevelopment();
         if (useDetailedExceptionPage)
         {
+			logger.LogError("UseNopExceptionHandler(application={Application}): useDetailedExceptionPage → {UseDetailedExceptionPage}", application, useDetailedExceptionPage);
             //get detailed exceptions for developing and testing purposes
             application.UseDeveloperExceptionPage();
         }
@@ -92,6 +101,7 @@ public static class ApplicationBuilderExtensions
             handler.Run(async context =>
             {
                 var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
+				logger.LogError("UseNopExceptionHandler(application={Application}): exception → {Exception}", application, exception);
                 if (exception == null)
                     return;
 
@@ -102,6 +112,7 @@ public static class ApplicationBuilderExtensions
                     {
                         //get current customer
                         var currentCustomer = await EngineContext.Current.Resolve<IWorkContext>().GetCurrentCustomerAsync();
+						logger.LogError("UseNopExceptionHandler(application={Application}): currentCustomer → {CurrentCustomer}", application, currentCustomer);
 
                         //log error
                         await EngineContext.Current.Resolve<ILogger>().ErrorAsync(exception.Message, exception, currentCustomer);
@@ -114,6 +125,7 @@ public static class ApplicationBuilderExtensions
                 }
             });
         });
+		logger.LogWarning("<<< Exiting UseNopExceptionHandler(application={Application})", application);
     }
 
     /// <summary>
@@ -122,6 +134,7 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UsePageNotFound(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UsePageNotFound(application={Application})", application);
         application.UseStatusCodePages(async context =>
         {
             //handle 404 Not Found
@@ -130,6 +143,7 @@ public static class ApplicationBuilderExtensions
 
             //return a browser-dependent error message indicating the static file can't be found
             var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+			logger.LogError("UsePageNotFound(application={Application}): webHelper → {WebHelper}", application, webHelper);
             if (webHelper.IsStaticResource())
                 return;
 
@@ -140,11 +154,14 @@ public static class ApplicationBuilderExtensions
             if (DataSettingsManager.IsDatabaseInstalled())
             {
                 var commonSettings = EngineContext.Current.Resolve<CommonSettings>();
+				logger.LogError("UsePageNotFound(application={Application}): commonSettings → {CommonSettings}", application, commonSettings);
 
                 if (commonSettings.Log404Errors)
                 {
                     var logger = EngineContext.Current.Resolve<ILogger>();
+					logger.LogError("UsePageNotFound(application={Application}): logger → {Logger}", application, logger);
                     var workContext = EngineContext.Current.Resolve<IWorkContext>();
+					logger.LogError("UsePageNotFound(application={Application}): workContext → {WorkContext}", application, workContext);
 
                     await logger.ErrorAsync($"Error 404. The requested page ({originalPath}) was not found",
                         customer: await workContext.GetCurrentCustomerAsync());
@@ -152,6 +169,7 @@ public static class ApplicationBuilderExtensions
             }
 
             var routeValuesFeature = context.HttpContext.Features.Get<IRouteValuesFeature>();
+			logger.LogError("UsePageNotFound(application={Application}): routeValuesFeature → {RouteValuesFeature}", application, routeValuesFeature);
 
             //store the original paths so we can check it later
             context.HttpContext.Features.Set<IStatusCodeReExecuteFeature>(new StatusCodeReExecuteFeature
@@ -169,6 +187,7 @@ public static class ApplicationBuilderExtensions
                     return string.Empty;
 
                 var localizationSettings = EngineContext.Current.Resolve<LocalizationSettings>();
+				logger.LogError("UsePageNotFound(application={Application}): localizationSettings → {LocalizationSettings}", application, localizationSettings);
                 if (!localizationSettings.SeoFriendlyUrlsForLanguagesEnabled)
                     return string.Empty;
 
@@ -183,6 +202,7 @@ public static class ApplicationBuilderExtensions
             context.HttpContext.SetEndpoint(null);
             if (routeValuesFeature is not null)
                 routeValuesFeature.RouteValues = null!;
+				logger.LogDebug("UsePageNotFound(application={Application}): routeValuesFeature.RouteValues → {Arg1}", application, routeValuesFeature.RouteValues);
 
             try
             {
@@ -197,6 +217,7 @@ public static class ApplicationBuilderExtensions
                 context.HttpContext.Features.Set<IStatusCodeReExecuteFeature>(null);
             }
         });
+		logger.LogWarning("<<< Exiting UsePageNotFound(application={Application})", application);
     }
 
     /// <summary>
@@ -205,16 +226,20 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseBadRequestResult(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseBadRequestResult(application={Application})", application);
         application.UseStatusCodePages(async context =>
         {
             //handle 404 (Bad request)
             if (context.HttpContext.Response.StatusCode == StatusCodes.Status400BadRequest)
             {
                 var logger = EngineContext.Current.Resolve<ILogger>();
+				logger.LogError("UseBadRequestResult(application={Application}): logger → {Logger}", application, logger);
                 var workContext = EngineContext.Current.Resolve<IWorkContext>();
+				logger.LogError("UseBadRequestResult(application={Application}): workContext → {WorkContext}", application, workContext);
                 await logger.ErrorAsync("Error 400. Bad request", null, customer: await workContext.GetCurrentCustomerAsync());
             }
         });
+		logger.LogWarning("<<< Exiting UseBadRequestResult(application={Application})", application);
     }
 
     /// <summary>
@@ -223,12 +248,14 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopResponseCompression(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopResponseCompression(application={Application})", application);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //whether to use compression (gzip by default)
         if (EngineContext.Current.Resolve<CommonSettings>().UseResponseCompression)
             application.UseResponseCompression();
+			logger.LogWarning("<<< Exiting UseNopResponseCompression(application={Application})", application);
     }
 
     /// <summary>
@@ -237,14 +264,18 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopWebOptimizer(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopWebOptimizer(application={Application})", application);
         var appSettings = Singleton<AppSettings>.Instance;
         var woConfig = appSettings.Get<WebOptimizerConfig>();
+		logger.LogError("UseNopWebOptimizer(application={Application}): woConfig → {WoConfig}", application, woConfig);
 
         if (!woConfig.EnableCssBundling && !woConfig.EnableJavaScriptBundling)
             return;
 
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
+		logger.LogError("UseNopWebOptimizer(application={Application}): fileProvider → {FileProvider}", application, fileProvider);
         var webHostEnvironment = EngineContext.Current.Resolve<IWebHostEnvironment>();
+		logger.LogError("UseNopWebOptimizer(application={Application}): webHostEnvironment → {WebHostEnvironment}", application, webHostEnvironment);
 
         application.UseWebOptimizer(webHostEnvironment,
         [
@@ -254,11 +285,13 @@ public static class ApplicationBuilderExtensions
                 FileProvider = new PhysicalFileProvider(fileProvider.MapPath(@"Plugins"))
             },
             new FileProviderOptions
+				logger.LogDebug("UseNopWebOptimizer(application={Application}): FileProvider → {FileProvider}", application, FileProvider);
             {
                 RequestPath = new PathString("/Themes"),
                 FileProvider = new PhysicalFileProvider(fileProvider.MapPath(@"Themes"))
             }
         ]);
+		logger.LogWarning("<<< Exiting UseNopWebOptimizer(application={Application})", application);
     }
 
     /// <summary>
@@ -267,8 +300,11 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopStaticFiles(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopStaticFiles(application={Application})", application);
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
         var appSettings = EngineContext.Current.Resolve<AppSettings>();
+		logger.LogError("UseNopStaticFiles(application={Application}): appSettings → {AppSettings}", application, appSettings);
+		logger.LogError("UseNopStaticFiles(application={Application}): fileProvider → {FileProvider}", application, fileProvider);
 
         void staticFileResponse(StaticFileResponseContext context)
         {
@@ -295,6 +331,7 @@ public static class ApplicationBuilderExtensions
 
         //common static files
         application.UseStaticFiles(new StaticFileOptions { OnPrepareResponse = staticFileResponse });
+		logger.LogDebug("UseNopStaticFiles(application={Application}): OnPrepareResponse → {OnPrepareResponse}", application, OnPrepareResponse);
 
         //images
         application.UseStaticFiles(new StaticFileOptions
@@ -352,6 +389,7 @@ public static class ApplicationBuilderExtensions
             RequestPath = "/icons",
             ContentTypeProvider = provider
         });
+		logger.LogDebug("UseNopStaticFiles(application={Application}): ContentTypeProvider → {ContentTypeProvider}", application, ContentTypeProvider);
 
         if (DataSettingsManager.IsDatabaseInstalled())
         {
@@ -372,6 +410,7 @@ public static class ApplicationBuilderExtensions
                 ServeUnknownFileTypes = true,
             });
         }
+		logger.LogWarning("<<< Exiting UseNopStaticFiles(application={Application})", application);
     }
 
     /// <summary>
@@ -380,7 +419,9 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseKeepAlive(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseKeepAlive(application={Application})", application);
         application.UseMiddleware<KeepAliveMiddleware>();
+		logger.LogWarning("<<< Exiting UseKeepAlive(application={Application})", application);
     }
 
     /// <summary>
@@ -389,7 +430,9 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseInstallUrl(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseInstallUrl(application={Application})", application);
         application.UseMiddleware<InstallUrlMiddleware>();
+		logger.LogWarning("<<< Exiting UseInstallUrl(application={Application})", application);
     }
 
     /// <summary>
@@ -398,11 +441,13 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopAuthentication(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopAuthentication(application={Application})", application);
         //check whether database is installed
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         application.UseMiddleware<AuthenticationMiddleware>();
+		logger.LogWarning("<<< Exiting UseNopAuthentication(application={Application})", application);
     }
 
     /// <summary>
@@ -410,16 +455,20 @@ public static class ApplicationBuilderExtensions
     /// </summary>
     public static void UseNopPdf(this IApplicationBuilder _)
     {
+		logger.LogError(">>> Entering UseNopPdf(_={_})", _);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         var fileProvider = EngineContext.Current.Resolve<INopFileProvider>();
+		logger.LogError("UseNopPdf(_={_}): fileProvider → {FileProvider}", _, fileProvider);
 
         var fontPaths = fileProvider.EnumerateFiles(fileProvider.MapPath("~/App_Data/Pdf/"), "*.ttf") ?? Enumerable.Empty<string>();
+		logger.LogError("UseNopPdf(_={_}): fontPaths → {FontPaths}", _, fontPaths);
         foreach (var fp in fontPaths)
         {
             FontFactory.Register(fp, fileProvider.GetFileNameWithoutExtension(fp));
         }
+		logger.LogWarning("<<< Exiting UseNopPdf(_={_})", _);
     }
 
     /// <summary>
@@ -428,13 +477,16 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopRequestLocalization(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopRequestLocalization(application={Application})", application);
         application.UseRequestLocalization(options =>
         {
             if (!DataSettingsManager.IsDatabaseInstalled())
                 return;
 
             var languageService = EngineContext.Current.Resolve<ILanguageService>();
+			logger.LogError("UseNopRequestLocalization(application={Application}): languageService → {LanguageService}", application, languageService);
             var localizationSettings = EngineContext.Current.Resolve<LocalizationSettings>();
+			logger.LogError("UseNopRequestLocalization(application={Application}): localizationSettings → {LocalizationSettings}", application, localizationSettings);
 
             //prepare supported cultures
             var cultures = languageService
@@ -443,23 +495,30 @@ public static class ApplicationBuilderExtensions
                 .Select(language => new CultureInfo(language.LanguageCulture))
                 .ToList();
             options.SupportedCultures = cultures;
+			logger.LogDebug("UseNopRequestLocalization(application={Application}): options.SupportedCultures → {Arg1}", application, options.SupportedCultures);
+			logger.LogDebug("UseNopRequestLocalization(application={Application}): options.SupportedUICultures → {Arg1}", application, options.SupportedUICultures);
             options.SupportedUICultures = cultures;
             options.DefaultRequestCulture = new RequestCulture(cultures.FirstOrDefault() ?? new CultureInfo(NopCommonDefaults.DefaultLanguageCulture));
             options.ApplyCurrentCultureToResponseHeaders = true;
+			logger.LogDebug("UseNopRequestLocalization(application={Application}): options.ApplyCurrentCultureToResponseHeaders → {Arg1}", application, options.ApplyCurrentCultureToResponseHeaders);
 
             //configure culture providers
             var headerRequestCultureProvider = options.RequestCultureProviders.OfType<AcceptLanguageHeaderRequestCultureProvider>().FirstOrDefault();
+			logger.LogError("UseNopRequestLocalization(application={Application}): headerRequestCultureProvider → {HeaderRequestCultureProvider}", application, headerRequestCultureProvider);
             if (headerRequestCultureProvider is not null)
                 options.RequestCultureProviders.Remove(headerRequestCultureProvider);
 
             options.AddInitialRequestCultureProvider(new NopSeoUrlCultureProvider());
             var cookieRequestCultureProvider = options.RequestCultureProviders.OfType<CookieRequestCultureProvider>().FirstOrDefault();
+			logger.LogError("UseNopRequestLocalization(application={Application}): cookieRequestCultureProvider → {CookieRequestCultureProvider}", application, cookieRequestCultureProvider);
             if (cookieRequestCultureProvider is not null)
                 cookieRequestCultureProvider.CookieName = $"{NopCookieDefaults.Prefix}{NopCookieDefaults.CultureCookie}";
+				logger.LogDebug("UseNopRequestLocalization(application={Application}): cookieRequestCultureProvider.CookieName → {Arg1}", application, cookieRequestCultureProvider.CookieName);
 
             if (localizationSettings.AutomaticallyDetectLanguage)
                 options.RequestCultureProviders.Add(new NopAcceptLanguageHeaderRequestCultureProvider());
         });
+		logger.LogWarning("<<< Exiting UseNopRequestLocalization(application={Application})", application);
     }
 
     /// <summary>
@@ -468,12 +527,14 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopEndpoints(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopEndpoints(application={Application})", application);
         //Execute the endpoint selected by the routing middleware
         application.UseEndpoints(endpoints =>
         {
             //register all routes
             EngineContext.Current.Resolve<IRoutePublisher>().RegisterRoutes(endpoints);
         });
+		logger.LogWarning("<<< Exiting UseNopEndpoints(application={Application})", application);
     }
 
     /// <summary>
@@ -482,8 +543,11 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopProxy(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopProxy(application={Application})", application);
         var appSettings = EngineContext.Current.Resolve<AppSettings>();
         var hostingConfig = appSettings.Get<HostingConfig>();
+		logger.LogError("UseNopProxy(application={Application}): hostingConfig → {HostingConfig}", application, hostingConfig);
+		logger.LogError("UseNopProxy(application={Application}): appSettings → {AppSettings}", application, appSettings);
 
         if (hostingConfig.UseProxy)
         {
@@ -497,9 +561,11 @@ public static class ApplicationBuilderExtensions
 
             if (!string.IsNullOrEmpty(hostingConfig.ForwardedForHeaderName))
                 options.ForwardedForHeaderName = hostingConfig.ForwardedForHeaderName;
+				logger.LogDebug("UseNopProxy(application={Application}): options.ForwardedForHeaderName → {Arg1}", application, options.ForwardedForHeaderName);
 
             if (!string.IsNullOrEmpty(hostingConfig.ForwardedProtoHeaderName))
                 options.ForwardedProtoHeaderName = hostingConfig.ForwardedProtoHeaderName;
+				logger.LogDebug("UseNopProxy(application={Application}): options.ForwardedProtoHeaderName → {Arg1}", application, options.ForwardedProtoHeaderName);
 
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
@@ -518,6 +584,7 @@ public static class ApplicationBuilderExtensions
                 foreach (var strIpNet in hostingConfig.KnownNetworks.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList())
                 {
                     var ipNetParts = strIpNet.Split("/");
+					logger.LogError("UseNopProxy(application={Application}): ipNetParts → {IpNetParts}", application, ipNetParts);
                     if (ipNetParts.Length == 2)
                     {
                         if (IPAddress.TryParse(ipNetParts[0], out var ip) && int.TryParse(ipNetParts[1], out var length))
@@ -528,10 +595,12 @@ public static class ApplicationBuilderExtensions
 
             if (options.KnownProxies.Count > 1 || options.KnownNetworks.Count > 1)
                 options.ForwardLimit = null; //disable the limit, because KnownProxies is configured
+				logger.LogDebug("UseNopProxy(application={Application}): options.ForwardLimit → {Arg1}", application, options.ForwardLimit);
 
             //configure forwarding
             application.UseForwardedHeaders(options);
         }
+		logger.LogWarning("<<< Exiting UseNopProxy(application={Application})", application);
     }
 
     /// <summary>
@@ -540,10 +609,12 @@ public static class ApplicationBuilderExtensions
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public static void UseNopWebMarkupMin(this IApplicationBuilder application)
     {
+		logger.LogError(">>> Entering UseNopWebMarkupMin(application={Application})", application);
         //check whether database is installed
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         application.UseWebMarkupMin();
+		logger.LogWarning("<<< Exiting UseNopWebMarkupMin(application={Application})", application);
     }
 }

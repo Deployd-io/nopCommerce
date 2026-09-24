@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Razor;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Themes;
 
@@ -8,6 +9,7 @@ namespace Nop.Web.Framework.Themes;
 /// </summary>
 public partial class ThemeableViewLocationExpander : IViewLocationExpander
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     protected const string THEME_KEY = "nop.themename";
     protected const string HTTP_CONTEXT_THEME_CACHE_KEY = "http-context-theme-cache-key";
 
@@ -19,6 +21,7 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
     /// <param name="context">Context</param>
     public virtual void PopulateValues(ViewLocationExpanderContext context)
     {
+		_logger.LogError(">>> Entering PopulateValues(context={Context})", context);
         //no need to add the themeable view locations at all as the administration should not be themeable anyway
         if (context.AreaName?.Equals(AreaNames.ADMIN) ?? false)
             return;
@@ -27,10 +30,13 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
         if (!httpContext.Items.TryGetValue(HTTP_CONTEXT_THEME_CACHE_KEY, out var cachedThemeName))
         {
             cachedThemeName = EngineContext.Current.Resolve<IThemeContext>().GetWorkingThemeNameAsync().Result;
+			_logger.LogError("PopulateValues(context={Context}): cachedThemeName → {CachedThemeName}", context, cachedThemeName);
+			_logger.LogDebug("PopulateValues(context={Context}): cachedThemeName → {CachedThemeName}", context, cachedThemeName);
             httpContext.Items[HTTP_CONTEXT_THEME_CACHE_KEY] = cachedThemeName;
         }
 
         context.Values[THEME_KEY] = (string)cachedThemeName;
+		_logger.LogWarning("<<< Exiting PopulateValues(context={Context})", context);
     }
 
     /// <summary>
@@ -41,6 +47,7 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
     /// <returns>View locations</returns>
     public virtual IEnumerable<string> ExpandViewLocations(ViewLocationExpanderContext context, IEnumerable<string> viewLocations)
     {
+		_logger.LogError(">>> Entering ExpandViewLocations(context={Context},viewLocations={ViewLocations})", context, viewLocations);
         if (context.Values.TryGetValue(THEME_KEY, out string theme))
         {
             viewLocations = new[] {
@@ -50,6 +57,7 @@ public partial class ThemeableViewLocationExpander : IViewLocationExpander
                 .Concat(viewLocations);
         }
 
+		_logger.LogWarning("<<< Exiting ExpandViewLocations(context={Context},viewLocations={ViewLocations})", context, viewLocations);
         return viewLocations;
     }
 }

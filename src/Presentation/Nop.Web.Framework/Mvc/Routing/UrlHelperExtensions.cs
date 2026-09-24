@@ -2,6 +2,7 @@
 using Nop.Core;
 using Nop.Core.Domain.Seo;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Routing;
 
@@ -10,6 +11,7 @@ namespace Nop.Web.Framework.Mvc.Routing;
 /// </summary>
 public static class UrlHelperExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Generate a generic URL for the specified entity type and route values
     /// </summary>
@@ -24,7 +26,10 @@ public static class UrlHelperExtensions
     public static string RouteUrl<TEntity>(this IUrlHelper urlHelper, object values = null, string protocol = null, string host = null, string fragment = null)
         where TEntity : BaseEntity, ISlugSupported
     {
+		_logger.LogError(">>> Entering RouteUrl(urlHelper={UrlHelper},values={Values},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, values, protocol, host, fragment);
         var nopUrlHelper = EngineContext.Current.Resolve<INopUrlHelper>();
+		_logger.LogWarning("<<< Exiting RouteUrl(urlHelper={UrlHelper},values={Values},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, values, protocol, host, fragment);
+		_logger.LogError("RouteUrl(urlHelper={UrlHelper},values={Values},protocol={Protocol},host={Host},fragment={Fragment}): nopUrlHelper → {NopUrlHelper}", urlHelper, values, protocol, host, fragment, nopUrlHelper);
         return nopUrlHelper.RouteGenericUrlAsync<TEntity>(values, protocol, host, fragment).Result;
     }
 
@@ -40,7 +45,10 @@ public static class UrlHelperExtensions
     [Obsolete("Following the ticket #7818, this extension method is no longer used and will be removed in the next version of nopCommerce")]
     public static string RouteTopicUrl(this IUrlHelper urlHelper, string systemName, string protocol = null, string host = null, string fragment = null)
     {
+		_logger.LogError(">>> Entering RouteTopicUrl(urlHelper={UrlHelper},systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, systemName, protocol, host, fragment);
         var nopUrlHelper = EngineContext.Current.Resolve<INopUrlHelper>();
+		_logger.LogError("RouteTopicUrl(urlHelper={UrlHelper},systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment}): nopUrlHelper → {NopUrlHelper}", urlHelper, systemName, protocol, host, fragment, nopUrlHelper);
+		_logger.LogWarning("<<< Exiting RouteTopicUrl(urlHelper={UrlHelper},systemName={SystemName},protocol={Protocol},host={Host},fragment={Fragment})", urlHelper, systemName, protocol, host, fragment);
         return nopUrlHelper.RouteTopicUrlAsync(systemName, protocol, host, fragment).Result;
     }
 }

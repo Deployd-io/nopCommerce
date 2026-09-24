@@ -5,6 +5,7 @@ using Nop.Core.Caching;
 using Nop.Core.Configuration;
 using Nop.Core.Domain.Common;
 using Nop.Core.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data;
 
@@ -14,6 +15,7 @@ namespace Nop.Data;
 /// <typeparam name="TEntity">Entity type</typeparam>
 public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IEventPublisher _eventPublisher;
@@ -32,16 +34,24 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         IStaticCacheManager staticCacheManager,
         AppSettings appSettings)
     {
+		_logger.LogError(">>> Entering EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings})", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings);
         _eventPublisher = eventPublisher;
+		_logger.LogDebug("EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings}): _eventPublisher → {_eventPublisher}", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings, _eventPublisher);
         _dataProvider = dataProvider;
+		_logger.LogError("EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings}): _dataProvider → {_dataProvider}", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings, _dataProvider);
+		_logger.LogDebug("EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings}): _dataProvider → {_dataProvider}", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings, _dataProvider);
         _shortTermCacheManager = shortTermCacheManager;
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings}): _shortTermCacheManager → {_shortTermCacheManager}", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings, _shortTermCacheManager);
         _usingDistributedCache = appSettings.Get<DistributedCacheConfig>().DistributedCacheType switch
         {
             DistributedCacheType.Redis => true,
             DistributedCacheType.SqlServer => true,
             _ => false
         };
+		_logger.LogDebug("EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings}): _staticCacheManager → {_staticCacheManager}", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings, _staticCacheManager);
+    _logger.LogDebug("EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings}): _usingDistributedCache → {_usingDistributedCache}", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings, _usingDistributedCache);
+    _logger.LogWarning("<<< Exiting EntityRepository(eventPublisher={EventPublisher},dataProvider={DataProvider},shortTermCacheManager={ShortTermCacheManager},staticCacheManager={StaticCacheManager},appSettings={AppSettings})", eventPublisher, dataProvider, shortTermCacheManager, staticCacheManager, appSettings);
     }
 
     #endregion
@@ -65,6 +75,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //caching
         var cacheKey = getCacheKey(_staticCacheManager)
                        ?? _staticCacheManager.PrepareKeyForDefaultCache(NopEntityCacheDefaults<TEntity>.AllCacheKey);
+		_logger.LogWarning("<<< Exiting GetEntitiesAsync(getAllAsync={GetAllAsync},getCacheKey={GetCacheKey})", getAllAsync, getCacheKey);
         return await _staticCacheManager.GetAsync(cacheKey, getAllAsync);
     }
 
@@ -76,6 +87,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>Entity entries</returns>
     protected virtual IList<TEntity> GetEntities(Func<IList<TEntity>> getAll, Func<IStaticCacheManager, CacheKey> getCacheKey)
     {
+		_logger.LogError(">>> Entering GetEntities(getAll={GetAll},getCacheKey={GetCacheKey})", getAll, getCacheKey);
         if (getCacheKey == null)
             return getAll();
 
@@ -83,6 +95,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         var cacheKey = getCacheKey(_staticCacheManager)
                        ?? _staticCacheManager.PrepareKeyForDefaultCache(NopEntityCacheDefaults<TEntity>.AllCacheKey);
 
+		_logger.LogWarning("<<< Exiting GetEntities(getAll={GetAll},getCacheKey={GetCacheKey})", getAll, getCacheKey);
         return _staticCacheManager.Get(cacheKey, getAll);
     }
 
@@ -114,6 +127,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>Entity entries</returns>
     protected virtual IQueryable<TEntity> AddDeletedFilter(IQueryable<TEntity> query, in bool includeDeleted)
     {
+		_logger.LogError(">>> Entering AddDeletedFilter(query={Query},includeDeleted={IncludeDeleted})", includeDeleted);
         if (includeDeleted)
             return query;
 
@@ -140,11 +154,14 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// </returns>
     public virtual async Task<TEntity> GetByIdAsync(int? id, Func<ICacheKeyService, CacheKey> getCacheKey = null, bool includeDeleted = true, bool useShortTermCache = false)
     {
+		_logger.LogError(">>> Entering GetByIdAsync(id={Id},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted},useShortTermCache={UseShortTermCache})", id, getCacheKey, includeDeleted, useShortTermCache);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (!id.HasValue || id == 0)
             return null;
 
         async Task<TEntity> getEntityAsync()
         {
+			_logger.LogError(">>> Entering getEntityAsync()");
             return await AddDeletedFilter(Table, includeDeleted).FirstOrDefaultAsync(entity => entity.Id == Convert.ToInt32(id));
         }
 
@@ -174,6 +191,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// </returns>
     public virtual TEntity GetById(int? id, Func<ICacheKeyService, CacheKey> getCacheKey = null, bool includeDeleted = true)
     {
+		_logger.LogError(">>> Entering GetById(id={Id},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted})", id, getCacheKey, includeDeleted);
         if (!id.HasValue || id == 0)
             return null;
 
@@ -204,28 +222,38 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// </returns>
     public virtual async Task<IList<TEntity>> GetByIdsAsync(IList<int> ids, Func<ICacheKeyService, CacheKey> getCacheKey = null, bool includeDeleted = true)
     {
+		_logger.LogError(">>> Entering GetByIdsAsync(ids={Ids},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted})", ids, getCacheKey, includeDeleted);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (ids?.Any() != true)
             return new List<TEntity>();
 
         static IList<TEntity> sortByIdList(IList<int> listOfId, IDictionary<int, TEntity> entitiesById)
         {
+			_logger.LogError(">>> Entering sortByIdList(listOfId={ListOfId},entitiesById={EntitiesById})", listOfId, entitiesById);
             var sortedEntities = new List<TEntity>(listOfId.Count);
 
+			_logger.LogError("sortByIdList(listOfId={ListOfId},entitiesById={EntitiesById}): sortedEntities → {SortedEntities}", listOfId, entitiesById, sortedEntities);
             foreach (var id in listOfId)
                 if (entitiesById.TryGetValue(id, out var entry))
                     sortedEntities.Add(entry);
+					_logger.LogError("GetByIdsAsync(ids={Ids},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted}): sortedEntities → {SortedEntities}", ids, getCacheKey, includeDeleted, sortedEntities);
 
+			_logger.LogWarning("<<< Exiting sortByIdList(listOfId={ListOfId},entitiesById={EntitiesById})", listOfId, entitiesById);
             return sortedEntities;
         }
 
         async Task<IList<TEntity>> getByIdsAsync(IList<int> listOfId, bool sort = true)
         {
+			_logger.LogError(">>> Entering getByIdsAsync(listOfId={ListOfId},sort={Sort})", listOfId, sort);
             var query = AddDeletedFilter(Table, includeDeleted)
                 .Where(entry => listOfId.Contains(entry.Id));
 
             return sort
                 ? sortByIdList(listOfId, await query.ToDictionaryAsync(entry => entry.Id))
                 : await query.ToListAsync();
+				var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+        _logger.LogWarning("<<< Exiting getByIdsAsync(listOfId={ListOfId},sort={Sort})", listOfId, sort);
+				_logger.LogError("GetByIdsAsync(ids,getCacheKey,includeDeleted)={Ids},{GetCacheKey},{IncludeDeleted}: database query executed in {Arg3} ms", ids, getCacheKey, includeDeleted, __logStartDb.ElapsedMilliseconds);
         }
 
         if (getCacheKey == null)
@@ -233,6 +261,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
 
         //caching
         var cacheKey = getCacheKey(_staticCacheManager);
+		_logger.LogError("GetByIdsAsync(ids={Ids},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted}): cacheKey → {CacheKey}", ids, getCacheKey, includeDeleted, cacheKey);
         if (cacheKey == null && _usingDistributedCache)
             cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopEntityCacheDefaults<TEntity>.ByIdsCacheKey, ids);
         if (cacheKey != null)
@@ -248,7 +277,9 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
             .Where(entity => entity != default)
             .ToDictionaryAsync(entity => entity.Id, entity => entity);
         var missingIds = ids.Except(cachedById.Keys).ToList();
+		_logger.LogError("GetByIdsAsync(ids={Ids},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted}): missingIds → {MissingIds}", ids, getCacheKey, includeDeleted, missingIds);
         var missingEntities = missingIds.Count > 0 ? await getByIdsAsync(missingIds, false) : new List<TEntity>();
+		_logger.LogError("GetByIdsAsync(ids={Ids},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted}): missingEntities → {MissingEntities}", ids, getCacheKey, includeDeleted, missingEntities);
 
         foreach (var entity in missingEntities)
         {
@@ -277,6 +308,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
             var query = AddDeletedFilter(Table, includeDeleted);
             query = func != null ? func(query) : query;
 
+			_logger.LogWarning("<<< Exiting getAllAsync()");
             return await query.ToListAsync();
         }
 
@@ -293,9 +325,11 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     public virtual IList<TEntity> GetAll(Func<IQueryable<TEntity>, IQueryable<TEntity>> func = null,
         Func<ICacheKeyService, CacheKey> getCacheKey = null, bool includeDeleted = true)
     {
+		_logger.LogError(">>> Entering GetAll(func={Func},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted})", func, getCacheKey, includeDeleted);
         IList<TEntity> getAll()
         {
             var query = AddDeletedFilter(Table, includeDeleted);
+			_logger.LogError("GetAll(func={Func},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted}): query → {Query}", func, getCacheKey, includeDeleted, query);
             query = func != null ? func(query) : query;
 
             return query.ToList();
@@ -326,6 +360,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
             return await query.ToListAsync();
         }
 
+		_logger.LogWarning("<<< Exiting GetAllAsync(func={Func},getCacheKey={GetCacheKey},includeDeleted={IncludeDeleted})", func, getCacheKey, includeDeleted);
         return await GetEntitiesAsync(getAllAsync, getCacheKey);
     }
 
@@ -406,6 +441,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAsync(TEntity entity, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering InsertAsync(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
         ArgumentNullException.ThrowIfNull(entity);
 
         await _dataProvider.InsertEntityAsync(entity);
@@ -413,6 +449,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //event notification
         if (publishEvent)
             await _eventPublisher.EntityInsertedAsync(entity);
+			_logger.LogWarning("<<< Exiting InsertAsync(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
     }
 
     /// <summary>
@@ -422,6 +459,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <param name="publishEvent">Whether to publish event notification</param>
     public virtual void Insert(TEntity entity, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering Insert(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
         ArgumentNullException.ThrowIfNull(entity);
 
         _dataProvider.InsertEntity(entity);
@@ -429,6 +467,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //event notification
         if (publishEvent)
             _eventPublisher.EntityInserted(entity);
+			_logger.LogWarning("<<< Exiting Insert(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
     }
 
     /// <summary>
@@ -439,9 +478,11 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertAsync(IList<TEntity> entities, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering InsertAsync(entities={Entities},publishEvent={PublishEvent})", entities, publishEvent);
         ArgumentNullException.ThrowIfNull(entities);
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+		_logger.LogError("InsertAsync(entities={Entities},publishEvent={PublishEvent}): transaction → {Transaction}", entities, publishEvent, transaction);
         await _dataProvider.BulkInsertEntitiesAsync(entities);
         transaction.Complete();
 
@@ -460,9 +501,11 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <param name="publishEvent">Whether to publish event notification</param>
     public virtual void Insert(IList<TEntity> entities, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering Insert(entities={Entities},publishEvent={PublishEvent})", entities, publishEvent);
         ArgumentNullException.ThrowIfNull(entities);
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+		_logger.LogError("Insert(entities={Entities},publishEvent={PublishEvent}): transaction → {Transaction}", entities, publishEvent, transaction);
         _dataProvider.BulkInsertEntities(entities);
         transaction.Complete();
 
@@ -484,6 +527,8 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// </returns>
     public virtual async Task<TEntity> LoadOriginalCopyAsync(TEntity entity)
     {
+		_logger.LogError(">>> Entering LoadOriginalCopyAsync(entity={Entity})", entity);
+        _logger.LogWarning("<<< Exiting LoadOriginalCopyAsync(entity={Entity})", entity);
         return await _dataProvider.GetTable<TEntity>()
             .FirstOrDefaultAsync(e => e.Id == Convert.ToInt32(entity.Id));
     }
@@ -496,6 +541,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAsync(TEntity entity, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering UpdateAsync(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
         ArgumentNullException.ThrowIfNull(entity);
 
         await _dataProvider.UpdateEntityAsync(entity);
@@ -503,6 +549,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //event notification
         if (publishEvent)
             await _eventPublisher.EntityUpdatedAsync(entity);
+			_logger.LogWarning("<<< Exiting UpdateAsync(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
     }
 
     /// <summary>
@@ -512,6 +559,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <param name="publishEvent">Whether to publish event notification</param>
     public virtual void Update(TEntity entity, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering Update(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
         ArgumentNullException.ThrowIfNull(entity);
 
         _dataProvider.UpdateEntity(entity);
@@ -519,6 +567,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //event notification
         if (publishEvent)
             _eventPublisher.EntityUpdated(entity);
+			_logger.LogWarning("<<< Exiting Update(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
     }
 
     /// <summary>
@@ -529,6 +578,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateAsync(IList<TEntity> entities, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering UpdateAsync(entities={Entities},publishEvent={PublishEvent})", entities, publishEvent);
         ArgumentNullException.ThrowIfNull(entities);
 
         if (!entities.Any())
@@ -551,6 +601,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <param name="publishEvent">Whether to publish event notification</param>
     public virtual void Update(IList<TEntity> entities, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering Update(entities={Entities},publishEvent={PublishEvent})", entities, publishEvent);
         ArgumentNullException.ThrowIfNull(entities);
 
         if (!entities.Any())
@@ -574,12 +625,14 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAsync(TEntity entity, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering DeleteAsync(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
         ArgumentNullException.ThrowIfNull(entity);
 
         switch (entity)
         {
             case ISoftDeletedEntity softDeletedEntity:
                 softDeletedEntity.Deleted = true;
+				_logger.LogDebug("DeleteAsync(entity={Entity},publishEvent={PublishEvent}): softDeletedEntity.Deleted → {Arg2}", entity, publishEvent, softDeletedEntity.Deleted);
                 await _dataProvider.UpdateEntityAsync(entity);
                 break;
 
@@ -591,6 +644,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //event notification
         if (publishEvent)
             await _eventPublisher.EntityDeletedAsync(entity);
+			_logger.LogWarning("<<< Exiting DeleteAsync(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
     }
 
     /// <summary>
@@ -600,12 +654,14 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <param name="publishEvent">Whether to publish event notification</param>
     public virtual void Delete(TEntity entity, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering Delete(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
         ArgumentNullException.ThrowIfNull(entity);
 
         switch (entity)
         {
             case ISoftDeletedEntity softDeletedEntity:
                 softDeletedEntity.Deleted = true;
+				_logger.LogDebug("Delete(entity={Entity},publishEvent={PublishEvent}): softDeletedEntity.Deleted → {Arg2}", entity, publishEvent, softDeletedEntity.Deleted);
                 _dataProvider.UpdateEntity(entity);
                 break;
 
@@ -617,6 +673,7 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
         //event notification
         if (publishEvent)
             _eventPublisher.EntityDeleted(entity);
+			_logger.LogWarning("<<< Exiting Delete(entity={Entity},publishEvent={PublishEvent})", entity, publishEvent);
     }
 
     /// <summary>
@@ -627,12 +684,14 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteAsync(IList<TEntity> entities, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering DeleteAsync(entities={Entities},publishEvent={PublishEvent})", entities, publishEvent);
         ArgumentNullException.ThrowIfNull(entities);
 
         if (!entities.Any())
             return;
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+		_logger.LogError("DeleteAsync(entities={Entities},publishEvent={PublishEvent}): transaction → {Transaction}", entities, publishEvent, transaction);
         
         if (typeof(TEntity).GetInterface(nameof(ISoftDeletedEntity)) == null)
             await _dataProvider.BulkDeleteEntitiesAsync(entities);
@@ -661,12 +720,14 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <param name="publishEvent">Whether to publish event notification</param>
     public virtual void Delete(IList<TEntity> entities, bool publishEvent = true)
     {
+		_logger.LogError(">>> Entering Delete(entities={Entities},publishEvent={PublishEvent})", entities, publishEvent);
         ArgumentNullException.ThrowIfNull(entities);
 
         if (!entities.Any())
             return;
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+		_logger.LogError("Delete(entities={Entities},publishEvent={PublishEvent}): transaction → {Transaction}", entities, publishEvent, transaction);
 
         if (typeof(TEntity).GetInterface(nameof(ISoftDeletedEntity)) == null)
             _dataProvider.BulkDeleteEntities(entities);
@@ -698,12 +759,16 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// </returns>
     public virtual async Task<int> DeleteAsync(Expression<Func<TEntity, bool>> predicate)
     {
+		_logger.LogError(">>> Entering DeleteAsync(predicate={Predicate})", predicate);
         ArgumentNullException.ThrowIfNull(predicate);
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+		_logger.LogError("DeleteAsync(predicate={Predicate}): transaction → {Transaction}", predicate, transaction);
         var countDeletedRecords = await _dataProvider.BulkDeleteEntitiesAsync(predicate);
+		_logger.LogError("DeleteAsync(predicate={Predicate}): countDeletedRecords → {CountDeletedRecords}", predicate, countDeletedRecords);
         transaction.Complete();
 
+		_logger.LogWarning("<<< Exiting DeleteAsync(predicate={Predicate})", predicate);
         return countDeletedRecords;
     }
 
@@ -716,12 +781,16 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// </returns>
     public virtual int Delete(Expression<Func<TEntity, bool>> predicate)
     {
+		_logger.LogError(">>> Entering Delete(predicate={Predicate})", predicate);
         ArgumentNullException.ThrowIfNull(predicate);
 
         using var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+		_logger.LogError("Delete(predicate={Predicate}): transaction → {Transaction}", predicate, transaction);
         var countDeletedRecords = _dataProvider.BulkDeleteEntities(predicate);
+		_logger.LogError("Delete(predicate={Predicate}): countDeletedRecords → {CountDeletedRecords}", predicate, countDeletedRecords);
         transaction.Complete();
 
+		_logger.LogWarning("<<< Exiting Delete(predicate={Predicate})", predicate);
         return countDeletedRecords;
     }
 
@@ -732,7 +801,9 @@ public partial class EntityRepository<TEntity> : IRepository<TEntity> where TEnt
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task TruncateAsync(bool resetIdentity = false)
     {
+		_logger.LogError(">>> Entering TruncateAsync(resetIdentity={ResetIdentity})", resetIdentity);
         await _dataProvider.TruncateAsync<TEntity>(resetIdentity);
+		_logger.LogWarning("<<< Exiting TruncateAsync(resetIdentity={ResetIdentity})", resetIdentity);
     }
 
     #endregion

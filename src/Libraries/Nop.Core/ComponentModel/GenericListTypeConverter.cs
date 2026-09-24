@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core.ComponentModel;
 
@@ -9,6 +10,7 @@ namespace Nop.Core.ComponentModel;
 /// <typeparam name="T">Type</typeparam>
 public partial class GenericListTypeConverter<T> : TypeConverter
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Type converter
     /// </summary>
@@ -16,8 +18,13 @@ public partial class GenericListTypeConverter<T> : TypeConverter
 
     public GenericListTypeConverter()
     {
+		_logger.LogError(">>> Entering GenericListTypeConverter()");
         typeConverter = TypeDescriptor.GetConverter(typeof(T));
+		_logger.LogDebug("GenericListTypeConverter(): typeConverter → {TypeConverter}", typeConverter);
         if (typeConverter == null)
+			_logger.LogError("Throwing InvalidOperationException from GenericListTypeConverter()");
+    _logger.LogError("GenericListTypeConverter(): typeConverter → {TypeConverter}", typeConverter);
+    _logger.LogWarning("<<< Exiting GenericListTypeConverter()");
             throw new InvalidOperationException("No type converter exists for type " + typeof(T).FullName);
     }
 
@@ -28,6 +35,8 @@ public partial class GenericListTypeConverter<T> : TypeConverter
     /// <returns>Array</returns>
     protected virtual string[] GetStringArray(string input)
     {
+		_logger.LogError(">>> Entering GetStringArray(input={Input})", input);
+		_logger.LogWarning("<<< Exiting GetStringArray(input={Input})", input);
         return string.IsNullOrEmpty(input) ? Array.Empty<string>() : input.Split(',').Select(x => x.Trim()).ToArray();
     }
 
@@ -41,10 +50,13 @@ public partial class GenericListTypeConverter<T> : TypeConverter
     /// <returns>Result</returns>
     public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
     {
+		_logger.LogError(">>> Entering CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         if (sourceType != typeof(string))
             return base.CanConvertFrom(context, sourceType);
 
         var items = GetStringArray(sourceType.ToString());
+		_logger.LogError("CanConvertFrom(context={Context},sourceType={SourceType}): items → {Items}", context, sourceType, items);
+		_logger.LogWarning("<<< Exiting CanConvertFrom(context={Context},sourceType={SourceType})", context, sourceType);
         return items.Any();
     }
 
@@ -78,10 +90,12 @@ public partial class GenericListTypeConverter<T> : TypeConverter
     /// <returns>Result</returns>
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
     {
+		_logger.LogError(">>> Entering ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         if (destinationType != typeof(string))
             return base.ConvertTo(context, culture, value, destinationType);
 
         var result = string.Empty;
+		_logger.LogError("ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType}): result → {Result}", context, culture, value, destinationType, result);
 
         if (value == null)
             return result;
@@ -91,6 +105,7 @@ public partial class GenericListTypeConverter<T> : TypeConverter
 
         result = string.Join(',', cultureInvariantStrings);
 
+		_logger.LogWarning("<<< Exiting ConvertTo(context={Context},culture={Culture},value={Value},destinationType={DestinationType})", context, culture, value, destinationType);
         return result;
     }
 }

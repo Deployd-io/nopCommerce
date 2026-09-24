@@ -3,6 +3,7 @@ using Nop.Plugin.Pickup.PickupInStore.Services;
 using Nop.Services.Localization;
 using Nop.Services.Stores;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Pickup.PickupInStore.Factories;
 
@@ -11,6 +12,7 @@ namespace Nop.Plugin.Pickup.PickupInStore.Factories;
 /// </summary>
 public class StorePickupPointModelFactory : IStorePickupPointModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IStorePickupPointService _storePickupPointService;
@@ -24,8 +26,12 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
     public StorePickupPointModelFactory(IStorePickupPointService storePickupPointService,
         ILocalizationService localizationService, IStoreService storeService)
     {
+		_logger.LogError(">>> Entering StorePickupPointModelFactory(storePickupPointService={StorePickupPointService},localizationService={LocalizationService},storeService={StoreService})", storePickupPointService, localizationService, storeService);
         _storePickupPointService = storePickupPointService;
         _localizationService = localizationService;
+		_logger.LogDebug("StorePickupPointModelFactory(storePickupPointService={StorePickupPointService},localizationService={LocalizationService},storeService={StoreService}): _localizationService → {_localizationService}", storePickupPointService, localizationService, storeService, _localizationService);
+		_logger.LogDebug("StorePickupPointModelFactory(storePickupPointService={StorePickupPointService},localizationService={LocalizationService},storeService={StoreService}): _storePickupPointService → {_storePickupPointService}", storePickupPointService, localizationService, storeService, _storePickupPointService);
+    _logger.LogWarning("<<< Exiting StorePickupPointModelFactory(storePickupPointService={StorePickupPointService},localizationService={LocalizationService},storeService={StoreService})", storePickupPointService, localizationService, storeService);
         _storeService = storeService;
     }
 
@@ -43,6 +49,7 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
     /// </returns>
     public async Task<StorePickupPointListModel> PrepareStorePickupPointListModelAsync(StorePickupPointSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareStorePickupPointListModelAsync(searchModel={SearchModel})", searchModel);
         var pickupPoints = await _storePickupPointService.GetAllStorePickupPointsAsync(pageIndex: searchModel.Page - 1,
             pageSize: searchModel.PageSize);
         var model = await new StorePickupPointListModel().PrepareToGridAsync(searchModel, pickupPoints, () =>
@@ -50,6 +57,7 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
             return pickupPoints.SelectAwait(async point =>
             {
                 var store = await _storeService.GetStoreByIdAsync(point.StoreId);
+				_logger.LogError("PrepareStorePickupPointListModelAsync(searchModel={SearchModel}): store → {Store}", searchModel, store);
 
                 return new StorePickupPointModel
                 {
@@ -65,6 +73,7 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareStorePickupPointListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -78,11 +87,13 @@ public class StorePickupPointModelFactory : IStorePickupPointModelFactory
     /// </returns>
     public Task<StorePickupPointSearchModel> PrepareStorePickupPointSearchModelAsync(StorePickupPointSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareStorePickupPointSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareStorePickupPointSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 

@@ -2,6 +2,7 @@
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Models.Translation;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Catalog;
 
@@ -10,14 +11,19 @@ namespace Nop.Web.Areas.Admin.Models.Catalog;
 /// </summary>
 public partial record SpecificationAttributeModel : BaseNopEntityModel, ITranslationSupportedModel, ILocalizedModel<SpecificationAttributeLocalizedModel>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public SpecificationAttributeModel()
     {
+		_logger.LogError(">>> Entering SpecificationAttributeModel()");
         AvailableGroups = new List<SelectListItem>();
         Locales = new List<SpecificationAttributeLocalizedModel>();
+		_logger.LogError("SpecificationAttributeModel(): Locales → {Locales}", Locales);
         SpecificationAttributeOptionSearchModel = new SpecificationAttributeOptionSearchModel();
+		_logger.LogError("SpecificationAttributeModel(): SpecificationAttributeOptionSearchModel → {SpecificationAttributeOptionSearchModel}", SpecificationAttributeOptionSearchModel);
         SpecificationAttributeProductSearchModel = new SpecificationAttributeProductSearchModel();
+		_logger.LogError("SpecificationAttributeModel(): SpecificationAttributeProductSearchModel → {SpecificationAttributeProductSearchModel}", SpecificationAttributeProductSearchModel);
     }
 
     #endregion

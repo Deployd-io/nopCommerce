@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
@@ -9,12 +10,15 @@ namespace Nop.Web.Areas.Admin.Models.Common;
 /// </summary>
 public partial record UrlRecordSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public UrlRecordSearchModel()
     {
+		_logger.LogError(">>> Entering UrlRecordSearchModel()");
         AvailableLanguages = new List<SelectListItem>();
         AvailableActiveOptions = new List<SelectListItem>();
+		_logger.LogError("UrlRecordSearchModel(): AvailableActiveOptions → {AvailableActiveOptions}", AvailableActiveOptions);
     }
 
     #endregion

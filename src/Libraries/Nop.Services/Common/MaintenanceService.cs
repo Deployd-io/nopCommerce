@@ -1,5 +1,6 @@
 ﻿using Nop.Core;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Common;
 
@@ -8,6 +9,7 @@ namespace Nop.Services.Common;
 /// </summary>
 public partial class MaintenanceService : IMaintenanceService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly INopFileProvider _fileProvider;
@@ -18,7 +20,10 @@ public partial class MaintenanceService : IMaintenanceService
 
     public MaintenanceService(INopFileProvider fileProvider)
     {
+		_logger.LogError(">>> Entering MaintenanceService(fileProvider={FileProvider})", fileProvider);
         _fileProvider = fileProvider;
+		_logger.LogDebug("MaintenanceService(fileProvider={FileProvider}): _fileProvider → {_fileProvider}", fileProvider, _fileProvider);
+    _logger.LogWarning("<<< Exiting MaintenanceService(fileProvider={FileProvider})", fileProvider);
     }
 
     #endregion
@@ -32,9 +37,12 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns></returns>
     protected virtual string GetBackupDirectoryPath(bool ensureFolderCreated = true)
     {
+		_logger.LogError(">>> Entering GetBackupDirectoryPath(ensureFolderCreated={EnsureFolderCreated})", ensureFolderCreated);
         var path = _fileProvider.GetAbsolutePath(NopCommonDefaults.DbBackupsPath);
         if (ensureFolderCreated)
             _fileProvider.CreateDirectory(path);
+			_logger.LogError("GetBackupDirectoryPath(ensureFolderCreated={EnsureFolderCreated}): path → {Path}", ensureFolderCreated, path);
+		_logger.LogWarning("<<< Exiting GetBackupDirectoryPath(ensureFolderCreated={EnsureFolderCreated})", ensureFolderCreated);
         return path;
     }
 
@@ -48,9 +56,13 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns>Backup file collection</returns>
     public virtual IList<string> GetAllBackupFiles()
     {
+		_logger.LogError(">>> Entering GetAllBackupFiles()");
         var path = GetBackupDirectoryPath();
 
+		_logger.LogError("GetAllBackupFiles(): path → {Path}", path);
         if (!_fileProvider.DirectoryExists(path))
+			_logger.LogError("Throwing NopException from GetAllBackupFiles()");
+		_logger.LogWarning("<<< Exiting GetAllBackupFiles()");
             throw new NopException("Backup directory not exists");
 
         return _fileProvider.GetFiles(path, $"*.{NopCommonDefaults.DbBackupFileExtension}")
@@ -64,6 +76,8 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns>The path to the backup file</returns>
     public virtual string GetBackupPath(string backupFileName)
     {
+		_logger.LogError(">>> Entering GetBackupPath(backupFileName={BackupFileName})", backupFileName);
+        _logger.LogWarning("<<< Exiting GetBackupPath(backupFileName={BackupFileName})", backupFileName);
         return _fileProvider.Combine(GetBackupDirectoryPath(), backupFileName);
     }
 
@@ -73,6 +87,8 @@ public partial class MaintenanceService : IMaintenanceService
     /// <returns>Path to a new database backup file</returns>
     public virtual string CreateNewBackupFilePath()
     {
+		_logger.LogError(">>> Entering CreateNewBackupFilePath()");
+        _logger.LogWarning("<<< Exiting CreateNewBackupFilePath()");
         return _fileProvider.Combine(GetBackupDirectoryPath(), $"database_{DateTime.Now:yyyy-MM-dd-HH-mm-ss}_{CommonHelper.GenerateRandomDigitCode(10)}.{NopCommonDefaults.DbBackupFileExtension}");
     }
 

@@ -18,11 +18,13 @@ using Nop.Web.Framework.Models.Extensions;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Controllers;
 
 public class AvalaraTaxController : TaxController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AvalaraTaxManager _avalaraTaxManager;
@@ -52,11 +54,16 @@ public class AvalaraTaxController : TaxController
         taxPluginManager,
         taxSettings)
     {
+		_logger.LogError(">>> Entering AvalaraTaxController(avalaraTaxManager={AvalaraTaxManager},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},cacheManager={CacheManager},taxCategoryService={TaxCategoryService},taxModelFactory={TaxModelFactory},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings})", avalaraTaxManager, genericAttributeService, localizationService, notificationService, permissionService, settingService, cacheManager, taxCategoryService, taxModelFactory, taxPluginManager, taxSettings);
         _avalaraTaxManager = avalaraTaxManager;
         _genericAttributeService = genericAttributeService;
+		_logger.LogDebug("AvalaraTaxController(avalaraTaxManager={AvalaraTaxManager},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},cacheManager={CacheManager},taxCategoryService={TaxCategoryService},taxModelFactory={TaxModelFactory},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings}): _genericAttributeService → {_genericAttributeService}", avalaraTaxManager, genericAttributeService, localizationService, notificationService, permissionService, settingService, cacheManager, taxCategoryService, taxModelFactory, taxPluginManager, taxSettings, _genericAttributeService);
         _localizationService = localizationService;
+		_logger.LogDebug("AvalaraTaxController(avalaraTaxManager={AvalaraTaxManager},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},cacheManager={CacheManager},taxCategoryService={TaxCategoryService},taxModelFactory={TaxModelFactory},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings}): _localizationService → {_localizationService}", avalaraTaxManager, genericAttributeService, localizationService, notificationService, permissionService, settingService, cacheManager, taxCategoryService, taxModelFactory, taxPluginManager, taxSettings, _localizationService);
         _notificationService = notificationService;
+		_logger.LogDebug("AvalaraTaxController(avalaraTaxManager={AvalaraTaxManager},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},cacheManager={CacheManager},taxCategoryService={TaxCategoryService},taxModelFactory={TaxModelFactory},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings}): _notificationService → {_notificationService}", avalaraTaxManager, genericAttributeService, localizationService, notificationService, permissionService, settingService, cacheManager, taxCategoryService, taxModelFactory, taxPluginManager, taxSettings, _notificationService);
         _cacheManager = cacheManager;
+		_logger.LogDebug("AvalaraTaxController(avalaraTaxManager={AvalaraTaxManager},genericAttributeService={GenericAttributeService},localizationService={LocalizationService},notificationService={NotificationService},permissionService={PermissionService},settingService={SettingService},cacheManager={CacheManager},taxCategoryService={TaxCategoryService},taxModelFactory={TaxModelFactory},taxPluginManager={TaxPluginManager},taxSettings={TaxSettings}): _cacheManager → {_cacheManager}", avalaraTaxManager, genericAttributeService, localizationService, notificationService, permissionService, settingService, cacheManager, taxCategoryService, taxModelFactory, taxPluginManager, taxSettings, _cacheManager);
     }
 
     #endregion
@@ -66,6 +73,8 @@ public class AvalaraTaxController : TaxController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public override async Task<IActionResult> Categories()
     {
+		_logger.LogError(">>> Entering Categories()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
         {
@@ -76,14 +85,20 @@ public class AvalaraTaxController : TaxController
 
         //prepare model
         var model = new Models.Tax.TaxCategorySearchModel();
+		_logger.LogError("Categories(): model → {Model}", model);
         var cacheKey = _cacheManager.PrepareKeyForDefaultCache(AvalaraTaxDefaults.TaxCodeTypesCacheKey);
+		_logger.LogError("Categories(): cacheKey → {CacheKey}", cacheKey);
         var taxCodeTypes = await _cacheManager.GetAsync(cacheKey, async () => await _avalaraTaxManager.GetTaxCodeTypesAsync());
+		_logger.LogError("Categories(): taxCodeTypes → {TaxCodeTypes}", taxCodeTypes);
 
         if (taxCodeTypes != null)
             model.AvailableTypes = taxCodeTypes.Select(type => new SelectListItem(type.Value, type.Key)).ToList();
         model.SetGridPageSize();
 
         //use overridden view
+		_logger.LogError("Categories(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting Categories()");
+		_logger.LogWarning("<<< Exiting Categories(searchModel={SearchModel})", searchModel);
         return View("~/Plugins/Tax.Avalara/Views/Tax/Categories.cshtml", model);
     }
 
@@ -139,6 +154,8 @@ public class AvalaraTaxController : TaxController
     [HttpPost]
     public async Task<IActionResult> TaxCategoryUpdate(Models.Tax.TaxCategoryModel model)
     {
+		_logger.LogError(">>> Entering TaxCategoryUpdate(model={Model})", model);
+        _logger.LogWarning("<<< Exiting TaxCategoryUpdate(model={Model})", model);
         return await base.CategoryUpdate(model);
     }
 
@@ -146,6 +163,7 @@ public class AvalaraTaxController : TaxController
     [HttpPost]
     public async Task<IActionResult> TaxCategoryAdd(Models.Tax.TaxCategoryModel model)
     {
+		_logger.LogError(">>> Entering TaxCategoryAdd(model={Model})", model);
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return new NullJsonResult();
@@ -154,6 +172,7 @@ public class AvalaraTaxController : TaxController
             return ErrorJson(ModelState.SerializeErrors());
 
         var taxCategory = new TaxCategory();
+		_logger.LogError("TaxCategoryAdd(model={Model}): taxCategory → {TaxCategory}", model, taxCategory);
         taxCategory = model.ToEntity(taxCategory);
         await _taxCategoryService.InsertTaxCategoryAsync(taxCategory);
 
@@ -161,6 +180,7 @@ public class AvalaraTaxController : TaxController
         if (!string.IsNullOrEmpty(model.TypeId) && !model.TypeId.Equals(Guid.Empty.ToString()))
             await _genericAttributeService.SaveAttributeAsync(taxCategory, AvalaraTaxDefaults.TaxCodeTypeAttribute, model.TypeId);
 
+		_logger.LogWarning("<<< Exiting TaxCategoryAdd(model={Model})", model);
         return Json(new { Result = true });
     }
 
@@ -168,6 +188,7 @@ public class AvalaraTaxController : TaxController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public override async Task<IActionResult> CategoryDelete(int id)
     {
+		_logger.LogError(">>> Entering CategoryDelete(id={Id})", id);
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return new NullJsonResult();
@@ -182,6 +203,7 @@ public class AvalaraTaxController : TaxController
 
         await _taxCategoryService.DeleteTaxCategoryAsync(taxCategory);
 
+		_logger.LogWarning("<<< Exiting CategoryDelete(id={Id})", id);
         return new NullJsonResult();
     }
 
@@ -190,21 +212,25 @@ public class AvalaraTaxController : TaxController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ImportTaxCodes()
     {
+		_logger.LogError(">>> Entering ImportTaxCodes()");
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return await Categories();
         
         //import tax caodes
         var importedTaxCodesNumber = await _avalaraTaxManager.ImportTaxCodesAsync();
+		_logger.LogError("ImportTaxCodes(): importedTaxCodesNumber → {ImportedTaxCodesNumber}", importedTaxCodesNumber);
         if (importedTaxCodesNumber.HasValue)
         {
             //successfully imported
             var successMessage = await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.TaxCodes.Import.Success");
+			_logger.LogError("ImportTaxCodes(): successMessage → {SuccessMessage}", successMessage);
             _notificationService.SuccessNotification(string.Format(successMessage, importedTaxCodesNumber));
         }
         else
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.TaxCodes.Import.Error"));
 
+		_logger.LogWarning("<<< Exiting ImportTaxCodes()");
         return await Categories();
     }
 
@@ -213,12 +239,14 @@ public class AvalaraTaxController : TaxController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> ExportTaxCodes()
     {
+		_logger.LogError(">>> Entering ExportTaxCodes()");
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return await Categories();
         
         //export tax codes
         var exportedTaxCodes = await _avalaraTaxManager.ExportTaxCodesAsync();
+		_logger.LogError("ExportTaxCodes(): exportedTaxCodes → {ExportedTaxCodes}", exportedTaxCodes);
         if (exportedTaxCodes.HasValue)
         {
             if (exportedTaxCodes > 0)
@@ -229,6 +257,7 @@ public class AvalaraTaxController : TaxController
         else
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.TaxCodes.Export.Error"));
 
+		_logger.LogWarning("<<< Exiting ExportTaxCodes()");
         return await Categories();
     }
 
@@ -237,16 +266,19 @@ public class AvalaraTaxController : TaxController
     [CheckPermission(StandardPermission.Configuration.MANAGE_TAX_SETTINGS)]
     public async Task<IActionResult> DeleteSystemTaxCodes()
     {
+		_logger.LogError(">>> Entering DeleteSystemTaxCodes()");
         //ensure that Avalara tax provider is active
         if (!await _taxPluginManager.IsPluginActiveAsync(AvalaraTaxDefaults.SystemName))
             return await Categories();
         
         var deleted = await _avalaraTaxManager.DeleteSystemTaxCodesAsync();
+		_logger.LogError("DeleteSystemTaxCodes(): deleted → {Deleted}", deleted);
         if (deleted)
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.TaxCodes.Delete.Success"));
         else
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Plugins.Tax.Avalara.TaxCodes.Delete.Error"));
 
+		_logger.LogWarning("<<< Exiting DeleteSystemTaxCodes()");
         return await Categories();
     }
 

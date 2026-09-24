@@ -10,6 +10,7 @@ using Nop.Data;
 using Nop.Services.Catalog;
 using Nop.Services.Html;
 using Nop.Services.Shipping;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Orders;
 
@@ -18,6 +19,7 @@ namespace Nop.Services.Orders;
 /// </summary>
 public partial class OrderService : IOrderService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IHtmlFormatter _htmlFormatter;
@@ -51,17 +53,30 @@ public partial class OrderService : IOrderService
         IRepository<RecurringPaymentHistory> recurringPaymentHistoryRepository,
         IShipmentService shipmentService)
     {
+		_logger.LogError(">>> Entering OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService})", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService);
         _htmlFormatter = htmlFormatter;
         _productService = productService;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _productService → {_productService}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _productService);
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _htmlFormatter → {_htmlFormatter}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _htmlFormatter);
+    _logger.LogWarning("<<< Exiting OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService})", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService);
         _addressRepository = addressRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _addressRepository → {_addressRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _addressRepository);
         _customerRepository = customerRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _customerRepository → {_customerRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _customerRepository);
         _orderRepository = orderRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _orderRepository → {_orderRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _orderRepository);
         _orderItemRepository = orderItemRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _orderItemRepository → {_orderItemRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _orderItemRepository);
         _orderNoteRepository = orderNoteRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _orderNoteRepository → {_orderNoteRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _orderNoteRepository);
         _productRepository = productRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _productRepository → {_productRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _productRepository);
         _productWarehouseInventoryRepository = productWarehouseInventoryRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _productWarehouseInventoryRepository → {_productWarehouseInventoryRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _productWarehouseInventoryRepository);
         _recurringPaymentRepository = recurringPaymentRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _recurringPaymentRepository → {_recurringPaymentRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _recurringPaymentRepository);
         _recurringPaymentHistoryRepository = recurringPaymentHistoryRepository;
+		_logger.LogDebug("OrderService(htmlFormatter={HtmlFormatter},productService={ProductService},addressRepository={AddressRepository},customerRepository={CustomerRepository},orderRepository={OrderRepository},orderItemRepository={OrderItemRepository},orderNoteRepository={OrderNoteRepository},productRepository={ProductRepository},productWarehouseInventoryRepository={ProductWarehouseInventoryRepository},recurringPaymentRepository={RecurringPaymentRepository},recurringPaymentHistoryRepository={RecurringPaymentHistoryRepository},shipmentService={ShipmentService}): _recurringPaymentHistoryRepository → {_recurringPaymentHistoryRepository}", htmlFormatter, productService, addressRepository, customerRepository, orderRepository, orderItemRepository, orderNoteRepository, productRepository, productWarehouseInventoryRepository, recurringPaymentRepository, recurringPaymentHistoryRepository, shipmentService, _recurringPaymentHistoryRepository);
         _shipmentService = shipmentService;
     }
 
@@ -77,10 +92,13 @@ public partial class OrderService : IOrderService
     /// <returns>The <see cref="Task"/> containing the value indicating whether there are shipment items with a positive quantity in order shipments.</returns>
     protected virtual async Task<bool> HasShipmentItemsAsync(Order order, Func<Shipment, bool> predicate = null)
     {
+		_logger.LogError(">>> Entering HasShipmentItemsAsync(order={Order},predicate={Predicate})", order, predicate);
         var shipments = await _shipmentService.GetShipmentsByOrderIdAsync(order.Id);
+		_logger.LogError("HasShipmentItemsAsync(order={Order},predicate={Predicate}): shipments → {Shipments}", order, predicate, shipments);
         if (shipments?.Any(shipment => predicate == null || predicate(shipment)) == true)
         {
             var orderItems = await GetOrderItemsAsync(order.Id, isShipEnabled: true);
+			_logger.LogError("HasShipmentItemsAsync(order={Order},predicate={Predicate}): orderItems → {OrderItems}", order, predicate, orderItems);
             if (orderItems?.Any() == true)
             {
                 foreach (var shipment in shipments)
@@ -94,6 +112,7 @@ public partial class OrderService : IOrderService
                     }
 
                     var shipmentItems = await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id);
+					_logger.LogError("HasShipmentItemsAsync(order={Order},predicate={Predicate}): shipmentItems → {ShipmentItems}", order, predicate, shipmentItems);
                     if (shipmentItems?.Any(hasPositiveQuantity) == true)
                         return true;
                 }
@@ -119,6 +138,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByIdAsync(int orderId)
     {
+		_logger.LogError(">>> Entering GetOrderByIdAsync(orderId={OrderId})", orderId);
+		_logger.LogError("GetOrderByIdAsync(orderId)={OrderId}: find query executing", orderId);
+    _logger.LogWarning("<<< Exiting GetOrderByIdAsync(orderId={OrderId})", orderId);
         return await _orderRepository.GetByIdAsync(orderId, cache => default, useShortTermCache: true);
     }
 
@@ -132,6 +154,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByCustomOrderNumberAsync(string customOrderNumber)
     {
+		_logger.LogError(">>> Entering GetOrderByCustomOrderNumberAsync(customOrderNumber={CustomOrderNumber})", customOrderNumber);
         if (string.IsNullOrEmpty(customOrderNumber))
             return null;
 
@@ -149,6 +172,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByOrderItemAsync(int orderItemId)
     {
+		_logger.LogError(">>> Entering GetOrderByOrderItemAsync(orderItemId={OrderItemId})", orderItemId);
         if (orderItemId == 0)
             return null;
 
@@ -168,6 +192,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<Order>> GetOrdersByIdsAsync(int[] orderIds)
     {
+		_logger.LogError(">>> Entering GetOrdersByIdsAsync(orderIds={OrderIds})", orderIds);
+        _logger.LogWarning("<<< Exiting GetOrdersByIdsAsync(orderIds={OrderIds})", orderIds);
         return await _orderRepository.GetByIdsAsync(orderIds, includeDeleted: false);
     }
 
@@ -181,14 +207,19 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<Order>> GetOrdersByGuidsAsync(Guid[] orderGuids)
     {
+		_logger.LogError(">>> Entering GetOrdersByGuidsAsync(orderGuids={OrderGuids})", orderGuids);
         if (orderGuids == null)
             return null;
 
         var query = from o in _orderRepository.Table
             where orderGuids.Contains(o.OrderGuid)
             select o;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var orders = await query.ToListAsync();
 
+		_logger.LogError("GetOrdersByGuidsAsync(orderGuids={OrderGuids}): orders → {Orders}", orderGuids, orders);
+		_logger.LogError("GetOrdersByGuidsAsync(orderGuids)={OrderGuids}: database query executed in {Arg1} ms", orderGuids, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetOrdersByGuidsAsync(orderGuids={OrderGuids})", orderGuids);
         return orders;
     }
 
@@ -202,14 +233,19 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Order> GetOrderByGuidAsync(Guid orderGuid)
     {
+		_logger.LogError(">>> Entering GetOrderByGuidAsync(orderGuid={OrderGuid})", orderGuid);
         if (orderGuid == Guid.Empty)
             return null;
 
         var query = from o in _orderRepository.Table
             where o.OrderGuid == orderGuid
             select o;
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var order = await query.FirstOrDefaultAsync();
 
+		_logger.LogError("GetOrderByGuidAsync(orderGuid={OrderGuid}): order → {Order}", orderGuid, order);
+		_logger.LogError("GetOrderByGuidAsync(orderGuid)={OrderGuid}: database query executed in {Arg1} ms", orderGuid, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetOrderByGuidAsync(orderGuid={OrderGuid})", orderGuid);
         return order;
     }
 
@@ -220,7 +256,11 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderAsync(Order order)
     {
+		_logger.LogError(">>> Entering DeleteOrderAsync(order={Order})", order);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderRepository.DeleteAsync(order);
+		_logger.LogError("DeleteOrderAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteOrderAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -259,8 +299,10 @@ public partial class OrderService : IOrderService
         string billingPhone = null, string billingEmail = null, string billingLastName = "",
         string orderNotes = null, int pageIndex = 0, int pageSize = int.MaxValue, bool getOnlyTotalCount = false)
     {
+		_logger.LogError(">>> Entering SearchOrdersAsync(storeId={StoreId},vendorId={VendorId},customerId={CustomerId},productId={ProductId},affiliateId={AffiliateId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},paymentMethodSystemName={PaymentMethodSystemName},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},ssIds={SsIds},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", storeId, vendorId, customerId, productId, affiliateId, warehouseId, billingCountryId, paymentMethodSystemName, createdFromUtc, createdToUtc, osIds, psIds, ssIds, billingPhone, billingEmail, billingLastName, orderNotes, pageIndex, pageSize, getOnlyTotalCount);
         var query = _orderRepository.Table;
 
+		_logger.LogError("SearchOrdersAsync(storeId={StoreId},vendorId={VendorId},customerId={CustomerId},productId={ProductId},affiliateId={AffiliateId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},paymentMethodSystemName={PaymentMethodSystemName},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},ssIds={SsIds},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): query → {Query}", storeId, vendorId, customerId, productId, affiliateId, warehouseId, billingCountryId, paymentMethodSystemName, createdFromUtc, createdToUtc, osIds, psIds, ssIds, billingPhone, billingEmail, billingLastName, orderNotes, pageIndex, pageSize, getOnlyTotalCount, query);
         if (storeId > 0)
             query = query.Where(o => o.StoreId == storeId);
 
@@ -291,6 +333,7 @@ public partial class OrderService : IOrderService
         if (warehouseId > 0)
         {
             var manageStockInventoryMethodId = (int)ManageInventoryMethod.ManageStock;
+			_logger.LogError("SearchOrdersAsync(storeId={StoreId},vendorId={VendorId},customerId={CustomerId},productId={ProductId},affiliateId={AffiliateId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},paymentMethodSystemName={PaymentMethodSystemName},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},ssIds={SsIds},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount}): manageStockInventoryMethodId → {ManageStockInventoryMethodId}", storeId, vendorId, customerId, productId, affiliateId, warehouseId, billingCountryId, paymentMethodSystemName, createdFromUtc, createdToUtc, osIds, psIds, ssIds, billingPhone, billingEmail, billingLastName, orderNotes, pageIndex, pageSize, getOnlyTotalCount, manageStockInventoryMethodId);
 
             query = from o in query
                 join oi in _orderItemRepository.Table on o.Id equals oi.OrderId
@@ -346,6 +389,7 @@ public partial class OrderService : IOrderService
         query = query.OrderByDescending(o => o.CreatedOnUtc);
 
         //database layer paging
+		_logger.LogWarning("<<< Exiting SearchOrdersAsync(storeId={StoreId},vendorId={VendorId},customerId={CustomerId},productId={ProductId},affiliateId={AffiliateId},warehouseId={WarehouseId},billingCountryId={BillingCountryId},paymentMethodSystemName={PaymentMethodSystemName},createdFromUtc={CreatedFromUtc},createdToUtc={CreatedToUtc},osIds={OsIds},psIds={PsIds},ssIds={SsIds},billingPhone={BillingPhone},billingEmail={BillingEmail},billingLastName={BillingLastName},orderNotes={OrderNotes},pageIndex={PageIndex},pageSize={PageSize},getOnlyTotalCount={GetOnlyTotalCount})", storeId, vendorId, customerId, productId, affiliateId, warehouseId, billingCountryId, paymentMethodSystemName, createdFromUtc, createdToUtc, osIds, psIds, ssIds, billingPhone, billingEmail, billingLastName, orderNotes, pageIndex, pageSize, getOnlyTotalCount);
         return await query.ToPagedListAsync(pageIndex, pageSize, getOnlyTotalCount);
     }
 
@@ -356,7 +400,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertOrderAsync(Order order)
     {
+		_logger.LogError(">>> Entering InsertOrderAsync(order={Order})", order);
         await _orderRepository.InsertAsync(order);
+		_logger.LogWarning("<<< Exiting InsertOrderAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -366,7 +412,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderAsync(Order order)
     {
+		_logger.LogError(">>> Entering UpdateOrderAsync(order={Order})", order);
         await _orderRepository.UpdateAsync(order);
+		_logger.LogWarning("<<< Exiting UpdateOrderAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -421,11 +469,13 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> HasItemsToAddToShipmentAsync(Order order)
     {
+		_logger.LogError(">>> Entering HasItemsToAddToShipmentAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         foreach (var orderItem in await GetOrderItemsAsync(order.Id, isShipEnabled: true)) //we can ship only shippable products
         {
             var totalNumberOfItemsCanBeAddedToShipment = await GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem);
+			_logger.LogError("HasItemsToAddToShipmentAsync(order={Order}): totalNumberOfItemsCanBeAddedToShipment → {TotalNumberOfItemsCanBeAddedToShipment}", order, totalNumberOfItemsCanBeAddedToShipment);
             if (totalNumberOfItemsCanBeAddedToShipment <= 0)
                 continue;
 
@@ -433,6 +483,7 @@ public partial class OrderService : IOrderService
             return true;
         }
 
+		_logger.LogWarning("<<< Exiting HasItemsToAddToShipmentAsync(order={Order})", order);
         return false;
     }
 
@@ -446,6 +497,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> HasItemsToShipAsync(Order order)
     {
+		_logger.LogError(">>> Entering HasItemsToShipAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (order.PickupInStore)
@@ -464,6 +516,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> HasItemsToReadyForPickupAsync(Order order)
     {
+		_logger.LogError(">>> Entering HasItemsToReadyForPickupAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
         if (!order.PickupInStore)
@@ -482,8 +535,10 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> HasItemsToDeliverAsync(Order order)
     {
+		_logger.LogError(">>> Entering HasItemsToDeliverAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
 
+		_logger.LogWarning("<<< Exiting HasItemsToDeliverAsync(order={Order})", order);
         return await HasShipmentItemsAsync(order, shipment => (shipment.ShippedDateUtc.HasValue || shipment.ReadyForPickupDateUtc.HasValue) && !shipment.DeliveryDateUtc.HasValue);
     }
 
@@ -501,6 +556,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<OrderItem> GetOrderItemByIdAsync(int orderItemId)
     {
+		_logger.LogError(">>> Entering GetOrderItemByIdAsync(orderItemId={OrderItemId})", orderItemId);
+		_logger.LogError("GetOrderItemByIdAsync(orderItemId)={OrderItemId}: find query executing", orderItemId);
+    _logger.LogWarning("<<< Exiting GetOrderItemByIdAsync(orderItemId={OrderItemId})", orderItemId);
         return await _orderItemRepository.GetByIdAsync(orderItemId, cache => default, useShortTermCache: true);
     }
 
@@ -514,6 +572,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<Product> GetProductByOrderItemIdAsync(int orderItemId)
     {
+		_logger.LogError(">>> Entering GetProductByOrderItemIdAsync(orderItemId={OrderItemId})", orderItemId);
         if (orderItemId == 0)
             return null;
 
@@ -559,13 +618,18 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<OrderItem> GetOrderItemByGuidAsync(Guid orderItemGuid)
     {
+		_logger.LogError(">>> Entering GetOrderItemByGuidAsync(orderItemGuid={OrderItemGuid})", orderItemGuid);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (orderItemGuid == Guid.Empty)
             return null;
 
         var query = from orderItem in _orderItemRepository.Table
             where orderItem.OrderItemGuid == orderItemGuid
             select orderItem;
+			_logger.LogError("GetOrderItemByGuidAsync(orderItemGuid)={OrderItemGuid}: database query executed in {Arg1} ms", orderItemGuid, __logStart.ElapsedMilliseconds);
         var item = await query.FirstOrDefaultAsync();
+		_logger.LogError("GetOrderItemByGuidAsync(orderItemGuid={OrderItemGuid}): item → {Item}", orderItemGuid, item);
+		_logger.LogWarning("<<< Exiting GetOrderItemByGuidAsync(orderItemGuid={OrderItemGuid})", orderItemGuid);
         return item;
     }
 
@@ -579,7 +643,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<OrderItem>> GetDownloadableOrderItemsAsync(int customerId)
     {
+		_logger.LogError(">>> Entering GetDownloadableOrderItemsAsync(customerId={CustomerId})", customerId);
         if (customerId == 0)
+			_logger.LogError("Throwing ArgumentOutOfRangeException from GetDownloadableOrderItemsAsync(customerId={CustomerId})", customerId);
             throw new ArgumentOutOfRangeException(nameof(customerId));
 
         var query = from orderItem in _orderItemRepository.Table
@@ -591,7 +657,11 @@ public partial class OrderService : IOrderService
             orderby o.CreatedOnUtc descending, orderItem.Id
             select orderItem;
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
+		_logger.LogError("GetDownloadableOrderItemsAsync(customerId)={CustomerId}: database query executed in {Arg1} ms", customerId, __logStart.ElapsedMilliseconds);
         var orderItems = await query.ToListAsync();
+		_logger.LogError("GetDownloadableOrderItemsAsync(customerId={CustomerId}): orderItems → {OrderItems}", customerId, orderItems);
+		_logger.LogWarning("<<< Exiting GetDownloadableOrderItemsAsync(customerId={CustomerId})", customerId);
         return orderItems;
     }
 
@@ -602,7 +672,11 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderItemAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering DeleteOrderItemAsync(orderItem={OrderItem})", orderItem);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderItemRepository.DeleteAsync(orderItem);
+		_logger.LogError("DeleteOrderItemAsync(orderItem)={OrderItem}: external service call took {Arg1} ms", orderItem, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteOrderItemAsync(orderItem={OrderItem})", orderItem);
     }
 
     /// <summary>
@@ -615,10 +689,12 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<int> GetTotalNumberOfItemsInAllShipmentsAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering GetTotalNumberOfItemsInAllShipmentsAsync(orderItem={OrderItem})", orderItem);
         ArgumentNullException.ThrowIfNull(orderItem);
 
         var totalInShipments = 0;
         var shipments = await _shipmentService.GetShipmentsByOrderIdAsync(orderItem.OrderId);
+		_logger.LogError("GetTotalNumberOfItemsInAllShipmentsAsync(orderItem={OrderItem}): shipments → {Shipments}", orderItem, shipments);
 
         for (var i = 0; i < shipments.Count; i++)
         {
@@ -631,6 +707,7 @@ public partial class OrderService : IOrderService
             }
         }
 
+		_logger.LogWarning("<<< Exiting GetTotalNumberOfItemsInAllShipmentsAsync(orderItem={OrderItem})", orderItem);
         return totalInShipments;
     }
 
@@ -644,15 +721,19 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<int> GetTotalNumberOfItemsCanBeAddedToShipmentAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem})", orderItem);
         ArgumentNullException.ThrowIfNull(orderItem);
 
         var totalInShipments = await GetTotalNumberOfItemsInAllShipmentsAsync(orderItem);
+		_logger.LogError("GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem}): totalInShipments → {TotalInShipments}", orderItem, totalInShipments);
 
         var qtyOrdered = orderItem.Quantity;
         var qtyCanBeAddedToShipmentTotal = qtyOrdered - totalInShipments;
+		_logger.LogError("GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem}): qtyCanBeAddedToShipmentTotal → {QtyCanBeAddedToShipmentTotal}", orderItem, qtyCanBeAddedToShipmentTotal);
         if (qtyCanBeAddedToShipmentTotal < 0)
             qtyCanBeAddedToShipmentTotal = 0;
 
+		_logger.LogWarning("<<< Exiting GetTotalNumberOfItemsCanBeAddedToShipmentAsync(orderItem={OrderItem})", orderItem);
         return qtyCanBeAddedToShipmentTotal;
     }
 
@@ -666,10 +747,12 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> IsDownloadAllowedAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering IsDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
         if (orderItem is null)
             return false;
 
         var order = await GetOrderByIdAsync(orderItem.OrderId);
+		_logger.LogError("IsDownloadAllowedAsync(orderItem={OrderItem}): order → {Order}", orderItem, order);
         if (order == null || order.Deleted)
             return false;
 
@@ -678,6 +761,7 @@ public partial class OrderService : IOrderService
             return false;
 
         var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+		_logger.LogError("IsDownloadAllowedAsync(orderItem={OrderItem}): product → {Product}", orderItem, product);
 
         if (product == null || !product.IsDownload)
             return false;
@@ -725,6 +809,7 @@ public partial class OrderService : IOrderService
                 break;
         }
 
+		_logger.LogWarning("<<< Exiting IsDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
         return false;
     }
 
@@ -738,6 +823,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<bool> IsLicenseDownloadAllowedAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering IsLicenseDownloadAllowedAsync(orderItem={OrderItem})", orderItem);
         if (orderItem == null)
             return false;
 
@@ -753,7 +839,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertOrderItemAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering InsertOrderItemAsync(orderItem={OrderItem})", orderItem);
         await _orderItemRepository.InsertAsync(orderItem);
+		_logger.LogWarning("<<< Exiting InsertOrderItemAsync(orderItem={OrderItem})", orderItem);
     }
 
     /// <summary>
@@ -763,7 +851,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateOrderItemAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering UpdateOrderItemAsync(orderItem={OrderItem})", orderItem);
         await _orderItemRepository.UpdateAsync(orderItem);
+		_logger.LogWarning("<<< Exiting UpdateOrderItemAsync(orderItem={OrderItem})", orderItem);
     }
 
     #endregion
@@ -780,6 +870,8 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<OrderNote> GetOrderNoteByIdAsync(int orderNoteId)
     {
+		_logger.LogError(">>> Entering GetOrderNoteByIdAsync(orderNoteId={OrderNoteId})", orderNoteId);
+        _logger.LogWarning("<<< Exiting GetOrderNoteByIdAsync(orderNoteId={OrderNoteId})", orderNoteId);
         return await _orderNoteRepository.GetByIdAsync(orderNoteId);
     }
 
@@ -794,16 +886,19 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<OrderNote>> GetOrderNotesByOrderIdAsync(int orderId, bool? displayToCustomer = null)
     {
+		_logger.LogError(">>> Entering GetOrderNotesByOrderIdAsync(orderId={OrderId},displayToCustomer={DisplayToCustomer})", orderId, displayToCustomer);
         if (orderId == 0)
             return new List<OrderNote>();
 
         var query = _orderNoteRepository.Table.Where(on => on.OrderId == orderId);
+		_logger.LogError("GetOrderNotesByOrderIdAsync(orderId={OrderId},displayToCustomer={DisplayToCustomer}): query → {Query}", orderId, displayToCustomer, query);
 
         if (displayToCustomer.HasValue)
         {
             query = query.Where(on => on.DisplayToCustomer == displayToCustomer);
         }
 
+		_logger.LogWarning("<<< Exiting GetOrderNotesByOrderIdAsync(orderId={OrderId},displayToCustomer={DisplayToCustomer})", orderId, displayToCustomer);
         return await query.ToListAsync();
     }
 
@@ -814,7 +909,11 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteOrderNoteAsync(OrderNote orderNote)
     {
+		_logger.LogError(">>> Entering DeleteOrderNoteAsync(orderNote={OrderNote})", orderNote);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _orderNoteRepository.DeleteAsync(orderNote);
+		_logger.LogError("DeleteOrderNoteAsync(orderNote)={OrderNote}: external service call took {Arg1} ms", orderNote, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteOrderNoteAsync(orderNote={OrderNote})", orderNote);
     }
 
     /// <summary>
@@ -824,15 +923,18 @@ public partial class OrderService : IOrderService
     /// <returns>Formatted text</returns>
     public virtual string FormatOrderNoteText(OrderNote orderNote)
     {
+		_logger.LogError(">>> Entering FormatOrderNoteText(orderNote={OrderNote})", orderNote);
         ArgumentNullException.ThrowIfNull(orderNote);
 
         var text = orderNote.Note;
+		_logger.LogError("FormatOrderNoteText(orderNote={OrderNote}): text → {Text}", orderNote, text);
 
         if (string.IsNullOrEmpty(text))
             return string.Empty;
 
         text = _htmlFormatter.FormatText(text, false, true, false, false, false, false);
 
+		_logger.LogWarning("<<< Exiting FormatOrderNoteText(orderNote={OrderNote})", orderNote);
         return text;
     }
 
@@ -843,7 +945,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertOrderNoteAsync(OrderNote orderNote)
     {
+		_logger.LogError(">>> Entering InsertOrderNoteAsync(orderNote={OrderNote})", orderNote);
         await _orderNoteRepository.InsertAsync(orderNote);
+		_logger.LogWarning("<<< Exiting InsertOrderNoteAsync(orderNote={OrderNote})", orderNote);
     }
 
     #endregion
@@ -857,7 +961,11 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogError(">>> Entering DeleteRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _recurringPaymentRepository.DeleteAsync(recurringPayment);
+		_logger.LogError("DeleteRecurringPaymentAsync(recurringPayment)={RecurringPayment}: external service call took {Arg1} ms", recurringPayment, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
     }
 
     /// <summary>
@@ -870,6 +978,9 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<RecurringPayment> GetRecurringPaymentByIdAsync(int recurringPaymentId)
     {
+		_logger.LogError(">>> Entering GetRecurringPaymentByIdAsync(recurringPaymentId={RecurringPaymentId})", recurringPaymentId);
+		_logger.LogError("GetRecurringPaymentByIdAsync(recurringPaymentId)={RecurringPaymentId}: find query executing", recurringPaymentId);
+    _logger.LogWarning("<<< Exiting GetRecurringPaymentByIdAsync(recurringPaymentId={RecurringPaymentId})", recurringPaymentId);
         return await _recurringPaymentRepository.GetByIdAsync(recurringPaymentId, cache => default);
     }
 
@@ -880,7 +991,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogError(">>> Entering InsertRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
         await _recurringPaymentRepository.InsertAsync(recurringPayment);
+		_logger.LogWarning("<<< Exiting InsertRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
     }
 
     /// <summary>
@@ -890,7 +1003,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateRecurringPaymentAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogError(">>> Entering UpdateRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
         await _recurringPaymentRepository.UpdateAsync(recurringPayment);
+		_logger.LogWarning("<<< Exiting UpdateRecurringPaymentAsync(recurringPayment={RecurringPayment})", recurringPayment);
     }
 
     /// <summary>
@@ -911,9 +1026,11 @@ public partial class OrderService : IOrderService
         int customerId = 0, int initialOrderId = 0, OrderStatus? initialOrderStatus = null,
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
     {
+		_logger.LogError(">>> Entering SearchRecurringPaymentsAsync(storeId={StoreId},customerId={CustomerId},initialOrderId={InitialOrderId},initialOrderStatus={InitialOrderStatus},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", storeId, customerId, initialOrderId, initialOrderStatus, pageIndex, pageSize, showHidden);
         int? initialOrderStatusId = null;
         if (initialOrderStatus.HasValue)
             initialOrderStatusId = (int)initialOrderStatus.Value;
+			_logger.LogError("SearchRecurringPaymentsAsync(storeId={StoreId},customerId={CustomerId},initialOrderId={InitialOrderId},initialOrderStatus={InitialOrderStatus},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): initialOrderStatusId → {InitialOrderStatusId}", storeId, customerId, initialOrderId, initialOrderStatus, pageIndex, pageSize, showHidden, initialOrderStatusId);
 
         var query1 = from rp in _recurringPaymentRepository.Table
             join o in _orderRepository.Table on rp.InitialOrderId equals o.Id
@@ -929,6 +1046,7 @@ public partial class OrderService : IOrderService
                 (!initialOrderStatusId.HasValue || initialOrderStatusId.Value == 0 ||
                  o.OrderStatusId == initialOrderStatusId.Value)
             select rp.Id;
+				_logger.LogDebug("SearchRecurringPaymentsAsync(storeId={StoreId},customerId={CustomerId},initialOrderId={InitialOrderId},initialOrderStatus={InitialOrderStatus},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): initialOrderStatusId → {InitialOrderStatusId}", storeId, customerId, initialOrderId, initialOrderStatus, pageIndex, pageSize, showHidden, initialOrderStatusId);
 
         var query2 = from rp in _recurringPaymentRepository.Table
             where query1.Contains(rp.Id)
@@ -936,7 +1054,9 @@ public partial class OrderService : IOrderService
             select rp;
 
         var recurringPayments = await query2.ToPagedListAsync(pageIndex, pageSize);
+		_logger.LogError("SearchRecurringPaymentsAsync(storeId={StoreId},customerId={CustomerId},initialOrderId={InitialOrderId},initialOrderStatus={InitialOrderStatus},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): recurringPayments → {RecurringPayments}", storeId, customerId, initialOrderId, initialOrderStatus, pageIndex, pageSize, showHidden, recurringPayments);
 
+		_logger.LogWarning("<<< Exiting SearchRecurringPaymentsAsync(storeId={StoreId},customerId={CustomerId},initialOrderId={InitialOrderId},initialOrderStatus={InitialOrderStatus},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", storeId, customerId, initialOrderId, initialOrderStatus, pageIndex, pageSize, showHidden);
         return recurringPayments;
     }
 
@@ -954,6 +1074,7 @@ public partial class OrderService : IOrderService
     /// </returns>
     public virtual async Task<IList<RecurringPaymentHistory>> GetRecurringPaymentHistoryAsync(RecurringPayment recurringPayment)
     {
+		_logger.LogError(">>> Entering GetRecurringPaymentHistoryAsync(recurringPayment={RecurringPayment})", recurringPayment);
         ArgumentNullException.ThrowIfNull(recurringPayment);
 
         return await _recurringPaymentHistoryRepository.Table
@@ -968,7 +1089,9 @@ public partial class OrderService : IOrderService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertRecurringPaymentHistoryAsync(RecurringPaymentHistory recurringPaymentHistory)
     {
+		_logger.LogError(">>> Entering InsertRecurringPaymentHistoryAsync(recurringPaymentHistory={RecurringPaymentHistory})", recurringPaymentHistory);
         await _recurringPaymentHistoryRepository.InsertAsync(recurringPaymentHistory);
+		_logger.LogWarning("<<< Exiting InsertRecurringPaymentHistoryAsync(recurringPaymentHistory={RecurringPaymentHistory})", recurringPaymentHistory);
     }
 
     #endregion

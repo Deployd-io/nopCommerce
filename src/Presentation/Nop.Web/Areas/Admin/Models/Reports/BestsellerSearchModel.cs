@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Reports;
 
@@ -10,17 +11,25 @@ namespace Nop.Web.Areas.Admin.Models.Reports;
 /// </summary>
 public partial record BestsellerSearchModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public BestsellerSearchModel()
     {
+		_logger.LogError(">>> Entering BestsellerSearchModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableOrderStatuses = new List<SelectListItem>();
+		_logger.LogError("BestsellerSearchModel(): AvailableOrderStatuses → {AvailableOrderStatuses}", AvailableOrderStatuses);
         AvailablePaymentStatuses = new List<SelectListItem>();
+		_logger.LogError("BestsellerSearchModel(): AvailablePaymentStatuses → {AvailablePaymentStatuses}", AvailablePaymentStatuses);
         AvailableCategories = new List<SelectListItem>();
+		_logger.LogError("BestsellerSearchModel(): AvailableCategories → {AvailableCategories}", AvailableCategories);
         AvailableManufacturers = new List<SelectListItem>();
+		_logger.LogError("BestsellerSearchModel(): AvailableManufacturers → {AvailableManufacturers}", AvailableManufacturers);
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("BestsellerSearchModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableVendors = new List<SelectListItem>();
+		_logger.LogError("BestsellerSearchModel(): AvailableVendors → {AvailableVendors}", AvailableVendors);
     }
 
     #endregion

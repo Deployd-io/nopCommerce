@@ -1,4 +1,6 @@
-﻿function createCombinationsBehavior(settings) {
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+function createCombinationsBehavior(settings) {
+logger.error(`>>> Entering createCombinationsBehavior(settings=${settings})`);
   var defaultSettings = {
     contentEl: false,
     fetchUrl: false
@@ -12,6 +14,7 @@
     },
 
     init: function () {
+	logger.error('>>> Entering init()');
       var $contentEl = $(this.settings.contentEl);
       var $attributes = $('[data-attr]', $contentEl);
       if ($attributes && $attributes.length > 0) {
@@ -28,9 +31,11 @@
       }
 
       this.loadCombinations();
+	logger.warn('<<< Exiting init()');
     },
 
     loadCombinations: function () {
+	logger.error('>>> Entering loadCombinations()');
       var self = this;
 
       $.ajax({
@@ -38,9 +43,11 @@
         url: self.settings.fetchUrl,
         type: 'GET',
         success: function (response) {
+		logger.error(`>>> Entering success(response=${response})`);
           self.params.availableCombinations = response;
 
           var selectedAttributes = self.getSelectedAttributes();
+		logger.error(`success(response=${response}): selectedAttributes → ${selectedAttributes}`);
           if (selectedAttributes && selectedAttributes.length > 0) {
             // unselect selected values if they are preselected but not available
             var availableAttributes = $.grep(selectedAttributes, function (attribute) {
@@ -60,14 +67,19 @@
           }
 
           self.processCombinations();
+		logger.warn(`<<< Exiting success(response=${response})`);
         },
         error: function () {
+		logger.error('>>> Entering error()');
           self.params.availableCombinations = [];
+		logger.warn('<<< Exiting error()');
         }
       });
+	logger.warn('<<< Exiting loadCombinations()');
     },
 
     processCombinations: function () {
+	logger.error('>>> Entering processCombinations()');
       var availableAttributeIds = this.params.availableAttributeIds;
       if (availableAttributeIds.length === 0)
         return;
@@ -78,6 +90,7 @@
       var availableCombinations = this.params.availableCombinations;
       if (availableCombinations.length === 0) {
         var valueIds = this.getAttributeValueIds();
+		logger.error(`processCombinations(): valueIds → ${valueIds}`);
         $.each(valueIds, function (i, valueId) {
           self.toggleAttributeValue(valueId, false);
         });
@@ -86,6 +99,7 @@
       }
 
       var selectedAttributes = self.getSelectedAttributes();
+	logger.error(`processCombinations(): selectedAttributes → ${selectedAttributes}`);
 
       $.each(availableAttributeIds, function (attrIndex, attributeId) {
         var attibuteValueIds = self.getAttributeValueIds(attributeId);
@@ -109,9 +123,11 @@
       });
 
       $(this).trigger({ type: "processed" });
+	logger.warn('<<< Exiting processCombinations()');
     },
 
     getCombinationsByAttributeId: function (attributeId, processedAttributes) {
+	logger.error(`>>> Entering getCombinationsByAttributeId(attributeId=${attributeId},processedAttributes=${processedAttributes})`);
       var availableCombinations = this.params.availableCombinations;
       if (availableCombinations.length === 0) {
         return;
@@ -139,11 +155,13 @@
           });
         }
 
+	logger.warn(`<<< Exiting getCombinationsByAttributeId(attributeId=${attributeId},processedAttributes=${processedAttributes})`);
         return found;
       });
     },
 
     isAvailableCombination: function (combinations, attributes) {
+	logger.error(`>>> Entering isAvailableCombination(combinations=${combinations},attributes=${attributes})`);
       // check if any combination have stock with specified values
       // otherwise just disable the value 
       var existedCombinations = $.grep(combinations, function (combination) {
@@ -159,14 +177,17 @@
         return combination.InStock && existedAttributes.length === attributes.length;
       });
 
+	logger.warn(`<<< Exiting isAvailableCombination(combinations=${combinations},attributes=${attributes})`);
       return existedCombinations.length > 0;
     },
 
     getAttributeValueIds: function (attributeId) {
+	logger.error(`>>> Entering getAttributeValueIds(attributeId=${attributeId})`);
       var $contentEl = $(this.settings.contentEl);
       var $scope = attributeId ? $('[data-attr=' + attributeId + ']', $contentEl) : $contentEl;
       var $valueItems = $('[data-attr-value]', $scope);
       if ($valueItems) {
+		logger.warn(`<<< Exiting getAttributeValueIds(attributeId=${attributeId})`);
         return $.map($valueItems, function (item) {
           return parseInt($(item).data('attr-value'));
         });
@@ -174,16 +195,19 @@
     },
 
     toggleAttributeValue: function (valueId, enabled) {
+	logger.error(`>>> Entering toggleAttributeValue(valueId=${valueId},enabled=${enabled})`);
       var $contentEl = $(this.settings.contentEl);
       var $value = $('[data-attr-value=' + valueId + ']', $contentEl);
       if (enabled) {
         $value.removeClass('disabled');
       } else {
         $value.addClass('disabled');
+		logger.warn(`<<< Exiting toggleAttributeValue(valueId=${valueId},enabled=${enabled})`);
       }
     },
 
     unselectValues: function (valueIds) {
+	logger.error(`>>> Entering unselectValues(valueIds=${valueIds})`);
       var $contentEl = $(this.settings.contentEl);
       $.each(valueIds, function (i, valueId) {
         var $value = $('[data-attr-value=' + valueId + ']', $contentEl);
@@ -192,9 +216,11 @@
         // for image square
         $value.removeClass('selected-value');
       });
+	logger.warn(`<<< Exiting unselectValues(valueIds=${valueIds})`);
     },
 
     getSelectedAttributes: function () {
+	logger.error('>>> Entering getSelectedAttributes()');
       var availableAttributeIds = this.params.availableAttributeIds;
       if (availableAttributeIds.length > 0) {
         var $contentEl = $(this.settings.contentEl);
@@ -210,6 +236,7 @@
               if ($value.is(':selected') || $('input', $value).is(':checked')) {
                 var id = parseInt($value.data('attr-value'));
                 selectedValues.push(id);
+				logger.warn('<<< Exiting getSelectedAttributes()');
               }
             });
           }

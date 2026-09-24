@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Text.RegularExpressions;
 using Nop.Core.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Core;
 
@@ -11,6 +12,7 @@ namespace Nop.Core;
 /// </summary>
 public partial class CommonHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     //we use regular expression based on RFC 5322 Official Standard (see https://emailregex.com/)
@@ -34,11 +36,15 @@ public partial class CommonHelper
     /// <returns></returns>
     public static string EnsureSubscriberEmailOrThrow(string email)
     {
+		_logger.LogError(">>> Entering EnsureSubscriberEmailOrThrow(email={Email})", email);
         var output = EnsureNotNull(email);
         output = output.Trim();
+		_logger.LogError("EnsureSubscriberEmailOrThrow(email={Email}): output → {Output}", email, output);
         output = EnsureMaximumLength(output, 255);
 
         if (!IsValidEmail(output))
+			_logger.LogError("Throwing NopException from EnsureSubscriberEmailOrThrow(email={Email})", email);
+		_logger.LogWarning("<<< Exiting EnsureSubscriberEmailOrThrow(email={Email})", email);
             throw new NopException("Email is not valid.");
 
         return output;
@@ -51,11 +57,14 @@ public partial class CommonHelper
     /// <returns>true if the string is a valid email address and false if it's not</returns>
     public static bool IsValidEmail(string email)
     {
+		_logger.LogError(">>> Entering IsValidEmail(email={Email})", email);
         if (string.IsNullOrEmpty(email))
             return false;
 
         email = email.Trim();
+		_logger.LogError("IsValidEmail(email={Email}): email → {Email1}", email, email);
 
+		_logger.LogWarning("<<< Exiting IsValidEmail(email={Email})", email);
         return GetEmailRegex().IsMatch(email);
     }
 
@@ -66,6 +75,8 @@ public partial class CommonHelper
     /// <returns>true if the string is a valid IpAddress and false if it's not</returns>
     public static bool IsValidIpAddress(string ipAddress)
     {
+		_logger.LogError(">>> Entering IsValidIpAddress(ipAddress={IpAddress})", ipAddress);
+        _logger.LogWarning("<<< Exiting IsValidIpAddress(ipAddress={IpAddress})", ipAddress);
         return IPAddress.TryParse(ipAddress, out var _);
     }
 
@@ -76,10 +87,14 @@ public partial class CommonHelper
     /// <returns>Result string</returns>
     public static string GenerateRandomDigitCode(int length)
     {
+		_logger.LogError(">>> Entering GenerateRandomDigitCode(length={Length})", length);
         using var random = new SecureRandomNumberGenerator();
         var str = string.Empty;
+		_logger.LogError("GenerateRandomDigitCode(length={Length}): str → {Str}", length, str);
         for (var i = 0; i < length; i++)
             str = string.Concat(str, random.Next(10).ToString());
+			_logger.LogError("GenerateRandomDigitCode(length={Length}): random → {Random}", length, random);
+		_logger.LogWarning("<<< Exiting GenerateRandomDigitCode(length={Length})", length);
         return str;
     }
 
@@ -91,7 +106,10 @@ public partial class CommonHelper
     /// <returns>Result</returns>
     public static int GenerateRandomInteger(int min = 0, int max = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GenerateRandomInteger(min={Min},max={Max})", min, max);
         using var random = new SecureRandomNumberGenerator();
+		_logger.LogError("GenerateRandomInteger(min={Min},max={Max}): random → {Random}", min, max, random);
+		_logger.LogWarning("<<< Exiting GenerateRandomInteger(min={Min},max={Max})", min, max);
         return random.Next(min, max);
     }
 
@@ -104,6 +122,7 @@ public partial class CommonHelper
     /// <returns>Input string if its length is OK; otherwise, truncated input string</returns>
     public static string EnsureMaximumLength(string str, int maxLength, string postfix = null)
     {
+		_logger.LogError(">>> Entering EnsureMaximumLength(str={Str},maxLength={MaxLength},postfix={Postfix})", str, maxLength, postfix);
         if (string.IsNullOrEmpty(str))
             return str;
 
@@ -113,9 +132,11 @@ public partial class CommonHelper
         var pLen = postfix?.Length ?? 0;
 
         var result = str[0..(maxLength - pLen)];
+		_logger.LogError("EnsureMaximumLength(str={Str},maxLength={MaxLength},postfix={Postfix}): result → {Result}", str, maxLength, postfix, result);
         if (!string.IsNullOrEmpty(postfix))
             result += postfix;
 
+		_logger.LogWarning("<<< Exiting EnsureMaximumLength(str={Str},maxLength={MaxLength},postfix={Postfix})", str, maxLength, postfix);
         return result;
     }
 
@@ -126,6 +147,8 @@ public partial class CommonHelper
     /// <returns>Input string with only numeric values, empty string if input is null/empty</returns>
     public static string EnsureNumericOnly(string str)
     {
+		_logger.LogError(">>> Entering EnsureNumericOnly(str={Str})", str);
+        _logger.LogWarning("<<< Exiting EnsureNumericOnly(str={Str})", str);
         return string.IsNullOrEmpty(str) ? string.Empty : new string(str.Where(char.IsDigit).ToArray());
     }
 
@@ -136,6 +159,8 @@ public partial class CommonHelper
     /// <returns>Result</returns>
     public static string EnsureNotNull(string str)
     {
+		_logger.LogError(">>> Entering EnsureNotNull(str={Str})", str);
+        _logger.LogWarning("<<< Exiting EnsureNotNull(str={Str})", str);
         return str ?? string.Empty;
     }
 
@@ -146,6 +171,8 @@ public partial class CommonHelper
     /// <returns>Boolean</returns>
     public static bool AreNullOrEmpty(params string[] stringsToValidate)
     {
+		_logger.LogError(">>> Entering AreNullOrEmpty(stringsToValidate={StringsToValidate})", stringsToValidate);
+        _logger.LogWarning("<<< Exiting AreNullOrEmpty(stringsToValidate={StringsToValidate})", stringsToValidate);
         return stringsToValidate.Any(string.IsNullOrEmpty);
     }
 
@@ -158,6 +185,7 @@ public partial class CommonHelper
     /// <returns>Result</returns>
     public static bool ArraysEqual<T>(T[] a1, T[] a2)
     {
+		_logger.LogError(">>> Entering ArraysEqual(a1={A1},a2={A2})", a1, a2);
         //also see Enumerable.SequenceEqual(a1, a2);
         if (ReferenceEquals(a1, a2))
             return true;
@@ -169,6 +197,7 @@ public partial class CommonHelper
             return false;
 
         var comparer = EqualityComparer<T>.Default;
+		_logger.LogWarning("<<< Exiting ArraysEqual(a1={A1},a2={A2})", a1, a2);
         return !a1.Where((t, i) => !comparer.Equals(t, a2[i])).Any();
     }
 
@@ -180,17 +209,22 @@ public partial class CommonHelper
     /// <param name="value">The value to set the property to.</param>
     public static void SetProperty(object instance, string propertyName, object value)
     {
+		_logger.LogError(">>> Entering SetProperty(instance={Instance},propertyName={PropertyName},value={Value})", instance, propertyName, value);
         ArgumentNullException.ThrowIfNull(instance);
         ArgumentNullException.ThrowIfNull(propertyName);
 
         var instanceType = instance.GetType();
+		_logger.LogError("SetProperty(instance={Instance},propertyName={PropertyName},value={Value}): instanceType → {InstanceType}", instance, propertyName, value, instanceType);
         var pi = instanceType.GetProperty(propertyName)
             ?? throw new NopException("No property '{0}' found on the instance of type '{1}'.", propertyName, instanceType);
 
         if (!pi.CanWrite)
+			_logger.LogError("Throwing NopException from SetProperty(instance={Instance},propertyName={PropertyName},value={Value})", instance, propertyName, value);
             throw new NopException("The property '{0}' on the instance of type '{1}' does not have a setter.", propertyName, instanceType);
         if (value != null && !value.GetType().IsAssignableFrom(pi.PropertyType))
             value = To(value, pi.PropertyType);
+			_logger.LogWarning("<<< Exiting SetProperty(instance={Instance},propertyName={PropertyName},value={Value})", instance, propertyName, value);
+			_logger.LogError("SetProperty(instance={Instance},propertyName={PropertyName},value={Value}): value → {Value1}", instance, propertyName, value, value);
         pi.SetValue(instance, value, Array.Empty<object>());
     }
 
@@ -202,6 +236,10 @@ public partial class CommonHelper
     /// <returns>The converted value.</returns>
     public static object To(object value, Type destinationType)
     {
+		_logger.LogError(">>> Entering To(value={Value},destinationType={DestinationType})", value, destinationType);
+        _logger.LogWarning("<<< Exiting To(value={Value},destinationType={DestinationType})", value, destinationType);
+		_logger.LogWarning("<<< Exiting To(value={Value},destinationType={DestinationType},culture={Culture})", value, destinationType, culture);
+        _logger.LogWarning("<<< Exiting To(value={Value})", value);
         return To(value, destinationType, CultureInfo.InvariantCulture);
     }
 
@@ -255,6 +293,7 @@ public partial class CommonHelper
     /// <returns>Splitted string</returns>
     public static string SplitCamelCaseWord(string str)
     {
+		_logger.LogError(">>> Entering SplitCamelCaseWord(str={Str})", str);
         if (string.IsNullOrEmpty(str))
             return string.Empty;
 
@@ -264,7 +303,9 @@ public partial class CommonHelper
 
         //ensure no spaces (e.g. when the first letter is upper case)
         result = result.TrimStart();
+		_logger.LogError("SplitCamelCaseWord(str={Str}): result → {Result}", str, result);
 
+		_logger.LogWarning("<<< Exiting SplitCamelCaseWord(str={Str})", str);
         return result;
     }
 
@@ -275,11 +316,14 @@ public partial class CommonHelper
     /// <returns>Splitted <c>PascalCase</c></returns>
     public static string SnakeCaseToPascalCase(string str)
     {
+		_logger.LogError(">>> Entering SnakeCaseToPascalCase(str={Str})", str);
         if (string.IsNullOrEmpty(str))
             return string.Empty;
 
         var tempString = str.ToLower().Replace("_", " ");
+		_logger.LogError("SnakeCaseToPascalCase(str={Str}): tempString → {TempString}", str, tempString);
 
+		_logger.LogWarning("<<< Exiting SnakeCaseToPascalCase(str={Str})", str);
         return CultureInfo.InvariantCulture.TextInfo
             .ToTitleCase(tempString)
             .Replace(" ", string.Empty);
@@ -293,11 +337,13 @@ public partial class CommonHelper
     /// <returns></returns>
     public static int GetDifferenceInYears(DateTime startDate, DateTime endDate)
     {
+		_logger.LogError(">>> Entering GetDifferenceInYears(startDate={StartDate},endDate={EndDate})", startDate, endDate);
         //source: http://stackoverflow.com/questions/9/how-do-i-calculate-someones-age-in-c
         //this assumes you are looking for the western idea of age and not using East Asian reckoning.
         var age = endDate.Year - startDate.Year;
         if (startDate > endDate.AddYears(-age))
             age--;
+		_logger.LogWarning("<<< Exiting GetDifferenceInYears(startDate={StartDate},endDate={EndDate})", startDate, endDate);
         return age;
     }
 
@@ -310,6 +356,7 @@ public partial class CommonHelper
     /// <returns>An instance of the Nullable<System.DateTime></returns>
     public static DateTime? ParseDate(int? year, int? month, int? day)
     {
+		_logger.LogError(">>> Entering ParseDate(year={Year},month={Month},day={Day})", year, month, day);
         if (!year.HasValue || !month.HasValue || !day.HasValue)
             return null;
 
@@ -317,8 +364,12 @@ public partial class CommonHelper
         try
         {
             date = new DateTime(year.Value, month.Value, day.Value, CultureInfo.CurrentCulture.Calendar);
+			_logger.LogError("ParseDate(year={Year},month={Month},day={Day}): date → {Date}", year, month, day, date);
         }
         catch { }
+		_logger.LogError("Exception in ParseDate(year={Year},month={Month},day={Day})", year, month, day);
+		_logger.LogDebug("ParseDate(year={Year},month={Month},day={Day}): date → {Date}", year, month, day, date);
+		_logger.LogWarning("<<< Exiting ParseDate(year={Year},month={Month},day={Day})", year, month, day);
         return date;
     }
 

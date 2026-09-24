@@ -29,6 +29,7 @@ using Nop.Web.Infrastructure.Cache;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.Order;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -37,6 +38,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class OrderModelFactory : IOrderModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly AddressSettings _addressSettings;
@@ -169,15 +171,21 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     protected virtual async Task<PictureModel> PrepareOrderItemPictureModelAsync(OrderItem orderItem, int pictureSize, bool showDefaultPicture, string productName)
     {
+		_logger.LogError(">>> Entering PrepareOrderItemPictureModelAsync(orderItem={OrderItem},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName})", orderItem, pictureSize, showDefaultPicture, productName);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var language = await _workContext.GetWorkingLanguageAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareOrderItemPictureModelAsync(orderItem={OrderItem},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName}): language → {Language}", orderItem, pictureSize, showDefaultPicture, productName, language);
+		_logger.LogError("PrepareOrderItemPictureModelAsync(orderItem={OrderItem},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName}): store → {Store}", orderItem, pictureSize, showDefaultPicture, productName, store);
 
         var model = await _shortTermCacheManager.GetAsync(async () =>
         {
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogError("PrepareOrderItemPictureModelAsync(orderItem={OrderItem},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName}): product → {Product}", orderItem, pictureSize, showDefaultPicture, productName, product);
 
             //order item picture
             var orderItemPicture = await _pictureService.GetProductPictureAsync(product, orderItem.AttributesXml);
+			_logger.LogError("PrepareOrderItemPictureModelAsync(orderItem={OrderItem},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName}): orderItemPicture → {OrderItemPicture}", orderItem, pictureSize, showDefaultPicture, productName, orderItemPicture);
 
             return new PictureModel
             {
@@ -187,6 +195,8 @@ public partial class OrderModelFactory : IOrderModelFactory
             };
         }, NopModelCacheDefaults.OrderPictureModelKey, orderItem, pictureSize, showDefaultPicture, language, _webHelper.IsCurrentConnectionSecured(), store);
 
+		_logger.LogError("PrepareOrderItemPictureModelAsync(orderItem,pictureSize,showDefaultPicture,productName)={OrderItem},{PictureSize},{ShowDefaultPicture},{ProductName}: external service call took {Arg4} ms", orderItem, pictureSize, showDefaultPicture, productName, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting PrepareOrderItemPictureModelAsync(orderItem={OrderItem},pictureSize={PictureSize},showDefaultPicture={ShowDefaultPicture},productName={ProductName})", orderItem, pictureSize, showDefaultPicture, productName);
         return model;
     }
 
@@ -205,10 +215,14 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<CustomerOrderListModel> PrepareCustomerOrderListModelAsync(int? page, OrderHistoryPeriods limit)
     {
+		_logger.LogError(">>> Entering PrepareCustomerOrderListModelAsync(page={Page},limit={Limit})", page, limit);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): store → {Store}", page, limit, store);
+		_logger.LogError("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): customer → {Customer}", page, limit, customer);
         var pageSize = _orderSettings.CustomerOrdersPageSize;
         var pageIndex = Math.Max((page ?? 0) - 1, 0);
+		_logger.LogError("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): pageIndex → {PageIndex}", page, limit, pageIndex);
 
         var orders = await _orderService.SearchOrdersAsync(storeId: store.Id,
             customerId: customer.Id,
@@ -217,6 +231,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             pageIndex: pageIndex,
             pageSize: pageSize);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var periods = await Enum.GetValues<OrderHistoryPeriods>()
             .SelectAwait(async enumValue => new
             {
@@ -224,8 +239,10 @@ public partial class OrderModelFactory : IOrderModelFactory
                 Name = await _localizationService.GetLocalizedEnumAsync(enumValue)
             }).ToListAsync();
 
+		_logger.LogError("PrepareCustomerOrderListModelAsync(page,limit)={Page},{Limit}: database query executed in {Arg2} ms", page, limit, __logStart.ElapsedMilliseconds);
         var model = new CustomerOrderListModel
         {
+			_logger.LogDebug("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): Name → {Name}", page, limit, Name);
             AvailableLimits = new SelectList(periods, "ID", "Name", limit.ToString()).ToList(),
             PagerModel = new PagerModel(_localizationService)
             {
@@ -253,6 +270,7 @@ public partial class OrderModelFactory : IOrderModelFactory
                 CustomOrderNumber = order.CustomOrderNumber
             };
             var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+			_logger.LogError("PrepareCustomerOrderListModelAsync(page={Page},limit={Limit}): orderTotalInCustomerCurrency → {OrderTotalInCustomerCurrency}", page, limit, orderTotalInCustomerCurrency);
             orderModel.OrderTotal = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, (await _workContext.GetWorkingLanguageAsync()).Id);
 
             model.Orders.Add(orderModel);
@@ -270,15 +288,20 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<CustomerRecurringPaymentListModel> PrepareCustomerRecurringPaymentListModelAsync()
     {
+		_logger.LogError(">>> Entering PrepareCustomerRecurringPaymentListModelAsync()");
         var model = new CustomerRecurringPaymentListModel();
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareCustomerRecurringPaymentListModelAsync(): customer → {Customer}", customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareCustomerRecurringPaymentListModelAsync(): store → {Store}", store);
+		_logger.LogError("PrepareCustomerRecurringPaymentListModelAsync(): model → {Model}", model);
 
         var recurringPayments = await _orderService.SearchRecurringPaymentsAsync(store.Id,
             customer.Id);
         foreach (var recurringPayment in recurringPayments)
         {
             var order = await _orderService.GetOrderByIdAsync(recurringPayment.InitialOrderId);
+			_logger.LogError("PrepareCustomerRecurringPaymentListModelAsync(): order → {Order}", order);
 
             var recurringPaymentModel = new CustomerRecurringPaymentModel
             {
@@ -297,6 +320,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             model.RecurringPayments.Add(recurringPaymentModel);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareCustomerRecurringPaymentListModelAsync()");
         return model;
     }
 
@@ -310,6 +334,7 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<OrderDetailsModel> PrepareOrderDetailsModelAsync(Order order)
     {
+		_logger.LogError(">>> Entering PrepareOrderDetailsModelAsync(order={Order})", order);
         ArgumentNullException.ThrowIfNull(order);
         var model = new OrderDetailsModel
         {
@@ -327,14 +352,18 @@ public partial class OrderModelFactory : IOrderModelFactory
         };
 
         var languageId = (await _workContext.GetWorkingLanguageAsync()).Id;
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): languageId → {LanguageId}", order, languageId);
 
         if (order.ShippingStatus != ShippingStatus.ShippingNotRequired)
         {
             model.IsShippable = true;
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.IsShippable → {Arg1}", order, model.IsShippable);
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.PickupInStore → {Arg1}", order, model.PickupInStore);
             model.PickupInStore = order.PickupInStore;
             if (!order.PickupInStore)
             {
                 var shippingAddress = await _addressService.GetAddressByIdAsync(order.ShippingAddressId ?? 0);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): shippingAddress → {ShippingAddress}", order, shippingAddress);
 
                 await _addressModelFactory.PrepareAddressModelAsync(model.ShippingAddress,
                     address: shippingAddress,
@@ -344,6 +373,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             else if (order.PickupAddressId.HasValue && await _addressService.GetAddressByIdAsync(order.PickupAddressId.Value) is Address pickupAddress)
             {
                 var (addressLine, addressFields) = await _addressService.FormatAddressAsync(pickupAddress, languageId);
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.PickupAddress → {Arg1}", order, model.PickupAddress);
                 model.PickupAddress = new AddressModel
                 {
                     Address1 = pickupAddress.Address1,
@@ -362,9 +392,11 @@ public partial class OrderModelFactory : IOrderModelFactory
             }
 
             model.ShippingMethod = order.ShippingMethod;
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.ShippingMethod → {Arg1}", order, model.ShippingMethod);
 
             //shipments (only already shipped or ready for pickup)
             var shipments = (await _shipmentService.GetShipmentsByOrderIdAsync(order.Id, !order.PickupInStore, order.PickupInStore)).OrderBy(x => x.CreatedOnUtc).ToList();
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): shipments → {Shipments}", order, shipments);
             foreach (var shipment in shipments)
             {
                 var shipmentModel = new OrderDetailsModel.ShipmentBriefModel
@@ -383,6 +415,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         }
 
         var billingAddress = await _addressService.GetAddressByIdAsync(order.BillingAddressId);
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): billingAddress → {BillingAddress}", order, billingAddress);
 
         //billing info
         await _addressModelFactory.PrepareAddressModelAsync(model.BillingAddress,
@@ -392,13 +425,16 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         //VAT number
         model.VatNumber = order.VatNumber;
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.VatNumber → {Arg1}", order, model.VatNumber);
 
         //payment method
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): customer → {Customer}", order, customer);
         var paymentMethod = await _paymentPluginManager
             .LoadPluginBySystemNameAsync(order.PaymentMethodSystemName, customer, order.StoreId);
         model.PaymentMethod = paymentMethod != null ? await _localizationService.GetLocalizedFriendlyNameAsync(paymentMethod, languageId) : order.PaymentMethodSystemName;
         model.PaymentStatus = order.PaymentStatus;
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.PaymentStatus → {Arg1}", order, model.PaymentStatus);
         model.PaymentMethodStatus = await _localizationService.GetLocalizedEnumAsync(order.PaymentStatus);
         model.CanRePostProcessPayment = await _paymentService.CanRePostProcessPaymentAsync(order);
 
@@ -412,14 +448,18 @@ public partial class OrderModelFactory : IOrderModelFactory
 
             //order subtotal
             var orderSubtotalInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderSubtotalInclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderSubtotalInclTaxInCustomerCurrency → {OrderSubtotalInclTaxInCustomerCurrency}", order, orderSubtotalInclTaxInCustomerCurrency);
             model.OrderSubtotal = await _priceFormatter.FormatPriceAsync(orderSubtotalInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
             model.OrderSubtotalValue = orderSubtotalInclTaxInCustomerCurrency;
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.OrderSubtotalValue → {Arg1}", order, model.OrderSubtotalValue);
             //discount (applied to order subtotal)
             var orderSubTotalDiscountInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderSubTotalDiscountInclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderSubTotalDiscountInclTaxInCustomerCurrency → {OrderSubTotalDiscountInclTaxInCustomerCurrency}", order, orderSubTotalDiscountInclTaxInCustomerCurrency);
             if (orderSubTotalDiscountInclTaxInCustomerCurrency > decimal.Zero)
             {
                 model.OrderSubTotalDiscount = await _priceFormatter.FormatPriceAsync(-orderSubTotalDiscountInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
                 model.OrderSubTotalDiscountValue = orderSubTotalDiscountInclTaxInCustomerCurrency;
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.OrderSubTotalDiscountValue → {Arg1}", order, model.OrderSubTotalDiscountValue);
             }
         }
         else
@@ -428,10 +468,12 @@ public partial class OrderModelFactory : IOrderModelFactory
 
             //order subtotal
             var orderSubtotalExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderSubtotalExclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderSubtotalExclTaxInCustomerCurrency → {OrderSubtotalExclTaxInCustomerCurrency}", order, orderSubtotalExclTaxInCustomerCurrency);
             model.OrderSubtotal = await _priceFormatter.FormatPriceAsync(orderSubtotalExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
             model.OrderSubtotalValue = orderSubtotalExclTaxInCustomerCurrency;
             //discount (applied to order subtotal)
             var orderSubTotalDiscountExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderSubTotalDiscountExclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderSubTotalDiscountExclTaxInCustomerCurrency → {OrderSubTotalDiscountExclTaxInCustomerCurrency}", order, orderSubTotalDiscountExclTaxInCustomerCurrency);
             if (orderSubTotalDiscountExclTaxInCustomerCurrency > decimal.Zero)
             {
                 model.OrderSubTotalDiscount = await _priceFormatter.FormatPriceAsync(-orderSubTotalDiscountExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
@@ -445,14 +487,18 @@ public partial class OrderModelFactory : IOrderModelFactory
 
             //order shipping
             var orderShippingInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderShippingInclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderShippingInclTaxInCustomerCurrency → {OrderShippingInclTaxInCustomerCurrency}", order, orderShippingInclTaxInCustomerCurrency);
             model.OrderShipping = await _priceFormatter.FormatShippingPriceAsync(orderShippingInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
             model.OrderShippingValue = orderShippingInclTaxInCustomerCurrency;
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.OrderShippingValue → {Arg1}", order, model.OrderShippingValue);
             //payment method additional fee
             var paymentMethodAdditionalFeeInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.PaymentMethodAdditionalFeeInclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): paymentMethodAdditionalFeeInclTaxInCustomerCurrency → {PaymentMethodAdditionalFeeInclTaxInCustomerCurrency}", order, paymentMethodAdditionalFeeInclTaxInCustomerCurrency);
             if (paymentMethodAdditionalFeeInclTaxInCustomerCurrency > decimal.Zero)
             {
                 model.PaymentMethodAdditionalFee = await _priceFormatter.FormatPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFeeInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
                 model.PaymentMethodAdditionalFeeValue = paymentMethodAdditionalFeeInclTaxInCustomerCurrency;
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.PaymentMethodAdditionalFeeValue → {Arg1}", order, model.PaymentMethodAdditionalFeeValue);
             }
         }
         else
@@ -461,10 +507,12 @@ public partial class OrderModelFactory : IOrderModelFactory
 
             //order shipping
             var orderShippingExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderShippingExclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderShippingExclTaxInCustomerCurrency → {OrderShippingExclTaxInCustomerCurrency}", order, orderShippingExclTaxInCustomerCurrency);
             model.OrderShipping = await _priceFormatter.FormatShippingPriceAsync(orderShippingExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
             model.OrderShippingValue = orderShippingExclTaxInCustomerCurrency;
             //payment method additional fee
             var paymentMethodAdditionalFeeExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.PaymentMethodAdditionalFeeExclTax, order.CurrencyRate);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): paymentMethodAdditionalFeeExclTaxInCustomerCurrency → {PaymentMethodAdditionalFeeExclTaxInCustomerCurrency}", order, paymentMethodAdditionalFeeExclTaxInCustomerCurrency);
             if (paymentMethodAdditionalFeeExclTaxInCustomerCurrency > decimal.Zero)
             {
                 model.PaymentMethodAdditionalFee = await _priceFormatter.FormatPaymentMethodAdditionalFeeAsync(paymentMethodAdditionalFeeExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
@@ -474,7 +522,9 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         //tax
         var displayTax = true;
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): displayTax → {DisplayTax}", order, displayTax);
         var displayTaxRates = true;
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): displayTaxRates → {DisplayTaxRates}", order, displayTaxRates);
         if (_taxSettings.HideTaxInOrderSummary && order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax)
         {
             displayTax = false;
@@ -490,10 +540,12 @@ public partial class OrderModelFactory : IOrderModelFactory
             else
             {
                 var taxRates = _orderService.ParseTaxRates(order, order.TaxRates);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): taxRates → {TaxRates}", order, taxRates);
                 displayTaxRates = _taxSettings.DisplayTaxRates && taxRates.Any();
                 displayTax = !displayTaxRates;
 
                 var orderTaxInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTax, order.CurrencyRate);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderTaxInCustomerCurrency → {OrderTaxInCustomerCurrency}", order, orderTaxInCustomerCurrency);
                 model.Tax = await _priceFormatter.FormatPriceAsync(orderTaxInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
 
                 foreach (var tr in taxRates)
@@ -507,16 +559,21 @@ public partial class OrderModelFactory : IOrderModelFactory
             }
         }
         model.DisplayTaxRates = displayTaxRates;
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.DisplayTaxRates → {Arg1}", order, model.DisplayTaxRates);
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.DisplayTax → {Arg1}", order, model.DisplayTax);
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.DisplayTaxShippingInfo → {Arg1}", order, model.DisplayTaxShippingInfo);
         model.DisplayTax = displayTax;
         model.DisplayTaxShippingInfo = _catalogSettings.DisplayTaxShippingInfoOrderDetailsPage;
         model.PricesIncludeTax = order.CustomerTaxDisplayType == TaxDisplayType.IncludingTax;
 
         //discount (applied to order total)
         var orderDiscountInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderDiscount, order.CurrencyRate);
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderDiscountInCustomerCurrency → {OrderDiscountInCustomerCurrency}", order, orderDiscountInCustomerCurrency);
         if (orderDiscountInCustomerCurrency > decimal.Zero)
         {
             model.OrderTotalDiscount = await _priceFormatter.FormatPriceAsync(-orderDiscountInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
             model.OrderTotalDiscountValue = orderDiscountInCustomerCurrency;
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.OrderTotalDiscountValue → {Arg1}", order, model.OrderTotalDiscountValue);
         }
 
         //gift cards
@@ -533,16 +590,20 @@ public partial class OrderModelFactory : IOrderModelFactory
         if (order.RedeemedRewardPointsEntryId.HasValue && await _rewardPointService.GetRewardPointsHistoryEntryByIdAsync(order.RedeemedRewardPointsEntryId.Value) is RewardPointsHistory redeemedRewardPointsEntry)
         {
             model.RedeemedRewardPoints = -redeemedRewardPointsEntry.Points;
+			_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.RedeemedRewardPoints → {Arg1}", order, model.RedeemedRewardPoints);
             model.RedeemedRewardPointsAmount = await _priceFormatter.FormatPriceAsync(-(_currencyService.ConvertCurrency(redeemedRewardPointsEntry.UsedAmount, order.CurrencyRate)), true, order.CustomerCurrencyCode, false, languageId);
         }
 
         //total
         var orderTotalInCustomerCurrency = _currencyService.ConvertCurrency(order.OrderTotal, order.CurrencyRate);
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderTotalInCustomerCurrency → {OrderTotalInCustomerCurrency}", order, orderTotalInCustomerCurrency);
         model.OrderTotal = await _priceFormatter.FormatPriceAsync(orderTotalInCustomerCurrency, true, order.CustomerCurrencyCode, false, languageId);
         model.OrderTotalValue = orderTotalInCustomerCurrency;
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.OrderTotalValue → {Arg1}", order, model.OrderTotalValue);
 
         //checkout attributes
         model.CheckoutAttributeInfo = order.CheckoutAttributeDescription;
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.CheckoutAttributeInfo → {Arg1}", order, model.CheckoutAttributeInfo);
 
         //order notes
         foreach (var orderNote in (await _orderService.GetOrderNotesByOrderIdAsync(order.Id, true))
@@ -556,6 +617,7 @@ public partial class OrderModelFactory : IOrderModelFactory
                 Note = _orderService.FormatOrderNoteText(orderNote),
                 CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(orderNote.CreatedOnUtc, DateTimeKind.Utc)
             });
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): CreatedOn → {CreatedOn}", order, CreatedOn);
         }
 
         //can user cancel the order
@@ -565,14 +627,19 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         //purchased products
         model.ShowSku = _catalogSettings.ShowSkuOnProductDetailsPage;
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.ShowSku → {Arg1}", order, model.ShowSku);
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.ShowVendorName → {Arg1}", order, model.ShowVendorName);
+		_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): model.ShowProductThumbnail → {Arg1}", order, model.ShowProductThumbnail);
         model.ShowVendorName = _vendorSettings.ShowVendorOnOrderDetailsPage;
         model.ShowProductThumbnail = _orderSettings.ShowProductThumbnailInOrderDetailsPage;
 
         var orderItems = await _orderService.GetOrderItemsAsync(order.Id);
+		_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): orderItems → {OrderItems}", order, orderItems);
 
         foreach (var orderItem in orderItems)
         {
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): product → {Product}", order, product);
 
             var orderItemModel = new OrderDetailsModel.OrderItemModel
             {
@@ -603,21 +670,27 @@ public partial class OrderModelFactory : IOrderModelFactory
             {
                 //including tax
                 var unitPriceInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceInclTax, order.CurrencyRate);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): unitPriceInclTaxInCustomerCurrency → {UnitPriceInclTaxInCustomerCurrency}", order, unitPriceInclTaxInCustomerCurrency);
                 orderItemModel.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
                 orderItemModel.UnitPriceValue = unitPriceInclTaxInCustomerCurrency;
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): orderItemModel.UnitPriceValue → {Arg1}", order, orderItemModel.UnitPriceValue);
 
                 var priceInclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.PriceInclTax, order.CurrencyRate);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): priceInclTaxInCustomerCurrency → {PriceInclTaxInCustomerCurrency}", order, priceInclTaxInCustomerCurrency);
                 orderItemModel.SubTotal = await _priceFormatter.FormatPriceAsync(priceInclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, true);
                 orderItemModel.SubTotalValue = priceInclTaxInCustomerCurrency;
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): orderItemModel.SubTotalValue → {Arg1}", order, orderItemModel.SubTotalValue);
             }
             else
             {
                 //excluding tax
                 var unitPriceExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.UnitPriceExclTax, order.CurrencyRate);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): unitPriceExclTaxInCustomerCurrency → {UnitPriceExclTaxInCustomerCurrency}", order, unitPriceExclTaxInCustomerCurrency);
                 orderItemModel.UnitPrice = await _priceFormatter.FormatPriceAsync(unitPriceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
                 orderItemModel.UnitPriceValue = unitPriceExclTaxInCustomerCurrency;
 
                 var priceExclTaxInCustomerCurrency = _currencyService.ConvertCurrency(orderItem.PriceExclTax, order.CurrencyRate);
+				_logger.LogError("PrepareOrderDetailsModelAsync(order={Order}): priceExclTaxInCustomerCurrency → {PriceExclTaxInCustomerCurrency}", order, priceExclTaxInCustomerCurrency);
                 orderItemModel.SubTotal = await _priceFormatter.FormatPriceAsync(priceExclTaxInCustomerCurrency, true, order.CustomerCurrencyCode, languageId, false);
                 orderItemModel.SubTotalValue = priceExclTaxInCustomerCurrency;
             }
@@ -625,8 +698,10 @@ public partial class OrderModelFactory : IOrderModelFactory
             //downloadable products
             if (await _orderService.IsDownloadAllowedAsync(orderItem))
                 orderItemModel.DownloadId = product.DownloadId;
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): orderItemModel.DownloadId → {Arg1}", order, orderItemModel.DownloadId);
             if (await _orderService.IsLicenseDownloadAllowedAsync(orderItem))
                 orderItemModel.LicenseId = orderItem.LicenseDownloadId ?? 0;
+				_logger.LogDebug("PrepareOrderDetailsModelAsync(order={Order}): orderItemModel.LicenseId → {Arg1}", order, orderItemModel.LicenseId);
 
             if (_orderSettings.ShowProductThumbnailInOrderDetailsPage)
             {
@@ -634,6 +709,7 @@ public partial class OrderModelFactory : IOrderModelFactory
             }
         }
 
+		_logger.LogWarning("<<< Exiting PrepareOrderDetailsModelAsync(order={Order})", order);
         return model;
     }
 
@@ -647,9 +723,11 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<ShipmentDetailsModel> PrepareShipmentDetailsModelAsync(Shipment shipment)
     {
+		_logger.LogError(">>> Entering PrepareShipmentDetailsModelAsync(shipment={Shipment})", shipment);
         ArgumentNullException.ThrowIfNull(shipment);
 
         var order = await _orderService.GetOrderByIdAsync(shipment.OrderId) ?? throw new Exception("order cannot be loaded");
+		_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): order → {Order}", shipment, order);
         var model = new ShipmentDetailsModel
         {
             Id = shipment.Id
@@ -665,22 +743,31 @@ public partial class OrderModelFactory : IOrderModelFactory
         if (!string.IsNullOrEmpty(shipment.TrackingNumber))
         {
             model.TrackingNumber = shipment.TrackingNumber;
+			_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): model.TrackingNumber → {Arg1}", shipment, model.TrackingNumber);
             var shipmentTracker = await _shipmentService.GetShipmentTrackerAsync(shipment);
+			_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentTracker → {ShipmentTracker}", shipment, shipmentTracker);
             if (shipmentTracker != null)
             {
                 model.TrackingNumberUrl = await shipmentTracker.GetUrlAsync(shipment.TrackingNumber, shipment);
                 if (_shippingSettings.DisplayShipmentEventsToCustomers)
                 {
                     var shipmentEvents = await shipmentTracker.GetShipmentEventsAsync(shipment.TrackingNumber, shipment);
+					_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentEvents → {ShipmentEvents}", shipment, shipmentEvents);
                     if (shipmentEvents != null)
                     {
                         foreach (var shipmentEvent in shipmentEvents)
                         {
                             var shipmentStatusEventModel = new ShipmentDetailsModel.ShipmentStatusEventModel();
+							_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel → {ShipmentStatusEventModel}", shipment, shipmentStatusEventModel);
                             var shipmentEventCountry = await _countryService.GetCountryByTwoLetterIsoCodeAsync(shipmentEvent.CountryCode);
+							_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentEventCountry → {ShipmentEventCountry}", shipment, shipmentEventCountry);
                             shipmentStatusEventModel.Country = shipmentEventCountry != null
                                 ? await _localizationService.GetLocalizedAsync(shipmentEventCountry, x => x.Name) : shipmentEvent.CountryCode;
                             shipmentStatusEventModel.Status = shipmentEvent.Status;
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.Status → {Arg1}", shipment, shipmentStatusEventModel.Status);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.Date → {Arg1}", shipment, shipmentStatusEventModel.Date);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.EventName → {Arg1}", shipment, shipmentStatusEventModel.EventName);
+							_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): shipmentStatusEventModel.Location → {Arg1}", shipment, shipmentStatusEventModel.Location);
                             shipmentStatusEventModel.Date = shipmentEvent.Date;
                             shipmentStatusEventModel.EventName = shipmentEvent.EventName;
                             shipmentStatusEventModel.Location = shipmentEvent.Location;
@@ -693,13 +780,16 @@ public partial class OrderModelFactory : IOrderModelFactory
 
         //products in this shipment
         model.ShowSku = _catalogSettings.ShowSkuOnProductDetailsPage;
+		_logger.LogDebug("PrepareShipmentDetailsModelAsync(shipment={Shipment}): model.ShowSku → {Arg1}", shipment, model.ShowSku);
         foreach (var shipmentItem in await _shipmentService.GetShipmentItemsByShipmentIdAsync(shipment.Id))
         {
             var orderItem = await _orderService.GetOrderItemByIdAsync(shipmentItem.OrderItemId);
+			_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): orderItem → {OrderItem}", shipment, orderItem);
             if (orderItem == null)
                 continue;
 
             var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
+			_logger.LogError("PrepareShipmentDetailsModelAsync(shipment={Shipment}): product → {Product}", shipment, product);
 
             var shipmentItemModel = new ShipmentDetailsModel.ShipmentItemModel
             {
@@ -728,6 +818,7 @@ public partial class OrderModelFactory : IOrderModelFactory
         //order details model
         model.Order = await PrepareOrderDetailsModelAsync(order);
 
+		_logger.LogWarning("<<< Exiting PrepareShipmentDetailsModelAsync(shipment={Shipment})", shipment);
         return model;
     }
 
@@ -741,11 +832,16 @@ public partial class OrderModelFactory : IOrderModelFactory
     /// </returns>
     public virtual async Task<CustomerRewardPointsModel> PrepareCustomerRewardPointsAsync(int? page)
     {
+		_logger.LogError(">>> Entering PrepareCustomerRewardPointsAsync(page={Page})", page);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         //get reward points history
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): customer → {Customer}", page, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): store → {Store}", page, store);
         var pageSize = _rewardPointsSettings.PageSize;
         var rewardPoints = await _rewardPointService.GetRewardPointsHistoryAsync(customer.Id, store.Id, true, pageIndex: --page ?? 0, pageSize: pageSize);
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): rewardPoints → {RewardPoints}", page, rewardPoints);
 
         //prepare model
         var model = new CustomerRewardPointsModel
@@ -767,6 +863,7 @@ public partial class OrderModelFactory : IOrderModelFactory
 
             PagerModel = new PagerModel(_localizationService)
             {
+				_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): PagerModel → {PagerModel}", page, PagerModel);
                 PageSize = rewardPoints.PageSize,
                 TotalRecords = rewardPoints.TotalCount,
                 PageIndex = rewardPoints.PageIndex,
@@ -775,20 +872,29 @@ public partial class OrderModelFactory : IOrderModelFactory
                 UseRouteLinks = true,
                 RouteValues = new RewardPointsRouteValues { PageNumber = page ?? 0 }
             }
+			_logger.LogError("PrepareCustomerRewardPointsAsync(page)={Page}: database query executed in {Arg1} ms", page, __logStart.ElapsedMilliseconds);
         };
 
         //current amount/balance
         var rewardPointsBalance = await _rewardPointService.GetRewardPointsBalanceAsync(customer.Id, store.Id);
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): rewardPointsBalance → {RewardPointsBalance}", page, rewardPointsBalance);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): model.RewardPointsBalance → {Arg1}", page, model.RewardPointsBalance);
         var rewardPointsAmountBase = await _orderTotalCalculationService.ConvertRewardPointsToAmountAsync(rewardPointsBalance);
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): rewardPointsAmountBase → {RewardPointsAmountBase}", page, rewardPointsAmountBase);
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): currentCurrency → {CurrentCurrency}", page, currentCurrency);
         var rewardPointsAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(rewardPointsAmountBase, currentCurrency);
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): rewardPointsAmount → {RewardPointsAmount}", page, rewardPointsAmount);
         model.RewardPointsBalance = rewardPointsBalance;
         model.RewardPointsAmount = await _priceFormatter.FormatPriceAsync(rewardPointsAmount, true, false);
 
         //minimum amount/balance
         var minimumRewardPointsBalance = _rewardPointsSettings.MinimumRewardPointsToUse;
         var minimumRewardPointsAmountBase = await _orderTotalCalculationService.ConvertRewardPointsToAmountAsync(minimumRewardPointsBalance);
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): minimumRewardPointsAmountBase → {MinimumRewardPointsAmountBase}", page, minimumRewardPointsAmountBase);
+		_logger.LogDebug("PrepareCustomerRewardPointsAsync(page={Page}): model.MinimumRewardPointsBalance → {Arg1}", page, model.MinimumRewardPointsBalance);
         var minimumRewardPointsAmount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(minimumRewardPointsAmountBase, currentCurrency);
+		_logger.LogError("PrepareCustomerRewardPointsAsync(page={Page}): minimumRewardPointsAmount → {MinimumRewardPointsAmount}", page, minimumRewardPointsAmount);
         model.MinimumRewardPointsBalance = minimumRewardPointsBalance;
         model.MinimumRewardPointsAmount = await _priceFormatter.FormatPriceAsync(minimumRewardPointsAmount, true, false);
 

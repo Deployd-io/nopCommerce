@@ -32,6 +32,7 @@ using Nop.Web.Framework.WebOptimizer;
 using WebMarkupMin.AspNetCoreLatest;
 using WebMarkupMin.Core;
 using WebMarkupMin.NUglify;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Infrastructure.Extensions;
 
@@ -40,6 +41,7 @@ namespace Nop.Web.Framework.Infrastructure.Extensions;
 /// </summary>
 public static class ServiceCollectionExtensions
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Configure base application settings
     /// </summary>
@@ -48,16 +50,19 @@ public static class ServiceCollectionExtensions
     public static void ConfigureApplicationSettings(this IServiceCollection services,
         WebApplicationBuilder builder)
     {
+		_logger.LogError(">>> Entering ConfigureApplicationSettings(services={Services},builder={Builder})", services, builder);
         //create default file provider
         CommonHelper.DefaultFileProvider = new NopFileProvider(builder.Environment);
 
         //register type finder
         var typeFinder = new WebAppTypeFinder();
+		_logger.LogError("ConfigureApplicationSettings(services={Services},builder={Builder}): typeFinder → {TypeFinder}", services, builder, typeFinder);
         Singleton<ITypeFinder>.Instance = typeFinder;
         services.AddSingleton<ITypeFinder>(typeFinder);
 
         //bind general configuration
         services.BindApplicationSettings(builder);
+		_logger.LogWarning("<<< Exiting ConfigureApplicationSettings(services={Services},builder={Builder})", services, builder);
     }
 
     /// <summary>
@@ -67,6 +72,7 @@ public static class ServiceCollectionExtensions
     /// <param name="builder">A builder for web applications and services</param>
     public static void BindApplicationSettings(this IServiceCollection services, WebApplicationBuilder builder)
     {
+		_logger.LogError(">>> Entering BindApplicationSettings(services={Services},builder={Builder})", services, builder);
         var typeFinder = Singleton<ITypeFinder>.Instance;
 
         //add configuration parameters
@@ -79,6 +85,7 @@ public static class ServiceCollectionExtensions
             builder.Configuration.GetSection(config.Name).Bind(config, options => options.BindNonPublicProperties = true);
 
         var appSettings = Singleton<AppSettings>.Instance;
+		_logger.LogError("BindApplicationSettings(services={Services},builder={Builder}): appSettings → {AppSettings}", services, builder, appSettings);
 
         if (appSettings == null)
         {
@@ -88,8 +95,10 @@ public static class ServiceCollectionExtensions
         else
         {
             var needToUpdate = configurations.Any(conf => !appSettings.Configuration.ContainsKey(conf.Name));
+			_logger.LogError("BindApplicationSettings(services={Services},builder={Builder}): needToUpdate → {NeedToUpdate}", services, builder, needToUpdate);
             AppSettingsHelper.SaveAppSettings(configurations, CommonHelper.DefaultFileProvider, needToUpdate);
         }
+		_logger.LogWarning("<<< Exiting BindApplicationSettings(services={Services},builder={Builder})", services, builder);
     }
 
     /// <summary>
@@ -100,12 +109,15 @@ public static class ServiceCollectionExtensions
     public static void ConfigureApplicationServices(this IServiceCollection services,
         WebApplicationBuilder builder)
     {
+		_logger.LogError(">>> Entering ConfigureApplicationServices(services={Services},builder={Builder})", services, builder);
         //add accessor to HttpContext
         services.AddHttpContextAccessor();
 
         //initialize plugins
         var mvcCoreBuilder = services.AddMvcCore();
+		_logger.LogError("ConfigureApplicationServices(services={Services},builder={Builder}): mvcCoreBuilder → {MvcCoreBuilder}", services, builder, mvcCoreBuilder);
         var pluginConfig = new PluginConfig();
+		_logger.LogError("ConfigureApplicationServices(services={Services},builder={Builder}): pluginConfig → {PluginConfig}", services, builder, pluginConfig);
         builder.Configuration.GetSection(nameof(PluginConfig)).Bind(pluginConfig, options => options.BindNonPublicProperties = true);
         mvcCoreBuilder.PartManager.InitializePlugins(pluginConfig);
 
@@ -114,10 +126,12 @@ public static class ServiceCollectionExtensions
 
         //create engine and configure service provider
         var engine = EngineContext.Create();
+		_logger.LogError("ConfigureApplicationServices(services={Services},builder={Builder}): engine → {Engine}", services, builder, engine);
 
         builder.Services.AddRateLimiter(options =>
         {
             var settings = Singleton<AppSettings>.Instance.Get<CommonConfig>();
+			_logger.LogError("ConfigureApplicationServices(services={Services},builder={Builder}): settings → {Settings}", services, builder, settings);
 
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
@@ -131,9 +145,11 @@ public static class ServiceCollectionExtensions
                     }));
 
             options.RejectionStatusCode = settings.RejectionStatusCode;
+			_logger.LogDebug("ConfigureApplicationServices(services={Services},builder={Builder}): options.RejectionStatusCode → {Arg2}", services, builder, options.RejectionStatusCode);
         });
 
         engine.ConfigureServices(services, builder.Configuration);
+		_logger.LogWarning("<<< Exiting ConfigureApplicationServices(services={Services},builder={Builder})", services, builder);
     }
 
     /// <summary>
@@ -142,7 +158,9 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddHttpContextAccessor(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddHttpContextAccessor(services={Services})", services);
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+		_logger.LogWarning("<<< Exiting AddHttpContextAccessor(services={Services})", services);
     }
 
     /// <summary>
@@ -151,12 +169,14 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddAntiForgery(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddAntiForgery(services={Services})", services);
         //override cookie name
         services.AddAntiforgery(options =>
         {
             options.Cookie.Name = $"{NopCookieDefaults.Prefix}{NopCookieDefaults.AntiforgeryCookie}";
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
+		_logger.LogWarning("<<< Exiting AddAntiForgery(services={Services})", services);
     }
 
     /// <summary>
@@ -165,12 +185,14 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddHttpSession(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddHttpSession(services={Services})", services);
         services.AddSession(options =>
         {
             options.Cookie.Name = $"{NopCookieDefaults.Prefix}{NopCookieDefaults.SessionCookie}";
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
+		_logger.LogWarning("<<< Exiting AddHttpSession(services={Services})", services);
     }
 
     /// <summary>
@@ -179,6 +201,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddThemes(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddThemes(services={Services})", services);
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -187,6 +210,7 @@ public static class ServiceCollectionExtensions
         {
             options.ViewLocationExpanders.Add(new ThemeableViewLocationExpander());
         });
+		_logger.LogWarning("<<< Exiting AddThemes(services={Services})", services);
     }
 
     /// <summary>
@@ -195,8 +219,10 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddDistributedCache(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddDistributedCache(services={Services})", services);
         var appSettings = Singleton<AppSettings>.Instance;
         var distributedCacheConfig = appSettings.Get<DistributedCacheConfig>();
+		_logger.LogError("AddDistributedCache(services={Services}): distributedCacheConfig → {DistributedCacheConfig}", services, distributedCacheConfig);
 
         if (!distributedCacheConfig.Enabled)
             return;
@@ -211,6 +237,9 @@ public static class ServiceCollectionExtensions
                 services.AddDistributedSqlServerCache(options =>
                 {
                     options.ConnectionString = distributedCacheConfig.ConnectionString;
+					_logger.LogDebug("AddDistributedCache(services={Services}): options.ConnectionString → {Arg1}", services, options.ConnectionString);
+					_logger.LogDebug("AddDistributedCache(services={Services}): options.SchemaName → {Arg1}", services, options.SchemaName);
+					_logger.LogDebug("AddDistributedCache(services={Services}): options.TableName → {Arg1}", services, options.TableName);
                     options.SchemaName = distributedCacheConfig.SchemaName;
                     options.TableName = distributedCacheConfig.TableName;
                 });
@@ -220,6 +249,8 @@ public static class ServiceCollectionExtensions
                 services.AddStackExchangeRedisCache(options =>
                 {
                     options.Configuration = distributedCacheConfig.ConnectionString;
+					_logger.LogDebug("AddDistributedCache(services={Services}): options.Configuration → {Arg1}", services, options.Configuration);
+					_logger.LogDebug("AddDistributedCache(services={Services}): options.InstanceName → {Arg1}", services, options.InstanceName);
                     options.InstanceName = distributedCacheConfig.InstanceName ?? string.Empty;
                 });
                 break;
@@ -232,6 +263,7 @@ public static class ServiceCollectionExtensions
                 });
                 break;
         }
+		_logger.LogWarning("<<< Exiting AddDistributedCache(services={Services})", services);
     }
 
     /// <summary>
@@ -240,11 +272,15 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddNopDataProtection(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopDataProtection(services={Services})", services);
         var dataProtectionKeysPath = CommonHelper.DefaultFileProvider.MapPath(NopDataProtectionDefaults.DataProtectionKeysPath);
         var dataProtectionKeysFolder = new System.IO.DirectoryInfo(dataProtectionKeysPath);
+		_logger.LogError("AddNopDataProtection(services={Services}): dataProtectionKeysFolder → {DataProtectionKeysFolder}", services, dataProtectionKeysFolder);
+		_logger.LogError("AddNopDataProtection(services={Services}): dataProtectionKeysPath → {DataProtectionKeysPath}", services, dataProtectionKeysPath);
 
         //configure the data protection system to persist keys to the specified directory
         services.AddDataProtection().PersistKeysToFileSystem(dataProtectionKeysFolder);
+		_logger.LogWarning("<<< Exiting AddNopDataProtection(services={Services})", services);
     }
 
     /// <summary>
@@ -253,10 +289,14 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddNopAuthentication(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopAuthentication(services={Services})", services);
         //set default authentication schemes
         var authenticationBuilder = services.AddAuthentication(options =>
         {
             options.DefaultChallengeScheme = NopAuthenticationDefaults.AuthenticationScheme;
+			_logger.LogDebug("AddNopAuthentication(services={Services}): options.DefaultChallengeScheme → {Arg1}", services, options.DefaultChallengeScheme);
+			_logger.LogDebug("AddNopAuthentication(services={Services}): options.DefaultScheme → {Arg1}", services, options.DefaultScheme);
+			_logger.LogDebug("AddNopAuthentication(services={Services}): options.DefaultSignInScheme → {Arg1}", services, options.DefaultSignInScheme);
             options.DefaultScheme = NopAuthenticationDefaults.AuthenticationScheme;
             options.DefaultSignInScheme = NopAuthenticationDefaults.ExternalAuthenticationScheme;
         });
@@ -268,6 +308,9 @@ public static class ServiceCollectionExtensions
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.LoginPath = NopAuthenticationDefaults.LoginPath;
+			_logger.LogDebug("AddNopAuthentication(services={Services}): options.LoginPath → {Arg1}", services, options.LoginPath);
+			_logger.LogDebug("AddNopAuthentication(services={Services}): options.AccessDeniedPath → {Arg1}", services, options.AccessDeniedPath);
+			_logger.LogDebug("AddNopAuthentication(services={Services}): options.ReturnUrlParameter → {Arg1}", services, options.ReturnUrlParameter);
             options.AccessDeniedPath = NopAuthenticationDefaults.AccessDeniedPath;
             options.ReturnUrlParameter = NopAuthenticationDefaults.ReturnUrlParameter;
         });
@@ -286,11 +329,13 @@ public static class ServiceCollectionExtensions
         //register and configure external authentication plugins now
         var typeFinder = Singleton<ITypeFinder>.Instance;
         var externalAuthConfigurations = typeFinder.FindClassesOfType<IExternalAuthenticationRegistrar>();
+		_logger.LogError("AddNopAuthentication(services={Services}): externalAuthConfigurations → {ExternalAuthConfigurations}", services, externalAuthConfigurations);
         var externalAuthInstances = externalAuthConfigurations
             .Select(x => (IExternalAuthenticationRegistrar)Activator.CreateInstance(x));
 
         foreach (var instance in externalAuthInstances)
             instance.Configure(authenticationBuilder);
+			_logger.LogWarning("<<< Exiting AddNopAuthentication(services={Services})", services);
     }
 
     /// <summary>
@@ -300,8 +345,10 @@ public static class ServiceCollectionExtensions
     /// <returns>A builder for configuring MVC services</returns>
     public static IMvcBuilder AddNopMvc(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopMvc(services={Services})", services);
         //add basic MVC feature
         var mvcBuilder = services.AddControllersWithViews();
+		_logger.LogError("AddNopMvc(services={Services}): mvcBuilder → {MvcBuilder}", services, mvcBuilder);
 
         mvcBuilder.AddRazorRuntimeCompilation();
 
@@ -351,6 +398,7 @@ public static class ServiceCollectionExtensions
         //register controllers as services, it'll allow to override them
         mvcBuilder.AddControllersAsServices();
 
+		_logger.LogWarning("<<< Exiting AddNopMvc(services={Services})", services);
         return mvcBuilder;
     }
 
@@ -360,9 +408,11 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddNopRedirectResultExecutor(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopRedirectResultExecutor(services={Services})", services);
         //we use custom redirect executor as a workaround to allow using non-ASCII characters in redirect URLs
         services.AddScoped<IActionResultExecutor<RedirectResult>, NopRedirectResultExecutor>();
         services.AddScoped<IActionResultExecutor<LocalRedirectResult>, NopLocalRedirectResultExecutor>();
+		_logger.LogWarning("<<< Exiting AddNopRedirectResultExecutor(services={Services})", services);
     }
 
     /// <summary>
@@ -371,6 +421,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddNopWebMarkupMin(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopWebMarkupMin(services={Services})", services);
         //check whether database is installed
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
@@ -379,9 +430,13 @@ public static class ServiceCollectionExtensions
             .AddWebMarkupMin(options =>
             {
                 options.AllowMinificationInDevelopmentEnvironment = true;
+				_logger.LogDebug("AddNopWebMarkupMin(services={Services}): options.AllowMinificationInDevelopmentEnvironment → {Arg1}", services, options.AllowMinificationInDevelopmentEnvironment);
+				_logger.LogDebug("AddNopWebMarkupMin(services={Services}): options.AllowCompressionInDevelopmentEnvironment → {Arg1}", services, options.AllowCompressionInDevelopmentEnvironment);
                 options.AllowCompressionInDevelopmentEnvironment = true;
                 options.DisableMinification = !EngineContext.Current.Resolve<CommonSettings>().EnableHtmlMinification;
                 options.DisableCompression = true;
+				_logger.LogDebug("AddNopWebMarkupMin(services={Services}): options.DisableCompression → {Arg1}", services, options.DisableCompression);
+				_logger.LogDebug("AddNopWebMarkupMin(services={Services}): options.DisablePoweredByHttpHeaders → {Arg1}", services, options.DisablePoweredByHttpHeaders);
                 options.DisablePoweredByHttpHeaders = true;
             })
             .AddHtmlMinification(options =>
@@ -395,8 +450,11 @@ public static class ServiceCollectionExtensions
             {
                 var settings = options.MinificationSettings;
                 settings.RenderEmptyTagsWithSpace = true;
+				_logger.LogDebug("AddNopWebMarkupMin(services={Services}): settings.RenderEmptyTagsWithSpace → {Arg1}", services, settings.RenderEmptyTagsWithSpace);
+				_logger.LogDebug("AddNopWebMarkupMin(services={Services}): settings.CollapseTagsWithoutContent → {Arg1}", services, settings.CollapseTagsWithoutContent);
                 settings.CollapseTagsWithoutContent = true;
             });
+			_logger.LogWarning("<<< Exiting AddNopWebMarkupMin(services={Services})", services);
     }
 
     /// <summary>
@@ -405,8 +463,10 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddNopWebOptimizer(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopWebOptimizer(services={Services})", services);
         var appSettings = Singleton<AppSettings>.Instance;
         var woConfig = appSettings.Get<WebOptimizerConfig>();
+		_logger.LogError("AddNopWebOptimizer(services={Services}): woConfig → {WoConfig}", services, woConfig);
 
         if (!woConfig.EnableCssBundling && !woConfig.EnableJavaScriptBundling)
         {
@@ -429,6 +489,7 @@ public static class ServiceCollectionExtensions
 
         services.AddWebOptimizer(null, cssSettings, codeSettings);
         services.AddScoped<INopAssetHelper, NopAssetHelper>();
+		_logger.LogWarning("<<< Exiting AddNopWebOptimizer(services={Services})", services);
     }
 
     /// <summary>
@@ -437,6 +498,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">Collection of service descriptors</param>
     public static void AddNopHttpClients(this IServiceCollection services)
     {
+		_logger.LogError(">>> Entering AddNopHttpClients(services={Services})", services);
         //default client
         services.AddHttpClient(NopHttpDefaults.DefaultHttpClient).WithProxy();
 
@@ -451,5 +513,6 @@ public static class ServiceCollectionExtensions
 
         //client to request artificial intelligence service
         services.AddHttpClient<ArtificialIntelligenceHttpClient>().WithProxy();
+		_logger.LogWarning("<<< Exiting AddNopHttpClients(services={Services})", services);
     }
 }

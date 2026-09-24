@@ -1,10 +1,12 @@
-﻿namespace Nop.Core.Domain.Media;
+﻿using Microsoft.Extensions.Logging;
+namespace Nop.Core.Domain.Media;
 
 /// <summary>
 /// Helper class for making pictures hashes from DB
 /// </summary>
 public partial class PictureHashItem : IComparable, IComparable<PictureHashItem>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Gets or sets the picture ID
     /// </summary>
@@ -22,6 +24,8 @@ public partial class PictureHashItem : IComparable, IComparable<PictureHashItem>
     /// <returns></returns>
     public int CompareTo(object obj)
     {
+		_logger.LogError(">>> Entering CompareTo(obj={Obj})", obj);
+        _logger.LogWarning("<<< Exiting CompareTo(obj={Obj})", obj);
         return CompareTo(obj as PictureHashItem);
     }
 

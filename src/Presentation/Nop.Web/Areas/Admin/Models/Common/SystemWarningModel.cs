@@ -1,9 +1,11 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Areas.Admin.Models.Common;
 
 public partial record SystemWarningModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public SystemWarningLevel Level { get; set; }
 
     public string Text { get; set; }
@@ -12,6 +14,8 @@ public partial record SystemWarningModel : BaseNopModel
 
     public override string ToString()
     {
+		_logger.LogError(">>> Entering ToString()");
+        _logger.LogWarning("<<< Exiting ToString()");
         return Text;
     }
 }

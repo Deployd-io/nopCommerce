@@ -5,6 +5,7 @@ using Nop.Services.Messages;
 using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Messages;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDateTimeHelper _dateTimeHelper;
@@ -29,9 +31,14 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
         ILocalizationService localizationService,
         IQueuedEmailService queuedEmailService)
     {
+		_logger.LogError(">>> Entering QueuedEmailModelFactory(dateTimeHelper={DateTimeHelper},emailAccountService={EmailAccountService},localizationService={LocalizationService},queuedEmailService={QueuedEmailService})", dateTimeHelper, emailAccountService, localizationService, queuedEmailService);
         _dateTimeHelper = dateTimeHelper;
         _emailAccountService = emailAccountService;
+		_logger.LogDebug("QueuedEmailModelFactory(dateTimeHelper={DateTimeHelper},emailAccountService={EmailAccountService},localizationService={LocalizationService},queuedEmailService={QueuedEmailService}): _emailAccountService → {_emailAccountService}", dateTimeHelper, emailAccountService, localizationService, queuedEmailService, _emailAccountService);
+		_logger.LogDebug("QueuedEmailModelFactory(dateTimeHelper={DateTimeHelper},emailAccountService={EmailAccountService},localizationService={LocalizationService},queuedEmailService={QueuedEmailService}): _dateTimeHelper → {_dateTimeHelper}", dateTimeHelper, emailAccountService, localizationService, queuedEmailService, _dateTimeHelper);
+    _logger.LogWarning("<<< Exiting QueuedEmailModelFactory(dateTimeHelper={DateTimeHelper},emailAccountService={EmailAccountService},localizationService={LocalizationService},queuedEmailService={QueuedEmailService})", dateTimeHelper, emailAccountService, localizationService, queuedEmailService);
         _localizationService = localizationService;
+		_logger.LogDebug("QueuedEmailModelFactory(dateTimeHelper={DateTimeHelper},emailAccountService={EmailAccountService},localizationService={LocalizationService},queuedEmailService={QueuedEmailService}): _localizationService → {_localizationService}", dateTimeHelper, emailAccountService, localizationService, queuedEmailService, _localizationService);
         _queuedEmailService = queuedEmailService;
     }
 
@@ -44,6 +51,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
     /// </summary>
     protected virtual string GetEmailAccountName(EmailAccount emailAccount)
     {
+		_logger.LogError(">>> Entering GetEmailAccountName(emailAccount={EmailAccount})", emailAccount);
         if (emailAccount == null)
             return string.Empty;
 
@@ -67,14 +75,17 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
     /// </returns>
     public virtual Task<QueuedEmailSearchModel> PrepareQueuedEmailSearchModelAsync(QueuedEmailSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareQueuedEmailSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare default search values
         searchModel.SearchMaxSentTries = 10;
+		_logger.LogDebug("PrepareQueuedEmailSearchModelAsync(searchModel={SearchModel}): searchModel.SearchMaxSentTries → {Arg1}", searchModel, searchModel.SearchMaxSentTries);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareQueuedEmailSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -88,6 +99,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
     /// </returns>
     public virtual async Task<QueuedEmailListModel> PrepareQueuedEmailListModelAsync(QueuedEmailSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareQueuedEmailListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get parameters to filter emails
@@ -114,15 +126,18 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
             {
                 //fill in model values from the entity
                 var queuedEmailModel = queuedEmail.ToModel<QueuedEmailModel>();
+				_logger.LogError("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): queuedEmailModel → {QueuedEmailModel}", searchModel, queuedEmailModel);
 
                 //little performance optimization: ensure that "Body" is not returned
                 queuedEmailModel.Body = string.Empty;
+				_logger.LogDebug("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): queuedEmailModel.Body → {Arg1}", searchModel, queuedEmailModel.Body);
 
                 //convert dates to the user time
                 queuedEmailModel.CreatedOn = await _dateTimeHelper.ConvertToUserTimeAsync(queuedEmail.CreatedOnUtc, DateTimeKind.Utc);
 
                 //fill in additional values (not existing in the entity)
                 var emailAccount = await _emailAccountService.GetEmailAccountByIdAsync(queuedEmail.EmailAccountId);
+				_logger.LogError("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): emailAccount → {EmailAccount}", searchModel, emailAccount);
                 queuedEmailModel.EmailAccountName = GetEmailAccountName(emailAccount);
                 queuedEmailModel.PriorityName = await _localizationService.GetLocalizedEnumAsync(queuedEmail.Priority);
 
@@ -130,6 +145,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
                 {
                     queuedEmailModel.DontSendBeforeDate = await _dateTimeHelper
                         .ConvertToUserTimeAsync(queuedEmail.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
+						_logger.LogDebug("PrepareQueuedEmailListModelAsync(searchModel={SearchModel}): queuedEmailModel.DontSendBeforeDate → {Arg1}", searchModel, queuedEmailModel.DontSendBeforeDate);
                 }
 
                 if (queuedEmail.SentOnUtc.HasValue)
@@ -139,6 +155,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareQueuedEmailListModelAsync(searchModel={SearchModel})", searchModel);
         return model;
     }
 
@@ -154,6 +171,7 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
     /// </returns>
     public virtual async Task<QueuedEmailModel> PrepareQueuedEmailModelAsync(QueuedEmailModel model, QueuedEmail queuedEmail, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareQueuedEmailModelAsync(model={Model},queuedEmail={QueuedEmail},excludeProperties={ExcludeProperties})", model, queuedEmail, excludeProperties);
         if (queuedEmail == null)
             return model;
 
@@ -170,7 +188,9 @@ public partial class QueuedEmailModelFactory : IQueuedEmailModelFactory
             model.DontSendBeforeDate = await _dateTimeHelper.ConvertToUserTimeAsync(queuedEmail.DontSendBeforeDateUtc.Value, DateTimeKind.Utc);
         else
             model.SendImmediately = true;
+			_logger.LogDebug("PrepareQueuedEmailModelAsync(model={Model},queuedEmail={QueuedEmail},excludeProperties={ExcludeProperties}): model.SendImmediately → {Arg3}", model, queuedEmail, excludeProperties, model.SendImmediately);
 
+		_logger.LogWarning("<<< Exiting PrepareQueuedEmailModelAsync(model={Model},queuedEmail={QueuedEmail},excludeProperties={ExcludeProperties})", model, queuedEmail, excludeProperties);
         return model;
     }
 

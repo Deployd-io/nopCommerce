@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Directory;
 
@@ -9,14 +10,19 @@ namespace Nop.Web.Areas.Admin.Models.Directory;
 /// </summary>
 public partial record CountryModel : BaseNopEntityModel, ILocalizedModel<CountryLocalizedModel>, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public CountryModel()
     {
+		_logger.LogError(">>> Entering CountryModel()");
         Locales = new List<CountryLocalizedModel>();
         SelectedStoreIds = new List<int>();
+		_logger.LogError("CountryModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("CountryModel(): AvailableStores → {AvailableStores}", AvailableStores);
         StateProvinceSearchModel = new StateProvinceSearchModel();
+		_logger.LogError("CountryModel(): StateProvinceSearchModel → {StateProvinceSearchModel}", StateProvinceSearchModel);
     }
 
     #endregion

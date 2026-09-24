@@ -1,13 +1,16 @@
 ﻿using FluentMigrator;
 using Nop.Core.Domain.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations.UpgradeTo460;
 
 [NopSchemaMigration("2022-12-06 15:09:01", "Added new fields to store table")]
 public class StoreMigration : ForwardOnlyMigration
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!Schema.Table(nameof(Store)).Column(nameof(Store.Deleted)).Exists())
         {
             //add new column
@@ -52,5 +55,6 @@ public class StoreMigration : ForwardOnlyMigration
                 .AddColumn(nameof(Store.HomepageTitle)).AsString(int.MaxValue).Nullable();
         else
             Alter.Table(nameof(Store)).AlterColumn(nameof(Store.HomepageTitle)).AsString(int.MaxValue).Nullable();
+			_logger.LogWarning("<<< Exiting Up()");
     }
 }
