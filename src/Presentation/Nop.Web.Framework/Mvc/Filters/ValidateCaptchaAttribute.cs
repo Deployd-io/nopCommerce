@@ -15,6 +15,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -23,7 +24,10 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
     /// <param name="actionParameterName">The name of the action parameter to which the result will be passed</param>
     public ValidateCaptchaAttribute(string actionParameterName = "captchaValid") : base(typeof(ValidateCaptchaFilter))
     {
+		_logger.LogError(">>> Entering ValidateCaptchaAttribute(actionParameterName={ActionParameterName})", actionParameterName);
         Arguments = [actionParameterName];
+		_logger.LogDebug("ValidateCaptchaAttribute(actionParameterName={ActionParameterName}): Arguments → {Arguments}", actionParameterName, Arguments);
+    _logger.LogWarning("<<< Exiting ValidateCaptchaAttribute(actionParameterName={ActionParameterName})", actionParameterName);
     }
 
     #endregion
@@ -35,6 +39,7 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
     /// </summary>
     private class ValidateCaptchaFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Constants
 
         private const string RESPONSE_FIELD_KEY = "recaptcha_response_field";
@@ -61,9 +66,15 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
             IWorkContext workContext)
         {
             _actionParameterName = actionParameterName;
+			_logger.LogDebug("ValidateCaptchaFilter(actionParameterName={ActionParameterName},captchaHttpClient={CaptchaHttpClient},captchaSettings={CaptchaSettings},logger={Logger},workContext={WorkContext}): _actionParameterName → {_actionParameterName}", actionParameterName, captchaHttpClient, captchaSettings, logger, workContext, _actionParameterName);
             _captchaHttpClient = captchaHttpClient;
+			_logger.LogDebug("ValidateCaptchaFilter(actionParameterName={ActionParameterName},captchaHttpClient={CaptchaHttpClient},captchaSettings={CaptchaSettings},logger={Logger},workContext={WorkContext}): _captchaHttpClient → {_captchaHttpClient}", actionParameterName, captchaHttpClient, captchaSettings, logger, workContext, _captchaHttpClient);
             _captchaSettings = captchaSettings;
+			_logger.LogDebug("ValidateCaptchaFilter(actionParameterName={ActionParameterName},captchaHttpClient={CaptchaHttpClient},captchaSettings={CaptchaSettings},logger={Logger},workContext={WorkContext}): _captchaSettings → {_captchaSettings}", actionParameterName, captchaHttpClient, captchaSettings, logger, workContext, _captchaSettings);
             _logger = logger;
+			_logger.LogError(">>> Entering ValidateCaptchaFilter(actionParameterName={ActionParameterName},captchaHttpClient={CaptchaHttpClient},captchaSettings={CaptchaSettings},logger={Logger},workContext={WorkContext})", actionParameterName, captchaHttpClient, captchaSettings, logger, workContext);
+			_logger.LogDebug("ValidateCaptchaFilter(actionParameterName={ActionParameterName},captchaHttpClient={CaptchaHttpClient},captchaSettings={CaptchaSettings},logger={Logger},workContext={WorkContext}): _logger → {_logger}", actionParameterName, captchaHttpClient, captchaSettings, logger, workContext, _logger);
+        _logger.LogWarning("<<< Exiting ValidateCaptchaFilter(actionParameterName={ActionParameterName},captchaHttpClient={CaptchaHttpClient},captchaSettings={CaptchaSettings},logger={Logger},workContext={WorkContext})", actionParameterName, captchaHttpClient, captchaSettings, logger, workContext);
             _workContext = workContext;
         }
 
@@ -78,6 +89,8 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task ValidateCaptchaAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering ValidateCaptchaAsync(context={Context})", context);
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             ArgumentNullException.ThrowIfNull(context);
 
             if (!DataSettingsManager.IsDatabaseInstalled())
@@ -88,10 +101,13 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
             {
                 //push the validation result as an action parameter
                 var isValid = false;
+				_logger.LogError("ValidateCaptchaAsync(context={Context}): isValid → {IsValid}", context, isValid);
 
                 //get form values
                 var captchaResponseValue = await context.HttpContext.Request.GetFormValueAsync(RESPONSE_FIELD_KEY);
+				_logger.LogError("ValidateCaptchaAsync(context={Context}): captchaResponseValue → {CaptchaResponseValue}", context, captchaResponseValue);
                 var gCaptchaResponseValue = await context.HttpContext.Request.GetFormValueAsync(G_RESPONSE_FIELD_KEY);
+				_logger.LogError("ValidateCaptchaAsync(context={Context}): gCaptchaResponseValue → {GCaptchaResponseValue}", context, gCaptchaResponseValue);
 
                 if (!StringValues.IsNullOrEmpty(captchaResponseValue) || !StringValues.IsNullOrEmpty(gCaptchaResponseValue))
                 {
@@ -99,7 +115,9 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
                     try
                     {
                         var value = !StringValues.IsNullOrEmpty(captchaResponseValue) ? captchaResponseValue : gCaptchaResponseValue;
+						_logger.LogError("ValidateCaptchaAsync(context={Context}): value → {Value}", context, value);
                         var response = await _captchaHttpClient.ValidateCaptchaAsync(value);
+						_logger.LogError("ValidateCaptchaAsync(context={Context}): response → {Response}", context, response);
 
                         switch (_captchaSettings.CaptchaType)
                         {
@@ -127,6 +145,8 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
             }
             else
                 context.ActionArguments[_actionParameterName] = false;
+				_logger.LogError("ValidateCaptchaAsync(context)={Context}: external service call took {Arg1} ms", context, __logStart.ElapsedMilliseconds);
+				_logger.LogWarning("<<< Exiting ValidateCaptchaAsync(context={Context})", context);
         }
 
         #endregion
@@ -141,9 +161,11 @@ public sealed class ValidateCaptchaAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await ValidateCaptchaAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

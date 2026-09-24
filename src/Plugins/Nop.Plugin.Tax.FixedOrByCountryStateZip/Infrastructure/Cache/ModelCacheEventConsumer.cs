@@ -5,6 +5,7 @@ using Nop.Plugin.Tax.FixedOrByCountryStateZip.Domain;
 using Nop.Plugin.Tax.FixedOrByCountryStateZip.Services;
 using Nop.Services.Configuration;
 using Nop.Services.Events;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.FixedOrByCountryStateZip.Infrastructure.Cache;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Tax.FixedOrByCountryStateZip.Infrastructure.Cache;
 /// Model cache event consumer (used for caching of presentation layer models)
 /// </summary>
 public class ModelCacheEventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     //tax rates
     IConsumer<EntityInsertedEvent<TaxRate>>,
     IConsumer<EntityUpdatedEvent<TaxRate>>,
@@ -45,9 +47,12 @@ public class ModelCacheEventConsumer :
         ISettingService settingService,
         IStaticCacheManager staticCacheManager)
     {
+		_logger.LogError(">>> Entering ModelCacheEventConsumer(taxRateService={TaxRateService},settingService={SettingService},staticCacheManager={StaticCacheManager})", taxRateService, settingService, staticCacheManager);
         _taxRateService = taxRateService;
         _settingService = settingService;
+		_logger.LogDebug("ModelCacheEventConsumer(taxRateService={TaxRateService},settingService={SettingService},staticCacheManager={StaticCacheManager}): _settingService → {_settingService}", taxRateService, settingService, staticCacheManager, _settingService);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("ModelCacheEventConsumer(taxRateService={TaxRateService},settingService={SettingService},staticCacheManager={StaticCacheManager}): _staticCacheManager → {_staticCacheManager}", taxRateService, settingService, staticCacheManager, _staticCacheManager);
     }
 
     #endregion
@@ -63,6 +68,7 @@ public class ModelCacheEventConsumer :
     {
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(TAXRATE_PATTERN_KEY);
+		_logger.LogWarning("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -85,6 +91,7 @@ public class ModelCacheEventConsumer :
     {
         //clear cache
         await _staticCacheManager.RemoveByPrefixAsync(TAXRATE_PATTERN_KEY);
+		_logger.LogError(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -100,6 +107,7 @@ public class ModelCacheEventConsumer :
 
         //delete an appropriate record when tax category is deleted
         var recordsToDelete = (await _taxRateService.GetAllTaxRatesAsync()).Where(taxRate => taxRate.TaxCategoryId == taxCategory.Id).ToList();
+		_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): recordsToDelete → {RecordsToDelete}", eventMessage, recordsToDelete);
         foreach (var taxRate in recordsToDelete)
         {
             await _taxRateService.DeleteTaxRateAsync(taxRate);
@@ -107,6 +115,7 @@ public class ModelCacheEventConsumer :
 
         //delete saved fixed rate if exists
         var setting = await _settingService.GetSettingAsync(string.Format(FixedOrByCountryStateZipDefaults.FIXED_RATE_SETTINGS_KEY, taxCategory.Id));
+		_logger.LogError("HandleEventAsync(eventMessage={EventMessage}): setting → {Setting}", eventMessage, setting);
         if (setting != null)
             await _settingService.DeleteSettingAsync(setting);
     }

@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Nop.Web.Factories;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Controllers;
 
 public partial class CountryController : BasePublicController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly ICountryModelFactory _countryModelFactory;
@@ -16,7 +18,10 @@ public partial class CountryController : BasePublicController
 
     public CountryController(ICountryModelFactory countryModelFactory)
     {
+		_logger.LogError(">>> Entering CountryController(countryModelFactory={CountryModelFactory})", countryModelFactory);
         _countryModelFactory = countryModelFactory;
+		_logger.LogDebug("CountryController(countryModelFactory={CountryModelFactory}): _countryModelFactory → {_countryModelFactory}", countryModelFactory, _countryModelFactory);
+    _logger.LogWarning("<<< Exiting CountryController(countryModelFactory={CountryModelFactory})", countryModelFactory);
     }
 
     #endregion
@@ -29,8 +34,11 @@ public partial class CountryController : BasePublicController
     [CheckLanguageSeoCode(ignore: true)]
     public virtual async Task<IActionResult> GetStatesByCountryId(int countryId, bool addSelectStateItem)
     {
+		_logger.LogError(">>> Entering GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         var model = await _countryModelFactory.GetStatesByCountryIdAsync(countryId, addSelectStateItem);
 
+		_logger.LogError("GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem}): model → {Model}", countryId, addSelectStateItem, model);
+		_logger.LogWarning("<<< Exiting GetStatesByCountryId(countryId={CountryId},addSelectStateItem={AddSelectStateItem})", countryId, addSelectStateItem);
         return Json(model);
     }
 

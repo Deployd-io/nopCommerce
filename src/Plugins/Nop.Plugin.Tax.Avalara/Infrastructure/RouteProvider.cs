@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Nop.Web.Framework;
 using Nop.Web.Framework.Mvc.Routing;
 using Nop.Web.Infrastructure;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.Avalara.Infrastructure;
 
@@ -11,14 +12,17 @@ namespace Nop.Plugin.Tax.Avalara.Infrastructure;
 /// </summary>
 public class RouteProvider : BaseRouteProvider, IRouteProvider
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Register routes
     /// </summary>
     /// <param name="endpointRouteBuilder">Route builder</param>
     public void RegisterRoutes(IEndpointRouteBuilder endpointRouteBuilder)
     {
+		_logger.LogError(">>> Entering RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
         var lang = GetLanguageRoutePattern();
 
+		_logger.LogError("RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder}): lang → {Lang}", endpointRouteBuilder, lang);
         endpointRouteBuilder.MapControllerRoute(name: AvalaraTaxDefaults.ConfigurationRouteName,
             pattern: "Admin/Avalara/Configure",
             defaults: new { controller = "Avalara", action = "Configure" });
@@ -39,6 +43,7 @@ public class RouteProvider : BaseRouteProvider, IRouteProvider
         endpointRouteBuilder.MapControllerRoute(name: AvalaraTaxDefaults.ItemClassificationWebhookRouteName,
             pattern: "avalara/item-classification-webhook",
             defaults: new { controller = "AvalaraWebhook", action = "ItemClassificationWebhook" });
+			_logger.LogWarning("<<< Exiting RegisterRoutes(endpointRouteBuilder={EndpointRouteBuilder})", endpointRouteBuilder);
     }
 
     /// <summary>

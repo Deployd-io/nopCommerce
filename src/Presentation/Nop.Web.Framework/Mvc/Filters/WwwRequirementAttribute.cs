@@ -4,6 +4,7 @@ using Nop.Core;
 using Nop.Core.Domain.Seo;
 using Nop.Core.Http.Extensions;
 using Nop.Data;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class WwwRequirementAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -19,6 +21,8 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
     /// </summary>
     public WwwRequirementAttribute() : base(typeof(WwwRequirementFilter))
     {
+	_logger.LogError(">>> Entering WwwRequirementAttribute()");
+    _logger.LogWarning("<<< Exiting WwwRequirementAttribute()");
     }
 
     #endregion
@@ -30,6 +34,7 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
     /// </summary>
     private class WwwRequirementFilter : IAsyncAuthorizationFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly IWebHelper _webHelper;
@@ -42,8 +47,10 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         public WwwRequirementFilter(IWebHelper webHelper,
             SeoSettings seoSettings)
         {
+			_logger.LogError(">>> Entering WwwRequirementFilter(webHelper={WebHelper},seoSettings={SeoSettings})", webHelper, seoSettings);
             _webHelper = webHelper;
             _seoSettings = seoSettings;
+			_logger.LogDebug("WwwRequirementFilter(webHelper={WebHelper},seoSettings={SeoSettings}): _seoSettings → {_seoSettings}", webHelper, seoSettings, _seoSettings);
         }
 
         #endregion
@@ -57,17 +64,22 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         /// <param name="withWww">Whether URL must start with WWW</param>
         private void RedirectRequest(AuthorizationFilterContext context, bool withWww)
         {
+			_logger.LogError(">>> Entering RedirectRequest(context={Context},withWww={WithWww})", context, withWww);
             //get scheme depending on securing connection
             var urlScheme = $"{_webHelper.GetCurrentRequestProtocol()}{Uri.SchemeDelimiter}";
+			_logger.LogError("RedirectRequest(context={Context},withWww={WithWww}): urlScheme → {UrlScheme}", context, withWww, urlScheme);
 
             //compose start of URL with WWW
             var urlWith3W = $"{urlScheme}www.";
+			_logger.LogError("RedirectRequest(context={Context},withWww={WithWww}): urlWith3W → {UrlWith3W}", context, withWww, urlWith3W);
 
             //get requested URL
             var currentUrl = _webHelper.GetThisPageUrl(true);
+			_logger.LogError("RedirectRequest(context={Context},withWww={WithWww}): currentUrl → {CurrentUrl}", context, withWww, currentUrl);
 
             //whether requested URL starts with WWW
             var urlStartsWith3W = currentUrl.StartsWith(urlWith3W, StringComparison.OrdinalIgnoreCase);
+			_logger.LogError("RedirectRequest(context={Context},withWww={WithWww}): urlStartsWith3W → {UrlStartsWith3W}", context, withWww, urlStartsWith3W);
 
             //page should have WWW prefix, so set 301 (permanent) redirection to URL with WWW
             if (withWww && !urlStartsWith3W)
@@ -76,6 +88,7 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
             //page shouldn't have WWW prefix, so set 301 (permanent) redirection to URL without WWW
             if (!withWww && urlStartsWith3W)
                 context.Result = new RedirectResult(currentUrl.Replace(urlWith3W, urlScheme), true);
+				_logger.LogWarning("<<< Exiting RedirectRequest(context={Context},withWww={WithWww})", context, withWww);
         }
 
         /// <summary>
@@ -84,6 +97,7 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         /// <param name="context">Authorization filter context</param>
         private void CheckWwwRequirement(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering CheckWwwRequirement(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in GET requests, otherwise the browser might not propagate the verb and request body correctly.
@@ -114,6 +128,8 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
                     break;
 
                 default:
+					_logger.LogError("Throwing NopException from CheckWwwRequirement(context={Context})", context);
+			_logger.LogWarning("<<< Exiting CheckWwwRequirement(context={Context})", context);
                     throw new NopException("Not supported WwwRequirement parameter");
             }
         }
@@ -129,7 +145,9 @@ public sealed class WwwRequirementAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+			_logger.LogError(">>> Entering OnAuthorizationAsync(context={Context})", context);
             CheckWwwRequirement(context);
+			_logger.LogWarning("<<< Exiting OnAuthorizationAsync(context={Context})", context);
             return Task.CompletedTask;
         }
 

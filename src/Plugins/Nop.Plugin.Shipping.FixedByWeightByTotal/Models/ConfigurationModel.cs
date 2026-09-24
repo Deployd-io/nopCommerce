@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Shipping.FixedByWeightByTotal.Models;
 
 public record ConfigurationModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     [NopResourceDisplayName("Plugins.Shipping.FixedByWeightByTotal.Fields.LimitMethodsToCreated")]
     public bool LimitMethodsToCreated { get; set; }
 
@@ -13,11 +15,16 @@ public record ConfigurationModel : BaseSearchModel
 
     public ConfigurationModel()
     {
+		_logger.LogError(">>> Entering ConfigurationModel()");
         AvailableCountries = new List<SelectListItem>();
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableShippingMethods = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableShippingMethods → {AvailableShippingMethods}", AvailableShippingMethods);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableStores → {AvailableStores}", AvailableStores);
         AvailableWarehouses = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableWarehouses → {AvailableWarehouses}", AvailableWarehouses);
     }
 
     [NopResourceDisplayName("Plugins.Shipping.FixedByWeightByTotal.Fields.Store")]

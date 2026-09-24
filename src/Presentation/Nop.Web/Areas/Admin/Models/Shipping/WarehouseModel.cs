@@ -1,6 +1,7 @@
 ﻿using Nop.Web.Areas.Admin.Models.Common;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Shipping;
 
@@ -9,11 +10,16 @@ namespace Nop.Web.Areas.Admin.Models.Shipping;
 /// </summary>
 public partial record WarehouseModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public WarehouseModel()
     {
+		_logger.LogError(">>> Entering WarehouseModel()");
         Address = new AddressModel();
+		_logger.LogDebug("WarehouseModel(): Address → {Address}", Address);
+    _logger.LogError("WarehouseModel(): Address → {Address}", Address);
+    _logger.LogWarning("<<< Exiting WarehouseModel()");
     }
 
     #endregion

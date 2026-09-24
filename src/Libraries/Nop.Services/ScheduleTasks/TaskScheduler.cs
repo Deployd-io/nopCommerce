@@ -30,8 +30,12 @@ public partial class TaskScheduler : ITaskScheduler
         IHttpClientFactory httpClientFactory,
         IServiceScopeFactory serviceScopeFactory)
     {
+		logger.LogError(">>> Entering TaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},serviceScopeFactory={ServiceScopeFactory})", appSettings, httpClientFactory, serviceScopeFactory);
+		logger.LogDebug("TaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},serviceScopeFactory={ServiceScopeFactory}): TaskThread.ServiceScopeFactory → {Arg3}", appSettings, httpClientFactory, serviceScopeFactory, TaskThread.ServiceScopeFactory);
+		logger.LogDebug("TaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},serviceScopeFactory={ServiceScopeFactory}): TaskThread.HttpClientFactory → {Arg3}", appSettings, httpClientFactory, serviceScopeFactory, TaskThread.HttpClientFactory);
         _appSettings = appSettings;
         _serviceScopeFactory = serviceScopeFactory;
+		logger.LogDebug("TaskScheduler(appSettings={AppSettings},httpClientFactory={HttpClientFactory},serviceScopeFactory={ServiceScopeFactory}): _serviceScopeFactory → {_serviceScopeFactory}", appSettings, httpClientFactory, serviceScopeFactory, _serviceScopeFactory);
         TaskThread.HttpClientFactory = httpClientFactory;
         TaskThread.ServiceScopeFactory = serviceScopeFactory;
     }
@@ -46,6 +50,7 @@ public partial class TaskScheduler : ITaskScheduler
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InitializeAsync()
     {
+		logger.LogError(">>> Entering InitializeAsync()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
@@ -53,7 +58,9 @@ public partial class TaskScheduler : ITaskScheduler
             return;
 
         using var scope = _serviceScopeFactory.CreateScope();
+		logger.LogError("InitializeAsync(): scope → {Scope}", scope);
         var scheduleTaskService = scope.ServiceProvider.GetService<IScheduleTaskService>() ?? throw new NullReferenceException($"Can't get {nameof(IScheduleTaskService)} implementation from the scope");
+		logger.LogError("InitializeAsync(): scheduleTaskService → {ScheduleTaskService}", scheduleTaskService);
 
         //initialize and start schedule tasks
         var scheduleTasks = (await scheduleTaskService.GetAllTasksAsync())
@@ -61,11 +68,15 @@ public partial class TaskScheduler : ITaskScheduler
             .ToList();
 
         var storeContext = scope.ServiceProvider.GetService<IStoreContext>() ?? throw new NullReferenceException($"Can't get {nameof(IStoreContext)} implementation from the scope");
+		logger.LogError("InitializeAsync(): storeContext → {StoreContext}", storeContext);
 
         var store = await storeContext.GetCurrentStoreAsync();
+		logger.LogError("InitializeAsync(): store → {Store}", store);
 
         var scheduleTaskUrl = $"{store.Url.TrimEnd('/')}/{NopTaskDefaults.ScheduleTaskPath}";
+		logger.LogError("InitializeAsync(): scheduleTaskUrl → {ScheduleTaskUrl}", scheduleTaskUrl);
         var timeout = _appSettings.Get<CommonConfig>().ScheduleTaskRunTimeout;
+		logger.LogError("InitializeAsync(): timeout → {Timeout}", timeout);
 
         foreach (var scheduleTask in scheduleTasks)
         {
@@ -81,6 +92,7 @@ public partial class TaskScheduler : ITaskScheduler
             {
                 //seconds left since the last start
                 var secondsLeft = (DateTime.UtcNow - scheduleTask.LastStartUtc).Value.TotalSeconds;
+				logger.LogError("InitializeAsync(): secondsLeft → {SecondsLeft}", secondsLeft);
 
                 if (secondsLeft >= scheduleTask.Seconds)
                     //run now (immediately)
@@ -89,6 +101,7 @@ public partial class TaskScheduler : ITaskScheduler
                     //calculate start time
                     //and round it (so "ensureRunOncePerPeriod" parameter was fine)
                     taskThread.InitSeconds = (int)(scheduleTask.Seconds - secondsLeft) + 1;
+					logger.LogDebug("InitializeAsync(): taskThread.InitSeconds → {Arg0}", taskThread.InitSeconds);
             }
             else if (scheduleTask.LastEnabledUtc.HasValue)
             {
@@ -109,6 +122,7 @@ public partial class TaskScheduler : ITaskScheduler
 
             _taskThreads.Add(taskThread);
         }
+		logger.LogWarning("<<< Exiting InitializeAsync()");
     }
 
     /// <summary>
@@ -117,8 +131,12 @@ public partial class TaskScheduler : ITaskScheduler
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual Task StartSchedulerAsync()
     {
+		logger.LogError(">>> Entering StartSchedulerAsync()");
         _taskThread = Task.WhenAll(_taskThreads.Select(taskThread => taskThread.InitTimerAsync()));
 
+		logger.LogDebug("StartSchedulerAsync(): _taskThread → {_taskThread}", _taskThread);
+		logger.LogError("StartSchedulerAsync(): _taskThread → {_taskThread}", _taskThread);
+		logger.LogWarning("<<< Exiting StartSchedulerAsync()");
         return Task.CompletedTask;
     }
 
@@ -128,6 +146,7 @@ public partial class TaskScheduler : ITaskScheduler
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task StopSchedulerAsync()
     {
+		logger.LogError(">>> Entering StopSchedulerAsync()");
         foreach (var taskThread in _taskThreads)
             taskThread.Dispose();
 
@@ -138,11 +157,13 @@ public partial class TaskScheduler : ITaskScheduler
         }
         catch
         {
+		logger.LogError("Exception in StopSchedulerAsync(): {Arg0}", ex.Message);
            //ignore
         }
 
         _taskThread?.Dispose();
         _taskThreads.Clear();
+		logger.LogWarning("<<< Exiting StopSchedulerAsync()");
     }
 
     #endregion
@@ -168,11 +189,18 @@ public partial class TaskScheduler : ITaskScheduler
 
         public TaskThread(ScheduleTask task, string scheduleTaskUrl, int? timeout)
         {
+			logger.LogError(">>> Entering TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout})", task, scheduleTaskUrl, timeout);
             _scheduleTaskUrl = scheduleTaskUrl;
             _scheduleTask = task;
+			logger.LogDebug("TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout}): _scheduleTask → {_scheduleTask}", task, scheduleTaskUrl, timeout, _scheduleTask);
+			logger.LogDebug("TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout}): Seconds → {Seconds}", task, scheduleTaskUrl, timeout, Seconds);
             _timeout = timeout;
+			logger.LogDebug("TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout}): _timeout → {_timeout}", task, scheduleTaskUrl, timeout, _timeout);
             IsStarted = false;
+			logger.LogDebug("TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout}): IsStarted → {IsStarted}", task, scheduleTaskUrl, timeout, IsStarted);
             _cancellationToken = new CancellationTokenSource();
+			logger.LogError("TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout}): _cancellationToken → {_cancellationToken}", task, scheduleTaskUrl, timeout, _cancellationToken);
+			logger.LogDebug("TaskThread(task={Task},scheduleTaskUrl={ScheduleTaskUrl},timeout={Timeout}): _cancellationToken → {_cancellationToken}", task, scheduleTaskUrl, timeout, _cancellationToken);
             
             Seconds = 10 * 60;
         }
@@ -187,12 +215,18 @@ public partial class TaskScheduler : ITaskScheduler
         /// <returns>A task that represents the asynchronous operation</returns>
         protected virtual async Task RunAsync()
         {
+			logger.LogError(">>> Entering RunAsync()");
+            var __logStart = System.Diagnostics.Stopwatch.StartNew();
             if (Seconds <= 0)
                 return;
 
             StartedUtc = DateTime.UtcNow;
+			logger.LogDebug("RunAsync(): StartedUtc → {StartedUtc}", StartedUtc);
             IsRunning = true;
+			logger.LogError("RunAsync(): IsRunning → {IsRunning}", IsRunning);
+			logger.LogDebug("RunAsync(): IsRunning → {IsRunning}", IsRunning);
             HttpClient client = null;
+			logger.LogError("RunAsync(): client → {Client}", client);
 
             try
             {
@@ -203,19 +237,27 @@ public partial class TaskScheduler : ITaskScheduler
 
                 //send post data
                 var data = new FormUrlEncodedContent(new[] { new KeyValuePair<string, string>("taskType", _scheduleTask.Type) });
+				logger.LogError("RunAsync(): data → {Data}", data);
                 await client.PostAsync(_scheduleTaskUrl, data);
             }
             catch (Exception ex)
             {
+				logger.LogError("Exception in RunAsync(): {Arg0}", ex.Message);
                 using var scope = ServiceScopeFactory.CreateScope();
+				logger.LogError("RunAsync(): scope → {Scope}", scope);
 
                 // Resolve
                 var logger = EngineContext.Current.Resolve<ILogger>(scope);
+				logger.LogError("RunAsync(): logger → {Logger}", logger);
                 var localizationService = EngineContext.Current.Resolve<ILocalizationService>(scope);
+				logger.LogError("RunAsync(): localizationService → {LocalizationService}", localizationService);
                 var storeContext = EngineContext.Current.Resolve<IStoreContext>(scope);
+				logger.LogError("RunAsync(): storeContext → {StoreContext}", storeContext);
 
                 var message = ex.InnerException?.GetType() == typeof(TaskCanceledException) ? await localizationService.GetResourceAsync("ScheduleTasks.TimeoutError") : ex.Message;
+				logger.LogError("RunAsync(): message → {Message}", message);
                 var store = await storeContext.GetCurrentStoreAsync();
+				logger.LogError("RunAsync(): store → {Store}", store);
 
                 message = string.Format(await localizationService.GetResourceAsync("ScheduleTasks.Error"), _scheduleTask.Name,
                     message, _scheduleTask.Type, store.Name, _scheduleTaskUrl);
@@ -228,6 +270,8 @@ public partial class TaskScheduler : ITaskScheduler
             }
 
             IsRunning = false;
+			logger.LogError("RunAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+			logger.LogWarning("<<< Exiting RunAsync()");
         }
         
         /// <summary>
@@ -236,12 +280,17 @@ public partial class TaskScheduler : ITaskScheduler
         /// <param name="disposing">Specifies whether to disposing resources</param>
         protected virtual void Dispose(bool disposing)
         {
+			logger.LogError(">>> Entering Dispose(disposing={Disposing})", disposing);
             if (_disposed)
                 return;
 
             IsStarted = false;
+			logger.LogDebug("Dispose(disposing={Disposing}): IsStarted → {IsStarted}", disposing, IsStarted);
             _disposed = true;
+			logger.LogDebug("Dispose(disposing={Disposing}): _disposed → {_disposed}", disposing, _disposed);
             _cancellationToken.Cancel();
+			logger.LogError(">>> Entering Dispose()");
+			logger.LogWarning("<<< Exiting Dispose(disposing={Disposing})", disposing);
         }
 
         #endregion
@@ -262,9 +311,13 @@ public partial class TaskScheduler : ITaskScheduler
         /// </summary>
         public virtual async Task InitTimerAsync()
         {
+			logger.LogError(">>> Entering InitTimerAsync()");
             var interval = TimeSpan.FromMilliseconds(Interval);
             IsStarted = true;
+			logger.LogDebug("InitTimerAsync(): IsStarted → {IsStarted}", IsStarted);
             using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(InitInterval > 0 ? InitInterval : 1));
+			logger.LogError("InitTimerAsync(): timer → {Timer}", timer);
+			logger.LogError("InitTimerAsync(): interval → {Interval}", interval);
             
             while (await timer.WaitForNextTickAsync(_cancellationToken.Token))
             {
@@ -277,6 +330,7 @@ public partial class TaskScheduler : ITaskScheduler
                 }
                 catch
                 {
+					logger.LogError("Exception in InitTimerAsync(): {Arg0}", ex.Message);
                     // ignore
                 }
                 finally
@@ -287,7 +341,9 @@ public partial class TaskScheduler : ITaskScheduler
 
                 if (timer.Period != interval)
                     timer.Period = interval;
+					logger.LogDebug("InitTimerAsync(): timer.Period → {Arg0}", timer.Period);
             }
+			logger.LogWarning("<<< Exiting InitTimerAsync()");
         }
 
         #endregion

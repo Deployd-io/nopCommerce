@@ -30,11 +30,13 @@ using Nop.Web.Areas.Admin.Models.Customers;
 using Nop.Web.Framework.Controllers;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Controllers;
 
 public partial class CustomerController : BaseAdminController
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -148,13 +150,16 @@ public partial class CustomerController : BaseAdminController
 
     protected virtual async Task<string> ValidateCustomerRolesAsync(IList<CustomerRole> customerRoles, IList<CustomerRole> existingCustomerRoles)
     {
+		_logger.LogError(">>> Entering ValidateCustomerRolesAsync(customerRoles={CustomerRoles},existingCustomerRoles={ExistingCustomerRoles})", customerRoles, existingCustomerRoles);
         ArgumentNullException.ThrowIfNull(customerRoles);
 
         ArgumentNullException.ThrowIfNull(existingCustomerRoles);
 
         //check ACL permission to manage customer roles
         var rolesToAdd = customerRoles.Except(existingCustomerRoles, new CustomerRoleComparerByName());
+		_logger.LogError("ValidateCustomerRolesAsync(customerRoles={CustomerRoles},existingCustomerRoles={ExistingCustomerRoles}): rolesToAdd → {RolesToAdd}", customerRoles, existingCustomerRoles, rolesToAdd);
         var rolesToDelete = existingCustomerRoles.Except(customerRoles, new CustomerRoleComparerByName());
+		_logger.LogError("ValidateCustomerRolesAsync(customerRoles={CustomerRoles},existingCustomerRoles={ExistingCustomerRoles}): rolesToDelete → {RolesToDelete}", customerRoles, existingCustomerRoles, rolesToDelete);
         if (rolesToAdd.Any(role => role.SystemName != NopCustomerDefaults.RegisteredRoleName) || rolesToDelete.Any())
         {
             if (!await _permissionService.AuthorizeAsync(StandardPermission.Configuration.MANAGE_ACL))
@@ -164,7 +169,9 @@ public partial class CustomerController : BaseAdminController
         //ensure a customer is not added to both 'Guests' and 'Registered' customer roles
         //ensure that a customer is in at least one required role ('Guests' and 'Registered')
         var isInGuestsRole = customerRoles.FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.GuestsRoleName) != null;
+		_logger.LogError("ValidateCustomerRolesAsync(customerRoles={CustomerRoles},existingCustomerRoles={ExistingCustomerRoles}): isInGuestsRole → {IsInGuestsRole}", customerRoles, existingCustomerRoles, isInGuestsRole);
         var isInRegisteredRole = customerRoles.FirstOrDefault(cr => cr.SystemName == NopCustomerDefaults.RegisteredRoleName) != null;
+		_logger.LogError("ValidateCustomerRolesAsync(customerRoles={CustomerRoles},existingCustomerRoles={ExistingCustomerRoles}): isInRegisteredRole → {IsInRegisteredRole}", customerRoles, existingCustomerRoles, isInRegisteredRole);
         if (isInGuestsRole && isInRegisteredRole)
             return await _localizationService.GetResourceAsync("Admin.Customers.Customers.GuestsAndRegisteredRolesError");
         if (!isInGuestsRole && !isInRegisteredRole)
@@ -176,13 +183,16 @@ public partial class CustomerController : BaseAdminController
 
     protected virtual async Task<string> ParseCustomCustomerAttributesAsync(IFormCollection form)
     {
+		_logger.LogError(">>> Entering ParseCustomCustomerAttributesAsync(form={Form})", form);
         ArgumentNullException.ThrowIfNull(form);
 
         var attributesXml = string.Empty;
         var customerAttributes = await _customerAttributeService.GetAllAttributesAsync();
+		_logger.LogError("ParseCustomCustomerAttributesAsync(form={Form}): customerAttributes → {CustomerAttributes}", form, customerAttributes);
         foreach (var attribute in customerAttributes)
         {
             var controlId = $"{NopCustomerServicesDefaults.CustomerAttributePrefix}{attribute.Id}";
+			_logger.LogError("ParseCustomCustomerAttributesAsync(form={Form}): controlId → {ControlId}", form, controlId);
             StringValues ctrlAttributes;
 
             switch (attribute.AttributeControlType)
@@ -190,9 +200,12 @@ public partial class CustomerController : BaseAdminController
                 case AttributeControlType.DropdownList:
                 case AttributeControlType.RadioList:
                     ctrlAttributes = form[controlId];
+					_logger.LogDebug("ParseCustomCustomerAttributesAsync(form={Form}): ctrlAttributes → {CtrlAttributes}", form, ctrlAttributes);
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
+						_logger.LogError("ParseCustomCustomerAttributesAsync(form={Form}): ctrlAttributes → {CtrlAttributes}", form, ctrlAttributes);
                         var selectedAttributeId = int.Parse(ctrlAttributes);
+						_logger.LogError("ParseCustomCustomerAttributesAsync(form={Form}): selectedAttributeId → {SelectedAttributeId}", form, selectedAttributeId);
                         if (selectedAttributeId > 0)
                             attributesXml = _customerAttributeParser.AddAttribute(attributesXml,
                                 attribute, selectedAttributeId.ToString());
@@ -217,6 +230,7 @@ public partial class CustomerController : BaseAdminController
                 case AttributeControlType.ReadonlyCheckboxes:
                     //load read-only (already server-side selected) values
                     var attributeValues = await _customerAttributeService.GetAttributeValuesAsync(attribute.Id);
+					_logger.LogError("ParseCustomCustomerAttributesAsync(form={Form}): attributeValues → {AttributeValues}", form, attributeValues);
                     foreach (var selectedAttributeId in attributeValues
                                  .Where(v => v.IsPreSelected)
                                  .Select(v => v.Id)
@@ -233,6 +247,7 @@ public partial class CustomerController : BaseAdminController
                     if (!StringValues.IsNullOrEmpty(ctrlAttributes))
                     {
                         var enteredText = ctrlAttributes.ToString().Trim();
+						_logger.LogError("ParseCustomCustomerAttributesAsync(form={Form}): enteredText → {EnteredText}", form, enteredText);
                         attributesXml = _customerAttributeParser.AddAttribute(attributesXml,
                             attribute, enteredText);
                     }
@@ -248,13 +263,17 @@ public partial class CustomerController : BaseAdminController
             }
         }
 
+		_logger.LogWarning("<<< Exiting ParseCustomCustomerAttributesAsync(form={Form})", form);
         return attributesXml;
     }
 
     protected virtual async Task<bool> SecondAdminAccountExistsAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering SecondAdminAccountExistsAsync(customer={Customer})", customer);
         var customers = await _customerService.GetAllCustomersAsync(customerRoleIds: [(await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.AdministratorsRoleName)).Id]);
 
+		_logger.LogError("SecondAdminAccountExistsAsync(customer={Customer}): customers → {Customers}", customer, customers);
+		_logger.LogWarning("<<< Exiting SecondAdminAccountExistsAsync(customer={Customer})", customer);
         return customers.Any(c => c.Active && c.Id != customer.Id);
     }
 
@@ -264,15 +283,20 @@ public partial class CustomerController : BaseAdminController
 
     public virtual IActionResult Index()
     {
+		_logger.LogError(">>> Entering Index()");
+        _logger.LogWarning("<<< Exiting Index()");
         return RedirectToAction("List");
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> List()
     {
+		_logger.LogError(">>> Entering List()");
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerSearchModelAsync(new CustomerSearchModel());
+		_logger.LogError("List(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting List()");
         return View(model);
     }
 
@@ -280,18 +304,25 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> CustomerList(CustomerSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering CustomerList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerListModelAsync(searchModel);
+		_logger.LogError("CustomerList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting CustomerList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Create()
     {
+		_logger.LogError(">>> Entering Create()");
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerModelAsync(new CustomerModel(), null);
+		_logger.LogError("Create(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting Create()");
+		_logger.LogWarning("<<< Exiting Create(model={Model},continueEditing={ContinueEditing},form={Form})", model, continueEditing, form);
         return View(model);
     }
 
@@ -453,14 +484,19 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> Edit(int id)
     {
+		_logger.LogError(">>> Entering Edit(id={Id})", id);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(id);
+		_logger.LogError("Edit(id={Id}): customer → {Customer}", id, customer);
         if (customer == null || customer.Deleted)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerModelAsync(null, customer);
+		_logger.LogError("Edit(id={Id}): model → {Model}", id, model);
 
+		_logger.LogWarning("<<< Exiting Edit(id={Id})", id);
+		_logger.LogWarning("<<< Exiting Edit(model={Model},continueEditing={ContinueEditing},form={Form})", model, continueEditing, form);
         return View(model);
     }
 
@@ -675,8 +711,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ChangePassword(CustomerModel model)
     {
+		_logger.LogError(">>> Entering ChangePassword(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("ChangePassword(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -690,12 +728,14 @@ public partial class CustomerController : BaseAdminController
         var changePassRequest = new ChangePasswordRequest(customer.Email,
             false, _customerSettings.DefaultPasswordFormat, model.Password);
         var changePassResult = await _customerRegistrationService.ChangePasswordAsync(changePassRequest);
+		_logger.LogError("ChangePassword(model={Model}): changePassResult → {ChangePassResult}", model, changePassResult);
         if (changePassResult.Success)
             _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.PasswordChanged"));
         else
             foreach (var error in changePassResult.Errors)
                 _notificationService.ErrorNotification(error);
 
+		_logger.LogWarning("<<< Exiting ChangePassword(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -704,14 +744,17 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> MarkVatNumberAsValid(CustomerModel model)
     {
+		_logger.LogError(">>> Entering MarkVatNumberAsValid(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("MarkVatNumberAsValid(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         customer.VatNumberStatusId = (int)VatNumberStatus.Valid;
         await _customerService.UpdateCustomerAsync(customer);
 
+		_logger.LogWarning("<<< Exiting MarkVatNumberAsValid(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -720,14 +763,17 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> MarkVatNumberAsInvalid(CustomerModel model)
     {
+		_logger.LogError(">>> Entering MarkVatNumberAsInvalid(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("MarkVatNumberAsInvalid(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         customer.VatNumberStatusId = (int)VatNumberStatus.Invalid;
         await _customerService.UpdateCustomerAsync(customer);
 
+		_logger.LogWarning("<<< Exiting MarkVatNumberAsInvalid(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -736,14 +782,18 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> RemoveAffiliate(CustomerModel model)
     {
+		_logger.LogError(">>> Entering RemoveAffiliate(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("RemoveAffiliate(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         customer.AffiliateId = 0;
+		_logger.LogDebug("RemoveAffiliate(model={Model}): customer.AffiliateId → {Arg1}", model, customer.AffiliateId);
         await _customerService.UpdateCustomerAsync(customer);
 
+		_logger.LogWarning("<<< Exiting RemoveAffiliate(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -751,8 +801,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> RemoveBindMFA(int id)
     {
+		_logger.LogError(">>> Entering RemoveBindMFA(id={Id})", id);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(id);
+		_logger.LogError("RemoveBindMFA(id={Id}): customer → {Customer}", id, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -763,6 +815,7 @@ public partial class CustomerController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.UnbindMFAProvider"));
 
+		_logger.LogWarning("<<< Exiting RemoveBindMFA(id={Id})", id);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -770,8 +823,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> Delete(int id)
     {
+		_logger.LogError(">>> Entering Delete(id={Id})", id);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(id);
+		_logger.LogError("Delete(id={Id}): customer → {Customer}", id, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -799,6 +854,7 @@ public partial class CustomerController : BaseAdminController
 
             //remove newsletter subscriptions (if exist)
             var subscriptions = await _newsLetterSubscriptionService.GetNewsLetterSubscriptionsByEmailAsync(customerEmail);
+			_logger.LogError("Delete(id={Id}): subscriptions → {Subscriptions}", id, subscriptions);
             foreach (var subscription in subscriptions)
                 await _newsLetterSubscriptionService.DeleteNewsLetterSubscriptionAsync(subscription);
 
@@ -812,7 +868,9 @@ public partial class CustomerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in Delete(id={Id}): {Arg1}", id, exc.Message);
             _notificationService.ErrorNotification(exc.Message);
+			_logger.LogWarning("<<< Exiting Delete(id={Id})", id);
             return RedirectToAction("Edit", new { id = customer.Id });
         }
     }
@@ -822,8 +880,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_IMPERSONATION)]
     public virtual async Task<IActionResult> Impersonate(int id)
     {
+		_logger.LogError(">>> Entering Impersonate(id={Id})", id);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(id);
+		_logger.LogError("Impersonate(id={Id}): customer → {Customer}", id, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -837,6 +897,7 @@ public partial class CustomerController : BaseAdminController
         //ensure that a non-admin user cannot impersonate as an administrator
         //otherwise, that user can simply impersonate as an administrator and gain additional administrative privileges
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("Impersonate(id={Id}): currentCustomer → {CurrentCustomer}", id, currentCustomer);
         if (!await _customerService.IsAdminAsync(currentCustomer) && await _customerService.IsAdminAsync(customer))
         {
             _notificationService.ErrorNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.NonAdminNotImpersonateAsAdminError"));
@@ -851,9 +912,11 @@ public partial class CustomerController : BaseAdminController
 
         //ensure login is not required
         customer.RequireReLogin = false;
+		_logger.LogDebug("Impersonate(id={Id}): customer.RequireReLogin → {Arg1}", id, customer.RequireReLogin);
         await _customerService.UpdateCustomerAsync(customer);
         await _genericAttributeService.SaveAttributeAsync<int?>(currentCustomer, NopCustomerDefaults.ImpersonatedCustomerIdAttribute, customer.Id);
 
+		_logger.LogWarning("<<< Exiting Impersonate(id={Id})", id);
         return RedirectToAction("Index", "Home", new { area = string.Empty });
     }
 
@@ -862,8 +925,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SendWelcomeMessage(CustomerModel model)
     {
+		_logger.LogError(">>> Entering SendWelcomeMessage(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("SendWelcomeMessage(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -871,6 +936,7 @@ public partial class CustomerController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.SendWelcomeMessage.Success"));
 
+		_logger.LogWarning("<<< Exiting SendWelcomeMessage(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -879,8 +945,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> ReSendActivationMessage(CustomerModel model)
     {
+		_logger.LogError(">>> Entering ReSendActivationMessage(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("ReSendActivationMessage(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -890,20 +958,24 @@ public partial class CustomerController : BaseAdminController
 
         _notificationService.SuccessNotification(await _localizationService.GetResourceAsync("Admin.Customers.Customers.ReSendActivationMessage.Success"));
 
+		_logger.LogWarning("<<< Exiting ReSendActivationMessage(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SendEmail(CustomerModel model)
     {
+		_logger.LogError(">>> Entering SendEmail(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("SendEmail(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         try
         {
             if (string.IsNullOrWhiteSpace(customer.Email))
+				_logger.LogError("Throwing NopException from SendEmail(model={Model})", model);
                 throw new NopException("Customer email is empty");
             if (!CommonHelper.IsValidEmail(customer.Email))
                 throw new NopException("Customer email is not valid");
@@ -935,23 +1007,28 @@ public partial class CustomerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in SendEmail(model={Model}): {Arg1}", model, exc.Message);
             _notificationService.ErrorNotification(exc.Message);
         }
 
+		_logger.LogWarning("<<< Exiting SendEmail(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> SendPm(CustomerModel model)
     {
+		_logger.LogError(">>> Entering SendPm(model={Model})", model);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.Id);
+		_logger.LogError("SendPm(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         try
         {
             if (!_forumSettings.AllowPrivateMessages)
+				_logger.LogError("Throwing NopException from SendPm(model={Model})", model);
                 throw new NopException("Private messages are disabled");
             if (await _customerService.IsGuestAsync(customer))
                 throw new NopException("Customer should be registered");
@@ -961,7 +1038,9 @@ public partial class CustomerController : BaseAdminController
                 throw new NopException(await _localizationService.GetResourceAsync("PrivateMessages.MessageCannotBeEmpty"));
 
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("SendPm(model={Model}): store → {Store}", model, store);
             var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("SendPm(model={Model}): currentCustomer → {CurrentCustomer}", model, currentCustomer);
 
             var privateMessage = new PrivateMessage
             {
@@ -982,9 +1061,11 @@ public partial class CustomerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in SendPm(model={Model}): {Arg1}", model, exc.Message);
             _notificationService.ErrorNotification(exc.Message);
         }
 
+		_logger.LogWarning("<<< Exiting SendPm(model={Model})", model);
         return RedirectToAction("Edit", new { id = customer.Id });
     }
 
@@ -996,19 +1077,23 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> RewardPointsHistorySelect(CustomerRewardPointsSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering RewardPointsHistorySelect(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
             ?? throw new ArgumentException("No customer found with the specified id");
 
         //prepare model
         var model = await _customerModelFactory.PrepareRewardPointsListModelAsync(searchModel, customer);
+		_logger.LogError("RewardPointsHistorySelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting RewardPointsHistorySelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> RewardPointsHistoryAdd(AddRewardPointsToCustomerModel model)
     {
+		_logger.LogError(">>> Entering RewardPointsHistoryAdd(model={Model})", model);
         //prevent adding a new row with zero value
         if (model.Points == 0)
             return ErrorJson(await _localizationService.GetResourceAsync("Admin.Customers.Customers.RewardPoints.AddingZeroValueNotAllowed"));
@@ -1019,6 +1104,7 @@ public partial class CustomerController : BaseAdminController
 
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(model.CustomerId);
+		_logger.LogError("RewardPointsHistoryAdd(model={Model}): customer → {Customer}", model, customer);
         if (customer == null)
             return ErrorJson("Customer cannot be loaded");
 
@@ -1027,19 +1113,26 @@ public partial class CustomerController : BaseAdminController
         if (!model.ActivatePointsImmediately && model.ActivationDelay > 0)
         {
             var delayPeriod = (RewardPointsActivatingDelayPeriod)model.ActivationDelayPeriodId;
+			_logger.LogError("RewardPointsHistoryAdd(model={Model}): delayPeriod → {DelayPeriod}", model, delayPeriod);
+			_logger.LogDebug("RewardPointsHistoryAdd(model={Model}): activatingDate → {ActivatingDate}", model, activatingDate);
             var delayInHours = delayPeriod.ToHours(model.ActivationDelay);
+			_logger.LogError("RewardPointsHistoryAdd(model={Model}): delayInHours → {DelayInHours}", model, delayInHours);
             activatingDate = DateTime.UtcNow.AddHours(delayInHours);
+			_logger.LogError("RewardPointsHistoryAdd(model={Model}): activatingDate → {ActivatingDate}", model, activatingDate);
         }
 
         //whether points validity is set
         DateTime? endDate = null;
         if (model.PointsValidity > 0)
             endDate = (activatingDate ?? DateTime.UtcNow).AddDays(model.PointsValidity.Value);
+			_logger.LogError("RewardPointsHistoryAdd(model={Model}): endDate → {EndDate}", model, endDate);
+			_logger.LogDebug("RewardPointsHistoryAdd(model={Model}): endDate → {EndDate}", model, endDate);
 
         //add reward points
         await _rewardPointService.AddRewardPointsHistoryEntryAsync(customer, model.Points, model.StoreId, model.Message,
             activatingDate: activatingDate, endDate: endDate);
 
+		_logger.LogWarning("<<< Exiting RewardPointsHistoryAdd(model={Model})", model);
         return Json(new { Result = true });
     }
 
@@ -1051,13 +1144,16 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> AddressesSelect(CustomerAddressSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering AddressesSelect(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
             ?? throw new ArgumentException("No customer found with the specified id");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerAddressListModelAsync(searchModel, customer);
+		_logger.LogError("AddressesSelect(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting AddressesSelect(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1065,12 +1161,14 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> AddressDelete(int id, int customerId)
     {
+		_logger.LogError(">>> Entering AddressDelete(id={Id},customerId={CustomerId})", id, customerId);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(customerId)
             ?? throw new ArgumentException("No customer found with the specified id", nameof(customerId));
 
         //try to get an address with the specified id
         var address = await _customerService.GetCustomerAddressAsync(customer.Id, id);
+		_logger.LogError("AddressDelete(id={Id},customerId={CustomerId}): address → {Address}", id, customerId, address);
 
         if (address == null)
             return Content("No address found with the specified id");
@@ -1081,20 +1179,26 @@ public partial class CustomerController : BaseAdminController
         //now delete the address record
         await _addressService.DeleteAddressAsync(address);
 
+		_logger.LogWarning("<<< Exiting AddressDelete(id={Id},customerId={CustomerId})", id, customerId);
         return new NullJsonResult();
     }
 
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> AddressCreate(int customerId)
     {
+		_logger.LogError(">>> Entering AddressCreate(customerId={CustomerId})", customerId);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
+		_logger.LogError("AddressCreate(customerId={CustomerId}): customer → {Customer}", customerId, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerAddressModelAsync(new CustomerAddressModel(), customer, null);
+		_logger.LogError("AddressCreate(customerId={CustomerId}): model → {Model}", customerId, model);
 
+		_logger.LogWarning("<<< Exiting AddressCreate(customerId={CustomerId})", customerId);
+		_logger.LogWarning("<<< Exiting AddressCreate(model={Model},form={Form})", model, form);
         return View(model);
     }
 
@@ -1146,19 +1250,25 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_CREATE_EDIT_DELETE)]
     public virtual async Task<IActionResult> AddressEdit(int addressId, int customerId)
     {
+		_logger.LogError(">>> Entering AddressEdit(addressId={AddressId},customerId={CustomerId})", addressId, customerId);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
+		_logger.LogError("AddressEdit(addressId={AddressId},customerId={CustomerId}): customer → {Customer}", addressId, customerId, customer);
         if (customer == null)
             return RedirectToAction("List");
 
         //try to get an address with the specified id
         var address = await _addressService.GetAddressByIdAsync(addressId);
+		_logger.LogError("AddressEdit(addressId={AddressId},customerId={CustomerId}): address → {Address}", addressId, customerId, address);
         if (address == null)
             return RedirectToAction("Edit", new { id = customer.Id });
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerAddressModelAsync(null, customer, address);
+		_logger.LogError("AddressEdit(addressId={AddressId},customerId={CustomerId}): model → {Model}", addressId, customerId, model);
 
+		_logger.LogWarning("<<< Exiting AddressEdit(addressId={AddressId},customerId={CustomerId})", addressId, customerId);
+		_logger.LogWarning("<<< Exiting AddressEdit(model={Model},form={Form})", model, form);
         return View(model);
     }
 
@@ -1210,13 +1320,16 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> OrderList(CustomerOrderSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering OrderList(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
             ?? throw new ArgumentException("No customer found with the specified id");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerOrderListModelAsync(searchModel, customer);
+		_logger.LogError("OrderList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting OrderList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1227,20 +1340,28 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> LoadCustomerStatistics(string period)
     {
+		_logger.LogError(">>> Entering LoadCustomerStatistics(period={Period})", period);
         var result = new List<object>();
 
+		_logger.LogError("LoadCustomerStatistics(period={Period}): result → {Result}", period, result);
         var nowDt = await _dateTimeHelper.ConvertToUserTimeAsync(DateTime.Now);
+		_logger.LogError("LoadCustomerStatistics(period={Period}): nowDt → {NowDt}", period, nowDt);
         var timeZone = await _dateTimeHelper.GetCurrentTimeZoneAsync();
+		_logger.LogError("LoadCustomerStatistics(period={Period}): timeZone → {TimeZone}", period, timeZone);
         var searchCustomerRoleIds = new[] { (await _customerService.GetCustomerRoleBySystemNameAsync(NopCustomerDefaults.RegisteredRoleName)).Id };
+		_logger.LogError("LoadCustomerStatistics(period={Period}): searchCustomerRoleIds → {SearchCustomerRoleIds}", period, searchCustomerRoleIds);
 
         var culture = new CultureInfo((await _workContext.GetWorkingLanguageAsync()).LanguageCulture);
+		_logger.LogError("LoadCustomerStatistics(period={Period}): culture → {Culture}", period, culture);
 
         switch (period)
         {
             case "year":
                 //year statistics
                 var yearAgoDt = nowDt.AddYears(-1).AddMonths(1);
+				_logger.LogError("LoadCustomerStatistics(period={Period}): yearAgoDt → {YearAgoDt}", period, yearAgoDt);
                 var searchYearDateUser = new DateTime(yearAgoDt.Year, yearAgoDt.Month, 1);
+				_logger.LogError("LoadCustomerStatistics(period={Period}): searchYearDateUser → {SearchYearDateUser}", period, searchYearDateUser);
                 for (var i = 0; i <= 12; i++)
                 {
                     result.Add(new
@@ -1253,6 +1374,7 @@ public partial class CustomerController : BaseAdminController
                             pageIndex: 0,
                             pageSize: 1, getOnlyTotalCount: true)).TotalCount.ToString()
                     });
+							_logger.LogDebug("LoadCustomerStatistics(period={Period}): value → {Value}", period, value);
 
                     searchYearDateUser = searchYearDateUser.AddMonths(1);
                 }
@@ -1261,7 +1383,9 @@ public partial class CustomerController : BaseAdminController
             case "month":
                 //month statistics
                 var monthAgoDt = nowDt.AddDays(-30);
+				_logger.LogError("LoadCustomerStatistics(period={Period}): monthAgoDt → {MonthAgoDt}", period, monthAgoDt);
                 var searchMonthDateUser = new DateTime(monthAgoDt.Year, monthAgoDt.Month, monthAgoDt.Day);
+				_logger.LogError("LoadCustomerStatistics(period={Period}): searchMonthDateUser → {SearchMonthDateUser}", period, searchMonthDateUser);
                 for (var i = 0; i <= 30; i++)
                 {
                     result.Add(new
@@ -1283,7 +1407,9 @@ public partial class CustomerController : BaseAdminController
             default:
                 //week statistics
                 var weekAgoDt = nowDt.AddDays(-7);
+				_logger.LogError("LoadCustomerStatistics(period={Period}): weekAgoDt → {WeekAgoDt}", period, weekAgoDt);
                 var searchWeekDateUser = new DateTime(weekAgoDt.Year, weekAgoDt.Month, weekAgoDt.Day);
+				_logger.LogError("LoadCustomerStatistics(period={Period}): searchWeekDateUser → {SearchWeekDateUser}", period, searchWeekDateUser);
                 for (var i = 0; i <= 7; i++)
                 {
                     result.Add(new
@@ -1303,6 +1429,7 @@ public partial class CustomerController : BaseAdminController
                 break;
         }
 
+		_logger.LogWarning("<<< Exiting LoadCustomerStatistics(period={Period})", period);
         return Json(result);
     }
 
@@ -1314,13 +1441,16 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> GetCartList(CustomerShoppingCartSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering GetCartList(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
             ?? throw new ArgumentException("No customer found with the specified id");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerShoppingCartListModelAsync(searchModel, customer);
+		_logger.LogError("GetCartList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting GetCartList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1333,13 +1463,16 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.ACTIVITY_LOG_VIEW)]
     public virtual async Task<IActionResult> ListActivityLog(CustomerActivityLogSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering ListActivityLog(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
             ?? throw new ArgumentException("No customer found with the specified id");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerActivityLogListModelAsync(searchModel, customer);
+		_logger.LogError("ListActivityLog(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting ListActivityLog(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1351,13 +1484,16 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_VIEW)]
     public virtual async Task<IActionResult> BackInStockSubscriptionList(CustomerBackInStockSubscriptionSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering BackInStockSubscriptionList(searchModel={SearchModel})", searchModel);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(searchModel.CustomerId)
             ?? throw new ArgumentException("No customer found with the specified id");
 
         //prepare model
         var model = await _customerModelFactory.PrepareCustomerBackInStockSubscriptionListModelAsync(searchModel, customer);
+		_logger.LogError("BackInStockSubscriptionList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting BackInStockSubscriptionList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1369,9 +1505,12 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.GDPR_MANAGE)]
     public virtual async Task<IActionResult> GdprLog()
     {
+		_logger.LogError(">>> Entering GdprLog()");
         //prepare model
         var model = await _customerModelFactory.PrepareGdprLogSearchModelAsync(new GdprLogSearchModel());
+		_logger.LogError("GdprLog(): model → {Model}", model);
 
+		_logger.LogWarning("<<< Exiting GdprLog()");
         return View(model);
     }
 
@@ -1380,9 +1519,12 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.GDPR_MANAGE)]
     public virtual async Task<IActionResult> GdprLogList(GdprLogSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering GdprLogList(searchModel={SearchModel})", searchModel);
         //prepare model
         var model = await _customerModelFactory.PrepareGdprLogListModelAsync(searchModel);
+		_logger.LogError("GdprLogList(searchModel={SearchModel}): model → {Model}", searchModel, model);
 
+		_logger.LogWarning("<<< Exiting GdprLogList(searchModel={SearchModel})", searchModel);
         return Json(model);
     }
 
@@ -1391,8 +1533,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.GDPR_MANAGE)]
     public virtual async Task<IActionResult> GdprDelete(int id)
     {
+		_logger.LogError(">>> Entering GdprDelete(id={Id})", id);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(id);
+		_logger.LogError("GdprDelete(id={Id}): customer → {Customer}", id, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -1428,7 +1572,9 @@ public partial class CustomerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in GdprDelete(id={Id}): {Arg1}", id, exc.Message);
             _notificationService.ErrorNotification(exc.Message);
+			_logger.LogWarning("<<< Exiting GdprDelete(id={Id})", id);
             return RedirectToAction("Edit", new { id = customer.Id });
         }
     }
@@ -1437,8 +1583,10 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.GDPR_MANAGE)]
     public virtual async Task<IActionResult> GdprExport(int id)
     {
+		_logger.LogError(">>> Entering GdprExport(id={Id})", id);
         //try to get a customer with the specified id
         var customer = await _customerService.GetCustomerByIdAsync(id);
+		_logger.LogError("GdprExport(id={Id}): customer → {Customer}", id, customer);
         if (customer == null)
             return RedirectToAction("List");
 
@@ -1449,13 +1597,17 @@ public partial class CustomerController : BaseAdminController
             
             //export
             var store = await _storeContext.GetCurrentStoreAsync();
+			_logger.LogError("GdprExport(id={Id}): store → {Store}", id, store);
             var bytes = await _exportManager.ExportCustomerGdprInfoToXlsxAsync(customer, store.Id);
+			_logger.LogError("GdprExport(id={Id}): bytes → {Bytes}", id, bytes);
 
             return File(bytes, MimeTypes.TextXlsx, $"customerdata-{customer.Id}.xlsx");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in GdprExport(id={Id}): {Arg1}", id, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting GdprExport(id={Id})", id);
             return RedirectToAction("Edit", new { id = customer.Id });
         }
     }
@@ -1469,6 +1621,7 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportExcelAll(CustomerSearchModel model)
     {
+		_logger.LogError(">>> Entering ExportExcelAll(model={Model})", model);
         var customers = await _customerService.GetAllCustomersAsync(customerRoleIds: model.SelectedCustomerRoleIds.ToArray(),
             email: model.SearchEmail,
             username: model.SearchUsername,
@@ -1484,11 +1637,14 @@ public partial class CustomerController : BaseAdminController
         try
         {
             var bytes = await _exportManager.ExportCustomersToXlsxAsync(customers);
+			_logger.LogError("ExportExcelAll(model={Model}): bytes → {Bytes}", model, bytes);
             return File(bytes, MimeTypes.TextXlsx, "customers.xlsx");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportExcelAll(model={Model}): {Arg1}", model, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting ExportExcelAll(model={Model})", model);
             return RedirectToAction("List");
         }
     }
@@ -1498,7 +1654,9 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportExcelSelected(string selectedIds)
     {
+		_logger.LogError(">>> Entering ExportExcelSelected(selectedIds={SelectedIds})", selectedIds);
         var customers = new List<Customer>();
+		_logger.LogError("ExportExcelSelected(selectedIds={SelectedIds}): customers → {Customers}", selectedIds, customers);
         if (selectedIds != null)
         {
             var ids = selectedIds
@@ -1511,11 +1669,14 @@ public partial class CustomerController : BaseAdminController
         try
         {
             var bytes = await _exportManager.ExportCustomersToXlsxAsync(customers);
+			_logger.LogError("ExportExcelSelected(selectedIds={SelectedIds}): bytes → {Bytes}", selectedIds, bytes);
             return File(bytes, MimeTypes.TextXlsx, "customers.xlsx");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportExcelSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting ExportExcelSelected(selectedIds={SelectedIds})", selectedIds);
             return RedirectToAction("List");
         }
     }
@@ -1526,6 +1687,7 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXmlAll(CustomerSearchModel model)
     {
+		_logger.LogError(">>> Entering ExportXmlAll(model={Model})", model);
         var customers = await _customerService.GetAllCustomersAsync(customerRoleIds: model.SelectedCustomerRoleIds.ToArray(),
             email: model.SearchEmail,
             username: model.SearchUsername,
@@ -1541,11 +1703,14 @@ public partial class CustomerController : BaseAdminController
         try
         {
             var xml = await _exportManager.ExportCustomersToXmlAsync(customers);
+			_logger.LogError("ExportXmlAll(model={Model}): xml → {Xml}", model, xml);
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", "customers.xml");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXmlAll(model={Model}): {Arg1}", model, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting ExportXmlAll(model={Model})", model);
             return RedirectToAction("List");
         }
     }
@@ -1555,7 +1720,9 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ExportXmlSelected(string selectedIds)
     {
+		_logger.LogError(">>> Entering ExportXmlSelected(selectedIds={SelectedIds})", selectedIds);
         var customers = new List<Customer>();
+		_logger.LogError("ExportXmlSelected(selectedIds={SelectedIds}): customers → {Customers}", selectedIds, customers);
         if (selectedIds != null)
         {
             var ids = selectedIds
@@ -1568,11 +1735,14 @@ public partial class CustomerController : BaseAdminController
         try
         {
             var xml = await _exportManager.ExportCustomersToXmlAsync(customers);
+			_logger.LogError("ExportXmlSelected(selectedIds={SelectedIds}): xml → {Xml}", selectedIds, xml);
             return File(Encoding.UTF8.GetBytes(xml), "application/xml", "customers.xml");
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ExportXmlSelected(selectedIds={SelectedIds}): {Arg1}", selectedIds, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
+			_logger.LogWarning("<<< Exiting ExportXmlSelected(selectedIds={SelectedIds})", selectedIds);
             return RedirectToAction("List");
         }
     }
@@ -1582,6 +1752,7 @@ public partial class CustomerController : BaseAdminController
     [CheckPermission(StandardPermission.Customers.CUSTOMERS_IMPORT_EXPORT)]
     public virtual async Task<IActionResult> ImportExcel(IFormFile importexcelfile)
     {
+		_logger.LogError(">>> Entering ImportExcel(importexcelfile={Importexcelfile})", importexcelfile);
         if (await _workContext.GetCurrentVendorAsync() != null)
             //a vendor can not import customer
             return AccessDeniedView();
@@ -1603,8 +1774,10 @@ public partial class CustomerController : BaseAdminController
         }
         catch (Exception exc)
         {
+			_logger.LogError("Exception in ImportExcel(importexcelfile={Importexcelfile}): {Arg1}", importexcelfile, exc.Message);
             await _notificationService.ErrorNotificationAsync(exc);
 
+			_logger.LogWarning("<<< Exiting ImportExcel(importexcelfile={Importexcelfile})", importexcelfile);
             return RedirectToAction("List");
         }
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nop.Core.Infrastructure;
 using Nop.Web.Framework.Infrastructure.Extensions;
 using Nop.Web.Framework.Mvc.Routing;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Infrastructure;
 
@@ -12,6 +13,7 @@ namespace Nop.Web.Framework.Infrastructure;
 /// </summary>
 public partial class NopCommonStartup : INopStartup
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Add and configure any of the middleware
     /// </summary>
@@ -19,6 +21,7 @@ public partial class NopCommonStartup : INopStartup
     /// <param name="configuration">Configuration of the application</param>
     public virtual void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
+		_logger.LogError(">>> Entering ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
         //add options feature
         services.AddOptions();
 
@@ -43,6 +46,7 @@ public partial class NopCommonStartup : INopStartup
             //add constraint key for language
             options.ConstraintMap[NopRoutingDefaults.LanguageParameterTransformer] = typeof(LanguageParameterTransformer);
         });
+		_logger.LogWarning("<<< Exiting ConfigureServices(services={Services},configuration={Configuration})", services, configuration);
     }
 
     /// <summary>
@@ -51,6 +55,7 @@ public partial class NopCommonStartup : INopStartup
     /// <param name="application">Builder for configuring an application's request pipeline</param>
     public virtual void Configure(IApplicationBuilder application)
     {
+		_logger.LogError(">>> Entering Configure(application={Application})", application);
         //check whether requested page is keep alive page
         application.UseKeepAlive();
 
@@ -65,6 +70,7 @@ public partial class NopCommonStartup : INopStartup
 
         //configure PDF
         application.UseNopPdf();
+		_logger.LogWarning("<<< Exiting Configure(application={Application})", application);
     }
 
     /// <summary>

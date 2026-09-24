@@ -5,6 +5,7 @@ using Nop.Core.Domain.Stores;
 using Nop.Core.Events;
 using Nop.Services.Events;
 using Nop.Services.Messages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Brevo.Services;
 
@@ -12,6 +13,7 @@ namespace Nop.Plugin.Misc.Brevo.Services;
 /// Represents event consumer
 /// </summary>
 public class EventConsumer :
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     IConsumer<EmailUnsubscribedEvent>,
     IConsumer<EmailSubscribedEvent>,
     IConsumer<EntityInsertedEvent<ShoppingCartItem>>,
@@ -36,8 +38,12 @@ public class EventConsumer :
         BrevoSettings brevoSettings,
         MarketingAutomationManager marketingAutomationManager)
     {
+		_logger.LogError(">>> Entering EventConsumer(brevoEmailManager={BrevoEmailManager},brevoSettings={BrevoSettings},marketingAutomationManager={MarketingAutomationManager})", brevoEmailManager, brevoSettings, marketingAutomationManager);
         _brevoEmailManager = brevoEmailManager;
         _brevoSettings = brevoSettings;
+		_logger.LogDebug("EventConsumer(brevoEmailManager={BrevoEmailManager},brevoSettings={BrevoSettings},marketingAutomationManager={MarketingAutomationManager}): _brevoSettings → {_brevoSettings}", brevoEmailManager, brevoSettings, marketingAutomationManager, _brevoSettings);
+		_logger.LogDebug("EventConsumer(brevoEmailManager={BrevoEmailManager},brevoSettings={BrevoSettings},marketingAutomationManager={MarketingAutomationManager}): _brevoEmailManager → {_brevoEmailManager}", brevoEmailManager, brevoSettings, marketingAutomationManager, _brevoEmailManager);
+    _logger.LogWarning("<<< Exiting EventConsumer(brevoEmailManager={BrevoEmailManager},brevoSettings={BrevoSettings},marketingAutomationManager={MarketingAutomationManager})", brevoEmailManager, brevoSettings, marketingAutomationManager);
         _marketingAutomationManager = marketingAutomationManager;
     }
 
@@ -57,6 +63,7 @@ public class EventConsumer :
 
         //unsubscribe contact
         await _brevoEmailManager.UnsubscribeAsync(eventMessage.Subscription);
+		_logger.LogWarning("<<< Exiting HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>
@@ -113,6 +120,7 @@ public class EventConsumer :
 
         //handle event
         await _marketingAutomationManager.HandleShoppingCartChangedEventAsync(eventMessage.Entity);
+		_logger.LogError(">>> Entering HandleEventAsync(eventMessage={EventMessage})", eventMessage);
     }
 
     /// <summary>

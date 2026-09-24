@@ -13,6 +13,7 @@ using Nop.Services.Customers;
 using Nop.Services.Directory;
 using Nop.Services.Orders;
 using Nop.Services.Tax;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Misc.Omnisend.Services;
 
@@ -21,6 +22,7 @@ namespace Nop.Plugin.Misc.Omnisend.Services;
 /// </summary>
 public class OmnisendService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly ICategoryService _categoryService;
@@ -73,27 +75,50 @@ public class OmnisendService
         OmnisendHttpClient omnisendHttpClient,
         OmnisendSettings omnisendSettings)
     {
+		_logger.LogError(">>> Entering OmnisendService()");
         _categoryService = categoryService;
         _countryService = countryService;
+		_logger.LogDebug("OmnisendService(): _countryService → {_countryService}", _countryService);
+		_logger.LogDebug("OmnisendService(): _categoryService → {_categoryService}", _categoryService);
+    _logger.LogWarning("<<< Exiting OmnisendService()");
         _customerService = customerService;
+		_logger.LogDebug("OmnisendService(): _customerService → {_customerService}", _customerService);
         _orderService = orderService;
+		_logger.LogDebug("OmnisendService(): _orderService → {_orderService}", _orderService);
         _orderTotalCalculationService = orderTotalCalculationService;
+		_logger.LogDebug("OmnisendService(): _orderTotalCalculationService → {_orderTotalCalculationService}", _orderTotalCalculationService);
         _productAttributeService = productAttributeService;
+		_logger.LogDebug("OmnisendService(): _productAttributeService → {_productAttributeService}", _productAttributeService);
         _productService = productService;
+		_logger.LogDebug("OmnisendService(): _productService → {_productService}", _productService);
         _countryRepository = countryRepository;
+		_logger.LogDebug("OmnisendService(): _countryRepository → {_countryRepository}", _countryRepository);
         _customerRepository = customerRepository;
+		_logger.LogDebug("OmnisendService(): _customerRepository → {_customerRepository}", _customerRepository);
         _newsLetterSubscriptionRepository = newsLetterSubscriptionRepository;
+		_logger.LogDebug("OmnisendService(): _newsLetterSubscriptionRepository → {_newsLetterSubscriptionRepository}", _newsLetterSubscriptionRepository);
         _stateProvinceRepository = stateProvinceRepository;
+		_logger.LogDebug("OmnisendService(): _stateProvinceRepository → {_stateProvinceRepository}", _stateProvinceRepository);
         _settingService = settingService;
+		_logger.LogDebug("OmnisendService(): _settingService → {_settingService}", _settingService);
         _shoppingCartService = shoppingCartService;
+		_logger.LogDebug("OmnisendService(): _shoppingCartService → {_shoppingCartService}", _shoppingCartService);
         _stateProvinceService = stateProvinceService;
+		_logger.LogDebug("OmnisendService(): _stateProvinceService → {_stateProvinceService}", _stateProvinceService);
         _storeContext = storeContext;
+		_logger.LogDebug("OmnisendService(): _storeContext → {_storeContext}", _storeContext);
         _taxService = taxService;
+		_logger.LogDebug("OmnisendService(): _taxService → {_taxService}", _taxService);
         _webHelper = webHelper;
+		_logger.LogDebug("OmnisendService(): _webHelper → {_webHelper}", _webHelper);
         _workContext = workContext;
+		_logger.LogDebug("OmnisendService(): _workContext → {_workContext}", _workContext);
         _omnisendCustomerService = omnisendCustomerService;
+		_logger.LogDebug("OmnisendService(): _omnisendCustomerService → {_omnisendCustomerService}", _omnisendCustomerService);
         _omnisendHelper = omnisendHelper;
+		_logger.LogDebug("OmnisendService(): _omnisendHelper → {_omnisendHelper}", _omnisendHelper);
         _omnisendHttpClient = omnisendHttpClient;
+		_logger.LogDebug("OmnisendService(): _omnisendHttpClient → {_omnisendHttpClient}", _omnisendHttpClient);
         _omnisendSettings = omnisendSettings;
     }
 
@@ -103,12 +128,16 @@ public class OmnisendService
 
     private async Task<string> SendBatchAsync(string data)
     {
+		_logger.LogError(">>> Entering SendBatchAsync(data={Data})", data);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var rez = await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.BatchesApiUrl, data, HttpMethod.Post);
 
+		_logger.LogError("SendBatchAsync(data={Data}): rez → {Rez}", data, rez);
         if (rez == null)
             return string.Empty;
 
         var bathId = JsonConvert.DeserializeAnonymousType(rez, new { batchID = "" })?.batchID;
+		_logger.LogError("SendBatchAsync(data={Data}): bathId → {BathId}", data, bathId);
 
         if (bathId == null)
             return string.Empty;
@@ -116,18 +145,25 @@ public class OmnisendService
         _omnisendSettings.BatchesIds.Add(bathId);
         await _settingService.SaveSettingAsync(_omnisendSettings);
 
+		_logger.LogError("SendBatchAsync(data)={Data}: external service call took {Arg1} ms", data, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting SendBatchAsync(data={Data})", data);
         return bathId;
     }
 
     private async Task<string> SendProductBatchAsync(IEnumerable<Product> products, HttpMethod batchMethod)
     {
+		_logger.LogError(">>> Entering SendProductBatchAsync(products={Products},batchMethod={BatchMethod})", products, batchMethod);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var data = JsonConvert.SerializeObject(new BatchRequest
         {
             Method = batchMethod.Method.ToUpper(),
             Endpoint = OmnisendDefaults.ProductsEndpoint,
             Items = await products.SelectAwait(async product => await ProductToDtoAsync(product) as IBatchSupport).ToListAsync()
         });
+			_logger.LogDebug("SendProductBatchAsync(products={Products},batchMethod={BatchMethod}): Items → {Items}", products, batchMethod, Items);
+			_logger.LogError("SendProductBatchAsync(products,batchMethod)={Products},{BatchMethod}: database query executed in {Arg2} ms", products, batchMethod, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting SendProductBatchAsync(products={Products},batchMethod={BatchMethod})", products, batchMethod);
         return await SendBatchAsync(data);
     }
 
@@ -138,6 +174,8 @@ public class OmnisendService
     /// <returns>New batch identifier if it placed during process the current one</returns>
     public async Task<string> ProcessBatch(BatchResponse batchResponse)
     {
+		_logger.LogError(">>> Entering ProcessBatch(batchResponse={BatchResponse})", batchResponse);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var (delete, batchId) = await process();
 
         if (!delete)
@@ -155,6 +193,7 @@ public class OmnisendService
             if (!batchResponse.Status.Equals(OmnisendDefaults.BatchFinishedStatus, StringComparison.InvariantCultureIgnoreCase))
             {
                 batchResponse.ErrorsCount = 0;
+				_logger.LogDebug("ProcessBatch(batchResponse={BatchResponse}): batchResponse.ErrorsCount → {Arg1}", batchResponse, batchResponse.ErrorsCount);
 
                 return (false, newBatchId);
             }
@@ -222,13 +261,17 @@ public class OmnisendService
 
     private async Task<List<BatchResponse>> GetBatchesInfoAsync(IList<string> batchesIds)
     {
+		_logger.LogError(">>> Entering GetBatchesInfoAsync(batchesIds={BatchesIds})", batchesIds);
         if (!batchesIds.Any())
             return [];
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var batches = await batchesIds.SelectAwait(GetBatchInfoAsync)
             .ToListAsync();
 
         batches = batches.Where(p => p != null).ToList();
+		_logger.LogError("GetBatchesInfoAsync(batchesIds={BatchesIds}): batches → {Batches}", batchesIds, batches);
+		_logger.LogError("GetBatchesInfoAsync(batchesIds)={BatchesIds}: database query executed in {Arg1} ms", batchesIds, __logStart.ElapsedMilliseconds);
 
         if (batches.Any())
             return batches;
@@ -236,41 +279,56 @@ public class OmnisendService
         _omnisendSettings.BatchesIds.Clear();
         await _settingService.SaveSettingAsync(_omnisendSettings);
 
+		_logger.LogWarning("<<< Exiting GetBatchesInfoAsync(batchesIds={BatchesIds})", batchesIds);
         return batches;
     }
 
     private async Task FillCustomerInfoAsync(BaseContactInfoDto dto, Customer customer)
     {
+		_logger.LogError(">>> Entering FillCustomerInfoAsync(dto={Dto},customer={Customer})", dto, customer);
         if (customer == null)
             return;
 
         dto.FirstName = customer.FirstName;
+		_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.FirstName → {Arg2}", dto, customer, dto.FirstName);
+		_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.LastName → {Arg2}", dto, customer, dto.LastName);
         dto.LastName = customer.LastName;
 
         var country = await _countryService.GetCountryByIdAsync(customer.CountryId);
+		_logger.LogError("FillCustomerInfoAsync(dto={Dto},customer={Customer}): country → {Country}", dto, customer, country);
 
         if (country != null)
         {
             dto.Country = country.Name;
+			_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.Country → {Arg2}", dto, customer, dto.Country);
+			_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.CountryCode → {Arg2}", dto, customer, dto.CountryCode);
             dto.CountryCode = country.TwoLetterIsoCode;
         }
 
         var state = await _stateProvinceService.GetStateProvinceByIdAsync(customer.StateProvinceId);
+		_logger.LogError("FillCustomerInfoAsync(dto={Dto},customer={Customer}): state → {State}", dto, customer, state);
 
         if (state != null)
             dto.State = state.Name;
+			_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.State → {Arg2}", dto, customer, dto.State);
 
         dto.City = customer.City;
+		_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.City → {Arg2}", dto, customer, dto.City);
+		_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.Address → {Arg2}", dto, customer, dto.Address);
+		_logger.LogDebug("FillCustomerInfoAsync(dto={Dto},customer={Customer}): dto.PostalCode → {Arg2}", dto, customer, dto.PostalCode);
         dto.Address = customer.StreetAddress;
         dto.PostalCode = customer.ZipPostalCode;
         dto.Gender = customer.Gender?.ToLower() ?? "f";
         dto.BirthDate = customer.DateOfBirth?.ToString("yyyy-MM-dd");
+		_logger.LogWarning("<<< Exiting FillCustomerInfoAsync(dto={Dto},customer={Customer})", dto, customer);
     }
 
     private async Task<OrderDto.OrderItemDto> OrderItemToDtoAsync(OrderItem orderItem)
     {
+		_logger.LogError(">>> Entering OrderItemToDtoAsync(orderItem={OrderItem})", orderItem);
         var product = await _productService.GetProductByIdAsync(orderItem.ProductId);
 
+		_logger.LogError("OrderItemToDtoAsync(orderItem={OrderItem}): product → {Product}", orderItem, product);
         var (sku, variantId) = await _omnisendHelper.GetSkuAndVariantIdAsync(product, orderItem.AttributesXml);
 
         var dto = new OrderDto.OrderItemDto
@@ -283,29 +341,39 @@ public class OmnisendService
             Price = orderItem.PriceInclTax.ToCents()
         };
 
+		_logger.LogWarning("<<< Exiting OrderItemToDtoAsync(orderItem={OrderItem})", orderItem);
         return dto;
     }
 
     private async Task<ProductDto> ProductToDtoAsync(Product product)
     {
+		_logger.LogError(">>> Entering ProductToDtoAsync(product={Product})", product);
         async Task<List<string>> getProductCategories()
         {
+			_logger.LogError(">>> Entering getProductCategories()");
             var productCategories = await _categoryService.GetProductCategoriesByProductIdAsync(product.Id);
 
+			_logger.LogError("getProductCategories(): productCategories → {ProductCategories}", productCategories);
+			_logger.LogWarning("<<< Exiting getProductCategories()");
             return productCategories.Select(pc => pc.CategoryId.ToString()).ToList();
         }
 
         async Task<IList<ProductAttributeCombination>> getProductCombinations()
         {
+			_logger.LogError(">>> Entering getProductCombinations()");
+            _logger.LogWarning("<<< Exiting getProductCombinations()");
             return await _productAttributeService.GetAllProductAttributeCombinationsAsync(product.Id);
         }
 
         var combinations = await getProductCombinations();
+		_logger.LogError("ProductToDtoAsync(product={Product}): combinations → {Combinations}", product, combinations);
 
         async Task<string> getProductStatus(ProductAttributeCombination productAttributeCombination = null)
         {
+			_logger.LogError(">>> Entering getProductStatus(productAttributeCombination={ProductAttributeCombination})", productAttributeCombination);
             var status = "notAvailable";
 
+			_logger.LogError("getProductStatus(productAttributeCombination={ProductAttributeCombination}): status → {Status}", productAttributeCombination, status);
             if (!product.Published || product.Deleted)
                 return status;
 
@@ -315,11 +383,15 @@ public class OmnisendService
             {
                 case ManageInventoryMethod.ManageStock:
                     stockQuantity = await _productService.GetTotalStockQuantityAsync(product);
+					_logger.LogError("ProductToDtoAsync(product={Product}): stockQuantity → {StockQuantity}", product, stockQuantity);
+					_logger.LogDebug("ProductToDtoAsync(product={Product}): stockQuantity → {StockQuantity}", product, stockQuantity);
 
                     if (stockQuantity > 0 || product.BackorderMode == BackorderMode.AllowQtyBelow0)
                         status = "inStock";
                     else
                         status = "outOfStock";
+						_logger.LogDebug("getProductStatus(productAttributeCombination={ProductAttributeCombination}): stockQuantity → {StockQuantity}", productAttributeCombination, stockQuantity);
+						_logger.LogError("getProductStatus(productAttributeCombination={ProductAttributeCombination}): stockQuantity → {StockQuantity}", productAttributeCombination, stockQuantity);
 
                     break;
                 case ManageInventoryMethod.ManageStockByAttributes:
@@ -339,6 +411,7 @@ public class OmnisendService
                     break;
             }
 
+			_logger.LogWarning("<<< Exiting getProductStatus(productAttributeCombination={ProductAttributeCombination})", productAttributeCombination);
             return status;
         }
 
@@ -370,6 +443,7 @@ public class OmnisendService
             }
         };
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (combinations.Any())
             dto.Variants.AddRange(await combinations.SelectAwait(async c => new ProductDto.Variant
             {
@@ -380,13 +454,19 @@ public class OmnisendService
                 Price = (c.OverriddenPrice ?? product.Price).ToCents()
             }).ToListAsync());
 
+		_logger.LogDebug("ProductToDtoAsync(product={Product}): Price → {Price}", product, Price);
+		_logger.LogError("ProductToDtoAsync(product)={Product}: database query executed in {Arg1} ms", product, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting ProductToDtoAsync(product={Product})", product);
         return dto;
     }
 
     private async Task<OrderDto> OrderToDtoAsync(Order order)
     {
+		_logger.LogError(">>> Entering OrderToDtoAsync(order={Order})", order);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
         var email = await _omnisendCustomerService.GetEmailAsync(customer, order.BillingAddressId);
+		_logger.LogError("OrderToDtoAsync(order={Order}): email → {Email}", order, email);
         if (string.IsNullOrEmpty(email))
             return null;
 
@@ -403,14 +483,18 @@ public class OmnisendService
             CreatedAt = order.CreatedOnUtc.ToDtoString(),
             Products = await (await _orderService.GetOrderItemsAsync(order.Id)).SelectAwait(async oi => await OrderItemToDtoAsync(oi)).ToListAsync()
         };
+		_logger.LogError("OrderToDtoAsync(order)={Order}: find query executed in {Arg1} ms", order, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting OrderToDtoAsync(order={Order})", order);
         return dto;
     }
 
     private async Task<CartItemDto> ShoppingCartItemToDtoAsync(ShoppingCartItem shoppingCartItem, Customer customer)
     {
+		_logger.LogError(">>> Entering ShoppingCartItemToDtoAsync(shoppingCartItem=<redacted>,customer={Customer})", customer);
         var product = await _productService.GetProductByIdAsync(shoppingCartItem.ProductId);
 
+		_logger.LogError("ShoppingCartItemToDtoAsync(shoppingCartItem=<redacted>,customer={Customer}): product → {Product}", customer, product);
         var (sku, variantId) = await _omnisendHelper.GetSkuAndVariantIdAsync(product, shoppingCartItem.AttributesXml);
 
         var (scSubTotal, _, _, _) = await _shoppingCartService.GetSubTotalAsync(shoppingCartItem, true);
@@ -427,11 +511,14 @@ public class OmnisendService
             Price = (await _taxService.GetProductPriceAsync(product, scSubTotal, true, customer)).price.ToCents()
         };
 
+		_logger.LogWarning("<<< Exiting ShoppingCartItemToDtoAsync(shoppingCartItem=<redacted>,customer={Customer})", customer);
         return dto;
     }
 
     private CategoryDto CategoryToDto(Category category)
     {
+		_logger.LogError(">>> Entering CategoryToDto(category={Category})", category);
+		_logger.LogWarning("<<< Exiting CategoryToDto(category={Category})", category);
         return new CategoryDto
         {
             CategoryId = category.Id.ToString(),
@@ -442,25 +529,33 @@ public class OmnisendService
 
     private async Task<CartDto> GetCartDtoAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogError(">>> Entering GetCartDtoAsync(cart={Cart})", cart);
         if (!cart.Any())
             return null;
 
         var customerId = cart.First().CustomerId;
+		_logger.LogError("GetCartDtoAsync(cart={Cart}): customerId → {CustomerId}", cart, customerId);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _customerService.GetCustomerByIdAsync(customerId);
+		_logger.LogError("GetCartDtoAsync(cart={Cart}): customer → {Customer}", cart, customer);
 
         var items = await cart
             .SelectAwait(async ci => await ShoppingCartItemToDtoAsync(ci, customer))
             .ToListAsync();
+			_logger.LogError("GetCartDtoAsync(cart)={Cart}: database query executed in {Arg1} ms", cart, __logStart.ElapsedMilliseconds);
 
         var cartSum = (await _orderTotalCalculationService.GetShoppingCartTotalAsync(cart)).shoppingCartTotal
             ?.ToCents() ?? 0;
 
         var email = await _omnisendCustomerService.GetEmailAsync(customer);
+		_logger.LogError("GetCartDtoAsync(cart={Cart}): email → {Email}", cart, email);
         if (string.IsNullOrEmpty(email))
             return null;
 
         var cartId = await _omnisendCustomerService.GetCartIdAsync(customer);
+		_logger.LogError("GetCartDtoAsync(cart={Cart}): cartId → {CartId}", cart, cartId);
 
+		_logger.LogWarning("<<< Exiting GetCartDtoAsync(cart={Cart})", cart);
         return new CartDto
         {
             Currency = await _omnisendHelper.GetPrimaryStoreCurrencyCodeAsync(),
@@ -474,36 +569,53 @@ public class OmnisendService
 
     private async Task CreateOrderAsync(Order order)
     {
+		_logger.LogError(">>> Entering CreateOrderAsync(order={Order})", order);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var orderDto = await OrderToDtoAsync(order);
         if (orderDto is null)
             return;
 
+		_logger.LogError("CreateOrderAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
         var data = JsonConvert.SerializeObject(orderDto);
+		_logger.LogError("CreateOrderAsync(order={Order}): data → {Data}", order, data);
         await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.OrdersApiUrl, data, HttpMethod.Post);
+		_logger.LogWarning("<<< Exiting CreateOrderAsync(order={Order})", order);
     }
 
     private async Task CreateCartAsync(IList<ShoppingCartItem> cart)
     {
+		_logger.LogError(">>> Entering CreateCartAsync(cart={Cart})", cart);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cartDto = await GetCartDtoAsync(cart);
         if (cartDto is null)
             return;
 
+		_logger.LogError("CreateCartAsync(cart)={Cart}: external service call took {Arg1} ms", cart, __logStart.ElapsedMilliseconds);
         var data = JsonConvert.SerializeObject(cartDto);
+		_logger.LogError("CreateCartAsync(cart={Cart}): data → {Data}", cart, data);
         await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.CartsApiUrl, data, HttpMethod.Post);
+		_logger.LogWarning("<<< Exiting CreateCartAsync(cart={Cart})", cart);
     }
 
     private async Task UpdateCartAsync(Customer customer, ShoppingCartItem newItem)
     {
+		_logger.LogError(">>> Entering UpdateCartAsync(customer={Customer},newItem={NewItem})", customer, newItem);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var item = await ShoppingCartItemToDtoAsync(newItem, customer);
         if (item is null)
             return;
 
+		_logger.LogError("UpdateCartAsync(customer,newItem)={Customer},{NewItem}: external service call took {Arg2} ms", customer, newItem, __logStart.ElapsedMilliseconds);
         var data = JsonConvert.SerializeObject(item);
+		_logger.LogError("UpdateCartAsync(customer={Customer},newItem={NewItem}): data → {Data}", customer, newItem, data);
         await _omnisendHttpClient.PerformRequestAsync($"{OmnisendDefaults.CartsApiUrl}/{await _omnisendCustomerService.GetCartIdAsync(customer)}/{OmnisendDefaults.ProductsEndpoint}", data, HttpMethod.Post);
+		_logger.LogWarning("<<< Exiting UpdateCartAsync(customer={Customer},newItem={NewItem})", customer, newItem);
     }
 
     private async Task<bool> CanSendRequestAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering CanSendRequestAsync(customer={Customer})", customer);
+        _logger.LogWarning("<<< Exiting CanSendRequestAsync(customer={Customer})", customer);
         return !string.IsNullOrEmpty(
             await _omnisendCustomerService.GetEmailAsync(customer, customer.BillingAddressId));
     }
@@ -525,6 +637,7 @@ public class OmnisendService
         int pageIndex, int pageSize,
         bool sendWelcomeMessage = false, NewsLetterSubscription subscriber = null, string inactiveStatus = "nonSubscribed")
     {
+		_logger.LogError(">>> Entering PrepareNewsletterSubscribersAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},sendWelcomeMessage={SendWelcomeMessage},subscriber={Subscriber},inactiveStatus={InactiveStatus})", storeId, pageIndex, pageSize, sendWelcomeMessage, subscriber, inactiveStatus);
         //get contacts of newsletter subscribers
         var subscriptions = (subscriber == null ? _newsLetterSubscriptionRepository.Table : _newsLetterSubscriptionRepository.Table.Where(nlsr => nlsr.Id.Equals(subscriber.Id)))
             .Where(subscription => subscription.StoreId == storeId)
@@ -566,6 +679,7 @@ public class OmnisendService
                 item.customer.DateOfBirth
             };
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var subscribers = (await contactsWithState.ToListAsync()).Select(item =>
         {
             var dto = new CreateContactRequest(item.subscription.Email, item.subscription.Active, item.subscription.CreatedOnUtc, inactiveStatus, sendWelcomeMessage)
@@ -581,16 +695,21 @@ public class OmnisendService
 
             if (!string.IsNullOrEmpty(item.CountryName))
                 dto.Country = item.CountryName;
+				_logger.LogDebug("PrepareNewsletterSubscribersAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},sendWelcomeMessage={SendWelcomeMessage},subscriber={Subscriber},inactiveStatus={InactiveStatus}): dto.Country → {Arg6}", storeId, pageIndex, pageSize, sendWelcomeMessage, subscriber, inactiveStatus, dto.Country);
 
             if (!string.IsNullOrEmpty(item.CountryTwoLetterIsoCode))
                 dto.CountryCode = item.CountryTwoLetterIsoCode;
+				_logger.LogDebug("PrepareNewsletterSubscribersAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},sendWelcomeMessage={SendWelcomeMessage},subscriber={Subscriber},inactiveStatus={InactiveStatus}): dto.CountryCode → {Arg6}", storeId, pageIndex, pageSize, sendWelcomeMessage, subscriber, inactiveStatus, dto.CountryCode);
 
             if (!string.IsNullOrEmpty(item.StateProvinceName))
                 dto.State = item.StateProvinceName;
+				_logger.LogDebug("PrepareNewsletterSubscribersAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},sendWelcomeMessage={SendWelcomeMessage},subscriber={Subscriber},inactiveStatus={InactiveStatus}): dto.State → {Arg6}", storeId, pageIndex, pageSize, sendWelcomeMessage, subscriber, inactiveStatus, dto.State);
 
             return (IBatchSupport)dto;
         }).ToList();
+		_logger.LogError("PrepareNewsletterSubscribersAsync(storeId,pageIndex,pageSize,sendWelcomeMessage,subscriber,inactiveStatus)={StoreId},{PageIndex},{PageSize},{SendWelcomeMessage},{Subscriber},{InactiveStatus}: find query executed in {Arg6} ms", storeId, pageIndex, pageSize, sendWelcomeMessage, subscriber, inactiveStatus, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting PrepareNewsletterSubscribersAsync(storeId={StoreId},pageIndex={PageIndex},pageSize={PageSize},sendWelcomeMessage={SendWelcomeMessage},subscriber={Subscriber},inactiveStatus={InactiveStatus})", storeId, pageIndex, pageSize, sendWelcomeMessage, subscriber, inactiveStatus);
         return subscribers;
     }
 
@@ -605,8 +724,12 @@ public class OmnisendService
     /// </summary>
     public async Task SyncContactsAsync()
     {
+		_logger.LogError(">>> Entering SyncContactsAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var su = await PrepareNewsletterSubscribersAsync(store.Id, 0, _omnisendSettings.PageSize);
+		_logger.LogError("SyncContactsAsync(): store → {Store}", store);
+		_logger.LogError("SyncContactsAsync(): su → {Su}", su);
 
         if (su.Count >= OmnisendDefaults.MinCountToUseBatch)
         {
@@ -619,10 +742,13 @@ public class OmnisendService
                     Endpoint = OmnisendDefaults.ContactsEndpoint,
                     Items = su
                 });
+				_logger.LogDebug("SyncContactsAsync(): Items → {Items}", Items);
 
                 var rez = await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.BatchesApiUrl, data, HttpMethod.Post);
+				_logger.LogError("SyncContactsAsync(): rez → {Rez}", rez);
 
                 var bathId = JsonConvert.DeserializeAnonymousType(rez, new { batchID = "" })?.batchID;
+				_logger.LogError("SyncContactsAsync(): bathId → {BathId}", bathId);
 
                 if (bathId != null)
                 {
@@ -641,6 +767,8 @@ public class OmnisendService
         else
             foreach (var newsLetterSubscription in su)
                 await UpdateOrCreateContactAsync(newsLetterSubscription as CreateContactRequest);
+				_logger.LogError("SyncContactsAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting SyncContactsAsync()");
     }
 
     /// <summary>
@@ -648,8 +776,11 @@ public class OmnisendService
     /// </summary>
     public async Task SyncCategoriesAsync()
     {
+		_logger.LogError(">>> Entering SyncCategoriesAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var categories = await _categoryService.GetAllCategoriesAsync(null, pageSize: _omnisendSettings.PageSize);
 
+		_logger.LogError("SyncCategoriesAsync(): categories → {Categories}", categories);
         if (categories.TotalCount >= OmnisendDefaults.MinCountToUseBatch || categories.TotalCount > _omnisendSettings.PageSize)
         {
             var page = 0;
@@ -661,6 +792,7 @@ public class OmnisendService
                     Endpoint = OmnisendDefaults.CategoriesEndpoint,
                     Items = categories.Select(category => CategoryToDto(category) as IBatchSupport).ToList()
                 });
+					_logger.LogDebug("SyncCategoriesAsync(): Items → {Items}", Items);
 
                 await SendBatchAsync(data);
 
@@ -673,8 +805,12 @@ public class OmnisendService
             foreach (var category in categories)
             {
                 var data = JsonConvert.SerializeObject(CategoryToDto(category));
+				_logger.LogError("SyncCategoriesAsync(): data → {Data}", data);
+				_logger.LogError("SyncCategoriesAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
                 await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.CategoriesApiUrl, data, HttpMethod.Post);
+				_logger.LogWarning("<<< Exiting SyncCategoriesAsync()");
             }
+			_logger.LogWarning("<<< Exiting UpdateOrCreateContactAsync(request={Request})", request);
     }
 
     /// <summary>
@@ -683,12 +819,18 @@ public class OmnisendService
     /// <param name="categoriesId">Categories identifiers list to update</param>
     public async Task UpdateCategoriesAsync(int[] categoriesId)
     {
+		_logger.LogError(">>> Entering UpdateCategoriesAsync(categoriesId={CategoriesId})", categoriesId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var categories = await _categoryService.GetCategoriesByIdsAsync(categoriesId);
 
+		_logger.LogError("UpdateCategoriesAsync(categoriesId={CategoriesId}): categories → {Categories}", categoriesId, categories);
         foreach (var category in categories)
         {
             var data = JsonConvert.SerializeObject(CategoryToDto(category));
+			_logger.LogError("UpdateCategoriesAsync(categoriesId={CategoriesId}): data → {Data}", categoriesId, data);
+			_logger.LogError("UpdateCategoriesAsync(categoriesId)={CategoriesId}: external service call took {Arg1} ms", categoriesId, __logStart.ElapsedMilliseconds);
             await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.CategoriesApiUrl + $"/{category.Id}", data, HttpMethod.Put);
+			_logger.LogWarning("<<< Exiting UpdateCategoriesAsync(categoriesId={CategoriesId})", categoriesId);
         }
     }
 
@@ -697,8 +839,10 @@ public class OmnisendService
     /// </summary>
     public async Task SyncProductsAsync()
     {
+		_logger.LogError(">>> Entering SyncProductsAsync()");
         var products = await _productService.SearchProductsAsync(pageSize: _omnisendSettings.PageSize);
 
+		_logger.LogError("SyncProductsAsync(): products → {Products}", products);
         if (products.TotalCount >= OmnisendDefaults.MinCountToUseBatch || products.TotalCount > _omnisendSettings.PageSize)
         {
             var page = 0;
@@ -715,6 +859,7 @@ public class OmnisendService
         else
             foreach (var product in products)
                 await AddNewProductAsync(product);
+				_logger.LogWarning("<<< Exiting SyncProductsAsync()");
     }
 
     /// <summary>
@@ -722,8 +867,11 @@ public class OmnisendService
     /// </summary>
     public async Task SyncOrdersAsync()
     {
+		_logger.LogError(">>> Entering SyncOrdersAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var orders = await _orderService.SearchOrdersAsync(pageSize: _omnisendSettings.PageSize);
 
+		_logger.LogError("SyncOrdersAsync(): orders → {Orders}", orders);
         if (orders.TotalCount >= OmnisendDefaults.MinCountToUseBatch || orders.TotalCount > _omnisendSettings.PageSize)
         {
             var page = 0;
@@ -735,10 +883,15 @@ public class OmnisendService
                     Endpoint = OmnisendDefaults.OrdersEndpoint,
                     Items = await orders.SelectAwait(async order => await OrderToDtoAsync(order) as IBatchSupport).ToListAsync()
                 });
+					var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+					_logger.LogError("SyncOrdersAsync(): database query executed in {Arg0} ms", __logStartDb.ElapsedMilliseconds);
+					_logger.LogDebug("SyncOrdersAsync(): Items → {Items}", Items);
 
                 var rez = await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.BatchesApiUrl, data, HttpMethod.Post);
+				_logger.LogError("SyncOrdersAsync(): rez → {Rez}", rez);
 
                 var bathId = JsonConvert.DeserializeAnonymousType(rez, new { batchID = "" })?.batchID;
+				_logger.LogError("SyncOrdersAsync(): bathId → {BathId}", bathId);
 
                 if (bathId != null)
                 {
@@ -754,6 +907,8 @@ public class OmnisendService
         else
             foreach (var order in orders)
                 await CreateOrderAsync(order);
+				_logger.LogError("SyncOrdersAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting SyncOrdersAsync()");
     }
 
     /// <summary>
@@ -761,13 +916,18 @@ public class OmnisendService
     /// </summary>
     public async Task SyncCartsAsync()
     {
+		_logger.LogError(">>> Entering SyncCartsAsync()");
         var store = await _storeContext.GetCurrentStoreAsync();
         var customers = await _customerService.GetCustomersWithShoppingCartsAsync(ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogError("SyncCartsAsync(): store → {Store}", store);
         foreach (var customer in customers)
         {
+			_logger.LogError("SyncCartsAsync(): customers → {Customers}", customers);
             var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+			_logger.LogError("SyncCartsAsync(): cart → {Cart}", cart);
             await CreateCartAsync(cart);
         }
+		_logger.LogWarning("<<< Exiting SyncCartsAsync()");
     }
 
     #endregion
@@ -783,16 +943,21 @@ public class OmnisendService
     /// </returns>
     public async Task<IList<BatchResponse>> GetStoredBatchesAsync()
     {
+		_logger.LogError(">>> Entering GetStoredBatchesAsync()");
         var batches = await GetBatchesInfoAsync(_omnisendSettings.BatchesIds);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var additionalBatches = await batches
             .Where(p => p.Status.Equals(OmnisendDefaults.BatchFinishedStatus,
                 StringComparison.InvariantCultureIgnoreCase))
             .SelectAwait(async batchResponse => await ProcessBatch(batchResponse))
             .Where(newBatchId => !string.IsNullOrEmpty(newBatchId)).ToListAsync();
+			_logger.LogError("GetStoredBatchesAsync(): database query executed in {Arg0} ms", __logStart.ElapsedMilliseconds);
+			_logger.LogError("GetStoredBatchesAsync(): batches → {Batches}", batches);
         
         batches.AddRange(await GetBatchesInfoAsync(additionalBatches));
 
+		_logger.LogWarning("<<< Exiting GetStoredBatchesAsync()");
         return batches.Where(b => b.TotalCount > 0).ToList();
     }
 
@@ -806,10 +971,16 @@ public class OmnisendService
     /// </returns>
     public async Task<string> GetBrandIdAsync(string apiKey)
     {
+		_logger.LogError(">>> Entering GetBrandIdAsync(apiKey=<redacted>)");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         _omnisendHttpClient.ApiKey = apiKey;
 
+		_logger.LogDebug("GetBrandIdAsync(apiKey=<redacted>): _omnisendHttpClient.ApiKey → {Arg1}", _omnisendHttpClient.ApiKey);
         var result = await _omnisendHttpClient.PerformRequestAsync<AccountsResponse>(OmnisendDefaults.AccountsApiUrl);
+		_logger.LogError("GetBrandIdAsync(apiKey=<redacted>): result → {Result}", result);
 
+		_logger.LogError("GetBrandIdAsync(apiKey)=<redacted>: external service call took {Arg1} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetBrandIdAsync(apiKey=<redacted>)");
         return result?.BrandId;
     }
 
@@ -818,16 +989,22 @@ public class OmnisendService
     /// </summary>
     public async Task SendCustomerDataAsync()
     {
+		_logger.LogError(">>> Entering SendCustomerDataAsync()");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var site = _webHelper.GetStoreLocation();
 
+		_logger.LogError("SendCustomerDataAsync(): site → {Site}", site);
         var data = JsonConvert.SerializeObject(new
         {
             website = site,
             platform = OmnisendDefaults.IntegrationOrigin,
             version = OmnisendDefaults.IntegrationVersion
         });
+		_logger.LogDebug("SendCustomerDataAsync(): version → {Version}", version);
 
         await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.AccountsApiUrl, data, HttpMethod.Post);
+		_logger.LogError("SendCustomerDataAsync(): external service call took {Arg0} ms", __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting SendCustomerDataAsync()");
     }
 
     /// <summary>
@@ -836,10 +1013,16 @@ public class OmnisendService
     /// <param name="bathId">Batch identifier</param>
     public async ValueTask<BatchResponse> GetBatchInfoAsync(string bathId)
     {
+		_logger.LogError(">>> Entering GetBatchInfoAsync(bathId={BathId})", bathId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var url = OmnisendDefaults.BatchesApiUrl + $"/{bathId}";
 
+		_logger.LogError("GetBatchInfoAsync(bathId={BathId}): url → {Url}", bathId, url);
         var result = await _omnisendHttpClient.PerformRequestAsync<BatchResponse>(url, httpMethod: HttpMethod.Get);
+		_logger.LogError("GetBatchInfoAsync(bathId={BathId}): result → {Result}", bathId, result);
 
+		_logger.LogError("GetBatchInfoAsync(bathId)={BathId}: external service call {Url} took {Arg2} ms", bathId, url, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetBatchInfoAsync(bathId={BathId})", bathId);
         return result;
     }
 
@@ -853,10 +1036,16 @@ public class OmnisendService
     /// <param name="contactId">Contact identifier</param>
     public async Task<ContactInfoDto> GetContactInfoAsync(string contactId)
     {
+		_logger.LogError(">>> Entering GetContactInfoAsync(contactId={ContactId})", contactId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var url = $"{OmnisendDefaults.ContactsApiUrl}/{contactId}";
 
+		_logger.LogError("GetContactInfoAsync(contactId={ContactId}): url → {Url}", contactId, url);
         var res = await _omnisendHttpClient.PerformRequestAsync<ContactInfoDto>(url, httpMethod: HttpMethod.Get);
+		_logger.LogError("GetContactInfoAsync(contactId={ContactId}): res → {Res}", contactId, res);
 
+		_logger.LogError("GetContactInfoAsync(contactId)={ContactId}: external service call {Url} took {Arg2} ms", contactId, url, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetContactInfoAsync(contactId={ContactId})", contactId);
         return res;
     }
 
@@ -866,21 +1055,29 @@ public class OmnisendService
     /// <param name="request">Create contact request</param>
     public async Task UpdateOrCreateContactAsync(CreateContactRequest request)
     {
+		_logger.LogError(">>> Entering UpdateOrCreateContactAsync(request={Request})", request);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var email = request.Identifiers.First().Id;
         var exists = !string.IsNullOrEmpty(await _omnisendCustomerService.GetContactIdAsync(email));
+		_logger.LogError("UpdateOrCreateContactAsync(request={Request}): email → {Email}", request, email);
+		_logger.LogError("UpdateOrCreateContactAsync(request={Request}): exists → {Exists}", request, exists);
 
         if (!exists)
         {
             var data = JsonConvert.SerializeObject(request);
+			_logger.LogError("UpdateOrCreateContactAsync(request={Request}): data → {Data}", request, data);
             await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.ContactsApiUrl, data, HttpMethod.Post);
         }
         else
         {
             var url = $"{OmnisendDefaults.ContactsApiUrl}?email={email}";
             var data = JsonConvert.SerializeObject(new { identifiers = new[] { request.Identifiers.First() } });
+			_logger.LogError("UpdateOrCreateContactAsync(request={Request}): url → {Url}", request, url);
 
             await _omnisendHttpClient.PerformRequestAsync(url, data, HttpMethod.Patch);
         }
+		_logger.LogError("UpdateOrCreateContactAsync(request)={Request}: external service call {Url} took {Arg2} ms", request, url, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UpdateOrCreateContactAsync(request={Request})", request);
     }
 
     /// <summary>
@@ -890,6 +1087,7 @@ public class OmnisendService
     /// <param name="sendWelcomeMessage">Specifies whether to send a welcome message</param>
     public async Task UpdateOrCreateContactAsync(NewsLetterSubscription subscription, bool sendWelcomeMessage = false)
     {
+		_logger.LogError(">>> Entering UpdateOrCreateContactAsync(subscription={Subscription},sendWelcomeMessage={SendWelcomeMessage})", subscription, sendWelcomeMessage);
         var su = await PrepareNewsletterSubscribersAsync(subscription.StoreId,
             0, _omnisendSettings.PageSize,
             sendWelcomeMessage, subscription, "unsubscribed");
@@ -906,20 +1104,28 @@ public class OmnisendService
     /// <param name="customer">Customer</param>
     public async Task UpdateContactAsync(Customer customer)
     {
+		_logger.LogError(">>> Entering UpdateContactAsync(customer={Customer})", customer);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var contactId = await _omnisendCustomerService.GetContactIdAsync(customer.Email);
 
+		_logger.LogError("UpdateContactAsync(customer={Customer}): contactId → {ContactId}", customer, contactId);
         if (string.IsNullOrEmpty(contactId))
             return;
 
         var url = $"{OmnisendDefaults.ContactsApiUrl}/{contactId}";
+		_logger.LogError("UpdateContactAsync(customer={Customer}): url → {Url}", customer, url);
 
         var dto = new BaseContactInfoDto();
+		_logger.LogError("UpdateContactAsync(customer={Customer}): dto → {Dto}", customer, dto);
 
         await FillCustomerInfoAsync(dto, customer);
 
         var data = JsonConvert.SerializeObject(dto);
+		_logger.LogError("UpdateContactAsync(customer={Customer}): data → {Data}", customer, data);
 
         await _omnisendHttpClient.PerformRequestAsync(url, data, HttpMethod.Patch);
+		_logger.LogError("UpdateContactAsync(customer)={Customer}: external service call {Url} took {Arg2} ms", customer, url, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UpdateContactAsync(customer={Customer})", customer);
     }
 
     #endregion
@@ -932,8 +1138,13 @@ public class OmnisendService
     /// <param name="product">Product to add</param>
     public async Task AddNewProductAsync(Product product)
     {
+		_logger.LogError(">>> Entering AddNewProductAsync(product={Product})", product);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var data = JsonConvert.SerializeObject(await ProductToDtoAsync(product));
+		_logger.LogError("AddNewProductAsync(product={Product}): data → {Data}", product, data);
         await _omnisendHttpClient.PerformRequestAsync(OmnisendDefaults.ProductsApiUrl, data, HttpMethod.Post);
+		_logger.LogError("AddNewProductAsync(product)={Product}: external service call took {Arg1} ms", product, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting AddNewProductAsync(product={Product})", product);
     }
 
     /// <summary>
@@ -942,9 +1153,12 @@ public class OmnisendService
     /// <param name="productId">Product identifier to update</param>
     public async Task UpdateProductAsync(int productId)
     {
+		_logger.LogError(">>> Entering UpdateProductAsync(productId={ProductId})", productId);
         var product = await _productService.GetProductByIdAsync(productId);
 
+		_logger.LogError("UpdateProductAsync(productId={ProductId}): product → {Product}", productId, product);
         await CreateOrUpdateProductAsync(product);
+		_logger.LogWarning("<<< Exiting UpdateProductAsync(productId={ProductId})", productId);
     }
 
     /// <summary>
@@ -953,8 +1167,11 @@ public class OmnisendService
     /// /// <param name="productsId">Products identifiers list to update</param>
     public async Task<string> UpdateProductsAsync(int[] productsId)
     {
+		_logger.LogError(">>> Entering UpdateProductsAsync(productsId={ProductsId})", productsId);
         var products = await _productService.GetProductsByIdsAsync(productsId);
 
+		_logger.LogError("UpdateProductsAsync(productsId={ProductsId}): products → {Products}", productsId, products);
+		_logger.LogWarning("<<< Exiting UpdateProductsAsync(productsId={ProductsId})", productsId);
         return await SendProductBatchAsync(products, HttpMethod.Put);
     }
 
@@ -964,13 +1181,19 @@ public class OmnisendService
     /// <param name="product">Product to update</param>
     public async Task CreateOrUpdateProductAsync(Product product)
     {
+		_logger.LogError(">>> Entering CreateOrUpdateProductAsync(product={Product})", product);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var result = await _omnisendHttpClient.PerformRequestAsync($"{OmnisendDefaults.ProductsApiUrl}/{product.Id}", httpMethod: HttpMethod.Get);
         if (string.IsNullOrEmpty(result))
             await AddNewProductAsync(product);
         else
         {
+			_logger.LogError("CreateOrUpdateProductAsync(product={Product}): result → {Result}", product, result);
+			_logger.LogError("CreateOrUpdateProductAsync(product)={Product}: external service call took {Arg1} ms", product, __logStart.ElapsedMilliseconds);
             var data = JsonConvert.SerializeObject(await ProductToDtoAsync(product));
+			_logger.LogError("CreateOrUpdateProductAsync(product={Product}): data → {Data}", product, data);
             await _omnisendHttpClient.PerformRequestAsync($"{OmnisendDefaults.ProductsApiUrl}/{product.Id}", data, HttpMethod.Put);
+			_logger.LogWarning("<<< Exiting CreateOrUpdateProductAsync(product={Product})", product);
         }
     }
 
@@ -984,8 +1207,11 @@ public class OmnisendService
     /// <param name="cartId">Cart identifier</param>
     public async Task RestoreShoppingCartAsync(string cartId)
     {
+		_logger.LogError(">>> Entering RestoreShoppingCartAsync(cartId={CartId})", cartId);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var res = await _omnisendHttpClient.PerformRequestAsync($"{OmnisendDefaults.CartsApiUrl}/{cartId}", httpMethod: HttpMethod.Get);
 
+		_logger.LogError("RestoreShoppingCartAsync(cartId={CartId}): res → {Res}", cartId, res);
         if (string.IsNullOrEmpty(res))
             return;
 
@@ -993,13 +1219,18 @@ public class OmnisendService
             ?? throw new NopException("Cart data can't be loaded");
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("RestoreShoppingCartAsync(cartId={CartId}): customer → {Customer}", cartId, customer);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("RestoreShoppingCartAsync(cartId={CartId}): store → {Store}", cartId, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogError("RestoreShoppingCartAsync(cartId={CartId}): cart → {Cart}", cartId, cart);
 
         foreach (var cartProduct in restoredCart.Products)
         {
             var combination = await _productAttributeService.GetProductAttributeCombinationBySkuAsync(cartProduct.Sku);
+			_logger.LogError("RestoreShoppingCartAsync(cartId={CartId}): combination → {Combination}", cartId, combination);
             var product = combination == null ? await _productService.GetProductBySkuAsync(cartProduct.Sku) : await _productService.GetProductByIdAsync(combination.ProductId);
+			_logger.LogError("RestoreShoppingCartAsync(cartId={CartId}): product → {Product}", cartId, product);
 
             if (product == null)
             {
@@ -1021,6 +1252,8 @@ public class OmnisendService
             await _shoppingCartService.AddToCartAsync(customer, product, ShoppingCartType.ShoppingCart, store.Id,
                 combination?.AttributesXml, quantity: cartProduct.Quantity);
         }
+		_logger.LogError("RestoreShoppingCartAsync(cartId)={CartId}: external service call took {Arg1} ms", cartId, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting RestoreShoppingCartAsync(cartId={CartId})", cartId);
     }
 
     /// <summary>
@@ -1029,17 +1262,21 @@ public class OmnisendService
     /// <param name="shoppingCartItem">Shopping cart item</param>
     public async Task AddShoppingCartItemAsync(ShoppingCartItem shoppingCartItem)
     {
+		_logger.LogError(">>> Entering AddShoppingCartItemAsync(shoppingCartItem=<redacted>)");
         var customer = await _customerService.GetCustomerByIdAsync(shoppingCartItem.CustomerId);
 
+		_logger.LogError("AddShoppingCartItemAsync(shoppingCartItem=<redacted>): customer → {Customer}", customer);
         if (!await CanSendRequestAsync(customer))
             return;
 
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, shoppingCartItem.StoreId);
+		_logger.LogError("AddShoppingCartItemAsync(shoppingCartItem=<redacted>): cart → {Cart}", cart);
 
         if (cart.Count == 1)
             await CreateCartAsync(cart);
         else
             await UpdateCartAsync(customer, shoppingCartItem);
+			_logger.LogWarning("<<< Exiting AddShoppingCartItemAsync(shoppingCartItem=<redacted>)");
     }
 
     /// <summary>
@@ -1048,16 +1285,23 @@ public class OmnisendService
     /// <param name="shoppingCartItem">Shopping cart item</param>
     public async Task EditShoppingCartItemAsync(ShoppingCartItem shoppingCartItem)
     {
+		_logger.LogError(">>> Entering EditShoppingCartItemAsync(shoppingCartItem=<redacted>)");
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _customerService.GetCustomerByIdAsync(shoppingCartItem.CustomerId);
 
+		_logger.LogError("EditShoppingCartItemAsync(shoppingCartItem=<redacted>): customer → {Customer}", customer);
         if (!await CanSendRequestAsync(customer))
             return;
 
         var item = await ShoppingCartItemToDtoAsync(shoppingCartItem, customer);
+		_logger.LogError("EditShoppingCartItemAsync(shoppingCartItem=<redacted>): item → {Item}", item);
 
         var data = JsonConvert.SerializeObject(item);
+		_logger.LogError("EditShoppingCartItemAsync(shoppingCartItem=<redacted>): data → {Data}", data);
 
         await _omnisendHttpClient.PerformRequestAsync($"{OmnisendDefaults.CartsApiUrl}/{await _omnisendCustomerService.GetCartIdAsync(customer)}/{OmnisendDefaults.ProductsEndpoint}/{item.CartProductId}", data, HttpMethod.Put);
+		_logger.LogError("EditShoppingCartItemAsync(shoppingCartItem)=<redacted>: external service call took {Arg1} ms", __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting EditShoppingCartItemAsync(shoppingCartItem=<redacted>)");
     }
 
     /// <summary>
@@ -1066,12 +1310,15 @@ public class OmnisendService
     /// <param name="shoppingCartItem">Shopping cart item</param>
     public async Task DeleteShoppingCartItemAsync(ShoppingCartItem shoppingCartItem)
     {
+		_logger.LogError(">>> Entering DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>)");
         var customer = await _customerService.GetCustomerByIdAsync(shoppingCartItem.CustomerId);
 
+		_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>): customer → {Customer}", customer);
         if (!await CanSendRequestAsync(customer))
             return;
 
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, shoppingCartItem.StoreId);
+		_logger.LogError("DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>): cart → {Cart}", cart);
 
         //var sendRequest = await _omnisendCustomerService.IsNeedToSendDeleteShoppingCartEventAsync(customer);
 
@@ -1085,6 +1332,7 @@ public class OmnisendService
 
             await _omnisendCustomerService.DeleteCurrentCustomerShoppingCartIdAsync(customer);
         }
+		_logger.LogWarning("<<< Exiting DeleteShoppingCartItemAsync(shoppingCartItem=<redacted>)");
     }
 
     #endregion
@@ -1097,14 +1345,17 @@ public class OmnisendService
     /// <param name="order">Order</param>
     public async Task PlaceOrderAsync(Order order)
     {
+		_logger.LogError(">>> Entering PlaceOrderAsync(order={Order})", order);
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
 
+		_logger.LogError("PlaceOrderAsync(order={Order}): customer → {Customer}", order, customer);
         if (!await CanSendRequestAsync(customer))
             return;
 
         //await CreateOrderAsync(order);
 
         await _omnisendCustomerService.DeleteStoredCustomerShoppingCartIdAsync(customer);
+		_logger.LogWarning("<<< Exiting PlaceOrderAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -1113,17 +1364,24 @@ public class OmnisendService
     /// <param name="order">Order</param>
     public async Task UpdateOrderAsync(Order order)
     {
+		_logger.LogError(">>> Entering UpdateOrderAsync(order={Order})", order);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var customer = await _customerService.GetCustomerByIdAsync(order.CustomerId);
 
+		_logger.LogError("UpdateOrderAsync(order={Order}): customer → {Customer}", order, customer);
         if (!await CanSendRequestAsync(customer))
             return;
 
         var item = await OrderToDtoAsync(order);
+		_logger.LogError("UpdateOrderAsync(order={Order}): item → {Item}", order, item);
         if (item is null)
             return;
 
         var data = JsonConvert.SerializeObject(item);
+		_logger.LogError("UpdateOrderAsync(order={Order}): data → {Data}", order, data);
         await _omnisendHttpClient.PerformRequestAsync($"{OmnisendDefaults.OrdersApiUrl}/{item.OrderId}", data, HttpMethod.Put);
+		_logger.LogError("UpdateOrderAsync(order)={Order}: external service call took {Arg1} ms", order, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UpdateOrderAsync(order={Order})", order);
     }
 
     /// <summary>
@@ -1133,15 +1391,20 @@ public class OmnisendService
     /// <returns></returns>
     public async Task OrderItemAddedAsync(OrderItem entity)
     {
+		_logger.LogError(">>> Entering OrderItemAddedAsync(entity={Entity})", entity);
         var customer = await _workContext.GetCurrentCustomerAsync();
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("OrderItemAddedAsync(entity={Entity}): store → {Store}", entity, store);
         var cart = await _shoppingCartService.GetShoppingCartAsync(customer, ShoppingCartType.ShoppingCart, store.Id);
+		_logger.LogError("OrderItemAddedAsync(entity={Entity}): cart → {Cart}", entity, cart);
+		_logger.LogError("OrderItemAddedAsync(entity={Entity}): customer → {Customer}", entity, customer);
 
         if (cart.Any(sci =>
                 sci.ProductId == entity.ProductId &&
                 sci.AttributesXml.Equals(entity.AttributesXml, StringComparison.InvariantCultureIgnoreCase) &&
                 sci.Quantity == entity.Quantity))
             await _omnisendCustomerService.StoreCartIdAsync(customer);
+			_logger.LogWarning("<<< Exiting OrderItemAddedAsync(entity={Entity})", entity);
     }
 
     #endregion

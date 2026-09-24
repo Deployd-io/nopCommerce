@@ -2,12 +2,14 @@
 using Nop.Data;
 using Nop.Data.Migrations;
 using Nop.Services.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.ExchangeRate.EcbExchange.Data;
 
 [NopMigration("2021-09-16 00:00:00", "ExchangeRate.EcbExchange 1.30. Add setting for url for ECB", MigrationProcessType.Update)]
 public class ExchangeEcbMigration : MigrationBase
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly EcbExchangeRateSettings _ecbExchangeRateSettings;
@@ -20,8 +22,11 @@ public class ExchangeEcbMigration : MigrationBase
     public ExchangeEcbMigration(EcbExchangeRateSettings ecbExchangeRateSettings,
         ISettingService settingService)
     {
+		_logger.LogError(">>> Entering ExchangeEcbMigration(ecbExchangeRateSettings={EcbExchangeRateSettings},settingService={SettingService})", ecbExchangeRateSettings, settingService);
         _ecbExchangeRateSettings = ecbExchangeRateSettings;
         _settingService = settingService;
+		_logger.LogDebug("ExchangeEcbMigration(ecbExchangeRateSettings={EcbExchangeRateSettings},settingService={SettingService}): _ecbExchangeRateSettings → {_ecbExchangeRateSettings}", ecbExchangeRateSettings, settingService, _ecbExchangeRateSettings);
+    _logger.LogWarning("<<< Exiting ExchangeEcbMigration(ecbExchangeRateSettings={EcbExchangeRateSettings},settingService={SettingService})", ecbExchangeRateSettings, settingService);
     }
 
     #endregion
@@ -33,14 +38,17 @@ public class ExchangeEcbMigration : MigrationBase
     /// </summary>
     public override void Up()
     {
+		_logger.LogError(">>> Entering Up()");
         if (!DataSettingsManager.IsDatabaseInstalled())
             return;
 
         //settings
         if (!_settingService.SettingExists(_ecbExchangeRateSettings, settings => settings.EcbLink))
             _ecbExchangeRateSettings.EcbLink = "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml";
+			_logger.LogDebug("Up(): _ecbExchangeRateSettings.EcbLink → {Arg0}", _ecbExchangeRateSettings.EcbLink);
 
         _settingService.SaveSetting(_ecbExchangeRateSettings);
+		_logger.LogWarning("<<< Exiting Up()");
     }
 
     /// <summary>
@@ -48,7 +56,9 @@ public class ExchangeEcbMigration : MigrationBase
     /// </summary>
     public override void Down()
     {
+		_logger.LogError(">>> Entering Down()");
         //nothing
+		_logger.LogWarning("<<< Exiting Down()");
     }
 
     #endregion

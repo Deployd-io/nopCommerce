@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Builders.Create.Table;
 using Nop.Core.Domain.Catalog;
 using Nop.Data.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Mapping.Builders.Catalog;
 
@@ -9,6 +10,7 @@ namespace Nop.Data.Mapping.Builders.Catalog;
 /// </summary>
 public partial class ProductManufacturerBuilder : NopEntityBuilder<ProductManufacturer>
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -17,9 +19,11 @@ public partial class ProductManufacturerBuilder : NopEntityBuilder<ProductManufa
     /// <param name="table">Create table expression builder</param>
     public override void MapEntity(CreateTableExpressionBuilder table)
     {
+		_logger.LogError(">>> Entering MapEntity(table={Table})", table);
         table
             .WithColumn(nameof(ProductManufacturer.ManufacturerId)).AsInt32().ForeignKey<Manufacturer>()
             .WithColumn(nameof(ProductManufacturer.ProductId)).AsInt32().ForeignKey<Product>();
+			_logger.LogWarning("<<< Exiting MapEntity(table={Table})", table);
     }
 
     #endregion

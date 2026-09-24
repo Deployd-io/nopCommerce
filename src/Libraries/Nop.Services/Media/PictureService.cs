@@ -20,6 +20,7 @@ namespace Nop.Services.Media;
 /// </summary>
 public partial class PictureService : IPictureService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IDownloadService _downloadService;
@@ -57,18 +58,32 @@ public partial class PictureService : IPictureService
         MediaSettings mediaSettings)
     {
         _downloadService = downloadService;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _downloadService → {_downloadService}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _downloadService);
         _httpContextAccessor = httpContextAccessor;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _httpContextAccessor → {_httpContextAccessor}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _httpContextAccessor);
         _logger = logger;
+		_logger.LogError(">>> Entering PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings})", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings);
         _fileProvider = fileProvider;
         _productAttributeParser = productAttributeParser;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _fileProvider → {_fileProvider}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _fileProvider);
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _productAttributeParser → {_productAttributeParser}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _productAttributeParser);
         _productAttributeService = productAttributeService;
         _pictureRepository = pictureRepository;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _productAttributeService → {_productAttributeService}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _productAttributeService);
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _pictureRepository → {_pictureRepository}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _pictureRepository);
         _pictureBinaryRepository = pictureBinaryRepository;
         _productPictureRepository = productPictureRepository;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _pictureBinaryRepository → {_pictureBinaryRepository}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _pictureBinaryRepository);
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _productPictureRepository → {_productPictureRepository}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _productPictureRepository);
         _settingService = settingService;
         _thumbService = thumbService;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _settingService → {_settingService}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _settingService);
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _thumbService → {_thumbService}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _thumbService);
         _urlRecordService = urlRecordService;
         _webHelper = webHelper;
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _urlRecordService → {_urlRecordService}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _urlRecordService);
+		_logger.LogDebug("PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings}): _webHelper → {_webHelper}", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings, _webHelper);
+		_logger.LogWarning("<<< Exiting PictureService(downloadService={DownloadService},httpContextAccessor={HttpContextAccessor},logger={Logger},fileProvider={FileProvider},productAttributeParser={ProductAttributeParser},productAttributeService={ProductAttributeService},pictureRepository={PictureRepository},pictureBinaryRepository={PictureBinaryRepository},productPictureRepository={ProductPictureRepository},settingService={SettingService},thumbService={ThumbService},urlRecordService={UrlRecordService},webHelper={WebHelper},mediaSettings={MediaSettings})", downloadService, httpContextAccessor, logger, fileProvider, productAttributeParser, productAttributeService, pictureRepository, pictureBinaryRepository, productPictureRepository, settingService, thumbService, urlRecordService, webHelper, mediaSettings);
         _mediaSettings = mediaSettings;
     }
 
@@ -87,10 +102,15 @@ public partial class PictureService : IPictureService
     /// </returns>
     protected virtual async Task<byte[]> LoadPictureFromFileAsync(int pictureId, string mimeType)
     {
+		_logger.LogError(">>> Entering LoadPictureFromFileAsync(pictureId={PictureId},mimeType={MimeType})", pictureId, mimeType);
         var lastPart = await GetFileExtensionFromMimeTypeAsync(mimeType);
         var fileName = $"{pictureId:0000000}_0.{lastPart}";
+		_logger.LogError("LoadPictureFromFileAsync(pictureId={PictureId},mimeType={MimeType}): fileName → {FileName}", pictureId, mimeType, fileName);
         var filePath = await GetPictureLocalPathAsync(fileName);
+		_logger.LogError("LoadPictureFromFileAsync(pictureId={PictureId},mimeType={MimeType}): filePath → {FilePath}", pictureId, mimeType, filePath);
+		_logger.LogError("LoadPictureFromFileAsync(pictureId={PictureId},mimeType={MimeType}): lastPart → {LastPart}", pictureId, mimeType, lastPart);
 
+		_logger.LogWarning("<<< Exiting LoadPictureFromFileAsync(pictureId={PictureId},mimeType={MimeType})", pictureId, mimeType);
         return await _fileProvider.ReadAllBytesAsync(filePath);
     }
 
@@ -103,8 +123,12 @@ public partial class PictureService : IPictureService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task SavePictureInFileAsync(int pictureId, byte[] pictureBinary, string mimeType)
     {
+		_logger.LogError(">>> Entering SavePictureInFileAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType})", pictureId, pictureBinary, mimeType);
         var lastPart = await GetFileExtensionFromMimeTypeAsync(mimeType);
+		_logger.LogWarning("<<< Exiting SavePictureInFileAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType})", pictureId, pictureBinary, mimeType);
         var fileName = $"{pictureId:0000000}_0.{lastPart}";
+		_logger.LogError("SavePictureInFileAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType}): fileName → {FileName}", pictureId, pictureBinary, mimeType, fileName);
+		_logger.LogError("SavePictureInFileAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType}): lastPart → {LastPart}", pictureId, pictureBinary, mimeType, lastPart);
         await _fileProvider.WriteAllBytesAsync(await GetPictureLocalPathAsync(fileName), pictureBinary);
     }
 
@@ -115,12 +139,17 @@ public partial class PictureService : IPictureService
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task DeletePictureOnFileSystemAsync(Picture picture)
     {
+		_logger.LogError(">>> Entering DeletePictureOnFileSystemAsync(picture={Picture})", picture);
         ArgumentNullException.ThrowIfNull(picture);
 
         var lastPart = await GetFileExtensionFromMimeTypeAsync(picture.MimeType);
+		_logger.LogError("DeletePictureOnFileSystemAsync(picture={Picture}): lastPart → {LastPart}", picture, lastPart);
         var fileName = $"{picture.Id:0000000}_0.{lastPart}";
+		_logger.LogError("DeletePictureOnFileSystemAsync(picture={Picture}): fileName → {FileName}", picture, fileName);
         var filePath = await GetPictureLocalPathAsync(fileName);
+		_logger.LogError("DeletePictureOnFileSystemAsync(picture={Picture}): filePath → {FilePath}", picture, filePath);
         _fileProvider.DeleteFile(filePath);
+		_logger.LogWarning("<<< Exiting DeletePictureOnFileSystemAsync(picture={Picture})", picture);
     }
 
     /// <summary>
@@ -133,11 +162,14 @@ public partial class PictureService : IPictureService
     /// </returns>
     protected virtual Task<string> GetImagesPathUrlAsync(string storeLocation = null)
     {
+		_logger.LogError(">>> Entering GetImagesPathUrlAsync(storeLocation={StoreLocation})", storeLocation);
         var pathBase = _httpContextAccessor.HttpContext?.Request?.PathBase.Value ?? string.Empty;
         var imagesPathUrl = _mediaSettings.UseAbsoluteImagePath ? storeLocation : $"{pathBase}/";
+		_logger.LogError("GetImagesPathUrlAsync(storeLocation={StoreLocation}): imagesPathUrl → {ImagesPathUrl}", storeLocation, imagesPathUrl);
         imagesPathUrl = string.IsNullOrEmpty(imagesPathUrl) ? _webHelper.GetStoreLocation() : imagesPathUrl;
         imagesPathUrl += "images/";
 
+		_logger.LogWarning("<<< Exiting GetImagesPathUrlAsync(storeLocation={StoreLocation})", storeLocation);
         return Task.FromResult(imagesPathUrl);
     }
 
@@ -151,6 +183,8 @@ public partial class PictureService : IPictureService
     /// </returns>
     protected virtual Task<string> GetPictureLocalPathAsync(string fileName)
     {
+		_logger.LogError(">>> Entering GetPictureLocalPathAsync(fileName={FileName})", fileName);
+        _logger.LogWarning("<<< Exiting GetPictureLocalPathAsync(fileName={FileName})", fileName);
         return Task.FromResult(_fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), fileName));
     }
 
@@ -165,12 +199,14 @@ public partial class PictureService : IPictureService
     /// </returns>
     protected virtual async Task<byte[]> LoadPictureBinaryAsync(Picture picture, bool fromDb)
     {
+		_logger.LogError(">>> Entering LoadPictureBinaryAsync(picture={Picture},fromDb={FromDb})", picture, fromDb);
         ArgumentNullException.ThrowIfNull(picture);
 
         var result = fromDb
             ? (await GetPictureBinaryByPictureIdAsync(picture.Id))?.BinaryData ?? Array.Empty<byte>()
             : await LoadPictureFromFileAsync(picture.Id, picture.MimeType);
 
+		_logger.LogWarning("<<< Exiting LoadPictureBinaryAsync(picture={Picture},fromDb={FromDb})", picture, fromDb);
         return result;
     }
 
@@ -185,9 +221,11 @@ public partial class PictureService : IPictureService
     /// </returns>
     protected virtual async Task<PictureBinary> UpdatePictureBinaryAsync(Picture picture, byte[] binaryData)
     {
+		_logger.LogError(">>> Entering UpdatePictureBinaryAsync(picture={Picture},binaryData={BinaryData})", picture, binaryData);
         ArgumentNullException.ThrowIfNull(picture);
 
         var pictureBinary = await GetPictureBinaryByPictureIdAsync(picture.Id);
+		_logger.LogError("UpdatePictureBinaryAsync(picture={Picture},binaryData={BinaryData}): pictureBinary → {PictureBinary}", picture, binaryData, pictureBinary);
 
         var isNew = pictureBinary == null;
 
@@ -198,12 +236,17 @@ public partial class PictureService : IPictureService
             };
 
         pictureBinary.BinaryData = binaryData;
+		_logger.LogDebug("UpdatePictureBinaryAsync(picture={Picture},binaryData={BinaryData}): pictureBinary.BinaryData → {Arg2}", picture, binaryData, pictureBinary.BinaryData);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         if (isNew)
             await _pictureBinaryRepository.InsertAsync(pictureBinary);
         else
             await _pictureBinaryRepository.UpdateAsync(pictureBinary);
+			_logger.LogError("UpdatePictureBinaryAsync(picture,binaryData)={Picture},{BinaryData}: save query executed in {Arg2} ms", picture, binaryData, __logStart.ElapsedMilliseconds);
+			_logger.LogError("UpdatePictureBinaryAsync(picture,binaryData)={Picture},{BinaryData}: update query executed in {Arg2} ms", picture, binaryData, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting UpdatePictureBinaryAsync(picture={Picture},binaryData={BinaryData})", picture, binaryData);
         return pictureBinary;
     }
 
@@ -214,11 +257,13 @@ public partial class PictureService : IPictureService
     /// <returns>SKEncodedImageFormat</returns>
     protected virtual SKEncodedImageFormat GetImageFormatByMimeType(string mimeType)
     {
+		_logger.LogError(">>> Entering GetImageFormatByMimeType(mimeType={MimeType})", mimeType);
         var format = SKEncodedImageFormat.Jpeg;
         if (string.IsNullOrEmpty(mimeType))
             return format;
 
         var parts = mimeType.ToLowerInvariant().Split('/');
+		_logger.LogError("GetImageFormatByMimeType(mimeType={MimeType}): parts → {Parts}", mimeType, parts);
         var lastPart = parts[^1];
 
         switch (lastPart)
@@ -236,6 +281,7 @@ public partial class PictureService : IPictureService
                 break;
         }
 
+		_logger.LogWarning("<<< Exiting GetImageFormatByMimeType(mimeType={MimeType})", mimeType);
         return format;
     }
 
@@ -246,11 +292,16 @@ public partial class PictureService : IPictureService
     /// <returns></returns>
     protected virtual string GetMimeTypeFromFileName(string fileName)
     {
+		_logger.LogError(">>> Entering GetMimeTypeFromFileName(fileName={FileName})", fileName);
         var provider = new FileExtensionContentTypeProvider();
+		_logger.LogError("GetMimeTypeFromFileName(fileName={FileName}): provider → {Provider}", fileName, provider);
         if (!provider.TryGetContentType(fileName, out var contentType))
         {
             contentType = "application/octet-stream";
+			_logger.LogError("GetMimeTypeFromFileName(fileName={FileName}): contentType → {ContentType}", fileName, contentType);
+			_logger.LogDebug("GetMimeTypeFromFileName(fileName={FileName}): contentType → {ContentType}", fileName, contentType);
         }
+		_logger.LogWarning("<<< Exiting GetMimeTypeFromFileName(fileName={FileName})", fileName);
         return contentType;
     }
 
@@ -264,20 +315,26 @@ public partial class PictureService : IPictureService
     /// <returns>Image as array of byte[]</returns>
     protected virtual byte[] ImageResize(SKBitmap image, SKEncodedImageFormat format, int targetSize, SKEncodedOrigin? encodedOrigin = null)
     {
+		_logger.LogError(">>> Entering ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin})", image, format, targetSize, encodedOrigin);
         ArgumentNullException.ThrowIfNull(image);
 
         if (encodedOrigin.HasValue)
             image = AutoOrient(image, encodedOrigin.Value);
+			_logger.LogError("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): image → {Image1}", image, format, targetSize, encodedOrigin, image);
 
         float width, height;
         if (image.Height > image.Width)
         {
             // portrait
             width = image.Width * (targetSize / (float)image.Height);
+			_logger.LogError("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): width → {Width}", image, format, targetSize, encodedOrigin, width);
             height = targetSize;
+			_logger.LogDebug("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): height → {Height}", image, format, targetSize, encodedOrigin, height);
         }
         else
         {
+			_logger.LogError("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): height → {Height}", image, format, targetSize, encodedOrigin, height);
+			_logger.LogDebug("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): width → {Width}", image, format, targetSize, encodedOrigin, width);
             // landscape or square
             width = targetSize;
             height = image.Height * (targetSize / (float)image.Width);
@@ -291,14 +348,19 @@ public partial class PictureService : IPictureService
         try
         {
             var samplingOption = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
+			_logger.LogError("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): samplingOption → {SamplingOption}", image, format, targetSize, encodedOrigin, samplingOption);
             using var resizedBitmap = image.Resize(new SKImageInfo((int)width, (int)height), samplingOption);
+			_logger.LogError("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): resizedBitmap → {ResizedBitmap}", image, format, targetSize, encodedOrigin, resizedBitmap);
             using var cropImage = SKImage.FromBitmap(resizedBitmap);
+			_logger.LogError("ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): cropImage → {CropImage}", image, format, targetSize, encodedOrigin, cropImage);
 
             //In order to exclude saving pictures in low quality at the time of installation, we will set the value of this parameter to 80 (as by default)
             return cropImage.Encode(format, _mediaSettings.DefaultImageQuality > 0 ? _mediaSettings.DefaultImageQuality : 80).ToArray();
         }
         catch
         {
+			_logger.LogError("Exception in ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin}): {Arg4}", image, format, targetSize, encodedOrigin, ex.Message);
+			_logger.LogWarning("<<< Exiting ImageResize(image={Image},format={Format},targetSize={TargetSize},encodedOrigin={EncodedOrigin})", image, format, targetSize, encodedOrigin);
             return image.Bytes;
         }
 
@@ -314,6 +376,9 @@ public partial class PictureService : IPictureService
     /// </returns>
     protected virtual async Task<IList<Picture>> GetPicturesByIdsAsync(int[] pictureIds)
     {
+		_logger.LogError(">>> Entering GetPicturesByIdsAsync(pictureIds={PictureIds})", pictureIds);
+		_logger.LogError("GetPicturesByIdsAsync(pictureIds)={PictureIds}: find query executing", pictureIds);
+    _logger.LogWarning("<<< Exiting GetPicturesByIdsAsync(pictureIds={PictureIds})", pictureIds);
         return await _pictureRepository.GetByIdsAsync(pictureIds, cache => default);
     }
 
@@ -325,6 +390,7 @@ public partial class PictureService : IPictureService
     /// <returns>Reoriented image</returns>
     protected virtual SKBitmap AutoOrient(SKBitmap bitmap, SKEncodedOrigin origin)
     {
+		_logger.LogError(">>> Entering AutoOrient(bitmap={Bitmap},origin={Origin})", bitmap, origin);
         SKBitmap rotated;
         switch (origin)
         {
@@ -337,8 +403,10 @@ public partial class PictureService : IPictureService
                 return bitmap;
             case SKEncodedOrigin.RightTop:
                 rotated = new SKBitmap(bitmap.Height, bitmap.Width);
+				_logger.LogDebug("AutoOrient(bitmap={Bitmap},origin={Origin}): rotated → {Rotated}", bitmap, origin, rotated);
                 using (var surface = new SKCanvas(rotated))
                 {
+					_logger.LogError("AutoOrient(bitmap={Bitmap},origin={Origin}): rotated → {Rotated}", bitmap, origin, rotated);
                     surface.Translate(rotated.Width, 0);
                     surface.RotateDegrees(90);
                     surface.DrawBitmap(bitmap, 0, 0);
@@ -354,6 +422,7 @@ public partial class PictureService : IPictureService
                 }
                 return rotated;
             default:
+				_logger.LogWarning("<<< Exiting AutoOrient(bitmap={Bitmap},origin={Origin})", bitmap, origin);
                 return bitmap;
         }
     }
@@ -372,10 +441,12 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual Task<string> GetFileExtensionFromMimeTypeAsync(string mimeType)
     {
+		_logger.LogError(">>> Entering GetFileExtensionFromMimeTypeAsync(mimeType={MimeType})", mimeType);
         if (mimeType == null)
             return Task.FromResult<string>(null);
 
         var parts = mimeType.Split('/');
+		_logger.LogError("GetFileExtensionFromMimeTypeAsync(mimeType={MimeType}): parts → {Parts}", mimeType, parts);
         var lastPart = parts[^1];
         lastPart = lastPart switch
         {
@@ -390,6 +461,7 @@ public partial class PictureService : IPictureService
             "svg+xml" => "svg",
             _ => "",
         };
+		_logger.LogWarning("<<< Exiting GetFileExtensionFromMimeTypeAsync(mimeType={MimeType})", mimeType);
         return Task.FromResult(lastPart);
     }
 
@@ -416,6 +488,8 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<string> GetPictureSeNameAsync(string name)
     {
+		_logger.LogError(">>> Entering GetPictureSeNameAsync(name={Name})", name);
+        _logger.LogWarning("<<< Exiting GetPictureSeNameAsync(name={Name})", name);
         return await _urlRecordService.GetSeNameAsync(name, true, false);
     }
 
@@ -433,6 +507,7 @@ public partial class PictureService : IPictureService
         PictureType defaultPictureType = PictureType.Entity,
         string storeLocation = null)
     {
+		_logger.LogError(">>> Entering GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation})", targetSize, defaultPictureType, storeLocation);
         //get overridden default image if exists
         if (defaultPictureType == PictureType.Entity && _mediaSettings.ProductDefaultImageId > 0)
             return await GetPictureUrlAsync(_mediaSettings.ProductDefaultImageId, targetSize, false, storeLocation, PictureType.Entity);
@@ -443,6 +518,7 @@ public partial class PictureService : IPictureService
             _ => await _settingService.GetSettingByKeyAsync("Media.DefaultImageName", NopMediaDefaults.DefaultImageFileName),
         };
         var filePath = await GetPictureLocalPathAsync(defaultImageFileName);
+		_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): filePath → {FilePath}", targetSize, defaultPictureType, storeLocation, filePath);
         if (!_fileProvider.FileExists(filePath))
         {
             return string.Empty;
@@ -452,8 +528,11 @@ public partial class PictureService : IPictureService
             return await GetImagesPathUrlAsync(storeLocation) + defaultImageFileName;
 
         var fileExtension = _fileProvider.GetFileExtension(filePath);
+		_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): fileExtension → {FileExtension}", targetSize, defaultPictureType, storeLocation, fileExtension);
         var thumbFileName = $"{_fileProvider.GetFileNameWithoutExtension(filePath)}_{targetSize}{fileExtension}";
+		_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): thumbFileName → {ThumbFileName}", targetSize, defaultPictureType, storeLocation, thumbFileName);
         var thumbFilePath = await _thumbService.GetThumbLocalPathByFileNameAsync(thumbFileName);
+		_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): thumbFilePath → {ThumbFilePath}", targetSize, defaultPictureType, storeLocation, thumbFilePath);
         if (!await _thumbService.GeneratedThumbExistsAsync(thumbFilePath, thumbFileName))
         {
             //the named mutex helps to avoid creating the same files in different threads,
@@ -461,14 +540,19 @@ public partial class PictureService : IPictureService
             //you should be very careful, mutexes cannot be used in with the await operation
             //we can't use semaphore here, because it produces PlatformNotSupportedException exception on UNIX based systems
             using var mutex = new Mutex(false, thumbFileName);
+			_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): mutex → {Mutex}", targetSize, defaultPictureType, storeLocation, mutex);
             mutex.WaitOne();
             try
             {
                 using var image = SKBitmap.Decode(filePath);
+				_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): image → {Image}", targetSize, defaultPictureType, storeLocation, image);
                 using var codec = SKCodec.Create(filePath);
+				_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): codec → {Codec}", targetSize, defaultPictureType, storeLocation, codec);
                 var format = codec.EncodedFormat;
                 var pictureBinary = ImageResize(image, format, targetSize);
+				_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): pictureBinary → {PictureBinary}", targetSize, defaultPictureType, storeLocation, pictureBinary);
                 var mimeType = GetMimeTypeFromFileName(thumbFileName);
+				_logger.LogError("GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation}): mimeType → {MimeType}", targetSize, defaultPictureType, storeLocation, mimeType);
                 _thumbService.SaveThumbAsync(thumbFilePath, thumbFileName, mimeType, pictureBinary).Wait();
             }
             finally
@@ -477,6 +561,7 @@ public partial class PictureService : IPictureService
             }
         }
 
+		_logger.LogWarning("<<< Exiting GetDefaultPictureUrlAsync(targetSize={TargetSize},defaultPictureType={DefaultPictureType},storeLocation={StoreLocation})", targetSize, defaultPictureType, storeLocation);
         return await _thumbService.GetThumbUrlAsync(thumbFileName, storeLocation);
     }
 
@@ -498,7 +583,10 @@ public partial class PictureService : IPictureService
         string storeLocation = null,
         PictureType defaultPictureType = PictureType.Entity)
     {
+		_logger.LogError(">>> Entering GetPictureUrlAsync(pictureId={PictureId},targetSize={TargetSize},showDefaultPicture={ShowDefaultPicture},storeLocation={StoreLocation},defaultPictureType={DefaultPictureType})", pictureId, targetSize, showDefaultPicture, storeLocation, defaultPictureType);
         var picture = await GetPictureByIdAsync(pictureId);
+		_logger.LogError("GetPictureUrlAsync(pictureId={PictureId},targetSize={TargetSize},showDefaultPicture={ShowDefaultPicture},storeLocation={StoreLocation},defaultPictureType={DefaultPictureType}): picture → {Picture}", pictureId, targetSize, showDefaultPicture, storeLocation, defaultPictureType, picture);
+		_logger.LogWarning("<<< Exiting GetPictureUrlAsync(pictureId={PictureId},targetSize={TargetSize},showDefaultPicture={ShowDefaultPicture},storeLocation={StoreLocation},defaultPictureType={DefaultPictureType})", pictureId, targetSize, showDefaultPicture, storeLocation, defaultPictureType);
         return (await GetPictureUrlAsync(picture, targetSize, showDefaultPicture, storeLocation, defaultPictureType)).Url;
     }
 
@@ -642,22 +730,29 @@ public partial class PictureService : IPictureService
     /// The task result contains the byte array</returns>
     public virtual Task<byte[]> ConvertSvgToPngAsync(Stream stream)
     {
+		_logger.LogError(">>> Entering ConvertSvgToPngAsync(stream={Stream})", stream);
         try
         {
             using var svg = new SKSvg();
+			_logger.LogError("ConvertSvgToPngAsync(stream={Stream}): svg → {Svg}", stream, svg);
             svg.Load(stream);
 
             using var bitmap = new SKBitmap((int)svg.Picture.CullRect.Width, (int)svg.Picture.CullRect.Height);
+			_logger.LogError("ConvertSvgToPngAsync(stream={Stream}): bitmap → {Bitmap}", stream, bitmap);
             var canvas = new SKCanvas(bitmap);
+			_logger.LogError("ConvertSvgToPngAsync(stream={Stream}): canvas → {Canvas}", stream, canvas);
             canvas.DrawPicture(svg.Picture);
             canvas.Flush();
             canvas.Save();
 
             using var image = SKImage.FromBitmap(bitmap);
+			_logger.LogError("ConvertSvgToPngAsync(stream={Stream}): image → {Image}", stream, image);
             using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+			_logger.LogError("ConvertSvgToPngAsync(stream={Stream}): data → {Data}", stream, data);
 
             // save the data to a stream
             using var memStream = new MemoryStream();
+			_logger.LogError("ConvertSvgToPngAsync(stream={Stream}): memStream → {MemStream}", stream, memStream);
             data.SaveTo(memStream);
             memStream.Seek(0, SeekOrigin.Begin);
 
@@ -665,8 +760,10 @@ public partial class PictureService : IPictureService
         }
         catch
         {
+		_logger.LogError("Exception in ConvertSvgToPngAsync(stream={Stream}): {Arg1}", stream, ex.Message);
         }
 
+		_logger.LogWarning("<<< Exiting ConvertSvgToPngAsync(stream={Stream})", stream);
         return null;
     }
 
@@ -684,6 +781,9 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<Picture> GetPictureByIdAsync(int pictureId)
     {
+		_logger.LogError(">>> Entering GetPictureByIdAsync(pictureId={PictureId})", pictureId);
+		_logger.LogError("GetPictureByIdAsync(pictureId)={PictureId}: find query executing", pictureId);
+    _logger.LogWarning("<<< Exiting GetPictureByIdAsync(pictureId={PictureId})", pictureId);
         return await _pictureRepository.GetByIdAsync(pictureId, cache => default);
     }
 
@@ -694,6 +794,8 @@ public partial class PictureService : IPictureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeletePictureAsync(Picture picture)
     {
+		_logger.LogError(">>> Entering DeletePictureAsync(picture={Picture})", picture);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(picture);
 
         //delete thumbs
@@ -704,6 +806,9 @@ public partial class PictureService : IPictureService
             await DeletePictureOnFileSystemAsync(picture);
 
         //delete from database
+		_logger.LogError("DeletePictureAsync(picture)={Picture}: external service call took {Arg1} ms", picture, __logStart.ElapsedMilliseconds);
+		var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+    _logger.LogWarning("<<< Exiting DeletePictureAsync(picture={Picture})", picture);
         await _pictureRepository.DeleteAsync(picture);
     }
 
@@ -719,13 +824,18 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<IPagedList<Picture>> GetPicturesAsync(string virtualPath = "", int pageIndex = 0, int pageSize = int.MaxValue)
     {
+		_logger.LogError(">>> Entering GetPicturesAsync(virtualPath={VirtualPath},pageIndex={PageIndex},pageSize={PageSize})", virtualPath, pageIndex, pageSize);
         var query = _pictureRepository.Table;
 
+		_logger.LogError("GetPicturesAsync(virtualPath={VirtualPath},pageIndex={PageIndex},pageSize={PageSize}): query → {Query}", virtualPath, pageIndex, pageSize, query);
         if (!string.IsNullOrEmpty(virtualPath))
             query = virtualPath.EndsWith('/') ? query.Where(p => p.VirtualPath.StartsWith(virtualPath) || p.VirtualPath == virtualPath.TrimEnd('/')) : query.Where(p => p.VirtualPath == virtualPath);
 
         query = query.OrderByDescending(p => p.Id);
 
+		_logger.LogWarning("<<< Exiting GetPicturesAsync(virtualPath={VirtualPath},pageIndex={PageIndex},pageSize={PageSize})", virtualPath, pageIndex, pageSize);
+		_logger.LogError(">>> Entering IsStoreInDbAsync()");
+        _logger.LogWarning("<<< Exiting IsStoreInDbAsync()");
         return await query.ToPagedListAsync(pageIndex, pageSize);
     }
 
@@ -740,6 +850,7 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<IList<Picture>> GetPicturesByProductIdAsync(int productId, int recordsToReturn = 0)
     {
+		_logger.LogError(">>> Entering GetPicturesByProductIdAsync(productId={ProductId},recordsToReturn={RecordsToReturn})", productId, recordsToReturn);
         if (productId == 0)
             return new List<Picture>();
 
@@ -751,9 +862,14 @@ public partial class PictureService : IPictureService
 
         if (recordsToReturn > 0)
             query = query.Take(recordsToReturn);
+			_logger.LogError("GetPicturesByProductIdAsync(productId={ProductId},recordsToReturn={RecordsToReturn}): query → {Query}", productId, recordsToReturn, query);
+			var __logStart = System.Diagnostics.Stopwatch.StartNew();
 
         var pics = await query.ToListAsync();
 
+		_logger.LogError("GetPicturesByProductIdAsync(productId={ProductId},recordsToReturn={RecordsToReturn}): pics → {Pics}", productId, recordsToReturn, pics);
+		_logger.LogError("GetPicturesByProductIdAsync(productId,recordsToReturn)={ProductId},{RecordsToReturn}: database query executed in {Arg2} ms", productId, recordsToReturn, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetPicturesByProductIdAsync(productId={ProductId},recordsToReturn={RecordsToReturn})", productId, recordsToReturn);
         return pics;
     }
 
@@ -775,13 +891,18 @@ public partial class PictureService : IPictureService
         string altAttribute = null, string titleAttribute = null,
         bool isNew = true, bool validateBinary = true)
     {
+		_logger.LogError(">>> Entering InsertPictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary})", pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         mimeType = CommonHelper.EnsureNotNull(mimeType);
         mimeType = CommonHelper.EnsureMaximumLength(mimeType, 20);
+		_logger.LogError("InsertPictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): mimeType → {MimeType1}", pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, mimeType);
 
         seoFilename = CommonHelper.EnsureMaximumLength(seoFilename, 100);
+		_logger.LogError("InsertPictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): seoFilename → {SeoFilename1}", pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, seoFilename);
 
         if (validateBinary)
             pictureBinary = await ValidatePictureAsync(pictureBinary, mimeType, seoFilename);
+			_logger.LogError("InsertPictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): pictureBinary → {PictureBinary1}", pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, pictureBinary);
 
         var picture = new Picture
         {
@@ -792,11 +913,13 @@ public partial class PictureService : IPictureService
             IsNew = isNew
         };
         await _pictureRepository.InsertAsync(picture);
+		_logger.LogError("InsertPictureAsync(pictureBinary,mimeType,seoFilename,altAttribute,titleAttribute,isNew,validateBinary)={PictureBinary},{MimeType},{SeoFilename},{AltAttribute},{TitleAttribute},{IsNew},{ValidateBinary}: save query executed in {Arg7} ms", pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, __logStart.ElapsedMilliseconds);
         await UpdatePictureBinaryAsync(picture, await IsStoreInDbAsync() ? pictureBinary : Array.Empty<byte>());
 
         if (!await IsStoreInDbAsync())
             await SavePictureInFileAsync(picture.Id, pictureBinary, mimeType);
 
+		_logger.LogWarning("<<< Exiting InsertPictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary})", pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary);
         return picture;
     }
 
@@ -812,6 +935,7 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<Picture> InsertPictureAsync(IFormFile formFile, string defaultFileName = "", string virtualPath = "")
     {
+		_logger.LogError(">>> Entering InsertPictureAsync(formFile={FormFile},defaultFileName={DefaultFileName},virtualPath={VirtualPath})", formFile, defaultFileName, virtualPath);
         var imgExt = new List<string>
         {
             ".bmp",
@@ -830,6 +954,7 @@ public partial class PictureService : IPictureService
         } as IReadOnlyCollection<string>;
 
         var fileName = formFile.FileName;
+		_logger.LogError("InsertPictureAsync(formFile={FormFile},defaultFileName={DefaultFileName},virtualPath={VirtualPath}): fileName → {FileName}", formFile, defaultFileName, virtualPath, fileName);
         if (string.IsNullOrEmpty(fileName) && !string.IsNullOrEmpty(defaultFileName))
             fileName = defaultFileName;
 
@@ -837,8 +962,10 @@ public partial class PictureService : IPictureService
         fileName = _fileProvider.GetFileName(fileName);
 
         var contentType = formFile.ContentType;
+		_logger.LogError("InsertPictureAsync(formFile={FormFile},defaultFileName={DefaultFileName},virtualPath={VirtualPath}): contentType → {ContentType}", formFile, defaultFileName, virtualPath, contentType);
 
         var fileExtension = _fileProvider.GetFileExtension(fileName);
+		_logger.LogError("InsertPictureAsync(formFile={FormFile},defaultFileName={DefaultFileName},virtualPath={VirtualPath}): fileExtension → {FileExtension}", formFile, defaultFileName, virtualPath, fileExtension);
         if (!string.IsNullOrEmpty(fileExtension))
             fileExtension = fileExtension.ToLowerInvariant();
 
@@ -865,6 +992,7 @@ public partial class PictureService : IPictureService
         picture.VirtualPath = _fileProvider.GetVirtualPath(virtualPath);
         await UpdatePictureAsync(picture);
 
+		_logger.LogWarning("<<< Exiting InsertPictureAsync(formFile={FormFile},defaultFileName={DefaultFileName},virtualPath={VirtualPath})", formFile, defaultFileName, virtualPath);
         return picture;
     }
 
@@ -891,11 +1019,14 @@ public partial class PictureService : IPictureService
         mimeType = CommonHelper.EnsureMaximumLength(mimeType, 20);
 
         seoFilename = CommonHelper.EnsureMaximumLength(seoFilename, 100);
+		_logger.LogError("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): seoFilename → {SeoFilename1}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, seoFilename);
 
         if (validateBinary)
             pictureBinary = await ValidatePictureAsync(pictureBinary, mimeType, seoFilename);
+			_logger.LogError("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): pictureBinary → {PictureBinary1}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, pictureBinary);
 
         var picture = await GetPictureByIdAsync(pictureId);
+		_logger.LogError("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): picture → {Picture}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, picture);
         if (picture == null)
             return null;
 
@@ -904,6 +1035,11 @@ public partial class PictureService : IPictureService
             await _thumbService.DeletePictureThumbsAsync(picture);
 
         picture.MimeType = mimeType;
+		_logger.LogDebug("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): picture.MimeType → {Arg8}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, picture.MimeType);
+		_logger.LogDebug("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): picture.SeoFilename → {Arg8}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, picture.SeoFilename);
+		_logger.LogDebug("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): picture.AltAttribute → {Arg8}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, picture.AltAttribute);
+		_logger.LogDebug("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): picture.TitleAttribute → {Arg8}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, picture.TitleAttribute);
+		_logger.LogDebug("UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary}): picture.IsNew → {Arg8}", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, picture.IsNew);
         picture.SeoFilename = seoFilename;
         picture.AltAttribute = altAttribute;
         picture.TitleAttribute = titleAttribute;
@@ -928,15 +1064,19 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<Picture> UpdatePictureAsync(Picture picture)
     {
+		_logger.LogError(">>> Entering UpdatePictureAsync(picture={Picture})", picture);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         if (picture == null)
             return null;
 
         var seoFilename = CommonHelper.EnsureMaximumLength(picture.SeoFilename, 100);
+		_logger.LogError("UpdatePictureAsync(picture={Picture}): seoFilename → {SeoFilename}", picture, seoFilename);
 
         //delete old thumbs if exists
         await _thumbService.DeletePictureThumbsAsync(picture);
 
         picture.SeoFilename = seoFilename;
+		_logger.LogDebug("UpdatePictureAsync(picture={Picture}): picture.SeoFilename → {Arg1}", picture, picture.SeoFilename);
 
         await _pictureRepository.UpdateAsync(picture);
         await UpdatePictureBinaryAsync(picture, await IsStoreInDbAsync() ? (await GetPictureBinaryByPictureIdAsync(picture.Id)).BinaryData : Array.Empty<byte>());
@@ -944,6 +1084,9 @@ public partial class PictureService : IPictureService
         if (!await IsStoreInDbAsync())
             await SavePictureInFileAsync(picture.Id, (await GetPictureBinaryByPictureIdAsync(picture.Id)).BinaryData, picture.MimeType);
 
+		_logger.LogWarning("<<< Exiting UpdatePictureAsync(picture={Picture})", picture);
+		_logger.LogError("UpdatePictureAsync(pictureId,pictureBinary,mimeType,seoFilename,altAttribute,titleAttribute,isNew,validateBinary)={PictureId},{PictureBinary},{MimeType},{SeoFilename},{AltAttribute},{TitleAttribute},{IsNew},{ValidateBinary}: update query executed in {Arg8} ms", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting UpdatePictureAsync(pictureId={PictureId},pictureBinary={PictureBinary},mimeType={MimeType},seoFilename={SeoFilename},altAttribute={AltAttribute},titleAttribute={TitleAttribute},isNew={IsNew},validateBinary={ValidateBinary})", pictureId, pictureBinary, mimeType, seoFilename, altAttribute, titleAttribute, isNew, validateBinary);
         return picture;
     }
 
@@ -957,6 +1100,8 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<PictureBinary> GetPictureBinaryByPictureIdAsync(int pictureId)
     {
+		_logger.LogError(">>> Entering GetPictureBinaryByPictureIdAsync(pictureId={PictureId})", pictureId);
+        _logger.LogWarning("<<< Exiting GetPictureBinaryByPictureIdAsync(pictureId={PictureId})", pictureId);
         return await _pictureBinaryRepository.Table
             .FirstOrDefaultAsync(pb => pb.PictureId == pictureId);
     }
@@ -972,8 +1117,10 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<Picture> SetSeoFilenameAsync(int pictureId, string seoFilename)
     {
+		_logger.LogError(">>> Entering SetSeoFilenameAsync(pictureId={PictureId},seoFilename={SeoFilename})", pictureId, seoFilename);
         var picture = await GetPictureByIdAsync(pictureId) ?? throw new ArgumentException("No picture found with the specified id");
 
+		_logger.LogError("SetSeoFilenameAsync(pictureId={PictureId},seoFilename={SeoFilename}): picture → {Picture}", pictureId, seoFilename, picture);
         //update if it has been changed
         if (seoFilename != picture.SeoFilename)
         {
@@ -988,6 +1135,7 @@ public partial class PictureService : IPictureService
                 false);
         }
 
+		_logger.LogWarning("<<< Exiting SetSeoFilenameAsync(pictureId={PictureId},seoFilename={SeoFilename})", pictureId, seoFilename);
         return picture;
     }
 
@@ -1003,6 +1151,7 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<byte[]> ValidatePictureAsync(byte[] pictureBinary, string mimeType, string fileName)
     {
+		_logger.LogError(">>> Entering ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName})", pictureBinary, mimeType, fileName);
         try
         {
             SKBitmap image;
@@ -1010,18 +1159,24 @@ public partial class PictureService : IPictureService
             if (_mediaSettings.AutoOrientImage)
             {
                 using var input = new MemoryStream(pictureBinary);
+				_logger.LogError("ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName}): input → {Input}", pictureBinary, mimeType, fileName, input);
                 using var codec = SKCodec.Create(input);
+				_logger.LogError("ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName}): codec → {Codec}", pictureBinary, mimeType, fileName, codec);
                 image = AutoOrient(SKBitmap.Decode(codec), codec.EncodedOrigin);
+				_logger.LogError("ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName}): image → {Image}", pictureBinary, mimeType, fileName, image);
             }
             else
                 image = SKBitmap.Decode(pictureBinary);
+				_logger.LogDebug("ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName}): image → {Image}", pictureBinary, mimeType, fileName, image);
 
             //resize the image in accordance with the maximum size
             if (Math.Max(image.Height, image.Width) <= _mediaSettings.MaximumImageSize)
                 return pictureBinary;
 
             var format = GetImageFormatByMimeType(mimeType);
+			_logger.LogError("ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName}): format → {Format}", pictureBinary, mimeType, fileName, format);
             pictureBinary = ImageResize(image, format, _mediaSettings.MaximumImageSize);
+			_logger.LogError("ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName}): pictureBinary → {PictureBinary1}", pictureBinary, mimeType, fileName, pictureBinary);
 
             return pictureBinary;
         }
@@ -1029,6 +1184,7 @@ public partial class PictureService : IPictureService
         {
             await _logger.ErrorAsync($"Cannot decode picture binary (file name: {fileName})", exc);
             return pictureBinary;
+		_logger.LogWarning("<<< Exiting ValidatePictureAsync(pictureBinary={PictureBinary},mimeType={MimeType},fileName={FileName})", pictureBinary, mimeType, fileName);
         }
     }
 
@@ -1043,23 +1199,29 @@ public partial class PictureService : IPictureService
     /// </returns>
     public virtual async Task<Picture> GetProductPictureAsync(Product product, string attributesXml)
     {
+		_logger.LogError(">>> Entering GetProductPictureAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         ArgumentNullException.ThrowIfNull(product);
 
         //first, try to get product attribute combination picture
         var combination = await _productAttributeParser.FindProductAttributeCombinationAsync(product, attributesXml);
+		_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): combination → {Combination}", product, attributesXml, combination);
         if (combination != null)
         {
             var combinationPicture = (await _productAttributeService.GetProductAttributeCombinationPicturesAsync(combination.Id)).FirstOrDefault();
+			_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): combinationPicture → {CombinationPicture}", product, attributesXml, combinationPicture);
             if (await GetPictureByIdAsync(combinationPicture?.PictureId ?? 0) is Picture picture)
                 return picture;
         }
 
         //then, let's see whether we have attribute values with pictures
         var values = await _productAttributeParser.ParseProductAttributeValuesAsync(attributesXml);
+		_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): values → {Values}", product, attributesXml, values);
         foreach (var attributeValue in values)
         {
             var valuePictures = await _productAttributeService.GetProductAttributeValuePicturesAsync(attributeValue.Id);
+			_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): valuePictures → {ValuePictures}", product, attributesXml, valuePictures);
             var attributePicture = (await GetPicturesByIdsAsync(valuePictures.Select(vp => vp.PictureId).ToArray())).FirstOrDefault();
+			_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): attributePicture → {AttributePicture}", product, attributesXml, attributePicture);
 
             if (attributePicture != null)
                 return attributePicture;
@@ -1067,6 +1229,7 @@ public partial class PictureService : IPictureService
 
         //now let's load the default product picture
         var productPicture = (await GetPicturesByProductIdAsync(product.Id, 1)).FirstOrDefault();
+		_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): productPicture → {ProductPicture}", product, attributesXml, productPicture);
         if (productPicture != null)
             return productPicture;
 
@@ -1075,6 +1238,8 @@ public partial class PictureService : IPictureService
             return null;
 
         var parentGroupedProductPicture = (await GetPicturesByProductIdAsync(product.ParentGroupedProductId, 1)).FirstOrDefault();
+		_logger.LogError("GetProductPictureAsync(product={Product},attributesXml={AttributesXml}): parentGroupedProductPicture → {ParentGroupedProductPicture}", product, attributesXml, parentGroupedProductPicture);
+		_logger.LogWarning("<<< Exiting GetProductPictureAsync(product={Product},attributesXml={AttributesXml})", product, attributesXml);
         return parentGroupedProductPicture;
     }
 
@@ -1094,6 +1259,7 @@ public partial class PictureService : IPictureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task SetIsStoreInDbAsync(bool isStoreInDb)
     {
+		_logger.LogError(">>> Entering SetIsStoreInDbAsync(isStoreInDb={IsStoreInDb})", isStoreInDb);
         //check whether it's a new value
         if (await IsStoreInDbAsync() == isStoreInDb)
             return;
@@ -1108,6 +1274,7 @@ public partial class PictureService : IPictureService
             while (true)
             {
                 var pictures = await GetPicturesAsync(pageIndex: pageIndex, pageSize: pageSize);
+				_logger.LogError("SetIsStoreInDbAsync(isStoreInDb={IsStoreInDb}): pictures → {Pictures}", isStoreInDb, pictures);
                 pageIndex++;
 
                 //all pictures converted?
@@ -1120,6 +1287,7 @@ public partial class PictureService : IPictureService
                         continue;
 
                     var pictureBinary = await LoadPictureBinaryAsync(picture, !isStoreInDb);
+					_logger.LogError("SetIsStoreInDbAsync(isStoreInDb={IsStoreInDb}): pictureBinary → {PictureBinary}", isStoreInDb, pictureBinary);
 
                     //we used the code below before. but it's too slow
                     //let's do it manually (uncommented code) - copy some logic from "UpdatePicture" method
@@ -1143,13 +1311,17 @@ public partial class PictureService : IPictureService
                 }
 
                 //save all at once
+				var __logStart = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogError("SetIsStoreInDbAsync(isStoreInDb)={IsStoreInDb}: update query executed in {Arg1} ms", isStoreInDb, __logStart.ElapsedMilliseconds);
                 await _pictureRepository.UpdateAsync(pictures, false);
             }
         }
         catch
         {
+			_logger.LogError("Exception in SetIsStoreInDbAsync(isStoreInDb={IsStoreInDb}): {Arg1}", isStoreInDb, exc.Message);
             // ignored
         }
+		_logger.LogWarning("<<< Exiting SetIsStoreInDbAsync(isStoreInDb={IsStoreInDb})", isStoreInDb);
     }
 
 
@@ -1160,16 +1332,21 @@ public partial class PictureService : IPictureService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task ChangePicturesPathAsync(string path)
     {
+		_logger.LogError(">>> Entering ChangePicturesPathAsync(path={Path})", path);
         var newPath = _fileProvider.GetLocalImagesPath(_mediaSettings, path);
         _fileProvider.CreateDirectory(newPath);
+		_logger.LogError("ChangePicturesPathAsync(path={Path}): newPath → {NewPath}", path, newPath);
 
         var oldPath = _fileProvider.GetLocalImagesPath(_mediaSettings);
+		_logger.LogError("ChangePicturesPathAsync(path={Path}): oldPath → {OldPath}", path, oldPath);
         if (newPath.Equals(oldPath))
             return;
 
         var isSubDir = newPath.StartsWith(oldPath);
+		_logger.LogError("ChangePicturesPathAsync(path={Path}): isSubDir → {IsSubDir}", path, isSubDir);
 
         var directoriesToDelete = new List<string>();
+		_logger.LogError("ChangePicturesPathAsync(path={Path}): directoriesToDelete → {DirectoriesToDelete}", path, directoriesToDelete);
         newPath = newPath.TrimEnd('/').TrimEnd('\\');
 
         foreach (var originalFile in _fileProvider.EnumerateFiles(oldPath, "*.*", false))
@@ -1178,10 +1355,14 @@ public partial class PictureService : IPictureService
                 continue;
 
             var fileName = originalFile.Replace(oldPath, string.Empty);
+			_logger.LogError("ChangePicturesPathAsync(path={Path}): fileName → {FileName}", path, fileName);
             var newFilePath = _fileProvider.Combine(newPath, fileName);
+			_logger.LogError("ChangePicturesPathAsync(path={Path}): newFilePath → {NewFilePath}", path, newFilePath);
             var newDirPath = _fileProvider.GetParentDirectory(newFilePath).TrimEnd('/').TrimEnd('\\');
+			_logger.LogError("ChangePicturesPathAsync(path={Path}): newDirPath → {NewDirPath}", path, newDirPath);
 
             var oldDirPath = _fileProvider.GetParentDirectory(originalFile).TrimEnd('/').TrimEnd('\\');
+			_logger.LogError("ChangePicturesPathAsync(path={Path}): oldDirPath → {OldDirPath}", path, oldDirPath);
 
             if (!oldDirPath.Equals(oldPath.TrimEnd('/').TrimEnd('\\')) && !directoriesToDelete.Contains(oldDirPath))
                 directoriesToDelete.Add(oldDirPath);
@@ -1201,6 +1382,7 @@ public partial class PictureService : IPictureService
         }
 
         _mediaSettings.PicturePath= path;
+		_logger.LogDebug("ChangePicturesPathAsync(path={Path}): _mediaSettings.PicturePath → {Arg1}", path, _mediaSettings.PicturePath);
         await _settingService.SaveSettingAsync(_mediaSettings, settings => settings.PicturePath);
     }
 
@@ -1215,8 +1397,10 @@ public partial class PictureService : IPictureService
     /// <returns>Picture's content type</returns>
     public string GetPictureContentTypeByFileExtension(string fileExtension)
     {
+		_logger.LogError(">>> Entering GetPictureContentTypeByFileExtension(fileExtension={FileExtension})", fileExtension);
         string contentType = null;
 
+		_logger.LogError("GetPictureContentTypeByFileExtension(fileExtension={FileExtension}): contentType → {ContentType}", fileExtension, contentType);
         switch (fileExtension.ToLower())
         {
             case ".bmp":
@@ -1250,6 +1434,7 @@ public partial class PictureService : IPictureService
                 break;
         }
 
+		_logger.LogWarning("<<< Exiting GetPictureContentTypeByFileExtension(fileExtension={FileExtension})", fileExtension);
         return contentType;
     }
 

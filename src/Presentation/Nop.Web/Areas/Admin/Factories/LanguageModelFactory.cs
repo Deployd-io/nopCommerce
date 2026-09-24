@@ -7,6 +7,7 @@ using Nop.Web.Areas.Admin.Infrastructure.Mapper.Extensions;
 using Nop.Web.Areas.Admin.Models.Localization;
 using Nop.Web.Framework.Factories;
 using Nop.Web.Framework.Models.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Factories;
 
@@ -15,6 +16,7 @@ namespace Nop.Web.Areas.Admin.Factories;
 /// </summary>
 public partial class LanguageModelFactory : ILanguageModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     private readonly IBaseAdminModelFactory _baseAdminModelFactory;
@@ -35,11 +37,18 @@ public partial class LanguageModelFactory : ILanguageModelFactory
         IStoreMappingSupportedModelFactory storeMappingSupportedModelFactory,
         MediaSettings mediaSettings)
     {
+		_logger.LogError(">>> Entering LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings})", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings);
         _baseAdminModelFactory = baseAdminModelFactory;
         _fileProvider = fileProvider;
+		_logger.LogDebug("LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings}): _fileProvider → {_fileProvider}", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings, _fileProvider);
+		_logger.LogDebug("LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings}): _baseAdminModelFactory → {_baseAdminModelFactory}", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings, _baseAdminModelFactory);
+    _logger.LogWarning("<<< Exiting LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings})", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings);
         _languageService = languageService;
+		_logger.LogDebug("LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings}): _languageService → {_languageService}", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings, _languageService);
         _localizationService = localizationService;
+		_logger.LogDebug("LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings}): _localizationService → {_localizationService}", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings, _localizationService);
         _storeMappingSupportedModelFactory = storeMappingSupportedModelFactory;
+		_logger.LogDebug("LanguageModelFactory(baseAdminModelFactory={BaseAdminModelFactory},fileProvider={FileProvider},languageService={LanguageService},localizationService={LocalizationService},storeMappingSupportedModelFactory=<redacted>,mediaSettings={MediaSettings}): _storeMappingSupportedModelFactory → {_storeMappingSupportedModelFactory}", baseAdminModelFactory, fileProvider, languageService, localizationService, mediaSettings, _storeMappingSupportedModelFactory);
         _mediaSettings = mediaSettings;
     }
 
@@ -55,15 +64,18 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// <returns>Locale resource search model</returns>
     protected virtual LocaleResourceSearchModel PrepareLocaleResourceSearchModel(LocaleResourceSearchModel searchModel, Language language)
     {
+		_logger.LogError(">>> Entering PrepareLocaleResourceSearchModel(searchModel={SearchModel},language={Language})", searchModel, language);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(language);
 
         searchModel.LanguageId = language.Id;
+		_logger.LogDebug("PrepareLocaleResourceSearchModel(searchModel={SearchModel},language={Language}): searchModel.LanguageId → {Arg2}", searchModel, language, searchModel.LanguageId);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareLocaleResourceSearchModel(searchModel={SearchModel},language={Language})", searchModel, language);
         return searchModel;
     }
 
@@ -81,11 +93,13 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual Task<LanguageSearchModel> PrepareLanguageSearchModelAsync(LanguageSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareLanguageSearchModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //prepare page parameters
         searchModel.SetGridPageSize();
 
+		_logger.LogWarning("<<< Exiting PrepareLanguageSearchModelAsync(searchModel={SearchModel})", searchModel);
         return Task.FromResult(searchModel);
     }
 
@@ -99,14 +113,17 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual async Task<LanguageListModel> PrepareLanguageListModelAsync(LanguageSearchModel searchModel)
     {
+		_logger.LogError(">>> Entering PrepareLanguageListModelAsync(searchModel={SearchModel})", searchModel);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         //get languages
         var languages = (await _languageService.GetAllLanguagesAsync(showHidden: true)).ToPagedList(searchModel);
+		_logger.LogError("PrepareLanguageListModelAsync(searchModel={SearchModel}): languages → {Languages}", searchModel, languages);
 
         //prepare list model
         var model = new LanguageListModel().PrepareToGrid(searchModel, languages, () =>
         {
+		_logger.LogWarning("<<< Exiting PrepareLanguageListModelAsync(searchModel={SearchModel})", searchModel);
             return languages.Select(language => language.ToModel<LanguageModel>());
         });
 
@@ -125,6 +142,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual async Task<LanguageModel> PrepareLanguageModelAsync(LanguageModel model, Language language, bool excludeProperties = false)
     {
+		_logger.LogError(">>> Entering PrepareLanguageModelAsync(model={Model},language={Language},excludeProperties={ExcludeProperties})", model, language, excludeProperties);
         if (language != null)
         {
             //fill in model values from the entity
@@ -139,6 +157,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
         {
             model.DisplayOrder = (await _languageService.GetAllLanguagesAsync()).Max(l => l.DisplayOrder) + 1;
             model.Published = true;
+			_logger.LogDebug("PrepareLanguageModelAsync(model={Model},language={Language},excludeProperties={ExcludeProperties}): model.Published → {Arg3}", model, language, excludeProperties, model.Published);
         }
         var flagNames = _fileProvider
             .EnumerateFiles(_fileProvider.Combine(_fileProvider.GetLocalImagesPath(_mediaSettings), "flags"), "*.png")
@@ -150,6 +169,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
             Text = flagName,
             Value = flagName
         });
+		_logger.LogDebug("PrepareLanguageModelAsync(model={Model},language={Language},excludeProperties={ExcludeProperties}): Value → {Value}", model, language, excludeProperties, Value);
 
         //prepare available currencies
         await _baseAdminModelFactory.PrepareCurrenciesAsync(model.AvailableCurrencies,
@@ -158,6 +178,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
         //prepare available stores
         await _storeMappingSupportedModelFactory.PrepareModelStoresAsync(model, language, excludeProperties);
 
+		_logger.LogWarning("<<< Exiting PrepareLanguageModelAsync(model={Model},language={Language},excludeProperties={ExcludeProperties})", model, language, excludeProperties);
         return model;
     }
 
@@ -172,6 +193,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
     /// </returns>
     public virtual async Task<LocaleResourceListModel> PrepareLocaleResourceListModelAsync(LocaleResourceSearchModel searchModel, Language language)
     {
+		_logger.LogError(">>> Entering PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language})", searchModel, language);
         ArgumentNullException.ThrowIfNull(searchModel);
 
         ArgumentNullException.ThrowIfNull(language);
@@ -183,10 +205,12 @@ public partial class LanguageModelFactory : ILanguageModelFactory
         //filter locale resources
         if (!string.IsNullOrEmpty(searchModel.SearchResourceName))
             localeResources = localeResources.Where(l => l.Key.ToLowerInvariant().Contains(searchModel.SearchResourceName.ToLowerInvariant()));
+			_logger.LogError("PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language}): localeResources → {LocaleResources}", searchModel, language, localeResources);
         if (!string.IsNullOrEmpty(searchModel.SearchResourceValue))
             localeResources = localeResources.Where(l => l.Value.Value.ToLowerInvariant().Contains(searchModel.SearchResourceValue.ToLowerInvariant()));
 
         var pagedLocaleResources = await localeResources.ToPagedListAsync(searchModel.Page - 1, searchModel.PageSize);
+		_logger.LogError("PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language}): pagedLocaleResources → {PagedLocaleResources}", searchModel, language, pagedLocaleResources);
 
         //prepare list model
         var model = new LocaleResourceListModel().PrepareToGrid(searchModel, pagedLocaleResources, () =>
@@ -201,6 +225,7 @@ public partial class LanguageModelFactory : ILanguageModelFactory
             });
         });
 
+		_logger.LogWarning("<<< Exiting PrepareLocaleResourceListModelAsync(searchModel={SearchModel},language={Language})", searchModel, language);
         return model;
     }
 

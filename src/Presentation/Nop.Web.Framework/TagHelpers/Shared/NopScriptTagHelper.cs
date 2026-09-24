@@ -12,6 +12,7 @@ using Nop.Core.Configuration;
 using Nop.Web.Framework.Extensions;
 using Nop.Web.Framework.UI;
 using Nop.Web.Framework.WebOptimizer;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.TagHelpers.Shared;
 
@@ -21,6 +22,7 @@ namespace Nop.Web.Framework.TagHelpers.Shared;
 [HtmlTargetElement(SCRIPT_TAG_NAME)]
 public partial class NopScriptTagHelper : UrlResolutionTagHelper
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Constants
 
     protected const string SCRIPT_TAG_NAME = "script";
@@ -51,11 +53,16 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
         IWebHelper webHelper,
         IWebHostEnvironment webHostEnvironment) : base(urlHelperFactory, htmlEncoder)
     {
+		_logger.LogError(">>> Entering NopScriptTagHelper(appSettings={AppSettings},htmlEncoder={HtmlEncoder},bundleHelper={BundleHelper},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory},webHelper={WebHelper},webHostEnvironment={WebHostEnvironment})", appSettings, htmlEncoder, bundleHelper, nopHtmlHelper, urlHelperFactory, webHelper, webHostEnvironment);
         _appSettings = appSettings;
         _bundleHelper = bundleHelper;
+		_logger.LogDebug("NopScriptTagHelper(appSettings={AppSettings},htmlEncoder={HtmlEncoder},bundleHelper={BundleHelper},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory},webHelper={WebHelper},webHostEnvironment={WebHostEnvironment}): _bundleHelper → {_bundleHelper}", appSettings, htmlEncoder, bundleHelper, nopHtmlHelper, urlHelperFactory, webHelper, webHostEnvironment, _bundleHelper);
         _nopHtmlHelper = nopHtmlHelper;
+		_logger.LogDebug("NopScriptTagHelper(appSettings={AppSettings},htmlEncoder={HtmlEncoder},bundleHelper={BundleHelper},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory},webHelper={WebHelper},webHostEnvironment={WebHostEnvironment}): _nopHtmlHelper → {_nopHtmlHelper}", appSettings, htmlEncoder, bundleHelper, nopHtmlHelper, urlHelperFactory, webHelper, webHostEnvironment, _nopHtmlHelper);
         _webHelper = webHelper;
+		_logger.LogDebug("NopScriptTagHelper(appSettings={AppSettings},htmlEncoder={HtmlEncoder},bundleHelper={BundleHelper},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory},webHelper={WebHelper},webHostEnvironment={WebHostEnvironment}): _webHelper → {_webHelper}", appSettings, htmlEncoder, bundleHelper, nopHtmlHelper, urlHelperFactory, webHelper, webHostEnvironment, _webHelper);
         _webHostEnvironment = webHostEnvironment;
+		_logger.LogDebug("NopScriptTagHelper(appSettings={AppSettings},htmlEncoder={HtmlEncoder},bundleHelper={BundleHelper},nopHtmlHelper={NopHtmlHelper},urlHelperFactory={UrlHelperFactory},webHelper={WebHelper},webHostEnvironment={WebHostEnvironment}): _webHostEnvironment → {_webHostEnvironment}", appSettings, htmlEncoder, bundleHelper, nopHtmlHelper, urlHelperFactory, webHelper, webHostEnvironment, _webHostEnvironment);
     }
 
     #endregion
@@ -64,24 +71,32 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
     protected static async Task<string> BuildInlineScriptTagAsync(TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering BuildInlineScriptTagAsync(output={Output})", output);
         //get JavaScript
         var scriptTag = new TagBuilder(SCRIPT_TAG_NAME);
+		_logger.LogError("BuildInlineScriptTagAsync(output={Output}): scriptTag → {ScriptTag}", output, scriptTag);
 
         var childContent = await output.GetChildContentAsync();
+		_logger.LogError("BuildInlineScriptTagAsync(output={Output}): childContent → {ChildContent}", output, childContent);
         var script = childContent.GetContent();
+		_logger.LogError("BuildInlineScriptTagAsync(output={Output}): script → {Script}", output, script);
 
         if (!string.IsNullOrEmpty(script))
             scriptTag.InnerHtml.SetHtmlContent(new HtmlString(script));
 
         scriptTag.MergeAttributes(await output.GetAttributeDictionaryAsync(), replaceExisting: false);
 
+		_logger.LogWarning("<<< Exiting BuildInlineScriptTagAsync(output={Output})", output);
         return await scriptTag.RenderHtmlContentAsync() + Environment.NewLine;
     }
 
     protected void ProcessSrcAttribute(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessSrcAttribute(context={Context},output={Output})", context, output);
         if (!string.IsNullOrEmpty(DebugSrc) && _webHostEnvironment.IsDevelopment())
             Src = DebugSrc;
+			_logger.LogError("ProcessSrcAttribute(context={Context},output={Output}): Src → {Src}", context, output, Src);
+			_logger.LogDebug("ProcessSrcAttribute(context={Context},output={Output}): Src → {Src}", context, output, Src);
 
         // Pass through attribute that is also a well-known HTML attribute.
         if (Src != null)
@@ -92,6 +107,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
         // Retrieve the TagHelperOutput variation of the "src" attribute in case other TagHelpers in the
         // pipeline have touched the value. If the value is already encoded this ScriptTagHelper may
+		_logger.LogWarning("<<< Exiting ProcessSrcAttribute(context={Context},output={Output})", context, output);
         // not function properly.
         if (output.Attributes[SRC_ATTRIBUTE_NAME]?.Value is string srcAttribute)
             Src = srcAttribute;
@@ -99,10 +115,12 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
     protected void ProcessAsset(TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsset(output={Output})", output);
         if (string.IsNullOrEmpty(Src))
             return;
 
         var urlHelper = UrlHelperFactory.GetUrlHelper(ViewContext);
+		_logger.LogError("ProcessAsset(output={Output}): urlHelper → {UrlHelper}", output, urlHelper);
         if (!urlHelper.IsLocalUrl(Src))
         {
             output.Attributes.SetAttribute(SRC_ATTRIBUTE_NAME, Src);
@@ -110,7 +128,9 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
         }
 
         var asset = _bundleHelper.GetOrCreateJavaScriptAsset(Src, [Src]);
+		_logger.LogError("ProcessAsset(output={Output}): asset → {Asset}", output, asset);
         output.Attributes.SetAttribute(SRC_ATTRIBUTE_NAME, _bundleHelper.CacheBusting(asset));
+		_logger.LogWarning("<<< Exiting ProcessAsset(output={Output})", output);
     }
 
     #endregion
@@ -119,6 +139,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
+		_logger.LogError(">>> Entering ProcessAsync(context={Context},output={Output})", context, output);
         ArgumentNullException.ThrowIfNull(context);
 
         ArgumentNullException.ThrowIfNull(output);
@@ -127,6 +148,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
             return;
 
         output.TagMode = TagMode.StartTagAndEndTag;
+		_logger.LogDebug("ProcessAsync(context={Context},output={Output}): output.TagMode → {Arg2}", context, output, output.TagMode);
 
         //process only text/javascript scripts
         if (context.AllAttributes.TryGetAttribute("type", out var attribute)
@@ -136,11 +158,13 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
         }
 
         var woConfig = _appSettings.Get<WebOptimizerConfig>();
+		_logger.LogError("ProcessAsync(context={Context},output={Output}): woConfig → {WoConfig}", context, output, woConfig);
 
         if (Location == ResourceLocation.Auto)
         {
             // move script to the footer bundle when bundling is enabled
             Location = woConfig.EnableJavaScriptBundling ? ResourceLocation.Footer : ResourceLocation.None;
+			_logger.LogDebug("ProcessAsync(context={Context},output={Output}): Location → {Location}", context, output, Location);
         }
 
         if (Location == ResourceLocation.None)
@@ -160,6 +184,7 @@ public partial class NopScriptTagHelper : UrlResolutionTagHelper
             _nopHtmlHelper.AddScriptParts(Location, Src, DebugSrc, ExcludeFromBundle);
 
         output.SuppressOutput();
+		_logger.LogWarning("<<< Exiting ProcessAsync(context={Context},output={Output})", context, output);
     }
 
     #endregion

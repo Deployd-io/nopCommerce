@@ -1,12 +1,16 @@
-﻿var Admin = Admin || {};
+﻿var logger = (typeof logger !== 'undefined' && logger) || console;
+var Admin = Admin || {};
 
 Admin.Search = (function () {
     var itemTemplate = function (data) {
+		logger.error(`>>> Entering itemTemplate(data=${data})`);
         var path = function () {
+			logger.error('>>> Entering path()');
             if (data.grandParent) {
                 return $("<p/>").text([data.grandParent, data.parent].join(" > ")).html();
             }
             else {
+				logger.warn('<<< Exiting path()');
                 return data.parent;
             }
         };
@@ -20,7 +24,9 @@ Admin.Search = (function () {
     };
 
     var substringMatcher = function (enumerate) {
+		logger.error(`>>> Entering substringMatcher(enumerate=${enumerate})`);
         var byRateAndTitle = function (a, b) {
+			logger.error(`>>> Entering byRateAndTitle(a=${a},b=${b})`);
             if (a.rate < b.rate)
                 return 1;
             if (a.rate > b.rate)
@@ -33,10 +39,12 @@ Admin.Search = (function () {
         };
 
         return function findMatches(q, cb) {
+		logger.error(`>>> Entering findMatches(q=${q},cb=${cb})`);
 
             var matches = [];
 
             var substrRegex = new RegExp(q, "i");
+			logger.warn(`<<< Exiting findMatches(q=${q},cb=${cb})`);
 
             enumerate(function (item) {
 
@@ -68,10 +76,12 @@ Admin.Search = (function () {
             matches.sort(byRateAndTitle);
             cb(matches);
         };
+		logger.warn(`<<< Exiting substringMatcher(enumerate=${enumerate})`);
     };
 
     return {
         init: function () {
+			logger.error('>>> Entering init()');
             Admin.Navigation.initOnce();
 
             var $input = $(".admin-search-box");
@@ -93,13 +103,16 @@ Admin.Search = (function () {
             });
 
             var navigateTo = function (item) {
+				logger.error(`>>> Entering navigateTo(item=${item})`);
                 $input.typeahead("val", "");
                 Admin.Navigation.open(item.link);
+				logger.warn(`<<< Exiting navigateTo(item=${item})`);
             };
 
             $input.on("typeahead:selected", function (e, item) {
                 navigateTo(item);
             });
+			logger.warn('<<< Exiting init()');
         }
     };
 })();

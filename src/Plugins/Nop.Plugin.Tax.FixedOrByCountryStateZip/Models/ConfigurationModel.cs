@@ -1,17 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Plugin.Tax.FixedOrByCountryStateZip.Models;
 
 public record ConfigurationModel : BaseSearchModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ConfigurationModel()
     {
+		_logger.LogError(">>> Entering ConfigurationModel()");
         AvailableStores = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableStates → {AvailableStates}", AvailableStates);
         AvailableTaxCategories = new List<SelectListItem>();
+		_logger.LogError("ConfigurationModel(): AvailableTaxCategories → {AvailableTaxCategories}", AvailableTaxCategories);
     }
 
     [NopResourceDisplayName("Plugins.Tax.FixedOrByCountryStateZip.Fields.Store")]

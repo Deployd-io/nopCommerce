@@ -4,19 +4,27 @@ using Nop.Core;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Customer;
 
 public partial record RegisterModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public RegisterModel()
     {
+		_logger.LogError(">>> Entering RegisterModel()");
         AvailableTimeZones = new List<SelectListItem>();
         AvailableCountries = new List<SelectListItem>();
+		_logger.LogError("RegisterModel(): AvailableCountries → {AvailableCountries}", AvailableCountries);
         AvailableStates = new List<SelectListItem>();
+		_logger.LogError("RegisterModel(): AvailableStates → {AvailableStates}", AvailableStates);
         CustomerAttributes = new List<CustomerAttributeModel>();
+		_logger.LogError("RegisterModel(): CustomerAttributes → {CustomerAttributes}", CustomerAttributes);
         GdprConsents = new List<GdprConsentModel>();
+		_logger.LogError("RegisterModel(): GdprConsents → {GdprConsents}", GdprConsents);
         NewsLetterSubscriptions = new List<NewsLetterSubscriptionModel>();
+		_logger.LogError("RegisterModel(): NewsLetterSubscriptions → {NewsLetterSubscriptions}", NewsLetterSubscriptions);
     }
 
     [DataType(DataType.EmailAddress)]
@@ -70,6 +78,8 @@ public partial record RegisterModel : BaseNopModel
     public bool DateOfBirthRequired { get; set; }
     public DateTime? ParseDateOfBirth()
     {
+		_logger.LogError(">>> Entering ParseDateOfBirth()");
+        _logger.LogWarning("<<< Exiting ParseDateOfBirth()");
         return CommonHelper.ParseDate(DateOfBirthYear, DateOfBirthMonth, DateOfBirthDay);
     }
 

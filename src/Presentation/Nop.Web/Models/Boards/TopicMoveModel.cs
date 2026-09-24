@@ -1,13 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Models.Boards;
 
 public partial record TopicMoveModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public TopicMoveModel()
     {
+		_logger.LogError(">>> Entering TopicMoveModel()");
         ForumList = new List<SelectListItem>();
+		_logger.LogDebug("TopicMoveModel(): ForumList → {ForumList}", ForumList);
+    _logger.LogError("TopicMoveModel(): ForumList → {ForumList}", ForumList);
+    _logger.LogWarning("<<< Exiting TopicMoveModel()");
     }
 
     public int ForumSelected { get; set; }

@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using Microsoft.Extensions.Logging;
+using System.Xml.Linq;
 
 namespace Nop.Core.Rss;
 
@@ -7,6 +8,7 @@ namespace Nop.Core.Rss;
 /// </summary>
 public partial class RssItem
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     /// <summary>
     /// Initialize new instance of RSS feed item
     /// </summary>
@@ -17,11 +19,16 @@ public partial class RssItem
     /// <param name="pubDate">Last build date</param>
     public RssItem(string title, string content, Uri link, string id, DateTimeOffset pubDate)
     {
+		_logger.LogError(">>> Entering RssItem(title={Title},content={Content},link={Link},id={Id},pubDate={PubDate})", title, content, link, id, pubDate);
         Title = new XElement(NopRssDefaults.Title, title);
         Content = new XElement(NopRssDefaults.Description, content);
+		_logger.LogError("RssItem(title={Title},content={Content},link={Link},id={Id},pubDate={PubDate}): Content → {Content1}", title, content, link, id, pubDate, Content);
         Link = new XElement(NopRssDefaults.Link, link);
+		_logger.LogError("RssItem(title={Title},content={Content},link={Link},id={Id},pubDate={PubDate}): Link → {Link1}", title, content, link, id, pubDate, Link);
         Id = new XElement(NopRssDefaults.Guid, new XAttribute("isPermaLink", false), id);
+		_logger.LogError("RssItem(title={Title},content={Content},link={Link},id={Id},pubDate={PubDate}): Id → {Id1}", title, content, link, id, pubDate, Id);
         PubDate = new XElement(NopRssDefaults.PubDate, pubDate.ToString("r"));
+		_logger.LogError("RssItem(title={Title},content={Content},link={Link},id={Id},pubDate={PubDate}): PubDate → {PubDate1}", title, content, link, id, pubDate, PubDate);
     }
 
     /// <summary>
@@ -30,20 +37,29 @@ public partial class RssItem
     /// <param name="item">XML view of rss item</param>
     public RssItem(XContainer item)
     {
+		_logger.LogError(">>> Entering RssItem(item={Item})", item);
         var title = item.Element(NopRssDefaults.Title)?.Value ?? string.Empty;
         var content = item.Element(NopRssDefaults.Content)?.Value ?? string.Empty;
         if (string.IsNullOrEmpty(content))
             content = item.Element(NopRssDefaults.Description)?.Value ?? string.Empty;
+			_logger.LogError("RssItem(item={Item}): content → {Content}", item, content);
         var link = new Uri(item.Element(NopRssDefaults.Link)?.Value ?? string.Empty);
         var pubDateValue = item.Element(NopRssDefaults.PubDate)?.Value;
         var pubDate = pubDateValue == null ? DateTimeOffset.Now : DateTimeOffset.ParseExact(pubDateValue, "r", null);
+		_logger.LogError("RssItem(item={Item}): link → {Link}", item, link);
         var id = item.Element(NopRssDefaults.Guid)?.Value ?? string.Empty;
 
+		_logger.LogError("RssItem(item={Item}): pubDateValue → {PubDateValue}", item, pubDateValue);
+		_logger.LogError("RssItem(item={Item}): pubDate → {PubDate}", item, pubDate);
         Title = new XElement(NopRssDefaults.Title, title);
         Content = new XElement(NopRssDefaults.Description, content);
+		_logger.LogError("RssItem(item={Item}): Title → {Title}", item, Title);
+		_logger.LogError("RssItem(item={Item}): Content → {Content}", item, Content);
+		_logger.LogError("RssItem(item={Item}): id → {Id}", item, id);
         Link = new XElement(NopRssDefaults.Link, link);
         Id = new XElement(NopRssDefaults.Guid, new XAttribute("isPermaLink", false), id);
         PubDate = new XElement(NopRssDefaults.PubDate, pubDate.ToString("r"));
+		_logger.LogError("RssItem(item={Item}): Link → {Link}", item, Link);
     }
 
     #region Methods
@@ -54,13 +70,16 @@ public partial class RssItem
     /// <returns></returns>
     public XElement ToXElement()
     {
+		_logger.LogError(">>> Entering ToXElement()");
         var element = new XElement(NopRssDefaults.Item, Id, Link, Title, Content);
 
+		_logger.LogError("ToXElement(): element → {Element}", element);
         foreach (var elementExtensions in ElementExtensions)
         {
             element.Add(elementExtensions);
         }
 
+		_logger.LogWarning("<<< Exiting ToXElement()");
         return element;
     }
 

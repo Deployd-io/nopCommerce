@@ -1,4 +1,5 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Catalog;
 
@@ -7,6 +8,7 @@ namespace Nop.Web.Models.Catalog;
 /// </summary>
 public partial record ProductSpecificationAttributeModel : BaseNopEntityModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Properties
 
     /// <summary>
@@ -25,7 +27,11 @@ public partial record ProductSpecificationAttributeModel : BaseNopEntityModel
 
     public ProductSpecificationAttributeModel()
     {
+		_logger.LogError(">>> Entering ProductSpecificationAttributeModel()");
         Values = new List<ProductSpecificationAttributeValueModel>();
+		_logger.LogDebug("ProductSpecificationAttributeModel(): Values → {Values}", Values);
+    _logger.LogError("ProductSpecificationAttributeModel(): Values → {Values}", Values);
+    _logger.LogWarning("<<< Exiting ProductSpecificationAttributeModel()");
     }
 
     #endregion

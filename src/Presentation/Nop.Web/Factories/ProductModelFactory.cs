@@ -33,6 +33,7 @@ using Nop.Web.Models.Catalog;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.Media;
 using Nop.Web.Models.ShoppingCart;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -41,6 +42,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class ProductModelFactory : IProductModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CaptchaSettings _captchaSettings;
@@ -190,9 +192,11 @@ public partial class ProductModelFactory : IProductModelFactory
     /// <returns>A task that represents the asynchronous operation</returns>
     protected virtual async Task PrepareGroupedProductPriceModelAsync(Product product, ProductPriceModel priceModel)
     {
+		_logger.LogError(">>> Entering PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel})", product, priceModel);
         var store = await _storeContext.GetCurrentStoreAsync();
         var associatedProducts = await _productService.GetAssociatedProductsAsync(product.Id,
             store.Id);
+			_logger.LogError("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): store → {Store}", product, priceModel, store);
 
         if (!associatedProducts.Any())
             return;
@@ -201,7 +205,9 @@ public partial class ProductModelFactory : IProductModelFactory
         //find a minimum possible price
         decimal? minPossiblePrice = null;
         Product minPriceProduct = null;
+		_logger.LogError("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): minPriceProduct → {MinPriceProduct}", product, priceModel, minPriceProduct);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): customer → {Customer}", product, priceModel, customer);
         foreach (var associatedProduct in associatedProducts)
         {
             var (_, tmpMinPossiblePrice, _, _) = await _priceCalculationService.GetFinalPriceAsync(associatedProduct, customer, store);
@@ -215,6 +221,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
             minPriceProduct = associatedProduct;
             minPossiblePrice = tmpMinPossiblePrice;
+			_logger.LogDebug("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): minPossiblePrice → {MinPossiblePrice}", product, priceModel, minPossiblePrice);
         }
 
         if (minPriceProduct == null || minPriceProduct.CustomerEntersPrice)
@@ -226,15 +233,19 @@ public partial class ProductModelFactory : IProductModelFactory
              _workContext.OriginalCustomerIfImpersonated == null))
         {
             priceModel.OldPrice = null;
+			_logger.LogDebug("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): priceModel.OldPrice → {Arg2}", product, priceModel, priceModel.OldPrice);
+			_logger.LogDebug("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): priceModel.OldPriceValue → {Arg2}", product, priceModel, priceModel.OldPriceValue);
             priceModel.OldPriceValue = null;
             priceModel.Price = await _localizationService.GetResourceAsync("Products.CallForPrice");
             priceModel.PriceValue = null;
+			_logger.LogDebug("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): priceModel.PriceValue → {Arg2}", product, priceModel, priceModel.PriceValue);
         }
         else
         {
             //calculate prices
             var (finalPriceBase, _) = await _taxService.GetProductPriceAsync(minPriceProduct, minPossiblePrice.Value);
             var finalPrice = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(finalPriceBase, await _workContext.GetWorkingCurrencyAsync());
+			_logger.LogError("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): finalPrice → {FinalPrice}", product, priceModel, finalPrice);
 
             priceModel.OldPrice = null;
             priceModel.OldPriceValue = null;
@@ -244,7 +255,9 @@ public partial class ProductModelFactory : IProductModelFactory
             //PAngV default baseprice (used in Germany)
             priceModel.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, finalPriceBase);
             priceModel.BasePricePAngVValue = finalPriceBase;
+			_logger.LogDebug("PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel}): priceModel.BasePricePAngVValue → {Arg2}", product, priceModel, priceModel.BasePricePAngVValue);
         }
+		_logger.LogWarning("<<< Exiting PrepareGroupedProductPriceModelAsync(product={Product},priceModel={PriceModel})", product, priceModel);
     }
 
     /// <summary>
@@ -373,9 +386,11 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductPriceModel> PrepareProductPriceModelAsync(Product product, bool addPriceRangeFrom = false, bool forceRedirectionAfterAddingToCart = false)
     {
+		_logger.LogError(">>> Entering PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart})", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart);
         ArgumentNullException.ThrowIfNull(product);
 
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): currentCurrency → {CurrentCurrency}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, currentCurrency);
 
         var model = new ProductPriceModel
         {
@@ -398,6 +413,11 @@ public partial class ProductModelFactory : IProductModelFactory
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.DISPLAY_PRICES))
         {
             model.OldPrice = null;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.OldPrice → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.OldPrice);
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.OldPriceValue → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.OldPriceValue);
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.Price → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.Price);
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.PriceValue → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.PriceValue);
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.HidePrices → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.HidePrices);
             model.OldPriceValue = null;
             model.Price = null;
             model.PriceValue = null;
@@ -419,13 +439,16 @@ public partial class ProductModelFactory : IProductModelFactory
             model.AvailableForPreOrder = !product.PreOrderAvailabilityStartDateTimeUtc.HasValue ||
                 product.PreOrderAvailabilityStartDateTimeUtc.Value >=
                 DateTime.UtcNow;
+				_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.AvailableForPreOrder → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.AvailableForPreOrder);
 
             model.PreOrderAvailabilityStartDateTimeUtc = product.PreOrderAvailabilityStartDateTimeUtc;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.PreOrderAvailabilityStartDateTimeUtc → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.PreOrderAvailabilityStartDateTimeUtc);
         }
 
         if (product.CustomerEntersPrice)
         {
             model.CustomerEntersPrice = true;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.CustomerEntersPrice → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.CustomerEntersPrice);
 
             return model;
         }
@@ -436,6 +459,7 @@ public partial class ProductModelFactory : IProductModelFactory
                 _workContext.OriginalCustomerIfImpersonated == null))
         {
             model.CallForPrice = true;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.CallForPrice → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.CallForPrice);
 
             //call for price
             model.OldPrice = null;
@@ -447,7 +471,9 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): store → {Store}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): customer → {Customer}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, customer);
 
         //prices
         decimal minPossiblePriceWithoutDiscount;
@@ -463,8 +489,11 @@ public partial class ProductModelFactory : IProductModelFactory
         var (finalPriceWithoutDiscountBase, _) = await _taxService.GetProductPriceAsync(product, minPossiblePriceWithoutDiscount);
         var (finalPriceWithDiscountBase, _) = await _taxService.GetProductPriceAsync(product, minPossiblePriceWithDiscount);
         var oldPrice = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(oldPriceBase, currentCurrency);
+		_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): oldPrice → {OldPrice}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, oldPrice);
         var finalPriceWithoutDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(finalPriceWithoutDiscountBase, currentCurrency);
+		_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): finalPriceWithoutDiscount → {FinalPriceWithoutDiscount}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, finalPriceWithoutDiscount);
         var finalPriceWithDiscount = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(finalPriceWithDiscountBase, currentCurrency);
+		_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): finalPriceWithDiscount → {FinalPriceWithDiscount}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, finalPriceWithDiscount);
 
         model.Price = await _priceFormatter.FormatPriceAsync(finalPriceWithoutDiscount);
         if (finalPriceWithoutDiscountBase != oldPriceBase && oldPriceBase > decimal.Zero)
@@ -481,6 +510,7 @@ public partial class ProductModelFactory : IProductModelFactory
         if (addPriceRangeFrom)
         {
             var strikeThroughPrice = decimal.Zero;
+			_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): strikeThroughPrice → {StrikeThroughPrice}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, strikeThroughPrice);
 
             if (finalPriceWithoutDiscountBase != finalPriceWithDiscountBase)
                 strikeThroughPrice = finalPriceWithoutDiscount;
@@ -498,6 +528,7 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             model.PriceWithDiscount = await _priceFormatter.FormatPriceAsync(finalPriceWithDiscount);
             model.PriceWithDiscountValue = finalPriceWithDiscount;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.PriceWithDiscountValue → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.PriceWithDiscountValue);
         }
 
         model.PriceValue = finalPriceWithDiscount;
@@ -511,21 +542,27 @@ public partial class ProductModelFactory : IProductModelFactory
         model.DisplayTaxShippingInfo = _catalogSettings.DisplayTaxShippingInfoProductBoxes
             && product.IsShipEnabled
             && !product.IsFreeShipping;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.DisplayTaxShippingInfo → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.DisplayTaxShippingInfo);
 
         if (product.IsRental)
         {
             model.IsRental = true;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.IsRental → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.IsRental);
             model.OldPrice = await _priceFormatter.FormatRentalProductPeriodAsync(product, model.OldPrice);
             model.Price = await _priceFormatter.FormatRentalProductPeriodAsync(product, model.Price);
             var priceStr = await _priceFormatter.FormatPriceAsync(finalPriceWithDiscount);
+			_logger.LogError("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): priceStr → {PriceStr}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, priceStr);
             model.RentalPrice = await _priceFormatter.FormatRentalProductPeriodAsync(product, priceStr);
             model.RentalPriceValue = finalPriceWithDiscount;
+			_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.RentalPriceValue → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.RentalPriceValue);
         }
 
         //PAngV default base price (used in Germany)
         model.BasePricePAngV = await _priceFormatter.FormatBasePriceAsync(product, finalPriceWithDiscountBase);
         model.BasePricePAngVValue = finalPriceWithDiscountBase;
+		_logger.LogDebug("PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): model.BasePricePAngVValue → {Arg3}", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart, model.BasePricePAngVValue);
 
+		_logger.LogWarning("<<< Exiting PrepareProductPriceModelAsync(product={Product},addPriceRangeFrom={AddPriceRangeFrom},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart})", product, addPriceRangeFrom, forceRedirectionAfterAddingToCart);
         return model;
     }
 
@@ -540,21 +577,26 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductSpecificationAttributeModel>> PrepareProductSpecificationAttributeModelAsync(Product product, SpecificationAttributeGroup group)
     {
+		_logger.LogError(">>> Entering PrepareProductSpecificationAttributeModelAsync(product={Product},group={Group})", product, group);
         ArgumentNullException.ThrowIfNull(product);
 
         var productSpecificationAttributes = await _specificationAttributeService.GetProductSpecificationAttributesAsync(
             product.Id, specificationAttributeGroupId: group?.Id, showOnProductPage: true);
 
         var result = new List<ProductSpecificationAttributeModel>();
+		_logger.LogError("PrepareProductSpecificationAttributeModelAsync(product={Product},group={Group}): result → {Result}", product, group, result);
 
         foreach (var psa in productSpecificationAttributes)
         {
             var option = await _specificationAttributeService.GetSpecificationAttributeOptionByIdAsync(psa.SpecificationAttributeOptionId);
+			_logger.LogError("PrepareProductSpecificationAttributeModelAsync(product={Product},group={Group}): option → {Option}", product, group, option);
 
             var model = result.FirstOrDefault(model => model.Id == option.SpecificationAttributeId);
+			_logger.LogError("PrepareProductSpecificationAttributeModelAsync(product={Product},group={Group}): model → {Model}", product, group, model);
             if (model == null)
             {
                 var attribute = await _specificationAttributeService.GetSpecificationAttributeByIdAsync(option.SpecificationAttributeId);
+				_logger.LogError("PrepareProductSpecificationAttributeModelAsync(product={Product},group={Group}): attribute → {Attribute}", product, group, attribute);
                 model = new ProductSpecificationAttributeModel
                 {
                     Id = attribute.Id,
@@ -580,6 +622,7 @@ public partial class ProductModelFactory : IProductModelFactory
             model.Values.Add(value);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareProductSpecificationAttributeModelAsync(product={Product},group={Group})", product, group);
         return result;
     }
 
@@ -593,16 +636,21 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductReviewOverviewModel> PrepareProductReviewOverviewModelAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductReviewOverviewModelAsync(product={Product})", product);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ProductReviewOverviewModel productReview;
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareProductReviewOverviewModelAsync(product={Product}): currentStore → {CurrentStore}", product, currentStore);
 
         if (_catalogSettings.ShowProductReviewsPerStore)
         {
             var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopModelCacheDefaults.ProductReviewsModelKey, product, currentStore);
+			_logger.LogError("PrepareProductReviewOverviewModelAsync(product={Product}): cacheKey → {CacheKey}", product, cacheKey);
 
             productReview = await _staticCacheManager.GetAsync(cacheKey, async () =>
             {
                 var productReviews = await _productReviewService.GetAllProductReviewsAsync(productId: product.Id, approved: true, storeId: currentStore.Id);
+				_logger.LogError("PrepareProductReviewOverviewModelAsync(product={Product}): productReviews → {ProductReviews}", product, productReviews);
 
                 return new ProductReviewOverviewModel
                 {
@@ -623,11 +671,15 @@ public partial class ProductModelFactory : IProductModelFactory
         if (productReview != null)
         {
             productReview.ProductId = product.Id;
+			_logger.LogDebug("PrepareProductReviewOverviewModelAsync(product={Product}): productReview.ProductId → {Arg1}", product, productReview.ProductId);
+			_logger.LogDebug("PrepareProductReviewOverviewModelAsync(product={Product}): productReview.AllowCustomerReviews → {Arg1}", product, productReview.AllowCustomerReviews);
             productReview.AllowCustomerReviews = product.AllowCustomerReviews;
             productReview.CanCurrentCustomerLeaveReview = _catalogSettings.AllowAnonymousUsersToReviewProduct || !await _customerService.IsGuestAsync(await _workContext.GetCurrentCustomerAsync());
             productReview.CanAddNewReview = await _productReviewService.CanAddReviewAsync(product.Id, _catalogSettings.ShowProductReviewsPerStore ? currentStore.Id : 0);
         }
 
+		_logger.LogError("PrepareProductReviewOverviewModelAsync(product)={Product}: external service call took {Arg1} ms", product, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting PrepareProductReviewOverviewModelAsync(product={Product})", product);
         return productReview;
     }
 
@@ -642,9 +694,12 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<PictureModel>> PrepareProductOverviewPicturesModelAsync(Product product, int? productThumbPictureSize = null)
     {
+		_logger.LogError(">>> Entering PrepareProductOverviewPicturesModelAsync(product={Product},productThumbPictureSize={ProductThumbPictureSize})", product, productThumbPictureSize);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var productName = await _localizationService.GetLocalizedAsync(product, x => x.Name);
+		_logger.LogError("PrepareProductOverviewPicturesModelAsync(product={Product},productThumbPictureSize={ProductThumbPictureSize}): productName → {ProductName}", product, productThumbPictureSize, productName);
         //If a size has been set in the view, we use it in priority
         var pictureSize = productThumbPictureSize ?? _mediaSettings.ProductThumbPictureSize;
 
@@ -657,11 +712,13 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             async Task<PictureModel> preparePictureModelAsync(Picture picture)
             {
+				_logger.LogError(">>> Entering preparePictureModelAsync(picture={Picture})", picture);
                 //we have to keep the url generation order "full size -> preview" because picture can be updated twice
                 //this section of code requires detailed analysis in the future
                 (var fullSizeImageUrl, picture) = await _pictureService.GetPictureUrlAsync(picture);
                 (var imageUrl, picture) = await _pictureService.GetPictureUrlAsync(picture, pictureSize);
 
+				_logger.LogWarning("<<< Exiting preparePictureModelAsync(picture={Picture})", picture);
                 return new PictureModel
                 {
                     ImageUrl = imageUrl,
@@ -686,9 +743,12 @@ public partial class ProductModelFactory : IProductModelFactory
             var pictureModels = await pictures
                 .SelectAwait(async picture => await preparePictureModelAsync(picture))
                 .ToListAsync();
+				var __logStartDb = System.Diagnostics.Stopwatch.StartNew();
+				_logger.LogError("PrepareProductOverviewPicturesModelAsync(product,productThumbPictureSize)={Product},{ProductThumbPictureSize}: database query executed in {Arg2} ms", product, productThumbPictureSize, __logStartDb.ElapsedMilliseconds);
             return pictureModels;
         });
 
+		_logger.LogWarning("<<< Exiting PrepareProductOverviewPicturesModelAsync(product={Product},productThumbPictureSize={ProductThumbPictureSize})", product, productThumbPictureSize);
         return cachedPictures;
     }
 
@@ -702,6 +762,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductDetailsModel.ProductBreadcrumbModel> PrepareProductBreadcrumbModelAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductBreadcrumbModelAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var breadcrumbModel = new ProductDetailsModel.ProductBreadcrumbModel
@@ -712,10 +773,12 @@ public partial class ProductModelFactory : IProductModelFactory
             ProductSeName = await _urlRecordService.GetSeNameAsync(product)
         };
         var productCategories = await _categoryService.GetProductCategoriesByProductIdAsync(product.Id);
+		_logger.LogError("PrepareProductBreadcrumbModelAsync(product={Product}): productCategories → {ProductCategories}", product, productCategories);
         if (!productCategories.Any())
             return breadcrumbModel;
 
         var category = await _categoryService.GetCategoryByIdAsync(productCategories[0].CategoryId);
+		_logger.LogError("PrepareProductBreadcrumbModelAsync(product={Product}): category → {Category}", product, category);
         if (category == null)
             return breadcrumbModel;
 
@@ -732,10 +795,13 @@ public partial class ProductModelFactory : IProductModelFactory
         if (_seoSettings.MicrodataEnabled)
         {
             var jsonLdModel = await _jsonLdModelFactory.PrepareJsonLdProductBreadcrumbAsync(breadcrumbModel);
+			_logger.LogError("PrepareProductBreadcrumbModelAsync(product={Product}): jsonLdModel → {JsonLdModel}", product, jsonLdModel);
             breadcrumbModel.JsonLd = JsonConvert
                 .SerializeObject(jsonLdModel, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+				_logger.LogDebug("PrepareProductBreadcrumbModelAsync(product={Product}): breadcrumbModel.JsonLd → {Arg1}", product, breadcrumbModel.JsonLd);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareProductBreadcrumbModelAsync(product={Product})", product);
         return breadcrumbModel;
     }
 
@@ -749,10 +815,14 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductTagModel>> PrepareProductTagModelsAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductTagModelsAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareProductTagModelsAsync(product={Product}): store → {Store}", product, store);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var productsTags = await _productTagService.GetAllProductTagsByProductIdAsync(product.Id);
+		_logger.LogError("PrepareProductTagModelsAsync(product={Product}): productsTags → {ProductsTags}", product, productsTags);
 
         var model = await productsTags
             //filter by store
@@ -765,6 +835,9 @@ public partial class ProductModelFactory : IProductModelFactory
                 ProductCount = await _productTagService.GetProductCountByProductTagIdAsync(x.Id, store.Id)
             }).ToListAsync();
 
+		_logger.LogDebug("PrepareProductTagModelsAsync(product={Product}): ProductCount → {ProductCount}", product, ProductCount);
+		_logger.LogError("PrepareProductTagModelsAsync(product)={Product}: database query executed in {Arg1} ms", product, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting PrepareProductTagModelsAsync(product={Product})", product);
         return model;
     }
 
@@ -778,6 +851,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductToWishlistModel> PrepareProductToWishlistModelAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductToWishlistModelAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new ProductToWishlistModel
@@ -786,7 +860,9 @@ public partial class ProductModelFactory : IProductModelFactory
         };
         //custom wishlists
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareProductToWishlistModelAsync(product={Product}): currentCustomer → {CurrentCustomer}", product, currentCustomer);
         var currentWishlists = await _customWishlistService.GetAllCustomWishlistsAsync(currentCustomer.Id);
+		_logger.LogError("PrepareProductToWishlistModelAsync(product={Product}): currentWishlists → {CurrentWishlists}", product, currentWishlists);
         foreach (var wishlist in currentWishlists)
         {
             var customWishlistModel = new CustomWishlistModel
@@ -796,6 +872,7 @@ public partial class ProductModelFactory : IProductModelFactory
             };
             model.CustomWishlistItems.Add(customWishlistModel);
         }
+		_logger.LogWarning("<<< Exiting PrepareProductToWishlistModelAsync(product={Product})", product);
         return model;
     }
 
@@ -810,6 +887,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<ProductDetailsModel.AddToCartModel> PrepareProductAddToCartModelAsync(Product product, ShoppingCartItem updatecartitem)
     {
+		_logger.LogError(">>> Entering PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem})", product, updatecartitem);
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new ProductDetailsModel.AddToCartModel
@@ -820,6 +898,8 @@ public partial class ProductModelFactory : IProductModelFactory
         if (updatecartitem != null)
         {
             model.UpdatedShoppingCartItemId = updatecartitem.Id;
+			_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.UpdatedShoppingCartItemId → {Arg2}", product, updatecartitem, model.UpdatedShoppingCartItemId);
+			_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.UpdateShoppingCartItemType → {Arg2}", product, updatecartitem, model.UpdateShoppingCartItemType);
             model.UpdateShoppingCartItemType = updatecartitem.ShoppingCartType;
         }
 
@@ -827,6 +907,7 @@ public partial class ProductModelFactory : IProductModelFactory
         model.EnteredQuantity = updatecartitem != null ? updatecartitem.Quantity : product.OrderMinimumQuantity;
         //allowed quantities
         var allowedQuantities = _productService.ParseAllowedQuantities(product);
+		_logger.LogError("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): allowedQuantities → {AllowedQuantities}", product, updatecartitem, allowedQuantities);
         foreach (var qty in allowedQuantities)
         {
             model.AllowedQuantities.Add(new SelectListItem
@@ -848,6 +929,8 @@ public partial class ProductModelFactory : IProductModelFactory
         if (!await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.DISPLAY_PRICES))
         {
             model.DisableBuyButton = true;
+			_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.DisableBuyButton → {Arg2}", product, updatecartitem, model.DisableBuyButton);
+			_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.DisableWishlistButton → {Arg2}", product, updatecartitem, model.DisableWishlistButton);
             model.DisableWishlistButton = true;
         }
 
@@ -859,6 +942,8 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             model.AvailableForPreOrder = !product.PreOrderAvailabilityStartDateTimeUtc.HasValue ||
                                          product.PreOrderAvailabilityStartDateTimeUtc.Value >= DateTime.UtcNow;
+										_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.AvailableForPreOrder → {Arg2}", product, updatecartitem, model.AvailableForPreOrder);
+										_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.PreOrderAvailabilityStartDateTimeUtc → {Arg2}", product, updatecartitem, model.PreOrderAvailabilityStartDateTimeUtc);
             model.PreOrderAvailabilityStartDateTimeUtc = product.PreOrderAvailabilityStartDateTimeUtc;
 
             if (model.AvailableForPreOrder &&
@@ -871,21 +956,27 @@ public partial class ProductModelFactory : IProductModelFactory
         }
         //rental
         model.IsRental = product.IsRental;
+		_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.IsRental → {Arg2}", product, updatecartitem, model.IsRental);
 
         //customer entered price
         model.CustomerEntersPrice = product.CustomerEntersPrice;
+		_logger.LogDebug("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): model.CustomerEntersPrice → {Arg2}", product, updatecartitem, model.CustomerEntersPrice);
         if (!model.CustomerEntersPrice)
             return model;
 
         var currentCurrency = await _workContext.GetWorkingCurrencyAsync();
+		_logger.LogError("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): currentCurrency → {CurrentCurrency}", product, updatecartitem, currentCurrency);
         var minimumCustomerEnteredPrice = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(product.MinimumCustomerEnteredPrice, currentCurrency);
+		_logger.LogError("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): minimumCustomerEnteredPrice → {MinimumCustomerEnteredPrice}", product, updatecartitem, minimumCustomerEnteredPrice);
         var maximumCustomerEnteredPrice = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(product.MaximumCustomerEnteredPrice, currentCurrency);
+		_logger.LogError("PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem}): maximumCustomerEnteredPrice → {MaximumCustomerEnteredPrice}", product, updatecartitem, maximumCustomerEnteredPrice);
 
         model.CustomerEnteredPrice = updatecartitem != null ? updatecartitem.CustomerEnteredPrice : minimumCustomerEnteredPrice;
         model.CustomerEnteredPriceRange = string.Format(await _localizationService.GetResourceAsync("Products.EnterProductPrice.Range"),
             await _priceFormatter.FormatPriceAsync(minimumCustomerEnteredPrice, false, false),
             await _priceFormatter.FormatPriceAsync(maximumCustomerEnteredPrice, false, false));
 
+		_logger.LogWarning("<<< Exiting PrepareProductAddToCartModelAsync(product={Product},updatecartitem={Updatecartitem})", product, updatecartitem);
         return model;
     }
 
@@ -900,15 +991,21 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductDetailsModel.ProductAttributeModel>> PrepareProductAttributeModelsAsync(Product product, ShoppingCartItem updatecartitem)
     {
+		_logger.LogError(">>> Entering PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem})", product, updatecartitem);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new List<ProductDetailsModel.ProductAttributeModel>();
+		_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): model → {Model}", product, updatecartitem, model);
         var store = updatecartitem != null ? await _storeService.GetStoreByIdAsync(updatecartitem.StoreId) : await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): store → {Store}", product, updatecartitem, store);
 
         var productAttributeMapping = await _productAttributeService.GetProductAttributeMappingsByProductIdAsync(product.Id);
+		_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): productAttributeMapping → {ProductAttributeMapping}", product, updatecartitem, productAttributeMapping);
         foreach (var attribute in productAttributeMapping)
         {
             var productAttribute = await _productAttributeService.GetProductAttributeByIdAsync(attribute.ProductAttributeId);
+			_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): productAttribute → {ProductAttribute}", product, updatecartitem, productAttribute);
 
             var attributeModel = new ProductDetailsModel.ProductAttributeModel
             {
@@ -928,12 +1025,14 @@ public partial class ProductModelFactory : IProductModelFactory
                 attributeModel.AllowedFileExtensions = attribute.ValidationFileAllowedExtensions
                     .Split(_separator, StringSplitOptions.RemoveEmptyEntries)
                     .ToList();
+					_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeModel.AllowedFileExtensions → {Arg2}", product, updatecartitem, attributeModel.AllowedFileExtensions);
             }
 
             if (attribute.ShouldHaveValues())
             {
                 //values
                 var attributeValues = await _productAttributeService.GetProductAttributeValuesAsync(attribute.Id);
+				_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeValues → {AttributeValues}", product, updatecartitem, attributeValues);
                 foreach (var attributeValue in attributeValues)
                 {
                     var valueModel = new ProductDetailsModel.ProductAttributeValueModel
@@ -951,17 +1050,23 @@ public partial class ProductModelFactory : IProductModelFactory
                     if (await _permissionService.AuthorizeAsync(StandardPermission.PublicStore.DISPLAY_PRICES))
                     {
                         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+						_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): currentCustomer → {CurrentCustomer}", product, updatecartitem, currentCustomer);
                         var customer = updatecartitem?.CustomerId is null ? currentCustomer : await _customerService.GetCustomerByIdAsync(updatecartitem.CustomerId);
+						_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): customer → {Customer}", product, updatecartitem, customer);
 
                         var attributeValuePriceAdjustment = await _priceCalculationService.GetProductAttributeValuePriceAdjustmentAsync(product, attributeValue, customer, store, quantity: updatecartitem?.Quantity ?? 1);
+						_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeValuePriceAdjustment → {AttributeValuePriceAdjustment}", product, updatecartitem, attributeValuePriceAdjustment);
                         var (priceAdjustmentBase, _) = await _taxService.GetProductPriceAsync(product, attributeValuePriceAdjustment);
                         var priceAdjustment = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(priceAdjustmentBase, await _workContext.GetWorkingCurrencyAsync());
+						_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): priceAdjustment → {PriceAdjustment}", product, updatecartitem, priceAdjustment);
 
                         if (attributeValue.PriceAdjustmentUsePercentage)
                         {
                             var priceAdjustmentStr = attributeValue.PriceAdjustment.ToString("G29");
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): priceAdjustmentStr → {PriceAdjustmentStr}", product, updatecartitem, priceAdjustmentStr);
                             if (attributeValue.PriceAdjustment > decimal.Zero)
                                 valueModel.PriceAdjustment = "+";
+								_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): valueModel.PriceAdjustment → {Arg2}", product, updatecartitem, valueModel.PriceAdjustment);
                             valueModel.PriceAdjustment += priceAdjustmentStr + "%";
                         }
                         else
@@ -973,6 +1078,7 @@ public partial class ProductModelFactory : IProductModelFactory
                         }
 
                         valueModel.PriceAdjustmentValue = priceAdjustment;
+						_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): valueModel.PriceAdjustmentValue → {Arg2}", product, updatecartitem, valueModel.PriceAdjustmentValue);
                     }
 
                     //"image square" picture (with with "image squares" attribute type only)
@@ -985,6 +1091,7 @@ public partial class ProductModelFactory : IProductModelFactory
                         valueModel.ImageSquaresPictureModel = await _staticCacheManager.GetAsync(productAttributeImageSquarePictureCacheKey, async () =>
                         {
                             var imageSquaresPicture = await _pictureService.GetPictureByIdAsync(attributeValue.ImageSquaresPictureId);
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): imageSquaresPicture → {ImageSquaresPicture}", product, updatecartitem, imageSquaresPicture);
 
                             (var fullSizeImageUrl, imageSquaresPicture) = await _pictureService.GetPictureUrlAsync(imageSquaresPicture);
                             (var imageUrl, imageSquaresPicture) = await _pictureService.GetPictureUrlAsync(imageSquaresPicture, _mediaSettings.ImageSquarePictureSize);
@@ -1027,6 +1134,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
                             //select new values
                             var selectedValues = await _productAttributeParser.ParseProductAttributeValuesAsync(updatecartitem.AttributesXml);
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): selectedValues → {SelectedValues}", product, updatecartitem, selectedValues);
                             foreach (var attributeValue in selectedValues)
                                 foreach (var item in attributeModel.Values)
                                     if (attributeValue.Id == item.Id)
@@ -1052,6 +1160,7 @@ public partial class ProductModelFactory : IProductModelFactory
                                      .Where(value => value.CustomerEntersQty))
                             {
                                 var item = attributeModel.Values.FirstOrDefault(value => value.Id == attributeValue.Id);
+								_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): item → {Item}", product, updatecartitem, item);
                                 if (item != null)
                                     item.Quantity = attributeValue.Quantity;
                             }
@@ -1065,8 +1174,10 @@ public partial class ProductModelFactory : IProductModelFactory
                         if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
                         {
                             var enteredText = _productAttributeParser.ParseValues(updatecartitem.AttributesXml, attribute.Id);
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): enteredText → {EnteredText}", product, updatecartitem, enteredText);
                             if (enteredText.Any())
                                 attributeModel.DefaultValue = enteredText[0];
+								_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeModel.DefaultValue → {Arg2}", product, updatecartitem, attributeModel.DefaultValue);
                         }
                     }
 
@@ -1075,12 +1186,16 @@ public partial class ProductModelFactory : IProductModelFactory
                     {
                         //keep in mind my that the code below works only in the current culture
                         var selectedDateStr = _productAttributeParser.ParseValues(updatecartitem.AttributesXml, attribute.Id);
+						_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): selectedDateStr → {SelectedDateStr}", product, updatecartitem, selectedDateStr);
                         if (selectedDateStr.Any())
                         {
                             if (DateTime.TryParseExact(selectedDateStr[0], "D", CultureInfo.CurrentCulture, DateTimeStyles.None, out var selectedDate))
                             {
                                 //successfully parsed
                                 attributeModel.SelectedDay = selectedDate.Day;
+								_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeModel.SelectedDay → {Arg2}", product, updatecartitem, attributeModel.SelectedDay);
+								_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeModel.SelectedMonth → {Arg2}", product, updatecartitem, attributeModel.SelectedMonth);
+								_logger.LogDebug("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): attributeModel.SelectedYear → {Arg2}", product, updatecartitem, attributeModel.SelectedYear);
                                 attributeModel.SelectedMonth = selectedDate.Month;
                                 attributeModel.SelectedYear = selectedDate.Year;
                             }
@@ -1093,8 +1208,11 @@ public partial class ProductModelFactory : IProductModelFactory
                         if (!string.IsNullOrEmpty(updatecartitem.AttributesXml))
                         {
                             var downloadGuidStr = _productAttributeParser.ParseValues(updatecartitem.AttributesXml, attribute.Id).FirstOrDefault();
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): downloadGuidStr → {DownloadGuidStr}", product, updatecartitem, downloadGuidStr);
                             _ = Guid.TryParse(downloadGuidStr, out var downloadGuid);
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): _ → {_}", product, updatecartitem, _);
                             var download = await _downloadService.GetDownloadByGuidAsync(downloadGuid);
+							_logger.LogError("PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem}): download → {Download}", product, updatecartitem, download);
                             if (download != null)
                                 attributeModel.DefaultValue = download.DownloadGuid.ToString();
                         }
@@ -1109,6 +1227,8 @@ public partial class ProductModelFactory : IProductModelFactory
             model.Add(attributeModel);
         }
 
+		_logger.LogError("PrepareProductAttributeModelsAsync(product,updatecartitem)={Product},{Updatecartitem}: external service call took {Arg2} ms", product, updatecartitem, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting PrepareProductAttributeModelsAsync(product={Product},updatecartitem={Updatecartitem})", product, updatecartitem);
         return model;
     }
 
@@ -1122,18 +1242,23 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ProductDetailsModel.TierPriceModel>> PrepareProductTierPriceModelsAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductTierPriceModelsAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareProductTierPriceModelsAsync(product={Product}): customer → {Customer}", product, customer);
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var store = await _storeContext.GetCurrentStoreAsync();
         var model = await (await _productService.GetTierPricesAsync(product, customer, store))
             .SelectAwait(async tierPrice =>
             {
+				_logger.LogError("PrepareProductTierPriceModelsAsync(product={Product}): store → {Store}", product, store);
                 var priceBase = (await _taxService.GetProductPriceAsync(product, (await _priceCalculationService.GetFinalPriceAsync(product,
                     customer, store, decimal.Zero, _catalogSettings.DisplayTierPricesWithDiscounts,
                     tierPrice.Quantity)).finalPrice)).price;
 
                 var price = await _currencyService.ConvertFromPrimaryStoreCurrencyAsync(priceBase, await _workContext.GetWorkingCurrencyAsync());
+				_logger.LogError("PrepareProductTierPriceModelsAsync(product={Product}): price → {Price}", product, price);
 
                 return new ProductDetailsModel.TierPriceModel
                 {
@@ -1142,7 +1267,9 @@ public partial class ProductModelFactory : IProductModelFactory
                     PriceValue = price
                 };
             }).ToListAsync();
+			_logger.LogError("PrepareProductTierPriceModelsAsync(product)={Product}: database query executed in {Arg1} ms", product, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting PrepareProductTierPriceModelsAsync(product={Product})", product);
         return model;
     }
 
@@ -1156,12 +1283,15 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     protected virtual async Task<IList<ManufacturerBriefInfoModel>> PrepareProductManufacturerModelsAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductManufacturerModelsAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var model = await (await _manufacturerService.GetProductManufacturersByProductIdAsync(product.Id))
             .SelectAwait(async pm =>
             {
                 var manufacturer = await _manufacturerService.GetManufacturerByIdAsync(pm.ManufacturerId);
+				_logger.LogError("PrepareProductManufacturerModelsAsync(product={Product}): manufacturer → {Manufacturer}", product, manufacturer);
                 var modelMan = new ManufacturerBriefInfoModel
                 {
                     Id = manufacturer.Id,
@@ -1171,7 +1301,9 @@ public partial class ProductModelFactory : IProductModelFactory
 
                 return modelMan;
             }).ToListAsync();
+			_logger.LogError("PrepareProductManufacturerModelsAsync(product)={Product}: database query executed in {Arg1} ms", product, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting PrepareProductManufacturerModelsAsync(product={Product})", product);
         return model;
     }
 
@@ -1289,11 +1421,13 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<string> PrepareProductTemplateViewPathAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductTemplateViewPathAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var template = (await _productTemplateService.GetProductTemplateByIdAsync(product.ProductTemplateId) ??
                         (await _productTemplateService.GetAllProductTemplatesAsync()).FirstOrDefault()) ?? throw new Exception("No default template could be loaded");
 
+		_logger.LogWarning("<<< Exiting PrepareProductTemplateViewPathAsync(product={Product})", product);
         return template.ViewPath;
     }
 
@@ -1315,9 +1449,11 @@ public partial class ProductModelFactory : IProductModelFactory
         int? productThumbPictureSize = null, bool prepareSpecificationAttributes = false,
         bool forceRedirectionAfterAddingToCart = false)
     {
+		_logger.LogError(">>> Entering PrepareProductOverviewModelsAsync(products={Products},preparePriceModel={PreparePriceModel},preparePictureModel={PreparePictureModel},productThumbPictureSize={ProductThumbPictureSize},prepareSpecificationAttributes={PrepareSpecificationAttributes},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart})", products, preparePriceModel, preparePictureModel, productThumbPictureSize, prepareSpecificationAttributes, forceRedirectionAfterAddingToCart);
         ArgumentNullException.ThrowIfNull(products);
 
         var models = new List<ProductOverviewModel>();
+		_logger.LogError("PrepareProductOverviewModelsAsync(products={Products},preparePriceModel={PreparePriceModel},preparePictureModel={PreparePictureModel},productThumbPictureSize={ProductThumbPictureSize},prepareSpecificationAttributes={PrepareSpecificationAttributes},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart}): models → {Models}", products, preparePriceModel, preparePictureModel, productThumbPictureSize, prepareSpecificationAttributes, forceRedirectionAfterAddingToCart, models);
         foreach (var product in products)
         {
             var model = new ProductOverviewModel
@@ -1361,6 +1497,7 @@ public partial class ProductModelFactory : IProductModelFactory
             models.Add(model);
         }
 
+		_logger.LogWarning("<<< Exiting PrepareProductOverviewModelsAsync(products={Products},preparePriceModel={PreparePriceModel},preparePictureModel={PreparePictureModel},productThumbPictureSize={ProductThumbPictureSize},prepareSpecificationAttributes={PrepareSpecificationAttributes},forceRedirectionAfterAddingToCart={ForceRedirectionAfterAddingToCart})", products, preparePriceModel, preparePictureModel, productThumbPictureSize, prepareSpecificationAttributes, forceRedirectionAfterAddingToCart);
         return models;
     }
 
@@ -1374,9 +1511,11 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<IList<ProductCombinationModel>> PrepareProductCombinationModelsAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductCombinationModelsAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var result = new List<ProductCombinationModel>();
+		_logger.LogError("PrepareProductCombinationModelsAsync(product={Product}): result → {Result}", product, result);
 
         var combinations = await _productAttributeService
             .GetAllProductAttributeCombinationsAsync(product.Id);
@@ -1416,6 +1555,7 @@ public partial class ProductModelFactory : IProductModelFactory
             }
         }
 
+		_logger.LogWarning("<<< Exiting PrepareProductCombinationModelsAsync(product={Product})", product);
         return result;
     }
 
@@ -1432,6 +1572,7 @@ public partial class ProductModelFactory : IProductModelFactory
     public virtual async Task<ProductDetailsModel> PrepareProductDetailsModelAsync(Product product,
         ShoppingCartItem updatecartitem = null, bool isAssociatedProduct = false)
     {
+		_logger.LogError(">>> Entering PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct})", product, updatecartitem, isAssociatedProduct);
         ArgumentNullException.ThrowIfNull(product);
 
         //standard properties
@@ -1468,15 +1609,19 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             //based on short description
             model.MetaDescription = model.ShortDescription;
+			_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.MetaDescription → {Arg3}", product, updatecartitem, isAssociatedProduct, model.MetaDescription);
         }
 
         //shipping info
         model.IsShipEnabled = product.IsShipEnabled;
+		_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.IsShipEnabled → {Arg3}", product, updatecartitem, isAssociatedProduct, model.IsShipEnabled);
         if (product.IsShipEnabled)
         {
             model.IsFreeShipping = product.IsFreeShipping;
+			_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.IsFreeShipping → {Arg3}", product, updatecartitem, isAssociatedProduct, model.IsFreeShipping);
             //delivery date
             var deliveryDate = await _dateRangeService.GetDeliveryDateByIdAsync(product.DeliveryDateId);
+			_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): deliveryDate → {DeliveryDate}", product, updatecartitem, isAssociatedProduct, deliveryDate);
             if (deliveryDate != null)
             {
                 model.DeliveryDate = await _localizationService.GetLocalizedAsync(deliveryDate, dd => dd.Name);
@@ -1484,10 +1629,13 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): store → {Store}", product, updatecartitem, isAssociatedProduct, store);
         //email a friend
         model.EmailAFriendEnabled = _catalogSettings.EmailAFriendEnabled;
+		_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.EmailAFriendEnabled → {Arg3}", product, updatecartitem, isAssociatedProduct, model.EmailAFriendEnabled);
         //compare products
         model.CompareProductsEnabled = _catalogSettings.CompareProductsEnabled;
+		_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.CompareProductsEnabled → {Arg3}", product, updatecartitem, isAssociatedProduct, model.CompareProductsEnabled);
         //store name
         model.CurrentStoreName = await _localizationService.GetLocalizedAsync(store, x => x.Name);
 
@@ -1495,9 +1643,12 @@ public partial class ProductModelFactory : IProductModelFactory
         if (_vendorSettings.ShowVendorOnProductDetailsPage)
         {
             var vendor = await _vendorService.GetVendorByIdAsync(product.VendorId);
+			_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): vendor → {Vendor}", product, updatecartitem, isAssociatedProduct, vendor);
             if (vendor != null && !vendor.Deleted && vendor.Active)
             {
                 model.ShowVendor = true;
+				_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.ShowVendor → {Arg3}", product, updatecartitem, isAssociatedProduct, model.ShowVendor);
+				_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.VendorModel → {Arg3}", product, updatecartitem, isAssociatedProduct, model.VendorModel);
 
                 model.VendorModel = new VendorBriefInfoModel
                 {
@@ -1512,6 +1663,7 @@ public partial class ProductModelFactory : IProductModelFactory
         if (_catalogSettings.ShowShareButton && !string.IsNullOrEmpty(_catalogSettings.PageShareCode))
         {
             var shareCode = _catalogSettings.PageShareCode;
+			_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): shareCode → {ShareCode}", product, updatecartitem, isAssociatedProduct, shareCode);
             if (_webHelper.IsCurrentConnectionSecured())
             {
                 //need to change the add this link to be https linked when the page is, so that the page doesn't ask about mixed mode when viewed in https...
@@ -1519,18 +1671,21 @@ public partial class ProductModelFactory : IProductModelFactory
             }
 
             model.PageShareCode = shareCode;
+			_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.PageShareCode → {Arg3}", product, updatecartitem, isAssociatedProduct, model.PageShareCode);
         }
 
         switch (product.ManageInventoryMethod)
         {
             case ManageInventoryMethod.DontManageStock:
                 model.InStock = true;
+				_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.InStock → {Arg3}", product, updatecartitem, isAssociatedProduct, model.InStock);
                 break;
 
             case ManageInventoryMethod.ManageStock:
                 model.InStock = product.BackorderMode != BackorderMode.NoBackorders
                                 || await _productService.GetTotalStockQuantityAsync(product) > 0;
                 model.DisplayBackInStockSubscription = !model.InStock && product.AllowBackInStockSubscriptions;
+				_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.DisplayBackInStockSubscription → {Arg3}", product, updatecartitem, isAssociatedProduct, model.DisplayBackInStockSubscription);
                 break;
 
             case ManageInventoryMethod.ManageStockByAttributes:
@@ -1557,10 +1712,13 @@ public partial class ProductModelFactory : IProductModelFactory
 
         //pictures and videos
         model.DefaultPictureZoomEnabled = _mediaSettings.DefaultPictureZoomEnabled;
+		_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.DefaultPictureZoomEnabled → {Arg3}", product, updatecartitem, isAssociatedProduct, model.DefaultPictureZoomEnabled);
         IList<PictureModel> allPictureModels;
         IList<VideoModel> allVideoModels;
         (model.DefaultPictureModel, allPictureModels, allVideoModels) = await PrepareProductDetailsPictureModelAsync(product, isAssociatedProduct);
         model.PictureModels = allPictureModels;
+		_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.PictureModels → {Arg3}", product, updatecartitem, isAssociatedProduct, model.PictureModels);
+		_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.VideoModels → {Arg3}", product, updatecartitem, isAssociatedProduct, model.VideoModels);
         model.VideoModels = allVideoModels;
 
         //price
@@ -1569,6 +1727,7 @@ public partial class ProductModelFactory : IProductModelFactory
         //'Add to cart' model
         model.AddToCart = await PrepareProductAddToCartModelAsync(product, updatecartitem);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): customer → {Customer}", product, updatecartitem, isAssociatedProduct, customer);
         //gift card
         if (product.IsGiftCard)
         {
@@ -1619,12 +1778,18 @@ public partial class ProductModelFactory : IProductModelFactory
         if (product.IsRental)
         {
             model.IsRental = true;
+			_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.IsRental → {Arg3}", product, updatecartitem, isAssociatedProduct, model.IsRental);
             //set already entered dates attributes (if we're going to update the existing shopping cart item)
             if (updatecartitem != null)
             {
                 model.RentalStartDate = updatecartitem.RentalStartDateUtc;
+				_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.RentalStartDate → {Arg3}", product, updatecartitem, isAssociatedProduct, model.RentalStartDate);
+				_logger.LogDebug("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): model.RentalEndDate → {Arg3}", product, updatecartitem, isAssociatedProduct, model.RentalEndDate);
                 model.RentalEndDate = updatecartitem.RentalEndDateUtc;
             }
+			_logger.LogError(">>> Entering PrepareProductSpecificationModelAsync(product={Product})", product);
+			_logger.LogDebug("PrepareProductSpecificationModelAsync(product={Product}): Attributes → {Attributes}", product, Attributes);
+			_logger.LogWarning("<<< Exiting PrepareProductSpecificationModelAsync(product={Product})", product);
         }
 
         //estimate shipping
@@ -1640,6 +1805,7 @@ public partial class ProductModelFactory : IProductModelFactory
             };
 
             var estimateShippingModel = await _shoppingCartModelFactory.PrepareEstimateShippingModelAsync(new[] { wrappedProduct });
+			_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): estimateShippingModel → {EstimateShippingModel}", product, updatecartitem, isAssociatedProduct, estimateShippingModel);
 
             model.ProductEstimateShipping.ProductId = product.Id;
             model.ProductEstimateShipping.RequestDelay = estimateShippingModel.RequestDelay;
@@ -1660,6 +1826,7 @@ public partial class ProductModelFactory : IProductModelFactory
             if (!isAssociatedProduct)
             {
                 var associatedProducts = await _productService.GetAssociatedProductsAsync(product.Id, store.Id);
+				_logger.LogError("PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct}): associatedProducts → {AssociatedProducts}", product, updatecartitem, isAssociatedProduct, associatedProducts);
                 foreach (var associatedProduct in associatedProducts)
                     model.AssociatedProducts.Add(await PrepareProductDetailsModelAsync(associatedProduct, null, true));
             }
@@ -1669,6 +1836,7 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             var jsonLdModel = await _jsonLdModelFactory.PrepareJsonLdProductAsync(model);
             model.JsonLd = JsonConvert.SerializeObject(jsonLdModel, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+			_logger.LogWarning("<<< Exiting PrepareProductDetailsModelAsync(product={Product},updatecartitem={Updatecartitem},isAssociatedProduct={IsAssociatedProduct})", product, updatecartitem, isAssociatedProduct);
         }
 
         return model;
@@ -1684,6 +1852,7 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductReviewsModel> PrepareProductReviewsModelAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductReviewsModelAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new ProductReviewsModel
@@ -1692,6 +1861,7 @@ public partial class ProductModelFactory : IProductModelFactory
         };
 
         var currentStore = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareProductReviewsModelAsync(product={Product}): currentStore → {CurrentStore}", product, currentStore);
 
         var productReviews = await _productReviewService.GetAllProductReviewsAsync(
             approved: true,
@@ -1713,13 +1883,16 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         var currentCustomer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareProductReviewsModelAsync(product={Product}): currentCustomer → {CurrentCustomer}", product, currentCustomer);
 
         //filling data from db
         foreach (var pr in productReviews)
         {
             var customer = await _customerService.GetCustomerByIdAsync(pr.CustomerId);
+			_logger.LogError("PrepareProductReviewsModelAsync(product={Product}): customer → {Customer}", product, customer);
 
             var writeOn = await _dateTimeHelper.ConvertToUserTimeAsync(pr.CreatedOnUtc, DateTimeKind.Utc);
+			_logger.LogError("PrepareProductReviewsModelAsync(product={Product}): writeOn → {WriteOn}", product, writeOn);
 
             var productReviewModel = new ProductReviewModel
             {
@@ -1751,6 +1924,7 @@ public partial class ProductModelFactory : IProductModelFactory
             foreach (var q in await _reviewTypeService.GetProductReviewReviewTypeMappingsByProductReviewIdAsync(pr.Id))
             {
                 var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(q.ReviewTypeId);
+				_logger.LogError("PrepareProductReviewsModelAsync(product={Product}): reviewType → {ReviewType}", product, reviewType);
 
                 productReviewModel.AdditionalProductReviewList.Add(new ProductReviewReviewTypeMappingModel
                 {
@@ -1787,6 +1961,7 @@ public partial class ProductModelFactory : IProductModelFactory
         {
             var totalRating = 0;
             var totalCount = 0;
+			_logger.LogError("PrepareProductReviewsModelAsync(product={Product}): totalCount → {TotalCount}", product, totalCount);
             foreach (var item in model.Items)
             {
                 foreach (var q in item.AdditionalProductReviewList.Where(w => w.ReviewTypeId == rtm.Id))
@@ -1804,6 +1979,7 @@ public partial class ProductModelFactory : IProductModelFactory
         model.AddProductReview.CanAddNewReview = await _productReviewService.CanAddReviewAsync(product.Id, _catalogSettings.ShowProductReviewsPerStore ? currentStore.Id : 0);
         model.AddProductReview.Rating = _catalogSettings.DefaultProductRatingValue;
 
+		_logger.LogWarning("<<< Exiting PrepareProductReviewsModelAsync(product={Product})", product);
         return model;
     }
 
@@ -1817,8 +1993,10 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<CustomerProductReviewsModel> PrepareCustomerProductReviewsModelAsync(int? page)
     {
+		_logger.LogError(">>> Entering PrepareCustomerProductReviewsModelAsync(page={Page})", page);
         var pageSize = _catalogSettings.ProductReviewsPageSizeOnAccountPage;
         var pageIndex = 0;
+		_logger.LogError("PrepareCustomerProductReviewsModelAsync(page={Page}): pageIndex → {PageIndex}", page, pageIndex);
 
         if (page > 0)
         {
@@ -1826,7 +2004,9 @@ public partial class ProductModelFactory : IProductModelFactory
         }
 
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareCustomerProductReviewsModelAsync(page={Page}): store → {Store}", page, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareCustomerProductReviewsModelAsync(page={Page}): customer → {Customer}", page, customer);
 
         var list = await _productReviewService.GetAllProductReviewsAsync(
             customerId: customer.Id,
@@ -1836,10 +2016,12 @@ public partial class ProductModelFactory : IProductModelFactory
             pageSize: pageSize);
 
         var productReviews = new List<CustomerProductReviewModel>();
+		_logger.LogError("PrepareCustomerProductReviewsModelAsync(page={Page}): productReviews → {ProductReviews}", page, productReviews);
 
         foreach (var review in list)
         {
             var product = await _productService.GetProductByIdAsync(review.ProductId);
+			_logger.LogError("PrepareCustomerProductReviewsModelAsync(page={Page}): product → {Product}", page, product);
 
             var productReviewModel = new CustomerProductReviewModel
             {
@@ -1858,11 +2040,13 @@ public partial class ProductModelFactory : IProductModelFactory
                 productReviewModel.ApprovalStatus = review.IsApproved
                     ? await _localizationService.GetResourceAsync("Account.CustomerProductReviews.ApprovalStatus.Approved")
                     : await _localizationService.GetResourceAsync("Account.CustomerProductReviews.ApprovalStatus.Pending");
+					_logger.LogDebug("PrepareCustomerProductReviewsModelAsync(page={Page}): productReviewModel.ApprovalStatus → {Arg1}", page, productReviewModel.ApprovalStatus);
             }
 
             foreach (var q in await _reviewTypeService.GetProductReviewReviewTypeMappingsByProductReviewIdAsync(review.Id))
             {
                 var reviewType = await _reviewTypeService.GetReviewTypeByIdAsync(q.ReviewTypeId);
+				_logger.LogError("PrepareCustomerProductReviewsModelAsync(page={Page}): reviewType → {ReviewType}", page, reviewType);
 
                 productReviewModel.AdditionalProductReviewList.Add(new ProductReviewReviewTypeMappingModel
                 {
@@ -1908,20 +2092,26 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductEmailAFriendModel> PrepareProductEmailAFriendModelAsync(ProductEmailAFriendModel model, Product product, bool excludeProperties)
     {
+		_logger.LogError(">>> Entering PrepareProductEmailAFriendModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties})", model, product, excludeProperties);
         ArgumentNullException.ThrowIfNull(model);
 
         ArgumentNullException.ThrowIfNull(product);
 
         model.ProductId = product.Id;
+		_logger.LogDebug("PrepareProductEmailAFriendModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.ProductId → {Arg3}", model, product, excludeProperties, model.ProductId);
         model.ProductName = await _localizationService.GetLocalizedAsync(product, x => x.Name);
         model.ProductSeName = await _urlRecordService.GetSeNameAsync(product);
         model.DisplayCaptcha = _captchaSettings.Enabled && _captchaSettings.ShowOnEmailProductToFriendPage;
+		_logger.LogDebug("PrepareProductEmailAFriendModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.DisplayCaptcha → {Arg3}", model, product, excludeProperties, model.DisplayCaptcha);
         if (!excludeProperties)
         {
             var customer = await _workContext.GetCurrentCustomerAsync();
+			_logger.LogError("PrepareProductEmailAFriendModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): customer → {Customer}", model, product, excludeProperties, customer);
+			_logger.LogDebug("PrepareProductEmailAFriendModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties}): model.YourEmailAddress → {Arg3}", model, product, excludeProperties, model.YourEmailAddress);
             model.YourEmailAddress = customer.Email;
         }
 
+		_logger.LogWarning("<<< Exiting PrepareProductEmailAFriendModelAsync(model={Model},product={Product},excludeProperties={ExcludeProperties})", model, product, excludeProperties);
         return model;
     }
 
@@ -1935,9 +2125,11 @@ public partial class ProductModelFactory : IProductModelFactory
     /// </returns>
     public virtual async Task<ProductSpecificationModel> PrepareProductSpecificationModelAsync(Product product)
     {
+		_logger.LogError(">>> Entering PrepareProductSpecificationModelAsync(product={Product})", product);
         ArgumentNullException.ThrowIfNull(product);
 
         var model = new ProductSpecificationModel();
+		_logger.LogError("PrepareProductSpecificationModelAsync(product={Product}): model → {Model}", product, model);
 
         // Add non-grouped attributes first
         model.Groups.Add(new ProductSpecificationAttributeGroupModel
@@ -1947,6 +2139,7 @@ public partial class ProductModelFactory : IProductModelFactory
 
         // Add grouped attributes
         var groups = await _specificationAttributeService.GetProductSpecificationAttributeGroupsAsync(product.Id);
+		_logger.LogError("PrepareProductSpecificationModelAsync(product={Product}): groups → {Groups}", product, groups);
         foreach (var group in groups)
         {
             model.Groups.Add(new ProductSpecificationAttributeGroupModel
@@ -1957,6 +2150,7 @@ public partial class ProductModelFactory : IProductModelFactory
             });
         }
 
+		_logger.LogWarning("<<< Exiting PrepareProductSpecificationModelAsync(product={Product})", product);
         return model;
     }
 

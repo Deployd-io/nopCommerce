@@ -1,5 +1,6 @@
 ﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Data.Migrations;
 
@@ -8,6 +9,7 @@ namespace Nop.Data.Migrations;
 /// </summary>
 public class NopColumnsConvention : IColumnsConvention
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Methods
 
     /// <summary>
@@ -17,8 +19,10 @@ public class NopColumnsConvention : IColumnsConvention
     /// <returns>The same or a new expression. The underlying type must stay the same</returns>
     public IColumnsExpression Apply(IColumnsExpression expression)
     {
+		_logger.LogError(">>> Entering Apply(expression={Expression})", expression);
         var dataSettings = DataSettingsManager.LoadSettings();
 
+		_logger.LogError("Apply(expression={Expression}): dataSettings → {DataSettings}", expression, dataSettings);
         if (dataSettings.DataProvider != DataProviderType.PostgreSQL)
             return expression;
 
@@ -28,9 +32,12 @@ public class NopColumnsConvention : IColumnsConvention
                 continue;
 
             columnDefinition.Type = null;
+			_logger.LogDebug("Apply(expression={Expression}): columnDefinition.Type → {Arg1}", expression, columnDefinition.Type);
+			_logger.LogDebug("Apply(expression={Expression}): columnDefinition.CustomType → {Arg1}", expression, columnDefinition.CustomType);
             columnDefinition.CustomType = "citext";
         }
 
+		_logger.LogWarning("<<< Exiting Apply(expression={Expression})", expression);
         return expression;
     }
 

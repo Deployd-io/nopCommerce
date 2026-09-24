@@ -9,6 +9,7 @@ using Nop.Services.Localization;
 using Nop.Web.Infrastructure;
 using Nop.Web.Models.Common;
 using Nop.Web.Models.PrivateMessages;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Factories;
 
@@ -17,6 +18,7 @@ namespace Nop.Web.Factories;
 /// </summary>
 public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly CustomerSettings _customerSettings;
@@ -41,13 +43,22 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
         IStoreContext storeContext,
         IWorkContext workContext)
     {
+		_logger.LogError(">>> Entering PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext})", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext);
         _customerSettings = customerSettings;
         _forumSettings = forumSettings;
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _forumSettings → {_forumSettings}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _forumSettings);
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _customerSettings → {_customerSettings}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _customerSettings);
+    _logger.LogWarning("<<< Exiting PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext})", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext);
         _customerService = customerService;
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _customerService → {_customerService}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _customerService);
         _dateTimeHelper = dateTimeHelper;
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _dateTimeHelper → {_dateTimeHelper}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _dateTimeHelper);
         _forumService = forumService;
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _forumService → {_forumService}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _forumService);
         _localizationService = localizationService;
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _localizationService → {_localizationService}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _localizationService);
         _storeContext = storeContext;
+		_logger.LogDebug("PrivateMessagesModelFactory(customerSettings={CustomerSettings},forumSettings={ForumSettings},customerService={CustomerService},dateTimeHelper={DateTimeHelper},forumService={ForumService},localizationService={LocalizationService},storeContext={StoreContext},workContext={WorkContext}): _storeContext → {_storeContext}", customerSettings, forumSettings, customerService, dateTimeHelper, forumService, localizationService, storeContext, workContext, _storeContext);
         _workContext = workContext;
     }
 
@@ -66,9 +77,13 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual Task<PrivateMessageIndexModel> PreparePrivateMessageIndexModelAsync(int? page, string tab)
     {
+		_logger.LogError(">>> Entering PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab})", page, tab);
         var inboxPage = 0;
         var sentItemsPage = 0;
+		_logger.LogError("PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab}): sentItemsPage → {SentItemsPage}", page, tab, sentItemsPage);
         var sentItemsTabSelected = false;
+		_logger.LogError("PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab}): sentItemsTabSelected → {SentItemsTabSelected}", page, tab, sentItemsTabSelected);
+		_logger.LogError("PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab}): inboxPage → {InboxPage}", page, tab, inboxPage);
 
         switch (tab)
         {
@@ -99,6 +114,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             SentItemsTabSelected = sentItemsTabSelected
         };
 
+		_logger.LogWarning("<<< Exiting PreparePrivateMessageIndexModelAsync(page={Page},tab={Tab})", page, tab);
         return Task.FromResult(model);
     }
 
@@ -113,6 +129,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<PrivateMessageListModel> PrepareInboxModelAsync(int page, string tab)
     {
+		_logger.LogError(">>> Entering PrepareInboxModelAsync(page={Page},tab={Tab})", page, tab);
         if (page > 0)
         {
             page -= 1;
@@ -121,8 +138,11 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
         var pageSize = _forumSettings.PrivateMessagesPageSize;
 
         var messages = new List<PrivateMessageModel>();
+		_logger.LogError("PrepareInboxModelAsync(page={Page},tab={Tab}): messages → {Messages}", page, tab, messages);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareInboxModelAsync(page={Page},tab={Tab}): store → {Store}", page, tab, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareInboxModelAsync(page={Page},tab={Tab}): customer → {Customer}", page, tab, customer);
         var list = await _forumService.GetAllPrivateMessagesAsync(store.Id,
             0, customer.Id, null, null, false, string.Empty, page, pageSize);
 
@@ -160,6 +180,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<PrivateMessageListModel> PrepareSentModelAsync(int page, string tab)
     {
+		_logger.LogError(">>> Entering PrepareSentModelAsync(page={Page},tab={Tab})", page, tab);
         if (page > 0)
         {
             page -= 1;
@@ -168,8 +189,11 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
         var pageSize = _forumSettings.PrivateMessagesPageSize;
 
         var messages = new List<PrivateMessageModel>();
+		_logger.LogError("PrepareSentModelAsync(page={Page},tab={Tab}): messages → {Messages}", page, tab, messages);
         var store = await _storeContext.GetCurrentStoreAsync();
+		_logger.LogError("PrepareSentModelAsync(page={Page},tab={Tab}): store → {Store}", page, tab, store);
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareSentModelAsync(page={Page},tab={Tab}): customer → {Customer}", page, tab, customer);
         var list = await _forumService.GetAllPrivateMessagesAsync(store.Id,
             customer.Id, 0, null, false, null, string.Empty, page, pageSize);
         foreach (var pm in list)
@@ -206,6 +230,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<SendPrivateMessageModel> PrepareSendPrivateMessageModelAsync(Customer customerTo, PrivateMessage replyToPM)
     {
+		_logger.LogError(">>> Entering PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM})", customerTo, replyToPM);
         ArgumentNullException.ThrowIfNull(customerTo);
 
         var model = new SendPrivateMessageModel
@@ -219,13 +244,17 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             return model;
 
         var customer = await _workContext.GetCurrentCustomerAsync();
+		_logger.LogError("PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM}): customer → {Customer}", customerTo, replyToPM, customer);
         if (replyToPM.ToCustomerId == customer.Id ||
             replyToPM.FromCustomerId == customer.Id)
         {
             model.ReplyToMessageId = replyToPM.Id;
+			_logger.LogDebug("PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM}): model.ReplyToMessageId → {Arg2}", customerTo, replyToPM, model.ReplyToMessageId);
+			_logger.LogDebug("PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM}): model.Subject → {Arg2}", customerTo, replyToPM, model.Subject);
             model.Subject = $"Re: {replyToPM.Subject}";
         }
 
+		_logger.LogWarning("<<< Exiting PrepareSendPrivateMessageModelAsync(customerTo={CustomerTo},replyToPM={ReplyToPM})", customerTo, replyToPM);
         return model;
     }
 
@@ -239,10 +268,13 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
     /// </returns>
     public virtual async Task<PrivateMessageModel> PreparePrivateMessageModelAsync(PrivateMessage pm)
     {
+		_logger.LogError(">>> Entering PreparePrivateMessageModelAsync(pm={Pm})", pm);
         ArgumentNullException.ThrowIfNull(pm);
 
         var fromCustomer = await _customerService.GetCustomerByIdAsync(pm.FromCustomerId);
+		_logger.LogError("PreparePrivateMessageModelAsync(pm={Pm}): fromCustomer → {FromCustomer}", pm, fromCustomer);
         var toCustomer = await _customerService.GetCustomerByIdAsync(pm.ToCustomerId);
+		_logger.LogError("PreparePrivateMessageModelAsync(pm={Pm}): toCustomer → {ToCustomer}", pm, toCustomer);
 
         var model = new PrivateMessageModel
         {
@@ -259,6 +291,7 @@ public partial class PrivateMessagesModelFactory : IPrivateMessagesModelFactory
             IsRead = pm.IsRead,
         };
 
+		_logger.LogWarning("<<< Exiting PreparePrivateMessageModelAsync(pm={Pm})", pm);
         return model;
     }
 

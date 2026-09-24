@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Plugins;
 
@@ -9,16 +10,23 @@ namespace Nop.Web.Areas.Admin.Models.Plugins;
 /// </summary>
 public partial record PluginModel : BaseNopModel, IAclSupportedModel, ILocalizedModel<PluginLocalizedModel>, IPluginModel, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public PluginModel()
     {
+		_logger.LogError(">>> Entering PluginModel()");
         Locales = new List<PluginLocalizedModel>();
 
+		_logger.LogDebug("PluginModel(): Locales → {Locales}", Locales);
         SelectedStoreIds = new List<int>();
+		_logger.LogError("PluginModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("PluginModel(): AvailableStores → {AvailableStores}", AvailableStores);
         SelectedCustomerRoleIds = new List<int>();
+		_logger.LogError("PluginModel(): SelectedCustomerRoleIds → {SelectedCustomerRoleIds}", SelectedCustomerRoleIds);
         AvailableCustomerRoles = new List<SelectListItem>();
+		_logger.LogError("PluginModel(): AvailableCustomerRoles → {AvailableCustomerRoles}", AvailableCustomerRoles);
     }
 
     #endregion

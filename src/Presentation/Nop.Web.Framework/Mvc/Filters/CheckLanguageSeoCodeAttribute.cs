@@ -5,6 +5,7 @@ using Nop.Core.Domain.Localization;
 using Nop.Core.Http.Extensions;
 using Nop.Data;
 using Nop.Services.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Framework.Mvc.Filters;
 
@@ -13,6 +14,7 @@ namespace Nop.Web.Framework.Mvc.Filters;
 /// </summary>
 public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     /// <summary>
@@ -21,8 +23,11 @@ public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
     /// <param name="ignore">Whether to ignore the execution of filter actions</param>
     public CheckLanguageSeoCodeAttribute(bool ignore = false) : base(typeof(CheckLanguageSeoCodeFilter))
     {
+		_logger.LogError(">>> Entering CheckLanguageSeoCodeAttribute(ignore={Ignore})", ignore);
         IgnoreFilter = ignore;
         Arguments = [ignore];
+		_logger.LogDebug("CheckLanguageSeoCodeAttribute(ignore={Ignore}): IgnoreFilter → {IgnoreFilter}", ignore, IgnoreFilter);
+    _logger.LogWarning("<<< Exiting CheckLanguageSeoCodeAttribute(ignore={Ignore})", ignore);
     }
 
     #endregion
@@ -43,6 +48,7 @@ public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
     /// </summary>
     private class CheckLanguageSeoCodeFilter : IAsyncActionFilter
     {
+    	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
         #region Fields
 
         protected readonly bool _ignoreFilter;
@@ -59,10 +65,14 @@ public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
             IWorkContext workContext,
             LocalizationSettings localizationSettings)
         {
+			_logger.LogError(">>> Entering CheckLanguageSeoCodeFilter(ignoreFilter={IgnoreFilter},webHelper={WebHelper},workContext={WorkContext},localizationSettings={LocalizationSettings})", ignoreFilter, webHelper, workContext, localizationSettings);
             _ignoreFilter = ignoreFilter;
             _webHelper = webHelper;
+			_logger.LogDebug("CheckLanguageSeoCodeFilter(ignoreFilter={IgnoreFilter},webHelper={WebHelper},workContext={WorkContext},localizationSettings={LocalizationSettings}): _webHelper → {_webHelper}", ignoreFilter, webHelper, workContext, localizationSettings, _webHelper);
             _workContext = workContext;
+			_logger.LogDebug("CheckLanguageSeoCodeFilter(ignoreFilter={IgnoreFilter},webHelper={WebHelper},workContext={WorkContext},localizationSettings={LocalizationSettings}): _workContext → {_workContext}", ignoreFilter, webHelper, workContext, localizationSettings, _workContext);
             _localizationSettings = localizationSettings;
+			_logger.LogDebug("CheckLanguageSeoCodeFilter(ignoreFilter={IgnoreFilter},webHelper={WebHelper},workContext={WorkContext},localizationSettings={LocalizationSettings}): _localizationSettings → {_localizationSettings}", ignoreFilter, webHelper, workContext, localizationSettings, _localizationSettings);
         }
 
         #endregion
@@ -76,6 +86,7 @@ public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         private async Task CheckLanguageSeoCodeAsync(ActionExecutingContext context)
         {
+			_logger.LogError(">>> Entering CheckLanguageSeoCodeAsync(context={Context})", context);
             ArgumentNullException.ThrowIfNull(context);
 
             //only in GET requests
@@ -102,15 +113,19 @@ public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
 
             //check whether current page URL is already localized URL
             var pageUrl = _webHelper.GetRawUrl(context.HttpContext.Request);
+			_logger.LogError("CheckLanguageSeoCodeAsync(context={Context}): pageUrl → {PageUrl}", context, pageUrl);
             var result = await pageUrl.IsLocalizedUrlAsync(context.HttpContext.Request.PathBase, true);
+			_logger.LogError("CheckLanguageSeoCodeAsync(context={Context}): result → {Result}", context, result);
             if (result.IsLocalized)
                 return;
 
             //not localized yet, so redirect to the page with working language SEO code
             var language = await _workContext.GetWorkingLanguageAsync();
+			_logger.LogError("CheckLanguageSeoCodeAsync(context={Context}): language → {Language}", context, language);
             pageUrl = pageUrl.AddLanguageSeoCodeToUrl(context.HttpContext.Request.PathBase, true, language);
 
             context.Result = new LocalRedirectResult(pageUrl, false);
+			_logger.LogWarning("<<< Exiting CheckLanguageSeoCodeAsync(context={Context})", context);
         }
 
         #endregion
@@ -125,9 +140,11 @@ public sealed class CheckLanguageSeoCodeAttribute : TypeFilterAttribute
         /// <returns>A task that represents the asynchronous operation</returns>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
+			_logger.LogError(">>> Entering OnActionExecutionAsync(context={Context},next={Next})", context, next);
             await CheckLanguageSeoCodeAsync(context);
             if (context.Result == null)
                 await next();
+				_logger.LogWarning("<<< Exiting OnActionExecutionAsync(context={Context},next={Next})", context, next);
         }
 
         #endregion

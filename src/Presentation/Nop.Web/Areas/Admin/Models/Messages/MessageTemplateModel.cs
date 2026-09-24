@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Nop.Web.Framework.Models;
 using Nop.Web.Framework.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Web.Areas.Admin.Models.Messages;
 
@@ -10,15 +11,21 @@ namespace Nop.Web.Areas.Admin.Models.Messages;
 /// </summary>
 public partial record MessageTemplateModel : BaseNopEntityModel, ILocalizedModel<MessageTemplateLocalizedModel>, IStoreMappingSupportedModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Ctor
 
     public MessageTemplateModel()
     {
+		_logger.LogError(">>> Entering MessageTemplateModel()");
         Locales = new List<MessageTemplateLocalizedModel>();
         AvailableEmailAccounts = new List<SelectListItem>();
+		_logger.LogError("MessageTemplateModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
+		_logger.LogDebug("MessageTemplateModel(): Locales → {Locales}", Locales);
 
         SelectedStoreIds = new List<int>();
+		_logger.LogError("MessageTemplateModel(): SelectedStoreIds → {SelectedStoreIds}", SelectedStoreIds);
         AvailableStores = new List<SelectListItem>();
+		_logger.LogError("MessageTemplateModel(): AvailableStores → {AvailableStores}", AvailableStores);
     }
 
     #endregion
@@ -82,9 +89,14 @@ public partial record MessageTemplateModel : BaseNopEntityModel, ILocalizedModel
 
 public partial record MessageTemplateLocalizedModel : ILocalizedLocaleModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public MessageTemplateLocalizedModel()
     {
+		_logger.LogError(">>> Entering MessageTemplateLocalizedModel()");
         AvailableEmailAccounts = new List<SelectListItem>();
+		_logger.LogDebug("MessageTemplateLocalizedModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
+    _logger.LogError("MessageTemplateLocalizedModel(): AvailableEmailAccounts → {AvailableEmailAccounts}", AvailableEmailAccounts);
+    _logger.LogWarning("<<< Exiting MessageTemplateLocalizedModel()");
     }
 
     public int LanguageId { get; set; }

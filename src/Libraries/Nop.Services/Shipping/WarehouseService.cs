@@ -3,6 +3,7 @@ using Nop.Core.Domain.Shipping;
 using Nop.Data;
 using Nop.Services.Catalog;
 using Nop.Services.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Shipping;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Shipping;
 /// </summary>
 public partial class WarehouseService : IWarehouseService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IAddressService _addressService;
@@ -23,8 +25,10 @@ public partial class WarehouseService : IWarehouseService
     public WarehouseService(IAddressService addressService,
         IRepository<Warehouse> warehouseRepository)
     {
+		_logger.LogError(">>> Entering WarehouseService(addressService={AddressService},warehouseRepository={WarehouseRepository})", addressService, warehouseRepository);
         _addressService = addressService;
         _warehouseRepository = warehouseRepository;
+		_logger.LogDebug("WarehouseService(addressService={AddressService},warehouseRepository={WarehouseRepository}): _warehouseRepository → {_warehouseRepository}", addressService, warehouseRepository, _warehouseRepository);
     }
 
     #endregion
@@ -38,7 +42,11 @@ public partial class WarehouseService : IWarehouseService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteWarehouseAsync(Warehouse warehouse)
     {
+		_logger.LogError(">>> Entering DeleteWarehouseAsync(warehouse={Warehouse})", warehouse);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _warehouseRepository.DeleteAsync(warehouse);
+		_logger.LogError("DeleteWarehouseAsync(warehouse)={Warehouse}: external service call took {Arg1} ms", warehouse, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteWarehouseAsync(warehouse={Warehouse})", warehouse);
     }
 
     /// <summary>
@@ -51,6 +59,9 @@ public partial class WarehouseService : IWarehouseService
     /// </returns>
     public virtual async Task<Warehouse> GetWarehouseByIdAsync(int warehouseId)
     {
+		_logger.LogError(">>> Entering GetWarehouseByIdAsync(warehouseId={WarehouseId})", warehouseId);
+		_logger.LogError("GetWarehouseByIdAsync(warehouseId)={WarehouseId}: find query executing", warehouseId);
+    _logger.LogWarning("<<< Exiting GetWarehouseByIdAsync(warehouseId={WarehouseId})", warehouseId);
         return await _warehouseRepository.GetByIdAsync(warehouseId, _ => default);
     }
 
@@ -64,14 +75,19 @@ public partial class WarehouseService : IWarehouseService
     /// </returns>
     public virtual async Task<IList<Warehouse>> GetAllWarehousesAsync(string name = null)
     {
+		_logger.LogError(">>> Entering GetAllWarehousesAsync(name={Name})", name);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var warehouses = await _warehouseRepository.GetAllAsync(query =>
             from wh in query
             orderby wh.Name
             select wh, _ => default);
+			_logger.LogError("GetAllWarehousesAsync(name)={Name}: find query executed in {Arg1} ms", name, __logStart.ElapsedMilliseconds);
 
         if (!string.IsNullOrEmpty(name))
             warehouses = warehouses.Where(wh => wh.Name.Contains(name)).ToList();
+			_logger.LogError("GetAllWarehousesAsync(name={Name}): warehouses → {Warehouses}", name, warehouses);
 
+		_logger.LogWarning("<<< Exiting GetAllWarehousesAsync(name={Name})", name);
         return warehouses;
     }
 
@@ -82,7 +98,9 @@ public partial class WarehouseService : IWarehouseService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertWarehouseAsync(Warehouse warehouse)
     {
+		_logger.LogError(">>> Entering InsertWarehouseAsync(warehouse={Warehouse})", warehouse);
         await _warehouseRepository.InsertAsync(warehouse);
+		_logger.LogWarning("<<< Exiting InsertWarehouseAsync(warehouse={Warehouse})", warehouse);
     }
 
     /// <summary>
@@ -92,7 +110,9 @@ public partial class WarehouseService : IWarehouseService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateWarehouseAsync(Warehouse warehouse)
     {
+		_logger.LogError(">>> Entering UpdateWarehouseAsync(warehouse={Warehouse})", warehouse);
         await _warehouseRepository.UpdateAsync(warehouse);
+		_logger.LogWarning("<<< Exiting UpdateWarehouseAsync(warehouse={Warehouse})", warehouse);
     }
 
     /// <summary>
@@ -106,6 +126,7 @@ public partial class WarehouseService : IWarehouseService
     /// </returns>
     public virtual async Task<Warehouse> GetNearestWarehouseAsync(Address address, IList<Warehouse> warehouses = null)
     {
+		_logger.LogError(">>> Entering GetNearestWarehouseAsync(address={Address},warehouses={Warehouses})", address, warehouses);
         warehouses ??= await GetAllWarehousesAsync();
 
         //no address specified. return any
@@ -118,9 +139,11 @@ public partial class WarehouseService : IWarehouseService
 
         //find by country
         var matchedByCountry = new List<Warehouse>();
+		_logger.LogError("GetNearestWarehouseAsync(address={Address},warehouses={Warehouses}): matchedByCountry → {MatchedByCountry}", address, warehouses, matchedByCountry);
         foreach (var warehouse in warehouses)
         {
             var warehouseAddress = await _addressService.GetAddressByIdAsync(warehouse.AddressId);
+			_logger.LogError("GetNearestWarehouseAsync(address={Address},warehouses={Warehouses}): warehouseAddress → {WarehouseAddress}", address, warehouses, warehouseAddress);
             if (warehouseAddress == null)
                 continue;
 
@@ -133,6 +156,7 @@ public partial class WarehouseService : IWarehouseService
 
         //find by state
         var matchedByState = new List<Warehouse>();
+		_logger.LogError("GetNearestWarehouseAsync(address={Address},warehouses={Warehouses}): matchedByState → {MatchedByState}", address, warehouses, matchedByState);
         foreach (var warehouse in matchedByCountry)
         {
             var warehouseAddress = await _addressService.GetAddressByIdAsync(warehouse.AddressId);

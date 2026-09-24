@@ -1,12 +1,18 @@
-﻿using Nop.Web.Framework.Models;
+﻿using Microsoft.Extensions.Logging;
+using Nop.Web.Framework.Models;
 
 namespace Nop.Web.Models.Boards;
 
 public partial record ForumPageModel : BaseNopModel
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     public ForumPageModel()
     {
+		_logger.LogError(">>> Entering ForumPageModel()");
         ForumTopics = new List<ForumTopicRowModel>();
+		_logger.LogDebug("ForumPageModel(): ForumTopics → {ForumTopics}", ForumTopics);
+    _logger.LogError("ForumPageModel(): ForumTopics → {ForumTopics}", ForumTopics);
+    _logger.LogWarning("<<< Exiting ForumPageModel()");
     }
 
     public int Id { get; set; }

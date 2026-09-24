@@ -3,6 +3,7 @@ using Nop.Core.Caching;
 using Nop.Core.Domain.Blogs;
 using Nop.Data;
 using Nop.Services.Stores;
+using Microsoft.Extensions.Logging;
 
 namespace Nop.Services.Blogs;
 
@@ -11,6 +12,7 @@ namespace Nop.Services.Blogs;
 /// </summary>
 public partial class BlogService : IBlogService
 {
+	private static readonly Microsoft.Extensions.Logging.ILogger _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     #region Fields
 
     protected readonly IRepository<BlogComment> _blogCommentRepository;
@@ -29,9 +31,14 @@ public partial class BlogService : IBlogService
         IStaticCacheManager staticCacheManager,
         IStoreMappingService storeMappingService)
     {
+		_logger.LogError(">>> Entering BlogService(blogCommentRepository={BlogCommentRepository},blogPostRepository={BlogPostRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>)", blogCommentRepository, blogPostRepository, staticCacheManager);
         _blogCommentRepository = blogCommentRepository;
         _blogPostRepository = blogPostRepository;
+		_logger.LogDebug("BlogService(blogCommentRepository={BlogCommentRepository},blogPostRepository={BlogPostRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _blogPostRepository → {_blogPostRepository}", blogCommentRepository, blogPostRepository, staticCacheManager, _blogPostRepository);
+		_logger.LogDebug("BlogService(blogCommentRepository={BlogCommentRepository},blogPostRepository={BlogPostRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _blogCommentRepository → {_blogCommentRepository}", blogCommentRepository, blogPostRepository, staticCacheManager, _blogCommentRepository);
+    _logger.LogWarning("<<< Exiting BlogService(blogCommentRepository={BlogCommentRepository},blogPostRepository={BlogPostRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>)", blogCommentRepository, blogPostRepository, staticCacheManager);
         _staticCacheManager = staticCacheManager;
+		_logger.LogDebug("BlogService(blogCommentRepository={BlogCommentRepository},blogPostRepository={BlogPostRepository},staticCacheManager={StaticCacheManager},storeMappingService=<redacted>): _staticCacheManager → {_staticCacheManager}", blogCommentRepository, blogPostRepository, staticCacheManager, _staticCacheManager);
         _storeMappingService = storeMappingService;
     }
 
@@ -48,7 +55,11 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteBlogPostAsync(BlogPost blogPost)
     {
+		_logger.LogError(">>> Entering DeleteBlogPostAsync(blogPost={BlogPost})", blogPost);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogPostRepository.DeleteAsync(blogPost);
+		_logger.LogError("DeleteBlogPostAsync(blogPost)={BlogPost}: external service call took {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteBlogPostAsync(blogPost={BlogPost})", blogPost);
     }
 
     /// <summary>
@@ -61,6 +72,9 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<BlogPost> GetBlogPostByIdAsync(int blogPostId)
     {
+		_logger.LogError(">>> Entering GetBlogPostByIdAsync(blogPostId={BlogPostId})", blogPostId);
+		_logger.LogError("GetBlogPostByIdAsync(blogPostId)={BlogPostId}: find query executing", blogPostId);
+    _logger.LogWarning("<<< Exiting GetBlogPostByIdAsync(blogPostId={BlogPostId})", blogPostId);
         return await _blogPostRepository.GetByIdAsync(blogPostId, cache => default, useShortTermCache: true);
     }
 
@@ -83,10 +97,13 @@ public partial class BlogService : IBlogService
         DateTime? dateFrom = null, DateTime? dateTo = null,
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false, string title = null)
     {
+		_logger.LogError(">>> Entering GetAllBlogPostsAsync(storeId={StoreId},languageId={LanguageId},dateFrom={DateFrom},dateTo={DateTo},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},title={Title})", storeId, languageId, dateFrom, dateTo, pageIndex, pageSize, showHidden, title);
         return await _blogPostRepository.GetAllPagedAsync(async query =>
         {
+			_logger.LogWarning("<<< Exiting GetAllBlogPostsAsync(storeId={StoreId},languageId={LanguageId},dateFrom={DateFrom},dateTo={DateTo},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden},title={Title})", storeId, languageId, dateFrom, dateTo, pageIndex, pageSize, showHidden, title);
             if (dateFrom.HasValue)
                 query = query.Where(b => dateFrom.Value <= (b.StartDateUtc ?? b.CreatedOnUtc));
+				_logger.LogError("GetAllBlogPostsAsync(storeId,languageId,dateFrom,dateTo,pageIndex,pageSize,showHidden,title)={StoreId},{LanguageId},{DateFrom},{DateTo},{PageIndex},{PageSize},{ShowHidden},{Title}: find query executing", storeId, languageId, dateFrom, dateTo, pageIndex, pageSize, showHidden, title);
 
             if (dateTo.HasValue)
                 query = query.Where(b => dateTo.Value >= (b.StartDateUtc ?? b.CreatedOnUtc));
@@ -132,20 +149,27 @@ public partial class BlogService : IBlogService
         int languageId = 0, string tag = "",
         int pageIndex = 0, int pageSize = int.MaxValue, bool showHidden = false)
     {
+		_logger.LogError(">>> Entering GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", storeId, languageId, tag, pageIndex, pageSize, showHidden);
         tag = tag.Trim();
+		_logger.LogError("GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): tag → {Tag1}", storeId, languageId, tag, pageIndex, pageSize, showHidden, tag);
 
         //we load all records and only then filter them by tag
         var blogPostsAll = await GetAllBlogPostsAsync(storeId: storeId, languageId: languageId, showHidden: showHidden);
+		_logger.LogError("GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): blogPostsAll → {BlogPostsAll}", storeId, languageId, tag, pageIndex, pageSize, showHidden, blogPostsAll);
         var taggedBlogPosts = new List<BlogPost>();
+		_logger.LogError("GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): taggedBlogPosts → {TaggedBlogPosts}", storeId, languageId, tag, pageIndex, pageSize, showHidden, taggedBlogPosts);
         foreach (var blogPost in blogPostsAll)
         {
             var tags = await ParseTagsAsync(blogPost);
+			_logger.LogError("GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): tags → {Tags}", storeId, languageId, tag, pageIndex, pageSize, showHidden, tags);
             if (!string.IsNullOrEmpty(tags.FirstOrDefault(t => t.Equals(tag, StringComparison.InvariantCultureIgnoreCase))))
                 taggedBlogPosts.Add(blogPost);
         }
 
         //server-side paging
         var result = new PagedList<BlogPost>(taggedBlogPosts, pageIndex, pageSize);
+		_logger.LogError("GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden}): result → {Result}", storeId, languageId, tag, pageIndex, pageSize, showHidden, result);
+		_logger.LogWarning("<<< Exiting GetAllBlogPostsByTagAsync(storeId={StoreId},languageId={LanguageId},tag={Tag},pageIndex={PageIndex},pageSize={PageSize},showHidden={ShowHidden})", storeId, languageId, tag, pageIndex, pageSize, showHidden);
         return result;
     }
 
@@ -161,17 +185,23 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<IList<BlogPostTag>> GetAllBlogPostTagsAsync(int storeId, int languageId, bool showHidden = false)
     {
+		_logger.LogError(">>> Entering GetAllBlogPostTagsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden})", storeId, languageId, showHidden);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopBlogsDefaults.BlogTagsCacheKey, languageId, storeId, showHidden);
 
+		_logger.LogError("GetAllBlogPostTagsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden}): cacheKey → {CacheKey}", storeId, languageId, showHidden, cacheKey);
         var blogPostTags = await _staticCacheManager.GetAsync(cacheKey, async () =>
         {
             var rezBlogPostTags = new List<BlogPostTag>();
+			_logger.LogError("GetAllBlogPostTagsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden}): rezBlogPostTags → {RezBlogPostTags}", storeId, languageId, showHidden, rezBlogPostTags);
 
             var blogPosts = await GetAllBlogPostsAsync(storeId, languageId, showHidden: showHidden);
+			_logger.LogError("GetAllBlogPostTagsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden}): blogPosts → {BlogPosts}", storeId, languageId, showHidden, blogPosts);
 
             foreach (var blogPost in blogPosts)
             {
                 var tags = await ParseTagsAsync(blogPost);
+				_logger.LogError("GetAllBlogPostTagsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden}): tags → {Tags}", storeId, languageId, showHidden, tags);
                 foreach (var tag in tags)
                 {
                     var foundBlogPostTag = rezBlogPostTags.Find(bpt =>
@@ -193,6 +223,9 @@ public partial class BlogService : IBlogService
             return rezBlogPostTags;
         });
 
+		_logger.LogError("GetAllBlogPostTagsAsync(storeId,languageId,showHidden)={StoreId},{LanguageId},{ShowHidden}: external service call took {Arg3} ms", storeId, languageId, showHidden, __logStart.ElapsedMilliseconds);
+		_logger.LogWarning("<<< Exiting GetAllBlogPostTagsAsync(storeId={StoreId},languageId={LanguageId},showHidden={ShowHidden})", storeId, languageId, showHidden);
+		__logStart = System.Diagnostics.Stopwatch.StartNew();
         return blogPostTags;
     }
 
@@ -203,7 +236,9 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertBlogPostAsync(BlogPost blogPost)
     {
+		_logger.LogError(">>> Entering InsertBlogPostAsync(blogPost={BlogPost})", blogPost);
         await _blogPostRepository.InsertAsync(blogPost);
+		_logger.LogWarning("<<< Exiting InsertBlogPostAsync(blogPost={BlogPost})", blogPost);
     }
 
     /// <summary>
@@ -213,7 +248,9 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateBlogPostAsync(BlogPost blogPost)
     {
+		_logger.LogError(">>> Entering UpdateBlogPostAsync(blogPost={BlogPost})", blogPost);
         await _blogPostRepository.UpdateAsync(blogPost);
+		_logger.LogWarning("<<< Exiting UpdateBlogPostAsync(blogPost={BlogPost})", blogPost);
     }
 
     /// <summary>
@@ -228,12 +265,16 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<IList<BlogPost>> GetPostsByDateAsync(IList<BlogPost> blogPosts, DateTime dateFrom, DateTime dateTo)
     {
+		_logger.LogError(">>> Entering GetPostsByDateAsync(blogPosts={BlogPosts},dateFrom={DateFrom},dateTo={DateTo})", blogPosts, dateFrom, dateTo);
         ArgumentNullException.ThrowIfNull(blogPosts);
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var rez = await blogPosts
             .Where(p => dateFrom.Date <= (p.StartDateUtc ?? p.CreatedOnUtc) && (p.StartDateUtc ?? p.CreatedOnUtc).Date <= dateTo)
             .ToListAsync();
+			_logger.LogError("GetPostsByDateAsync(blogPosts,dateFrom,dateTo)={BlogPosts},{DateFrom},{DateTo}: database query executed in {Arg3} ms", blogPosts, dateFrom, dateTo, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting GetPostsByDateAsync(blogPosts={BlogPosts},dateFrom={DateFrom},dateTo={DateTo})", blogPosts, dateFrom, dateTo);
         return rez;
     }
 
@@ -247,16 +288,20 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<IList<string>> ParseTagsAsync(BlogPost blogPost)
     {
+		_logger.LogError(">>> Entering ParseTagsAsync(blogPost={BlogPost})", blogPost);
         ArgumentNullException.ThrowIfNull(blogPost);
 
         if (blogPost.Tags == null)
             return new List<string>();
 
+		var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var tags = await blogPost.Tags.Split(_separator, StringSplitOptions.RemoveEmptyEntries)
             .Select(tag => tag.Trim())
             .Where(tag => !string.IsNullOrEmpty(tag))
             .ToListAsync();
+			_logger.LogError("ParseTagsAsync(blogPost)={BlogPost}: database query executed in {Arg1} ms", blogPost, __logStart.ElapsedMilliseconds);
 
+		_logger.LogWarning("<<< Exiting ParseTagsAsync(blogPost={BlogPost})", blogPost);
         return tags;
     }
 
@@ -268,6 +313,7 @@ public partial class BlogService : IBlogService
     /// <returns>Result</returns>
     public virtual bool BlogPostIsAvailable(BlogPost blogPost, DateTime? dateTime = null)
     {
+		_logger.LogError(">>> Entering BlogPostIsAvailable(blogPost={BlogPost},dateTime={DateTime})", blogPost, dateTime);
         ArgumentNullException.ThrowIfNull(blogPost);
 
         if (blogPost.StartDateUtc.HasValue && blogPost.StartDateUtc.Value >= (dateTime ?? DateTime.UtcNow))
@@ -300,10 +346,12 @@ public partial class BlogService : IBlogService
     public virtual async Task<IList<BlogComment>> GetAllCommentsAsync(int customerId = 0, int storeId = 0, int? blogPostId = null,
         bool? approved = null, DateTime? fromUtc = null, DateTime? toUtc = null, string commentText = null)
     {
+		_logger.LogError(">>> Entering GetAllCommentsAsync(customerId={CustomerId},storeId={StoreId},blogPostId={BlogPostId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},commentText={CommentText})", customerId, storeId, blogPostId, approved, fromUtc, toUtc, commentText);
         return await _blogCommentRepository.GetAllAsync(query =>
         {
             if (approved.HasValue)
                 query = query.Where(comment => comment.IsApproved == approved);
+				_logger.LogError("GetAllCommentsAsync(customerId,storeId,blogPostId,approved,fromUtc,toUtc,commentText)={CustomerId},{StoreId},{BlogPostId},{Approved},{FromUtc},{ToUtc},{CommentText}: find query executing", customerId, storeId, blogPostId, approved, fromUtc, toUtc, commentText);
 
             if (blogPostId > 0)
                 query = query.Where(comment => comment.BlogPostId == blogPostId);
@@ -325,6 +373,7 @@ public partial class BlogService : IBlogService
 
             query = query.OrderBy(comment => comment.CreatedOnUtc);
 
+		_logger.LogWarning("<<< Exiting GetAllCommentsAsync(customerId={CustomerId},storeId={StoreId},blogPostId={BlogPostId},approved={Approved},fromUtc={FromUtc},toUtc={ToUtc},commentText={CommentText})", customerId, storeId, blogPostId, approved, fromUtc, toUtc, commentText);
             return query;
         });
     }
@@ -339,6 +388,9 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<BlogComment> GetBlogCommentByIdAsync(int blogCommentId)
     {
+		_logger.LogError(">>> Entering GetBlogCommentByIdAsync(blogCommentId={BlogCommentId})", blogCommentId);
+		_logger.LogError("GetBlogCommentByIdAsync(blogCommentId)={BlogCommentId}: find query executing", blogCommentId);
+    _logger.LogWarning("<<< Exiting GetBlogCommentByIdAsync(blogCommentId={BlogCommentId})", blogCommentId);
         return await _blogCommentRepository.GetByIdAsync(blogCommentId, cache => default, useShortTermCache: true);
     }
 
@@ -352,6 +404,8 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<IList<BlogComment>> GetBlogCommentsByIdsAsync(int[] commentIds)
     {
+		_logger.LogError(">>> Entering GetBlogCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
+        _logger.LogWarning("<<< Exiting GetBlogCommentsByIdsAsync(commentIds={CommentIds})", commentIds);
         return await _blogCommentRepository.GetByIdsAsync(commentIds);
     }
 
@@ -367,8 +421,11 @@ public partial class BlogService : IBlogService
     /// </returns>
     public virtual async Task<int> GetBlogCommentsCountAsync(BlogPost blogPost, int storeId = 0, bool? isApproved = null)
     {
+		_logger.LogError(">>> Entering GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved})", blogPost, storeId, isApproved);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         var query = _blogCommentRepository.Table.Where(comment => comment.BlogPostId == blogPost.Id);
 
+		_logger.LogError("GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved}): query → {Query}", blogPost, storeId, isApproved, query);
         if (storeId > 0)
             query = query.Where(comment => comment.StoreId == storeId);
 
@@ -376,6 +433,9 @@ public partial class BlogService : IBlogService
             query = query.Where(comment => comment.IsApproved == isApproved.Value);
 
         var cacheKey = _staticCacheManager.PrepareKeyForDefaultCache(NopBlogsDefaults.BlogCommentsNumberCacheKey, blogPost, storeId, isApproved);
+		_logger.LogError("GetBlogCommentsCountAsync(blogPost={BlogPost},storeId={StoreId},isApproved={IsApproved}): cacheKey → {CacheKey}", blogPost, storeId, isApproved, cacheKey);
+		_logger.LogError("GetBlogCommentsCountAsync(blogPost,storeId,isApproved)={BlogPost},{StoreId},{IsApproved}: find query executing", blogPost, storeId, isApproved);
+		_logger.LogError("GetBlogCommentsCountAsync(blogPost,storeId,isApproved)={BlogPost},{StoreId},{IsApproved}: external service call took {Arg3} ms", blogPost, storeId, isApproved, __logStart.ElapsedMilliseconds);
 
         return await _staticCacheManager.GetAsync(cacheKey, async () => await query.CountAsync());
     }
@@ -387,7 +447,11 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteBlogCommentAsync(BlogComment blogComment)
     {
+		_logger.LogError(">>> Entering DeleteBlogCommentAsync(blogComment={BlogComment})", blogComment);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogCommentRepository.DeleteAsync(blogComment);
+		_logger.LogError("DeleteBlogCommentAsync(blogComment)={BlogComment}: external service call took {Arg1} ms", blogComment, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteBlogCommentAsync(blogComment={BlogComment})", blogComment);
     }
 
     /// <summary>
@@ -397,7 +461,11 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task DeleteBlogCommentsAsync(IList<BlogComment> blogComments)
     {
+		_logger.LogError(">>> Entering DeleteBlogCommentsAsync(blogComments={BlogComments})", blogComments);
+        var __logStart = System.Diagnostics.Stopwatch.StartNew();
         await _blogCommentRepository.DeleteAsync(blogComments);
+		_logger.LogError("DeleteBlogCommentsAsync(blogComments)={BlogComments}: external service call took {Arg1} ms", blogComments, __logStart.ElapsedMilliseconds);
+    _logger.LogWarning("<<< Exiting DeleteBlogCommentsAsync(blogComments={BlogComments})", blogComments);
     }
 
     /// <summary>
@@ -407,7 +475,9 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task InsertBlogCommentAsync(BlogComment blogComment)
     {
+		_logger.LogError(">>> Entering InsertBlogCommentAsync(blogComment={BlogComment})", blogComment);
         await _blogCommentRepository.InsertAsync(blogComment);
+		_logger.LogWarning("<<< Exiting InsertBlogCommentAsync(blogComment={BlogComment})", blogComment);
     }
 
     /// <summary>
@@ -417,7 +487,9 @@ public partial class BlogService : IBlogService
     /// <returns>A task that represents the asynchronous operation</returns>
     public virtual async Task UpdateBlogCommentAsync(BlogComment blogComment)
     {
+		_logger.LogError(">>> Entering UpdateBlogCommentAsync(blogComment={BlogComment})", blogComment);
         await _blogCommentRepository.UpdateAsync(blogComment);
+		_logger.LogWarning("<<< Exiting UpdateBlogCommentAsync(blogComment={BlogComment})", blogComment);
     }
 
     #endregion
